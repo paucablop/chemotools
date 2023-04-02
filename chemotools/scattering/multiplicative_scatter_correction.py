@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MultiplicativeSignalCorrection(BaseEstimator, TransformerMixin):
+class MultiplicativeScatterCorrection(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         reference: np.ndarray = None,
@@ -16,7 +16,7 @@ class MultiplicativeSignalCorrection(BaseEstimator, TransformerMixin):
         self.use_mean = use_mean
         self.use_median = use_median
 
-    def fit(self, X: np.ndarray, y=None) -> "MultiplicativeSignalCorrection":
+    def fit(self, X: np.ndarray, y=None) -> "MultiplicativeScatterCorrection":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 

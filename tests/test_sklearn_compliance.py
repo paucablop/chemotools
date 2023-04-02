@@ -1,13 +1,13 @@
 from sklearn.utils.estimator_checks import check_estimator
 from chemotools.derivative.savitzky_golay import SavitzkyGolay
-from chemotools.scattering import MultiplicativeSignalCorrection, StandardNormalVariate
-from chemotools.smoothing import SavitzkyGolayFilter
+from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
+from chemotools.smoothing import SavitzkyGolayFilter, WhittakerSmooth
 
 
-# MultiplicativeSignalCorrection
+# MultiplicativeScatterCorrection
 def test_compliance_multiplicative_scatter_correction():
     # Arrange
-    transformer = MultiplicativeSignalCorrection()
+    transformer = MultiplicativeScatterCorrection()
     # Act & Assert
     check_estimator(transformer)
 
@@ -29,5 +29,12 @@ def test_compliance_savitzky_golay_filter():
 def test_compliance_standard_normal_variate():
     # Arrange
     transformer = StandardNormalVariate()
+    # Act & Assert
+    check_estimator(transformer)
+
+# WhittakerSmooth
+def test_compliance_whittaker_smooth():
+    # Arrange
+    transformer = WhittakerSmooth()
     # Act & Assert
     check_estimator(transformer)

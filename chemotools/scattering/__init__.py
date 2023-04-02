@@ -1,2 +1,2 @@
-from .multiplicative_signal_correction import MultiplicativeSignalCorrection
+from .multiplicative_scatter_correction import MultiplicativeScatterCorrection
 from .standard_normal_variate import StandardNormalVariate
