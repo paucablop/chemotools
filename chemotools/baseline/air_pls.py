@@ -1,20 +1,24 @@
+import logging
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
+logger = logging.getLogger(__name__)
 
-class WhittakerSmooth(BaseEstimator, TransformerMixin):
+class AirPls(BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        lam: float = 1e2,
+        nr_iterations: int,
+        lam: int = 1e2,
         differences: int = 2,
     ):
+        self.nr_iterations = nr_iterations
         self.lam = lam
         self.differences = differences
 
-    def fit(self, X: np.ndarray, y=None) -> "WhittakerSmooth":
+    def fit(self, X: np.ndarray, y=None) -> "AirPls":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -40,18 +44,37 @@ class WhittakerSmooth(BaseEstimator, TransformerMixin):
 
         # Calculate the whittaker smooth
         for i, x in enumerate(X_):
-            X_[i] = self._calculate_whittaker_smooth(x)
-            
+            X_[i] = self._calculate_air_pls(x)
+
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _calculate_whittaker_smooth(self, x):
+    def _calculate_whittaker_smooth(self, x, w):
         x = np.asarray(x)
         n = len(x)
         D = np.diff(np.eye(n), self.differences)
-        w = np.ones(n)
-        for i in range(self.differences+1):
+        for i in range(3):
             W = np.diag(w) + 1e-8*np.eye(n)
             Z = W + self.lam * np.dot(D, D.T)
             z = np.linalg.solve(Z, w * x)
             w = np.sqrt(np.maximum(z, 0))
         return z
+
+    def _calculate_air_pls(self, x):
+        m = x.shape[0]
+        w = np.ones(m)
+
+        for i in range(self.nr_iterations):
+            z = self._calculate_whittaker_smooth(x, w)
+            d = x - z
+            dssn = np.abs(d[d<0].sum())          
+            if dssn < 0.001 * np.abs(x).sum() or i == self.nr_iterations - 1:
+                break
+
+            w[d>=0]=0
+            w[d<0] =  np.exp(i * np.abs(d[d < 0]) / dssn)
+            w[0] = np.exp(i * (d[d < 0]).max() / dssn)
+            w[-1] = w[0]
+
+        return z
+
+
