@@ -1,0 +1,40 @@
+name: Python ci
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DRY_RUN: false
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          pip install flake8 pytest build
+          if [ -f requirements.txt ]
+          then
+            pip install \
+            -r requirements.txt
+          fi
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Test with pytest
+        run: |
+          PYTHONPATH=./chemotools pytest
+      - name: Python build package
+        run: |
+          python -m build
