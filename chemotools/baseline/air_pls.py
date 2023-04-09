@@ -12,7 +12,7 @@ class AirPls(BaseEstimator, TransformerMixin):
         self,
         nr_iterations: int = 15,
         lam: int = 1e2,
-        polynomial_order: int = 2,
+        polynomial_order: int = 1,
     ):
         self.nr_iterations = nr_iterations
         self.lam = lam
@@ -66,8 +66,12 @@ class AirPls(BaseEstimator, TransformerMixin):
         for i in range(1, self.nr_iterations):
             z = self._calculate_whittaker_smooth(x, w)
             d = x - z
-            dssn = np.abs(d[d<0].sum())          
-            if dssn < 0.001 * np.abs(x).sum() or i == self.nr_iterations - 1:
+            dssn = np.abs(d[d<0].sum()) 
+
+            if dssn < 0.001 * np.abs(x).sum(): 
+                break
+                
+            if i == self.nr_iterations - 1:
                 break
 
             w[d>=0]=0
