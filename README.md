@@ -141,7 +141,7 @@ The following arguments can be set:
 - ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 5_.
 - ```polynomial_order: int```: The order of the polynomial used to fit the samples. Must be less than ```window_size```. _Default: 2_.
 - ```derivative_order: int```: The order of the derivative to compute. _Default: 1_.
-- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```'nearest'```, ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html for more information.
+- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```'nearest'```, ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See the [official documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html) for more information.
 
 Usage example:
 
@@ -162,7 +162,7 @@ The following arguments can be set:
 - ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 5_.
 - ```gap_size: int```: The number of points between the first and second points of the window. _Default: 3_.
 - ```derivative_order: int```: The order of the derivative to compute. _Default: 1_.
-- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```‘reflect’```, ```‘constant’```, ```‘nearest’```, ```‘mirror’```, ```‘wrap’```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.convolve.html for more information.
+- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```‘reflect’```, ```‘constant’```, ```‘nearest’```, ```‘mirror’```, ```‘wrap’```. See the [official documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.convolve.html) for more information.
 
 Usage example:
 
@@ -325,7 +325,7 @@ The following arguments can be set:
 
 - ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 3_.
 - ```polynomial_order: int```: The order of the polynomial used to fit the samples. Must be less than ```window_size```. _Default: 1_.
-- ```derivative_order: int```: The order of the derivative to compute. _Default: 1_. ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html for more information.
+- ```derivative_order: int```: The order of the derivative to compute. _Default: 1_. ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See the [official documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html) for more information.
 
 Usage example:
 
@@ -361,7 +361,7 @@ Mean filter is a preprocessing technique in spectroscopy that smooths the spectr
 
 The following arguments can be set:
 - ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 3_.
-- ```mode: str```: The mode parameter determines how the array borders are handled, where ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.uniform_filter1d.html for more information. _Default: ```'nearest'```_.
+- ```mode: str```: The mode parameter determines how the array borders are handled, where ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See the [official documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.uniform_filter1d.html) for more information. _Default: ```'nearest'```_.
 
 Usage example:
 
@@ -379,7 +379,7 @@ Median filter is a preprocessing technique in spectroscopy that smooths the spec
 
 The following arguments can be set:
 - ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 3_.
-- ```mode: str```: The mode parameter determines how the array borders are handled, where ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html for more information. _Default: ```'nearest'```_.
+- ```mode: str```: The mode parameter determines how the array borders are handled, where ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See the [official documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html) for more information. _Default: ```'nearest'```_.
 
 Usage example:
 
