@@ -89,8 +89,8 @@ Savitzky-Golay derivative is a preprocessing technique in spectroscopy that calc
 
 The following arguments can be set:
 
-- ```window_length```: The length of the window. Must be an odd integer number. _Default: 5_.
-- ```polynomial_order```: The order of the polynomial used to fit the samples. Must be less than ```window_length```. _Default: 2_.
+- ```window_size```: The length of the window. Must be an odd integer number. _Default: 5_.
+- ```polynomial_order```: The order of the polynomial used to fit the samples. Must be less than ```window_size```. _Default: 2_.
 - ```derivative_order```: The order of the derivative to compute. _Default: 1_.
 - ```mode```: The mode of the boundary. _Default: 'nearest'_, available options: ```'nearest'```, ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html for more information.
 
@@ -103,4 +103,24 @@ sg = SavitzkyGolay(window_size=15, polynomial_order=2, derivate_order=1)
 spectra_derivative = sg.fit_transform(spectra)
 ```
 
+![sgd](figures/sgd.png)
+
+### __William Norris derivative__
+William Norris derivative is a preprocessing technique in spectroscopy that calculates the derivative of a spectrum using finite differences.
+
+The following arguments can be set:
+
+- ```window_size```: The length of the window. Must be an odd integer number. _Default: 5_.
+- ```gap_size```: The number of points between the first and second points of the window. _Default: 3_.
+- ```derivative_order```: The order of the derivative to compute. _Default: 1_.
+- ```mode```: The mode of the boundary. _Default: 'nearest'_, available options: ```‘reflect’```, ```‘constant’```, ```‘nearest’```, ```‘mirror’```, ```‘wrap’```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.convolve.html for more information.
+
+Usage example:
+
+```python
+from chemotools.derivative import NorrisWilliams
+
+nw = NorrisWilliams(window_size=15, gap_size=3, derivative_order=1)
+spectra_derivative =   nw.fit_transform(spectra)
+```
 ![sgd](figures/sgd.png)
