@@ -1,6 +1,6 @@
 import numpy as np
 
-from chemotools.baseline import AirPls
+from chemotools.baseline import AirPls, NonNegative
 from chemotools.normalize import LNormalize, MinMaxNormalize
 from chemotools.smoothing import WhittakerSmooth
 from tests.fixtures import spectrum, reference_airpls, reference_whitakker
@@ -63,6 +63,30 @@ def test_min_norm(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / np.min(spectrum[0]), atol=1e-8)
+
+
+def test_non_negative_zeroes():
+    # Arrange
+    spectrum = np.array([[-1, 0, 1]])
+    non_negative = NonNegative(mode='zero')
+
+    # Act
+    spectrum_corrected = non_negative.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], [0, 0, 1], atol=1e-8)
+
+
+def test_non_negative_absolute():
+    # Arrange
+    spectrum = np.array([[-1, 0, 1]])
+    non_negative = NonNegative(mode='abs')
+
+    # Act
+    spectrum_corrected = non_negative.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], [1, 0, 1], atol=1e-8)
 
 
 def test_whitakker_smooth(spectrum, reference_whitakker):
