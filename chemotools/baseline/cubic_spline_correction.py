@@ -42,7 +42,7 @@ class CubicSplineCorrection(BaseEstimator, TransformerMixin):
         if self.indices is None:
             indices = [0, len(x) - 1]
         else:
-            indices = self.indices
+            indices = list(self.indices)
 
         intensity = x[indices]  
         spl = CubicSpline(indices, intensity)
