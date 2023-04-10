@@ -8,7 +8,7 @@ from chemotools.utils.check_inputs import check_input
 
 class SavitzkyGolay(BaseEstimator, TransformerMixin):
     def __init__(
-        self, window_size: int = 3, polynomial_order: int = 1, derivate_order: int = 0, mode: str = "nearest"
+        self, window_size: int = 3, polynomial_order: int = 1, derivate_order: int = 1, mode: str = "nearest"
     ) -> None:
         self.window_size = window_size
         self.polynomial_order = polynomial_order
