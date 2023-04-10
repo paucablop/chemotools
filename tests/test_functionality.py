@@ -2,9 +2,9 @@ import numpy as np
 
 from chemotools.baseline import AirPls, LinearCorrection, NonNegative
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.normalize import LNormalize, MinMaxNormalize
-from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
-from chemotools.smoothing import MeanFilter, MedianFilter, WhittakerSmooth
+from chemotools.scale import LNormalize, MinMaxNormalize
+from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
+from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from tests.fixtures import (
     spectrum,
     reference_airpls,

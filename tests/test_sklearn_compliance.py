@@ -2,9 +2,9 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline import AirPls, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.normalize import MinMaxNormalize, LNormalize
-from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
-from chemotools.smoothing import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
+from chemotools.scale import MinMaxNormalize, LNormalize
+from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
+from chemotools.smooth import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
 
 
 # AirPls
