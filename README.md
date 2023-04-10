@@ -49,7 +49,7 @@ msc = MultiplicativeScatterCorrection(reference=reference_spectrum)
 spectra_msc = msc.fit_transform(spectra)
 ```
 
-![alt text](figures/msc.png)
+![msc](figures/msc.png)
 
 
 ### __Standard normal variate__
@@ -63,3 +63,4 @@ from chemotools.scattering import StandardNormalVariate
 snv = StandardNormalVariate()
 spectra_snv = snv.fit_transform(spectra)
 ```
+![snv](figures/snv.png)
