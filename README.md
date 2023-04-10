@@ -11,7 +11,7 @@ Table of contents
         * [Multiplicative scatter correction](#multiplicative-scatter-correction)
         * [Standard normal variate](#standard-normal-variate)
         * [Extended multiplicative scatter correction](#extended-multiplicative-scatter-correction)
-   * [Derivatives](#derivatives)
+   * [Derivative](#derivatives)
         * [Savitzky-Golay derivative](#savitzky-golay-derivative)
         * [William Norris derivative](#william-norris-derivative)
    * [Baseline](#baseline)
@@ -20,7 +20,8 @@ Table of contents
         * [Cubic spline baseline correction](#cubic-spline-baseline-correction)
         * [AirPls](#alternate-iterative-reweighed-penalized-least-squares-(AIRPLS)-baseline-correction)
         * [Non-negative](#non-negative)
-   * [Normalization](#normalization)
+   * [Scale](#scale)
+        * [Min-max scaler](#minmax-scaler)
 
 <!--te-->
 
@@ -248,7 +249,7 @@ Scale is a preprocessing technique in spectroscopy that scales the spectra. The 
 - MinMaxScaler: scales each spectrum by its minimum or maximum value.
 - L-normalization: scales each spectrum by its L-norm.
 
-### __MinMaxScaler__
+### __MinMax scaler__
 MinMaxScaler is a preprocessing technique in spectroscopy that scales each spectrum by its minimum or maximum value. 
 
 The following arguments can be set:
