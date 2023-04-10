@@ -19,7 +19,7 @@ Table of contents
    * [Scatter](#scatter)
         * [Multiplicative scatter correction](#multiplicative-scatter-correction)
         * [Standard normal variate](#standard-normal-variate)
-        * [Extended multiplicative scatter correction](#extended-multiplicative-scatter-correction)
+        * [Extended multiplicative scatter correction (COMING SOON)](#extended-multiplicative-scatter-correction)
    * [Derivative](#derivatives)
         * [Savitzky-Golay derivative](#savitzky-golay-derivative)
         * [William Norris derivative](#william-norris-derivative)
