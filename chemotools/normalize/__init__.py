@@ -1,1 +1,1 @@
-from .max_norm import MaxNorm
+from .min_max_norm import MinMaxNorm

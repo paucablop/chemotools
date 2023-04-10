@@ -5,8 +5,12 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MaxNorm(BaseEstimator, TransformerMixin):
-    def fit(self, X: np.ndarray, y=None) -> "ByMax":
+class MinMaxNorm(BaseEstimator, TransformerMixin):
+    def __init__(self, norm: int = 'max'):
+        self.norm = norm
+
+
+    def fit(self, X: np.ndarray, y=None) -> "MinMaxNorm":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -32,5 +36,10 @@ class MaxNorm(BaseEstimator, TransformerMixin):
 
         # Normalize the data by the maximum value
         for i, x in enumerate(X_):
-            X_[i] = x / np.max(x)
+            if self.norm == 'max':
+                X_[i] = x / np.max(x)
+            
+            if self.norm == 'min':
+                X_[i] = x / np.min(x)
+
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
