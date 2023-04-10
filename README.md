@@ -31,7 +31,7 @@ Usage example for a single reference spectrum:
 Usage example for the mean spectrum:
 
 ```python
-from chemotools.scattering import MultiplicativeScatterCorrection
+from chemotools.scatter import MultiplicativeScatterCorrection
 
 msc = MultiplicativeScatterCorrection()
 spectra_msc = msc.fit_transform(spectra)
@@ -40,7 +40,7 @@ spectra_msc = msc.fit_transform(spectra)
 Usage example for the median spectrum:
 
 ```python
-from chemotools.scattering import MultiplicativeScatterCorrection
+from chemotools.scatter import MultiplicativeScatterCorrection
 
 msc = MultiplicativeScatterCorrection(use_median=True)
 spectra_msc = msc.fit_transform(spectra)
@@ -49,7 +49,7 @@ spectra_msc = msc.fit_transform(spectra)
 Usage example for a single reference spectrum:
 
 ```python
-from chemotools.scattering import MultiplicativeScatterCorrection
+from chemotools.scatter import MultiplicativeScatterCorrection
 
 msc = MultiplicativeScatterCorrection(reference=reference_spectrum)
 spectra_msc = msc.fit_transform(spectra)
@@ -64,7 +64,7 @@ Standard normal variate (SNV) is a preprocessing technique in spectroscopy that 
 Usage example for a single reference spectrum:
 
 ```python
-from chemotools.scattering import StandardNormalVariate
+from chemotools.scatter import StandardNormalVariate
 
 snv = StandardNormalVariate()
 spectra_snv = snv.fit_transform(spectra)
@@ -123,4 +123,26 @@ from chemotools.derivative import NorrisWilliams
 nw = NorrisWilliams(window_size=15, gap_size=3, derivative_order=1)
 spectra_derivative =   nw.fit_transform(spectra)
 ```
-![sgd](figures/sgd.png)
+![wn](figures/wn.png)
+
+## __Baseline__
+Baseline correction is a preprocessing technique in spectroscopy that corrects for baseline shifts and variations in signal intensity by subtracting a baseline from a spectrum. The following algorithms are available:
+
+- Linear baseline correction
+- Polynomial baseline correction
+- Cubic spline baseline correction
+- Alternate iterative reweighed penalized least squares (AIRPLS) baseline correction
+- Non-negative
+
+### __Linear baseline correction__
+Linear baseline correction is a preprocessing technique in spectroscopy that corrects for baseline shifts and variations in signal intensity by subtracting a linear baseline from a spectrum. The current implementation subtracts a linear baseline between the first and last point of the spectrum.
+
+Usage example:
+
+```python
+from chemotools.baseline import LinearCorrection
+
+lc = LinearCorrection()
+spectra_baseline = lc.fit_transform(spectra)
+```
+![lb](figures/lb.png)
