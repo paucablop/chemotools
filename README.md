@@ -7,6 +7,7 @@ Table of contents
 
 <!--ts-->
    * [Installation](#installation)
+   * [Integration with scikit-learn](#integration-with-scikit-learn)
    * [Scatter](#scatter)
         * [Multiplicative scatter correction](#multiplicative-scatter-correction)
         * [Standard normal variate](#standard-normal-variate)
@@ -22,6 +23,12 @@ Table of contents
         * [Non-negative](#non-negative)
    * [Scale](#scale)
         * [Min-max scaler](#minmax-scaler)
+        * [L-Norm scaler](#l-norm-scaler)
+   * [Smooth](#smooth)
+        * [Savitzky-Golay smoothing](#savitzky-golay-smoothing)
+        * [Whittaker smoother](#whittaker-smoother)
+        * [Mean filter](#mean-filter)
+        * [Median filter](#median-filter)
 
 <!--te-->
 
@@ -32,6 +39,18 @@ This package is available on PyPI and can be installed using pip:
 ```bash
 pip install chemotools
 ```
+
+## __Integration with scikit-learn__
+All preprocessing techniques in this package are compatible with ```scikit-learn``` and can be used in pipelines. For example, the following code creates a pipeline that performs multiplicative scatter correction, followed by a min-max scaling and a Savitzky-Golay smoothing:
+
+```python
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+pipeline = make_pipeline(AirPls(), MultiplicativeScatterCorrection(), StandardScaler(with_std=False)) 
+spectra_transformed = pipeline.fit_transform(spectra)
+```
+
 
 ## __Scatter__
 
