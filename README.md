@@ -105,10 +105,10 @@ Savitzky-Golay derivative is a preprocessing technique in spectroscopy that calc
 
 The following arguments can be set:
 
-- ```window_size```: The length of the window. Must be an odd integer number. _Default: 5_.
-- ```polynomial_order```: The order of the polynomial used to fit the samples. Must be less than ```window_size```. _Default: 2_.
-- ```derivative_order```: The order of the derivative to compute. _Default: 1_.
-- ```mode```: The mode of the boundary. _Default: 'nearest'_, available options: ```'nearest'```, ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html for more information.
+- ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 5_.
+- ```polynomial_order: int```: The order of the polynomial used to fit the samples. Must be less than ```window_size```. _Default: 2_.
+- ```derivative_order: int```: The order of the derivative to compute. _Default: 1_.
+- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```'nearest'```, ```'constant'```, ```'reflect'```, ```'wrap'```, ```'mirror'```, ```'interp'```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html for more information.
 
 Usage example:
 
@@ -126,10 +126,10 @@ William Norris derivative is a preprocessing technique in spectroscopy that calc
 
 The following arguments can be set:
 
-- ```window_size```: The length of the window. Must be an odd integer number. _Default: 5_.
-- ```gap_size```: The number of points between the first and second points of the window. _Default: 3_.
-- ```derivative_order```: The order of the derivative to compute. _Default: 1_.
-- ```mode```: The mode of the boundary. _Default: 'nearest'_, available options: ```‘reflect’```, ```‘constant’```, ```‘nearest’```, ```‘mirror’```, ```‘wrap’```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.convolve.html for more information.
+- ```window_size: int```: The length of the window. Must be an odd integer number. _Default: 5_.
+- ```gap_size: int```: The number of points between the first and second points of the window. _Default: 3_.
+- ```derivative_order: int```: The order of the derivative to compute. _Default: 1_.
+- ```mode: str```: The mode of the boundary. _Default: 'nearest'_, available options: ```‘reflect’```, ```‘constant’```, ```‘nearest’```, ```‘mirror’```, ```‘wrap’```. See https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.convolve.html for more information.
 
 Usage example:
 
@@ -162,3 +162,80 @@ lc = LinearCorrection()
 spectra_baseline = lc.fit_transform(spectra)
 ```
 ![lb](figures/lb.png)
+
+
+### __Polynomial baseline correction__
+Polynomial baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a polynomial to selected points of the spectrum. The selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum.
+
+The following arguments can be set:
+
+- ```order: int``` The order of the polynomial used to fit the samples. _Default: 1_.
+- ```indices: tuple``` The indices of the points to use for fitting the polynomial. _Default: (0, -1)_. At the moment the indices need to be specified manually as a tuple because ```scikit-learn``` does not support mutable attributes in ```BaseEstimator```. This tuple is transformed to a list when the ```transform``` method is called.
+
+Usage example:
+
+```python
+from chemotools.baseline import PolynomialCorrection
+
+pc = PolynomialCorrection(order=2, indices=(0, 75, 150, 200, 337))
+spectra_baseline = pc.fit_transform(spectra)
+```
+![pb](figures/pb.png)
+
+### __Cubic spline baseline correction__
+Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
+
+The following arguments can be set:
+- ```indices: tuple``` The indices of the points to use for fitting the polynomial. _Default: None_. At the moment the indices need to be specified manually as a tuple because ```scikit-learn``` does not support mutable attributes in ```BaseEstimator```. This tuple is transformed to a list when the ```transform``` method is called.
+
+Usage example:
+
+```python
+from chemotools.baseline import CubicSplineCorrection
+
+cspl = CubicSplineCorrection(indices=(0, 75, 150, 200, 337))
+spectra_baseline = cspl.fit_transform(spectra)
+```
+
+![splines](figures/splines.png)
+
+### __Alternate iterative reweighed penalized least squares (AIRPLS) baseline correction__
+It is an automated baseline correction algorithm that uses a penalized least squares approach to fit a baseline to a spectrum. The original algorithm is based on the paper by [Zhang et al.](https://pubs.rsc.org/is/content/articlelanding/2010/an/b922045c). The current implementation is based on the Python implementation by [zmzhang](https://github.com/zmzhang/airPLS).
+
+The following arguments can be set:
+- ```nr_iterations: int``` The number of iterations before exiting the algorithm. _Default: 15_.
+- ```lam: float``` smoothing factor. _Default: 1e2_.
+- ```polynomial_order: int``` The order of the polynomial used to fit the samples. _Default: 1_.
+
+Usage example:
+
+```python
+from chemotools.baseline import AirPls
+
+airpls = AirPls()
+spectra_baseline = airpls.fit_transform(spectra)
+```
+
+![airpls](figures/airpls.png)
+
+### __Non-negative__
+Non-negative baseline correction is a preprocessing technique in spectroscopy that corrects for baseline by removing negative values from a spectrum. Negative values are either replaced by 0, or set to their absolute value.
+
+The following arguments can be set:
+- ```mode: str``` If ```'zero'```, negative values are replaced by 0. If ```'abs'```, negative values are set to their absolute value. _Default: ```'zero'```.
+
+Usage example:
+
+```python
+from chemotools.baseline import NonNegative
+
+nnz = NonNegative(mode='zero')
+nna = NonNegative(mode='abs')
+spectra_nnz = nnz.fit_transform(spectra_baseline)
+spectra_nna = nna.fit_transform(spectra_baseline)
+```
+
+![nnz](figures/nnz.png)
+![nna](figures/nna.png)
+
+## __Normalization__
