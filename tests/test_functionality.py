@@ -1,6 +1,6 @@
 import numpy as np
 
-from chemotools.baseline import AirPls, NonNegative
+from chemotools.baseline import AirPls, LinearCorrection, NonNegative
 from chemotools.normalize import LNormalize, MinMaxNormalize
 from chemotools.smoothing import MeanFilter, MedianFilter, WhittakerSmooth
 from tests.fixtures import spectrum, reference_airpls, reference_whitakker
@@ -41,6 +41,18 @@ def test_l2_norm(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum_norm, atol=1e-8)
+
+
+def test_linear_correction(spectrum):
+    # Arrange
+    linear_correction = LinearCorrection()
+
+    # Act
+    spectrum_corrected = linear_correction.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum_corrected[0][0] == 0
+    assert spectrum_corrected[-1][0] == 0
 
 
 def test_max_norm(spectrum):

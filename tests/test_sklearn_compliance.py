@@ -1,6 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.baseline import AirPls, NonNegative
+from chemotools.baseline import AirPls, LinearCorrection, NonNegative
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.normalize import MinMaxNormalize, LNormalize
 from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
@@ -14,6 +14,12 @@ def test_compliance_air_pls():
     # Act & Assert
     check_estimator(transformer)
 
+# LinearCorrection
+def test_compliance_linear_correction():
+    # Arrange
+    transformer = LinearCorrection()
+    # Act & Assert
+    check_estimator(transformer)
 
 # LNormalize
 def test_compliance_l_norm():
