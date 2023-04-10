@@ -20,3 +20,12 @@ def reference_airpls() -> np.ndarray:
             os.path.join(path_to_resources, "reference_airpls.csv"), delimiter=","
         ).tolist()
     ]
+
+
+@pytest.fixture
+def reference_whitakker() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_whitakker.csv"), delimiter=","
+        ).tolist()
+    ]

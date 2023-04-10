@@ -9,7 +9,7 @@ class WhittakerSmooth(BaseEstimator, TransformerMixin):
     def __init__(
         self,
         lam: float = 1e2,
-        differences: int = 2,
+        differences: int = 1,
     ):
         self.lam = lam
         self.differences = differences
