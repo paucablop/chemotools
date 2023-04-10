@@ -5,12 +5,29 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
+class LinearCorrection(BaseEstimator, TransformerMixin):
 
-class NonNegative(BaseEstimator, TransformerMixin):
-    def __init__(self, mode: str = "zero"):
-        self.mode = mode
+    def _drift_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
 
-    def fit(self, X: np.ndarray, y=None) -> "NonNegative":
+        # Can take any array and returns with a linear baseline correction
+        # Find the x values at the edges of the spectrum
+        y1: float = x[0]
+        y2: float = x[-1]
+
+        # Find the max and min wavenumebrs
+        x1 = 0
+        x2 = len(x)
+        x_range = np.linspace(x1, x2, x2)
+
+        # Calculate the straight line initial and end point
+        slope = (y2 - y1) / (x2 - x1)
+        intercept = y1 - slope * x1
+        drift_correction = slope * x_range + intercept
+
+        # Return the drift corrected spectrum
+        return x - drift_correction
+
+    def fit(self, X: np.ndarray, y=None) -> "LinearCorrection":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -22,7 +39,7 @@ class NonNegative(BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=0, copy=True) -> np.ndarray:
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 
@@ -36,10 +53,5 @@ class NonNegative(BaseEstimator, TransformerMixin):
 
         # Calculate non-negative values
         for i, x in enumerate(X_):
-            if self.mode == "zero":
-                X_[i] = np.clip(x, a_min=0, a_max=np.inf)
-            
-            if self.mode == "abs":
-                X_[i] = np.abs(x)
-
+            X_[i, :] = self._drift_correct_spectrum(x)
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
