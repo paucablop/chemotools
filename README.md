@@ -1,4 +1,6 @@
-# Welcome to chemotools! the project where chemometric tools are integrated with ```scikit-learn```
+# Welcome to chemotools! 
+
+the project where chemometric tools are integrated with ```scikit-learn```
 
 ## __Introduction__
 
@@ -39,6 +41,8 @@ from chemotools.scattering import MultiplicativeScatterCorrection
 msc = MultiplicativeScatterCorrection(reference=reference_spectrum)
 spectra_msc = msc.fit_transform(spectra)
 ```
+
+![alt text](figures/msc.png)
 
 
 
