@@ -20,7 +20,7 @@ Table of contents
         * [Cubic spline baseline correction](#cubic-spline-baseline-correction)
         * [AirPls](#alternate-iterative-reweighed-penalized-least-squares-(AIRPLS)-baseline-correction)
         * [Non-negative](#non-negative)
-    * [Normalization](#normalization)
+   * [Normalization](#normalization)
 
 <!--te-->
 
@@ -243,4 +243,24 @@ spectra_nna = nna.fit_transform(spectra_baseline)
 ![nnz](figures/nnz.png)
 ![nna](figures/nna.png)
 
-## __Normalization__
+## __Scale__
+Scale is a preprocessing technique in spectroscopy that scales the spectra. The following algorithms are available:
+- MinMaxScaler: scales each spectrum by its minimum or maximum value.
+- L-normalization: scales each spectrum by its L-norm.
+
+### __MinMaxScaler__
+MinMaxScaler is a preprocessing technique in spectroscopy that scales each spectrum by its minimum or maximum value. 
+
+The following arguments can be set:
+- ```norm: str``` If ```'min'```, the spectrum is scaled by its minimum value. If ```'max'```, the spectrum is scaled by its maximum value. _Default: ```'max'```_.
+
+Usage example:
+
+```python
+from chemotools.scale import MinMaxScaler
+
+minmax = MinMaxScaler(norm='max')
+spectra_norm = minmax.fit_transform(spectra)
+```
+
+![minmax](figures/minmax.png)

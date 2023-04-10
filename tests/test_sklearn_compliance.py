@@ -2,7 +2,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline import AirPls, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import MinMaxNormalize, LNormalize
+from chemotools.scale import MinMaxScaler, LNormalize
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
 
@@ -52,7 +52,7 @@ def test_compliance_median_filter():
 # MinMaxNormalize
 def test_compliance_min_max_norm():
     # Arrange
-    transformer = MinMaxNormalize()
+    transformer = MinMaxScaler()
     # Act & Assert
     check_estimator(transformer)
 

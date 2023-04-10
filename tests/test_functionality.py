@@ -2,7 +2,7 @@ import numpy as np
 
 from chemotools.baseline import AirPls, LinearCorrection, NonNegative
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import LNormalize, MinMaxNormalize
+from chemotools.scale import LNormalize, MinMaxScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from tests.fixtures import (
@@ -67,7 +67,7 @@ def test_linear_correction(spectrum):
 
 def test_max_norm(spectrum):
     # Arrange
-    max_norm = MinMaxNormalize(norm="max")
+    max_norm = MinMaxScaler(norm="max")
 
     # Act
     spectrum_corrected = max_norm.fit_transform(spectrum)
@@ -104,7 +104,7 @@ def test_median_filter():
 
 def test_min_norm(spectrum):
     # Arrange
-    min_norm = MinMaxNormalize(norm="min")
+    min_norm = MinMaxScaler(norm="min")
 
     # Act
     spectrum_corrected = min_norm.fit_transform(spectrum)

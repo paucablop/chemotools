@@ -5,12 +5,12 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MinMaxNormalize(BaseEstimator, TransformerMixin):
+class MinMaxScaler(BaseEstimator, TransformerMixin):
     def __init__(self, norm: str = 'max'):
         self.norm = norm
 
 
-    def fit(self, X: np.ndarray, y=None) -> "MinMaxNormalize":
+    def fit(self, X: np.ndarray, y=None) -> "MinMaxScaler":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
