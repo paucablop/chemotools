@@ -12,7 +12,6 @@ path_to_resources = os.path.join(test_directory, "resources")
 def spectrum() -> np.ndarray:
     return [np.loadtxt(os.path.join(path_to_resources, "spectrum.csv"), delimiter=",").tolist()]
 
-
 @pytest.fixture
 def reference_airpls() -> np.ndarray:
     return [
@@ -21,6 +20,29 @@ def reference_airpls() -> np.ndarray:
         ).tolist()
     ]
 
+@pytest.fixture
+def reference_msc_mean() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_msc_mean.csv"), delimiter=","
+        ).tolist()
+    ]
+
+@pytest.fixture
+def reference_msc_median() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_msc_median.csv"), delimiter=","
+        ).tolist()
+    ]
+
+@pytest.fixture
+def reference_snv() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_snv.csv"), delimiter=","
+        ).tolist()
+    ]
 
 @pytest.fixture
 def reference_whitakker() -> np.ndarray:
@@ -29,3 +51,5 @@ def reference_whitakker() -> np.ndarray:
             os.path.join(path_to_resources, "reference_whitakker.csv"), delimiter=","
         ).tolist()
     ]
+
+

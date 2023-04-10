@@ -2,8 +2,9 @@ import numpy as np
 
 from chemotools.baseline import AirPls, LinearCorrection, NonNegative
 from chemotools.normalize import LNormalize, MinMaxNormalize
+from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smoothing import MeanFilter, MedianFilter, WhittakerSmooth
-from tests.fixtures import spectrum, reference_airpls, reference_whitakker
+from tests.fixtures import spectrum, reference_airpls, reference_msc_mean, reference_msc_median, reference_snv, reference_whitakker
 
 
 def test_air_pls(spectrum, reference_airpls):
@@ -65,7 +66,6 @@ def test_max_norm(spectrum):
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / np.max(spectrum[0]), atol=1e-8)
 
-
 def test_mean_filter():
     # Arrange
     array = np.array([[1., 2., 3., 4., 5.]])
@@ -98,6 +98,45 @@ def test_min_norm(spectrum):
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / np.min(spectrum[0]), atol=1e-8)
 
+def test_multiplicative_scatter_correction_mean(spectrum, reference_msc_mean):
+    # Arrange
+    msc = MultiplicativeScatterCorrection()
+
+    # Act
+    spectrum_corrected = msc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_msc_mean[0], atol=1e-8)
+
+def test_multiplicative_scatter_correction_with_reference(spectrum, reference_msc_mean):
+    # Arrange
+    msc = MultiplicativeScatterCorrection(reference=reference_msc_mean)
+
+    # Act
+    spectrum_corrected = msc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_msc_mean[0], atol=1e-8)
+
+def test_multiplicative_scatter_correction_median(spectrum, reference_msc_median):
+    # Arrange
+    msc = MultiplicativeScatterCorrection(use_median=True)
+
+    # Act
+    spectrum_corrected = msc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_msc_median[0], atol=1e-8)
+
+def test_multiplicative_scatter_correction_with_reference_median(spectrum, reference_msc_median):
+    # Arrange
+    msc = MultiplicativeScatterCorrection(reference=reference_msc_median, use_median=True)
+
+    # Act
+    spectrum_corrected = msc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_msc_median[0], atol=1e-8)
 
 def test_non_negative_zeroes():
     # Arrange
@@ -110,7 +149,6 @@ def test_non_negative_zeroes():
     # Assert
     assert np.allclose(spectrum_corrected[0], [0, 0, 1], atol=1e-8)
 
-
 def test_non_negative_absolute():
     # Arrange
     spectrum = np.array([[-1, 0, 1]])
@@ -122,6 +160,15 @@ def test_non_negative_absolute():
     # Assert
     assert np.allclose(spectrum_corrected[0], [1, 0, 1], atol=1e-8)
 
+def test_standard_normal_variate(spectrum, reference_snv):
+    # Arrange
+    snv = StandardNormalVariate()
+
+    # Act
+    spectrum_corrected = snv.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_snv[0], atol=1e-2)
 
 def test_whitakker_smooth(spectrum, reference_whitakker):
     # Arrange
