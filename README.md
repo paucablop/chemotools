@@ -16,6 +16,11 @@ Table of contents
         * [William Norris derivative](#william-norris-derivative)
    * [Baseline](#baseline)
         * [Linear baseline correction](#linear-baseline-correction)
+        * [Polynomial baseline correction](#polynomial-baseline-correction)
+        * [Cubic spline baseline correction](#cubic-spline-baseline-correction)
+        * [AirPls](#alternate-iterative-reweighed-penalized-least-squares-(AIRPLS)-baseline-correction)
+        * [Non-negative](#non-negative)
+    * [Normalization](#normalization)
 
 <!--te-->
 
