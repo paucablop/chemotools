@@ -2,6 +2,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline.air_pls import AirPls
 from chemotools.derivative.savitzky_golay import SavitzkyGolay
+from chemotools.normalize.max_norm import MaxNorm
 from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smoothing import SavitzkyGolayFilter, WhittakerSmooth
 
@@ -13,6 +14,12 @@ def test_compliance_air_pls():
     # Act & Assert
     check_estimator(transformer)
 
+
+def test_compliance_max_norm():
+    # Arrange
+    transformer = MaxNorm()
+    # Act & Assert
+    check_estimator(transformer)
 
 # MultiplicativeScatterCorrection
 def test_compliance_multiplicative_scatter_correction():
