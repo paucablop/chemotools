@@ -4,6 +4,13 @@ the project where chemometric tools are integrated with ```scikit-learn```
 
 ## __Introduction__
 
+## __Installation__
+This package is available on PyPI and can be installed using pip:
+
+```bash
+pip install chemotools
+```
+
 ## __Scatter__
 
 ### __Multiplicative scatter correction__
