@@ -37,6 +37,14 @@ def reference_msc_median() -> np.ndarray:
     ]
 
 @pytest.fixture
+def reference_sg_15_2() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_sg_15_2.csv"), delimiter=","
+        ).tolist()
+    ]
+
+@pytest.fixture
 def reference_snv() -> np.ndarray:
     return [
         np.loadtxt(
