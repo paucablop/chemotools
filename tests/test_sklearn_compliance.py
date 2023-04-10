@@ -1,7 +1,7 @@
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline import AirPls, NonNegative
-from chemotools.derivative import SavitzkyGolay
+from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.normalize import MinMaxNormalize, LNormalize
 from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smoothing import SavitzkyGolayFilter, WhittakerSmooth
@@ -39,12 +39,20 @@ def test_compliance_multiplicative_scatter_correction():
     check_estimator(transformer)
 
 
+# NonNegative
 def test_compliance_non_negative():
     # Arrange
     transformer = NonNegative()
     # Act & Assert
     check_estimator(transformer)
 
+
+# NorrisWilliams
+def test_compliance_norris_williams():
+    # Arrange
+    transformer = NorrisWilliams()
+    # Act & Assert
+    check_estimator(transformer)
 
 # SavitzkyGolay
 def test_compliance_savitzky_golay():
