@@ -4,7 +4,7 @@ from chemotools.baseline import AirPls, NonNegative
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.normalize import MinMaxNormalize, LNormalize
 from chemotools.scattering import MultiplicativeScatterCorrection, StandardNormalVariate
-from chemotools.smoothing import SavitzkyGolayFilter, WhittakerSmooth
+from chemotools.smoothing import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
 
 
 # AirPls
@@ -22,6 +22,20 @@ def test_compliance_l_norm():
     # Act & Assert
     check_estimator(transformer)
 
+
+# MeanFilter
+def test_compliance_mean_filter():
+    # Arrange
+    transformer = MeanFilter()
+    # Act & Assert
+    check_estimator(transformer)
+
+# MedianFilter
+def test_compliance_median_filter():
+    # Arrange
+    transformer = MedianFilter()
+    # Act & Assert
+    check_estimator(transformer)
 
 # MinMaxNormalize
 def test_compliance_min_max_norm():

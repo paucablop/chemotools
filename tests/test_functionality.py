@@ -2,7 +2,7 @@ import numpy as np
 
 from chemotools.baseline import AirPls, NonNegative
 from chemotools.normalize import LNormalize, MinMaxNormalize
-from chemotools.smoothing import WhittakerSmooth
+from chemotools.smoothing import MeanFilter, MedianFilter, WhittakerSmooth
 from tests.fixtures import spectrum, reference_airpls, reference_whitakker
 
 
@@ -53,6 +53,28 @@ def test_max_norm(spectrum):
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / np.max(spectrum[0]), atol=1e-8)
 
+
+def test_mean_filter():
+    # Arrange
+    array = np.array([[1., 2., 3., 4., 5.]])
+    mean_filter = MeanFilter(window_size=2)
+
+    # Act
+    array_corrected = mean_filter.fit_transform(array)
+
+    # Assert
+    assert np.allclose(array_corrected[0], [1, 1.5, 2.5, 3.5, 4.5], atol=1e-8)
+
+def test_median_filter():
+    # Arrange
+    array = np.array([[1., 2., 30., 4., 5.]])
+    mean_filter = MedianFilter(window_size=3)
+
+    # Act
+    array_corrected = mean_filter.fit_transform(array)
+
+    # Assert
+    assert np.allclose(array_corrected[0], [1, 2., 4., 5., 5.], atol=1e-8)
 
 def test_min_norm(spectrum):
     # Arrange
