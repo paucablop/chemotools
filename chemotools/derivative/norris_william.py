@@ -63,8 +63,8 @@ class NorrisWilliams(BaseEstimator, TransformerMixin):
 
     def _first_derivaive_kernel(self):
         array = np.zeros(self.gap_size)
-        array[0] = -1 / (self.gap_size)
-        array[-1] = 1 / (self.gap_size)
+        array[0] = 1 / (self.gap_size)
+        array[-1] = -1 / (self.gap_size)
         return array
 
     def _second_derivative_kernel(self):
