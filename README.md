@@ -2,7 +2,23 @@
 
 the project where chemometric tools are integrated with ```scikit-learn```
 
-## __Introduction__
+Table of contents
+=================
+
+<!--ts-->
+   * [Installation](#installation)
+   * [Scatter](#scatter)
+        * [Multiplicative scatter correction](#multiplicative-scatter-correction)
+        * [Standard normal variate](#standard-normal-variate)
+        * [Extended multiplicative scatter correction](#extended-multiplicative-scatter-correction)
+    * [Derivatives](#derivatives)
+        * [Savitzky-Golay derivative](#savitzky-golay-derivative)
+        * [William Norris derivative](#william-norris-derivative)
+    * [Baseline](#baseline)
+        * [Linear baseline correction](#linear-baseline-correction)
+
+<!--te-->
+
 
 ## __Installation__
 This package is available on PyPI and can be installed using pip:
