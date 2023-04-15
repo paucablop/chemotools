@@ -210,7 +210,9 @@ spectra_baseline = lc.fit_transform(spectra)
 The following arguments can be set:
 
 - ```order: int``` The order of the polynomial used to fit the samples. _Default: 1_.
-- ```indices: list``` The indices of the points to use for fitting the polynomial. _Default: None_ (✨ note this is new in version 0.0.11, in previous versions the indices had to be specified as a tuple ✨)
+- ```indices: list``` The indices of the points to use for fitting the polynomial. _Default: None_ 
+
+(✨ note this is new in version 0.0.11, in previous versions the indices had to be specified as a tuple ✨)
 
 Usage example:
 
@@ -226,7 +228,9 @@ spectra_baseline = pc.fit_transform(spectra)
 ✨ New in version 0.0.11 ✨ - Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
 
 The following arguments can be set:
-- ```indices: list``` The indices of the points to use for fitting the polynomial. _Default: None_. (✨ note this is new syntax in version 0.0.11, in previous versions the indices had to be specified as tuples ✨).
+- ```indices: list``` The indices of the points to use for fitting the polynomial. _Default: None_. 
+
+(✨ note this is new syntax in version 0.0.11, in previous versions the indices had to be specified as tuples ✨).
 
 
 Usage example:
@@ -263,7 +267,7 @@ spectra_baseline = airpls.fit_transform(spectra)
 Non-negative baseline correction is a preprocessing technique in spectroscopy that corrects for baseline by removing negative values from a spectrum. Negative values are either replaced by 0, or set to their absolute value.
 
 The following arguments can be set:
-- ```mode: str``` If ```'zero'```, negative values are replaced by 0. If ```'abs'```, negative values are set to their absolute value. _Default: ```'zero'```.
+- ```mode: str``` If ```'zero'```, negative values are replaced by 0. If ```'abs'```, negative values are set to their absolute value. _Default: ```'zero'```_.
 
 Usage example:
 
@@ -281,6 +285,10 @@ spectra_nna = nna.fit_transform(spectra_baseline)
 
 ### __Subtract reference spectrum__
 ✨ New in version 0.0.11 ✨ - Subtract reference spectrum is a preprocessing technique in spectroscopy that subtracts a reference spectrum from a target spectrum. The reference spectrum must be a single spectrum. The target spectrum can be a single spectrum or a list of spectra.
+
+The following arguments can be set:
+- ```reference: np.array``` The reference spectrum. _Default: None_. When it is set to None, the algorithm will not subtract the reference spectrum.
+
 
 Usage example:
 
