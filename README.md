@@ -1,3 +1,9 @@
+<p align="center">
+    <a href="https://pypi.org/project/chemotools">
+        <img alt="PyPI" src="https://img.shields.io/pypi/v/chemotools" />
+    </a>
+</p>
+
 ## Welcome to chemotools! 🖖 
 
 This project is an implementation of spectral preprocessing techniques integrated with the widely popular sklearn API, providing you with an easy-to-use toolkit for analyzing and manipulating your data. With this integration, you can easily apply techniques such as spectral derivative, scatter correction or baseline removal to your datasets.
