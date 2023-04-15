@@ -1,21 +1,6 @@
-<p>
-    <a href="https://pypi.org/project/chemotools">
-        <img alt="PyPI" src="https://img.shields.io/pypi/v/chemotools" />
-    </a>
-    </a>
-    <a href="https://pypi.org/project/chemotools">
-        <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/chemotools" />
-    </a>
-    <a href="https://github.com/paucablop/chemotools/blob/main/LICENSE">
-        <img alt="PyPI - License" src="https://img.shields.io/pypi/l/chemotools" />
-    </a>
-</p>
-
-
 [![pypi](https://img.shields.io/pypi/v/chemotools?style=flat-square)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools?style=flat-square)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/l/chemotools?style=flat-square)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
-
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN?style=flat-square)](https://codecov.io/github/paucablop/chemotools)
 
 ## Welcome to chemotools! 🖖 
