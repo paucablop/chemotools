@@ -6,10 +6,10 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 class CubicSplineCorrection(BaseEstimator, TransformerMixin):
-    def __init__(self, indices: tuple = None) -> None:
+    def __init__(self, indices: np.ndarray = None) -> None:
         self.indices = indices
 
-    def fit(self, X: np.ndarray, y=None) -> "CubicSplineCorrection":
+    def fit(self, X: list, y=None) -> "CubicSplineCorrection":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -18,6 +18,11 @@ class CubicSplineCorrection(BaseEstimator, TransformerMixin):
 
         # Set the fitted attribute to True
         self._is_fitted = True
+
+        if self.indices is None:
+            self.indices_ = [0, len(X[0]) - 1]
+        else:
+            self.indices_ = self.indices
 
         return self
 
@@ -39,11 +44,7 @@ class CubicSplineCorrection(BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _spline_baseline_correct(self, x: np.ndarray) -> np.ndarray:
-        if self.indices is None:
-            indices = [0, len(x) - 1]
-        else:
-            indices = list(self.indices)
-
+        indices = self.indices_
         intensity = x[indices]  
         spl = CubicSpline(indices, intensity)
         baseline = spl(range(len(x)))      
