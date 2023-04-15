@@ -1,4 +1,4 @@
-<p align="center">
+<p>
     <a href="https://pypi.org/project/chemotools">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/chemotools" />
     </a>
