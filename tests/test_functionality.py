@@ -1,6 +1,6 @@
 import numpy as np
 
-from chemotools.baseline import AirPls, LinearCorrection, NonNegative
+from chemotools.baseline import AirPls, LinearCorrection, NonNegative, SubtractReference
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import LNormalize, MinMaxScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
@@ -238,6 +238,7 @@ def test_saviszky_golay_filter_3():
     # Assert
     assert np.allclose(spectrum_corrected[0], np.ones((1, 10)), atol=1e-2)
 
+
 def test_standard_normal_variate(spectrum, reference_snv):
     # Arrange
     snv = StandardNormalVariate()
@@ -248,6 +249,25 @@ def test_standard_normal_variate(spectrum, reference_snv):
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_snv[0], atol=1e-2)
 
+def test_subtract_reference(spectrum):
+    # Arrange
+    baseline = SubtractReference(reference=spectrum)
+
+    # Act
+    spectrum_corrected = baseline.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], np.zeros(len(spectrum)), atol=1e-8)
+
+def test_subtract_reference_without_reference(spectrum):
+    # Arrange
+    baseline = SubtractReference()
+
+    # Act
+    spectrum_corrected = baseline.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum, atol=1e-8)
 
 def test_whitakker_smooth(spectrum, reference_whitakker):
     # Arrange
