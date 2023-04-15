@@ -2,6 +2,10 @@
     <a href="https://pypi.org/project/chemotools">
         <img alt="PyPI" src="https://img.shields.io/pypi/v/chemotools" />
     </a>
+    </a>
+    <a href="https://pypi.org/project/chemotools">
+        <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/chemotools" />
+    </a>
 </p>
 
 ## Welcome to chemotools! 🖖 
