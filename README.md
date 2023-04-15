@@ -6,6 +6,9 @@
     <a href="https://pypi.org/project/chemotools">
         <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/chemotools" />
     </a>
+    <a href="https://github.com/paucablop/chemotools/blob/main/LICENSE">
+        <img alt="PyPI - License" src="https://img.shields.io/pypi/l/chemotools" />
+    </a>
 </p>
 
 ## Welcome to chemotools! 🖖 
