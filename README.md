@@ -29,6 +29,7 @@ Table of contents
         * [Cubic spline baseline correction](#cubic-spline-baseline-correction)
         * [AirPls](#alternate-iterative-reweighed-penalized-least-squares-(AIRPLS)-baseline-correction)
         * [Non-negative](#non-negative)
+        * [Subtract reference spectrum](#subtract-reference-spectrum)
    * [Scale](#scale)
         * [Min-max scaler](#minmax-scaler)
         * [L-Norm scaler](#l-norm-scaler)
@@ -182,6 +183,7 @@ Baseline correction is a preprocessing technique in spectroscopy that corrects f
 - Cubic spline baseline correction
 - Alternate iterative reweighed penalized least squares (AIRPLS) baseline correction
 - Non-negative
+- Subtract reference spectrum
 
 ### __Linear baseline correction__
 Linear baseline correction is a preprocessing technique in spectroscopy that corrects for baseline shifts and variations in signal intensity by subtracting a linear baseline from a spectrum. The current implementation subtracts a linear baseline between the first and last point of the spectrum.
@@ -198,8 +200,7 @@ spectra_baseline = lc.fit_transform(spectra)
 
 
 ### __Polynomial baseline correction__
-✨ New in version 0.0.11 ✨
-Polynomial baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a polynomial to selected points of the spectrum. The selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select all the points in the spectrum to fit a polynomial of a given order. This case is often called detrending in other spectral processing software.
+✨ New in version 0.0.11 ✨ - Polynomial baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a polynomial to selected points of the spectrum. The selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select all the points in the spectrum to fit a polynomial of a given order. This case is often called detrending in other spectral processing software.
 
 The following arguments can be set:
 
@@ -217,8 +218,7 @@ spectra_baseline = pc.fit_transform(spectra)
 ![pb](figures/pb.png)
 
 ### __Cubic spline baseline correction__
-✨ New in version 0.0.11 ✨
-Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
+✨ New in version 0.0.11 ✨ - Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
 
 The following arguments can be set:
 - ```indices: tuple``` The indices of the points to use for fitting the polynomial. _Default: None_. (✨ note this is new syntax in version 0.0.11, in previous versions the indices had to be specified as tuples ✨).
@@ -274,9 +274,8 @@ spectra_nna = nna.fit_transform(spectra_baseline)
 ![nnz](figures/nnz.png)
 ![nna](figures/nna.png)
 
-### Subtract reference spectrum
-✨ New in version 0.0.11 ✨
-Subtract reference spectrum is a preprocessing technique in spectroscopy that subtracts a reference spectrum from a target spectrum. The reference spectrum must be a single spectrum. The target spectrum can be a single spectrum or a list of spectra.
+### __Subtract reference spectrum__
+✨ New in version 0.0.11 ✨ - Subtract reference spectrum is a preprocessing technique in spectroscopy that subtracts a reference spectrum from a target spectrum. The reference spectrum must be a single spectrum. The target spectrum can be a single spectrum or a list of spectra.
 
 Usage example:
 
