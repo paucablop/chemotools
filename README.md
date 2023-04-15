@@ -12,6 +12,8 @@
 </p>
 
 
+[![codecov](https://pypi.org/project/chemotools)](https://img.shields.io/pypi/v/chemotools)
+
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
 
 ## Welcome to chemotools! 🖖 
