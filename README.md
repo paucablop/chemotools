@@ -275,6 +275,7 @@ spectra_nna = nna.fit_transform(spectra_baseline)
 ![nna](figures/nna.png)
 
 ### Subtract reference spectrum
+✨ New in version 0.0.11 ✨
 Subtract reference spectrum is a preprocessing technique in spectroscopy that subtracts a reference spectrum from a target spectrum. The reference spectrum must be a single spectrum. The target spectrum can be a single spectrum or a list of spectra.
 
 Usage example:
