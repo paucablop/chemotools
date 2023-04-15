@@ -39,4 +39,6 @@ jobs:
         run: |
           python -m build
       - name: Upload coverage reports to Codecov
+        run: |
+          PYTHONPATH=./chemotools 
         uses: codecov/codecov-action@v3
