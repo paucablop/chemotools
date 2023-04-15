@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 class PolynomialCorrection(BaseEstimator, TransformerMixin):
-    def __init__(self, order: int = 1, indices: tuple = (0, -1)) -> None:
+    def __init__(self, order: int = 1, indices: list = None) -> None:
         self.order = order
         self.indices = indices
 
@@ -18,6 +18,11 @@ class PolynomialCorrection(BaseEstimator, TransformerMixin):
 
         # Set the fitted attribute to True
         self._is_fitted = True
+
+        if self.indices is None:
+            self.indices_ = range(0, len(X[0]))
+        else:
+            self.indices_ = self.indices
 
         return self
     
@@ -39,7 +44,7 @@ class PolynomialCorrection(BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
     
     def _baseline_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
-        intensity = x[list(self.indices)]
-        poly = np.polyfit(self.indices, intensity, self.order)
+        intensity = x[self.indices_]
+        poly = np.polyfit(self.indices_, intensity, self.order)
         baseline = [np.polyval(poly, i) for i in range(0, len(x))]      
         return x - baseline
