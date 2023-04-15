@@ -226,7 +226,7 @@ spectra_baseline = pc.fit_transform(spectra)
 ✨ New in version 0.0.11 ✨ - Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
 
 The following arguments can be set:
-- ```indices: tuple``` The indices of the points to use for fitting the polynomial. _Default: None_. (✨ note this is new syntax in version 0.0.11, in previous versions the indices had to be specified as tuples ✨).
+- ```indices: list``` The indices of the points to use for fitting the polynomial. _Default: None_. (✨ note this is new syntax in version 0.0.11, in previous versions the indices had to be specified as tuples ✨).
 
 
 Usage example:
