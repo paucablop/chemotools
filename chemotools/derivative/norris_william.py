@@ -50,7 +50,7 @@ class NorrisWilliams(BaseEstimator, TransformerMixin):
                 X_[i] = derivative
             return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-        if self.derivative_order == 1:
+        if self.derivative_order == 2:
             for i, x in enumerate(X_):
                 derivative = self._spectrum_second_derivative(x)
                 X_[i] = derivative
