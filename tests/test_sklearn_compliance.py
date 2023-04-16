@@ -79,6 +79,14 @@ def test_compliance_norris_williams():
     # Act & Assert
     check_estimator(transformer)
 
+# NorrisWilliams
+def test_compliance_norris_williams_2():
+    # Arrange
+    transformer = NorrisWilliams(derivative_order=2)
+    # Act & Assert
+    check_estimator(transformer)
+
+
 # PolynomialCorrection
 def test_compliance_polynomial_correction():
     # Arrange
