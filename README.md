@@ -56,15 +56,15 @@ We welcome contributions to Chemotools from anyone interested in improving the p
 
 To contribute to Chemotools, please follow these guidelines:
 
-### Reporting Bugs
+#### Reporting Bugs
 
 If you encounter a bug or unexpected behavior in Chemotools, please open an issue on the GitHub repository with a detailed description of the problem, including any error messages and steps to reproduce the issue. If possible, include sample code or data that demonstrates the problem.
 
-### Suggesting Enhancements
+#### Suggesting Enhancements
 
 If you have an idea for a new feature or enhancement for Chemotools, please open an issue on the GitHub repository with a detailed description of the proposed feature and its benefits. If possible, include example code or use cases that illustrate how the feature would be used.
 
-### Submitting Changes
+#### Submitting Changes
 
 If you'd like to contribute code changes to Chemotools, please follow these steps:
 
@@ -78,7 +78,7 @@ If you'd like to contribute code changes to Chemotools, please follow these step
 
 We will review your changes and provide feedback as soon as possible. If we request changes, please make them as quickly as possible to keep the review process moving.
 
-### Code Style
+#### Code Style
 
 Please follow the Chemotools code style and conventions when contributing code changes. Specifically:
 
@@ -86,6 +86,11 @@ Please follow the Chemotools code style and conventions when contributing code c
 - Use descriptive variable names
 - Avoid using magic numbers or hard-coded strings
 - Format your code using Black
+
+#### Codecov
+
+We use Codecov to track the test coverage of Chemotools. Please make sure that your changes do not reduce the test coverage of the package.
+
 
 ## License
 
