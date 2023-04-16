@@ -54,7 +54,7 @@ This package is available on PyPI and can be installed using pip:
 pip install chemotools
 ```
 
-## __Integration with scikit-learn ✨__
+## __Integration with scikit-learn__
 All preprocessing techniques in this package are compatible with ```scikit-learn``` and can be used in pipelines. For example, the following code creates a pipeline that performs multiplicative scatter correction, followed by a min-max scaling and a Savitzky-Golay smoothing:
 
 ```python
