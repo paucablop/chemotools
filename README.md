@@ -52,7 +52,7 @@ Check the [documentation](https://paucablop.github.io/chemotools/) for more info
 
 ## Contributing
 
-We welcome contributions to Chemotools from anyone interested in improving the package. Whether you have ideas for new features, bug reports, or just want to help improve the code, we appreciate your contributions!
+We welcome contributions to Chemotools from anyone interested in improving the package. Whether you have ideas for new features, bug reports, or just want to help improve the code, we appreciate your contributions! You are also welcome to see the [Project Board](https://github.com/users/paucablop/projects/4) to see what we are currently working on.
 
 To contribute to Chemotools, please follow these guidelines:
 
