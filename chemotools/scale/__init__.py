@@ -1,2 +1,3 @@
-from .min_max_normalize import MinMaxScaler
-from .l_normalize import LNormalize
+from .index_scaler import IndexScaler
+from .min_max_scaler import MinMaxScaler
+from .norm_scaler import NormScaler

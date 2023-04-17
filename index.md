@@ -36,6 +36,7 @@ Table of contents
         * [Non-negative](#non-negative)
         * [Subtract reference spectrum](#subtract-reference-spectrum)
    * [Scale](#scale)
+        * [Index scaler](#index-scaler)
         * [Min-max scaler](#minmax-scaler)
         * [L-Norm scaler](#l-norm-scaler)
    * [Smooth](#smooth)

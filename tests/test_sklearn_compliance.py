@@ -2,7 +2,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline import AirPls, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection, SubtractReference
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import MinMaxScaler, LNormalize
+from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
 
@@ -23,6 +23,13 @@ def test_compliance_cubic_spline_correction():
     # Act & Assert
     check_estimator(transformer)
 
+# IndexScaler
+def test_compliance_index_scaler():
+    # Arrange
+    transformer = IndexScaler()
+    # Act & Assert
+    check_estimator(transformer)
+
 # LinearCorrection
 def test_compliance_linear_correction():
     # Arrange
@@ -33,7 +40,7 @@ def test_compliance_linear_correction():
 # LNormalize
 def test_compliance_l_norm():
     # Arrange
-    transformer = LNormalize()
+    transformer = NormScaler()
     # Act & Assert
     check_estimator(transformer)
 
