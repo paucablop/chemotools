@@ -304,8 +304,28 @@ spectra_sr = sr.fit_transform(spectra)
 
 ## __Scale__
 Scale is a preprocessing technique in spectroscopy that scales the spectra. The following algorithms are available:
+- IndexScaler: scales each spectrum by the absorbance/intensity at a given index.
 - MinMaxScaler: scales each spectrum by its minimum or maximum value.
-- L-normalization: scales each spectrum by its L-norm.
+- NormScaler: scales each spectrum by its L-norm.
+
+
+### __Index scaler__
+Index scaler is a preprocessing technique in spectroscopy that scales each spectrum by the absorbance/intensity at a given index. Not that the index is not the wavenumber, but the index of the spectrum.
+
+The following arguments can be set:
+- ```index: int``` The index of the spectrum to use for scaling. _Default: ```0```_.
+
+Usage example:
+
+```python
+from chemotools.scale import IndexScaler
+
+index = IndexScaler(index=310)
+spectra_norm = index.fit_transform(spectra)
+```
+
+![index](figures/index_scaler.png)
+
 
 ### __MinMax scaler__
 MinMaxScaler is a preprocessing technique in spectroscopy that scales each spectrum by its minimum or maximum value. 
@@ -325,7 +345,7 @@ spectra_norm = minmax.fit_transform(spectra)
 ![minmax](figures/minmax.png)
 
 
-### __L-normalization__
+### __L-Norm scaler__
 L-normalization is a preprocessing technique in spectroscopy that scales each spectrum by its L-norm. 
 
 The following arguments can be set:
@@ -334,13 +354,14 @@ The following arguments can be set:
 Usage example:
 
 ```python
-from chemotools.scale import LNormalize
+from chemotools.scale import NormScaler
 
-lnorm = LNormalize(l_norm=2)
+lnorm = NormScaler(l_norm=2)
 spectra_norm = lnorm.fit_transform(spectra)
 ```
 
 ![lnorm](figures/lnorm.png)
+
 
 ## __Smooth__
 Smooth is a preprocessing technique in spectroscopy that smooths the spectra. The following algorithms are available:
