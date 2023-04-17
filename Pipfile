@@ -8,6 +8,7 @@ numpy = ">=1.24.1"
 scikit-learn = ">=1.2.0"
 pytest = "*"
 dtuprosys = "*"
+cairocffi = "*"
 
 [dev-packages]
 black = "*"

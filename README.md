@@ -3,7 +3,7 @@
 [![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
 
-# CHEMOTOOLS
+# __chemotools__
 
 Welcome to Chemotools, a Python package that integrates chemometrics with Scikit-learn.
 
