@@ -7,6 +7,8 @@
 
 Welcome to Chemotools, a Python package that integrates chemometrics with Scikit-learn.
 
+👉 Check the [documentation](https://paucablop.github.io/chemotools/) for a full description on how to use chemotools.
+
 ## Description
 
 Chemotools is a Python package that provides a collection of preprocessing tools and utilities for working with spectral data. It is built on top of popular scientific libraries and is designed to be highly modular, easy to use, and compatible with Scikit-learn transformers.
