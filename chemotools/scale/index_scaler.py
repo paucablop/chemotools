@@ -5,11 +5,12 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class LNormalize(BaseEstimator, TransformerMixin):
-    def __init__(self, l_norm: int = 2):
-        self.l_norm = l_norm
+class IndexScaler(BaseEstimator, TransformerMixin):
+    def __init__(self, index: int = 0):
+        self.index = index
 
-    def fit(self, X: np.ndarray, y=None) -> "LNormalize":
+
+    def fit(self, X: np.ndarray, y=None) -> "IndexScaler":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -31,12 +32,10 @@ class LNormalize(BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
+            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
 
-        # Normalize the data by the maximum value
+        # Scale the data by index
         for i, x in enumerate(X_):
-            X_[i] = x / np.linalg.norm(x, ord=self.l_norm)
-
+            X_[i] = x / x[self.index]
+        
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
