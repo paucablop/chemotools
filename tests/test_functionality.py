@@ -2,7 +2,7 @@ import numpy as np
 
 from chemotools.baseline import AirPls, LinearCorrection, NonNegative, SubtractReference
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import LNormalize, MinMaxScaler
+from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from tests.fixtures import (
@@ -26,11 +26,20 @@ def test_air_pls(spectrum, reference_airpls):
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-8)
 
+def test_index_scaler(spectrum):
+    # Arrange
+    index_scaler = IndexScaler(index=0)
+    reference_spectrum = [value/spectrum[0][0] for value in spectrum[0]]
+    # Act
+    spectrum_corrected = index_scaler.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
 
 def test_l1_norm(spectrum):
     # Arrange
     norm = 1
-    l1_norm = LNormalize(l_norm=norm)
+    l1_norm = NormScaler(l_norm=norm)
     spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
 
     # Act
@@ -43,7 +52,7 @@ def test_l1_norm(spectrum):
 def test_l2_norm(spectrum):
     # Arrange
     norm = 2
-    l1_norm = LNormalize(l_norm=norm)
+    l1_norm = NormScaler(l_norm=norm)
     spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
 
     # Act
