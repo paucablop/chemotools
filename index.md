@@ -111,8 +111,6 @@ msc = MultiplicativeScatterCorrection(reference=reference_spectrum)
 spectra_msc = msc.fit_transform(spectra)
 ```
 
-![msc](figures/msc.html)
-
 {% include multiplicative_signal_correction.html  %}
 
 ### __Standard normal variate__
