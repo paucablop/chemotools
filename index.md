@@ -66,6 +66,9 @@ pipeline = make_pipeline(AirPls(), MultiplicativeScatterCorrection(), StandardSc
 spectra_transformed = pipeline.fit_transform(spectra)
 ```
 
+{% include pipeline.html  %}
+
+
 
 ## __Scatter__
 
@@ -301,7 +304,7 @@ sr = SubtractReference(reference=reference_spectrum)
 spectra_sr = sr.fit_transform(spectra)
 ```
 
-{% include subtract_reference_baseline.html  %}
+{% include subtract_reference_baseline_correction.html  %}
 
 ## __Scale__
 Scale is a preprocessing technique in spectroscopy that scales the spectra. The following algorithms are available:
