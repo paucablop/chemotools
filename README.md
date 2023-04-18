@@ -7,7 +7,11 @@
 
 Welcome to Chemotools, a Python package that integrates chemometrics with Scikit-learn.
 
-👉 Check the [documentation](https://paucablop.github.io/chemotools/) for a full description on how to use chemotools.
+## Note
+
+Since I released Chemotools, I have received a fantastic response from the community. I am really happy for the interest in the project 🤗. This also means that I have received a lot of good feedback and suggestions for improvements. I have been intensively working on releasing new versions of Chemotools to address the feedback and suggestions. If you use Chemotools, make sure you are using the latest version (see installation), which will be aligned with the documentation. 
+
+👉👉 Check the [documentation](https://paucablop.github.io/chemotools/) for a full description on how to use chemotools.
 
 ## Description
 
@@ -32,6 +36,12 @@ Chemotools is distributed via PyPI and can be easily installed using pip:
 
 ```bash
 pip install chemotools
+```
+
+Upgrading to the latest version is as simple as:
+
+```bash
+pip install chemotools --upgrade
 ```
 
 ## Usage
