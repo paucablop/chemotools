@@ -57,6 +57,12 @@ This package is available on PyPI and can be installed using pip:
 pip install chemotools
 ```
 
+The package can be updated using the following command:
+
+```bash
+pip install chemotools --upgrade
+```
+
 ## __Integration with scikit-learn__
 
 ### __Working with single spectra (1D arrays)__
@@ -70,7 +76,7 @@ from chemotools.scatter import MultiplicativeScatterCorrection
 msc = MultiplicativeScatterCorrection()
 spectra_msc = msc.fit_transform(spectra.reshape(1, -1))
 ```
-The ```.reshape(1, -1)``` method is applied to the 1D array spectra, which is converted into a 2D array with a single row.
+The ```.reshape(1, -1)``` method is applied to the 1D array ```spectra```, which is converted into a 2D array with a single row.
 
 
 ### Pipelines integration with scikit-learn
