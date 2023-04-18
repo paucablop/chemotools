@@ -124,7 +124,7 @@ from chemotools.scatter import StandardNormalVariate
 snv = StandardNormalVariate()
 spectra_snv = snv.fit_transform(spectra)
 ```
-![snv](figures/snv.png)
+{% include standard_normal_variate.html  %}
 
 
 ### __Extended multiplicative scatter correction__
@@ -158,7 +158,7 @@ sg = SavitzkyGolay(window_size=15, polynomial_order=2, derivate_order=1)
 spectra_derivative = sg.fit_transform(spectra)
 ```
 
-![sgd](figures/sgd.png)
+{% include savitzky_golay_derivative.html  %}
 
 ### __William Norris derivative__
 William Norris derivative is a preprocessing technique in spectroscopy that calculates the derivative of a spectrum using finite differences.
@@ -178,7 +178,9 @@ from chemotools.derivative import NorrisWilliams
 nw = NorrisWilliams(window_size=15, gap_size=3, derivative_order=1)
 spectra_derivative =   nw.fit_transform(spectra)
 ```
-![wn](figures/wn.png)
+
+{% include norris_williams_derivative.html  %}
+
 
 ## __Baseline__
 Baseline correction is a preprocessing technique in spectroscopy that corrects for baseline shifts and variations in signal intensity by subtracting a baseline from a spectrum. The following algorithms are available:
@@ -201,7 +203,7 @@ from chemotools.baseline import LinearCorrection
 lc = LinearCorrection()
 spectra_baseline = lc.fit_transform(spectra)
 ```
-![lb](figures/lb.png)
+{% include linear_baseline_correction.html  %}
 
 
 ### __Polynomial baseline correction__
@@ -222,7 +224,7 @@ from chemotools.baseline import PolynomialCorrection
 pc = PolynomialCorrection(order=2, indices=[0, 75, 150, 200, 337])
 spectra_baseline = pc.fit_transform(spectra)
 ```
-![pb](figures/pb.png)
+{% include polynomial_baseline_correction.html  %}
 
 ### __Cubic spline baseline correction__
 ✨ New in version 0.0.11 ✨ - Cubic spline baseline correction is a preprocessing technique in spectroscopy that approximates a baseline by fitting a cubic spline to selected points of the spectrum. Similar to the ```PolynomialCorrection```, the selected points often correspond to minima in the spectra, and are selected by their index (not by the wavenumber). If no points are selected, the algorithm will select the first and last point of the spectrum. 
@@ -242,7 +244,7 @@ cspl = CubicSplineCorrection(indices=[0, 75, 150, 200, 337])
 spectra_baseline = cspl.fit_transform(spectra)
 ```
 
-![splines](figures/splines.png)
+{% include cubic_spline_baseline_correction.html  %}
 
 ### __Alternate iterative reweighed penalized least squares (AIRPLS) baseline correction__
 It is an automated baseline correction algorithm that uses a penalized least squares approach to fit a baseline to a spectrum. The original algorithm is based on the paper by [Zhang et al.](https://pubs.rsc.org/is/content/articlelanding/2010/an/b922045c). The current implementation is based on the Python implementation by [zmzhang](https://github.com/zmzhang/airPLS).
@@ -261,7 +263,7 @@ airpls = AirPls()
 spectra_baseline = airpls.fit_transform(spectra)
 ```
 
-![airpls](figures/airpls.png)
+{% include airpls_baseline_correction.html  %}
 
 ### __Non-negative__
 Non-negative baseline correction is a preprocessing technique in spectroscopy that corrects for baseline by removing negative values from a spectrum. Negative values are either replaced by 0, or set to their absolute value.
@@ -280,8 +282,8 @@ spectra_nnz = nnz.fit_transform(spectra_baseline)
 spectra_nna = nna.fit_transform(spectra_baseline)
 ```
 
-![nnz](figures/nnz.png)
-![nna](figures/nna.png)
+{% include non_negative_zero_baseline_correction.html  %}
+{% include non_negative_abs_baseline_correction.html  %}
 
 ### __Subtract reference spectrum__
 ✨ New in version 0.0.11 ✨ - Subtract reference spectrum is a preprocessing technique in spectroscopy that subtracts a reference spectrum from a target spectrum. The reference spectrum must be a single spectrum. The target spectrum can be a single spectrum or a list of spectra.
@@ -299,7 +301,7 @@ sr = SubtractReference(reference=reference_spectrum)
 spectra_sr = sr.fit_transform(spectra)
 ```
 
-![sr](figures/subtract_reference.png)
+{% include subtract_reference_baseline.html  %}
 
 ## __Scale__
 Scale is a preprocessing technique in spectroscopy that scales the spectra. The following algorithms are available:
@@ -323,7 +325,7 @@ index = IndexScaler(index=310)
 spectra_norm = index.fit_transform(spectra)
 ```
 
-![index](figures/index_scaler.png)
+{% include index_scaler.html  %}
 
 
 ### __MinMax scaler__
@@ -341,7 +343,7 @@ minmax = MinMaxScaler(norm='max')
 spectra_norm = minmax.fit_transform(spectra)
 ```
 
-![minmax](figures/minmax.png)
+{% include min_max_normalization.html  %}
 
 
 ### __L-Norm scaler__
@@ -359,7 +361,7 @@ lnorm = NormScaler(l_norm=2)
 spectra_norm = lnorm.fit_transform(spectra)
 ```
 
-![lnorm](figures/lnorm.png)
+{% include l_norm_normalization.html  %}
 
 
 ## __Smooth__
@@ -387,7 +389,7 @@ sgf = SavitzkyGolayFilter(window_size=15, polynomial_order=2)
 spectra_norm = sgf.fit_transform(spectra)
 ```
 
-![sgf](figures/sgf.png)
+{% include savitzky_golay_smoothing.html  %}
 
 ### __Whittaker smoother__
 It is an automated smoothing algorithm that uses a penalized least squares approach to iteratively apply a smoothing operation to the data  by minimizing a penalty function that balances the degree of smoothness and the fidelity to the original data.
@@ -405,7 +407,7 @@ wtk = WhittakerSmooth(lam=10)
 spectra_norm = wtk.fit_transform(spectra)
 ```
 
-![wtk](figures/wtk.png)
+{% include whittaker_smoothing.html  %}
 
 ### __Mean filter__
 Mean filter is a preprocessing technique in spectroscopy that smooths the spectra by applying a mean filter. The current implementation is based on the ```scipy.ndimage.uniform_filter``` function.
@@ -423,7 +425,7 @@ mean_filter = MeanFilter()
 spectra_norm = mean_filter.fit_transform(spectra)
 ```
 
-![mean_filter](figures/mean_filter.png)
+{% include mean_smoothing.html  %}
 
 ### __Median filter__
 Median filter is a preprocessing technique in spectroscopy that smooths the spectra by applying a median filter. The current implementation is based on the ```scipy.ndimage.median_filter``` function.
@@ -441,4 +443,4 @@ median_filter = MedianFilter()
 spectra_norm = median_filter.fit_transform(spectra)
 ```
 
-![median_filter](figures/median_filter.png)
+{% include median_smoothing.html  %}
