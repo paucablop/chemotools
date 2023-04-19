@@ -495,3 +495,24 @@ spectra_rcbi = rcbi.fit_transform(spectra)
 ```
 
 {% include range_cut_by_index.html  %}
+
+### __Range cut by wavenumber__
+Range cut by wavenumber is a preprocessing technique in spectroscopy that selects all the variables in the spectra given a range of two wavenumbers. 
+
+The following arguments can be set:
+- ```wavenumbers: array-like``` The wavenumbers of the spectra. _Default: ```None```_.
+- ```start: float``` The wavenumber of the first variable to select. _Default: ```0```_.
+- ```end: float``` The wavenumber of the last variable to select. _Default: ```-1```_.
+
+Note that once instanciated, the ```RangeCutByWavenumber``` object will store the indices of the selected variables. This is useful when the same range of wavenumbers is used to select variables in different spectra.
+
+Usage example:
+
+```python
+from chemotools.variable_selection import RangeCutByWavenumber
+
+rcbw = RangeCutByWavenumber(wn, 950, 1100)
+spectra_rcbw = rcbw.fit_transform(spectra)
+```
+
+{% include range_cut_by_wavenumber.html  %}
