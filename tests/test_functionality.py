@@ -5,7 +5,7 @@ from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.variable_selection import RangeCutByIndex
+from chemotools.variable_selection import RangeCutByIndex, RangeCutByWavenumber
 from tests.fixtures import (
     spectrum,
     reference_airpls,
@@ -227,6 +227,30 @@ def test_range_cut_by_index(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][:10], atol=1e-8)
+
+def test_range_cut_by_wavenumber():
+    # Arrange
+    wavenumbers = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
+    range_cut = RangeCutByWavenumber(wavenumbers, start=2.5, end=7.9)
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
+
+def test_range_cut_by_wavenumber_2():
+    # Arrange
+    wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
+    range_cut = RangeCutByWavenumber(wavenumbers, start=2.5, end=7.9)
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
 
 def test_savizky_golay_filter_1(spectrum, reference_sg_15_2):
     # Arrange

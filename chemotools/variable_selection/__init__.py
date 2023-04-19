@@ -1,1 +1,2 @@
 from .range_cut_by_index import RangeCutByIndex
+from .range_cut_by_wavenumber import RangeCutByWavenumber
