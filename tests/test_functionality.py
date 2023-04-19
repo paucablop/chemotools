@@ -5,6 +5,7 @@ from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
+from chemotools.variable_selection import RangeCutByIndex
 from tests.fixtures import (
     spectrum,
     reference_airpls,
@@ -206,6 +207,26 @@ def test_norris_williams_filter_1():
     # Assert
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
 
+def test_norris_williams_filter_2():
+    # Arrange
+    norris_williams_filter = NorrisWilliams(derivative_order=2)
+    array = np.ones((1, 10)).reshape(1, -1)
+
+    # Act
+    spectrum_corrected = norris_williams_filter.fit_transform(array)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
+
+def test_range_cut_by_index(spectrum):
+    # Arrange
+    range_cut = RangeCutByIndex(start=0, end=10)
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0][:10], atol=1e-8)
 
 def test_savizky_golay_filter_1(spectrum, reference_sg_15_2):
     # Arrange
