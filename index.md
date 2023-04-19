@@ -46,6 +46,8 @@ Table of contents
         * [Whittaker smoother](#whittaker-smoother)
         * [Mean filter](#mean-filter)
         * [Median filter](#median-filter)
+   * [Variable Selection](#variable-selection)
+        * [Range cut by index](#range-cut-by-index)
 
 <!--te-->
 
@@ -471,3 +473,25 @@ spectra_norm = median_filter.fit_transform(spectra)
 ```
 
 {% include median_smoothing.html  %}
+
+## __Variable selection__
+Variable selection is a preprocessing technique in spectroscopy that selects the most relevant variables. The following algorithms are available:
+- Range cut by index
+
+### __Range cut by index__
+Range cut by index is a preprocessing technique in spectroscopy that selects all the variables in the spectra given a range of two indices.
+
+The following arguments can be set:
+- ```start: int``` The index of the first variable to select. _Default: ```0```_.
+- ```end: int``` The index of the last variable to select. _Default: ```-1```_.
+
+Usage example:
+
+```python
+from chemotools.variable_selection import RangeCutByIndex
+
+rcbi = RangeCutByIndex(10, 200)
+spectra_rcbi = rcbi.fit_transform(spectra)
+```
+
+{% include range_cut_by_index.html  %}
