@@ -10,8 +10,8 @@ class ConstantBaselineCorrection(BaseEstimator, TransformerMixin):
         self, wavenumbers: np.ndarray = None, start: int = 0, end: int = 1
     ) -> None:
         self.wavenumbers = wavenumbers
-        self.start = start if not wavenumbers else self._find_index(start)
-        self.end = end if not wavenumbers else self._find_index(end)
+        self.start = self._find_index(start)
+        self.end = self._find_index(end)
 
     def fit(self, X: np.ndarray, y=None) -> "ConstantBaselineCorrection":
         # Check that X is a 2D array and has only finite values
@@ -41,7 +41,7 @@ class ConstantBaselineCorrection(BaseEstimator, TransformerMixin):
 
         # Base line correct the spectra
         for i, x in enumerate(X_):
-            mean_baseline = np.mean(x[self.start : self.end])
+            mean_baseline = np.mean(x[self.start : self.end+1])
             X_[i, :] = x - mean_baseline
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
