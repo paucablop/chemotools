@@ -1,6 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.baseline import AirPls, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection, SubtractReference
+from chemotools.baseline import AirPls, ConstantBaselineCorrection, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection, SubtractReference
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
@@ -14,6 +14,13 @@ from tests.fixtures import spectrum
 def test_compliance_air_pls():
     # Arrange
     transformer = AirPls()
+    # Act & Assert
+    check_estimator(transformer)
+
+# ConstantBaselineCorrection
+def test_compliance_constant_baseline_correction():
+    # Arrange
+    transformer = ConstantBaselineCorrection()
     # Act & Assert
     check_estimator(transformer)
 
