@@ -5,15 +5,18 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class RangeCutByIndex(BaseEstimator, TransformerMixin):
+class RangeCut(BaseEstimator, TransformerMixin):
     def __init__(
         self,
+        wavenumbers: np.ndarray = None,
         start: int = 0,
         end: int = -1,
     ):
-        self.start = start
-        self.end = end
-    def fit(self, X: np.ndarray, y=None) -> "RangeCutByIndex":
+        self.wavenumbers = wavenumbers
+        self.start = self._find_index(start)
+        self.end = self._find_index(end)
+
+    def fit(self, X: np.ndarray, y=None) -> "RangeCut":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -35,7 +38,15 @@ class RangeCutByIndex(BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Range cut the spectra
         return X_[:, self.start : self.end]
+
+    def _find_index(self, target: float) -> int:
+        if self.wavenumbers is None:
+            return target
+        wavenumbers = np.array(self.wavenumbers)
+        return np.argmin(np.abs(wavenumbers - target))

@@ -5,7 +5,7 @@ from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
 from chemotools.smooth import MeanFilter, MedianFilter, SavitzkyGolayFilter, WhittakerSmooth
-from chemotools.variable_selection import RangeCutByIndex, RangeCutByWavenumber
+from chemotools.variable_selection import RangeCut
 
 from tests.fixtures import spectrum
 
@@ -130,15 +130,10 @@ def test_compliance_standard_normal_variate():
     # Act & Assert
     check_estimator(transformer)
 
-def test_compliance_range_cut_by_index():
+# RangeCut
+def test_compliance_range_cut():
     # Arrange
-    transformer = RangeCutByIndex()
-    # Act & Assert
-    check_estimator(transformer)
-
-def test_compliance_range_cut_by_wavenumber():
-    # Arrange
-    transformer = RangeCutByWavenumber()
+    transformer = RangeCut()
     # Act & Assert
     check_estimator(transformer)
 
