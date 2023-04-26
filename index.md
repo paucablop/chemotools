@@ -28,7 +28,7 @@ data science
 
 # __Welcome to chemotools 🖖__
 
-- [Wellcome](#the-chemotools-project!)
+- [Welcome](#the-chemotools-project!)
 - [Installation](#installation) 
 
 
