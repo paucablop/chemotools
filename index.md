@@ -8,10 +8,22 @@ nav_order: 1
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
-[![Documentation Status](https://readthedocs.org/projects/chemotools/badge/?version=latest)](https://chemotools.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://travis-ci.com/paucablop/chemotools.svg?branch=main)](https://travis-ci.c
 
-Scikit-learn {: .label .label-yellow } Chemometrics {: .label .label-yellow } Spectroscopy {: .label .label-yellow } Spectral preprocessing {: .label .label-yellow } Machine learning {: .label .label-yellow } Data analysis {: .label .label-yellow } Python {: .label .label-yellow }
+
+Scikit-learn 
+{: .label .label-yellow } 
+Chemometrics 
+{: .label .label-yellow } 
+Spectroscopy 
+{: .label .label-yellow } 
+Spectral preprocessing 
+{: .label .label-yellow } 
+Machine learning 
+{: .label .label-yellow } 
+Data analysis 
+{: .label .label-yellow } 
+Python 
+{: .label .label-yellow }
 
 [Checkout in Github](https://github.com/paucablop/chemotools){: .btn .btn-blue }
 
