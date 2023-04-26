@@ -1,5 +1,13 @@
-title: CHEMOTOOLS
-description: Chemotools integrates chemometrics with scikit-learn
-show_downloads: true
-google_analytics:
-theme: jekyll-theme-cayman
+title: chemotools
+description: Chemotools integrates chemometrics with sklearn
+theme: just-the-docs
+
+markdown: kramdown
+kramdown:
+  parse_block_html: true
+
+
+url: https://just-the-docs.github.io
+
+aux_links:
+  Template Repository: https://github.com/just-the-docs/just-the-docs-template
