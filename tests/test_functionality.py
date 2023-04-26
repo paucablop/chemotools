@@ -245,7 +245,7 @@ def test_norris_williams_filter_2():
 
 def test_range_cut_by_index(spectrum):
     # Arrange
-    range_cut = RangeCutByIndex(start=0, end=10)
+    range_cut = RangeCutByWavenumber(start=0, end=10)
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
