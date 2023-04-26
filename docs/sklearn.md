@@ -41,7 +41,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from chemotools.baseline import AirPls
-fom chemotools.scatter import MultiplicativeScatterCorrection
+from chemotools.scatter import MultiplicativeScatterCorrection
 from chemotools.smooth import WhittakerSmooth
 
 pipeline = make_pipeline(
