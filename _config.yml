@@ -2,6 +2,9 @@ title: chemotools
 description: Chemotools integrates chemometrics with sklearn
 theme: just-the-docs
 
+# logo
+logo: "/assets/images/logo.png"
+
 markdown: kramdown
 kramdown:
   parse_block_html: true
