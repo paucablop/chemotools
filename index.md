@@ -4,6 +4,14 @@ layout: home
 nav_order: 1
 ---
 
+[![pypi](https://img.shields.io/pypi/v/chemotools)](https://pypi.org/project/chemotools)
+---
+[![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
+title: Home
+[![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
+layout: home
+[![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
+
 # __Welcome to chemotools 🖖__
 
 This project is an implementation of spectral preprocessing techniques integrated with the widely popular sklearn API, providing you with an easy-to-use toolkit for analyzing and manipulating your data. With this integration, you can easily apply techniques such as spectral derivative, scatter correction or baseline removal to your datasets.
