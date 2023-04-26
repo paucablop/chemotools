@@ -10,20 +10,17 @@ nav_order: 1
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
 
 
-Scikit-learn 
+scikit-learn 
 {: .label .label-yellow } 
-Chemometrics 
+chemometrics 
 {: .label .label-yellow } 
-Spectroscopy 
+spectroscopy 
 {: .label .label-yellow } 
-Spectral preprocessing 
+machine learning 
 {: .label .label-yellow } 
-Machine learning 
+data science 
 {: .label .label-yellow } 
-Data analysis 
-{: .label .label-yellow } 
-Python 
-{: .label .label-yellow }
+
 
 [Checkout in Github](https://github.com/paucablop/chemotools){: .btn .btn-blue }
 
