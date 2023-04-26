@@ -9,7 +9,7 @@ Variable selection is a preprocessing technique in spectroscopy that selects the
 - [Range cut](#range-cut)
 - [SelectFeatures](#range-cut-by-wavenumber)
 
-## __Range cut __
+## __Range cut__
 Range cut by index is a preprocessing technique in spectroscopy that selects all the variables in the spectra given a range of either two indices or two wavenumbers.
 
 ### __Arguments__:
@@ -27,7 +27,7 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 
 ### __Usage examples__:
 
-#### Case 1: Range cut by index
+#### __Case 1: Range cut by index__
 
 ```python
 from chemotools.variable_selection import RangeCut
@@ -36,7 +36,7 @@ rcbi = RangeCut(0, 200)
 spectra_rcbi = rcbi.fit_transform(spectra)
 ```
 
-#### Case 2: Range cut by wavenumbers
+#### __Case 2: Range cut by wavenumbers__
 
 
 ```python
