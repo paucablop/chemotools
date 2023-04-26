@@ -7,10 +7,10 @@ nav_order: 1
 [![pypi](https://img.shields.io/pypi/v/chemotools)](https://pypi.org/project/chemotools)
 ---
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
-title: Home
 [![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
-layout: home
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
+
+[Github](https://github.com/paucablop/chemotools){: .btn .btn-blue }
 
 # __Welcome to chemotools 🖖__
 
