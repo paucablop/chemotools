@@ -4,7 +4,7 @@ layout: home
 nav_order: 1
 ---
 
-![banner](assets/images/logo_2.svg)
+![banner](assets/images/logo_2.png)
 
 [![pypi](https://img.shields.io/pypi/v/chemotools)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
