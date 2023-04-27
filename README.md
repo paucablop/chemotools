@@ -1,3 +1,6 @@
+![chemotools](assets/images/logo_2.png)
+
+
 [![pypi](https://img.shields.io/pypi/v/chemotools)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
