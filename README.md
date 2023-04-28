@@ -5,6 +5,7 @@
 [![pypi](https://img.shields.io/pypi/pyversions/chemotools)](https://pypi.org/project/chemotools)
 [![pypi](https://img.shields.io/pypi/l/chemotools)](https://github.com/paucablop/chemotools/blob/main/LICENSE)
 [![codecov](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
+[![Downloads](https://static.pepy.tech/badge/chemotools)](https://pepy.tech/project/chemotools)
 
 # __chemotools__
 
