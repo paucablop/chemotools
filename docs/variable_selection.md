@@ -21,7 +21,7 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 | ```end``` | If not ```wavenumbers```, end corresponds to the last index. If the ```wavenumbers``` are provided, then it correpsonds to the last wavenumber. | ```float``` | ```-1``` |
     
 {: .warning }
-> The ```wavenumbers``` vector myst be sorted in ascending order.
+> The ```wavenumbers``` vector must be sorted in ascending order.
 
 {: .note }
 
