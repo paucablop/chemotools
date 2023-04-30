@@ -10,7 +10,7 @@ Baseline correction is a preprocessing technique in spectroscopy that corrects f
 - [Linear baseline correction](#linear-baseline-correction)
 - [Polynomial baseline correction](#polynomial-baseline-correction)
 - [Cubic spline baseline correction](#cubic-spline-baseline-correction)
-- [Alternate iterative reweighed penalized least squares baseline correction (AirPLS)](##alternate-iterative-reweighed-penalized-least-squares-baseline-correction-airpls)
+- [Alternate iterative reweighed penalized least squares baseline correction (AirPLS)](#alternate-iterative-reweighed-penalized-least-squares-baseline-correction-airpls)
 - [Non-negative](#non-negative)
 - [Subtract reference spectrum](#subtract-reference-spectrum)
 - [Constant baseline correction](#constant-baseline-correction)
