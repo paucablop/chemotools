@@ -1,7 +1,7 @@
 ---
 title: Docs
 layout: page
-nav_order: 2
+nav_order: 3
 has_children: true
 permalink: /docs/
 ---
