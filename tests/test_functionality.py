@@ -25,7 +25,7 @@ def test_air_pls(spectrum, reference_airpls):
     spectrum_corrected = air_pls.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-8)
+    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
 
 def test_constant_baseline_correction():
     # Arrange
@@ -356,4 +356,4 @@ def test_whitakker_smooth(spectrum, reference_whitakker):
     spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-2)
+    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)

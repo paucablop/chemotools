@@ -1,11 +1,19 @@
 import logging
 import numpy as np
+from scipy.sparse import csc_matrix, eye, diags
+from scipy.sparse.linalg import spsolve
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
+
+# This code is adapted from the following source:
+# Z.-M. Zhang, S. Chen, and Y.-Z. Liang,
+# Baseline correction using adaptive iteratively reweighted penalized least squares.
+# Analyst 135 (5), 1138-1146 (2010).P
+
 
 class AirPls(BaseEstimator, TransformerMixin):
     def __init__(
@@ -40,7 +48,9 @@ class AirPls(BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the air pls smooth
         for i, x in enumerate(X_):
@@ -49,15 +59,16 @@ class AirPls(BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _calculate_whittaker_smooth(self, x, w):
-        x = np.asarray(x)
-        n = len(x)
-        D = np.diff(np.eye(n), self.polynomial_order)
+        X = np.matrix(x)
+        m = X.size
+        E = eye(m, format="csc")
         for i in range(self.polynomial_order):
-            W = np.diag(w) + 1e-8*np.eye(n)
-            Z = W + self.lam * np.dot(D, D.T)
-            z = np.linalg.solve(Z, w * x)
-            w = np.sqrt(np.maximum(z, 0))
-        return z
+            E = E[1:] - E[:-1]
+        W = diags(w, 0, shape=(m, m))
+        A = csc_matrix(W + (self.lam * E.T * E))
+        B = csc_matrix(W * X.T)
+        background = spsolve(A, B)
+        return np.array(background)
 
     def _calculate_air_pls(self, x):
         m = x.shape[0]
@@ -66,16 +77,16 @@ class AirPls(BaseEstimator, TransformerMixin):
         for i in range(1, self.nr_iterations):
             z = self._calculate_whittaker_smooth(x, w)
             d = x - z
-            dssn = np.abs(d[d<0].sum()) 
+            dssn = np.abs(d[d < 0].sum())
 
-            if dssn < 0.001 * np.abs(x).sum(): 
+            if dssn < 0.001 * np.abs(x).sum():
                 break
-                
+
             if i == self.nr_iterations - 1:
                 break
 
-            w[d>=0]=0
-            w[d<0] =  np.exp(i * np.abs(d[d < 0]) / dssn)
+            w[d >= 0] = 0
+            w[d < 0] = np.exp(i * np.abs(d[d < 0]) / dssn)
 
             negative_d = d[d < 0]
             if negative_d.size > 0:
@@ -84,5 +95,3 @@ class AirPls(BaseEstimator, TransformerMixin):
             w[-1] = w[0]
 
         return z
-
-
