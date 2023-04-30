@@ -6,6 +6,11 @@ from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
+# This code is adapted from the following source:
+# Z.-M. Zhang, S. Chen, and Y.-Z. Liang, 
+# Baseline correction using adaptive iteratively reweighted penalized least squares. 
+# Analyst 135 (5), 1138-1146 (2010).
+
 
 class WhittakerSmooth(BaseEstimator, TransformerMixin):
     def __init__(
@@ -54,9 +59,7 @@ class WhittakerSmooth(BaseEstimator, TransformerMixin):
         E = eye(m, format="csc")
         w = np.ones(m)
         for i in range(self.differences):
-            E = (
-                E[1:] - E[:-1]
-            ) 
+            E = E[1:] - E[:-1]
         W = diags(w, 0, shape=(m, m))
         A = csc_matrix(W + (self.lam * E.T * E))
         B = csc_matrix(W * X.T)
