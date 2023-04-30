@@ -9,6 +9,11 @@ from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
 
+# This code is adapted from the following source:
+# Z.-M. Zhang, S. Chen, and Y.-Z. Liang,
+# Baseline correction using adaptive iteratively reweighted penalized least squares.
+# Analyst 135 (5), 1138-1146 (2010).P
+
 
 class AirPls(BaseEstimator, TransformerMixin):
     def __init__(
@@ -72,16 +77,16 @@ class AirPls(BaseEstimator, TransformerMixin):
         for i in range(1, self.nr_iterations):
             z = self._calculate_whittaker_smooth(x, w)
             d = x - z
-            dssn = np.abs(d[d<0].sum()) 
+            dssn = np.abs(d[d < 0].sum())
 
-            if dssn < 0.001 * np.abs(x).sum(): 
+            if dssn < 0.001 * np.abs(x).sum():
                 break
-                
+
             if i == self.nr_iterations - 1:
                 break
 
-            w[d>=0]=0
-            w[d<0] =  np.exp(i * np.abs(d[d < 0]) / dssn)
+            w[d >= 0] = 0
+            w[d < 0] = np.exp(i * np.abs(d[d < 0]) / dssn)
 
             negative_d = d[d < 0]
             if negative_d.size > 0:
