@@ -27,7 +27,7 @@ data science
 [Checkout in Github](https://github.com/paucablop/chemotools){: .btn .btn-blue }
 [Read the Docs](https://paucablop.github.io/chemotools/docs/){: .btn .btn-blue }
 [Install from PyPI](https://pypi.org/project/chemotools/){: .btn .btn-blue }
-[Get started](https://pypi.org/project/chemotools/get-started/){: .btn .btn-blue }
+[Get started](https://paucablop.github.io/chemotools/get-started/){: .btn .btn-blue }
 
 # __Welcome to chemotools__
 

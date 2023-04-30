@@ -1,8 +1,8 @@
 ---
 title: Scikit learn integration
 layout: default
-parent: Docs
-nav_order: 1
+parent: Get Started
+nav_order: 2
 ---
 
 
