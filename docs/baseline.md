@@ -164,6 +164,9 @@ Constant baseline correction is a preprocessing technique in spectroscopy that c
 | ```start``` | The start index of the region to use for calculating the mean. If no wavenumbers are provided, it will take the index of the spectrum. If wavenumbers are provided it will take the index corresponding to the wavenumber | ```int``` | ```0``` |
 | ```end``` | The end index of the region to use for calculating the mean. If no wavenumbers are provided, it will take the index of the spectrum. If wavenumbers are provided it will take the index corresponding to the wavenumber| ```int``` | ```1``` |
 
+{: .warning }
+> The ```wavenumbers``` vector must be sorted in ascending order.
+
 ### __Usage example__:
 
 #### __Case 1: No wavenumbers provided__
