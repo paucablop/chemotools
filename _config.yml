@@ -3,9 +3,9 @@ description: Chemotools integrates chemometrics with sklearn
 theme: just-the-docs
 
 # logo
-logo: "/assets/images/logo_2.png"
+logo: "/assets/images/logo_5.png"
 
-favicon_ico: "/assets/images/icon_2.bmp"
+favicon_ico: "/assets/images/icon_3.bmp"
 
 markdown: kramdown
 kramdown:
