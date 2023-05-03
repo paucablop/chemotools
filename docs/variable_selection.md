@@ -23,8 +23,6 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 {: .warning }
 > The ```wavenumbers``` vector must be sorted in ascending order.
 
-{: .note }
-
 ### __Usage examples__:
 
 #### __Case 1: Range cut by index__
