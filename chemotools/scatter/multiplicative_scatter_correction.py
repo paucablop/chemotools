@@ -33,7 +33,7 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
     ValueError
         If no reference is provided.
     
-    """"
+    """
     def __init__(
         self,
         reference: np.ndarray = None,
