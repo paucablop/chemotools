@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.ndimage import uniform_filter1d
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class MeanFilter(BaseEstimator, TransformerMixin):
+class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(self, window_size: int = 3, mode='nearest') -> None:
         self.window_size = window_size
         self.mode = mode

@@ -1,11 +1,11 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
-class CubicSplineCorrection(BaseEstimator, TransformerMixin):
+class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(self, indices: np.ndarray = None) -> None:
         self.indices = indices
 

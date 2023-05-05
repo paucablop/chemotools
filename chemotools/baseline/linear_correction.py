@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class LinearCorrection(BaseEstimator, TransformerMixin):
+class LinearCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     def _drift_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
 

@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class StandardNormalVariate(BaseEstimator, TransformerMixin):
+class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
