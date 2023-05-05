@@ -6,6 +6,34 @@ from chemotools.utils.check_inputs import check_input
 
 
 class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """Multiplicative scatter correction (MSC) is a preprocessing technique for
+    removing scatter effects from spectra. It is based on fitting a linear
+    regression model to the spectrum using a reference spectrum. The reference
+    spectrum is usually a mean or median spectrum of a set of spectra.
+
+    Parameters
+    ----------
+    reference : np.ndarray, optional
+        The reference spectrum to use for the correction. If None, the mean
+        spectrum will be used. The default is None.
+    use_mean : bool, optional
+        Whether to use the mean spectrum as the reference. The default is True.
+    use_median : bool, optional
+        Whether to use the median spectrum as the reference. The default is False.
+
+    Attributes
+    ----------
+    reference_ : np.ndarray
+        The reference spectrum used for the correction.
+    n_features_in_ : int
+        The number of features in the training data.
+
+    Raises
+    ------
+    ValueError
+        If no reference is provided.
+    
+    """"
     def __init__(
         self,
         reference: np.ndarray = None,
