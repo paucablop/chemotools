@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        lam: int = 1e10,
-        ratio: int = 0.1,
+        lam: int = 1e4,
+        ratio: int = 0.01,
         nr_iterations: int = 100,
     ):
         self.lam = lam
@@ -52,7 +52,7 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
                 f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
             )
 
-        # Calculate the air pls smooth
+        # Calculate the ar pls baseline
         for i, x in enumerate(X_):
             X_[i] = x - self._calculate_ar_pls(x)
 
