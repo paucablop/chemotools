@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class NormScaler(BaseEstimator, TransformerMixin):
+class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(self, l_norm: int = 2):
         self.l_norm = l_norm
 
