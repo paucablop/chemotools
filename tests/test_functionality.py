@@ -1,6 +1,13 @@
 import numpy as np
 
-from chemotools.baseline import AirPls, ConstantBaselineCorrection, LinearCorrection, NonNegative, SubtractReference
+from chemotools.baseline import (
+    AirPls,
+    ArPls,
+    ConstantBaselineCorrection,
+    LinearCorrection,
+    NonNegative,
+    SubtractReference,
+)
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
@@ -8,7 +15,9 @@ from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from chemotools.variable_selection import RangeCut
 from tests.fixtures import (
     spectrum,
+    spectrum_arpls,
     reference_airpls,
+    reference_arpls,
     reference_msc_mean,
     reference_msc_median,
     reference_sg_15_2,
@@ -27,23 +36,39 @@ def test_air_pls(spectrum, reference_airpls):
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
 
+
+def test_ar_pls(spectrum_arpls, reference_arpls):
+    # Arrange
+    arpls = ArPls(1e2, 0.0001)
+    reference = np.array(spectrum_arpls) - np.array(reference_arpls)
+
+    # Act
+    spectrum_corrected = arpls.fit_transform(spectrum_arpls)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+
+
 def test_constant_baseline_correction():
     # Arrange
     spectrum = np.array([1, 1, 1, 1, 1, 1, 1, 2, 2, 1]).reshape(1, -1)
     constant_baseline_correction = ConstantBaselineCorrection(start=7, end=8)
-    
+
     # Act
     spectrum_corrected = constant_baseline_correction.fit_transform(spectrum)
 
     # Assert
     expected = np.array([-1, -1, -1, -1, -1, -1, -1, 0, 0, -1])
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
+
 
 def test_constant_baseline_correction_with_wavenumbers():
     # Arrange
     spectrum = np.array([1, 1, 1, 1, 1, 1, 1, 2, 2, 1]).reshape(1, -1)
     wavenumbers = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
-    constant_baseline_correction = ConstantBaselineCorrection(wavenumbers=wavenumbers, start=9, end=10)
+    constant_baseline_correction = ConstantBaselineCorrection(
+        wavenumbers=wavenumbers, start=9, end=10
+    )
 
     # Act
     spectrum_corrected = constant_baseline_correction.fit_transform(spectrum)
@@ -52,15 +77,17 @@ def test_constant_baseline_correction_with_wavenumbers():
     expected = np.array([-1, -1, -1, -1, -1, -1, -1, 0, 0, -1])
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
 
+
 def test_index_scaler(spectrum):
     # Arrange
     index_scaler = IndexScaler(index=0)
-    reference_spectrum = [value/spectrum[0][0] for value in spectrum[0]]
+    reference_spectrum = [value / spectrum[0][0] for value in spectrum[0]]
     # Act
     spectrum_corrected = index_scaler.fit_transform(spectrum)
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
+
 
 def test_l1_norm(spectrum):
     # Arrange
@@ -221,6 +248,7 @@ def test_non_negative_absolute():
     # Assert
     assert np.allclose(spectrum_corrected[0], [1, 0, 1], atol=1e-8)
 
+
 def test_norris_williams_filter_1():
     # Arrange
     norris_williams_filter = NorrisWilliams()
@@ -231,6 +259,7 @@ def test_norris_williams_filter_1():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
+
 
 def test_norris_williams_filter_2():
     # Arrange
@@ -243,6 +272,7 @@ def test_norris_williams_filter_2():
     # Assert
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
 
+
 def test_range_cut_by_index(spectrum):
     # Arrange
     range_cut = RangeCut(start=0, end=10)
@@ -252,6 +282,7 @@ def test_range_cut_by_index(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][:10], atol=1e-8)
+
 
 def test_range_cut_by_wavenumber():
     # Arrange
@@ -265,6 +296,7 @@ def test_range_cut_by_wavenumber():
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
 
+
 def test_range_cut_by_wavenumber_2():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -277,6 +309,7 @@ def test_range_cut_by_wavenumber_2():
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
 
+
 def test_savizky_golay_filter_1(spectrum, reference_sg_15_2):
     # Arrange
     savitzky_golay_filter = SavitzkyGolay(
@@ -288,6 +321,7 @@ def test_savizky_golay_filter_1(spectrum, reference_sg_15_2):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_sg_15_2[0], atol=1e-2)
+
 
 def test_saviszky_golay_filter_2():
     # Arrange
@@ -303,13 +337,14 @@ def test_saviszky_golay_filter_2():
     # Assert
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
 
+
 def test_saviszky_golay_filter_3():
     # Arrange
     savitzky_golay_filter = SavitzkyGolay(
         window_size=3, polynomial_order=2, derivate_order=1, mode="interp"
     )
 
-    array = np.array([0., 1., 2., 3., 4., 5., 6., 7., 8., 9.]).reshape(1, -1)
+    array = np.array([0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]).reshape(1, -1)
 
     # Act
     spectrum_corrected = savitzky_golay_filter.fit_transform(array)
@@ -328,6 +363,7 @@ def test_standard_normal_variate(spectrum, reference_snv):
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_snv[0], atol=1e-2)
 
+
 def test_subtract_reference(spectrum):
     # Arrange
     baseline = SubtractReference(reference=spectrum)
@@ -338,6 +374,7 @@ def test_subtract_reference(spectrum):
     # Assert
     assert np.allclose(spectrum_corrected[0], np.zeros(len(spectrum)), atol=1e-8)
 
+
 def test_subtract_reference_without_reference(spectrum):
     # Arrange
     baseline = SubtractReference()
@@ -347,6 +384,7 @@ def test_subtract_reference_without_reference(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum, atol=1e-8)
+
 
 def test_whitakker_smooth(spectrum, reference_whitakker):
     # Arrange
