@@ -1,8 +1,8 @@
 ---
-title: Training a PLS model using ```scikit-learn```
+title: Training a PLS model using scikit-learn
 layout: default
 parent: Get Started
-nav_order: 2
+nav_order: 3
 ---
 
 

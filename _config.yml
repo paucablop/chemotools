@@ -20,6 +20,7 @@ color_scheme: nil
 callouts_level: quiet # or loud
 callouts:
   highlight:
+    title: Highlight
     color: yellow
   important:
     title: Important
