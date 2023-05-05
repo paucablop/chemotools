@@ -72,7 +72,7 @@ Below there are two examples of how to use this new API:
 
 ### __Example 1: Using the ```set_output()``` API with a single preprocessing method__
 
-#### 1. Load your spectral data as a ```pandas.DataFrame```.
+#### __1. Load your spectral data as a ```pandas.DataFrame```.__
 
 First load your spectral data. In this case we assume a file called ```spectra.csv``` where each row represents a spectrum and each column represents a wavenumbers.
 
@@ -96,7 +96,7 @@ The ```spectra``` variable is a ```pandas.DataFrame``` object with the indices r
 |  5 | 0.189985 | 0.195004 | 0.202557 | 0.216794 | 0.222717 | 0.230456 | 0.233048 | 0.270167 | 0.272373 |
 
 
-#### 2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.
+#### __2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.__
 
 Next, we create the ```AirPls``` object and set the output to ```pandas```.
 
@@ -109,7 +109,7 @@ The ```set_output()``` method accepts the following arguments:
 - ```transform```: The output format. Can be ```'pandas'``` or ```'default'``` (the default format will output a ```numpy.ndarray```).
 
 
-#### 3. Fit and transform the spectra
+#### __3. Fit and transform the spectra__
 
 ```python
 # Fit and transform the spectra
