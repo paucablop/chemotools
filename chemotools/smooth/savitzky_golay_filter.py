@@ -1,12 +1,12 @@
 import numpy as np
 from scipy.signal import savgol_filter
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class SavitzkyGolayFilter(BaseEstimator, TransformerMixin):
+class SavitzkyGolayFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self, window_size: int = 3, polynomial_order: int = 1, mode: str = "nearest"
     ) -> None:

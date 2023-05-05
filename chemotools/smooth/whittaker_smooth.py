@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import csc_matrix, eye, diags
 from scipy.sparse.linalg import spsolve
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
@@ -12,7 +12,7 @@ from chemotools.utils.check_inputs import check_input
 # Analyst 135 (5), 1138-1146 (2010).
 
 
-class WhittakerSmooth(BaseEstimator, TransformerMixin):
+class WhittakerSmooth(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self,
         lam: float = 1e2,
