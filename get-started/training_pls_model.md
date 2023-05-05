@@ -1,12 +1,12 @@
 ---
-title: Training a PLS model using scikit-learn
+title: Training a PLS model
 layout: default
 parent: Get Started
 nav_order: 3
 ---
 
 
-## __Training a PLS model using scikit-learn__
+## __Training a PLS model__
 
 The following code shows how to train a PLS model using ```scikit-learn```. The following preprocessing are used:
 
