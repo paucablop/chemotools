@@ -2,7 +2,7 @@ import logging
 import numpy as np
 from scipy.sparse import csc_matrix, eye, diags
 from scipy.sparse.linalg import spsolve
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # Analyst 135 (5), 1138-1146 (2010).P
 
 
-class AirPls(BaseEstimator, TransformerMixin):
+class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self,
         nr_iterations: int = 15,

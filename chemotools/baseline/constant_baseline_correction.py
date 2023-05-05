@@ -1,11 +1,11 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class ConstantBaselineCorrection(BaseEstimator, TransformerMixin):
+class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self, wavenumbers: np.ndarray = None, start: int = 0, end: int = 1
     ) -> None:
