@@ -85,7 +85,7 @@ spectra = pd.read_csv('data/spectra.csv', index_col=0)
 
 The ```spectra``` variable is a ```pandas.DataFrame``` object with the indices representing the sample names and the columns representing the wavenumbers. The first 5 rows of the ```spectra``` DataFrame look like this:
 
-<iframe src="figures/spectra.html" width="800px" height="500px" style="border: none;"></iframe>
+<iframe src="figures/spectra.html" width="100%" style="border: none;"></iframe>
 
 ### 2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.
 Next, we create the ```AirPls``` object and set the output to ```pandas```.
@@ -113,7 +113,7 @@ The output of the ```fit_transform()``` method is now a ```pandas.DataFrame``` o
 
 The ```spectra_airpls``` DataFrame has the following structure:
 
-<iframe src="figures/processed.html" width="800px" height="500px" style="border: none;"></iframe>
+<iframe src="figures/processed.html" width="100%" style="border: none;"></iframe>
 
 #### __Example 2: Using the ```set_output()``` API with a pipeline__
 
