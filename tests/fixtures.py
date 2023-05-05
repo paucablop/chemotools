@@ -10,7 +10,21 @@ path_to_resources = os.path.join(test_directory, "resources")
 
 @pytest.fixture
 def spectrum() -> np.ndarray:
-    return [np.loadtxt(os.path.join(path_to_resources, "spectrum.csv"), delimiter=",").tolist()]
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "spectrum.csv"), delimiter=","
+        ).tolist()
+    ]
+
+
+@pytest.fixture
+def spectrum_arpls() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "spectrum_arpls.csv"), delimiter=","
+        ).tolist()
+    ]
+
 
 @pytest.fixture
 def reference_airpls() -> np.ndarray:
@@ -20,6 +34,16 @@ def reference_airpls() -> np.ndarray:
         ).tolist()
     ]
 
+
+@pytest.fixture
+def reference_arpls() -> np.ndarray:
+    return [
+        np.loadtxt(
+            os.path.join(path_to_resources, "reference_arpls.csv"), delimiter=","
+        ).tolist()
+    ]
+
+
 @pytest.fixture
 def reference_msc_mean() -> np.ndarray:
     return [
@@ -27,6 +51,7 @@ def reference_msc_mean() -> np.ndarray:
             os.path.join(path_to_resources, "reference_msc_mean.csv"), delimiter=","
         ).tolist()
     ]
+
 
 @pytest.fixture
 def reference_msc_median() -> np.ndarray:
@@ -36,6 +61,7 @@ def reference_msc_median() -> np.ndarray:
         ).tolist()
     ]
 
+
 @pytest.fixture
 def reference_sg_15_2() -> np.ndarray:
     return [
@@ -43,6 +69,7 @@ def reference_sg_15_2() -> np.ndarray:
             os.path.join(path_to_resources, "reference_sg_15_2.csv"), delimiter=","
         ).tolist()
     ]
+
 
 @pytest.fixture
 def reference_snv() -> np.ndarray:
@@ -52,6 +79,7 @@ def reference_snv() -> np.ndarray:
         ).tolist()
     ]
 
+
 @pytest.fixture
 def reference_whitakker() -> np.ndarray:
     return [
@@ -59,5 +87,3 @@ def reference_whitakker() -> np.ndarray:
             os.path.join(path_to_resources, "reference_whitakker.csv"), delimiter=","
         ).tolist()
     ]
-
-
