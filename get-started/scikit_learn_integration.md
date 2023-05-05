@@ -113,7 +113,7 @@ The output of the ```fit_transform()``` method is now a ```pandas.DataFrame``` o
 
 The ```spectra_airpls``` DataFrame has the following structure:
 
-<iframe src="figures/preprocessed.html" width="800px" height="500px" style="border: none;"></iframe>
+<iframe src="figures/processed.html" width="800px" height="500px" style="border: none;"></iframe>
 
 #### __Example 2: Using the ```set_output()``` API with a pipeline__
 
