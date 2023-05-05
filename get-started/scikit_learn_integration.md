@@ -70,9 +70,10 @@ For the ```pandas.DataFrame``` lovers. By default, all ```scikit-learn``` and ``
 
 Below there are two examples of how to use this new API:
 
-#### __Example 1: Using the ```set_output()``` API with a single preprocessing method__
+### __Example 1: Using the ```set_output()``` API with a single preprocessing method__
 
-### 1. Load your spectral data as a ```pandas.DataFrame```.
+#### 1. Load your spectral data as a ```pandas.DataFrame```.
+
 First load your spectral data. In this case we assume a file called ```spectra.csv``` where each row represents a spectrum and each column represents a wavenumbers.
 
 ```python
@@ -95,7 +96,8 @@ The ```spectra``` variable is a ```pandas.DataFrame``` object with the indices r
 |  5 | 0.189985 | 0.195004 | 0.202557 | 0.216794 | 0.222717 | 0.230456 | 0.233048 | 0.270167 | 0.272373 |
 
 
-### 2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.
+#### 2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.
+
 Next, we create the ```AirPls``` object and set the output to ```pandas```.
 
 ```python
@@ -107,7 +109,7 @@ The ```set_output()``` method accepts the following arguments:
 - ```transform```: The output format. Can be ```'pandas'``` or ```'default'``` (the default format will output a ```numpy.ndarray```).
 
 
-### 3. Fit and transform the spectra
+#### 3. Fit and transform the spectra
 
 ```python
 # Fit and transform the spectra
@@ -129,7 +131,7 @@ The ```spectra_airpls``` DataFrame has the following structure:
 |  3 | 0.211932 | 0.213675 | 0.216953 | 0.222211 | 0.22891  | 0.235941 | 0.243654 | 0.252518 | 0.261452 | 0.270276 |
 |  4 | 0.212528 | 0.21408  | 0.217522 | 0.222005 | 0.228657 | 0.236576 | 0.244935 | 0.253593 | 0.262239 | 0.271826 |
 
-#### __Example 2: Using the ```set_output()``` API with a pipeline__
+### __Example 2: Using the ```set_output()``` API with a pipeline__
 
 Similarly, the ```set_output()``` API can be used with pipelines. The following code shows how to create a pipeline that performs:
 
@@ -140,9 +142,7 @@ Similarly, the ```set_output()``` API can be used with pipelines. The following 
 import pandas as pd
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-
 from chemotools.scatter import MultiplicativeScatterCorrection
-
 
 pipeline = make_pipeline(MultiplicativeScatterCorrection(),StandardScaler())
 pipeline.set_output(transform="pandas")
