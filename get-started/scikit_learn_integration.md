@@ -15,7 +15,14 @@ This page shows how to use ```chemotools``` in combination with ```scikit-learn`
 - [Persisting your models](#persisting-your-models)
 
 ## __Working with single spectra__
-Preprocessing techniques in scikit-learn are primarily designed to work with 2D arrays, where each row represents a sample and each column represents a feature (i.e., matrices). However, in spectroscopy, single spectra are often of interest, which are represented as 1D arrays (i.e., vectors). To apply scikit-learn and chemotools techniques to single spectra, they need to be reshaped into 2D arrays (i.e., a matrix with one row). To achieve this, you can use the following code that reshapes a 1D array into a 2D array with a single row:
+Preprocessing techniques in ```scikit-learn``` are primarily designed to work with 2D arrays, where each row represents a sample and each column represents a feature (i.e., matrices). However, in spectroscopy, single spectra are often of interest, which are represented as 1D arrays (i.e., vectors). Below there is an example of a single spectrum:
+
+```bash
+array([0.484434, 0.485629, 0.488754, 0.491942, 0.489923, 0.492869,
+        0.497285, 0.501567, 0.500027, 0.50265 ])
+```
+
+To apply ```scikit-learn``` and ```chemotools``` techniques to single spectra, they need to be reshaped into 2D arrays (i.e., a matrix with one row). To achieve this, you can use the following code that reshapes a 1D array into a 2D array with a single row:
 
 ```python
 import numpy as np
@@ -24,7 +31,15 @@ from chemotools.scatter import MultiplicativeScatterCorrection
 msc = MultiplicativeScatterCorrection()
 spectra_msc = msc.fit_transform(spectra.reshape(1, -1))
 ```
-The ```.reshape(1, -1)``` method is applied to the 1D array ```spectra```, which is converted into a 2D array with a single row.
+The ```.reshape(1, -1)``` method is applied to the 1D array ```spectra```, which is converted into a 2D array with a single row. An example of the output of the ```.reshape(1, -1)``` method is shown below:
+
+```bash
+array([[0.484434, 0.485629, 0.488754, 0.491942, 0.489923, 0.492869,
+         0.497285, 0.501567, 0.500027, 0.50265 ]])
+```
+
+{: .highlight }
+> The output of the ```.reshape(1, -1)``` method is a 2D array with a single row. This is the format that ```scikit-learn``` and ```chemotools``` preprocessing techniques expect as input.
 
 ## __Working with pipelines__
 Pipelines are becoming increasingly popular in machine learning workflows. In essence, pipelines are a sequence of connected data processing steps, where the output of one step is the input of the next. They are very useful for:
