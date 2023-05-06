@@ -32,7 +32,7 @@ Pipelines are becoming increasingly popular in machine learning workflows. In es
 - automating complex workflows, 
 - improving efficiency, 
 - reducing errors in data processing and analysis and
-- simplifying model persistence.
+- simplifying model persistence and deployment.
 
 All preprocessing techniques in ```chemotools``` are compatible with ```scikit-learn``` and can be used in pipelines. As an example, we will study the case where we would like to apply the following preprocessing techniques to our spectra:
 
