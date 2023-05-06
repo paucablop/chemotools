@@ -12,7 +12,7 @@ This page shows how to use ```chemotools``` in combination with ```scikit-learn`
 - [Working with single spectra](#working-with-single-spectra)
 - [Working with pipelines](#working-with-pipelines)
 - [Working with pandas DataFrames](#working-with-pandas-dataframes)
-- [Persisting your pipelines](#persisting-your-pipelines)
+- [Persisting your models](#persisting-your-models)
 
 ## __Working with single spectra__
 Preprocessing techniques in scikit-learn are primarily designed to work with 2D arrays, where each row represents a sample and each column represents a feature (i.e., matrices). However, in spectroscopy, single spectra are often of interest, which are represented as 1D arrays (i.e., vectors). To apply scikit-learn and chemotools techniques to single spectra, they need to be reshaped into 2D arrays (i.e., a matrix with one row). To achieve this, you can use the following code that reshapes a 1D array into a 2D array with a single row:
@@ -27,40 +27,89 @@ spectra_msc = msc.fit_transform(spectra.reshape(1, -1))
 The ```.reshape(1, -1)``` method is applied to the 1D array ```spectra```, which is converted into a 2D array with a single row.
 
 ## __Working with pipelines__
-All preprocessing techniques in this package are compatible with ```scikit-learn``` and can be used in pipelines. For example, the following code creates a pipeline that performs:
+Pipelines are becoming increasingly popular in machine learning workflows. In essence, pipelines are a sequence of connected data processing steps, where the output of one step is the input of the next. They are very useful for:
+
+- automating complex workflows, 
+- improving efficiency, 
+- reducing errors in data processing and analysis and
+- simplifying model persistence.
+
+All preprocessing techniques in ```chemotools``` are compatible with ```scikit-learn``` and can be used in pipelines. As an example, we will study the case where we would like to apply the following preprocessing techniques to our spectra:
 
 - Whittaker smoothing
-- AirPLS baseline correction
-- Multiplicative scatter correction
+- ArPls baseline correction
 - Mean centering
+- PLS regression
+
+In a traditional workflow, would apply each preprocessing technique individually to the spectra as shown in the image below:
+
+[![traditional workflow](figures/no-pipeline.png)](figures/no-pipeline.png)
+
+The code to perform this workflow would look like this:
 
 ```python
+form sklearn.cross_decomposition import PLSRegression
+from sklearn.preprocessing import StandardScaler
+
+from chemotools.baseline import ArPls
+from chemotools.smooth import WhittakerSmooth
+
+# Whittaker smoothing
+spectra_smoothed = WhittakerSmooth().fit_transform(spectra)
+
+# ArPls baseline correction
+spectra_corrected = ArPls().fit_transform(spectra_smoothed)
+
+# Mean centering
+spectra_centered = StandardScaler(with_mean=True, with_std=False).fit_transform(spectra_corrected)
+
+# PLS regression
+pls = PLSRegression(n_components=2)
+pls.fit(spectra_centered, reference)
+prediction = pls.predict(spectra_centered)
+```
+
+This is a tedious and error-prone workflow, especially when the number of preprocessing steps increases. In addition, persisting the model and deploying it to a production environment is not straightforward, as each preprocessing step needs to be persisted and deployed individually.
+
+A better approach is to use a pipeline, which automates the workflow and reduces the risk of errors. The figure below shows the same workflow as above, but using a pipeline:
+
+[![pipeline](figures/pipeline.png)](figures/pipeline.png)
+
+The code to perform this workflow would look like this:
+
+```python
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from chemotools.baseline import AirPls
-from chemotools.scatter import MultiplicativeScatterCorrection
+from chemotools.baseline import ArPls
 from chemotools.smooth import WhittakerSmooth
 
 pipeline = make_pipeline(
     WhittakerSmooth(),
-    AirPls(),
-    MultiplicativeScatterCorrection(),
+    ArPls(),
     StandardScaler(with_std=False),
+    PLSRegression(n_components=2)
 )
 ```
-Now the pileline can be visualized, which will show the sequence of preprocessing techniques that will be applied in the pipeline.
+Now the pipeline can be visualized, which will show the sequence of preprocessing techniques that will be applied in the pipeline and their parameters:
 
 <iframe src="figures/pipeline_visual.html" width="100%" style="border: none;"></iframe>
 
-Once the pipeline is created, it can be used to fit and transform the spectra using the ```.fit_transform()``` method.
+Once the pipeline is created, it can be used to fit and transform the spectra and to make predictions:
 
 ```python
-spectra_transformed = pipeline.fit_transform(spectra)
+spectra_transformed = pipeline.fit(spectra, reference).predict(spectra)
 ```
-This will produce the following output:
+
+The preprocessed spectra produced by the previous pipeline is shown in the figure below.
 
 <iframe src="figures/pipeline.html" width="800px" height="500px" style="border: none;"></iframe>
+
+
+{: .highlight }
+> Notice that in the traditional workflow, the different preprocessing objects had to be persisted individually. In the pipeline workflow, the entire pipeline can be persisted and deployed to a production environment. See the [Persisting your models](#persisting-your-models) section for more information.
+
 
 ## __Working with pandas DataFrames__
 For the ```pandas.DataFrame``` lovers. By default, all ```scikit-learn``` and ```chemotools``` transformers output ```numpy.ndarray```. However, now it is possible to configure your ```chemotools``` preprocessing methods to produce ```pandas.DataFrame``` objects as output. This is possible after implementing the new ```set_output()``` API from ```scikit-learn```>= 1.2.2 ([documentation](https://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html)). The same API implemented in other ```scikit-learn``` preprocessing methods like the ```StandardScaler()``` is now available for the ```chemotools``` transformers. 
@@ -149,3 +198,5 @@ pipeline.set_output(transform="pandas")
 
 output = pipeline.fit_transform(spectra)
 ```
+
+## __Persisting your models__
