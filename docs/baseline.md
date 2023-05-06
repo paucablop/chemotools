@@ -177,9 +177,9 @@ It is an automated baseline correction algorithm that uses a penalized least squ
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```nr_iterations``` | The number of iterations before exiting the algorithm. | ```int``` | ```15``` |
 | ```lam``` | The smoothing factor. | ```float``` | ```1e2``` |
 | ```polynomial_order``` | The order of the polynomial used to fit the samples. | ```int``` | ```1``` |
+| ```nr_iterations``` | The number of iterations before exiting the algorithm. | ```int``` | ```15``` |
 
 ### __Usage examples__:
 
@@ -201,9 +201,9 @@ This is an automated baseline correction algorithm that uses a penalized least s
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```nr_iterations``` | The number of iterations before exiting the algorithm. | ```int``` | ```100``` |
 | ```lam``` | The smoothing factor. | ```float``` | ```1e2``` |
 | ```ratio``` | The convergence criteria for the algorithm to exit. | ```float``` | ```0.001``` |
+| ```nr_iterations``` | The number of iterations before exiting the algorithm. | ```int``` | ```100``` |
 
 ### __Usage examples__:
 

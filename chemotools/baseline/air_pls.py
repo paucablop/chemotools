@@ -18,13 +18,14 @@ logger = logging.getLogger(__name__)
 class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     def __init__(
         self,
-        nr_iterations: int = 15,
         lam: int = 1e2,
         polynomial_order: int = 1,
+        nr_iterations: int = 15,
     ):
-        self.nr_iterations = nr_iterations
         self.lam = lam
         self.polynomial_order = polynomial_order
+        self.nr_iterations = nr_iterations
+
 
     def fit(self, X: np.ndarray, y=None) -> "AirPls":
         # Check that X is a 2D array and has only finite values
