@@ -63,7 +63,7 @@ In a traditional workflow, would apply each preprocessing technique individually
 The code to perform this workflow would look like this:
 
 ```python
-form sklearn.cross_decomposition import PLSRegression
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.preprocessing import StandardScaler
 
 from chemotools.baseline import ArPls
