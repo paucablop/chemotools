@@ -114,7 +114,7 @@ Now the pipeline can be visualized, which will show the sequence of preprocessin
 Once the pipeline is created, it can be used to fit and transform the spectra and to make predictions:
 
 ```python
-spectra_transformed = pipeline.fit(spectra, reference).predict(spectra)
+prediction = pipeline.fit(spectra, reference).predict(spectra)
 ```
 
 The preprocessed spectra produced by the previous pipeline is shown in the figure below.
