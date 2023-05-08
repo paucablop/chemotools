@@ -73,10 +73,10 @@ from chemotools.smooth import WhittakerSmooth
 spectra_smoothed = WhittakerSmooth().fit_transform(spectra)
 
 # ArPls baseline correction
-spectra_corrected = ArPls().fit_transform(spectra_smoothed)
+spectra_baseline = ArPls().fit_transform(spectra_smoothed)
 
 # Mean centering
-spectra_centered = StandardScaler(with_mean=True, with_std=False).fit_transform(spectra_corrected)
+spectra_centered = StandardScaler(with_mean=True, with_std=False).fit_transform(spectra_baseline)
 
 # PLS regression
 pls = PLSRegression(n_components=2)
