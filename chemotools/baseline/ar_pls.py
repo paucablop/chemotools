@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import scipy.sparse as sp
 from scipy.sparse import spdiags, csc_matrix
 from scipy.sparse.linalg import splu
 
@@ -58,10 +59,15 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
+    def _calculate_diff(self, N):
+        I = sp.eye(N, format='csc')
+        D2 = sp.diags([1, -2, 1], [0, 1, 2], shape=(N-2, N), format='csc')
+        return D2.dot(I).T
+
     def _calculate_ar_pls(self, x):
         N = len(x)
-        D = np.diff(np.eye(N), 2)
-        H = self.lam * np.dot(D, D.T)
+        D = self._calculate_diff(N)
+        H = self.lam * D.dot(D.T)
         w = np.ones(N)
         iteration = 0
         while iteration < self.nr_iterations:
