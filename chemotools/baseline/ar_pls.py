@@ -17,10 +17,49 @@ logger = logging.getLogger(__name__)
 
 
 class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
+    correction method for spectroscopy data. It uses an iterative process
+    to estimate and remove the baseline from the spectra.
+
+    Parameters
+    ----------
+    lam : int, optional (default=1e4)
+        The penalty parameter for the difference matrix in the objective function.
+
+    ratio : int, optional (default=0.01)
+        The convergence threshold for the weight updating scheme.
+
+    nr_iterations : int, optional (default=100)
+        The maximum number of iterations for the weight updating scheme.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of input features.
+
+    _is_fitted : bool
+        Whether the estimator has been fitted.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the estimator to the data.
+
+    transform(X, y=None)
+        Transform the data by removing the baseline.
+
+    _calculate_diff(N)
+        Calculate the difference matrix for a given size.
+
+    _calculate_ar_pls(x)
+        Calculate the baseline for a given spectrum.
+
+    """
+
     def __init__(
         self,
-        lam: int = 1e4,
-        ratio: int = 0.01,
+        lam: float = 1e4,
+        ratio: float = 0.01,
         nr_iterations: int = 100,
     ):
         self.lam = lam
@@ -28,6 +67,22 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self.nr_iterations = nr_iterations
 
     def fit(self, X: np.ndarray, y=None) -> "ArPls":
+        """Fit the estimator to the data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data.
+
+        y : array-like of shape (n_samples,), optional (default=None)
+            The target values.
+
+        Returns
+        -------
+        self : ArPls
+            Returns the instance itself.
+        """
+
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -40,6 +95,22 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """Transform the data by removing the baseline.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data.
+
+        y : array-like of shape (n_samples,), optional (default=None)
+            The target values.
+
+        Returns
+        -------
+        X_ : array-like of shape (n_samples, n_features)
+            The transformed data with the baseline removed.
+        """
+
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 
@@ -60,8 +131,8 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _calculate_diff(self, N):
-        I = sp.eye(N, format='csc')
-        D2 = sp.diags([1, -2, 1], [0, 1, 2], shape=(N-2, N), format='csc')
+        I = sp.eye(N, format="csc")
+        D2 = sp.diags([1, -2, 1], [0, 1, 2], shape=(N - 2, N), format="csc")
         return D2.dot(I).T
 
     def _calculate_ar_pls(self, x):
@@ -73,16 +144,16 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         while iteration < self.nr_iterations:
             W = spdiags(w, 0, N, N)
             C = csc_matrix(W + H)
-            z = splu(C).solve(w*x)
+            z = splu(C).solve(w * x)
             d = x - z
-            dn = d[d<0]
+            dn = d[d < 0]
             if len(dn) == 0:
                 break
-            m = np.mean(dn) 
-            s = np.std(dn)   
-            exponent = np.clip(2* (d-(2*s-m))/s, -709, 709)
+            m = np.mean(dn)
+            s = np.std(dn)
+            exponent = np.clip(2 * (d - (2 * s - m)) / s, -709, 709)
             wt = 1.0 / (1.0 + np.exp(exponent))
-            if np.linalg.norm(w-wt)/np.linalg.norm(w) < self.ratio:
+            if np.linalg.norm(w - wt) / np.linalg.norm(w) < self.ratio:
                 break
             w = wt
             iteration += 1
