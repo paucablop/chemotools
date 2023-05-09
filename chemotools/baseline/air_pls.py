@@ -16,6 +16,46 @@ logger = logging.getLogger(__name__)
 
 
 class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """
+    This class implements the AirPLS (Adaptive Iteratively Reweighted Penalized Least Squares) algorithm for baseline 
+    correction of spectra data. AirPLS is a common approach for removing the baseline from spectra, which can be useful 
+    in various applications such as spectroscopy and chromatography.
+
+    Parameters
+    ----------
+    lam : float, optional default=1e2
+        The lambda parameter controls the smoothness of the baseline. Increasing the value of lambda results in 
+        a smoother baseline.
+    polynomial_order : int, optional default=1
+        The polynomial order determines the degree of the polynomial used to fit the baseline. A value of 1 corresponds 
+        to a linear fit, while higher values correspond to higher-order polynomials.
+    nr_iterations : int, optional default=15
+        The number of iterations used to calculate the baseline. Increasing the number of iterations can improve the 
+        accuracy of the baseline correction, but also increases the computation time.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
+    _is_fitted : bool
+        A flag indicating whether the estimator has been fitted to data.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the estimator to the input data.
+    transform(X, y=None)
+        Transform the input data by subtracting the baseline.
+    _calculate_whittaker_smooth(x, w)
+        Calculate the Whittaker smooth of a given input vector x, with weights w.
+    _calculate_air_pls(x)
+        Calculate the AirPLS baseline of a given input vector x.
+
+    References
+    ----------
+    - Z.-M. Zhang, S. Chen, and Y.-Z. Liang, Baseline correction using adaptive iteratively reweighted penalized least 
+      squares. Analyst 135 (5), 1138-1146 (2010).
+    """
     def __init__(
         self,
         lam: int = 1e2,
@@ -28,6 +68,21 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
 
     def fit(self, X: np.ndarray, y=None) -> "AirPls":
+        """Fit the AirPls baseline correction estimator to the input data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data.
+
+        y : array-like of shape (n_samples,), optional (default=None)
+            The target values.
+
+        Returns
+        -------
+        self : AirPls
+            Returns the instance itself.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -40,6 +95,22 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """Correct the baseline in the input data using the fitted AirPls estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data.
+
+        y : array-like of shape (n_samples,), optional (default=None)
+            The target values.
+
+        Returns
+        -------
+        X_ : array-like of shape (n_samples, n_features)
+            The transformed data with the baseline removed.
+        """
+        
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 

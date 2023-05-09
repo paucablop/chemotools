@@ -23,10 +23,10 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    lam : int, optional (default=1e4)
+    lam : float, optional (default=1e4)
         The penalty parameter for the difference matrix in the objective function.
 
-    ratio : int, optional (default=0.01)
+    ratio : float, optional (default=0.01)
         The convergence threshold for the weight updating scheme.
 
     nr_iterations : int, optional (default=100)
@@ -54,6 +54,11 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     _calculate_ar_pls(x)
         Calculate the baseline for a given spectrum.
 
+    References
+    ----------
+    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo 
+    Baseline correction using asymmetrically reweighted penalized 
+    least squares smoothing
     """
 
     def __init__(
