@@ -7,6 +7,40 @@ from chemotools.utils.check_inputs import check_input
 
 
 class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """
+    A transformer that calculates the Norris-Williams derivative of the input data.
+
+    Parameters
+    ----------
+    window_size : int, optional
+        The size of the window to use for the derivative calculation.
+
+    gap_size : int, optional
+        The size of the gap to use for the derivative calculation.
+
+    derivative_order : int, optional
+        The order of the derivative to calculate. Can be 1 or 2.
+
+    mode : str, optional
+        The mode to use for the derivative calculation. Can be "nearest", "constant", 
+        "reflect", "wrap", "mirror" or "interp".
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
+
+    _is_fitted : bool
+        Whether the transformer has been fitted to data.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the transformer to the input data.
+
+    transform(X, y=0, copy=True)
+        Transform the input data by calculating the Norris-Williams derivative.
+    """
     def __init__(
         self,
         window_size: int = 5,
@@ -20,6 +54,22 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self.mode = mode
 
     def fit(self, X: np.ndarray, y=None) -> "NorrisWilliams":
+        """
+        Fit the transformer to the input data.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to fit the transformer to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : NorrisWilliams
+            The fitted transformer.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -32,6 +82,22 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=None):
+        """
+        Transform the input data by calculating the Norris-Williams derivative.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to transform.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_ : np.ndarray
+            The transformed data.
+        """
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 
