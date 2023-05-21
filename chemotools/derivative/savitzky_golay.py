@@ -13,17 +13,19 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     Parameters
     ----------
     window_size : int, optional
-        The size of the window to use for the derivative calculation.
+        The size of the window to use for the derivative calculation. Must be odd. Default
+        is 3.
 
     polynomial_order : int, optional
-        The order of the polynomial to use for the derivative calculation.
+        The order of the polynomial to use for the derivative calculation. Must be less
+        than window_size. Default is 1.
 
     derivate_order : int, optional
-        The order of the derivative to calculate. Can be 1 or 2.
+        The order of the derivative to calculate. Default is 1.
 
     mode : str, optional
         The mode to use for the derivative calculation. Can be "nearest", "constant",
-        "reflect", "wrap", "mirror" or "interp".
+        "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
     Attributes
     ----------
