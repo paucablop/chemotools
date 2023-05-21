@@ -7,8 +7,47 @@ from chemotools.utils.check_inputs import check_input
 
 
 class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """
+    A transformer that calculates the Savitzky-Golay derivative of the input data.
+
+    Parameters
+    ----------
+    window_size : int, optional
+        The size of the window to use for the derivative calculation.
+
+    polynomial_order : int, optional
+        The order of the polynomial to use for the derivative calculation.
+
+    derivate_order : int, optional
+        The order of the derivative to calculate. Can be 1 or 2.
+
+    mode : str, optional
+        The mode to use for the derivative calculation. Can be "nearest", "constant",
+        "reflect", "wrap", "mirror" or "interp".
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
+
+    _is_fitted : bool
+        Whether the transformer has been fitted to data.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the transformer to the input data.
+
+    transform(X, y=0, copy=True)
+        Transform the input data by calculating the Savitzky-Golay derivative.
+    """
+
     def __init__(
-        self, window_size: int = 3, polynomial_order: int = 1, derivate_order: int = 1, mode: str = "nearest"
+        self,
+        window_size: int = 3,
+        polynomial_order: int = 1,
+        derivate_order: int = 1,
+        mode: str = "nearest",
     ) -> None:
         self.window_size = window_size
         self.polynomial_order = polynomial_order
@@ -16,6 +55,22 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self.mode = mode
 
     def fit(self, X: np.ndarray, y=None) -> "SavitzkyGolay":
+        """
+        Fit the transformer to the input data.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to fit the transformer to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : NorrisWilliams
+            The fitted transformer.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -28,6 +83,22 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """
+        Transform the input data by calculating the Savitzky-Golay derivative.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to transform.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_ : np.ndarray
+            The transformed data.
+        """
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 
