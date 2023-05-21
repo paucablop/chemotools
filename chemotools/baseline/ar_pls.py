@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
-    """Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
+    """
+    This class implements the Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
     correction method for spectroscopy data. It uses an iterative process
     to estimate and remove the baseline from the spectra.
 
