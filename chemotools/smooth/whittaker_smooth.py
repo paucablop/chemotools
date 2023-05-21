@@ -13,6 +13,33 @@ from chemotools.utils.check_inputs import check_input
 
 
 class WhittakerSmooth(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """
+    A transformer that calculates the Whittaker smooth of the input data.
+
+    Parameters
+    ----------
+    lam : float, optional
+        The lambda parameter to use for the Whittaker smooth. Default is 1e2.
+
+    differences : int, optional
+        The number of differences to use for the Whittaker smooth. Default is 1.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
+
+    _is_fitted : bool
+        Whether the transformer has been fitted to data.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the transformer to the input data.
+
+    transform(X, y=0, copy=True)
+        Transform the input data by calculating the Whittaker smooth.
+    """
     def __init__(
         self,
         lam: float = 1e2,
@@ -22,6 +49,22 @@ class WhittakerSmooth(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self.differences = differences
 
     def fit(self, X: np.ndarray, y=None) -> "WhittakerSmooth":
+        """
+        Fit the transformer to the input data.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input data to fit the transformer to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : WhittakerSmooth
+            The fitted transformer.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -34,6 +77,22 @@ class WhittakerSmooth(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """
+        Transform the input data by calculating the Whittaker smooth.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input data to transform.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_ : np.ndarray of shape (n_samples, n_features)
+            The transformed data.
+        """
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 

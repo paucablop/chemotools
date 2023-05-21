@@ -13,11 +13,11 @@ class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     Parameters
     ----------
     window_size : int, optional
-        The size of the window to use for the mean filter.
+        The size of the window to use for the mean filter. Must be odd. Default is 3.
     
     mode : str, optional
         The mode to use for the mean filter. Can be "nearest", "constant", "reflect",
-        "wrap", "mirror" or "interp".
+        "wrap", "mirror" or "interp". Default is "nearest".
 
     Attributes
     ----------
