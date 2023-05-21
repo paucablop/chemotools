@@ -45,6 +45,23 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
         self.use_median = use_median
 
     def fit(self, X: np.ndarray, y=None) -> "MultiplicativeScatterCorrection":
+        """
+        Fit the transformer to the input data. If no reference is provided, the
+        mean or median spectrum will be calculated from the input data.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input data to fit the transformer to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : MultiplicativeScatterCorrection
+            The fitted transformer.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -70,6 +87,23 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
         raise ValueError("No reference was provided")
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """
+        Transform the input data by applying the multiplicative scatter
+        correction.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input data to transform.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        X_ : np.ndarray of shape (n_samples, n_features)
+            The transformed data.
+        """
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 

@@ -41,7 +41,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
         Parameters
         ----------
-        X : np.ndarray
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -74,7 +74,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
         Parameters
         ----------
-        X : np.ndarray
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -85,7 +85,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
         Returns
         -------
-        X_ : np.ndarray
+        X_ : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

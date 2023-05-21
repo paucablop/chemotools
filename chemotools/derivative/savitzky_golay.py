@@ -60,7 +60,7 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : np.ndarray
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -88,7 +88,7 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Parameters
         ----------
-        X : np.ndarray
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -96,7 +96,7 @@ class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        X_ : np.ndarray
+        X_ : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
