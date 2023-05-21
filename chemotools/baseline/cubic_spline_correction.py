@@ -6,10 +6,10 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
-    def __init__(self, indices: np.ndarray = None) -> None:
+    def __init__(self, indices: list = None) -> None:
         self.indices = indices
 
-    def fit(self, X: list, y=None) -> "CubicSplineCorrection":
+    def fit(self, X: np.ndarray, y=None) -> "CubicSplineCorrection":
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 

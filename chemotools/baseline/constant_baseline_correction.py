@@ -40,7 +40,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
     """
 
     def __init__(
-        self, wavenumbers: np.ndarray|None = None, start: int = 0, end: int = 1
+        self, wavenumbers: np.ndarray = None, start: int = 0, end: int = 1
     ) -> None:
         self.wavenumbers = wavenumbers
         self.start = self._find_index(start)
@@ -113,7 +113,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
             X_[i, :] = x - mean_baseline
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _find_index(self, target: float|int) -> int:
+    def _find_index(self, target: float) -> int:
         if self.wavenumbers is None:
             return target
         wavenumbers = np.array(self.wavenumbers)
