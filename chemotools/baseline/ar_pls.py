@@ -11,10 +11,6 @@ from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
 
-# This code is adapted from the following source:
-# Sung-June Baek a, Aaron Park *a, Young-Jin Ahn a and Jaebum Choo
-# Baseline correction using asymmetrically reweighted penalized least squares smoothing
-
 
 class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
