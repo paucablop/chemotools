@@ -6,6 +6,29 @@ from chemotools.utils.check_inputs import check_input
 
 
 class LinearCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+    """
+    A transformer that corrects a baseline by subtracting a linear baseline through the
+    initial and final points of the spectrum.
+
+    Parameters
+    ----------
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
+
+    _is_fitted : bool
+        Whether the transformer has been fitted to data.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the transformer to the input data.
+
+    transform(X, y=0, copy=True)
+        Transform the input data by subtracting the constant baseline value.
+    """
 
     def _drift_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
 
@@ -28,6 +51,22 @@ class LinearCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return x - drift_correction
 
     def fit(self, X: np.ndarray, y=None) -> "LinearCorrection":
+        """
+        Fit the transformer to the input data.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to fit the transformer to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : ConstantBaselineCorrection
+            The fitted transformer.
+        """
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
 
@@ -40,6 +79,25 @@ class LinearCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X: np.ndarray, y=0, copy=True) -> np.ndarray:
+        """
+        Transform the input data by subtracting the constant baseline value.
+
+        Parameters
+        ----------
+        X : np.ndarray
+            The input data to transform.
+
+        y : int, float, optional
+            Ignored.
+
+        copy : bool, optional
+            Whether to copy the input data or not.
+
+        Returns
+        -------
+        X_ : np.ndarray
+            The transformed data.
+        """
         # Check that the estimator is fitted
         check_is_fitted(self, "_is_fitted")
 
