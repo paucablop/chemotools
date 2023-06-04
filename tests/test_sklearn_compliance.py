@@ -12,7 +12,11 @@ from chemotools.baseline import (
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
-from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
+from chemotools.scatter import (
+    ExtendedMultiplicativeScatterCorrection,
+    MultiplicativeScatterCorrection,
+    StandardNormalVariate,
+)
 from chemotools.smooth import (
     MeanFilter,
     MedianFilter,
@@ -55,6 +59,13 @@ def test_compliance_cubic_spline_correction():
     # Act & Assert
     check_estimator(transformer)
 
+
+# ExtendedMultiplicativeScatterCorrection
+def test_compliance_extended_multiplicative_scatter_correction():
+    # Arrange
+    transformer = ExtendedMultiplicativeScatterCorrection()
+    # Act & Assert
+    check_estimator(transformer) 
 
 # IndexScaler
 def test_compliance_index_scaler():
