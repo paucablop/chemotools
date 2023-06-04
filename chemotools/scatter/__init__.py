@@ -1,2 +1,3 @@
+from .extended_multiplicative_scatter_correction import ExtendedMultiplicativeScatterCorrection
 from .multiplicative_scatter_correction import MultiplicativeScatterCorrection
 from .standard_normal_variate import StandardNormalVariate
