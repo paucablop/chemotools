@@ -79,7 +79,7 @@ class ExtendedMultiplicativeScatterCorrection(
 
         # Set the reference
 
-        if self.reference:
+        if self.reference is not None:
             self.reference_ = self.reference.copy()
             self.indices_ = self._calculate_indices(self.reference_)
             self.A_ = self._calculate_A(self.indices_, self.reference_)

@@ -10,7 +10,11 @@ from chemotools.baseline import (
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
-from chemotools.scatter import MultiplicativeScatterCorrection, StandardNormalVariate
+from chemotools.scatter import (
+    ExtendedMultiplicativeScatterCorrection,
+    MultiplicativeScatterCorrection,
+    StandardNormalVariate,
+)
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from chemotools.variable_selection import RangeCut
 from tests.fixtures import (
@@ -76,6 +80,35 @@ def test_constant_baseline_correction_with_wavenumbers():
     # Assert
     expected = np.array([-1, -1, -1, -1, -1, -1, -1, 0, 0, -1])
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
+
+
+def test_extended_baseline_correction():
+    # Arrange
+    spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).reshape(
+        1, -1
+    )
+    reference = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    emsc = ExtendedMultiplicativeScatterCorrection(reference=reference)
+
+    # Act
+    spectrum_emsc = emsc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_emsc[0], reference, atol=1e-8)
+
+
+def test_extended_baseline_correction_through_msc(spectrum):
+    # EMSC of 0 order should be equivalient to MSC
+    # Arrange
+    msc = MultiplicativeScatterCorrection()
+    emsc = ExtendedMultiplicativeScatterCorrection(order=0)
+
+    # Act
+    spectrum_msc = msc.fit_transform(spectrum)
+    spectrum_emsc = emsc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
 
 
 def test_index_scaler(spectrum):
