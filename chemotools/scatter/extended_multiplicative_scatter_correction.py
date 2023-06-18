@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.preprocessing import StandardScaler
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
@@ -9,9 +10,12 @@ class ExtendedMultiplicativeScatterCorrection(
     OneToOneFeatureMixin, BaseEstimator, TransformerMixin
 ):
     """Extended multiplicative scatter correction (EMSC) is a preprocessing technique for
-    removing scatter effects from spectra. It is based on fitting a polynomial
-    regression model to the spectrum using a reference spectrum. The reference
-    spectrum can be the mean or median spectrum of a set of spectra or a selected reerence.
+    removing non linear scatter effects from spectra. It is based on fitting a polynomial
+    regression model to the spectrum using a reference spectrum. The reference spectrum 
+    can be the mean or median spectrum of a set of spectra or a selected reerence. 
+
+    Note that this implementation does not include further extensions of the model using 
+    orthogonal subspace models (such as PCA).
 
     Parameters
     ----------
@@ -31,16 +35,21 @@ class ExtendedMultiplicativeScatterCorrection(
     n_features_in_ : int
         The number of features in the training data.
 
-    Raises
-    ------
-    ValueError
-        If no reference is provided.
+    References
+    ----------
+    Nils Kristian Afseth, Achim Kohler. Extended multiplicative signal correction 
+    in vibrational spectroscopy, a tutorial, doi:10.1016/j.chemolab.2012.03.004
+
+    Valeria Tafintseva et al. Correcting replicate variation in spectroscopic data by machine learning and
+    model-based pre-processing, doi:10.1016/j.chemolab.2021.104350
+
+
 
     """
 
     def __init__(
         self,
-        reference: np.ndarray = False,
+        reference: np.ndarray = None,
         use_mean: bool = True,
         use_median: bool = False,
         order: int = 2,
@@ -84,7 +93,7 @@ class ExtendedMultiplicativeScatterCorrection(
             self.indices_ = self._calculate_indices(self.reference_)
             self.A_ = self._calculate_A(self.indices_, self.reference_)
             return self
-        
+
         if self.use_median:
             self.reference_ = np.median(X, axis=0)
             self.indices_ = self._calculate_indices(X[0])
@@ -126,7 +135,9 @@ class ExtendedMultiplicativeScatterCorrection(
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the extended multiplicative scatter correction
         X_ = X.copy()
