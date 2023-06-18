@@ -72,18 +72,18 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
         self._is_fitted = True
 
         # Set the reference
-        if self.reference is None and self.use_mean:
-            self.reference_ = X.mean(axis=0)
-            return self
-
-        if self.reference is None and self.use_median:
-            self.reference_ = np.median(X, axis=0)
-            return self
-
         if self.reference is not None:
             self.reference_ = self.reference.copy()
             return self
-
+        
+        if self.use_median:
+            self.reference_ = np.median(X, axis=0)
+            return self
+        
+        if self.use_mean:
+            self.reference_ = X.mean(axis=0)
+            return self
+        
         raise ValueError("No reference was provided")
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
