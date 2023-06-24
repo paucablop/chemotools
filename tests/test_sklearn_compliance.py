@@ -15,6 +15,7 @@ from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
     MultiplicativeScatterCorrection,
+    RobustNormalVariate,
     StandardNormalVariate,
 )
 from chemotools.smooth import (
@@ -186,6 +187,13 @@ def test_compliance_range_cut():
     # Act & Assert
     check_estimator(transformer)
 
+
+# RobustNormalVariate
+def test_compliance_robust_normal_variate():
+    # Arrange
+    transformer = RobustNormalVariate()
+    # Act & Assert
+    check_estimator(transformer)
 
 # SubtractReference
 def test_compliance_subtract_reference():
