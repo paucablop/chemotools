@@ -5,7 +5,9 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class MultiplicativeScatterCorrection(
+    OneToOneFeatureMixin, BaseEstimator, TransformerMixin
+):
     """Multiplicative scatter correction (MSC) is a preprocessing technique for
     removing scatter effects from spectra. It is based on fitting a linear
     regression model to the spectrum using a reference spectrum. The reference
@@ -13,7 +15,7 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
 
     Parameters
     ----------
-    reference : np.ndarray, optional
+    reference : np.ndarray of shape (n_freatures), optional
         The reference spectrum to use for the correction. If None, the mean
         spectrum will be used. The default is None.
     use_mean : bool, optional
@@ -32,17 +34,20 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
     ------
     ValueError
         If no reference is provided.
-    
+
     """
+
     def __init__(
         self,
         reference: np.ndarray = None,
         use_mean: bool = True,
         use_median: bool = False,
+        weights: np.ndarray = None,
     ):
         self.reference = reference
         self.use_mean = use_mean
         self.use_median = use_median
+        self.weights = weights
 
     def fit(self, X: np.ndarray, y=None) -> "MultiplicativeScatterCorrection":
         """
@@ -71,17 +76,36 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
         # Set the fitted attribute to True
         self._is_fitted = True
 
-        # Set the reference
-        if self.reference is None and self.use_mean:
-            self.reference_ = X.mean(axis=0)
-            return self
-
-        if self.reference is None and self.use_median:
-            self.reference_ = np.median(X, axis=0)
-            return self
-
+        # Check that the length of the reference is the same as the number of features
         if self.reference is not None:
-            self.reference_ = self.reference.copy()
+            if len(self.reference) != self.n_features_in_:
+                raise ValueError(
+                    f"Expected {self.n_features_in_} features in reference but got {len(self.reference)}"
+                )
+
+        if self.weights is not None:
+            if len(self.weights) != self.n_features_in_:
+                raise ValueError(
+                    f"Expected {self.n_features_in_} features in weights but got {len(self.weights)}"
+                )
+
+        # Set the reference
+        if self.reference is not None:
+            self.reference_ = np.array(self.reference)
+            self.A_ = self._calculate_A(self.reference_)
+            self.weights_ = np.array(self.weights)
+            return self
+
+        if self.use_median:
+            self.reference_ = np.median(X, axis=0)
+            self.A_ = self._calculate_A(self.reference_)
+            self.weights_ = np.array(self.weights)
+            return self
+
+        if self.use_mean:
+            self.reference_ = X.mean(axis=0)
+            self.A_ = self._calculate_A(self.reference_)
+            self.weights_ = np.array(self.weights)
             return self
 
         raise ValueError("No reference was provided")
@@ -111,13 +135,33 @@ class MultiplicativeScatterCorrection(OneToOneFeatureMixin, BaseEstimator, Trans
         X = check_input(X)
         X_ = X.copy()
 
-        # Calculate the multiplicative signal correction
-        ones = np.ones(X.shape[1])
-        for i, x in enumerate(X_):
-            X_[i] = self._calculate_multiplicative_correction(x, ones)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Check that the number of features is the same as the fitted data
+        if X_.shape[1] != self.n_features_in_:
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
-    def _calculate_multiplicative_correction(self, x, ones) -> np.ndarray:
-        A = np.vstack([self.reference_, ones]).T
-        m, c = np.linalg.lstsq(A, x, rcond=None)[0]
+        # Calculate the multiplicative signal correction
+        if self.weights is None:
+            for i, x in enumerate(X_):
+                X_[i] = self._calculate_multiplicative_correction(x)
+            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+
+        if self.weights is not None:
+            for i, x in enumerate(X_):
+                X_[i] = self._calculate_weighted_multiplicative_correction(x)
+            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+
+    def _calculate_weighted_multiplicative_correction(self, x) -> np.ndarray:
+        m, c = np.linalg.lstsq(
+            np.diag(self.weights_) @ self.A_, x * self.weights_, rcond=None
+        )[0]
         return (x - c) / m
+
+    def _calculate_multiplicative_correction(self, x) -> np.ndarray:
+        m, c = np.linalg.lstsq(self.A_, x, rcond=None)[0]
+        return (x - c) / m
+
+    def _calculate_A(self, reference):
+        ones = np.ones(reference.shape[0])
+        return np.vstack([reference, ones]).T
