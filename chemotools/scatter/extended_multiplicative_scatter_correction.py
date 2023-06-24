@@ -42,9 +42,6 @@ class ExtendedMultiplicativeScatterCorrection(
 
     Valeria Tafintseva et al. Correcting replicate variation in spectroscopic data by machine learning and
     model-based pre-processing, doi:10.1016/j.chemolab.2021.104350
-
-
-
     """
 
     def __init__(
@@ -163,12 +160,12 @@ class ExtendedMultiplicativeScatterCorrection(
             for i, x in enumerate(X_):
                 X_[i] = self._calculate_emsc(x)
             return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-        
+
         if self.weights is not None:
             for i, x in enumerate(X_):
                 X_[i] = self._calculate_weighted_emsc(x)
             return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-        
+
     def _calculate_weighted_emsc(self, x):
         reg = np.linalg.lstsq(
             np.diag(self.weights_) @ self.A_, x * self.weights_, rcond=None
