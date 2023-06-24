@@ -11,11 +11,11 @@ class ExtendedMultiplicativeScatterCorrection(
 ):
     """Extended multiplicative scatter correction (EMSC) is a preprocessing technique for
     removing non linear scatter effects from spectra. It is based on fitting a polynomial
-    regression model to the spectrum using a reference spectrum. The reference spectrum 
-    can be the mean or median spectrum of a set of spectra or a selected reerence. 
+    regression model to the spectrum using a reference spectrum. The reference spectrum
+    can be the mean or median spectrum of a set of spectra or a selected reerence.
 
-    Note that this implementation does not include further extensions of the model using 
-    orthogonal subspace models (such as PCA).
+    Note that this implementation does not include further extensions of the model using
+    orthogonal subspace models.
 
     Parameters
     ----------
@@ -37,7 +37,7 @@ class ExtendedMultiplicativeScatterCorrection(
 
     References
     ----------
-    Nils Kristian Afseth, Achim Kohler. Extended multiplicative signal correction 
+    Nils Kristian Afseth, Achim Kohler. Extended multiplicative signal correction
     in vibrational spectroscopy, a tutorial, doi:10.1016/j.chemolab.2012.03.004
 
     Valeria Tafintseva et al. Correcting replicate variation in spectroscopic data by machine learning and
@@ -53,11 +53,13 @@ class ExtendedMultiplicativeScatterCorrection(
         use_mean: bool = True,
         use_median: bool = False,
         order: int = 2,
+        weights: np.ndarray = None,
     ):
         self.reference = reference
         self.use_mean = use_mean
         self.use_median = use_median
         self.order = order
+        self.weights = weights
 
     def fit(self, X: np.ndarray, y=None) -> "ExtendedMultiplicativeScatterCorrection":
         """
@@ -86,24 +88,39 @@ class ExtendedMultiplicativeScatterCorrection(
         # Set the fitted attribute to True
         self._is_fitted = True
 
-        # Set the reference
-
+        # Check that the length of the reference is the same as the number of features
         if self.reference is not None:
-            self.reference_ = self.reference.copy()
+            if len(self.reference) != self.n_features_in_:
+                raise ValueError(
+                    f"Expected {self.n_features_in_} features in reference but got {len(self.reference)}"
+                )
+
+        if self.weights is not None:
+            if len(self.weights) != self.n_features_in_:
+                raise ValueError(
+                    f"Expected {self.n_features_in_} features in weights but got {len(self.weights)}"
+                )
+
+        # Set the reference
+        if self.reference is not None:
+            self.reference_ = np.array(self.reference)
             self.indices_ = self._calculate_indices(self.reference_)
             self.A_ = self._calculate_A(self.indices_, self.reference_)
+            self.weights_ = np.array(self.weights)
             return self
 
         if self.use_median:
             self.reference_ = np.median(X, axis=0)
             self.indices_ = self._calculate_indices(X[0])
             self.A_ = self._calculate_A(self.indices_, self.reference_)
+            self.weights_ = np.array(self.weights)
             return self
 
         if self.use_mean:
             self.reference_ = X.mean(axis=0)
             self.indices_ = self._calculate_indices(X[0])
             self.A_ = self._calculate_A(self.indices_, self.reference_)
+            self.weights_ = np.array(self.weights)
             return self
 
         raise ValueError("No reference was provided")
@@ -141,9 +158,23 @@ class ExtendedMultiplicativeScatterCorrection(
 
         # Calculate the extended multiplicative scatter correction
         X_ = X.copy()
-        for i, x in enumerate(X_):
-            X_[i] = self._calculate_emsc(x)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+
+        if self.weights is None:
+            for i, x in enumerate(X_):
+                X_[i] = self._calculate_emsc(x)
+            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        
+        if self.weights is not None:
+            for i, x in enumerate(X_):
+                X_[i] = self._calculate_weighted_emsc(x)
+            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        
+    def _calculate_weighted_emsc(self, x):
+        reg = np.linalg.lstsq(
+            np.diag(self.weights_) @ self.A_, x * self.weights_, rcond=None
+        )[0]
+        x_ = (x - np.dot(self.A_[:, 0:-1], reg[0:-1])) / reg[-1]
+        return x_
 
     def _calculate_emsc(self, x):
         reg = np.linalg.lstsq(self.A_, x, rcond=None)[0]
