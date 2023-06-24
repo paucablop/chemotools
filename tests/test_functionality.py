@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from chemotools.baseline import (
     AirPls,
@@ -95,6 +96,52 @@ def test_extended_baseline_correction():
 
     # Assert
     assert np.allclose(spectrum_emsc[0], reference, atol=1e-8)
+
+
+def test_extended_baseline_correction_with_weights():
+    # Arrange
+    spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).reshape(
+        1, -1
+    )
+    reference = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    weights = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+    emsc = ExtendedMultiplicativeScatterCorrection(reference=reference, weights=weights)
+
+    # Act
+    spectrum_emsc = emsc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_emsc[0], reference, atol=1e-8)
+
+
+def test_extended_baseline_correction_with_wrong_reference():
+    # Arrange
+    spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).reshape(
+        1, -1
+    )
+    reference = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+    # Act
+    emsc = ExtendedMultiplicativeScatterCorrection(reference=reference)
+
+    # Assert
+    with pytest.raises(ValueError):
+        emsc.fit_transform(spectrum)
+
+
+def test_extended_baseline_correction_with_wrong_weights():
+    # Arrange
+    spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).reshape(
+        1, -1
+    )
+    weights = np.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+    # Act
+    emsc = ExtendedMultiplicativeScatterCorrection(weights=weights)
+
+    # Assert
+    with pytest.raises(ValueError):
+        emsc.fit_transform(spectrum)
 
 
 def test_extended_baseline_correction_through_msc(spectrum):
@@ -223,7 +270,7 @@ def test_multiplicative_scatter_correction_mean(spectrum, reference_msc_mean):
 
 def test_multiplicative_scatter_correction_with_reference(spectrum, reference_msc_mean):
     # Arrange
-    msc = MultiplicativeScatterCorrection(reference=reference_msc_mean)
+    msc = MultiplicativeScatterCorrection(reference=reference_msc_mean[0])
 
     # Act
     spectrum_corrected = msc.fit_transform(spectrum)
@@ -247,15 +294,46 @@ def test_multiplicative_scatter_correction_with_reference_median(
     spectrum, reference_msc_median
 ):
     # Arrange
-    msc = MultiplicativeScatterCorrection(
-        reference=reference_msc_median, use_median=True
-    )
+    msc = MultiplicativeScatterCorrection(reference=reference_msc_median[0], use_median=True)
 
     # Act
     spectrum_corrected = msc.fit_transform(spectrum)
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_msc_median[0], atol=1e-8)
+
+
+def test_multiplicative_scatter_correction_with_weights(spectrum, reference_msc_mean):
+    # Arrange
+    weights = np.ones(len(spectrum[0]))
+
+    msc = MultiplicativeScatterCorrection(weights=weights)
+
+    # Act
+    spectrum_corrected = msc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_msc_mean[0], atol=1e-8)
+
+
+def test_multiplicative_scatter_correction_with_wrong_weights(spectrum, reference_msc_mean):
+    # Arrange
+    weights = np.ones(10)
+    msc = MultiplicativeScatterCorrection(weights=weights)
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        msc.fit_transform(spectrum)
+
+
+def test_multiplicative_scatter_correction_with_wrong_reference(spectrum, reference_msc_mean):
+    # Arrange
+    reference = np.ones(10)
+    msc = MultiplicativeScatterCorrection(reference=reference)
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        msc.fit_transform(spectrum)
 
 
 def test_non_negative_zeroes():
