@@ -145,7 +145,7 @@ def test_extended_baseline_correction_with_wrong_weights():
         emsc.fit_transform(spectrum)
 
 
-def test_extended_baseline_correction_with_wrong_weights():
+def test_extended_baseline_correction_with_noreference_no_median_no_mean():
     # Arrange
     emsc = ExtendedMultiplicativeScatterCorrection(use_mean=False)
 
