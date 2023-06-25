@@ -145,11 +145,34 @@ def test_extended_baseline_correction_with_wrong_weights():
         emsc.fit_transform(spectrum)
 
 
+def test_extended_baseline_correction_with_wrong_weights():
+    # Arrange
+    emsc = ExtendedMultiplicativeScatterCorrection(use_mean=False)
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        emsc.fit_transform(spectrum)
+
+
 def test_extended_baseline_correction_through_msc(spectrum):
     # EMSC of 0 order should be equivalient to MSC
     # Arrange
     msc = MultiplicativeScatterCorrection()
     emsc = ExtendedMultiplicativeScatterCorrection(order=0)
+
+    # Act
+    spectrum_msc = msc.fit_transform(spectrum)
+    spectrum_emsc = emsc.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
+
+
+def test_extended_baseline_correction_through_msc_median(spectrum):
+    # EMSC of 0 order should be equivalient to MSC
+    # Arrange
+    msc = MultiplicativeScatterCorrection(use_median=True)
+    emsc = ExtendedMultiplicativeScatterCorrection(order=0, use_median=True)
 
     # Act
     spectrum_msc = msc.fit_transform(spectrum)
@@ -327,10 +350,20 @@ def test_multiplicative_scatter_correction_with_wrong_weights(spectrum, referenc
         msc.fit_transform(spectrum)
 
 
-def test_multiplicative_scatter_correction_with_wrong_reference(spectrum, reference_msc_mean):
+def test_multiplicative_scatter_correction_with_wrong_reference(spectrum):
     # Arrange
     reference = np.ones(10)
     msc = MultiplicativeScatterCorrection(reference=reference)
+
+    # Act & Assert
+    with pytest.raises(ValueError):
+        msc.fit_transform(spectrum)
+
+
+def test_multiplicative_scatter_correction_no_mean_no_median_no_reference(spectrum):
+    # Arrange
+    reference = np.ones(10)
+    msc = MultiplicativeScatterCorrection(use_mean=False)
 
     # Act & Assert
     with pytest.raises(ValueError):
