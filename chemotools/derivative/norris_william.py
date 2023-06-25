@@ -122,7 +122,9 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
                 X_[i] = derivative
             return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-        print("Derivative order must be either 1 or 2")
+        raise ValueError(
+            f"Expected derivative_order to be 1 or 2 but got {self.derivative_order}"
+        )
 
     def _smoothing_kernel(self):
         return np.ones(self.window_size) / self.window_size
