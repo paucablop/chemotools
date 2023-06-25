@@ -418,6 +418,17 @@ def test_norris_williams_filter_2():
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
 
 
+def test_norris_williams_wrong_filter():
+    # Arrange
+    norris_williams_filter = NorrisWilliams(derivative_order=5)
+    array = np.ones((1, 10)).reshape(1, -1)
+
+    # Act & Assert
+    
+    with pytest.raises(ValueError):
+        norris_williams_filter.fit_transform(array)
+
+
 def test_range_cut_by_index(spectrum):
     # Arrange
     range_cut = RangeCut(start=0, end=10)
