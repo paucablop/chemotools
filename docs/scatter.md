@@ -9,8 +9,9 @@ parent: Docs
 This package contains three common algorithms for scatter correction in spectroscopy:
 
 - [Multiplicative scatter correction (MSC)](#multiplicative-scatter-correction)
-- [Standard normal variate (SNV)](#standard-normal-variate)
 - [Extended multiplicative scatter correction (EMSC)](#extended-multiplicative-scatter-correction)
+- [Standard normal variate (SNV)](#standard-normal-variate)
+- [Robust normal variate (RNV)](#robust-normal-variate)
 
 ## __Multiplicative scatter correction__
 Multiplicative scatter correction (MSC) is a preprocessing technique in spectroscopy that corrects for the influence of light scattering on spectral measurements by dividing each spectrum by a scatter reference spectrum. The current implementation, accepts three types of reference spectra:
@@ -85,7 +86,7 @@ spectra_emsc = emsc.fit_transform(spectra)
 
 ### __Plotting example__:
 
-<iframe src="figures/extended_multiplicative_scatter_correction.html" width="800px" height="400px" style="border: none;"></iframe>
+<iframe src="figures/extended_multiplicative_signal_correction.html" width="800px" height="400px" style="border: none;"></iframe>
 
 
 ## __Standard normal variate__
