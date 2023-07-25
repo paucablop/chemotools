@@ -26,6 +26,11 @@ class ExtendedMultiplicativeScatterCorrection(
         Whether to use the mean spectrum as the reference. The default is True.
     use_median : bool, optional
         Whether to use the median spectrum as the reference. The default is False.
+    order : int, optional
+        The order of the polynomial to fit to the spectrum. The default is 2.
+    weights : np.ndarray, optional
+        The weights to use for the weighted EMSC. If None, the standard EMSC
+        will be used. The default is None.
 
 
     Attributes

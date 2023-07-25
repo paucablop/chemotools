@@ -56,14 +56,44 @@ spectra_msc = msc.fit_transform(spectra)
 
 <iframe src="figures/multiplicative_signal_correction.html" width="800px" height="400px" style="border: none;"></iframe>
 
+## __Extended multiplicative scatter correction__
+
+Extended multiplicative scatter correction (EMSC) is a preprocessing technique for removing non linear scatter effects from spectra. It is based on fitting a polynomial regression model to the spectrum using a reference spectrum. The reference spectrum can be the mean or median spectrum of a set of spectra or a selected reference. The current implementation is based on the following articles:
+
+- Nils Kristian Afseth, Achim Kohler. Extended multiplicative signal correction in vibrational spectroscopy, a tutorial, doi:10.1016/j.chemolab.2012.03.004
+
+- Valeria Tafintseva et al. Correcting replicate variation in spectroscopic data by machine learning and model-based pre-processing, doi:10.1016/j.chemolab.2021.104350
+
+### __Arguments__:
+
+| Argument | Description | Type | Default |
+| --- | --- | --- | --- |
+|```use_mean``` | Whether to use the mean spectrum of the dataset as a reference spectrum. | ```bool``` | ```True``` |
+| ```use_median``` | Whether to use the median spectrum of the dataset as a reference spectrum. | ```bool``` | ```False``` |
+| ```reference``` | The reference spectrum to use for scatter correction. | ```numpy.ndarray``` | ```None``` |
+| ```order``` | The degree of the polynomial regression model. | ```int``` | ```2``` |
+| ```weights``` | The weights to use for the polynomial regression model. If ```None``` all weights will be set to 1.| ```numpy.ndarray``` | ```None``` |
+
+### __Usage examples__:
+
+```python
+from chemotools.scatter import ExtendedMultiplicativeScatterCorrection
+
+emsc = ExtendedMultiplicativeScatterCorrection()
+spectra_emsc = emsc.fit_transform(spectra)
+``` 
+
+### __Plotting example__:
+
+<iframe src="figures/extended_multiplicative_scatter_correction.html" width="800px" height="400px" style="border: none;"></iframe>
+
+
 ## __Standard normal variate__
 Standard normal variate (SNV) is a preprocessing technique in spectroscopy that adjusts for baseline shifts and variations in signal intensity by subtracting the mean and dividing by the standard deviation of each spectrum.
-
 
 ### __Arguments__:
 
 The current implementation does not require any arguments.
-
 
 ### __Usage example__:
 
@@ -77,11 +107,27 @@ spectra_snv = snv.fit_transform(spectra)
 ### __Plotting example__:
 <iframe src="figures/standard_normal_variate.html" width="800px" height="400px" style="border: none;"></iframe>
 
-## __Extended multiplicative scatter correction__
 
-Coming soon
-{: .label .label-yellow }
+## __Robust normal variate__
+Robust normal variate (RNV) is a preprocessing technique in spectroscopy that adjusts for baseline shifts and variations in signal intensity. In contrast to the standard normal variate, the robust normal variate uses the mean and the standard deviation of a certain percentile of the spectrum to ensure robustness against outliers. The current implementation is based on:
 
-Extended multiplicative scatter correction (EMSC) is a preprocessing technique in spectroscopy that corrects for the influence of light scattering and instrumental drift by fitting a mathematical model to a reference spectrum and using it to normalize all spectra in the dataset.
+- Q. Guo, W. Wu, D.L. Massart. The robust normal variate transform for pattern recognition with near-infrared data. doi:10.1016/S0003-2670(98)00737-5
 
-An implementation of the EMSC will be available soon 🤓.
+### __Arguments__:
+
+| Argument | Description | Type | Default |
+| --- | --- | --- | --- |
+|```percentile``` | The percentile of the spectrum to use for calculating the mean and standard deviation. | ```float``` | ```25``` |
+
+### __Usage example__:
+
+```python
+from chemotools.scatter import RobustNormalVariate
+
+rnv = RobustNormalVariate()
+spectra_rnv = rnv.fit_transform(spectra)
+```
+
+### __Plotting example__:
+<iframe src="figures/robust_normal_variate.html" width="800px" height="400px" style="border: none;"></iframe>
+
