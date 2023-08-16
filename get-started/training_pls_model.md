@@ -6,9 +6,9 @@ nav_order: 3
 ---
 
 
-## __Training a PLS model__
+## __Training a regression model__
 
-The following code shows how to train a PLS model using ```scikit-learn```. The following preprocessing are used:
+The following code shows how to train a partial least squares (PLS) regression model using ```chemotools``` and ```scikit-learn```. The following preprocessing are used:
 
 - Linear correction
 - Savitzky-Golay derivative

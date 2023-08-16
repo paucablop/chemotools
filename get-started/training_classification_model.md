@@ -45,7 +45,7 @@ spectra.shape
 
 The ```origins``` variable is a ```list``` with 128 elements corresponding to the origin of each sample. The amount of samples of each origin is visualized in the following plot:
 
-<iframe src="figures/origins_pie.html" width="100%" style="border: none;"></iframe>
+<iframe src="figures/origins_pie.html" width="800px" height="500px" style="border: none;"></iframe>
 
 In this dataset, the coffee from Spain is over-represented.
 
@@ -53,9 +53,9 @@ In this dataset, the coffee from Spain is over-represented.
 
 Plotting and visualizing the spectra is key to understand the data. In this case, we will plot and color the spectra according to their origin:
 
-<iframe src="figures/coffee_data.html" width="100%" style="border: none;"></iframe>
+<iframe src="figures/coffee_data.html" width="800px" height="500px" style="border: none;"></iframe>
 
-Just by plotting the data we can easily differentiate the Spanish coffee from the other two. 
+Just by plotting the data we can easily distinguish the Spanish coffee from the other two. 
 
 
 
