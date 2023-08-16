@@ -1,12 +1,12 @@
 ---
-title: Training a PLS model
+title: Training a regression model
 layout: default
 parent: Get Started
 nav_order: 3
 ---
 
 
-## __Training a regression model__
+# __Training a regression model__
 
 The following code shows how to train a partial least squares (PLS) regression model using ```chemotools``` and ```scikit-learn```. The following preprocessing are used:
 

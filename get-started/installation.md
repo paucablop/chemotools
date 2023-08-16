@@ -5,7 +5,7 @@ parent: Get Started
 nav_order: 1
 ---
 
-## __Installation__
+# __Installation__
 
 The easiest way to install ```chemotools``` is using ```pip```:
 

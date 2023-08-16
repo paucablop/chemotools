@@ -21,7 +21,7 @@ Can coffees from different origins be differentiated using infrared spectroscopy
 The spectra are measured from already brewed coffees using attenuated total refractance mid infrared spectroscopy (ATR-MIR). 
 
 {: .highlight }
-> Yes! I know. If you are a coffee lover you will be thinking _that there can be many factors affecting the spectra: an espresso is very different than a pourover!_. You are right! in this dataset, all coffees were roasted under the same conditions, but the Ethiopian and Brazilian coffees were brewed for espresso and the Spanish using a moka pot.
+> Yes! I know. If you are a coffee lover you will be thinking: _there can be many factors affecting the spectra: an espresso is very different than a pourover!_. You are right! in this dataset, all coffees were roasted under the same conditions, but the Ethiopian and Brazilian coffees were brewed for espresso and the Spanish using a moka pot.
 
 ### __Import the data__
 
@@ -47,7 +47,7 @@ The ```origins``` variable is a ```list``` with 128 elements corresponding to th
 
 <iframe src="figures/origins_pie.html" width="800px" height="500px" style="border: none;"></iframe>
 
-In this dataset, the coffee from Spain is over-represented.
+This is a balanced dataset where all the classes are equally represented 🤩!
 
 ### __Plot and color__
 
@@ -55,9 +55,7 @@ Plotting and visualizing the spectra is key to understand the data. In this case
 
 <iframe src="figures/coffee_data.html" width="800px" height="500px" style="border: none;"></iframe>
 
-Just by plotting the data we can easily distinguish the Spanish coffee from the other two. 
-
-
+By plotting and coloring the spectra according to the origin, we can visually distinguish the Spanish coffee from the Ethiopian and the Brazilian.
 
 
 
