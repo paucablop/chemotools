@@ -31,5 +31,6 @@ setuptools.setup(
         "scikit-learn",
     ],
     include_package_data=True,
-    package_data={'': ['tests/resources/*.csv']}
+    package_data={'': ['tests/resources/*.csv',
+                       'datasets/data/*.csv']}
 )
