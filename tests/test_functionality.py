@@ -444,7 +444,7 @@ def test_range_cut_by_wavenumber():
     # Arrange
     wavenumbers = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
-    range_cut = RangeCut(wavenumbers, start=2.5, end=7.9)
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers)
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
@@ -457,7 +457,7 @@ def test_range_cut_by_wavenumber_2():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
-    range_cut = RangeCut(wavenumbers, start=2.5, end=7.9)
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers)
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
