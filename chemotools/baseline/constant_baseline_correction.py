@@ -8,7 +8,7 @@ from chemotools.utils.check_inputs import check_input
 class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
     A transformer that corrects a baseline by subtracting a constant value.
-    The constant value is taken by the mean of the features between the start 
+    The constant value is taken by the mean of the features between the start
     and end indices. This is a common preprocessing technique for UV-Vis spectra.
 
     Parameters
@@ -24,6 +24,12 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
 
     Attributes
     ----------
+    start_index_ : int
+        The index of the start of the range. It is 0 if the wavenumbers are not provided.
+
+    end_index_ : int
+        The index of the end of the range. It is 1 if the wavenumbers are not provided.
+
     n_features_in_ : int
         The number of features in the input data.
 
@@ -40,11 +46,11 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
     """
 
     def __init__(
-        self, wavenumbers: np.ndarray = None, start: int = 0, end: int = 1
+        self, start: int = 0, end: int = 1, wavenumbers: np.ndarray = None,
     ) -> None:
+        self.start = start
+        self.end = end
         self.wavenumbers = wavenumbers
-        self.start = self._find_index(start)
-        self.end = self._find_index(end)
 
     def fit(self, X: np.ndarray, y=None) -> "ConstantBaselineCorrection":
         """
@@ -71,6 +77,14 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
 
         # Set the fitted attribute to True
         self._is_fitted = True
+
+        # Set the start and end indices
+        if self.wavenumbers is None:
+            self.start_index_ = self.start
+            self.end_index_ = self.end
+        else:
+            self.start_index_ = self._find_index(self.start)
+            self.end_index_ = self._find_index(self.end)
 
         return self
 
@@ -109,7 +123,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
 
         # Base line correct the spectra
         for i, x in enumerate(X_):
-            mean_baseline = np.mean(x[self.start : self.end + 1])
+            mean_baseline = np.mean(x[self.start_index_ : self.end_index_ + 1])
             X_[i, :] = x - mean_baseline
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
