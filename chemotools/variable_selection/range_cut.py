@@ -9,26 +9,32 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
     A transformer that cuts the input data to a specified range. The range is specified:
     - by the indices of the start and end of the range,
-    - by the wavenumbers of the start and end of the range. In this case, the wavenumbers 
+    - by the wavenumbers of the start and end of the range. In this case, the wavenumbers
         must be provided to the transformer when it is initialised. If the wavenumbers
         are not provided, the indices will be used instead. The wavenumbers must be
         provided in ascending order.
 
     Parameters
     ----------
-    wavenumbers : array-like, optional
-        The wavenumbers of the input data. If not provided, the indices will be used
-        instead. Default is None. If provided, the wavenumbers must be provided in
-        ascending order.
-
     start : int, optional
         The index or wavenumber of the start of the range. Default is 0.
 
     end : int, optional
         The index or wavenumber of the end of the range. Default is -1.
 
+    wavenumbers : array-like, optional
+        The wavenumbers of the input data. If not provided, the indices will be used
+        instead. Default is None. If provided, the wavenumbers must be provided in
+        ascending order.
+
     Attributes
     ----------
+    start_index_ : int
+        The index of the start of the range. It is 0 if the wavenumbers are not provided.
+
+    end_index_ : int
+        The index of the end of the range. It is -1 if the wavenumbers are not provided.
+
     n_features_in_ : int
         The number of features in the input data.
 
@@ -43,15 +49,16 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     transform(X, y=0, copy=True)
         Transform the input data by cutting it to the specified range.
     """
+
     def __init__(
         self,
-        wavenumbers: np.ndarray = None,
         start: int = 0,
         end: int = -1,
+        wavenumbers: np.ndarray = None,
     ):
+        self.start = start
+        self.end = end
         self.wavenumbers = wavenumbers
-        self.start = self._find_index(start)
-        self.end = self._find_index(end)
 
     def fit(self, X: np.ndarray, y=None) -> "RangeCut":
         """
@@ -78,6 +85,14 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         # Set the fitted attribute to True
         self._is_fitted = True
+
+        # Set the start and end indices
+        if self.wavenumbers is None:
+            self.start_index_ = self.start
+            self.end_index_ = self.end
+        else:
+            self.start_index_ = self._find_index(self.start)
+            self.end_index_ = self._find_index(self.end)
 
         return self
 
@@ -112,7 +127,7 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             )
 
         # Range cut the spectra
-        return X_[:, self.start : self.end]
+        return X_[:, self.start_index_ : self.end_index_]
 
     def _find_index(self, target: float) -> int:
         if self.wavenumbers is None:
