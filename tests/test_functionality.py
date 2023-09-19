@@ -73,7 +73,7 @@ def test_constant_baseline_correction_with_wavenumbers():
     spectrum = np.array([1, 1, 1, 1, 1, 1, 1, 2, 2, 1]).reshape(1, -1)
     wavenumbers = np.array([2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
     constant_baseline_correction = ConstantBaselineCorrection(
-        wavenumbers=wavenumbers, start=9, end=10
+        start=9, end=10, wavenumbers=wavenumbers
     )
 
     # Act
