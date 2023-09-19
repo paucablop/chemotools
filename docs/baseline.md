@@ -97,7 +97,7 @@ spectra_baseline = cbc.fit_transform(spectra)
 ```python
 from chemotools.baseline import ConstantBaselineCorrection
 
-cbc = ConstantBaselineCorrection(wavenumbers=wn,start=950, end=975)
+cbc = ConstantBaselineCorrection(start=950, end=975, wavenumbers=wn)
 spectra_baseline = cbc.fit_transform(spectra)
 ```
 

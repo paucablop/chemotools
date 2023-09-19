@@ -40,7 +40,7 @@ spectra_rcbi = rcbi.fit_transform(spectra)
 ```python
 from chemotools.variable_selection import RangeCut
 
-rcbw = RangeCut(wn, 950, 1100)
+rcbw = RangeCut(950, 1100, wavenumbers=wn)
 spectra_rcbw = rcbw.fit_transform(spectra)
 ```
 
