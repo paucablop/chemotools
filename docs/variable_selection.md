@@ -16,9 +16,9 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```wavenumbers```| The wavenumbers of the spectra. |```numpy.ndarray```/```list```| ```None``` |
 | ```start``` | If not ```wavenumbers```, start corresponds to the first index. If the ```wavenumbers``` are provided, then it correpsonds to the first wavenumber. | ```float``` | ```0``` |
 | ```end``` | If not ```wavenumbers```, end corresponds to the last index. If the ```wavenumbers``` are provided, then it correpsonds to the last wavenumber. | ```float``` | ```-1``` |
+| ```wavenumbers```| The wavenumbers of the spectra. |```numpy.ndarray```/```list```| ```None``` |
     
 {: .warning }
 > The ```wavenumbers``` vector must be sorted in ascending order.

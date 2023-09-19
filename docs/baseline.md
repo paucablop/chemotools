@@ -74,9 +74,9 @@ Constant baseline correction is a preprocessing technique in spectroscopy that c
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-|```wavenumbers``` | The wavenumbers of the spectrum. | ```numpy.ndarray``` | ```None``` |
 | ```start``` | The start index of the region to use for calculating the mean. If no wavenumbers are provided, it will take the index of the spectrum. If wavenumbers are provided it will take the index corresponding to the wavenumber | ```int``` | ```0``` |
 | ```end``` | The end index of the region to use for calculating the mean. If no wavenumbers are provided, it will take the index of the spectrum. If wavenumbers are provided it will take the index corresponding to the wavenumber| ```int``` | ```1``` |
+|```wavenumbers``` | The wavenumbers of the spectrum. | ```numpy.ndarray``` | ```None``` |
 
 {: .warning }
 > The ```wavenumbers``` vector must be sorted in ascending order.
