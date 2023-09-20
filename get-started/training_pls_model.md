@@ -43,6 +43,13 @@ Before diving into data modeling, it's essential to get familiar with your data.
 print(f"Number of samples: {spectra.shape[0]}")
 print(f"Number of wavenumbers: {spectra.shape[1]}")
 ```
+This should return the following output:
+
+```
+Number of samples: 21
+Number of wavenumbers: 1047
+```
+
 Now that you have the basics down, let's take a closer look at the data.
 
 For the spectral data, you can use the ```pandas.DataFrame.head()``` method to examine the first 5 rows:
