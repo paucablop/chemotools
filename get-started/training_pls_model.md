@@ -37,6 +37,8 @@ The ```load_fermentation_train()``` function returns two ```pandas.DataFrame```:
 
 - ```hplc```: AHere, you'll find HPLC measurements, specifically glucose concentrations (in g/L), stored in a single column labeled ```glucose```.
 
+### __Exploring the training dataset__
+
 Before diving into data modeling, it's essential to get familiar with your data. Start by answering basic questions: _How many samples are there?_, and _how many wavenumbers are available?_
 
 ```python
@@ -78,3 +80,46 @@ This summary offers insights into the distribution of glucose concentrations. Wi
 | 50%       | 18.395220    |
 | 75%       | 29.135105    |
 | Max       | 38.053004    |
+
+
+### __Visualizing the training dataset__
+
+To better understand our dataset, we employ visualization. We will generate a graphical representation of the train dataset, with each spectrum color-coded to reflect its associated glucose concentration. This visual approach provides a didactic means to grasp the dataset's nuances, offering insights into chemical variations among samples. To do so, we'll use the ```matplotlib.pyplot``` module:
+
+
+```python
+import matplotlib.pyplot as plt
+from matplotlib.colors import Normalize
+
+# Define a colormap
+cmap = plt.get_cmap("jet")
+
+# Define a normalization function to scale glucose concentrations between 0 and 1
+norm = Normalize(vmin=hplc.glucose.min(), vmax=hplc.glucose.max())
+colors = [cmap(normalize(value)) for value in hplc['glucose']]
+
+# Plot the spectra
+fig, ax = plt.subplots(figsize=(10, 4))
+for i, row in enumerate(spectra.iterrows()):
+    ax.plot(row[1], color=colors[i])
+
+# Add a colorbar
+sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalize)
+sm.set_array([])
+fig.colorbar(sm, ax=ax, label='Glucose (g/L)')
+
+# Add labels
+ax.set_xlabel('Wavenumber (cm$^{-1}$)')
+ax.set_ylabel('Absorbance (a.u.)')
+ax.set_title('Fermentation training set')
+
+plt.show()
+```
+
+This should result in the following plot:
+
+![Fermentation training set](./figures/fermentation_train.png)
+
+Ok, these are not very beautiful spectra. This is because they are recorded over a long wavenumber range, where there is a large section withoug chemical information. Let's zoom in on the region between 950 and 1550 cm$^{-1}$, where we can see some interesting features:
+
+![Fermentation training set](./figures/fermentation_train_zoom.png)
