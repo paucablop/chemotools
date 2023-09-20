@@ -302,7 +302,10 @@ ax.set_ylabel('Predicted glucose (g/L)')
 ax.set_title('PLS regression')
 ```
 
-![PLS regression](./figures/fermentation_train_predictions.png)
+<a href="link_to_image">
+    <img src="./figures/fermentation_train_predictions.png" alt="PLS regression" width="50%">
+</a>
+
 
 ## __Applying the model to the testing dataset__
 
