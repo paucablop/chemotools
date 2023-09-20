@@ -163,6 +163,47 @@ Ok, these are not very beautiful spectra. This is because they are recorded over
 
 ## __Preprocessing the training spectra__
 
-Now that you've explored the dataset, it's time to preprocess the spectral data. This step is essential for removing unwanted variations, such as baseline shifts and noise, which can negatively impact model performance. We'll use the ```chemotools``` module to preprocess the spectral data:
+Now that you've explored the dataset, it's time to preprocess the spectral data. This step is essential for removing unwanted variations, such as baseline shifts and noise, which can negatively impact model performance. We'll use the ```chemotools``` and the ```scikit-learn``` modules to preprocess the spectral data. 
+
+We will preprocess the spectra using the following steps:
+
+- __[Range Cut](https://paucablop.github.io/chemotools/docs/variable_selection.html#range-cut)__: to remove the wavenumbers outside the range between 950 and 1550 cm-1.
+
+- __[Linear Correction](https://paucablop.github.io/chemotools/docs/baseline.html#linear-baseline-correction)__: to remove the linear baseline shift. 
+
+- __[Savitzky-Golay](https://paucablop.github.io/chemotools/docs/derivative.html#savitzky-golay-derivative)__: calculates the nth order derivative of the spectra using the Savitzky-Golay method. This is useful to remove additive and multiplicative scatter effects. 
+
+- __[Standard Scaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)__: to scale the spectra to zero mean.
+
+We will chain the preprocessing steps using the [```make_pipeline()```](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html) function from ```scikit-learn```. _What is a pipeline?_ A pipeline is a sequence of steps that are executed in a specific order. In our case, we will create a pipeline that will execute the preprocessing steps in the order described above. You can find more information on working with pipelines on our [documentation page](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-pipelines).
+
+
 
 ```python
+from chemotools.variable_selection import RangeCut
+from chemotools.baseline import LinearCorrection
+from chemotools.derivative import SavitzkyGolay
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+
+# create a pipeline that scales the data
+
+preprocessing = make_pipeline(
+    RangeCut(start=950, end=1500, wavelength=wavenumbers),
+    LinearCorrection(),
+    SavitzkyGolay(window_size=21, derivate_order=1),
+    StandardScaler(with_std=False)
+)
+```
+
+Now we can use the preprocessing pipeline to preprocess the spectra:
+
+```python
+spectra_preprocessed = preprocessing.fit_transform(spectra_np)
+```
+
+
+
+{: .note }
+> Ok, this is cool! see how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaity provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
