@@ -191,7 +191,7 @@ from sklearn.pipeline import make_pipeline
 preprocessing = make_pipeline(
     RangeCut(start=950, end=1500, wavelength=wavenumbers),
     LinearCorrection(),
-    SavitzkyGolay(window_size=21, derivate_order=1),
+    SavitzkyGolay(window_size=15, polynomial_order=2, derivate_order=1),
     StandardScaler(with_std=False)
 )
 ```
@@ -218,7 +218,58 @@ This will produce the following plot:
 
 ![Fermentation training set](./figures/fermentation_train_preprocessed.png)
 
-
-
 {: .note }
 > Ok, this is cool! See how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaity provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
+
+
+## __Training a PLS model__
+A [Partial Least Squares (PLS)](https://en.wikipedia.org/wiki/Partial_least_squares_regression) model is a bilinear regression model that is widely used in chemometrics. It is a regression algorithm that will learn a latent space representation of the data that has a maximum covariance with the target variable. A crucial parameter of the PLS model is the dimension of the latent space (often referred to as number of components). Selecting a number of components that is too large, will result in overfitting, as the latent space will start describing the noise in the data. On the other hand, selecting a number of components that is too small, will result in underfitting, as the latent space will not be able to capture the relevant information in the data. Therefore, it is important to select the right number of components.
+
+Finding the right number of components can be challenging, specially when the number of samples is not so large. For this reason, a powerfull tool to select the number of components is cross-validation. Cross-validation is a technique that allows us to estimate the generalization error of a model. The idea is to split the data into a training and a validation set. Then, we train the model on the training set and evaluate its performance on the validation set. We repeat this process several times, each time using a different split of the data. Finally, we average the performance of the model over all the splits. This will give us an estimate of the generalization error of the model. 
+
+We will use the cross-validation functionalities provided by ```scikit-learn``` to find the optimal numbers of components for our PLS model. We will use the ```GridSearchCV``` class to perform a grid search over the number of components. The ```GridSearchCV``` class will perform a cross-validation for each number of components in the grid and return the optimal number of components.
+
+```python
+# import the PLSRegression and GridSearchCV classes
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import GridSearchCV
+
+# instanciate a PLSRegression object
+pls = PLSRegression(scale=False)
+
+# define the parameter grid (number of components to evaluate)
+param_grid = {'n_components': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+
+# create a grid search object
+grid_search = GridSearchCV(pls, param_grid, cv=10, scoring='neg_mean_absolute_error')
+
+# fit the grid search object to the data
+grid_search.fit(spectra_preprocessed, hplc_np)
+
+# print the best parameters and score
+print("Best parameters: ", grid_search.best_params_)
+print("Best score: ", np.abs(grid_search.best_score_))
+```
+
+This returns the following output:
+
+```
+Fitting 10 folds for each of 10 candidates, totalling 100 fits
+Best parameters:  {'n_components': 6}
+Best score:  0.9229440262462993
+```
+
+Suggesting that the optimal number of components is 6, with a mean absolute error of 0.92 g/L. We can verify this by plotting the mean absolute error as a function of the number of components:
+
+```python
+fig, ax = plt.subplots(figsize=(10, 4))
+ax.plot(param_grid['n_components'], np.abs(grid_search.cv_results_['mean_test_score']), marker='o', color='b')
+ax.set_xlabel('Number of components')
+ax.set_ylabel('Mean absolute error (g/L)')
+ax.set_title('Cross validation results')
+```
+which produces the following plot:
+
+![Cross validation results](./figures/fermentation_train_cv.png)
+
+
