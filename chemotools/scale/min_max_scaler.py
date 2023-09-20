@@ -7,13 +7,15 @@ from chemotools.utils.check_inputs import check_input
 
 class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that scales the input data by the maximum value or minimum 
-    value in the spectrum.
+    A transformer that scales the input data by subtracting the minimum and dividing by
+    the difference between the maximum and the minimum. When the use_min parameter is False, 
+    the data is scaled by the maximum.
 
     Parameters
     ----------
-    norm : str, optional
-        The normalization to use. Can be "max" or "min". Default is "max".
+    use_min : bool, default=True
+        The normalization to use. If True, the data is subtracted by the minimum and 
+        scaled by the maximum. If False, the data is scaled by the maximum.
 
     Attributes
     ----------
@@ -31,9 +33,9 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     transform(X, y=0, copy=True)
         Transform the input data by scaling by the maximum value.
     """
-    def __init__(self, norm: str = 'max'):
-        self.norm = norm
 
+    def __init__(self, use_min: bool = True):
+        self.use_min = use_min
 
     def fit(self, X: np.ndarray, y=None) -> "MinMaxScaler":
         """
@@ -65,7 +67,7 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by scaling by the maximum or minimum value.
+        Transform the input data by scaling it.
 
         Parameters
         ----------
@@ -89,14 +91,16 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Normalize the data by the maximum value
-        for i, x in enumerate(X_):
-            if self.norm == 'max':
-                X_[i] = x / np.max(x)
-            
-            if self.norm == 'min':
-                X_[i] = x / np.min(x)
+        if self.use_min:
+            X_ = (X_ - np.min(X_, axis=1, keepdims=True)) / (np.max(
+                X_, axis=1, keepdims=True) - np.min(X_, axis=1, keepdims=True))
+
+        else:
+            X_ = X_ / np.max(X_, axis=1, keepdims=True)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
