@@ -30,7 +30,7 @@ For a deeper understanding of these datasets and their transformation of raw dat
 {: .note }
 > This is a step by step guide, that you should be able to run on your own computer. Just remember to install the ```chemotools``` package first using ```pip install chemotools```.
 
-### __Loading the training dataset__
+## __Loading the training dataset__
 The Fermentation dataset is a valuable resource for investigating lignocellulosic ethanol fermentation. You can access it through the chemotools.datasets module using the ```load_fermentation_train()``` function:
 
 ```python
@@ -45,7 +45,7 @@ The ```load_fermentation_train()``` function returns two ```pandas.DataFrame```:
 
 - ```hplc```: AHere, you'll find HPLC measurements, specifically glucose concentrations (in g/L), stored in a single column labeled ```glucose```.
 
-### __Exploring the training dataset__
+## __Exploring the training dataset__
 
 Before diving into data modeling, it's essential to get familiar with your data. Start by answering basic questions: _How many samples are there?_, and _how many wavenumbers are available?_
 
@@ -90,41 +90,70 @@ This summary offers insights into the distribution of glucose concentrations. Wi
 | Max       | 38.053004    |
 
 
-### __Visualizing the training dataset__
+## __Visualizing the training dataset__
 
-To better understand our dataset, we employ visualization. We will generate a graphical representation of the train dataset, with each spectrum color-coded to reflect its associated glucose concentration. This visual approach provides a didactic means to grasp the dataset's nuances, offering insights into chemical variations among samples. To do so, we'll use the ```matplotlib.pyplot``` module:
+To better understand our dataset, we employ visualization. We will plot the train dataset, with each spectrum color-coded to reflect its associated glucose concentration. This visual approach provides a didactic means to grasp the dataset's characteristics, offering insights into chemical variations among the samples. To do so, we'll use the ```matplotlib.pyplot``` module. Remember to install it first using ```pip install matplotlib```.
+
+Up until now, we have used ```pandas.DataFrame``` to represent the dataset. ```pandas.DataFrame``` are great for storing and manipulating many large datasets. However, I often find more convenient to use ```numpy.ndarray``` to work with spectral data. Therefore, we will convert the ```pandas.DataFrame``` to ```numpy.ndarray``` using the ```pandas.DataFrame.to_numpy()``` method.
+
+{: .note }
+> Pandas lover 🐼 ❤️? No problem! ```chemotools``` also supports working with ```pandas.DataFrame``` by implementing the latest ```set_output()``` API from ```scikit-learn```. If you are more interested in working with ```pandas```, take a look at the documentation [here](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-pandas-dataframes).
+
+So our first step will be to transform our ```pandas.DataFrame``` to ```numpy.ndarray```:
+
+```python
+import numpy as np
+
+# Convert the spectra pandas.DataFrame to numpy.ndarray
+spectra_np = spectra.to_numpy()
+
+# Convert the wavenumbers pandas.columns to numpy.ndarray
+wavenumbers = spectra.columns.to_numpy(dtype=np.float64)
+
+# Convert the hplc pandas.DataFrame to numpy.ndarray
+hplc = hplc.to_numpy()
+```
+
+Now that we have our data in the right format, we can start plotting. We will define a function to plot the spectra, where each spectrum will be color-coded according to its glucose concentration. We will use the ```matplotlib.colors.Normalize``` class to normalize the glucose concentrations between 0 and 1. Then, we will use the ```matplotlib.cm.ScalarMappable``` class to create a colorbar.
 
 
 ```python
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 
-# Define a colormap
-cmap = plt.get_cmap("jet")
+def plot_spectra(spectra: np.ndarray, wavenumbers: np.ndarray, hplc: np.ndarray):
+    # Define a colormap
+    cmap = plt.get_cmap("jet")
 
-# Define a normalization function to scale glucose concentrations between 0 and 1
-norm = Normalize(vmin=hplc.glucose.min(), vmax=hplc.glucose.max())
-colors = [cmap(normalize(value)) for value in hplc['glucose']]
+    # Define a normalization function to scale glucose concentrations between 0 and 1
+    norm = Normalize(vmin=hplc.min(), vmax=hplc.max())
+    colors = [cmap(normalize(value)) for value in hplc]
 
-# Plot the spectra
-fig, ax = plt.subplots(figsize=(10, 4))
-for i, row in enumerate(spectra.iterrows()):
-    ax.plot(row[1], color=colors[i])
+    # Plot the spectra
+    fig, ax = plt.subplots(figsize=(10, 4))
+    for i, row in enumerate(spectra):
+        ax.plot(wavenumbers, row, color=colors[i])
 
-# Add a colorbar
-sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalize)
-sm.set_array([])
-fig.colorbar(sm, ax=ax, label='Glucose (g/L)')
+    # Add a colorbar
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=normalize)
+    sm.set_array([])
+    fig.colorbar(sm, ax=ax, label='Glucose (g/L)')
 
-# Add labels
-ax.set_xlabel('Wavenumber (cm$^{-1}$)')
-ax.set_ylabel('Absorbance (a.u.)')
-ax.set_title('Fermentation training set')
+    # Add labels
+    ax.set_xlabel('Wavenumber (cm$^{-1}$)')
+    ax.set_ylabel('Absorbance (a.u.)')
+    ax.set_title('Fermentation training set')
 
-plt.show()
+    plt.show()
 ```
 
-This should result in the following plot:
+Then, we can use this function to plot the training dataset:
+
+```python
+plot_spectra(spectra, hplc)
+```
+
+which should result in the following plot:
 
 ![Fermentation training set](./figures/fermentation_train.png)
 
@@ -133,3 +162,7 @@ Ok, these are not very beautiful spectra. This is because they are recorded over
 ![Fermentation training set](./figures/fermentation_train_zoom.png)
 
 ## __Preprocessing the training spectra__
+
+Now that you've explored the dataset, it's time to preprocess the spectral data. This step is essential for removing unwanted variations, such as baseline shifts and noise, which can negatively impact model performance. We'll use the ```chemotools``` module to preprocess the spectral data:
+
+```python
