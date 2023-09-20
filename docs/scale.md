@@ -34,20 +34,20 @@ spectra_norm = index.fit_transform(spectra)
 <iframe src="figures/index_scaler.html" width="800px" height="400px" style="border: none;"></iframe>
 
 ## __MinMax scaler__
-MinMaxScaler is a preprocessing technique in spectroscopy that scales each spectrum by its minimum or maximum value. 
+MinMaxScaler is a preprocessing technique in spectroscopy subtracts the minimum value of the spectrum and divides it by the difference between the maximum and the minimum value of the spectrum. If the parameter ```use_min``` is set to ```False```, the spectrum is just divided by the maximum value of the spectrum.
 
 ### __Arguments__:
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```norm``` | If ```'min'```, the spectrum is scaled by its minimum value. If ```'max'```, the spectrum is scaled by its maximum value. | ```str``` | ```'max'``` |
+| ```use_min``` | If ```True```, the spectrum is subtracted by its minimum value and divided by the difference between the maximum and the minimum. If ```False```, the spectrum is scaled by its maximum value. | ```bool``` | ```True``` |
 
 ### __Usage examples__:
 
 ```python
 from chemotools.scale import MinMaxScaler
 
-minmax = MinMaxScaler(norm='max')
+minmax = MinMaxScaler()
 spectra_norm = minmax.fit_transform(spectra)
 ```
 
