@@ -344,3 +344,38 @@ plot_spectra(spectra_test_preprocessed, wavenumbers_cut, glucose_test_pred)
 ```
 
 ![PLS regression](./figures/fermentation_test_preprocessed.png)
+
+Now we can compare the predicted glucose concentrations with the off-line HPLC measurements. We will plot the predictions and the off-line measurements over time. Each spectrum was taken every 1.25 minutes, while the off-line measurements were taken every 60 minutes. 
+
+```python
+# make linspace of length of predictoins
+time = np.linspace(0, len(predictions_test), len(predictions_test),) * 1.25 / 60
+
+# plot the predictions
+fig, ax = plt.subplots(figsize=(10, 4))
+
+ax.plot(time, predictions_test,  color='blue', label='Predicted')
+ax.plot(hplc_test.index, hplc_test['glucose']+4, 'o', color='red', label='Measured')
+ax.set_xlabel('Time (h)')
+ax.set_ylabel('Glucose (g/L)')
+ax.set_title('Fermentation test set')
+ax.legend()
+```
+
+## __Recap__
+
+In this tutorial, we embarked on a journey into the realm of machine learning for spectroscopic data analysis, focusing on the Fermentation dataset. We covered essential steps in building a regression model to predict glucose concentrations during lignocellulosic ethanol fermentation. Here's a brief recap of what we accomplished:
+
+- __Introduction:__ We introduced the Fermentation dataset, which consists of spectral data obtained through attenuated total reflectance, mid-infrared spectroscopy (ATR-MIR), and HPLC reference data. We highlighted the importance of this dataset in understanding real-time fermentation processes.
+
+- __Loading and Exploring Data:__ We loaded the training dataset, explored its dimensions, and gained insights into both spectral and HPLC data. Understanding your data is a crucial first step in any data analysis project.
+
+- __Visualizing Data:__ We used data visualization to gain a deeper understanding of the dataset. By plotting the spectra color-coded by glucose concentration, we visually examined the chemical variations among samples.
+
+- __Preprocessing Data:__ We applied preprocessing techniques, such as range cutting, linear correction, Savitzky-Golay derivative, and standard scaling, to prepare the spectral data for modeling. This step removed unwanted variations and enhanced the data's quality.
+
+- __Model Training:__ We trained a Partial Least Squares (PLS) regression model to predict glucose concentrations. We used cross-validation to find the optimal number of components and assessed model performance.
+
+- __Application to Testing Data:__ We extended our model to predict glucose concentrations in real-time by applying it to the testing dataset. This allowed us to monitor glucose levels during fermentation.
+
+This tutorial provides a solid foundation for anyone interested in using machine learning techniques for spectroscopic data analysis. By following these steps, you can gain valuable insights from complex spectral data and make predictions that can be applied in real-world applications. Happy analyzing!
