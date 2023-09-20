@@ -302,7 +302,7 @@ ax.set_ylabel('Predicted glucose (g/L)')
 ax.set_title('PLS regression')
 ```
 
-![PLS regression](./figures/fermentation_train_predictions.png, width=100)
+![PLS regression](./figures/fermentation_train_predictions.png)
 
 ## __Applying the model to the testing dataset__
 
@@ -361,6 +361,10 @@ ax.set_ylabel('Glucose (g/L)')
 ax.set_title('Fermentation test set')
 ax.legend()
 ```
+
+![PLS regression](./figures/fermentation_test_predictions.png)
+
+{:.note}
 
 ## __Recap__
 
