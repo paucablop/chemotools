@@ -233,7 +233,7 @@ def test_linear_correction(spectrum):
 
 def test_max_norm(spectrum):
     # Arrange
-    max_norm = MinMaxScaler(norm="max")
+    max_norm = MinMaxScaler(use_min=False)
 
     # Act
     spectrum_corrected = max_norm.fit_transform(spectrum)
@@ -270,14 +270,17 @@ def test_median_filter():
 
 def test_min_norm(spectrum):
     # Arrange
-    min_norm = MinMaxScaler(norm="min")
+    min_norm = MinMaxScaler()
 
     # Act
     spectrum_corrected = min_norm.fit_transform(spectrum)
 
     # Assert
     assert np.allclose(
-        spectrum_corrected[0], spectrum[0] / np.min(spectrum[0]), atol=1e-8
+        spectrum_corrected[0],
+        (spectrum[0] - np.min(spectrum[0]))
+        / (np.max(spectrum[0]) - np.min(spectrum[0])),
+        atol=1e-8,
     )
 
 
@@ -318,7 +321,9 @@ def test_multiplicative_scatter_correction_with_reference_median(
     spectrum, reference_msc_median
 ):
     # Arrange
-    msc = MultiplicativeScatterCorrection(reference=reference_msc_median[0], use_median=True)
+    msc = MultiplicativeScatterCorrection(
+        reference=reference_msc_median[0], use_median=True
+    )
 
     # Act
     spectrum_corrected = msc.fit_transform(spectrum)
@@ -340,7 +345,9 @@ def test_multiplicative_scatter_correction_with_weights(spectrum, reference_msc_
     assert np.allclose(spectrum_corrected[0], reference_msc_mean[0], atol=1e-8)
 
 
-def test_multiplicative_scatter_correction_with_wrong_weights(spectrum, reference_msc_mean):
+def test_multiplicative_scatter_correction_with_wrong_weights(
+    spectrum, reference_msc_mean
+):
     # Arrange
     weights = np.ones(10)
     msc = MultiplicativeScatterCorrection(weights=weights)
@@ -424,7 +431,7 @@ def test_norris_williams_wrong_filter():
     array = np.ones((1, 10)).reshape(1, -1)
 
     # Act & Assert
-    
+
     with pytest.raises(ValueError):
         norris_williams_filter.fit_transform(array)
 
