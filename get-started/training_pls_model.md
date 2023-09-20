@@ -14,7 +14,9 @@ nav_order: 3
 - [Load the fermentation dataset](#loading-the-training-dataset)
 - [Explore the fermentation dataset](#exploring-the-training-dataset)
 - [Visualize the fermentation dataset](#visualizing-the-training-dataset)
-- [Preprocess the training spectra](#preprocessing-the-training-spectra)
+- [Preprocess the spectra using pipelines](#preprocessing-the-training-spectra)
+- [Train a PLS model](#training-a-pls-model)
+- [Apply the model to the testing dataset](#applying-the-model-to-the-testing-dataset)
 
 ## __Introduction__
 Welcome to the world of spectroscopic data analysis, where we provide you with a unique insight into lignocellulosic ethanol fermentation in real-time. Our dataset comprises spectra obtained through attenuated total reflectance, mid-infrared (ATR-MIR) spectroscopy, combined with high-performance liquid chromatography (HPLC) reference data to ensure precision and accuracy.
@@ -25,7 +27,7 @@ Within this project, you'll find two vital datasets:
 
 - __Testing Dataset:__ Immerse yourself in the fermentation process through a time series of real-time spectra. For a comprehensive view, we've also included off-line HPLC measurements.
 
-For a deeper understanding of these datasets and their transformation of raw data into actionable insights, please refer to our comprehensive article: "Transforming Data to Information: A Parallel Hybrid Model for Real-Time State Estimation in Lignocellulosic Ethanol Fermentation." It's a journey into the world of data analysis, offering real-world applications.
+For a deeper understanding of these datasets and their transformation of raw data into actionable insights, please refer to our comprehensive article: "Transforming Data to Information: A Parallel Hybrid Model for Real-Time State Estimation in Lignocellulosic Ethanol Fermentation." It's a journey into the world of data analysis, offering real-world applications. (Note that the data in the article and the one provided here do not correspond to the same fermentation).
 
 {: .note }
 > This is a step by step guide, that you should be able to run on your own computer. Just remember to install the ```chemotools``` package first using ```pip install chemotools```.
@@ -219,7 +221,7 @@ This will produce the following plot:
 ![Fermentation training set](./figures/fermentation_train_preprocessed.png)
 
 {: .note }
-> Ok, this is cool! See how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaity provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
+> Ok, this is cool! See how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaities provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
 
 
 ## __Training a PLS model__
@@ -299,8 +301,15 @@ ax.set_xlabel('Measured glucose (g/L)')
 ax.set_ylabel('Predicted glucose (g/L)')
 ax.set_title('PLS regression')
 ```
-producing the following plot:
 
-![PLS regression](./figures/fermentation_train_predictions.png)
+![PLS regression](./figures/fermentation_train_predictions.png, width=100)
 
-{: .note }
+## __Applying the model to the testing dataset__
+
+Now that we have trained our model, we can apply it to the testing dataset. The testing dataset contains spectra recorded in real-time during the fermentation process. The test dataset contains two ```pandas.DataFrame```:
+
+- ```spectra```: This dataset contains spectral data, with columns representing wavenumbers and rows representing samples. These spectra were recorded in real-time during the fermentation process approximately every 1.5 minutes.
+
+- ```hplc```: This dataset contains HPLC measurements, specifically glucose concentrations (in g/L), stored in a single column labeled ```glucose```. These measurements were recorded off-line approximately every 60 minutes.
+
+So 
