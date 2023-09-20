@@ -175,7 +175,7 @@ We will preprocess the spectra using the following steps:
 
 - __[Standard Scaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)__: to scale the spectra to zero mean.
 
-We will chain the preprocessing steps using the [```make_pipeline()```](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html) function from ```scikit-learn```. _What is a pipeline?_ A pipeline is a sequence of steps that are executed in a specific order. In our case, we will create a pipeline that will execute the preprocessing steps in the order described above. You can find more information on working with pipelines on our [documentation page](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-pipelines).
+We will chain the preprocessing steps using the [```make_pipeline()```](https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html) function from ```scikit-learn```. _What is a pipeline?_ A pipeline is a sequence of steps that are executed in a specific order. In our case, we will create a pipeline that will execute the preprocessing steps in the order described above. You can find more information on working with pipelines at our [documentation page](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-pipelines).
 
 
 
@@ -188,7 +188,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 
 # create a pipeline that scales the data
-
 preprocessing = make_pipeline(
     RangeCut(start=950, end=1500, wavelength=wavenumbers),
     LinearCorrection(),
@@ -203,7 +202,23 @@ Now we can use the preprocessing pipeline to preprocess the spectra:
 spectra_preprocessed = preprocessing.fit_transform(spectra_np)
 ```
 
+Finally, we can plot the preprocessed spectra:
+
+```python
+# get the wavenumbers after the range cut
+start_index = preprocessing.named_steps['rangecut'].start
+end_index = preprocessing.named_steps['rangecut'].end
+wavenumbers_cut = wavenumbers[start_index:end_index]
+
+# plot the preprocessed spectra
+plot_spectra(spectra_preprocessed, wavenumbers_cut, hplc_np)
+
+```
+This will produce the following plot:
+
+![Fermentation training set](./figures/fermentation_train_preprocessed.png)
+
 
 
 {: .note }
-> Ok, this is cool! see how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaity provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
+> Ok, this is cool! See how we are integrating chemometrics with ```scikit-learn```? ```RangeCut```, ```LinearCorrection``` and ```SavitizkyGolay``` are all preprocessing techniques implemented in ```chemotools```, while ```StandardScaler``` and ```pipelines``` are functinlaity provided by ```scikit-learn```. This is the power of ```chemotools```, it is designed to work seamlessly with ```scikit-learn```.
