@@ -8,6 +8,14 @@ nav_order: 3
 
 # __Training a regression model__
 
+## What will you learn?
+
+- [Get familiar with the Fermentation dataset](#introduction)
+- [Load the fermentation dataset](#loading-the-training-dataset)
+- [Explore the fermentation dataset](#exploring-the-training-dataset)
+- [Visualize the fermentation dataset](#visualizing-the-training-dataset)
+- [Preprocess the training spectra](#preprocessing-the-training-spectra)
+
 ## __Introduction__
 Welcome to the world of spectroscopic data analysis, where we provide you with a unique insight into lignocellulosic ethanol fermentation in real-time. Our dataset comprises spectra obtained through attenuated total reflectance, mid-infrared (ATR-MIR) spectroscopy, combined with high-performance liquid chromatography (HPLC) reference data to ensure precision and accuracy.
 
@@ -123,3 +131,5 @@ This should result in the following plot:
 Ok, these are not very beautiful spectra. This is because they are recorded over a long wavenumber range, where there is a large section withoug chemical information. Let's zoom in on the region between 950 and 1550 cm$^{-1}$, where we can see some interesting features:
 
 ![Fermentation training set](./figures/fermentation_train_zoom.png)
+
+## __Preprocessing the training spectra__
