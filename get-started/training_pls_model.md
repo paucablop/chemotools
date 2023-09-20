@@ -312,4 +312,35 @@ Now that we have trained our model, we can apply it to the testing dataset. The 
 
 - ```hplc```: This dataset contains HPLC measurements, specifically glucose concentrations (in g/L), stored in a single column labeled ```glucose```. These measurements were recorded off-line approximately every 60 minutes.
 
-So 
+We will use the ```load_fermentation_test()``` function from the ```chemotools.datasets``` module to load the testing dataset:
+
+```python
+from chemotools.datasets import load_fermentation_test
+
+spectra_test, hplc_test = load_fermentation_test()
+```
+
+Then, we will preprocess the spectra using the same preprocessing pipeline that we used for the training dataset:
+
+```python
+# convert the spectra pandas.DataFrame to numpy.ndarray
+spectra_test_np = spectra_test.to_numpy()
+
+# preprocess the spectra
+spectra_test_preprocessed = preprocessing.transform(spectra_test_np)
+```
+
+Finally, we can use the PLS model to predict the glucose concentrations:
+
+```python
+# predict the glucose concentrations
+glucose_test_pred = pls.predict(spectra_test_preprocessed)
+```
+
+We can use the predicted values to plot the spectra color-coded according to the predicted glucose concentrations:
+
+```python
+plot_spectra(spectra_test_preprocessed, wavenumbers_cut, glucose_test_pred)
+```
+
+![PLS regression](./figures/fermentation_test_preprocessed.png)
