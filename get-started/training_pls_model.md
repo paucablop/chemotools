@@ -272,4 +272,35 @@ which produces the following plot:
 
 ![Cross validation results](./figures/fermentation_train_cv.png)
 
+{: .note }
+> Even though using the number of components that minimize the mean absolute error is a good starting point, it is not always the best. The model with 6 components does not increase the mean absolute error much compared to the model with 3 or even two components. However, the model with 6 components includes components associatet to small eigenvalues, which are more uncertain. This means that models with 3 or 2 components might be more robust. Therefore, it is always a good idea to try different numbers of components and select the one that gives the best performance.
 
+For now, we will train the model with 6 components:
+
+```python
+# instanciate a PLSRegression object with 6 components
+pls = PLSRegression(n_components=6, scale=False)
+
+# fit the model to the data
+pls.fit(spectra_preprocessed, hplc_np)
+```
+
+Finally we can evaluate the performance of the model on the training set:
+
+```python
+# predict the glucose concentrations
+hplc_pred = pls.predict(spectra_preprocessed)
+
+# plot the predictions
+fig, ax = plt.subplots(figsize=(4, 4))
+ax.scatter(hplc_np, predictions, color='blue')
+ax.plot([0, 40], [0, 40], color='magenta')
+ax.set_xlabel('Measured glucose (g/L)')
+ax.set_ylabel('Predicted glucose (g/L)')
+ax.set_title('PLS regression')
+```
+producing the following plot:
+
+![PLS regression](./figures/fermentation_train_predictions.png)
+
+{: .note }
