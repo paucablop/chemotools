@@ -53,7 +53,7 @@ spectra_norm = minmax.fit_transform(spectra)
 
 ### __Plotting example__:
 
-<iframe src="figures/minmax_scaler.html" width="800px" height="400px" style="border: none;"></iframe>
+<iframe src="figures/minmax_normalization.html" width="800px" height="400px" style="border: none;"></iframe>
 
 
 ## __L-norm scaler__
