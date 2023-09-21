@@ -50,3 +50,20 @@ def load_fermentation_test():
     fermentation_hplc = pd.read_csv(PACKAGE_DIRECTORY + "/data/fermentation_hplc.csv")
 
     return fermentation_spectra, fermentation_hplc
+
+
+def load_coffee():
+    """
+    Loads the coffee dataset. This data corresponds to a coffee spectra from three different origins 
+    measured off-line using attenuated total reflectance Fourier transform infrared spectroscopy (ATR-FTIR).
+
+    Returns
+    -------
+    coffee_spectra: pd.DataFrame A pandas DataFrame containing the coffee spectra.
+    coffee_labels: pd.DataFrame A pandas DataFrame containing the corresponding labels.
+    """
+
+    coffee_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
+    coffee_labels = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
+
+    return coffee_spectra, coffee_labels
