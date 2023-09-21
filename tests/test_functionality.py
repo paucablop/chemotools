@@ -115,6 +115,19 @@ def test_extended_baseline_correction_with_weights():
     assert np.allclose(spectrum_emsc[0], reference, atol=1e-8)
 
 
+def test_extended_baseline_correction_with_no_reference():
+    # Arrange
+    spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0]).reshape(1, -1)
+
+    # Act
+    emsc = ExtendedMultiplicativeScatterCorrection(use_mean=False, use_median=False)
+
+    # Assert
+    with pytest.raises(ValueError):
+        emsc.fit_transform(spectrum)
+
+
+
 def test_extended_baseline_correction_with_wrong_reference():
     # Arrange
     spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0]).reshape(
