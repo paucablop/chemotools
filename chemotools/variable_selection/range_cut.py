@@ -130,7 +130,5 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_[:, self.start_index_ : self.end_index_]
 
     def _find_index(self, target: float) -> int:
-        if self.wavenumbers is None:
-            return target
         wavenumbers = np.array(self.wavenumbers)
         return np.argmin(np.abs(wavenumbers - target))
