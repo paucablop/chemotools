@@ -10,7 +10,7 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
+from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
     MultiplicativeScatterCorrection,
@@ -180,17 +180,6 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
 
     # Assert
     assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
-
-
-def test_index_scaler(spectrum):
-    # Arrange
-    index_scaler = IndexScaler(index=0)
-    reference_spectrum = [value / spectrum[0][0] for value in spectrum[0]]
-    # Act
-    spectrum_corrected = index_scaler.fit_transform(spectrum)
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
 
 
 def test_l1_norm(spectrum):
@@ -434,6 +423,32 @@ def test_norris_williams_wrong_filter():
 
     with pytest.raises(ValueError):
         norris_williams_filter.fit_transform(array)
+
+
+def test_point_scaler(spectrum):
+    # Arrange
+    index_scaler = PointScaler(point=0)
+    reference_spectrum = [value / spectrum[0][0] for value in spectrum[0]]
+
+    # Act
+    spectrum_corrected = index_scaler.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
+
+
+def test_point_scaler_with_wavenumbers():
+    # Arrange
+    wavenumbers = np.array([1., 2., 3., 4., 5., 6., 7., 8., 9., 10.])
+    spectrum = np.array([[10., 12., 14., 16., 14., 12., 10., 12., 14., 16.]])
+
+    # Act
+    index_scaler = PointScaler(point=4, wavenumbers=wavenumbers)
+    spectrum_corrected = index_scaler.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum[0][3], atol=1e-8)
+
 
 
 def test_range_cut_by_index(spectrum):

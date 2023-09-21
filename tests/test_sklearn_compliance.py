@@ -11,7 +11,7 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
-from chemotools.scale import IndexScaler, MinMaxScaler, NormScaler
+from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
     MultiplicativeScatterCorrection,
@@ -67,13 +67,6 @@ def test_compliance_extended_multiplicative_scatter_correction():
     transformer = ExtendedMultiplicativeScatterCorrection()
     # Act & Assert
     check_estimator(transformer) 
-
-# IndexScaler
-def test_compliance_index_scaler():
-    # Arrange
-    transformer = IndexScaler()
-    # Act & Assert
-    check_estimator(transformer)
 
 
 # LinearCorrection
@@ -148,6 +141,14 @@ def test_compliance_norris_williams_2():
     check_estimator(transformer)
 
 
+# PointScaler
+def test_compliance_point_scaler():
+    # Arrange
+    transformer = PointScaler()
+    # Act & Assert
+    check_estimator(transformer)
+
+    
 # PolynomialCorrection
 def test_compliance_polynomial_correction():
     # Arrange
