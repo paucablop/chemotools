@@ -145,8 +145,9 @@ ax.set_xlabel("PC1")
 ax.set_ylabel("PC2")
 ax.set_title("PCA scores")
 ```
-
-![Coffee PCA scores](./figures/coffee_pca_scores.png)
+<a href="link_to_image">
+    <img src="./figures/coffee_pca_scores.png" alt="PLS regression" width="50%">
+</a>
 
 The results show that there are some differences between the spectra of the three coffes.
 
