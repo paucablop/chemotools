@@ -2,7 +2,7 @@
 title: Brewing a PLS regressor 
 layout: default
 parent: Get Started
-nav_order: 3
+nav_order: 4
 ---
 
 

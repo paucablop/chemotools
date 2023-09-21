@@ -2,7 +2,7 @@
 title: Coffee Spectra Classifier
 layout: default
 parent: Get Started
-nav_order: 4
+nav_order: 5
 ---
 
 # __Coffee Spectra Classifier__
