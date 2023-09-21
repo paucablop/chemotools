@@ -21,6 +21,9 @@ Point scaler is a preprocessing technique in spectroscopy that scales each spect
 | ```point``` | The index or wavenumber of the spectrum to use for scaling. If not ```wavenumbers``` it will use the index.| ```int``` | ```0``` |
 | ```wavenumber``` | The wavenumbers of the spectra. Optional. | ```np.ndarray```/```list``` | ```None``` |
 
+{: .warning }
+> The ```wavenumbers``` vector must be sorted in ascending order.
+
 ### __Usage examples__:
 
 ```python
