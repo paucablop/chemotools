@@ -546,6 +546,18 @@ def test_saviszky_golay_filter_3():
 def test_select_features():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+
+    # Act
+    select_features = SelectFeatures()
+    spectrum_corrected = select_features.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0], atol=1e-8)
+
+
+def test_select_features_with_index():
+    # Arrange
+    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
     expected = np.array([[1, 2, 3, 8, 9, 10]])
 
     # Act
