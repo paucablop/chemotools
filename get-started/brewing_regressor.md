@@ -1,12 +1,12 @@
 ---
-title: Training a regression model
+title: Brewing a PLS regressor 
 layout: default
 parent: Get Started
 nav_order: 3
 ---
 
 
-# __Training a regression model__
+# __Brewing a PLS regressor__
 
 ## What will you learn?
 
