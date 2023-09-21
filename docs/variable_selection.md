@@ -9,6 +9,9 @@ Variable selection is a preprocessing technique in spectroscopy that selects the
 - [Range cut](#range-cut)
 - [SelectFeatures](#range-cut-by-wavenumber)
 
+{: .note }
+> The variable selection algorithms implemented in ```chemotools``` allow you to select a subset of variables/features from the spectra. They are not designed to find the most relevant variables/features for a given task. 
+
 ## __Range cut__
 Range cut by index is a preprocessing technique in spectroscopy that selects all the variables in the spectra given a range of either two indices or two wavenumbers.
 
@@ -51,9 +54,30 @@ spectra_rcbw = rcbw.fit_transform(spectra)
 <iframe src="figures/range_cut_by_wavenumber.html" width="800px" height="400px" style="border: none;"></iframe>
 
 ## __SelectFeatures__
+SelectFeatures is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
 
-Coming soon
-{: .label .label-yellow }
+### __Arguments__:
 
-This preprocessing technique allows selecting the relevant features in a spectra. 
+| Argument | Description | Type | Default |
+| --- | --- | --- | --- |
+| ```features``` | The indices or wavenumbers of the features to be selected. If ```None``` it will return the entire array. | ```numpy.ndarray```/```list``` | ```None``` |
+| ```wavenumbers```| The wavenumbers of the spectra. |```numpy.ndarray```/```list```| ```None``` |
+    
+{: .warning }
+> The ```wavenumbers``` vector must be sorted in ascending order.
 
+### __Usage examples__:
+
+In the example below, the selected wavenumbers ```wn_select``` are used to select the features in the spectra.The selected wavenumbers include features from the beginning, middle and end of the spectra.
+
+
+```python
+from chemotools.variable_selection import SelectFeatures
+
+sfbw = SelectFeatures(features=wn_select,wavenumbers=wn)
+spectra_sfbw = sfbw.fit_transform(spectra)
+```
+
+### __Plotting example__:
+
+<iframe src="figures/select_features_by_wavenumber.html" width="800px" height="400px" style="border: none;"></iframe>
