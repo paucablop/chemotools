@@ -214,3 +214,70 @@ output = pipeline.fit_transform(spectra)
 ```
 
 ## __Persisting your models__
+
+In the previous sections, we saw how to use ```chemotools``` in combination with ```scikit-learn``` to preprocess your data and make predictions. However, in a real-world scenario, you would like to persist your preprocessing pipelines and models to deploy it to a production environment. In this section, we will show two ways to persist your models:
+
+- Using ```pickle```
+- Using ```joblib```
+
+For this section, we will use the following fit pipeline as an example:
+
+```python
+from chemotools.scatter import MultiplicativeScatterCorrection
+from chemotools.baseline import AirPls
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+# create pipeline
+pipeline = make_pipeline(
+    MultiplicativeScatterCorrection(),
+    AirPls(),
+    StandardScaler(with_std=False),
+    PLSRegression(n_components=2)
+)
+
+# fit pipeline
+pipeline.fit(spectra, reference)
+```
+
+### __Using ```pickle```__
+
+```pickle``` is a Python module that implements a binary protocol for serializing and de-serializing a Python object structure. It is a standard module that comes with the Python installation. The following code shows how to persist a ```scikit-learn``` model using ```pickle```:
+
+{: .warning }
+> Notice that the ```pickle``` module is not secure against erroneous or maliciously constructed data. Never unpickle data received from an untrusted or unauthenticated source.
+
+```python
+import pickle
+
+# persist model
+filename = 'model.pkl'
+
+with open(filename, 'wb') as file:
+    pickle.dump(pipeline, file)
+
+# load model
+with open(filename, 'rb') as file:
+    pipeline = pickle.load(file)
+```
+
+### __Using ```joblib```__
+
+[```joblib```](https://joblib.readthedocs.io/en/stable/) is a Python module that provides utilities for saving and loading Python objects that make use of NumPy data structures, efficiently. It is not part of the standard Python installation, but it can be installed using ```pip```. The following code shows how to persist a ```scikit-learn``` model using ```joblib```:
+
+```python
+from joblib import dump, load
+
+# persist model
+filename = 'model.joblib'
+
+with open(filename, 'wb') as file:
+    dump(pipeline, file)
+
+# load model
+with open(filename, 'rb') as file:
+    pipeline = load(file)
+```
+
+
