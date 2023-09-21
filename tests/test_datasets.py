@@ -1,6 +1,19 @@
 import pandas as pd
 
-from chemotools.datasets import load_fermentation_test, load_fermentation_train
+from chemotools.datasets import load_coffee, load_fermentation_test, load_fermentation_train
+
+
+def test_load_coffee():
+    # Arrange
+
+    # Act
+    coffee_spectra, coffee_labels = load_coffee()
+
+    # Assert
+    assert coffee_spectra.shape == (60, 1841)
+    assert coffee_labels.shape == (60, 1)
+    assert isinstance(coffee_spectra, pd.DataFrame)
+    assert isinstance(coffee_labels, pd.DataFrame)
 
 
 def test_load_fermentation_test():
