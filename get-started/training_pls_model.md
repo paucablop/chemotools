@@ -33,7 +33,7 @@ For a deeper understanding of these datasets and their transformation of raw dat
 > This is a step by step guide, that you should be able to run on your own computer. Just remember to install the ```chemotools``` package first using ```pip install chemotools```.
 
 ## __Loading the training dataset__
-The Fermentation dataset is a valuable resource for investigating lignocellulosic ethanol fermentation. You can access it through the chemotools.datasets module using the ```load_fermentation_train()``` function:
+The Fermentation dataset is a valuable resource for investigating lignocellulosic ethanol fermentation. You can access it through the ```chemotools.datasets``` module using the ```load_fermentation_train()``` function:
 
 ```python
 from chemotools.datasets import load_fermentation_train

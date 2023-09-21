@@ -6,27 +6,28 @@ parent: Docs
 
 # __Scale__
 Scale is a preprocessing technique in spectroscopy that scales the spectra. The following algorithms are available:
-- [Index scaler](#index-scaler)
+- [Point scaler](#point-scaler)
 - [MinMax scaler](#minmax-scaler)
 - [Norm scaler](#l-norm-scaler)
 
 
-## __Index scaler__
-Index scaler is a preprocessing technique in spectroscopy that scales each spectrum by the absorbance/intensity at a given index. Note that the index is not the wavenumber, but the index of the spectrum.
+## __Point scaler__
+Point scaler is a preprocessing technique in spectroscopy that scales each spectrum by the absorbance/intensity at a given index or wavenumber. The default index is 0, which means that the first point of each spectrum is used for scaling.
 
 ### __Arguments__:
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```index``` | The index of the spectrum to use for scaling. | ```int``` | ```0``` |
+| ```point``` | The index or wavenumber of the spectrum to use for scaling. If not ```wavenumbers``` it will use the index.| ```int``` | ```0``` |
+| ```wavenumber``` | The wavenumbers of the spectra. Optional. | ```np.ndarray```/```list``` | ```None``` |
 
 ### __Usage examples__:
 
 ```python
-from chemotools.scale import IndexScaler
+from chemotools.scale import PointScaler
 
-index = IndexScaler(index=310)
-spectra_norm = index.fit_transform(spectra)
+point_scaler = PointScaler(point=310)
+spectra_scaled = point_scaler.fit_transform(spectra)
 ```
 
 ### __Plotting example__:
