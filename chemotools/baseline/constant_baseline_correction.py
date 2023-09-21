@@ -128,7 +128,5 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _find_index(self, target: float) -> int:
-        if self.wavenumbers is None:
-            return target
         wavenumbers = np.array(self.wavenumbers)
         return np.argmin(np.abs(wavenumbers - target))
