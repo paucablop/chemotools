@@ -37,10 +37,10 @@ from chemotools.datasets import load_fermentation_train
 X_train, y_train = load_fermentation_train()
 ```
 
-: .note}
+{: .note}
 > Want to master the art of building a PLS model using the Fermentation Dataset? 📝 [Dive into our Training Guide](https://paucablop.github.io/chemotools/get-started/brewing_regressor.html).
 
-#### __🧪 THE TEST SET: Real-Time Exploration___
+#### __🧪 THE TEST SET: Real-Time Exploration__
 
 The test set takes you on a real-time adventure with over 1000 spectra collected during a fermentation process. These spectra are captured every 1.25 minutes over several hours. Moreover, you have 35 reference glucose concentrations, measured hourly during the fermentation, to gauge your model's performance.
 
