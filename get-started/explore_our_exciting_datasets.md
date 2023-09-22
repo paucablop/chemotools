@@ -5,7 +5,7 @@ parent: Get Started
 nav_order: 3
 ---
 
-# 🚀 Discover Our Unique Datasets 📊
+# __🚀 Explore Our Exciting Datasets 📊__
 
 Welcome to the world of data exploration! Our ```chemotools``` package offers a treasure trove of datasets that will not only help you test the package but also serve as an exciting playground for your learning journey. These captivating datasets are tucked away in the ```chemotools.datasets``` module and can be easily unleashed using loading functions. Let's dive into the adventure:
 
