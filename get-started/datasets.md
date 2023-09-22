@@ -14,7 +14,17 @@ The ```chemotools``` package includes a number of datasets that can be used to t
 
 
 ## The Fermentation Dataset
-The Fermentation Dataset contains spectra collected during a fermentation process. The spectra are collected using attenuated total reflectance Fourier transform infrared spectroscopy (ATR-FTIR). The Fermentation Dataset consists of two sets of spectra:
+The Fermentation Dataset contains spectra collected during a fermentation process. The spectra are collected using attenuated total reflectance Fourier transform infrared spectroscopy (ATR-FTIR). The Fermentation Dataset consists of two sets of spectra, a training set and a test set. A representation of the fermentation setup is shown in the figure below.
+
+![Fermentation setup](./figures/fermentation_setup.png)
+
+More information about the Fermentation Dataset can be found in the following publications:
+
+- Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T. et al. __Transforming data to information: A parallel hybrid model for real-time state estimation in lignocellulosic ethanol fermentation.__ 2, 118 (2021). Biotechnology and Bioengineering https://doi.org/10.1002/bit.27586.
+
+- Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T. et al. __Towards a digital twin: a hybrid data-driven and mechanistic digital shadow to forecast the evolution of lignocellulosic fermentation.__ Biofuels, Bioproducs and Biorefining 5, 14 (2020). https://doi.org/10.1002/bbb.2108.
+
+- Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T. et al. __Promoting the co-utilisation of glucose and xylose in lignocellulosic ethanol fermentations using a data-driven feed-back controller.__ Biotechnol Biofuels 13, 190 (2020). https://doi.org/10.1186/s13068-020-01829-2
 
 ##### __THE TRAIN SET__ 
 The train set consists of 21 synthetic spectra and their reference glucose concentrations measured by high-performance liquid chromatography (HPLC).
