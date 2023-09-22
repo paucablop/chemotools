@@ -27,7 +27,7 @@ For those curious minds, you can find more about the Fermentation Dataset in the
 
 - Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. 📗 [Promoting the co-utilisation of glucose and xylose in lignocellulosic ethanol fermentations using a data-driven feed-back controller](https://doi.org/10.1186/s13068-020-01829-2).
 
-#### 📚 THE TRAIN SET: Start Your Training Adventure
+#### __📚 THE TRAIN SET: Start Your Training Adventure__
 
 The train set boasts 21 synthetic spectra paired with their reference glucose concentrations, measured by high-performance liquid chromatography (HPLC). Ready to embark on your training journey? You can load the train set with a single command:
 
