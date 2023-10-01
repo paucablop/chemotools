@@ -1,2 +1,2 @@
 # make language python
-*.rb linguist-language=Python
+*.html linguist-language=Python
