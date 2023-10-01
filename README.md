@@ -1,4 +1,4 @@
-![chemotools](assets/images/logo_5.png)
+![chemotools](assets/images/logo_7.png)
 
 
 [![pypi](https://img.shields.io/pypi/v/chemotools)](https://pypi.org/project/chemotools)
