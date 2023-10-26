@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from chemotools.augmenation import (
+    BaselineShift,
     ExponentialNoise, 
     IndexShift,
     NormalNoise, 
@@ -61,6 +62,21 @@ def test_ar_pls(spectrum_arpls, reference_arpls):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+
+
+def test_baseline_shift():
+    # Arrange
+    spectrum = np.ones(100).reshape(1, -1)
+    baseline_shift = BaselineShift(scale=1, random_state=42)
+
+    # Act
+    spectrum_corrected = baseline_shift.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum.shape == spectrum_corrected.shape
+    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0]) 
+    assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
+    assert np.isclose(np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8)
 
 
 def test_constant_baseline_correction():
