@@ -3,7 +3,8 @@ from sklearn.utils.estimator_checks import check_estimator
 from chemotools.augmenation import (
     ExponentialNoise, 
     NormalNoise,
-    SpectrumShift, 
+    IndexShift,
+    SpectrumScale, 
     UniformNoise,
 )
 
@@ -83,6 +84,13 @@ def test_compliance_extended_multiplicative_scatter_correction():
     # Act & Assert
     check_estimator(transformer) 
 
+
+# IndexShift
+def test_compliance_spectrum_shift():
+    # Arrange
+    transformer = IndexShift()
+    # Act & Assert
+    check_estimator(transformer)
 
 # LinearCorrection
 def test_compliance_linear_correction():
@@ -204,10 +212,10 @@ def test_compliance_select_features():
     check_estimator(transformer)
 
 
-# SpectrumShift
-def test_compliance_spectrum_shift():
+# SpectrumScale
+def test_compliance_spectrum_scale():
     # Arrange
-    transformer = SpectrumShift()
+    transformer = SpectrumScale()
     # Act & Assert
     check_estimator(transformer)
 
