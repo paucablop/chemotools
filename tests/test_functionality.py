@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from chemotools.augmenation import ExponentialNoise, NormalNoise, UniformNoise
+from chemotools.augmenation import (
+    ExponentialNoise, 
+    NormalNoise, 
+    SpectrumShift,
+    UniformNoise,
+)
 
 from chemotools.baseline import (
     AirPls,
@@ -625,6 +630,18 @@ def test_select_features_with_wavenumbers():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
+
+
+def test_spectrum_shift():
+    # Arrange
+    spectrum = np.array([[1, 1, 1, 1, 1, 2, 1, 1, 1, 1]])
+    spectrum_shift = SpectrumShift(shift=1, random_state=42)
+
+    # Act
+    spectrum_corrected = spectrum_shift.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum_corrected[0][4] == 2
 
 
 def test_standard_normal_variate(spectrum, reference_snv):

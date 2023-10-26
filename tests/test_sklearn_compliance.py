@@ -1,6 +1,11 @@
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.augmenation import ExponentialNoise, NormalNoise, UniformNoise
+from chemotools.augmenation import (
+    ExponentialNoise, 
+    NormalNoise,
+    SpectrumShift, 
+    UniformNoise,
+)
 
 from chemotools.baseline import (
     AirPls,
@@ -195,6 +200,14 @@ def test_compliance_savitzky_golay_filter():
 def test_compliance_select_features():
     # Arrange
     transformer = SelectFeatures()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# SpectrumShift
+def test_compliance_spectrum_shift():
+    # Arrange
+    transformer = SpectrumShift()
     # Act & Assert
     check_estimator(transformer)
 
