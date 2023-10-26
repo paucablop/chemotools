@@ -1,4 +1,5 @@
 from .exponential_noise import ExponentialNoise
 from .normal_noise import NormalNoise
-from .spectrum_shift import SpectrumShift
+from .index_shift import IndexShift
+from .spectrum_scale import SpectrumScale
 from .uniform_noise import UniformNoise

@@ -5,14 +5,14 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class IndexShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    Add normal noise to the input data.
+    Shift the spectrum a given number of indices.
 
     Parameters
     ----------
-    scale : float, default=0.0
-        The scale of the noise to add to the input data.
+    shift : float, default=0.0
+        Shifts the data by a random integer between -shift and shift.
 
     random_state : int, default=None
         The random state to use for the random number generator.
@@ -31,15 +31,15 @@ class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Fit the transformer to the input data.
 
     transform(X, y=0, copy=True)
-        Transform the input data by adding random noise.
+        Transform the input data by shifting the spectrum.
     """
 
 
-    def __init__(self, scale: float = 0.0, random_state: int = None):
-        self.scale = scale
+    def __init__(self, shift: int = 0.0, random_state: int = None):
+        self.shift = shift
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "NormalNoise":
+    def fit(self, X: np.ndarray, y=None) -> "IndexShift":
         """
         Fit the transformer to the input data.
         
@@ -53,7 +53,7 @@ class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : NormalNoise
+        self : IndexShift
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
@@ -72,7 +72,7 @@ class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by adding random normal noise.
+        Transform the input data by shifting the spectrum.
 
         Parameters
         ----------
@@ -100,9 +100,11 @@ class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
-            X_[i] = self._add_random_noise(x)
+            X_[i] = self._shift_spectrum(x)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _add_random_noise(self, x) -> np.ndarray:
-        return x + self._rng.normal(0, self.scale, size=x.shape)
+    def _shift_spectrum(self, x) -> np.ndarray:
+        shift_amount = self._rng.integers(-self.shift, self.shift+1)
+        return np.roll(x, shift_amount)
+    
