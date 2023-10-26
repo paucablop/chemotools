@@ -1,5 +1,7 @@
 from sklearn.utils.estimator_checks import check_estimator
 
+from chemotools.augmenation import ExponentialNoise, NormalNoise, UniformNoise
+
 from chemotools.baseline import (
     AirPls,
     ArPls,
@@ -57,6 +59,14 @@ def test_compliance_constant_baseline_correction():
 def test_compliance_cubic_spline_correction():
     # Arrange
     transformer = CubicSplineCorrection()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# ExponentialNoise
+def test_compliance_exponential_noise():
+    # Arrange
+    transformer = ExponentialNoise()
     # Act & Assert
     check_estimator(transformer)
 
@@ -121,6 +131,14 @@ def test_compliance_multiplicative_scatter_correction():
 def test_compliance_non_negative():
     # Arrange
     transformer = NonNegative()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# NormalNoise
+def test_compliance_normal_noise():
+    # Arrange
+    transformer = NormalNoise()
     # Act & Assert
     check_estimator(transformer)
 
@@ -208,6 +226,14 @@ def test_compliance_robust_normal_variate():
 def test_compliance_subtract_reference():
     # Arrange
     transformer = SubtractReference()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# UniformNoise
+def test_compliance_uniform_noise():
+    # Arrange
+    transformer = UniformNoise()
     # Act & Assert
     check_estimator(transformer)
 
