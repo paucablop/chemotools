@@ -1,6 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.augmenation import (
+from chemotools.augmentation import (
     BaselineShift,
     ExponentialNoise, 
     NormalNoise,
