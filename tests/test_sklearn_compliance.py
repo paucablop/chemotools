@@ -1,6 +1,7 @@
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.augmenation import (
+    BaselineShift,
     ExponentialNoise, 
     NormalNoise,
     IndexShift,
@@ -52,6 +53,14 @@ def test_compliance_ar_pls():
     # Act & Assert
     check_estimator(transformer)
 
+
+# BaselineShift
+def test_compliance_baseline_shift():
+    # Arrange
+    transformer = BaselineShift()
+    # Act & Assert
+    check_estimator(transformer)
+    
 
 # ConstantBaselineCorrection
 def test_compliance_constant_baseline_correction():
