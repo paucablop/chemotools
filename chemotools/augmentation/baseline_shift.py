@@ -106,6 +106,6 @@ class BaselineShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _add_baseline(self, x) -> np.ndarray:
-        adding_factor = self._rng.uniform(low=0, high=0+self.scale)
+        adding_factor = self._rng.uniform(low=0, high=self.scale)
         return np.add(x, adding_factor)
     

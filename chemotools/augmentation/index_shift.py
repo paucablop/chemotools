@@ -7,7 +7,8 @@ from chemotools.utils.check_inputs import check_input
 
 class IndexShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    Shift the spectrum a given number of indices.
+    Shift the spectrum a given number of indices between - shift and + shift drawn
+    from a discrete uniform distribution. 
 
     Parameters
     ----------
@@ -35,7 +36,7 @@ class IndexShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
 
 
-    def __init__(self, shift: int = 0.0, random_state: int = None):
+    def __init__(self, shift: int = 0, random_state: int = None):
         self.shift = shift
         self.random_state = random_state
 
@@ -105,6 +106,6 @@ class IndexShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _shift_spectrum(self, x) -> np.ndarray:
-        shift_amount = self._rng.integers(-self.shift, self.shift+1)
+        shift_amount = self._rng.integers(-self.shift, self.shift, endpoint=True)
         return np.roll(x, shift_amount)
     
