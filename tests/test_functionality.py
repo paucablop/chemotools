@@ -27,7 +27,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.variable_selection import RangeCut, SelectFeatures
+from chemotools.feature_selection import RangeCut, SelectFeatures
 from tests.fixtures import (
     spectrum,
     spectrum_arpls,
