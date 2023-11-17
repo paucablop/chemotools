@@ -33,7 +33,7 @@ from chemotools.smooth import (
     SavitzkyGolayFilter,
     WhittakerSmooth,
 )
-from chemotools.feature_selection import RangeCut, RangeCutSelector, SelectFeatures
+from chemotools.feature_selection import RangeCut, RangeCutSelector, SelectFeatures, IndexSelector
 
 from tests.fixtures import spectrum
 
@@ -216,7 +216,7 @@ def test_compliance_savitzky_golay_filter():
 # SelectFeatures
 def test_compliance_select_features():
     # Arrange
-    transformer = SelectFeatures()
+    transformer = IndexSelector()
     # Act & Assert
     check_estimator(transformer)
 
@@ -240,7 +240,7 @@ def test_compliance_standard_normal_variate():
 # RangeCut
 def test_compliance_range_cut():
     # Arrange
-    transformer = RangeCut()
+    transformer = RangeCutSelector()
     # Act & Assert
     check_estimator(transformer)
 
