@@ -1,2 +1,2 @@
-from .index_selector import IndexSelector
-from .range_cut import RangeCut
+from ._index_selector import IndexSelector
+from ._range_cut import RangeCut
