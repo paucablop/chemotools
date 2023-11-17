@@ -1,9 +1,7 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
 
 
 class RangeCutSelector(BaseEstimator, SelectorMixin):
@@ -36,19 +34,11 @@ class RangeCutSelector(BaseEstimator, SelectorMixin):
     end_index_ : int
         The index of the end of the range. It is -1 if the wavenumbers are not provided.
 
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
 
     Methods
     -------
     fit(X, y=None)
         Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by cutting it to the specified range.
     """
 
     def __init__(
@@ -79,15 +69,7 @@ class RangeCutSelector(BaseEstimator, SelectorMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        #X = check_input(X)
         X = self._validate_data(X)
-
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
 
         # Set the start and end indices
         if self.wavenumbers is None:
@@ -110,7 +92,7 @@ class RangeCutSelector(BaseEstimator, SelectorMixin):
             The boolean mask indicating which features are selected.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, ["start_index_", "end_index_"])
 
         # Create the mask
         mask = np.zeros(self.n_features_in_, dtype=bool)
