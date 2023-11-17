@@ -1,13 +1,12 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator
+from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils.validation import check_is_fitted
 
-from chemotools.utils.check_inputs import check_input
 
-
-class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class RangeCut(BaseEstimator, SelectorMixin):
     """
-    A transformer that cuts the input data to a specified range. The range is specified:
+    A selector that cuts the input data to a specified range. The range is specified:
     - by the indices of the start and end of the range,
     - by the wavenumbers of the start and end of the range. In this case, the wavenumbers
         must be provided to the transformer when it is initialised. If the wavenumbers
@@ -35,19 +34,11 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     end_index_ : int
         The index of the end of the range. It is -1 if the wavenumbers are not provided.
 
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
 
     Methods
     -------
     fit(X, y=None)
         Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by cutting it to the specified range.
     """
 
     def __init__(
@@ -78,13 +69,7 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         # Set the start and end indices
         if self.wavenumbers is None:
@@ -95,39 +80,25 @@ class RangeCut(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             self.end_index_ = self._find_index(self.end)
 
         return self
+    
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def _get_support_mask(self):
         """
-        Transform the input data by cutting it to the specified range.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            The input data to transform.
-
-        y : None
-            Ignored.
+        Get the boolean mask indicating which features are selected.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+        mask : np.ndarray of shape (n_features,)
+            The boolean mask indicating which features are selected.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, ["start_index_", "end_index_"])
 
-        # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        # Create the mask
+        mask = np.zeros(self.n_features_in_, dtype=bool)
+        mask[self.start_index_ : self.end_index_] = True
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
-        # Range cut the spectra
-        return X_[:, self.start_index_ : self.end_index_]
+        return mask
 
     def _find_index(self, target: float) -> int:
         wavenumbers = np.array(self.wavenumbers)

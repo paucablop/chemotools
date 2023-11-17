@@ -33,7 +33,7 @@ from chemotools.smooth import (
     SavitzkyGolayFilter,
     WhittakerSmooth,
 )
-from chemotools.variable_selection import RangeCut, SelectFeatures
+from chemotools.feature_selection import RangeCut, IndexSelector
 
 from tests.fixtures import spectrum
 
@@ -92,6 +92,14 @@ def test_compliance_extended_multiplicative_scatter_correction():
     transformer = ExtendedMultiplicativeScatterCorrection()
     # Act & Assert
     check_estimator(transformer) 
+
+
+# IndexSelector
+def test_compliance_index_selector():
+    # Arrange
+    transformer = IndexSelector()
+    # Act & Assert
+    check_estimator(transformer)
 
 
 # IndexShift
@@ -197,6 +205,22 @@ def test_compliance_polynomial_correction():
     check_estimator(transformer)
 
 
+# RangeCut
+def test_compliance_range_cut():
+    # Arrange
+    transformer = RangeCut()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# RobustNormalVariate
+def test_compliance_robust_normal_variate():
+    # Arrange
+    transformer = RobustNormalVariate()
+    # Act & Assert
+    check_estimator(transformer)
+
+
 # SavitzkyGolay
 def test_compliance_savitzky_golay():
     # Arrange
@@ -209,14 +233,6 @@ def test_compliance_savitzky_golay():
 def test_compliance_savitzky_golay_filter():
     # Arrange
     transformer = SavitzkyGolayFilter()
-    # Act & Assert
-    check_estimator(transformer)
-
-
-# SelectFeatures
-def test_compliance_select_features():
-    # Arrange
-    transformer = SelectFeatures()
     # Act & Assert
     check_estimator(transformer)
 
@@ -236,21 +252,6 @@ def test_compliance_standard_normal_variate():
     # Act & Assert
     check_estimator(transformer)
 
-
-# RangeCut
-def test_compliance_range_cut():
-    # Arrange
-    transformer = RangeCut()
-    # Act & Assert
-    check_estimator(transformer)
-
-
-# RobustNormalVariate
-def test_compliance_robust_normal_variate():
-    # Arrange
-    transformer = RobustNormalVariate()
-    # Act & Assert
-    check_estimator(transformer)
 
 # SubtractReference
 def test_compliance_subtract_reference():

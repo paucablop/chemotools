@@ -1,11 +1,13 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator
+from sklearn.feature_selection._base import SelectorMixin
+
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class SelectFeatures(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class IndexSelector(BaseEstimator, SelectorMixin):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:
@@ -52,7 +54,7 @@ class SelectFeatures(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self.features = features
         self.wavenumbers = wavenumbers
 
-    def fit(self, X: np.ndarray, y=None) -> "SelectFeatures":
+    def fit(self, X: np.ndarray, y=None) -> "IndexSelector":
         """
         Fit the transformer to the input data.
 
@@ -66,14 +68,11 @@ class SelectFeatures(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : SelectFeatures
+        self : IndexSelector
             The fitted transformer.
         """
-        # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
+        # validate that X is a 2D array and has only finite values
+        X = self._validate_data(X)
 
         # Set the fitted attribute to True
         self._is_fitted = True
@@ -91,41 +90,23 @@ class SelectFeatures(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def _get_support_mask(self):
         """
-        Transform the input data by cutting it to the specified range.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            The input data to transform.
-
-        y : None
-            Ignored.
+        Get the boolean mask indicating which features are selected.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+        mask : ndarray of shape (n_features,)
+            The mask indicating the selected features.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self)
 
-        # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        # Create the mask
+        mask = np.zeros(self.n_features_in_, dtype=bool)
+        mask[self.features_index_] = True
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
-        # Select the features
-        if self.features is None:
-            return X_
-
-        return X_[:, self.features_index_]
+        return mask
 
     def _find_index(self, target: float) -> int:
         if self.wavenumbers is None:

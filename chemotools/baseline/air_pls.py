@@ -132,14 +132,14 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _calculate_whittaker_smooth(self, x, w):
-        X = np.matrix(x)
+        X = np.array(x)
         m = X.size
         E = eye(m, format="csc")
         for i in range(self.polynomial_order):
             E = E[1:] - E[:-1]
         W = diags(w, 0, shape=(m, m))
-        A = csc_matrix(W + (self.lam * E.T * E))
-        B = csc_matrix(W * X.T)
+        A = csc_matrix(W + (self.lam * E.T @ E))
+        B = csc_matrix(W @ X.T).toarray().ravel()
         background = spsolve(A, B)
         return np.array(background)
 

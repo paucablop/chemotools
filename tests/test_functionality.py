@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from chemotools.augmentation import (
@@ -27,7 +28,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.variable_selection import RangeCut, SelectFeatures
+from chemotools.feature_selection import IndexSelector, RangeCut
 from tests.fixtures import (
     spectrum,
     spectrum_arpls,
@@ -231,6 +232,77 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
 
     # Assert
     assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
+    
+
+
+def test_index_selector():
+    # Arrange
+    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+
+    # Act
+    select_features = IndexSelector()
+    spectrum_corrected = select_features.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], spectrum[0], atol=1e-8)
+
+
+def test_index_selector_with_index():
+    # Arrange
+    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
+    expected = np.array([[1, 2, 3, 8, 9, 10]])
+
+    # Act
+    select_features = IndexSelector(features=np.array([0, 1, 2, 7, 8, 9]))
+    spectrum_corrected = select_features.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
+
+
+def test_index_selector_with_wavenumbers():
+    # Arrange
+    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    spectrum = np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]])
+    expected = np.array([[1.0, 2.0, 3.0, 34.0, 55.0, 89.0]])
+
+    # Act
+    select_features = IndexSelector(
+        features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
+    )
+    spectrum_corrected = select_features.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
+
+
+def test_index_selector_with_wavenumbers_and_dataframe():
+    # Arrange
+    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    spectrum = pd.DataFrame(np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]]))
+    expected = np.array([[1.0, 2.0, 3.0, 34.0, 55.0, 89.0]])
+
+    # Act
+    select_features = IndexSelector(
+        features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
+    ).set_output(transform='pandas')
+
+    spectrum_corrected = select_features.fit_transform(spectrum)
+
+    # Assert
+    assert type(spectrum_corrected) == pd.DataFrame
+
+
+def test_index_shift():
+    # Arrange
+    spectrum = np.array([[1, 1, 1, 1, 1, 2, 1, 1, 1, 1]])
+    spectrum_shift = IndexShift(shift=1, random_state=42)
+
+    # Act
+    spectrum_corrected = spectrum_shift.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum_corrected[0][4] == 2
 
 
 def test_l1_norm(spectrum):
@@ -539,7 +611,7 @@ def test_range_cut_by_wavenumber():
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
 
 
-def test_range_cut_by_wavenumber_2():
+def test_range_cut_by_wavenumber_with_list():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
@@ -550,6 +622,19 @@ def test_range_cut_by_wavenumber_2():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
+
+
+def test_range_cut_by_wavenumber_with_dataframe():
+    # Arrange
+    wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='pandas')
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert type(spectrum_corrected) == pd.DataFrame
 
 
 def test_robust_normal_variate():
@@ -606,59 +691,6 @@ def test_saviszky_golay_filter_3():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], np.ones((1, 10)), atol=1e-2)
-
-
-def test_select_features():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
-
-    # Act
-    select_features = SelectFeatures()
-    spectrum_corrected = select_features.fit_transform(spectrum)
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], spectrum[0], atol=1e-8)
-
-
-def test_select_features_with_index():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]])
-    expected = np.array([[1, 2, 3, 8, 9, 10]])
-
-    # Act
-    select_features = SelectFeatures(features=np.array([0, 1, 2, 7, 8, 9]))
-    spectrum_corrected = select_features.fit_transform(spectrum)
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
-
-
-def test_select_features_with_wavenumbers():
-    # Arrange
-    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
-    spectrum = np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]])
-    expected = np.array([[1.0, 2.0, 3.0, 34.0, 55.0, 89.0]])
-
-    # Act
-    select_features = SelectFeatures(
-        features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
-    )
-    spectrum_corrected = select_features.fit_transform(spectrum)
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
-
-
-def test_index_shift():
-    # Arrange
-    spectrum = np.array([[1, 1, 1, 1, 1, 2, 1, 1, 1, 1]])
-    spectrum_shift = IndexShift(shift=1, random_state=42)
-
-    # Act
-    spectrum_corrected = spectrum_shift.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum_corrected[0][4] == 2
 
 
 def test_spectrum_scale(spectrum):
