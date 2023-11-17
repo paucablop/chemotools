@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import pytest
 
 from chemotools.augmentation import (
@@ -27,7 +28,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.feature_selection import RangeCut, SelectFeatures
+from chemotools.feature_selection import RangeCut, RangeCutSelector, SelectFeatures
 from tests.fixtures import (
     spectrum,
     spectrum_arpls,
@@ -539,7 +540,7 @@ def test_range_cut_by_wavenumber():
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
 
 
-def test_range_cut_by_wavenumber_2():
+def test_range_cut_by_wavenumber_with_list():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]])
@@ -550,6 +551,19 @@ def test_range_cut_by_wavenumber_2():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
+
+
+def test_range_cut_by_wavenumber_with_dataframe():
+    # Arrange
+    wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
+    range_cut = RangeCutSelector(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='pandas')
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert type(spectrum_corrected) == pd.DataFrame
 
 
 def test_robust_normal_variate():
