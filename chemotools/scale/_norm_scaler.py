@@ -12,15 +12,7 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     Parameters
     ----------
     l_norm : int, optional
-        The L-norm to use. Default is 2. 
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
+        The L-norm to use. Default is 2.
 
     Methods
     -------
@@ -30,13 +22,14 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     transform(X, y=0, copy=True)
         Transform the input data by scaling by the L-norm.
     """
+
     def __init__(self, l_norm: int = 2):
         self.l_norm = l_norm
 
     def fit(self, X: np.ndarray, y=None) -> "NormScaler":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -51,13 +44,7 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
@@ -79,7 +66,7 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
