@@ -14,14 +14,6 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     mode : str, optional
         The mode to use for the non-negative values. Can be "zero" or "abs".
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -52,13 +44,7 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
@@ -80,7 +66,7 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
