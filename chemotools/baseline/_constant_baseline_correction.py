@@ -30,12 +30,6 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
     end_index_ : int
         The index of the end of the range. It is 1 if the wavenumbers are not provided.
 
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -46,7 +40,10 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
     """
 
     def __init__(
-        self, start: int = 0, end: int = 1, wavenumbers: np.ndarray = None,
+        self,
+        start: int = 0,
+        end: int = 1,
+        wavenumbers: np.ndarray = None,
     ) -> None:
         self.start = start
         self.end = end
@@ -70,13 +67,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         # Set the start and end indices
         if self.wavenumbers is None:
@@ -109,7 +100,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
             The transformed input data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, ["start_index_", "end_index_"])
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
