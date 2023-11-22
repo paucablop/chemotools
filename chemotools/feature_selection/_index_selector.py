@@ -90,7 +90,7 @@ class IndexSelector(BaseEstimator, SelectorMixin):
 
         Returns
         -------
-        mask : ndarray of shape (n_features,)
+        mask : ndarray of shape (n_features_in_,)
             The mask indicating the selected features.
         """
         # Check that the estimator is fitted
