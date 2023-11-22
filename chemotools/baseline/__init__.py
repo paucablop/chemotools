@@ -1,4 +1,4 @@
-from .air_pls import AirPls
+from ._air_pls import AirPls
 from .ar_pls import ArPls
 from .constant_baseline_correction import ConstantBaselineCorrection
 from .cubic_spline_correction import CubicSplineCorrection
