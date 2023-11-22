@@ -31,12 +31,6 @@ class IndexSelector(BaseEstimator, SelectorMixin):
     features_index_ : int
         The index of the features to select.
 
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -96,7 +90,7 @@ class IndexSelector(BaseEstimator, SelectorMixin):
 
         Returns
         -------
-        mask : ndarray of shape (n_features,)
+        mask : ndarray of shape (n_features_in_,)
             The mask indicating the selected features.
         """
         # Check that the estimator is fitted

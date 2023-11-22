@@ -5,9 +5,10 @@ from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
+
 class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that corrects a baseline by subtracting a cubic spline through the 
+    A transformer that corrects a baseline by subtracting a cubic spline through the
     points defined by the indices.
 
     Parameters
@@ -32,6 +33,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
         Transform the input data by subtracting the constant baseline value.
 
     """
+
     def __init__(self, indices: list = None) -> None:
         self.indices = indices
 
@@ -53,13 +55,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         if self.indices is None:
             self.indices_ = [0, len(X[0]) - 1]
@@ -89,7 +85,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "indices_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -97,7 +93,9 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate spline baseline correction
         for i, x in enumerate(X_):
@@ -106,7 +104,7 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
     def _spline_baseline_correct(self, x: np.ndarray) -> np.ndarray:
         indices = self.indices_
-        intensity = x[indices]  
+        intensity = x[indices]
         spl = CubicSpline(indices, intensity)
-        baseline = spl(range(len(x)))      
+        baseline = spl(range(len(x)))
         return x - baseline

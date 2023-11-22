@@ -30,14 +30,6 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         The number of iterations used to calculate the baseline. Increasing the number of iterations can improve the
         accuracy of the baseline correction, but also increases the computation time.
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        A flag indicating whether the estimator has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -85,13 +77,7 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             Returns the instance itself.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
@@ -113,7 +99,7 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         """
 
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)

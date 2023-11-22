@@ -22,16 +22,8 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         The order of the derivative to calculate. Can be 1 or 2. Default is 1.
 
     mode : str, optional
-        The mode to use for the derivative calculation. Can be "nearest", "constant", 
+        The mode to use for the derivative calculation. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
 
     Methods
     -------
@@ -41,6 +33,7 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     transform(X, y=0, copy=True)
         Transform the input data by calculating the Norris-Williams derivative.
     """
+
     def __init__(
         self,
         window_size: int = 5,
@@ -71,13 +64,7 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
@@ -99,7 +86,7 @@ class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)

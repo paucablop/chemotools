@@ -37,8 +37,6 @@ class ExtendedMultiplicativeScatterCorrection(
     ----------
     reference_ : np.ndarray
         The reference spectrum used for the correction.
-    n_features_in_ : int
-        The number of features in the training data.
 
     References
     ----------
@@ -82,13 +80,7 @@ class ExtendedMultiplicativeScatterCorrection(
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         # Check that the length of the reference is the same as the number of features
         if self.reference is not None:
@@ -146,7 +138,7 @@ class ExtendedMultiplicativeScatterCorrection(
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)

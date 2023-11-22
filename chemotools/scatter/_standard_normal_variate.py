@@ -5,25 +5,9 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that scales the input data by subtracting the minimum and dividing by
-    the difference between the maximum and the minimum. When the use_min parameter is False, 
-    the data is scaled by the maximum.
-
-    Parameters
-    ----------
-    use_min : bool, default=True
-        The normalization to use. If True, the data is subtracted by the minimum and 
-        scaled by the maximum. If False, the data is scaled by the maximum.
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
+    A transformer that calculates the standard normal variate of the input data.
 
     Methods
     -------
@@ -31,13 +15,10 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Fit the transformer to the input data.
 
     transform(X, y=0, copy=True)
-        Transform the input data by scaling by the maximum value.
+        Transform the input data by calculating the standard normal variate.
     """
 
-    def __init__(self, use_min: bool = True):
-        self.use_min = use_min
-
-    def fit(self, X: np.ndarray, y=None) -> "MinMaxScaler":
+    def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":
         """
         Fit the transformer to the input data.
 
@@ -51,23 +32,17 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : MinMaxScaler
+        self : StandardNormalVariate
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by scaling it.
+        Transform the input data by calculating the standard normal variate.
 
         Parameters
         ----------
@@ -83,7 +58,7 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -95,12 +70,11 @@ class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
                 f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
             )
 
-        # Normalize the data by the maximum value
-        if self.use_min:
-            X_ = (X_ - np.min(X_, axis=1, keepdims=True)) / (np.max(
-                X_, axis=1, keepdims=True) - np.min(X_, axis=1, keepdims=True))
-
-        else:
-            X_ = X_ / np.max(X_, axis=1, keepdims=True)
+        # Calculate the standard normal variate
+        for i, x in enumerate(X_):
+            X_[i] = self._calculate_standard_normal_variate(x)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+
+    def _calculate_standard_normal_variate(self, x) -> np.ndarray:
+        return (x - x.mean()) / x.std()

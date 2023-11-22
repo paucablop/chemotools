@@ -1,31 +1,18 @@
 import numpy as np
-from scipy.ndimage import uniform_filter1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
 
-class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that calculates the mean filter of the input data.
+    A transformer that sets all negative values to zero or to abs.
 
     Parameters
     ----------
-    window_size : int, optional
-        The size of the window to use for the mean filter. Must be odd. Default is 3.
-    
     mode : str, optional
-        The mode to use for the mean filter. Can be "nearest", "constant", "reflect",
-        "wrap", "mirror" or "interp". Default is "nearest".
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
+        The mode to use for the non-negative values. Can be "zero" or "abs".
 
     Methods
     -------
@@ -33,13 +20,13 @@ class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Fit the transformer to the input data.
 
     transform(X, y=0, copy=True)
-        Transform the input data by calculating the mean filter.
+        Transform the input data by subtracting the constant baseline value.
     """
-    def __init__(self, window_size: int = 3, mode='nearest') -> None:
-        self.window_size = window_size
+
+    def __init__(self, mode: str = "zero"):
         self.mode = mode
 
-    def fit(self, X: np.ndarray, y=None) -> "MeanFilter":
+    def fit(self, X: np.ndarray, y=None) -> "NonNegative":
         """
         Fit the transformer to the input data.
 
@@ -53,23 +40,17 @@ class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : MeanFilter
+        self : ConstantBaselineCorrection
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by calculating the mean filter.
+        Transform the input data by subtracting the constant baseline value.
 
         Parameters
         ----------
@@ -85,18 +66,24 @@ class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
         X_ = X.copy()
 
+        # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
             raise ValueError(
                 f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
             )
 
-        # Mean filter the data
+        # Calculate non-negative values
         for i, x in enumerate(X_):
-            X_[i] = uniform_filter1d(x, size=self.window_size, mode=self.mode)
+            if self.mode == "zero":
+                X_[i] = np.clip(x, a_min=0, a_max=np.inf)
+
+            if self.mode == "abs":
+                X_[i] = np.abs(x)
+
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_

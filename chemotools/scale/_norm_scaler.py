@@ -5,22 +5,14 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that sets all negative values to zero or to abs.
+    A transformer that scales the input data by the L-norm of the spectrum.
 
     Parameters
     ----------
-    mode : str, optional
-        The mode to use for the non-negative values. Can be "zero" or "abs".
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
+    l_norm : int, optional
+        The L-norm to use. Default is 2.
 
     Methods
     -------
@@ -28,13 +20,13 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Fit the transformer to the input data.
 
     transform(X, y=0, copy=True)
-        Transform the input data by subtracting the constant baseline value.
+        Transform the input data by scaling by the L-norm.
     """
 
-    def __init__(self, mode: str = "zero"):
-        self.mode = mode
+    def __init__(self, l_norm: int = 2):
+        self.l_norm = l_norm
 
-    def fit(self, X: np.ndarray, y=None) -> "NonNegative":
+    def fit(self, X: np.ndarray, y=None) -> "NormScaler":
         """
         Fit the transformer to the input data.
 
@@ -48,23 +40,17 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : ConstantBaselineCorrection
+        self : NormScaler
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by subtracting the constant baseline value.
+        Transform the input data by scaling by the L-norm.
 
         Parameters
         ----------
@@ -80,7 +66,7 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -92,12 +78,8 @@ class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
                 f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
             )
 
-        # Calculate non-negative values
+        # Normalize the data by the maximum value
         for i, x in enumerate(X_):
-            if self.mode == "zero":
-                X_[i] = np.clip(x, a_min=0, a_max=np.inf)
-
-            if self.mode == "abs":
-                X_[i] = np.abs(x)
+            X_[i] = x / np.linalg.norm(x, ord=self.l_norm)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_

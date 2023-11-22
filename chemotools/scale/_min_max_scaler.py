@@ -5,22 +5,17 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that scales the input data by the L-norm of the spectrum.
+    A transformer that scales the input data by subtracting the minimum and dividing by
+    the difference between the maximum and the minimum. When the use_min parameter is False,
+    the data is scaled by the maximum.
 
     Parameters
     ----------
-    l_norm : int, optional
-        The L-norm to use. Default is 2. 
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
+    use_min : bool, default=True
+        The normalization to use. If True, the data is subtracted by the minimum and
+        scaled by the maximum. If False, the data is scaled by the maximum.
 
     Methods
     -------
@@ -28,15 +23,16 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Fit the transformer to the input data.
 
     transform(X, y=0, copy=True)
-        Transform the input data by scaling by the L-norm.
+        Transform the input data by scaling by the maximum value.
     """
-    def __init__(self, l_norm: int = 2):
-        self.l_norm = l_norm
 
-    def fit(self, X: np.ndarray, y=None) -> "NormScaler":
+    def __init__(self, use_min: bool = True):
+        self.use_min = use_min
+
+    def fit(self, X: np.ndarray, y=None) -> "MinMaxScaler":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -47,23 +43,17 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         Returns
         -------
-        self : NormScaler
+        self : MinMaxScaler
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by scaling by the L-norm.
+        Transform the input data by scaling it.
 
         Parameters
         ----------
@@ -79,7 +69,7 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -92,7 +82,12 @@ class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             )
 
         # Normalize the data by the maximum value
-        for i, x in enumerate(X_):
-            X_[i] = x / np.linalg.norm(x, ord=self.l_norm)
+        if self.use_min:
+            X_ = (X_ - np.min(X_, axis=1, keepdims=True)) / (
+                np.max(X_, axis=1, keepdims=True) - np.min(X_, axis=1, keepdims=True)
+            )
+
+        else:
+            X_ = X_ / np.max(X_, axis=1, keepdims=True)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
