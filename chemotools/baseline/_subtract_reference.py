@@ -15,14 +15,6 @@ class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         The reference spectrum to subtract from the input data. If None, the original spectrum
         is returned.
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -34,6 +26,7 @@ class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     _subtract_reference(x)
         Subtract the reference spectrum from a single spectrum.
     """
+
     def __init__(
         self,
         reference: np.ndarray = None,
@@ -58,20 +51,13 @@ class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         # Set the reference
-
         if self.reference is not None:
             self.reference_ = self.reference.copy()
             return self
-        
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -92,7 +78,7 @@ class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -100,7 +86,9 @@ class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         if self.reference is None:
             return X_.reshape(-1, 1) if X_.ndim == 1 else X_

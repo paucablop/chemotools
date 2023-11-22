@@ -4,9 +4,10 @@ from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
 
+
 class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
-    A transformer that subtracts a polynomial baseline from the input data. The polynomial is 
+    A transformer that subtracts a polynomial baseline from the input data. The polynomial is
     fitted to the points in the spectrum specified by the indices parameter.
 
     Parameters
@@ -17,14 +18,6 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
     indices : list, optional
         The indices of the points in the spectrum to fit the polynomial to. Defaults to None,
         which fits the polynomial to all points in the spectrum (equivalent to detrend).
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
 
     Methods
     -------
@@ -37,6 +30,7 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
     _baseline_correct_spectrum(x)
         Subtract the polynomial baseline from a single spectrum.
     """
+
     def __init__(self, order: int = 1, indices: list = None) -> None:
         self.order = order
         self.indices = indices
@@ -59,13 +53,7 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         if self.indices is None:
             self.indices_ = range(0, len(X[0]))
@@ -73,8 +61,8 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
             self.indices_ = self.indices
 
         return self
-    
-    def transform(self, X: np.ndarray, y:int=0, copy:bool=True) -> np.ndarray:
+
+    def transform(self, X: np.ndarray, y: int = 0, copy: bool = True) -> np.ndarray:
         """
         Transform the input data by subtracting the polynomial baseline.
 
@@ -95,7 +83,7 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "indices_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -103,13 +91,15 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate polynomial baseline correction
         for i, x in enumerate(X_):
             X_[i] = self._baseline_correct_spectrum(x)
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-    
+
     def _baseline_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
         """
         Subtract the polynomial baseline from a single spectrum.
@@ -126,5 +116,5 @@ class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin
         """
         intensity = x[self.indices_]
         poly = np.polyfit(self.indices_, intensity, self.order)
-        baseline = [np.polyval(poly, i) for i in range(0, len(x))]      
+        baseline = [np.polyval(poly, i) for i in range(0, len(x))]
         return x - baseline
