@@ -31,12 +31,6 @@ class IndexSelector(BaseEstimator, SelectorMixin):
     features_index_ : int
         The index of the features to select.
 
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
