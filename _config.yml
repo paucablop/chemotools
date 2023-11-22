@@ -5,7 +5,7 @@ theme: just-the-docs
 # logo
 logo: "/assets/images/logo_pixel.png"
 
-favicon_ico: "/assets/images/icon_3.bmp"
+favicon_ico: "/assets/images/icon_4.bmp"
 
 markdown: kramdown
 kramdown:
