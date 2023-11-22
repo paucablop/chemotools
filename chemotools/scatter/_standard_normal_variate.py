@@ -9,14 +9,6 @@ class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
     """
     A transformer that calculates the standard normal variate of the input data.
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
     Methods
     -------
     fit(X, y=None)
@@ -25,10 +17,11 @@ class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
     transform(X, y=0, copy=True)
         Transform the input data by calculating the standard normal variate.
     """
+
     def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -43,13 +36,7 @@ class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
+        X = self._validate_data(X)
 
         return self
 
@@ -71,7 +58,7 @@ class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X = check_input(X)
@@ -79,7 +66,9 @@ class StandardNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
