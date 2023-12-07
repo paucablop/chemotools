@@ -1,46 +1,57 @@
-We welcome contributions to Chemotools from anyone interested in improving the package. Whether you have ideas for new features, bug reports, or just want to help improve the code, we appreciate your contributions! You are also welcome to see the [Project Board](https://github.com/users/paucablop/projects/4) to see what we are currently working on.
+We appreciate your interest in contributing to Chemotools and welcome contributions from everyone. Whether you have bug reports, ideas for new features, or want to improve the code, your contributions are valuable. Check the [Project Board](https://github.com/users/paucablop/projects/4) to see what we're working on.
 
-To contribute to Chemotools, please follow these guidelines:
+# Contributing to Chemotools
 
-#### Reporting Bugs
+Chemotools is a project designed for production code, focusing on maintaining high-quality standards. Please adhere to the following guidelines when contributing:
 
-If you encounter a bug or unexpected behavior in Chemotools, please open an issue on the GitHub repository with a detailed description of the problem, including any error messages and steps to reproduce the issue. If possible, include sample code or data that demonstrates the problem.
+## Project Functionality
 
-#### Suggesting Enhancements
+- **Scikit-Learn API Implementation:** All functions within Chemotools must implement the Scikit-Learn API for consistency and interoperability.
 
-If you have an idea for a new feature or enhancement for Chemotools, please open an issue on the GitHub repository with a detailed description of the proposed feature and its benefits. If possible, include example code or use cases that illustrate how the feature would be used.
+- **Avoiding Redundancy:** Functions that are already present in other libraries implementing the Scikit-Learn API should not be implemented in Chemotools to prevent redundancy.
 
-#### Submitting Changes
+- **Unit Testing:** Every function in Chemotools must be accompanied by thorough unit tests. This ensures the reliability and robustness of the codebase.
 
-If you'd like to contribute code changes to Chemotools, please follow these steps:
+We welcome your contributions and appreciate your commitment to maintaining the quality of Chemotools. Please follow the guidelines outlined below to ensure a smooth and effective contribution process.
 
-- Create a new branch for your changes. We follow trunk-based development, so all changes should be made on a new branch and branches should be short-lived and merged into main.
 
-- Write your code and tests, making sure to follow the Chemotools coding style and conventions. It is fundamental to include tests for both, the Scikit-learn API and the functionality of the transformers.
+## Reporting Bugs
 
-- Run the tests using the provided testing framework to ensure that your changes do not introduce any new errors or regressions.
+If you find a bug or unexpected behavior, please open a detailed issue on the GitHub repository. Include error messages and steps to reproduce, along with sample code or data if possible.
 
-- Submit a pull request to the main Chemotools repository with a detailed description of your changes and the problem they solve.
+## Suggesting Enhancements
 
-We will review your changes and provide feedback as soon as possible. If we request changes, please make them as quickly as possible to keep the review process moving.
+For new features or enhancements, open an issue with a detailed description and benefits. Include example code or use cases to illustrate how the feature would be used.
 
-#### Code Style
+## Submitting Changes
 
-Please follow the Chemotools code style and conventions when contributing code changes. Specifically:
+To contribute code changes:
 
-- Use four spaces for indentation
+1. Open an issue describing the changes you want to implement.
+2. We'll review and discuss the issue to determine the scope.
+3. Once agreed, create a new branch for your contribution (we follow trunk-based development).
+4. Write code and tests, adhering to Chemotools coding style and conventions.
+5. Run tests using the provided framework to ensure your changes don't introduce errors.
+6. Submit a pull request with a detailed description and the problem your changes solve.
+
+We'll review promptly and provide feedback. If changes are requested, make them quickly to keep the process moving.
+
+## Code Style
+
+Follow Chemotools coding style:
+- Indent with four spaces
 - Use descriptive variable names
-- Avoid using magic numbers or hard-coded strings
-- Format your code using Black
+- Avoid magic numbers or hard-coded strings
+- Format code using [Black](https://black.readthedocs.io/en/stable/)
 
-#### Codecov
+## Codecov
 
-We use Codecov to track the test coverage of Chemotools. Please make sure that your changes do not reduce the test coverage of the package.
+Ensure your changes don't reduce Chemotools' test coverage. We use Codecov to track coverage.
 
-#### Documentation
+## Documentation
 
-Please update the documentation for Chemotools if your changes affect the API or functionality of the package. 
+Update Chemotools documentation if your changes affect the API or functionality.
 
-#### License
+## License
 
-By contributing to Chemotools, you agree that your contributions will be licensed under its MIT license.
+By contributing to Chemotools, you agree that your contributions will be licensed under its [MIT license](link-to-license).
