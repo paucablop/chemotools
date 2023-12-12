@@ -29,7 +29,7 @@ Bibliography: paper.bib
 
 Spectroscopy is an analytical technique used to understand the composition of materials using light. Traditionally, spectroscopic data is analyzed by a discipline called chemometrics, a branch of machine learning specialized on extracting chemical information from multivariate spectra. Over the last decades, chemometricians, have excelled by developing advanced preprocessing methods designed to remove instrument and measuring artifacts from the spectra, isolating the pure chemical information of the samples. 
 
-Since spectroscopic methods are faster and simpler than most of other analytical techniques, their adoption as integral components of Process Analytical Technology (PAT) has witnessed significant growth across industries, including chemical, biotech, food, and pharmaceuticals. Despite this surge, a notable obstacle has been the absence of open-source standardized, accessible toolkit for chemometric model development and deployment. ```chemotools```, positioned as a comprehensive solution, addresses this void by integrating into the Python machine learning ecosystem. By implementing a variety of preprocessing and feature selection tools with the ```scikit-learn``` API, ```chemotools``` opens up the entire ```scikit-learn``` toolbox to users, encompassing features such as:
+Since spectroscopic methods are faster and simpler than most of other analytical techniques, their adoption as integral components of Process Analytical Technology (PAT) has witnessed significant growth across industries, including chemical, biotech, food, and pharmaceuticals. Despite this surge, a notable obstacle has been the absence of open-source standardized, accessible toolkit for chemometric model development and deployment. ```chemotools```, positioned as a comprehensive solution, addresses this void by integrating into the Python machine learning ecosystem. By implementing a variety of preprocessing and feature selection tools with the ```scikit-learn``` API [@pedregosa2018scikitlearn], ```chemotools``` opens up the entire ```scikit-learn``` toolbox to users, encompassing features such as:
 
 - a rich collection of estimators for regression, classification, and clustering
 - cross-validation and hyper-parameter optimization algorithms
@@ -58,5 +58,7 @@ Beyond its practical applications, ```chemotools``` has being utilized as an edu
 
 Conceptualization, coding, developing and paper writing by Pau Cabaneros Lopez.
 
-# References
+# Acknowledgements
+
+This project has not received any external funding.
 
