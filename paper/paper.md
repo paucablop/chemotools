@@ -17,7 +17,7 @@ affiliations:
   index: 1
 
 date: 1 December 2023
-Bibliography: paper.bib
+bibliography: ./paper.bib
 ---
 
 
