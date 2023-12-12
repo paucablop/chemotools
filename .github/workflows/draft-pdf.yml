@@ -1,3 +1,5 @@
+name: JOSS Draft PDF
+
 on: [push]
 
 jobs:
