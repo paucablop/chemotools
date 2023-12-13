@@ -88,9 +88,11 @@ Beyond its mathematical prowess, ```chemotools``` goes a step further by providi
 
 For those seeking detailed insights, the documentation page (https://paucablop.github.io/chemotools/) meticulously outlines all available mathematical functions within chemotools. This comprehensive resource serves as a guide for users exploring the extensive capabilities of the library.
 
-# Adoption in educational applications
+# Adoption and applications
 
 Beyond its practical applications, ```chemotools``` has being utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Its incorporation into academic curricula provides a valuable way to enable the students to benefit from hands-on experience on real-world datasets gaining practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user-friendly interface, coupled with comprehensive documentation, has proven and enriching learning experience for students pursuing higher education in fields related to analytical chemistry and chemometrics.
+
+![Applications of ```chemotools```.\label{fig:3}](../assets/images/applications.svg)
 
 # Author contribution statement
 
