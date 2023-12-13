@@ -27,9 +27,9 @@ bibliography: ./paper.bib
 
 # Statement of need
 
-Spectroscopy is an analytical technique used to understand the composition of materials using light. Traditionally, spectroscopic data is analyzed by a discipline called chemometrics, a branch of machine learning specialized on extracting chemical information from multivariate spectra. Over the last decades, chemometricians, have excelled by developing advanced preprocessing methods designed to remove instrument and measuring artifacts from the spectra, isolating the pure chemical information of the samples [@RINNAN20091201], [@MISHRA2020116045]. 
+Spectroscopy comprises a group of several analytical techniques used to understand the composition of materials using light. Traditionally, spectroscopic data is analyzed by a discipline called chemometrics, a branch of machine learning specialized on extracting chemical information from multivariate spectra. Over the last decades, chemometricians, have excelled by developing advanced preprocessing methods designed to attenuate instrument and measuring artifacts from the spectra, enhancing the pure chemical information of the samples [@RINNAN20091201], [@MISHRA2020116045]. 
 
-Since spectroscopic methods are faster and simpler than most of other analytical techniques, their adoption as integral components of Process Analytical Technology (PAT) has witnessed significant growth across industries, including chemical, biotech, food, and pharmaceuticals. Despite this surge, a notable obstacle has been the absence of open-source standardized, accessible toolkit for chemometric model development and deployment. ```chemotools```, positioned as a comprehensive solution, addresses this void by integrating into the Python machine learning ecosystem. By implementing a variety of preprocessing and feature selection tools with the ```scikit-learn``` API [@pedregosa2018scikitlearn], ```chemotools``` opens up the entire ```scikit-learn``` toolbox to users, encompassing features such as:
+Spectroscopic methods are very suited for a wide range of applications because they allow analyzing the chemical properties of various samples in a fast and simple manner. For this reason, their adoption as integral components of Process Analytical Technology (PAT) has witnessed significant growth across industries, including chemical, biotech, food, and pharmaceuticals. Despite this surge, a notable obstacle has been the absence of open-source standardized, accessible toolkit for chemometric model development and deployment. ```chemotools```, positioned as a comprehensive solution, addresses this void by integrating into the Python machine learning ecosystem. By implementing a variety of preprocessing and feature selection tools with the ```scikit-learn``` API [@pedregosa2018scikitlearn], ```chemotools``` opens up the entire ```scikit-learn``` toolbox to users, encompassing features such as:
 
 - a rich collection of estimators for regression, classification, and clustering
 - cross-validation and hyper-parameter optimization algorithms
@@ -49,10 +49,24 @@ In addition, ```chemotools``` introduces a pra This feature offers users a strai
 
 # Features and functionality
 
-```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established chemometric methods such as multiplicative scatter correction or standard normal variate [@RINNAN20091201], to more recent methods such as asymmetrically reweighed penalized least squares baseline correction method used to remove complex baselines [@arpls2]. 
+```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighed penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (Figure!!!). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
+
+```python
+from chemotools.baseline import ArPls
+from chemotools.smooth import WhittakerSmooth
+
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 
-The data augmentation module implements methods that add stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can laverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in (\autoref{fig:2}) and the code below: 
+pipeline = make_pipeline(
+    WhittakerSmooth(),
+    ArPls(),
+    StandardScaler(with_std=False),
+)
+```
+
+The data augmentation module introduces stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can leverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in (\autoref{fig:2}). An example of code to create an augmentation pipeline is shown below: 
 
 
 ```python
@@ -66,17 +80,14 @@ augmentation_pipeline = make_pipeline(
 )
 
 ```
+![Spectral augmentation. Five augmented spectra (in magenta) are generated from an original spectrum (in blue) using an augmentation pipeline.\label{fig:2}](../assets/images/augmentation_pipeline.svg)
 
-![Spectral augmentation. The original spectrum is shown in blue and the augmented spectra are shown in magenta .\label{fig:2}](../assets/images/augmentation_pipeline.svg)
 
+In addition to the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset based on a given criteria. Selectors are used to select the features that contain the chemical information of the sample, making the models more robust and generalizable.
 
-Besides the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset. After using  
+Beyond its mathematical prowess, ```chemotools``` goes a step further by providing real-world spectral datasets [@cabaneros1]. Accompanied by guides demonstrating the integration of scikit-learn and ```chemotools``` for training regression and classification models, these datasets immerse learners in practical applications. This hands-on approach bridges theoretical concepts and real-world implementation, nurturing a deeper understanding of potential challenges in real-world scenarios.
 
-In addition to the mathematical methods, ```chemotools``` also provides real-world spectral datasets [@cabaneros1] complemented with guides showcasing how to combine ```scikit-learn``` and ```chemotools``` to train regression and classification models. By incorporating real-world examples, learners gain a practical understanding of the challenges  they might encounter in practical applications. The inclusion of these datasets is intended to facilitate a of hands-on learning, providing a bridge between theoretical concepts and real-world implementation. 
-
-Finally 
-
- (https://paucablop.github.io/chemotools/). 
+For those seeking detailed insights, the documentation page (https://paucablop.github.io/chemotools/) meticulously outlines all available mathematical functions within chemotools. This comprehensive resource serves as a guide for users exploring the extensive capabilities of the library.
 
 # Adoption in educational applications
 
@@ -88,7 +99,7 @@ Conceptualization, coding, developing and paper writing by Pau Cabaneros Lopez.
 
 # Acknowledgements
 
-This project has not received any external funding.
+This project has not received any external funding. The author would like to express gratitude to Vitor Hugo da Silva for the thorough feedback on the manuscript.
 
 # References
 
