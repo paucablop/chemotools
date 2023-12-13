@@ -68,7 +68,7 @@ pipeline = make_pipeline(
 )
 ```
 
-The data augmentation module introduces stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can leverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in \autoref{fig:2} and \autored{fig:3}. An example of code to create an augmentation pipeline is shown below: 
+The data augmentation module introduces stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can leverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in \autoref{fig:2} and \autoref{fig:3}. An example of code to create an augmentation pipeline is shown below: 
 
 
 ```python
