@@ -40,11 +40,10 @@ This integration empowers users with a versatile array of tools for robust model
 
 In addition to its foundational capabilities, ```chemotools``` not only enables users to preprocess data and train models using ```scikit-learn``` but also streamlines the transition of these models into a production setting. By enabling users with a well defined interface, ```chemotools``` facilitates the reception of input data and delivery of predictions from the trained model. This can then be containerized using Docker, providing an efficient means for the distribution and implementation of the model in any Docker-compatible environment, facilitating the deployment of models to cloud environments. This adaptive capability not only enables organizations to scale model usage but also allows them to monitor performance and promptly update or rollback the model as necessary.
 
-In addition, ```chemotools``` introduces a pra
-In addition, ```chemotools``` introduces a pra This feature offers users a straightforward and consistent method to enhance their datasets, contributing to improved model generalization. By integrating data augmentation into the chemometric workflow, ```chemotools``` provides users with an efficient tool for refining their datasets and optimizing model performance. 
+```chemotools``` also introduces a practical innovation by providing a streamlined framework for data augmentation of spectroscopic datasets through the ```scikit-learn``` API. This feature offers users a straightforward and consistent method to enhance spectral datasets, by introducing stochastic artifacts that represent real-world variations. By integrating data augmentation into the chemometric workflow, ```chemotools``` provides users with an efficient tool for refining and their datasets generalizing the models and optimizing their performance. 
 
 
-![chemotools workflow .\label{fig:1}](../assets/images/overview_2.png)
+![chemotools in the Python machine learning environment .\label{fig:1}](../assets/images/overview_2.png)
 
 
 # Features and functionality
