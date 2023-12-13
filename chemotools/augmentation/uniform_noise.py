@@ -11,10 +11,10 @@ class UniformNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    low : float, default=0.0
+    min : float, default=0.0
         The lower bound of the uniform distribution.
 
-    high : float, default=0.0
+    max : float, default=0.0
         The upper bound of the uniform distribution.
 
     random_state : int, default=None

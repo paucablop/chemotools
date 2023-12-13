@@ -740,7 +740,7 @@ def test_subtract_reference_without_reference(spectrum):
 def test_uniform_noise():
     # Arrange
     spectrum = np.ones(10000).reshape(1, -1)
-    uniform_noise = UniformNoise(low=-1, high=1, random_state=42)
+    uniform_noise = UniformNoise(min=-1, max=1, random_state=42)
 
     # Act
     spectrum_corrected = uniform_noise.fit_transform(spectrum)
