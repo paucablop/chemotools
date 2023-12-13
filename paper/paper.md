@@ -38,9 +38,10 @@ Since spectroscopic methods are faster and simpler than most of other analytical
 
 This integration empowers users with a versatile array of tools for robust model development and evaluation (\autoref{fig:1}).
 
-In addition to its foundational capabilities, ```chemotools``` not only enables users to preprocess data and construct/train models using ```scikit-learn``` but also streamlines the transition of these models into a production setting. By enabling users with a well defined interface, ```chemotools``` facilitates the reception of input data and delivery of predictions from the trained model. This can then be containerized using Docker, providing an efficient means for the distribution and implementation of the model in any Docker-compatible environment, facilitating the deployment of models to cloud environments. This adaptive capability not only enables organizations to scale model usage but also allows them to monitor performance and promptly update or rollback the model as necessary.
+In addition to its foundational capabilities, ```chemotools``` not only enables users to preprocess data and train models using ```scikit-learn``` but also streamlines the transition of these models into a production setting. By enabling users with a well defined interface, ```chemotools``` facilitates the reception of input data and delivery of predictions from the trained model. This can then be containerized using Docker, providing an efficient means for the distribution and implementation of the model in any Docker-compatible environment, facilitating the deployment of models to cloud environments. This adaptive capability not only enables organizations to scale model usage but also allows them to monitor performance and promptly update or rollback the model as necessary.
 
-In addition, ```chemotools``` introduces a practical innovation by providing a standardized framework for data augmentation of spectroscopic datasets through the ```scikit-learn``` API. This feature offers users a straightforward and consistent method to enhance their datasets, contributing to improved model generalization. By integrating data augmentation into the chemometric workflow, ```chemotools``` provides users with an efficient tool for refining their datasets and optimizing model performance. 
+In addition, ```chemotools``` introduces a pra
+In addition, ```chemotools``` introduces a pra This feature offers users a straightforward and consistent method to enhance their datasets, contributing to improved model generalization. By integrating data augmentation into the chemometric workflow, ```chemotools``` provides users with an efficient tool for refining their datasets and optimizing model performance. 
 
 
 ![chemotools workflow .\label{fig:1}](../assets/images/overview_2.png)
@@ -48,7 +49,34 @@ In addition, ```chemotools``` introduces a practical innovation by providing a s
 
 # Features and functionality
 
-```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established chemometric methods such as multiplicative scatter correction or standard normal variate [@RINNAN20091201], to more recent methods such as asymmetrically reweighed penalized least squares baseline correction method used to remove complex baselines [@arpls2]. The augmentation module implements methods to add stochastic artifacts to the spectral data. These artifacts can range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Besides the transformers, ```chemotools``` also implements selectors, used to select the relevant features of the spectra that contain the chemical information. In addition to the mathematical methods, ```chemotools``` also provides real-world spectral datasets complemented [@cabaneros1] with an extensive documentation page of the different methods as well guides showcasing how to combine ```scikit-learn``` and ```chemotools``` to train regression and classification models (https://paucablop.github.io/chemotools/).
+```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established chemometric methods such as multiplicative scatter correction or standard normal variate [@RINNAN20091201], to more recent methods such as asymmetrically reweighed penalized least squares baseline correction method used to remove complex baselines [@arpls2]. 
+
+
+The data augmentation module implements methods that add stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can laverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in (\autoref{fig:2}) and the code below: 
+
+
+```python
+from chemotools.augmentation import BaselineShift, IndexShift, NormalNoise
+from sklearn.pipeline import make_pipeline
+
+augmentation_pipeline = make_pipeline(
+    NormalNoise(scale=0.001),
+    BaselineShift(0.001),
+    IndexShift(3),
+)
+
+```
+
+![Spectral augmentation. The original spectrum is shown in blue and the augmented spectra are shown in magenta .\label{fig:2}](../assets/images/augmentation_pipeline.svg)
+
+
+Besides the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset. After using  
+
+In addition to the mathematical methods, ```chemotools``` also provides real-world spectral datasets [@cabaneros1] complemented with guides showcasing how to combine ```scikit-learn``` and ```chemotools``` to train regression and classification models. By incorporating real-world examples, learners gain a practical understanding of the challenges  they might encounter in practical applications. The inclusion of these datasets is intended to facilitate a of hands-on learning, providing a bridge between theoretical concepts and real-world implementation. 
+
+Finally 
+
+ (https://paucablop.github.io/chemotools/). 
 
 # Adoption in educational applications
 
