@@ -48,7 +48,10 @@ In addition to its foundational capabilities, ```chemotools``` not only enables 
 
 # Features and functionality
 
-```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighed penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (Figure!!!). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
+```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighed penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (\autoref{fig:2}). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
+
+![Overview of the pipelines. A: Preprocessing pipeline. B: Augmentation pipeline.\label{fig:2}](../assets/images/pipelines.png)
+
 
 ```python
 from chemotools.baseline import ArPls
@@ -65,7 +68,7 @@ pipeline = make_pipeline(
 )
 ```
 
-The data augmentation module introduces stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can leverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in (\autoref{fig:2}). An example of code to create an augmentation pipeline is shown below: 
+The data augmentation module introduces stochastic artifacts to the spectral data to reflect real-world variability (e.g. instrument-to-instrument variations). These artifacts range from adding noise following a given distribution to shifts on the spectral peaks or changes on the intensity of the peaks. Since the data augmentation functions are implemented as transformers, the user can leverage the pipelining functions of ```scikit-learn``` to create augmentation pipelines to transform their data. An example of an augmentation pipeline is shown in \autoref{fig:2} and \autored{fig:3}. An example of code to create an augmentation pipeline is shown below: 
 
 
 ```python
@@ -79,7 +82,7 @@ augmentation_pipeline = make_pipeline(
 )
 
 ```
-![Spectral augmentation. Five augmented spectra (in magenta) are generated from an original spectrum (in blue) using an augmentation pipeline.\label{fig:2}](../assets/images/augmentation_pipeline.svg)
+![Spectral augmentation. Five augmented spectra (in magenta) are generated from an original spectrum (in blue) using an augmentation pipeline.\label{fig:3}](../assets/images/augmentation_pipeline.svg)
 
 
 In addition to the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset based on a given criteria. Selectors are used to select the features that contain the chemical information of the sample, making the models more robust and generalizable.
@@ -92,7 +95,7 @@ For those seeking detailed insights, the documentation page (https://paucablop.g
 
 Beyond its practical applications, ```chemotools``` has being utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Its incorporation into academic curricula provides a valuable way to enable the students to benefit from hands-on experience on real-world datasets gaining practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user-friendly interface, coupled with comprehensive documentation, has proven and enriching learning experience for students pursuing higher education in fields related to analytical chemistry and chemometrics.
 
-![Applications of ```chemotools```.\label{fig:3}](../assets/images/applications.svg)
+![Applications of ```chemotools```.\label{fig:4}](../assets/images/applications.png)
 
 # Author contribution statement
 
@@ -100,7 +103,7 @@ Conceptualization, coding, developing and paper writing by Pau Cabaneros Lopez.
 
 # Acknowledgements
 
-This project has not received any external funding. The author would like to express gratitude to Vitor Hugo da Silva for the thorough feedback on the manuscript.
+This project has not received any external funding. The author would like to express his gratitude to Dr. Vitor Hugo da Silva for his thorough feedback on the manuscript.
 
 # References
 
