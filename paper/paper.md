@@ -88,7 +88,6 @@ spectra_augmented = np.array([augmentation_pipeline.fit_transform(spectrum) for 
 
 ![Spectral augmentation. Five augmented spectra (in magenta) are generated from an original spectrum (in blue) using an augmentation pipeline.\label{fig:3}](../assets/images/augmentation_pipeline.svg)
 
-
 In addition to the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset based on a given criteria. Selectors are used to select the features that contain the chemical information of the sample, making the models more robust and generalizable.
 
 Beyond its mathematical prowess, ```chemotools``` goes a step further by providing real-world spectral datasets [@cabaneros1]. Accompanied by guides demonstrating the integration of scikit-learn and ```chemotools``` for training regression and classification models, these datasets immerse learners in practical applications. This hands-on approach bridges theoretical concepts and real-world implementation, nurturing a deeper understanding of potential challenges in real-world scenarios.
@@ -97,7 +96,8 @@ For those seeking detailed insights, the documentation page (https://paucablop.g
 
 # Adoption and applications
 
-Developing *chemometric* and other machine learning models on spectral data has a two fold objectives. On the one hand i
+The ultimate objective of developing *chemometric* and machine learning models is either to gain insights about complex datasets and/or to train models that can be used in production applications (\autoref{fig:4}). From a research and development perspective, ```chemotools``` offers a wide range of transformers and selectors that, combined with the rest of the Python machine learning environment, enables researchers to investigate and understand their spectral datasets. From an industrial point of view, ```chemotools``` allows users to streamline the deployment of their trained models into production environments adhering to the frameworks developed by the machine learning community in Python (\autoref{fig:1}).  
+
 Beyond its practical applications, ```chemotools``` has being utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Its incorporation into academic curricula provides a valuable way to enable the students to benefit from hands-on experience on real-world datasets gaining practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user-friendly interface, coupled with comprehensive documentation, has proven and enriching learning experience for students pursuing higher education in fields related to analytical chemistry and *chemometrics*.
 
 ![Applications of ```chemotools```.\label{fig:4}](../assets/images/applications.png)
