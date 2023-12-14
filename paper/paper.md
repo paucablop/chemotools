@@ -97,8 +97,7 @@ For those seeking detailed insights, the documentation page (https://paucablop.g
 
 # Adoption and applications
 
-The application of *chemometric* and machine learning 
-
+Developing *chemometric* and other machine learning models on spectral data has a two fold objectives. On the one hand i
 Beyond its practical applications, ```chemotools``` has being utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Its incorporation into academic curricula provides a valuable way to enable the students to benefit from hands-on experience on real-world datasets gaining practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user-friendly interface, coupled with comprehensive documentation, has proven and enriching learning experience for students pursuing higher education in fields related to analytical chemistry and *chemometrics*.
 
 ![Applications of ```chemotools```.\label{fig:4}](../assets/images/applications.png)
