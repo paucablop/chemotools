@@ -11,10 +11,10 @@ class UniformNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    low : float, default=0.0
+    min : float, default=0.0
         The lower bound of the uniform distribution.
 
-    high : float, default=0.0
+    max : float, default=0.0
         The upper bound of the uniform distribution.
 
     random_state : int, default=None
@@ -38,9 +38,9 @@ class UniformNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
     """
 
 
-    def __init__(self, low: float = 0.0, high: float = 0.0, random_state: int = None):
-        self.low = low
-        self.high = high
+    def __init__(self, min: float = 0.0, max: float = 0.0, random_state: int = None):
+        self.min = min
+        self.max = max
         self.random_state = random_state
 
     def fit(self, X: np.ndarray, y=None) -> "UniformNoise":
@@ -109,4 +109,4 @@ class UniformNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _add_random_noise(self, x) -> np.ndarray:
-        return x + self._rng.uniform(self.low, self.high, size=x.shape)
+        return x + self._rng.uniform(self.min, self.max, size=x.shape)
