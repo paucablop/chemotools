@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
@@ -17,7 +17,7 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     random_state : int, default=None
         The random state to use for the random number generator.
-    
+
     Attributes
     ----------
     n_features_in_ : int
@@ -25,7 +25,7 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     _is_fitted : bool
         Whether the transformer has been fitted to data.
-    
+
     Methods
     -------
     fit(X, y=None)
@@ -35,15 +35,14 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Transform the input data by scaling the spectrum.
     """
 
-
-    def __init__(self, scale: int = 0.0, random_state: int = None):
+    def __init__(self, scale: float = 0.0, random_state: int | None = None):
         self.scale = scale
         self.random_state = random_state
 
     def fit(self, X: np.ndarray, y=None) -> "SpectrumScale":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -97,7 +96,9 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the scaled spectrum
         for i, x in enumerate(X_):
@@ -106,6 +107,5 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _scale_spectrum(self, x) -> np.ndarray:
-        scaling_factor = self._rng.uniform(low=1-self.scale, high=1+self.scale)
+        scaling_factor = self._rng.uniform(low=1 - self.scale, high=1 + self.scale)
         return np.multiply(x, scaling_factor)
-    
