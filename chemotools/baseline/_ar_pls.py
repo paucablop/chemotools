@@ -1,18 +1,17 @@
 import logging
-import numpy as np
-import scipy.sparse as sp
-from scipy.sparse import spdiags, csc_matrix
-from scipy.sparse.linalg import splu
+from numbers import Integral
 
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
+import numpy as np
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
+from sklearn.utils.validation import check_is_fitted, check_scalar
 
 from chemotools.utils.check_inputs import check_input
+from chemotools.utils.whittaker_base import WhittakerLikeSolver
 
 logger = logging.getLogger(__name__)
 
 
-class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver):
     """
     This class implements the Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
     correction method for spectroscopy data. It uses an iterative process
@@ -20,7 +19,7 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     Parameters
     ----------
-    lam : float, optional (default=1e4)
+    lam : float or int, optional (default=1e4)
         The penalty parameter for the difference matrix in the objective function.
 
     ratio : float, optional (default=0.01)
@@ -28,6 +27,11 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     nr_iterations : int, optional (default=100)
         The maximum number of iterations for the weight updating scheme.
+
+    rcond : float, default=1e-15
+        The relative condition number which is used to keep all matrices involved
+        positive definite. This is not actively used at the moment.
+        It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
 
 
     Methods
@@ -46,20 +50,24 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     References
     ----------
-    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo 
-    Baseline correction using asymmetrically reweighted penalized 
+    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo
+    Baseline correction using asymmetrically reweighted penalized
     least squares smoothing
     """
 
     def __init__(
         self,
-        lam: float = 1e4,
+        lam: float | int = 1e4,
+        differences: int = 2,
         ratio: float = 0.01,
         nr_iterations: int = 100,
+        rcond: float = 1e-15,
     ):
-        self.lam = lam
-        self.ratio = ratio
-        self.nr_iterations = nr_iterations
+        self.lam: float | int = lam
+        self.differences: int = differences
+        self.ratio: float = ratio
+        self.nr_iterations: int = nr_iterations
+        self.rcond: float = rcond
 
     def fit(self, X: np.ndarray, y=None) -> "ArPls":
         """Fit the estimator to the data.
@@ -78,8 +86,28 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
             Returns the instance itself.
         """
 
+        # the constructor parameters are checked
+        check_scalar(
+            x=self.ratio,
+            name="ratio",
+            target_type=float,
+            min_val=1e-15,
+            max_val=1.0 - 1e-15,
+        )
+        check_scalar(
+            x=self.nr_iterations, name="nr_iterations", target_type=Integral, min_val=1
+        )
+
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
+        X = BaseEstimator._validate_data(self, X, reset=True)  # type: ignore
+
+        # the internal solver is setup
+        self._setup_for_fit(
+            series_size=X.shape[1],
+            lam=self.lam,
+            differences=self.differences,
+            rcond=self.rcond,
+        )
 
         return self
 
@@ -108,42 +136,50 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         X_ = X.copy()
 
         # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
+        # NOTE: ``n_features_in_`` is set in ``BaseEstimator._validate_data`` when
+        #       ``reset`` is True
+        if X_.shape[1] != self.n_features_in_:  # type: ignore
             raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"  # type: ignore # noqa: E501
             )
 
         # Calculate the ar pls baseline
         for i, x in enumerate(X_):
             X_[i] = x - self._calculate_ar_pls(x)
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _calculate_diff(self, N):
-        I = sp.eye(N, format="csc")
-        D2 = sp.diags([1, -2, 1], [0, 1, 2], shape=(N - 2, N), format="csc")
-        return D2.dot(I).T
+        # FIXME: can this even happen because X is ensured to be 2D?
+        if X_.ndim == 1:
+            # FIXME: shouldn't this be a row and not a column vector because
+            #        Scikit-Learn works with shape (n_samples, n_features), i.e.,
+            #        (1, n_features) for a single sample?
+            return X_.reshape((-1, 1))
+        else:
+            return X_
 
     def _calculate_ar_pls(self, x):
-        N = len(x)
-        D = self._calculate_diff(N)
-        H = self.lam * D.dot(D.T)
-        w = np.ones(N)
-        iteration = 0
-        while iteration < self.nr_iterations:
-            W = spdiags(w, 0, N, N)
-            C = csc_matrix(W + H)
-            z = splu(C).solve(w * x)
+        # FIXME: this initial weighting strategy might not yield the best results
+        if self.ratio < 0.5:
+            w = np.ones_like(x)
+        else:
+            w = np.zeros_like(x)
+
+        z = np.zeros_like(x)
+        # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
+        for _ in range(self.nr_iterations):
+            # the baseline is fitted using the Whittaker smoother framework
+            z = self._whittaker_solve(X=x, w=w, use_same_w_for_all=True)[0]
             d = x - z
-            dn = d[d < 0]
-            if len(dn) == 0:
+
+            # if there is no data point below the baseline, the baseline is considered
+            # to be fitted
+            d_negative = d[d < 0]
+            if len(d_negative) == 0:
                 break
-            m = np.mean(dn)
-            s = np.std(dn)
-            exponent = np.clip(2 * (d - (2 * s - m)) / s, -709, 709)
+            m = np.mean(d_negative)
+            s = np.std(d_negative)
+            exponent = np.clip(2.0 * (d - (2.0 * s - m)) / s, -709, 709)  # type: ignore
             wt = 1.0 / (1.0 + np.exp(exponent))
-            if np.linalg.norm(w - wt) / np.linalg.norm(w) < self.ratio:
+            if np.linalg.norm(w - wt) / np.linalg.norm(w) < self.ratio:  # type: ignore
                 break
             w = wt
-            iteration += 1
         return z

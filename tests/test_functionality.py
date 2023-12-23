@@ -4,13 +4,12 @@ import pytest
 
 from chemotools.augmentation import (
     BaselineShift,
-    ExponentialNoise, 
+    ExponentialNoise,
     IndexShift,
-    NormalNoise, 
+    NormalNoise,
     SpectrumScale,
     UniformNoise,
 )
-
 from chemotools.baseline import (
     AirPls,
     ArPls,
@@ -20,6 +19,7 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
+from chemotools.feature_selection import IndexSelector, RangeCut
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
@@ -28,23 +28,20 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.feature_selection import IndexSelector, RangeCut
-from tests.fixtures import (
-    spectrum,
-    spectrum_arpls,
-    reference_airpls,
-    reference_arpls,
-    reference_msc_mean,
-    reference_msc_median,
-    reference_sg_15_2,
-    reference_snv,
-    reference_whitakker,
-)
+from tests.fixtures import reference_airpls  # noqa: F401
+from tests.fixtures import reference_arpls  # noqa: F401
+from tests.fixtures import reference_msc_mean  # noqa: F401
+from tests.fixtures import reference_msc_median  # noqa: F401
+from tests.fixtures import reference_sg_15_2  # noqa: F401
+from tests.fixtures import reference_snv  # noqa: F401
+from tests.fixtures import reference_whittaker  # noqa: F401
+from tests.fixtures import spectrum_arpls  # noqa: F401
+from tests.fixtures import spectrum
 
 
-def test_air_pls(spectrum, reference_airpls):
+def test_air_pls_single_signal(spectrum, reference_airpls):  # noqa: F811
     # Arrange
-    air_pls = AirPls()
+    air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
@@ -53,9 +50,23 @@ def test_air_pls(spectrum, reference_airpls):
     assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
 
 
-def test_ar_pls(spectrum_arpls, reference_arpls):
+def test_air_pls_multi_signals(spectrum, reference_airpls):  # noqa: F811
     # Arrange
-    arpls = ArPls(1e2, 0.0001)
+    reps = (5, 1)
+    air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
+
+    # Act
+    spectrum_corrected = air_pls.fit_transform(X=np.tile(spectrum, reps=reps))
+
+    # Assert
+    assert np.allclose(
+        spectrum_corrected, np.tile(reference_airpls[0], reps=reps), atol=1e-7
+    )
+
+
+def test_ar_pls(spectrum_arpls, reference_arpls):  # noqa: F811
+    # Arrange
+    arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
     # Act
@@ -63,6 +74,19 @@ def test_ar_pls(spectrum_arpls, reference_arpls):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+
+
+def test_ar_pls_multi_signals(spectrum_arpls, reference_arpls):  # noqa: F811
+    # Arrange
+    reps = (5, 1)
+    arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
+    reference = np.array(spectrum_arpls) - np.array(reference_arpls)
+
+    # Act
+    spectrum_corrected = arpls.fit_transform(X=np.tile(spectrum_arpls, reps=reps))
+
+    # Assert
+    assert np.allclose(spectrum_corrected, np.tile(reference[0], reps=reps), atol=1e-4)
 
 
 def test_baseline_shift():
@@ -75,9 +99,11 @@ def test_baseline_shift():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0]) 
+    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0])
     assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
-    assert np.isclose(np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8)
+    assert np.isclose(
+        np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8
+    )
 
 
 def test_constant_baseline_correction():
@@ -119,8 +145,7 @@ def test_exponential_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0.1, atol=1e-2)
-
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
 
 
 def test_extended_baseline_correction():
@@ -164,7 +189,6 @@ def test_extended_baseline_correction_with_no_reference():
     # Assert
     with pytest.raises(ValueError):
         emsc.fit_transform(spectrum)
-
 
 
 def test_extended_baseline_correction_with_wrong_reference():
@@ -221,7 +245,7 @@ def test_extended_baseline_correction_through_msc(spectrum):
 
 
 def test_extended_baseline_correction_through_msc_median(spectrum):
-    # EMSC of 0 order should be equivalient to MSC
+    # EMSC of 0 order should be equivalent to MSC
     # Arrange
     msc = MultiplicativeScatterCorrection(use_median=True)
     emsc = ExtendedMultiplicativeScatterCorrection(order=0, use_median=True)
@@ -232,7 +256,6 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
 
     # Assert
     assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
-    
 
 
 def test_index_selector():
@@ -279,13 +302,16 @@ def test_index_selector_with_wavenumbers():
 def test_index_selector_with_wavenumbers_and_dataframe():
     # Arrange
     wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
-    spectrum = pd.DataFrame(np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]]))
+    spectrum = pd.DataFrame(
+        np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]])
+    )
+    # FIXME: this is not used
     expected = np.array([[1.0, 2.0, 3.0, 34.0, 55.0, 89.0]])
 
     # Act
     select_features = IndexSelector(
         features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
-    ).set_output(transform='pandas')
+    ).set_output(transform="pandas")
 
     spectrum_corrected = select_features.fit_transform(spectrum)
 
@@ -523,7 +549,7 @@ def test_normal_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0, atol=1e-2)
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
 
 
@@ -628,7 +654,9 @@ def test_range_cut_by_wavenumber_with_dataframe():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
-    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='pandas')
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(
+        transform="pandas"
+    )
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
@@ -747,16 +775,88 @@ def test_uniform_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1/3), atol=1e-2)
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
+    assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1 / 3), atol=1e-2)
 
 
-def test_whitakker_smooth(spectrum, reference_whitakker):
+def test_whittaker_smooth_single_signal_no_weights(
+    spectrum, reference_whittaker  # noqa: F811
+):
     # Arrange
-    whitakker_smooth = WhittakerSmooth()
+    whittaker_smooth = WhittakerSmooth()
 
     # Act
-    spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
+    spectrum_corrected = whittaker_smooth.fit_transform(X=spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
+    assert np.allclose(spectrum_corrected[0], reference_whittaker[0], atol=1e-8)
+
+
+def test_whittaker_smooth_multi_signals_no_weights(
+    spectrum, reference_whittaker  # noqa: F811 #
+):
+    # Arrange
+    reps = (5, 1)
+    whittaker_smooth = WhittakerSmooth()
+
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(X=np.tile(spectrum, reps=reps))
+
+    # Assert
+    assert np.allclose(
+        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
+    )
+
+
+def test_whittaker_smooth_single_signal_with_weights(
+    spectrum, reference_whittaker  # noqa: F811
+):
+    # Arrange
+    weights = np.ones(shape=(len(spectrum[0]),))
+    whittaker_smooth = WhittakerSmooth()
+
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(
+        X=spectrum, sample_weight=weights
+    )
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_whittaker[0], atol=1e-8)
+
+
+def test_whittaker_smooth_multi_signals_single_weights(
+    spectrum, reference_whittaker  # noqa: F811
+):
+    # Arrange
+    weights = np.ones(shape=(len(spectrum[0]),))
+    reps = (5, 1)
+    whittaker_smooth = WhittakerSmooth()
+
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(
+        X=np.tile(spectrum, reps=reps), sample_weight=weights
+    )
+
+    # Assert
+    assert np.allclose(
+        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
+    )
+
+
+def test_whittaker_smooth_multi_signals_multi_weights(
+    spectrum, reference_whittaker  # noqa: F811
+):
+    # Arrange
+    weights = np.ones(shape=(5, len(spectrum[0])))
+    reps = (weights.shape[0], 1)
+    whittaker_smooth = WhittakerSmooth()
+
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(
+        X=np.tile(spectrum, reps=reps), sample_weight=weights
+    )
+
+    # Assert
+    assert np.allclose(
+        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
+    )

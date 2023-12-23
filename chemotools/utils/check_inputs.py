@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.utils.validation import check_array
 
 
@@ -12,3 +13,47 @@ def check_input(X, y=None):
         if len(y) != X.shape[0]:
             raise ValueError("y must have the same number of samples as X")
     return X
+
+
+def check_weights(
+    weights: np.ndarray | None, n_samples: int, n_features: int
+) -> tuple[np.ndarray | None, bool]:
+    # if the weights are None, return None and a flag that the same weights should be
+    # applied for all samples
+    if weights is None:
+        return None, True
+    # else nothing
+
+    # if the weights are an effectively 1D-array, make them a 2D-array
+    if weights.ndim == 1 or (weights.ndim == 2 and weights.shape[0] == 1):
+        weights_checked = weights.reshape((1, -1))
+    else:
+        weights_checked = weights
+    # else nothing
+
+    # now, the need to be checked for having the right shape
+    weights_checked = check_array(
+        weights_checked, ensure_2d=True, force_all_finite=True
+    )
+
+    # afterwards, they are checked for having the right shape
+    if weights_checked.shape[0] not in {1, n_samples}:
+        raise ValueError(
+            f"\nWeights must have either 1 or {n_samples} rows, but they have "
+            f"{weights_checked.shape[0]} rows."
+        )
+    elif weights_checked.shape[1] != n_features:
+        raise ValueError(
+            f"\nWeights must have {n_features} columns, but they have "
+            f"{weights_checked.shape[1]} columns."
+        )
+    # else nothing
+
+    # finally, it is checked whether the weights are all non-negative
+    if not np.all(weights_checked >= 0.0):
+        raise ValueError("\nWeights must be non-negative.")
+    # else nothing
+
+    # the weights are returned together with a flag whether to apply the same weights
+    # for all samples or not
+    return weights_checked, weights_checked.shape[0] == 1
