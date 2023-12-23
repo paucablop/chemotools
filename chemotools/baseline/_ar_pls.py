@@ -1,3 +1,23 @@
+"""
+This module contains the ``ArPLS`` transformer, which performs baseline correction on
+data according to the Whittaker-Henderson formulation of Penalized Least Squares which
+was modified by the introduction of weights that are updated iteratively to improve the
+baseline identification. It simultaneously estimates the baseline as well as the
+baseline noise.
+
+References
+----------
+It's based on the algorithms described in [1]_ and [2]_ where an implementational
+adaption of [2]_ was required to make it numerically stable ([3]_).
+
+.. [1] S.-J. Baek, A. Park, Y.-J. Ahn, J. Choo, "Baseline correction using
+   asymmetrically reweighted penalized least squares smoothing", Analyst, 140, 250–257
+   (2015)
+.. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932 (2023)
+.. [3] https://math.stackexchange.com/q/4819039/1261538
+
+"""
+
 import logging
 from numbers import Integral
 
@@ -13,17 +33,21 @@ logger = logging.getLogger(__name__)
 
 class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver):
     """
-    This class implements the Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
-    correction method for spectroscopy data. It uses an iterative process
-    to estimate and remove the baseline from the spectra.
+    This class implements the Asymmetrically Reweighted Penalized Least Squares a.k.a
+    ArPLS which is a baseline correction method for spectroscopy data. It uses an
+    iterative process that simultaneously estimates the baseline as well as the baseline
+    noise.
 
     Parameters
     ----------
-    lam : float or int, optional (default=1e4)
-        The penalty parameter for the difference matrix in the objective function.
+    lam : float or int, default=1e4
+        The lambda parameter that controls the smoothness of the baseline. Higher values
+        will result in a smoother baseline.
 
-    ratio : float, optional (default=0.01)
-        The convergence threshold for the weight updating scheme.
+    ratio : float, default=0.01
+        The convergence threshold for the weight updating scheme. Lower values will
+        result in a more accurate baseline at the cost of computation time and even
+        convergence.
 
     nr_iterations : int, optional (default=100)
         The maximum number of iterations for the weight updating scheme.
@@ -33,7 +57,6 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         positive definite. This is not actively used at the moment.
         It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
 
-
     Methods
     -------
     fit(X, y=None)
@@ -42,17 +65,18 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
     transform(X, y=None)
         Transform the data by removing the baseline.
 
-    _calculate_diff(N)
-        Calculate the difference matrix for a given size.
-
     _calculate_ar_pls(x)
         Calculate the baseline for a given spectrum.
 
     References
     ----------
-    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo
-    Baseline correction using asymmetrically reweighted penalized
-    least squares smoothing
+    .. [1] S.-J. Baek, A. Park, Y.-J. Ahn, J. Choo, "Baseline correction using
+       asymmetrically reweighted penalized least squares smoothing", Analyst, 140,
+       250–257 (2015)
+    .. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932
+       (2023)
+    .. [3] https://math.stackexchange.com/q/4819039/1261538
+
     """
 
     def __init__(
@@ -84,6 +108,7 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         -------
         self : ArPls
             Returns the instance itself.
+
         """
 
         # the constructor parameters are checked
@@ -92,7 +117,6 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
             name="ratio",
             target_type=float,
             min_val=1e-15,
-            max_val=1.0 - 1e-15,
         )
         check_scalar(
             x=self.nr_iterations, name="nr_iterations", target_type=Integral, min_val=1
@@ -126,6 +150,7 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         -------
         X_ : array-like of shape (n_samples, n_features)
             The transformed data with the baseline removed.
+
         """
 
         # Check that the estimator is fitted
@@ -158,11 +183,7 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
 
     def _calculate_ar_pls(self, x):
         # FIXME: this initial weighting strategy might not yield the best results
-        if self.ratio < 0.5:
-            w = np.ones_like(x)
-        else:
-            w = np.zeros_like(x)
-
+        w = np.ones_like(x)
         z = np.zeros_like(x)
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for _ in range(self.nr_iterations):

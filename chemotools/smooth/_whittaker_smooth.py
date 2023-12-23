@@ -8,8 +8,8 @@ It's based on the algorithms described in [1]_ and [2]_ where an implementationa
 adaption of [2]_ was required to make it numerically stable ([3]_).
 
 .. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
-   iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146 (2010).
-.. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932 (2023).
+   iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146 (2010)
+.. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932 (2023)
 .. [3] https://math.stackexchange.com/q/4819039/1261538
 
 """
@@ -62,6 +62,18 @@ class WhittakerSmooth(
 
     fit_transform(X, y=None, sample_weight=None)
         Fit the transformer to the input data and transform it.
+
+    References
+    ----------
+    It's based on the algorithms described in [1]_ and [2]_ where an implementational
+    adaption of [2]_ was required to make it numerically stable ([3]_).
+
+    .. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
+       iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146
+       (2010)
+    .. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932
+       (2023)
+    .. [3] https://math.stackexchange.com/q/4819039/1261538
 
     """
 
@@ -185,6 +197,7 @@ class WhittakerSmooth(
         -------
         X_smoothed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
+
         """  # noqa: E501
 
         return self.fit(X=X).transform(X=X, sample_weight=sample_weight)

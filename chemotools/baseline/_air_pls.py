@@ -1,3 +1,22 @@
+"""
+This module contains the ``AirPLS`` transformer, which performs baseline correction on
+data according to the Whittaker-Henderson formulation of Penalized Least Squares which
+was modified by the introduction of weights that are updated iteratively to improve the
+baseline identification.
+
+References
+----------
+It's based on the algorithms described in [1]_ and [2]_ where an implementational
+adaption of [2]_ was required to make it numerically stable ([3]_).
+
+.. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
+   iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146 (2010)
+.. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932 (2023)
+.. [3] https://math.stackexchange.com/q/4819039/1261538
+
+"""
+
+
 import logging
 
 import numpy as np
@@ -10,27 +29,30 @@ from chemotools.utils.whittaker_base import WhittakerLikeSolver
 logger = logging.getLogger(__name__)
 
 
+# TODO: is polynomial_order actually differences and if so, is the description correct?
 class AirPls(
     OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver
 ):
     """
-    This class implements the AirPLS (Adaptive Iteratively Reweighted Penalized Least Squares) algorithm for baseline
-    correction of spectra data. AirPLS is a common approach for removing the baseline from spectra, which can be useful
-    in various applications such as spectroscopy and chromatography.
+    This class implements the Adaptive Iteratively Reweighted Penalized Least Squares
+    a.k.a AirPLS algorithm for baseline correction of spectra data. AirPLS is a common
+    approach for removing the baseline from spectra, which can be useful in various
+    applications such as spectroscopy and chromatography.
 
     Parameters
     ----------
     lam : float or int, optional default=1e2
-        The lambda parameter controls the smoothness of the baseline. Increasing the value of lambda results in
-        a smoother baseline.
+        The lambda parameter that controls the smoothness of the baseline. Higher values
+        will result in a smoother baseline.
 
     polynomial_order : int, optional default=1
-        The polynomial order determines the degree of the polynomial used to fit the baseline. A value of 1 corresponds
+        The degree of the polynomial used to fit the baseline. A value of 1 corresponds
         to a linear fit, while higher values correspond to higher-order polynomials.
 
     nr_iterations : int, optional default=15
-        The number of iterations used to calculate the baseline. Increasing the number of iterations can improve the
-        accuracy of the baseline correction, but also increases the computation time.
+        The number of iterations used to calculate the baseline. Increasing the number
+        of iterations can improve the accuracy of the baseline correction at the cost of
+        computation time.
 
     rcond : float, default=1e-15
         The relative condition number which is used to keep all matrices involved
@@ -53,8 +75,16 @@ class AirPls(
 
     References
     ----------
-    - Z.-M. Zhang, S. Chen, and Y.-Z. Liang, Baseline correction using adaptive iteratively reweighted penalized least
-      squares. Analyst 135 (5), 1138-1146 (2010).
+    It's based on the algorithms described in [1]_ and [2]_ where an implementational
+    adaption of [2]_ was required to make it numerically stable ([3]_).
+
+    .. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
+       iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146
+       (2010)
+    .. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932
+       (2023)
+    .. [3] https://math.stackexchange.com/q/4819039/1261538
+
     """
 
     # TODO: polynomial order is actually differences
@@ -85,6 +115,7 @@ class AirPls(
         -------
         self : AirPls
             Returns the instance itself.
+
         """
         # Check that X is a 2D array and has only finite values
         X = BaseEstimator._validate_data(self, X, reset=True)  # type: ignore
@@ -114,6 +145,7 @@ class AirPls(
         -------
         X_ : array-like of shape (n_samples, n_features)
             The transformed data with the baseline removed.
+
         """
 
         # Check that the estimator is fitted
