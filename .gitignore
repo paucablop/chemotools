@@ -103,7 +103,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv*
 env/
 venv/
 ENV/
@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # VScode
-.vscode/
+# .vscode/
 
 # Notebooks
 *.ipynb
