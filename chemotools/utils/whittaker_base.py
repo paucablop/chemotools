@@ -31,26 +31,27 @@ class WhittakerLikeSolver:
     It support weights and tries to use the most efficient method available.
     Besides, it also offers the possibility to fit the roughness penalty itself.
 
-    Parameters
+    Attributes
     ----------
-    lam : int or float or None, default=1e2
+    _lam : int or float or None, default=1e2
         The lambda parameter to use for the Whittaker smooth.
         If ``None``, the transformer will fit the smoothness parameter itself by
         maximising the marginal likelihood, which can be computationally expensive, but
         more accurate than using (Generalized) Cross-Validation (see Notes).
 
-    differences : int, default=1
+    _differences : int, default=1
         The number of differences to use for the Whittaker smooth. If the aim is to
         obtain a smooth estimate of the `m`-th order derivative, this should be set to
         at least ``m + 2``.
 
-    polynomial_order : int, default=1
-        Same as ``differences``, but for ``AirPls``.
-
-    rcond : float, default=1e-15
+    _rcond : float, default=1e-15
         The relative condition number which is used to keep all matrices involved
         positive definite. This is only used if ``lam`` is ``None``.
         It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
+
+    _allow_pentapy : bool, default=True
+        Whether to enable the Pentapy solver if available. This is only used for
+        debugging and testing purposes.
 
     Notes
     -----
@@ -72,17 +73,16 @@ class WhittakerLikeSolver:
 
     """
 
-    __log_lam_bounds = (
+    __log_lam_bounds: tuple[float, float] = (
         -34.5,  # 1e-15
         115.13,  # 1e50
     )
+    __allow_pentapy: bool = True
 
     def __init__(
         self,
     ) -> None:
-        self._lam: int | float | None = float("nan")
-        self._differences: int = -1
-        self._rcond: float = float("nan")
+        pass
 
     def _setup_for_fit(
         self,
@@ -96,9 +96,9 @@ class WhittakerLikeSolver:
         """
 
         # the input arguments are stored
-        self._lam = lam
-        self._differences = differences
-        self._rcond = rcond
+        self._lam: int | float | None = lam
+        self._differences: int = differences
+        self._rcond: float = rcond
 
         # the banded storage for a LAPACK LU decomposition is computed for the squared
         # forward finite difference matrix D^T @ D which is the penalty matrix P
@@ -151,22 +151,48 @@ class WhittakerLikeSolver:
         # finally, Pentapy is enabled if available, the number of differences is 2,
         # and the lambda parameter is not fitted automatically
         self._pentapy_enabled: bool = (
-            _PENTAPY_AVAILABLE and self._differences == 2 and not self.auto_lam_
+            _PENTAPY_AVAILABLE
+            and self._differences == 2
+            and not self.auto_lam_
+            and self.__allow_pentapy
         )
 
     def _pentapy_solve(self, ab: np.ndarray, bw: np.ndarray) -> np.ndarray:
         """Solves the linear system of equations ``(W + lam * D^T @ D) @ x = W @ b``
         with the Pentapy package. This is written as the system ``A @ x = b`` where
         ``A = W + lam * D^T @ D`` and ``b = W @ b``.
+
+        Notes
+        -----
+        Pentapy does not (maybe yet) allow for 2D right-hand side matrices, so the
+        solution is computed for each column of ``bw`` separately.
+
         """
 
-        return pp.solve(
-            mat=ab,
-            rhs=bw,
-            is_flat=True,
-            index_row_wise=False,
-            solver=1,
-        )
+        # for 1-dimensional right-hand side vectors, the solution is computed directly
+        if bw.ndim == 1:
+            return pp.solve(
+                mat=ab,
+                rhs=bw,
+                is_flat=True,
+                index_row_wise=False,
+                solver=1,
+            )
+
+        # for 2-dimensional right-hand side matrices, the solution is computed for each
+        # column separately
+        else:
+            solution = np.empty(shape=(bw.shape[1], bw.shape[0]))
+            for iter_j in range(0, bw.shape[1]):
+                solution[iter_j, ::] = pp.solve(
+                    mat=ab,
+                    rhs=bw[::, iter_j],
+                    is_flat=True,
+                    index_row_wise=False,
+                    solver=1,
+                )
+
+            return solution.transpose()
 
     def _cholesky_solve(
         self, ab: np.ndarray, bw: np.ndarray
@@ -198,13 +224,19 @@ class WhittakerLikeSolver:
 
         """
 
-        # the LU decomposition is computed
-        lub, ipiv = lu_banded(
-            l_and_u=self.l_and_u_,
-            ab=ab,
-            check_finite=False,
-        )
-        decomposition = (lub, ipiv, self.l_and_u_)
+        # the LU decomposition is computed, but if the matrix cannot properly be
+        # decomposed and at least one diagonal element of U is zero, a LinAlgError is
+        # raised
+        try:
+            lub, ipiv = lu_banded(
+                l_and_u=self.l_and_u_,
+                ab=ab,
+                check_finite=False,
+            )
+            decomposition = (lub, ipiv, self.l_and_u_)
+
+        except RuntimeWarning:
+            raise np.linalg.LinAlgError()
 
         # the linear system is solved
         return (
@@ -258,6 +290,24 @@ class WhittakerLikeSolver:
         decomposition_type : BandedSolveDecompositions
             The type of decomposition used to solve the linear system of equations.
 
+        Notes
+        -----
+        This methods has the following fallback strategy in case of failures (->):
+
+            - with pentapy: Pentapy -> LU -> weighted polynomial fit (``np.polyfit``)
+            - without pentapy: Cholesky -> LU -> weightedd polynomial fit
+                (``np.polyfit``)
+
+        Why ``np.polyfit``? If the LU-decomposition fails, the lambda parameter is so
+        large that the penalty matrix is numerically singular. But on the other hand
+        this also means that the ``differences``-th order derivative of the series
+        should be as small as possible and the data fidelity term has no influence on
+        the solution. Fortunately, the penalty can be reduced to zero by fitting the
+        data with a weighted polynomial of order ``differences - 1`` because its
+        ``differences``-th order derivative is zero. It is however still closer to the
+        data than smoother solutions, i.e., even lower order polynomials whose
+        derivatives would also be zero.
+
         """
 
         # the banded storage for a LAPACK LU decomposition is computed by updating the
@@ -272,28 +322,54 @@ class WhittakerLikeSolver:
         else:
             ab[self._differences, ::] += 1.0
 
-        # the linear system of equations is solved with the most efficient method
-        # Case 1: Pentapy can be used
-        if self._pentapy_enabled:
-            return (
-                self._pentapy_solve(ab=ab, bw=bw),
-                None,
-                BandedSolveDecompositions.PENTAPY,
-            )
-
-        # Case 2: Pentapy cannot be used, but the matrix is NUMERICALLY positive
-        # definite
+        # the linear system of equations is solved with the most efficient method with
+        # LU decomposition as the fallback
         try:
-            x, decomposition = self._cholesky_solve(
-                ab=ab[0 : self._differences + 1], bw=bw
-            )
-            return x, decomposition, BandedSolveDecompositions.CHOLESKY
+            # Case 1: Pentapy can be used
+            if self._pentapy_enabled:
+                x = self._pentapy_solve(ab=ab, bw=bw)
+                if np.all(np.isfinite(x)):
+                    return (
+                        x,
+                        None,
+                        BandedSolveDecompositions.PENTAPY,
+                    )
+
+                else:
+                    raise np.linalg.LinAlgError()
+
+            # Case 2: Pentapy cannot be used, but the matrix is NUMERICALLY positive
+            # definite
+            else:
+                x, decomposition = self._cholesky_solve(
+                    ab=ab[0 : self._differences + 1], bw=bw
+                )
+                return x, decomposition, BandedSolveDecompositions.CHOLESKY
 
         # Case 3: Pentapy cannot be used and the matrix is NOT NUMERICALLY positive
-        # definite
+        # definite, so the fallback is to use the LU decomposition
         except np.linalg.LinAlgError:
-            x, decomposition = self._lu_solve(ab=ab, bw=bw)
-            return x, decomposition, BandedSolveDecompositions.LU
+            try:
+                x, decomposition = self._lu_solve(ab=ab, bw=bw)
+                if np.all(np.isfinite(x)):
+                    return x, decomposition, BandedSolveDecompositions.LU
+
+                else:
+                    raise np.linalg.LinAlgError()
+
+            # Case 4: the LU decomposition also fails, so the fallback is to fit a
+            # polynomial
+            except np.linalg.LinAlgError:
+                idx_vect = np.arange(
+                    start=0,
+                    stop=self.series_size_,
+                    step=1,
+                    dtype=np.int64,
+                )
+                poly = np.poly1d(
+                    np.polyfit(x=idx_vect, y=bw, deg=self._differences - 1, w=w)
+                )
+                return poly(idx_vect), None, BandedSolveDecompositions.POLYFIT
 
     # FIXME: this method is not yet used and needs to be tested
     def _calc_neg_marginal_likelihood(
@@ -568,6 +644,7 @@ class WhittakerLikeSolver:
         """
 
         # a nested function is defined for updating the weights
+        # TODO: add zero-weight protection (eigenvalues are weights themselves)
         def update_to_next_weights(iter_i: int) -> None:
             nonlocal w_curr, w_logdet_curr, num_nonzero_w_curr
             if iter_i > 0:

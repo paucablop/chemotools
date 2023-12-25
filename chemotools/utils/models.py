@@ -17,4 +17,5 @@ except ImportError:
 class BandedSolveDecompositions(str, Enum):
     CHOLESKY = "cholesky"
     LU = "lu"
+    POLYFIT = "polyfit"
     PENTAPY = "pentapy"

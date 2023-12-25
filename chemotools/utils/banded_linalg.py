@@ -268,7 +268,8 @@ def lu_banded(
             warn(
                 f"\nThe ({info-1}, {info-1})-th entry of the factor U is exactly 0, "
                 f"which makes it singular.\n"
-                f"Linear systems cannot be solved with this factor."
+                f"Linear systems cannot be solved with this factor.",
+                RuntimeWarning,
             )
         # else nothing
 

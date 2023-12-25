@@ -28,6 +28,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
+from chemotools.utils.models import BandedSolveDecompositions
 from tests.fixtures import reference_airpls  # noqa: F401
 from tests.fixtures import reference_arpls  # noqa: F401
 from tests.fixtures import reference_msc_mean  # noqa: F401
@@ -860,3 +861,59 @@ def test_whittaker_smooth_multi_signals_multi_weights(
     assert np.allclose(
         spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
     )
+
+
+def test_whittaker_with_pentapy_single_signal():
+    # Arrange
+    np.random.seed(42)
+    spectrum = np.random.rand(1, 1000)
+    whittaker_smooth = WhittakerSmooth(differences=2)
+
+    # Act with pentapy
+    spectrum_corr_pentapy = whittaker_smooth.fit_transform(spectrum)
+
+    # Assert with pentapy
+    assert (
+        whittaker_smooth._solve(
+            bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
+        )[2]
+        == BandedSolveDecompositions.PENTAPY
+    )
+
+    # Act without pentapy
+    whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
+    spectrum_corr_scipy = whittaker_smooth.fit_transform(spectrum)
+
+    # Assert without pentapy
+    assert whittaker_smooth._solve(
+        bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
+    )[2] in {BandedSolveDecompositions.CHOLESKY, BandedSolveDecompositions.LU}
+    assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_scipy[0])
+
+
+def test_whittaker_with_pentapy_multi_signals():
+    # Arrange
+    np.random.seed(42)
+    spectrum = np.random.rand(5, 1000)
+    whittaker_smooth = WhittakerSmooth(differences=2)
+
+    # Act with pentapy
+    spectrum_corr_pentapy = whittaker_smooth.fit_transform(spectrum)
+
+    # Assert with pentapy
+    assert (
+        whittaker_smooth._solve(
+            bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
+        )[2]
+        == BandedSolveDecompositions.PENTAPY
+    )
+
+    # Act without pentapy
+    whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
+    spectrum_corr_scipy = whittaker_smooth.fit_transform(spectrum)
+
+    # Assert without pentapy
+    assert whittaker_smooth._solve(
+        bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
+    )[2] in {BandedSolveDecompositions.CHOLESKY, BandedSolveDecompositions.LU}
+    assert np.allclose(spectrum_corr_pentapy, spectrum_corr_scipy)

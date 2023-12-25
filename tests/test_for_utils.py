@@ -16,8 +16,7 @@ from chemotools.utils.finite_differences import (
     calc_forward_diff_kernel,
     forward_finite_diff_conv_matrix,
 )
-
-# from chemotools.utils.whittaker_base import WhittakerLikeSolver
+from chemotools.utils.whittaker_base import WhittakerLikeSolver
 from tests.fixtures import reference_finite_differences  # noqa: F401
 
 
@@ -43,7 +42,7 @@ def test_forward_diff_kernel(
 
 @pytest.mark.parametrize("accuracy", list(range(1, 21)))
 @pytest.mark.parametrize("difference", list(range(0, 21)))
-@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1000, 5000])
+@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1_000, 5_000])
 def test_forward_finite_diff_conv_matrix(
     size: int, difference: int, accuracy: int
 ) -> None:
@@ -85,7 +84,7 @@ def test_forward_finite_diff_conv_matrix(
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
 @pytest.mark.parametrize("difference", list(range(0, 11)))
-@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1000, 5000])
+@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1_000, 5_000])
 def test_stepwise_lu_banded_solve(
     size: int, difference: int, with_finite_check: bool
 ) -> None:
@@ -146,7 +145,7 @@ def test_stepwise_lu_banded_solve(
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
 @pytest.mark.parametrize("difference", list(range(0, 11)))
-@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1000, 5000])
+@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1_000, 5_000])
 def test_lu_banded_slogdet(size: int, difference: int, with_finite_check: bool) -> None:
     """Tests the computation of the sign and log determinant of a banded matrix from
     its LU decomposition by comparing it to NumPy's ``slogdet``.
@@ -203,7 +202,7 @@ def test_lu_banded_slogdet(size: int, difference: int, with_finite_check: bool) 
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
 @pytest.mark.parametrize("difference", list(range(0, 11)))
-@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1000, 5000])
+@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1_000, 5_000])
 def test_cho_banded_slogdet(
     size: int, difference: int, with_finite_check: bool
 ) -> None:
@@ -253,7 +252,7 @@ def test_cho_banded_slogdet(
 @pytest.mark.parametrize("with_finite_check", [True, False])
 # @pytest.mark.parametrize("difference", list(range(0, 11)))
 @pytest.mark.parametrize("difference", [0, 1, 2])
-@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1000, 5000])
+@pytest.mark.parametrize("size", [1, 2, 10, 50, 100, 500, 1_000, 5_000])
 def test_largest_smallest_eigval_of_spbanded(
     size: int, difference: int, with_finite_check: bool
 ) -> None:
@@ -302,4 +301,31 @@ def test_largest_smallest_eigval_of_spbanded(
         f"sub- and superdiagonals failed. "
         f"Chemotools solution {min_eigval} vs."
         f"NumPy's solution {np_min_eigval}"
+    )
+
+
+@pytest.mark.parametrize("with_pentapy", [True, False])
+@pytest.mark.parametrize("log10_lam", np.arange(-30.0, 110.0, step=10.0).tolist())
+@pytest.mark.parametrize("size", [3, 10, 50, 100, 500, 1_000, 5_000, 10_000])
+def test_whittaker_solve(size: int, log10_lam: float, with_pentapy: bool) -> None:
+    """Tests if the Whittaker smoothing still works for very large values of the
+    smoothing parameter.
+    """
+
+    # a Whittaker solver is instantiated ...
+    whittaker_solver = WhittakerLikeSolver()
+    # ... pentapy is enabled if requested ...
+    whittaker_solver._WhittakerLikeSolver__allow_pentapy = with_pentapy  # type: ignore
+    whittaker_solver._setup_for_fit(
+        series_size=size,
+        lam=10.0**log10_lam,
+        differences=2,
+    )
+    # ... and the linear system is solved
+    np.random.seed(seed=42)
+    z = whittaker_solver._whittaker_solve(X=np.random.rand(1, size))[0]
+
+    assert np.all(np.isfinite(z)), (
+        f"Whittaker solver for series of size {size} with smoothing parameter "
+        f"{10.0 ** log10_lam} failed."
     )
