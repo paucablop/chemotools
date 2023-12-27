@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -28,7 +30,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.utils.models import BandedSolveDecompositions
+from chemotools.utils.models import _PENTAPY_AVAILABLE, BandedSolveDecompositions
 from tests.fixtures import reference_airpls  # noqa: F401
 from tests.fixtures import reference_arpls  # noqa: F401
 from tests.fixtures import reference_msc_mean  # noqa: F401
@@ -832,6 +834,12 @@ def test_whittaker_smooth(
 def test_whittaker_with_pentapy(
     n_samples: int, with_weights: bool, same_weights_for_all: bool
 ):
+    # this test is skipped with a warning if pentapy is not installed
+    if not _PENTAPY_AVAILABLE:
+        logging.warning("pentapy is not installed")
+        pytest.skip("pentapy is not installed, test cannot be performed")
+    # else nothing
+
     # Arrange
     np.random.seed(42)
     spectrum = np.random.rand(n_samples, 1000)
