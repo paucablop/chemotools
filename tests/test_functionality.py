@@ -40,33 +40,46 @@ from tests.fixtures import spectrum_arpls  # noqa: F401
 from tests.fixtures import spectrum
 
 
-def test_air_pls_single_signal(spectrum, reference_airpls):  # noqa: F811
+@pytest.mark.parametrize("n_samples", [1, 5])
+def test_air_pls(
+    spectrum,
+    reference_airpls,  # noqa: F811
+    n_samples: int,
+):
     # Arrange
+    reps = (n_samples, 1)
     air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
-
-
-def test_air_pls_multi_signals(spectrum, reference_airpls):  # noqa: F811
-    # Arrange
-    reps = (5, 1)
-    air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
-
-    # Act
-    spectrum_corrected = air_pls.fit_transform(X=np.tile(spectrum, reps=reps))
-
-    # Assert
     assert np.allclose(
-        spectrum_corrected, np.tile(reference_airpls[0], reps=reps), atol=1e-7
+        spectrum_corrected[0], np.tile(reference_airpls, reps=reps), atol=1e-7
     )
 
 
-def test_ar_pls(spectrum_arpls, reference_arpls):  # noqa: F811
+# FIXME: Deactivated because it fails; Issue created:
+# @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+# @pytest.mark.parametrize("size", [5_000])
+# def test_air_pls_constant_signal(size: int, fill_value: float) -> None:
+#     # Arrange
+#     spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+#     air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
+
+#     # Act
+#     spectrum_corrected = air_pls.fit_transform(spectrum)
+
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0])
+
+
+# FIXME: working with such a high ``atol`` indicates that the reference is not up to
+#        date anymore
+@pytest.mark.parametrize("n_samples", [1, 5])
+def test_ar_pls(spectrum_arpls, reference_arpls, n_samples: int):  # noqa: F811
     # Arrange
+    reps = (n_samples, 1)
     arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
@@ -74,20 +87,22 @@ def test_ar_pls(spectrum_arpls, reference_arpls):  # noqa: F811
     spectrum_corrected = arpls.fit_transform(spectrum_arpls)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+    assert np.allclose(spectrum_corrected[0], np.tile(reference, reps=reps), atol=1e-4)
 
 
-def test_ar_pls_multi_signals(spectrum_arpls, reference_arpls):  # noqa: F811
-    # Arrange
-    reps = (5, 1)
-    arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
-    reference = np.array(spectrum_arpls) - np.array(reference_arpls)
+# FIXME: Deactivated because it fails; Issue created:
+# @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+# @pytest.mark.parametrize("size", [5_000])
+# def test_ar_pls_constant_signal(size: int, fill_value: float) -> None:
+#     # Arrange
+#     spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+#     ar_pls = ArPls(lam=1e2, differences=2, ratio=0.0001)
 
-    # Act
-    spectrum_corrected = arpls.fit_transform(X=np.tile(spectrum_arpls, reps=reps))
+#     # Act
+#     spectrum_corrected = ar_pls.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected, np.tile(reference[0], reps=reps), atol=1e-4)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0])
 
 
 def test_baseline_shift():
@@ -780,58 +795,25 @@ def test_uniform_noise():
     assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1 / 3), atol=1e-2)
 
 
-def test_whittaker_smooth_single_signal_no_weights(
-    spectrum, reference_whittaker  # noqa: F811
+@pytest.mark.parametrize("same_weights_for_all", [True, False])
+@pytest.mark.parametrize("with_weights", [True, False])
+@pytest.mark.parametrize("n_samples", [1, 5])
+def test_whittaker_smooth(
+    spectrum,
+    reference_whittaker,  # noqa: F811
+    n_samples: int,
+    with_weights: bool,
+    same_weights_for_all: bool,
 ):
     # Arrange
+    reps = (n_samples, 1)
     whittaker_smooth = WhittakerSmooth()
-
-    # Act
-    spectrum_corrected = whittaker_smooth.fit_transform(X=spectrum)
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whittaker[0], atol=1e-8)
-
-
-def test_whittaker_smooth_multi_signals_no_weights(
-    spectrum, reference_whittaker  # noqa: F811 #
-):
-    # Arrange
-    reps = (5, 1)
-    whittaker_smooth = WhittakerSmooth()
-
-    # Act
-    spectrum_corrected = whittaker_smooth.fit_transform(X=np.tile(spectrum, reps=reps))
-
-    # Assert
-    assert np.allclose(
-        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
-    )
-
-
-def test_whittaker_smooth_single_signal_with_weights(
-    spectrum, reference_whittaker  # noqa: F811
-):
-    # Arrange
-    weights = np.ones(shape=(len(spectrum[0]),))
-    whittaker_smooth = WhittakerSmooth()
-
-    # Act
-    spectrum_corrected = whittaker_smooth.fit_transform(
-        X=spectrum, sample_weight=weights
-    )
-
-    # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whittaker[0], atol=1e-8)
-
-
-def test_whittaker_smooth_multi_signals_single_weights(
-    spectrum, reference_whittaker  # noqa: F811
-):
-    # Arrange
-    weights = np.ones(shape=(len(spectrum[0]),))
-    reps = (5, 1)
-    whittaker_smooth = WhittakerSmooth()
+    if with_weights and not same_weights_for_all:
+        weights = np.ones(shape=(n_samples, len(spectrum[0])))
+    elif with_weights and same_weights_for_all:
+        weights = np.ones(shape=(len(spectrum[0]),))
+    else:
+        weights = None
 
     # Act
     spectrum_corrected = whittaker_smooth.fit_transform(
@@ -844,76 +826,79 @@ def test_whittaker_smooth_multi_signals_single_weights(
     )
 
 
-def test_whittaker_smooth_multi_signals_multi_weights(
-    spectrum, reference_whittaker  # noqa: F811
+@pytest.mark.parametrize("same_weights_for_all", [True, False])
+@pytest.mark.parametrize("with_weights", [True, False])
+@pytest.mark.parametrize("n_samples", [1, 5])
+def test_whittaker_with_pentapy(
+    n_samples: int, with_weights: bool, same_weights_for_all: bool
 ):
-    # Arrange
-    weights = np.ones(shape=(5, len(spectrum[0])))
-    reps = (weights.shape[0], 1)
-    whittaker_smooth = WhittakerSmooth()
-
-    # Act
-    spectrum_corrected = whittaker_smooth.fit_transform(
-        X=np.tile(spectrum, reps=reps), sample_weight=weights
-    )
-
-    # Assert
-    assert np.allclose(
-        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
-    )
-
-
-def test_whittaker_with_pentapy_single_signal():
     # Arrange
     np.random.seed(42)
-    spectrum = np.random.rand(1, 1000)
+    spectrum = np.random.rand(n_samples, 1000)
     whittaker_smooth = WhittakerSmooth(differences=2)
+    if with_weights and not same_weights_for_all:
+        weights = np.ones(shape=(n_samples, len(spectrum[0])))
+    elif with_weights and same_weights_for_all:
+        weights = np.ones(shape=(len(spectrum[0]),))
+    else:
+        weights = None
 
     # Act with pentapy
-    spectrum_corr_pentapy = whittaker_smooth.fit_transform(spectrum)
+    spectrum_corr_pentapy = whittaker_smooth.fit_transform(
+        spectrum, sample_weight=weights
+    )
 
     # Assert with pentapy
     assert (
         whittaker_smooth._solve(
-            bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
+            bw=spectrum.transpose(),
+            log_lam=np.log(whittaker_smooth.lam),
+            w=None,
+            mod_squ_fin_diff_mat_lub=whittaker_smooth.base_squ_fw_fin_diff_mat_lub_,
         )[2]
         == BandedSolveDecompositions.PENTAPY
     )
 
     # Act without pentapy
     whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
-    spectrum_corr_scipy = whittaker_smooth.fit_transform(spectrum)
+    spectrum_corr_scipy = whittaker_smooth.fit_transform(
+        spectrum, sample_weight=weights
+    )
 
     # Assert without pentapy
-    assert whittaker_smooth._solve(
-        bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
-    )[2] in {BandedSolveDecompositions.CHOLESKY, BandedSolveDecompositions.LU}
+    assert (
+        whittaker_smooth._solve(
+            bw=spectrum.transpose(),
+            log_lam=np.log(whittaker_smooth.lam),
+            w=None,
+            mod_squ_fin_diff_mat_lub=whittaker_smooth.base_squ_fw_fin_diff_mat_lub_,
+        )[2]
+        == BandedSolveDecompositions.CHOLESKY
+    )
     assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_scipy[0])
 
 
-def test_whittaker_with_pentapy_multi_signals():
+@pytest.mark.parametrize(
+    "log10_lam", np.arange(start=-50.0, stop=170.0, step=20.0).tolist()
+)
+@pytest.mark.parametrize("difference", [1, 2, 10])
+@pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+@pytest.mark.parametrize("size", [5_000])
+def test_whittaker_constant_signal(
+    size: int, fill_value: float, difference: int, log10_lam: float
+) -> None:
     # Arrange
-    np.random.seed(42)
-    spectrum = np.random.rand(5, 1000)
-    whittaker_smooth = WhittakerSmooth(differences=2)
+    spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+    whittaker_smooth = WhittakerSmooth(lam=10.0**log10_lam, differences=difference)
 
-    # Act with pentapy
-    spectrum_corr_pentapy = whittaker_smooth.fit_transform(spectrum)
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(spectrum)
 
-    # Assert with pentapy
-    assert (
-        whittaker_smooth._solve(
-            bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
-        )[2]
-        == BandedSolveDecompositions.PENTAPY
+    # Assert
+    # this test needs to be as strict as possible because the result has to be exact
+    assert np.allclose(
+        spectrum_corrected[0],
+        spectrum[0],
+        atol=size * np.finfo(np.float64).eps,  # type: ignore
+        rtol=0.0,
     )
-
-    # Act without pentapy
-    whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
-    spectrum_corr_scipy = whittaker_smooth.fit_transform(spectrum)
-
-    # Assert without pentapy
-    assert whittaker_smooth._solve(
-        bw=spectrum.transpose(), log_lam=np.log(whittaker_smooth.lam), w=None
-    )[2] in {BandedSolveDecompositions.CHOLESKY, BandedSolveDecompositions.LU}
-    assert np.allclose(spectrum_corr_pentapy, spectrum_corr_scipy)

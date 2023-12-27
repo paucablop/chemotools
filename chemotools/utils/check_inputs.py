@@ -1,10 +1,12 @@
+from typing import Literal
+
 import numpy as np
 from sklearn.utils.validation import check_array
 
 
-def check_input(X, y=None):
+def check_input(X, y=None, dtype: type | Literal["numeric"] | None = "numeric"):
     # Check that X is a 2D array and has only finite values
-    X = check_array(X, ensure_2d=True, force_all_finite=True)
+    X = check_array(X, ensure_2d=True, force_all_finite=True, dtype=dtype)
 
     # Check that y is None or a 1D array of the same length as X
     if y is not None:
@@ -39,19 +41,27 @@ def check_weights(
     # afterwards, they are checked for having the right shape
     if weights_checked.shape[0] not in {1, n_samples}:
         raise ValueError(
-            f"\nWeights must have either 1 or {n_samples} rows, but they have "
+            f"Weights must have either 1 or {n_samples} rows, but they have "
             f"{weights_checked.shape[0]} rows."
         )
     elif weights_checked.shape[1] != n_features:
         raise ValueError(
-            f"\nWeights must have {n_features} columns, but they have "
+            f"Weights must have {n_features} columns, but they have "
             f"{weights_checked.shape[1]} columns."
         )
     # else nothing
 
-    # finally, it is checked whether the weights are all non-negative
-    if not np.all(weights_checked >= 0.0):
-        raise ValueError("\nWeights must be non-negative.")
+    # finally, it needs to be checked that the weights are all non-negative ...
+    if np.any(weights < 0.0):
+        raise ValueError(
+            f"Weights may not be negative, but {np.sum(weights < 0.0)} negative "
+            f"weights were found."
+        )
+    # ... and also at least one of them is positive
+    elif np.sum(weights) <= 0.0:
+        raise ValueError(
+            "At least one weights needs to be > 0, but all weights were 0.0."
+        )
     # else nothing
 
     # the weights are returned together with a flag whether to apply the same weights

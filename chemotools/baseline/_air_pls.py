@@ -54,11 +54,6 @@ class AirPls(
         of iterations can improve the accuracy of the baseline correction at the cost of
         computation time.
 
-    rcond : float, default=1e-15
-        The relative condition number which is used to keep all matrices involved
-        positive definite. This is not actively used at the moment.
-        It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
-
     Methods
     -------
     fit(X, y=None)
@@ -93,12 +88,10 @@ class AirPls(
         lam: int | float = 100,
         polynomial_order: int = 1,
         nr_iterations: int = 15,
-        rcond: float = 1e-15,
     ):
         self.lam: int | float = lam
         self.polynomial_order: int = polynomial_order
         self.nr_iterations: int = nr_iterations
-        self.rcond: float = rcond
 
     def fit(self, X: np.ndarray, y=None) -> "AirPls":
         """Fit the AirPls baseline correction estimator to the input data.
@@ -106,7 +99,8 @@ class AirPls(
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            The input data.
+            The input data. It is internally promoted to ``np.float64`` to avoid loss of
+            precision.
 
         y : array-like of shape (n_samples,), optional (default=None)
             The target values.
@@ -118,14 +112,20 @@ class AirPls(
 
         """
         # Check that X is a 2D array and has only finite values
-        X = BaseEstimator._validate_data(self, X, reset=True)  # type: ignore
+        X = BaseEstimator._validate_data(  # type: ignore
+            self,
+            X,
+            reset=True,
+            ensure_2d=True,
+            force_all_finite=True,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
 
         # the internal solver is set up
         self._setup_for_fit(
             series_size=X.shape[1],
             lam=self.lam,
             differences=self.polynomial_order,
-            rcond=self.rcond,
         )
 
         return self
@@ -152,7 +152,10 @@ class AirPls(
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
+        X = check_input(
+            X,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
         X_ = X.copy()
 
         # Check that the number of features is the same as the fitted data
@@ -179,18 +182,22 @@ class AirPls(
     def _calculate_air_pls(self, x):
         # FIXME: this initial weighting strategy might not yield the best results
         w = np.ones_like(x)
+        # FIXME: this initialisation will will fail for many signals and produce a
+        #        zero-baseline
         z = np.zeros_like(x)
-        dssn_thresh = 1e-3 * np.abs(x).sum()
+        dssn_thresh = max(1e-3 * np.abs(x).sum(), 1e-308) # to avoid 0 equalities
 
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for i in range(0, self.nr_iterations - 1):
             # the baseline is fitted using the Whittaker smoother framework
-            z = self._whittaker_solve(X=x, w=w, use_same_w_for_all=True)[0]
+            z, _ = self._solve_single_x(
+                x=x, w=w, mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_
+            )
             d = x - z
             dssn = np.abs(d[d < 0].sum())
 
             # the algorithm is stopped if the threshold is reached
-            if dssn < dssn_thresh:
+            if dssn <= dssn_thresh:
                 break
 
             # the weights are updated

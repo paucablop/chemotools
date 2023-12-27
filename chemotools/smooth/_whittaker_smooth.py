@@ -36,13 +36,9 @@ class WhittakerSmooth(
 
     differences : int, default=1
         The number of differences to use for the Whittaker smooth. If the aim is to
-        obtain a smooth estimate of the `m`-th order derivative, this should be set to
+        obtain a smooth estimate of the ``m``-th order derivative, this should be set to
         at least ``m + 2``.
 
-    rcond : float, default=1e-15
-        The relative condition number which is used to keep all matrices involved
-        positive definite. This is not actively used at the moment.
-        It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
 
     Attributes
     ----------
@@ -81,11 +77,9 @@ class WhittakerSmooth(
         self,
         lam: int | float = 1e2,
         differences: int = 1,
-        rcond: float = 1e-15,
     ):
         self.lam = lam
         self.differences = differences
-        self.rcond = rcond
 
     def fit(self, X: ndarray, y=None) -> "WhittakerSmooth":
         """
@@ -94,7 +88,8 @@ class WhittakerSmooth(
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit the transformer to.
+            The input data to fit the transformer to. It is internally promoted to
+            ``np.float64`` to avoid loss of precision.
 
         y : None
             Ignored.
@@ -106,7 +101,10 @@ class WhittakerSmooth(
 
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
+        X = check_input(
+            X,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
 
         # Set the number of features ...
         self.n_features_in_ = X.shape[1]
@@ -115,7 +113,6 @@ class WhittakerSmooth(
             series_size=self.n_features_in_,
             lam=self.lam,
             differences=self.differences,
-            rcond=self.rcond,
         )
 
         # Set the fitted attribute to True
@@ -135,7 +132,8 @@ class WhittakerSmooth(
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
+            The input data to transform. It is internally promoted to ``np.float64`` to
+            avoid loss of precision.
 
         y : None
             Ignored.
@@ -156,7 +154,10 @@ class WhittakerSmooth(
         check_is_fitted(self, "_is_fitted")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
+        X = check_input(
+            X,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
         X_ = X.copy()
 
         # Check that the number of features is the same as the fitted data
@@ -183,7 +184,8 @@ class WhittakerSmooth(
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit and transform.
+            The input data to fit and transform. It is internally promoted to
+            ``np.float64`` to avoid loss of precision.
 
         y : None
             Ignored.
@@ -191,6 +193,8 @@ class WhittakerSmooth(
         sample_weight : np.ndarray of shape (n_features,), (n_samples, n_features), (1, n_features), or None, default=None
             Individual weights for each of the input data. If only 1 weight vector is
             provided, it is assumed to be the same for the features all samples.
+            No weights may be negative (< 0.0) and at least one weight needs to be
+            positive (> 0.0).
             If ``None``, all features are assumed to have the same weight.
 
         Returns

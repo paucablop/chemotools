@@ -52,11 +52,6 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
     nr_iterations : int, optional (default=100)
         The maximum number of iterations for the weight updating scheme.
 
-    rcond : float, default=1e-15
-        The relative condition number which is used to keep all matrices involved
-        positive definite. This is not actively used at the moment.
-        It works in the same way as the ``rcond`` parameter of SciPy's ``linalg.pinvh``.
-
     Methods
     -------
     fit(X, y=None)
@@ -85,13 +80,11 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         differences: int = 2,
         ratio: float = 0.01,
         nr_iterations: int = 100,
-        rcond: float = 1e-15,
     ):
         self.lam: float | int = lam
         self.differences: int = differences
         self.ratio: float = ratio
         self.nr_iterations: int = nr_iterations
-        self.rcond: float = rcond
 
     def fit(self, X: np.ndarray, y=None) -> "ArPls":
         """Fit the estimator to the data.
@@ -99,7 +92,8 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            The input data.
+            The input data. It is internally promoted to ``np.float64`` to avoid loss of
+            precision.
 
         y : array-like of shape (n_samples,), optional (default=None)
             The target values.
@@ -123,14 +117,20 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         )
 
         # Check that X is a 2D array and has only finite values
-        X = BaseEstimator._validate_data(self, X, reset=True)  # type: ignore
+        X = BaseEstimator._validate_data(  # type: ignore
+            self,
+            X,
+            reset=True,
+            ensure_2d=True,
+            force_all_finite=True,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
 
         # the internal solver is setup
         self._setup_for_fit(
             series_size=X.shape[1],
             lam=self.lam,
             differences=self.differences,
-            rcond=self.rcond,
         )
 
         return self
@@ -141,7 +141,8 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            The input data.
+            The input data. It is internally promoted to ``np.float64`` to avoid loss of
+            precision.
 
         y : array-like of shape (n_samples,), optional (default=None)
             The target values.
@@ -157,7 +158,10 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
+        X = check_input(
+            X,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
         X_ = X.copy()
 
         # Check that the number of features is the same as the fitted data
@@ -184,11 +188,15 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
     def _calculate_ar_pls(self, x):
         # FIXME: this initial weighting strategy might not yield the best results
         w = np.ones_like(x)
+        # FIXME: this initialisation will will fail for many signals and produce a
+        #        zero-baseline
         z = np.zeros_like(x)
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for _ in range(self.nr_iterations):
             # the baseline is fitted using the Whittaker smoother framework
-            z = self._whittaker_solve(X=x, w=w, use_same_w_for_all=True)[0]
+            z, _ = self._solve_single_x(
+                x=x, w=w, mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_
+            )
             d = x - z
 
             # if there is no data point below the baseline, the baseline is considered
