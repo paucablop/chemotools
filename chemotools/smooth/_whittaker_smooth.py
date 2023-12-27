@@ -38,7 +38,8 @@ class WhittakerSmooth(
         The number of differences to use for the Whittaker smooth. If the aim is to
         obtain a smooth estimate of the ``m``-th order derivative, this should be set to
         at least ``m + 2``.
-
+        Currently, values >= 6 are highly discouraged and might lead to obscured
+        smoothing.
 
     Attributes
     ----------

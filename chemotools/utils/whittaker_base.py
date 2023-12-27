@@ -387,7 +387,7 @@ class WhittakerLikeSolver:
 
         Parameters
         ----------
-        X : np.ndarray of shape(n, m)
+        X : np.ndarray of shape (n, m)
             The series to be smoothed stored as individual rows.
         w : np.ndarray of shape(1, m), shape(n, m), or None
             The weights to be applied for smoothing. If only a single row is provided
@@ -409,7 +409,7 @@ class WhittakerLikeSolver:
             The lambda parameter used for the smoothing of each series. If `lam` was
             fixed, this is a vector of length `n` with the same value for each series.
 
-        """
+        """  # noqa: E501
 
         # a nested function is defined for updating the weights
         # TODO: add zero-weight protection (eigenvalues are weights themselves)
@@ -434,25 +434,12 @@ class WhittakerLikeSolver:
             X.dtype == self.__dtype
         ), f"Internal error: Promotion to {self.__dtype} failed."
 
-        # the modified squared forward finite difference matrix is computed
-        mod_squ_fin_diff_mat_lub = posdef_mod_squared_fw_fin_diff_conv_matrix(
-            fw_fin_diff_mat=self.fw_fin_diff_mat_,
-            differences=self.differences_,
-            dia_mod_matrix=None,
-            max_eigval_mult=self.max_eigval_mult_,
-            dtype=self.__dtype,
-        )
-        mod_squ_fin_diff_mat_lub = conv_to_lu_banded_storage(
-            a=mod_squ_fin_diff_mat_lub,
-            l_and_u=self.l_and_u_,
-        )
-
         # if multiple x with the same weights are to be solved for fixed lambda, this
         # can be done more efficiently by leveraging Pentapy's and LAPACK'S ability to
         # perform multiple solves from the same inversion at once
         if use_same_w_for_all:
             return self._solve_multiple_x(
-                X=X, w=w, mod_squ_fin_diff_mat_lub=mod_squ_fin_diff_mat_lub
+                X=X, w=w, mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_
             )
         # else nothing
 
@@ -464,7 +451,9 @@ class WhittakerLikeSolver:
         for iter_i, x in enumerate(X):
             update_to_next_weights(iter_i=iter_i)
             X_smooth[iter_i], lam[iter_i] = self._solve_single_x(
-                x=x, w=w_curr, mod_squ_fin_diff_mat_lub=mod_squ_fin_diff_mat_lub
+                x=x,
+                w=w_curr,
+                mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_,
             )
 
         return X_smooth, lam
