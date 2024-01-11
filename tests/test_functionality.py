@@ -622,6 +622,7 @@ def test_range_cut_by_wavenumber_with_list():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0][1:7], atol=1e-8)
+    assert range_cut.wavenumbers_ == [2, 3, 4, 5, 6, 7]
 
 
 def test_range_cut_by_wavenumber_with_dataframe():

@@ -78,6 +78,7 @@ class RangeCut(BaseEstimator, SelectorMixin):
         else:
             self.start_index_ = self._find_index(self.start)
             self.end_index_ = self._find_index(self.end)
+            self.wavenumbers_ = self.wavenumbers[self.start_index_ : self.end_index_]
 
         return self
     
