@@ -34,6 +34,8 @@ class RangeCut(BaseEstimator, SelectorMixin):
     end_index_ : int
         The index of the end of the range. It is -1 if the wavenumbers are not provided.
 
+    wavenuumbers_ : array-like
+        The cut wavenumbers of the input data.
 
     Methods
     -------
@@ -75,6 +77,7 @@ class RangeCut(BaseEstimator, SelectorMixin):
         if self.wavenumbers is None:
             self.start_index_ = self.start
             self.end_index_ = self.end
+            self.wavenumbers_ = None
         else:
             self.start_index_ = self._find_index(self.start)
             self.end_index_ = self._find_index(self.end)
