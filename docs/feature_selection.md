@@ -1,11 +1,11 @@
 ---
-title: Variable selection
+title: Feature selection
 layout: default
 parent: Docs
 ---
 
-# __Variable selection__
-Variable selection is a preprocessing technique in spectroscopy that selects the most relevant variables. The following algorithms are available:
+# __Feature selection__
+Feature selection is a preprocessing technique in spectroscopy that selects the most relevant features. The following algorithms are available:
 - [Range cut](#range-cut)
 - [SelectFeatures](#range-cut-by-wavenumber)
 
@@ -31,7 +31,7 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 #### __Case 1: Range cut by index__
 
 ```python
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 
 rcbi = RangeCut(0, 200)
 spectra_rcbi = rcbi.fit_transform(spectra)
@@ -41,11 +41,15 @@ spectra_rcbi = rcbi.fit_transform(spectra)
 
 
 ```python
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 
 rcbw = RangeCut(950, 1100, wavenumbers=wn)
 spectra_rcbw = rcbw.fit_transform(spectra)
 ```
+
+After fitting the method with the wavenumbers, the selected wavenumbers can be accessed using the ```wavenumbers_``` attribute.
+
+```python
 
 ### __Plotting example__:
 
@@ -72,7 +76,7 @@ In the example below, the selected wavenumbers ```wn_select``` are used to selec
 
 
 ```python
-from chemotools.variable_selection import SelectFeatures
+from chemotools.feature_selection import SelectFeatures
 
 sfbw = SelectFeatures(features=wn_select,wavenumbers=wn)
 spectra_sfbw = sfbw.fit_transform(spectra)
