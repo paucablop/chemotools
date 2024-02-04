@@ -7,7 +7,7 @@ parent: Docs
 # __Feature selection__
 Feature selection is a preprocessing technique in spectroscopy that selects the most relevant features. The following algorithms are available:
 - [Range cut](#range-cut)
-- [IndexSelector](#range-cut-by-wavenumber)
+- [IndexSelector](#index-selector)
 
 {: .note }
 > The variable selection algorithms implemented in ```chemotools``` allow you to select a subset of variables/features from the spectra. They are not designed to find the most relevant variables/features for a given task. 
@@ -57,7 +57,7 @@ After fitting the method with the wavenumbers, the selected wavenumbers can be a
 <iframe src="figures/range_cut_by_wavenumber.html" width="800px" height="400px" style="border: none;"></iframe>
 
 
-## __IndexSelector__
+## __Index selector__
 IndexSelector is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
 
 ### __Arguments__:
