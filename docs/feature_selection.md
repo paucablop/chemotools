@@ -7,7 +7,7 @@ parent: Docs
 # __Feature selection__
 Feature selection is a preprocessing technique in spectroscopy that selects the most relevant features. The following algorithms are available:
 - [Range cut](#range-cut)
-- [SelectFeatures](#range-cut-by-wavenumber)
+- [IndexSelector](#range-cut-by-wavenumber)
 
 {: .note }
 > The variable selection algorithms implemented in ```chemotools``` allow you to select a subset of variables/features from the spectra. They are not designed to find the most relevant variables/features for a given task. 
@@ -49,7 +49,6 @@ spectra_rcbw = rcbw.fit_transform(spectra)
 
 After fitting the method with the wavenumbers, the selected wavenumbers can be accessed using the ```wavenumbers_``` attribute.
 
-```python
 
 ### __Plotting example__:
 
@@ -57,8 +56,9 @@ After fitting the method with the wavenumbers, the selected wavenumbers can be a
 
 <iframe src="figures/range_cut_by_wavenumber.html" width="800px" height="400px" style="border: none;"></iframe>
 
-## __SelectFeatures__
-SelectFeatures is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
+
+## __IndexSelector__
+IndexSelector is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
 
 ### __Arguments__:
 
@@ -76,9 +76,9 @@ In the example below, the selected wavenumbers ```wn_select``` are used to selec
 
 
 ```python
-from chemotools.feature_selection import SelectFeatures
+from chemotools.feature_selection import IndexSelector
 
-sfbw = SelectFeatures(features=wn_select,wavenumbers=wn)
+sfbw = IndexSelector(features=wn_select,wavenumbers=wn)
 spectra_sfbw = sfbw.fit_transform(spectra)
 ```
 
