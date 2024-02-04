@@ -10,13 +10,16 @@ nav_order: 4
 
 ## What will you learn?
 
-- [Get familiar with the Fermentation dataset](#introduction)
-- [Load the fermentation dataset](#loading-the-training-dataset)
-- [Explore the fermentation dataset](#exploring-the-training-dataset)
-- [Visualize the fermentation dataset](#visualizing-the-training-dataset)
-- [Preprocess the spectra using pipelines](#preprocessing-the-training-spectra)
-- [Train a PLS model](#training-a-pls-model)
-- [Apply the model to the testing dataset](#applying-the-model-to-the-testing-dataset)
+- [__Brewing a PLS regressor__](#brewing-a-pls-regressor)
+  - [What will you learn?](#what-will-you-learn)
+  - [__Introduction__](#introduction)
+  - [__Loading the training dataset__](#loading-the-training-dataset)
+  - [__Exploring the training dataset__](#exploring-the-training-dataset)
+  - [__Visualizing the training dataset__](#visualizing-the-training-dataset)
+  - [__Preprocessing the training spectra__](#preprocessing-the-training-spectra)
+  - [__Training a PLS model__](#training-a-pls-model)
+  - [__Applying the model to the testing dataset__](#applying-the-model-to-the-testing-dataset)
+  - [__Recap__](#recap)
 
 ## __Introduction__
 Welcome to the world of spectroscopic data analysis, where we provide you with a unique insight into lignocellulosic ethanol fermentation in real-time. Our dataset comprises spectra obtained through attenuated total reflectance, mid-infrared (ATR-MIR) spectroscopy, combined with high-performance liquid chromatography (HPLC) reference data to ensure precision and accuracy.
@@ -169,7 +172,7 @@ Now that you've explored the dataset, it's time to preprocess the spectral data.
 
 We will preprocess the spectra using the following steps:
 
-- __[Range Cut](https://paucablop.github.io/chemotools/docs/variable_selection.html#range-cut)__: to remove the wavenumbers outside the range between 950 and 1550 cm-1.
+- __[Range Cut](https://paucablop.github.io/chemotools/docs/feature_selection.html#range-cut)__: to remove the wavenumbers outside the range between 950 and 1550 cm-1.
 
 - __[Linear Correction](https://paucablop.github.io/chemotools/docs/baseline.html#linear-baseline-correction)__: to remove the linear baseline shift. 
 
@@ -182,7 +185,7 @@ We will chain the preprocessing steps using the [```make_pipeline()```](https://
 
 
 ```python
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 from chemotools.baseline import LinearCorrection
 from chemotools.derivative import SavitzkyGolay
 
