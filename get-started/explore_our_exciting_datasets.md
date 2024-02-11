@@ -47,7 +47,7 @@ from chemotools.datasets import load_fermentation_train
 X_train, y_train = load_fermentation_train(set_output="polars")
 ```
 
-{: .note}
+{: .highlight}
 > Polars is supported in ```chemotools```>=0.1.5
 
 
@@ -61,6 +61,7 @@ The test set takes you on a real-time adventure with over 1000 spectra collected
 Ready for this real-time exploration? Load the test set like a pro:
 
 - __Load as```pandas.DataFrame```__:
+  
 ```python
 from chemotools.datasets import load_fermentation_test
 
@@ -68,6 +69,7 @@ X_test, y_test = load_fermentation_test()
 ```
 
 - __Load as```polars.DataFrame```__:
+  
 ```python
 from chemotools.datasets import load_fermentation_test
 
@@ -84,6 +86,7 @@ The Coffee Dataset invites you to embark on a journey through the world of coffe
 Feeling the coffee buzz? You can load the Coffee Dataset with ease as a ```pandas.DataFrame``` or as a ```polars.DataFrame```.
 
 - __Load as```pandas.DataFrame```__:
+  
 ```python
 from chemotools.datasets import load_coffee
 
@@ -91,6 +94,7 @@ spectra, labels = load_coffee()
 ```
 
 - __Load as```polars.DataFrame```__:
+  
 ```python
 from chemotools.datasets import load_coffee
 
