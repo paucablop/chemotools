@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import polars as pl
 import pytest
 
 from chemotools.augmentation import (
@@ -625,7 +626,7 @@ def test_range_cut_by_wavenumber_with_list():
     assert range_cut.wavenumbers_ == [2, 3, 4, 5, 6, 7]
 
 
-def test_range_cut_by_wavenumber_with_dataframe():
+def test_range_cut_by_wavenumber_with_pandas_dataframe():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
@@ -636,6 +637,19 @@ def test_range_cut_by_wavenumber_with_dataframe():
 
     # Assert
     assert type(spectrum_corrected) == pd.DataFrame
+
+
+def test_range_cut_by_wavenumber_with_polars_dataframe():
+    # Arrange
+    wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    spectrum = pl.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='polars')
+
+    # Act
+    spectrum_corrected = range_cut.fit_transform(spectrum)
+
+    # Assert
+    assert type(spectrum_corrected) == pl.DataFrame
 
 
 def test_robust_normal_variate():
