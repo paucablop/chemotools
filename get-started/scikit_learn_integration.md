@@ -11,7 +11,7 @@ This page shows how to use ```chemotools``` in combination with ```scikit-learn`
 
 - [Working with single spectra](#working-with-single-spectra)
 - [Working with pipelines](#working-with-pipelines)
-- [Working with pandas DataFrames](#working-with-pandas-dataframes)
+- [Working with pandas DataFrames](#working-with-dataframes-🐼-and-🐻‍❄️)
 - [Persisting your models](#persisting-your-models)
 
 ## __Working with single spectra__
@@ -172,7 +172,7 @@ The ```set_output()``` method accepts the following arguments:
 - ```transform```: The output format. Can be ```'pandas'``` or ```'default'``` (the default format will output a ```numpy.ndarray```).
 
 {: .highlight }
-> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the set_output() method (AirPLS().set_output(transform='polars')).
+> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the ```set_output()``` method (```AirPLS().set_output(transform='polars')```).
 
 
 #### __3. Fit and transform the spectra__
@@ -217,7 +217,7 @@ output = pipeline.fit_transform(spectra)
 ```
 
 {: .highlight }
-> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the set_output() method (pipeline.set_output(transform='polars')).
+> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the ```set_output()``` method (```pipeline.set_output(transform='polars')```).
 
 ## __Persisting your models__
 
