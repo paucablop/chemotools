@@ -44,7 +44,7 @@ So, grab your favorite coffee mug, prepare to delve into the world of data-drive
 
 ## __Importing the data__
 
-Fantastic! Now that we've set the stage with our coffee dataset, it's time to take the plunge into the rich world of data analysis. No need to worry about complicated data wrangling – with ```chemotools``` we've made it effortless for you. We've gracefully loaded our coffee spectra into a sleek and ready-to-explore ```pandas.DataFrame```. Let's start brewing some data magic! ☕🔮📊. 
+Fantastic! Now that we've set the stage with our coffee dataset, it's time to take the plunge into the rich world of data analysis. No need to worry about complicated data wrangling – with ```chemotools``` we've made it effortless for you. We've gracefully loaded our coffee spectra into a sleek and ready-to-explore ```pandas.DataFrame``` or ```polars.DataFrame```, your choice! For this example, we will use ```pandas.DataFrame```. Let's start brewing some data magic! ☕🔮📊. 
 
 
 ```python
@@ -57,6 +57,9 @@ The ```load_coffee()``` function returns two variables: ```spectra``` and ```lab
 
 - ```spectra```: A ```pandas.DataFrame``` containing the spectra of the coffee samples as rows.
 - ```labels```: A ```pandas.DataFrame``` containing the origin of each sample.
+
+{: .highlight }
+> If you are interested in working with ```polars.DataFrame``` you can simply use the  ```load_coffee(set_output="polars")```  (```chemotools```>=0.1.5).
 
 ## __Explore, plot and color__
 

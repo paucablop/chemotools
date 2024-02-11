@@ -50,6 +50,10 @@ The ```load_fermentation_train()``` function returns two ```pandas.DataFrame```:
 
 - ```hplc```: AHere, you'll find HPLC measurements, specifically glucose concentrations (in g/L), stored in a single column labeled ```glucose```.
 
+{: .highlight }
+> If you are interested in working with ```polars.DataFrame``` you can simply use  ```load_fermentation_train(set_output="polars")``` (chemotools>=0.1.5). Note that if you choose to work with ```polars.DataFrame``` the wavenumbers are given in the column names as ```str``` and not as ```float```. This is because ```polars``` does not support column names with types other than ```str```. To extract the wavenumbers as ```float``` from the ```polars.DataFrame``` you can use the ```df.columns.to_numpy(dtype=np.float64)``` method.
+
+
 ## __Exploring the training dataset__
 
 Before diving into data modeling, it's essential to get familiar with your data. Start by answering basic questions: _How many samples are there?_, and _how many wavenumbers are available?_
@@ -102,7 +106,7 @@ To better understand our dataset, we employ visualization. We will plot the trai
 Up until now, we have used ```pandas.DataFrame``` to represent the dataset. ```pandas.DataFrame``` are great for storing and manipulating many large datasets. However, I often find more convenient to use ```numpy.ndarray``` to work with spectral data. Therefore, we will convert the ```pandas.DataFrame``` to ```numpy.ndarray``` using the ```pandas.DataFrame.to_numpy()``` method.
 
 {: .note }
-> Pandas lover 🐼 ❤️? No problem! ```chemotools``` also supports working with ```pandas.DataFrame``` by implementing the latest ```set_output()``` API from ```scikit-learn```. If you are more interested in working with ```pandas```, take a look at the documentation [here](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-pandas-dataframes).
+> Pandas 🐼 or polars 🐻‍❄️ lover ❤️? No problem! ```chemotools``` also supports working with ```pandas.DataFrame``` or ```polars.DataFrame``` by implementing the latest ```set_output()``` API from ```scikit-learn```. If you are more interested in working with ```pandas``` or ```polars```, take a look at the documentation [here](https://paucablop.github.io/chemotools/get-started/scikit_learn_integration.html#working-with-dataframes).
 
 So our first step will be to transform our ```pandas.DataFrame``` to ```numpy.ndarray```:
 

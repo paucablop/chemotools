@@ -29,13 +29,27 @@ For those curious minds, you can find more about the Fermentation Dataset in the
 
 #### __📚 THE TRAIN SET: Start Your Training Adventure__
 
-The train set boasts 21 synthetic spectra paired with their reference glucose concentrations, measured by high-performance liquid chromatography (HPLC). Ready to embark on your training journey? You can load the train set with a single command:
+The train set boasts 21 synthetic spectra paired with their reference glucose concentrations, measured by high-performance liquid chromatography (HPLC). Ready to embark on your training journey? You can load the train set as a ```pandas.DataFrame``` or as a ```polars.DataFrame``` with a single command:
+
+- __Load as```pandas.DataFrame```__:
 
 ```python
 from chemotools.datasets import load_fermentation_train
 
 X_train, y_train = load_fermentation_train()
 ```
+
+- __Load as```polars.DataFrame```__:
+
+```python
+from chemotools.datasets import load_fermentation_train
+
+X_train, y_train = load_fermentation_train(set_output="polars")
+```
+
+{: .note}
+> Polars is supported in ```chemotools```>=0.1.5
+
 
 {: .note}
 > Want to master the art of building a PLS model using the Fermentation Dataset? 📝 [Dive into our Training Guide](https://paucablop.github.io/chemotools/get-started/brewing_regressor.html).
@@ -46,22 +60,41 @@ The test set takes you on a real-time adventure with over 1000 spectra collected
 
 Ready for this real-time exploration? Load the test set like a pro:
 
+- __Load as```pandas.DataFrame```__:
 ```python
 from chemotools.datasets import load_fermentation_test
 
 X_test, y_test = load_fermentation_test()
 ```
 
+- __Load as```polars.DataFrame```__:
+```python
+from chemotools.datasets import load_fermentation_test
+
+X_test, y_test = load_fermentation_test(set_output="polars")
+```
+
+{: .highlight }
+> Note that the wavenumbers are stored as the column names in both the ```pandas.DataFrame``` and the ```polars.DataFrame```. However, while in a ```pandas.DataFrame``` the column names can be of type ```float```, in a ```polars.DataFrame``` the column names must be of type ```str```. 
+
 ## __☕ The Coffee Dataset: A Global Coffee Journey 🌍__
 
 The Coffee Dataset invites you to embark on a journey through the world of coffee. These captivating spectra are collected from a rich diversity of coffee samples, each originating from a different country. The magic happens with attenuated total reflectance Fourier transform infrared spectroscopy (ATR-FTIR).
 
-Feeling the coffee buzz? You can load the Coffee Dataset with ease:
+Feeling the coffee buzz? You can load the Coffee Dataset with ease as a ```pandas.DataFrame``` or as a ```polars.DataFrame```.
 
+- __Load as```pandas.DataFrame```__:
 ```python
 from chemotools.datasets import load_coffee
 
 spectra, labels = load_coffee()
+```
+
+- __Load as```polars.DataFrame```__:
+```python
+from chemotools.datasets import load_coffee
+
+spectra, labels = load_coffee(set_output="polars")
 ```
 
 {: .note}
