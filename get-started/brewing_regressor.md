@@ -120,7 +120,7 @@ spectra_np = spectra.to_numpy()
 wavenumbers = spectra.columns.to_numpy(dtype=np.float64)
 
 # Convert the hplc pandas.DataFrame to numpy.ndarray
-hplc = hplc.to_numpy()
+hplc_np = hplc.to_numpy()
 ```
 
 Now that we have our data in the right format, we can start plotting. We will define a function to plot the spectra, where each spectrum will be color-coded according to its glucose concentration. We will use the ```matplotlib.colors.Normalize``` class to normalize the glucose concentrations between 0 and 1. Then, we will use the ```matplotlib.cm.ScalarMappable``` class to create a colorbar.
@@ -135,7 +135,7 @@ def plot_spectra(spectra: np.ndarray, wavenumbers: np.ndarray, hplc: np.ndarray)
     cmap = plt.get_cmap("jet")
 
     # Define a normalization function to scale glucose concentrations between 0 and 1
-    norm = Normalize(vmin=hplc.min(), vmax=hplc.max())
+    normalize = Normalize(vmin=hplc.min(), vmax=hplc.max())
     colors = [cmap(normalize(value)) for value in hplc]
 
     # Plot the spectra
@@ -159,7 +159,7 @@ def plot_spectra(spectra: np.ndarray, wavenumbers: np.ndarray, hplc: np.ndarray)
 Then, we can use this function to plot the training dataset:
 
 ```python
-plot_spectra(spectra, hplc)
+plot_spectra(spectra_np, wavenumbers, hplc_np)
 ```
 
 which should result in the following plot:
@@ -198,7 +198,7 @@ from sklearn.pipeline import make_pipeline
 
 # create a pipeline that scales the data
 preprocessing = make_pipeline(
-    RangeCut(start=950, end=1500, wavelength=wavenumbers),
+    RangeCut(start=950, end=1500, wavenumbers=wavenumbers),
     LinearCorrection(),
     SavitzkyGolay(window_size=15, polynomial_order=2, derivate_order=1),
     StandardScaler(with_std=False)
@@ -215,9 +215,8 @@ Finally, we can plot the preprocessed spectra:
 
 ```python
 # get the wavenumbers after the range cut
-start_index = preprocessing.named_steps['rangecut'].start
-end_index = preprocessing.named_steps['rangecut'].end
-wavenumbers_cut = wavenumbers[start_index:end_index]
+wavenumbers_cut = preprocessing.named_steps['rangecut'].wavenumbers_
+
 
 # plot the preprocessed spectra
 plot_spectra(spectra_preprocessed, wavenumbers_cut, hplc_np)
@@ -302,7 +301,7 @@ hplc_pred = pls.predict(spectra_preprocessed)
 
 # plot the predictions
 fig, ax = plt.subplots(figsize=(4, 4))
-ax.scatter(hplc_np, predictions, color='blue')
+ax.scatter(hplc_np, hplc_pred, color='blue')
 ax.plot([0, 40], [0, 40], color='magenta')
 ax.set_xlabel('Measured glucose (g/L)')
 ax.set_ylabel('Predicted glucose (g/L)')
@@ -359,12 +358,12 @@ Now we can compare the predicted glucose concentrations with the off-line HPLC m
 
 ```python
 # make linspace of length of predictoins
-time = np.linspace(0, len(predictions_test), len(predictions_test),) * 1.25 / 60
+time = np.linspace(0, len(glucose_test_pred), len(glucose_test_pred),) * 1.25 / 60
 
 # plot the predictions
 fig, ax = plt.subplots(figsize=(10, 4))
 
-ax.plot(time, predictions_test,  color='blue', label='Predicted')
+ax.plot(time, glucose_test_pred,  color='blue', label='Predicted')
 ax.plot(hplc_test.index, hplc_test['glucose']+4, 'o', color='red', label='Measured')
 ax.set_xlabel('Time (h)')
 ax.set_ylabel('Glucose (g/L)')
