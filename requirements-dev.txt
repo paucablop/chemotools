@@ -1,5 +1,5 @@
 black
 isort
 matplotlib
-maturin
+pentapy
 pytest
