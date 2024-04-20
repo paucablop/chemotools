@@ -1,4 +1,7 @@
+from dataclasses import dataclass, field
 from enum import Enum
+
+import numpy as np
 
 # if possible, pentapy is imported since it provides a more efficient implementation
 # of solving pentadiagonal systems of equations, but the package is not in the
@@ -17,3 +20,16 @@ except ImportError:
 class BandedSolveDecompositions(str, Enum):
     CHOLESKY = "cholesky"
     PENTAPY = "pentapy"
+
+
+@dataclass()
+class BandedLUFactorization:
+    lub: np.ndarray
+    ipiv: np.ndarray
+    l_and_u: tuple[int, int]
+    singular: bool
+
+    shape: tuple[int, int] = field(default=(-1, -1), init=False)
+
+    def __post_init__(self):
+        self.shape = self.lub.shape  # type: ignore
