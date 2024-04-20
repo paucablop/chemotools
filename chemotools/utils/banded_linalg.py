@@ -2,11 +2,13 @@ from numbers import Integral
 
 import numpy as np
 from numpy.typing import ArrayLike
+from scipy.linalg import cho_solve_banded as scipy_cho_solve_banded
+from scipy.linalg import cholesky_banded as scipy_cholesky_banded
 from scipy.linalg import lapack
 from scipy.sparse import spmatrix
 from sklearn.utils import check_array, check_scalar
 
-from chemotools.utils.models import BandedLUFactorization
+from chemotools.utils.models import BandedCholeskyFactorization, BandedLUFactorization
 
 
 def _datacopied(arr, original):
@@ -349,9 +351,9 @@ def lu_solve_banded(
 
     # then, the shapes of the LU-decomposition and ``b`` need to be validated against
     # each other
-    if lub_factorization.shape[-1] != b_inter.shape[0]:
+    if lub_factorization.n_cols != b_inter.shape[0]:
         raise ValueError(
-            f"\nShapes of lub ({lub_factorization.shape[-1]}) and b "
+            f"\nShapes of lub ({lub_factorization.n_cols}) and b "
             f"({b_inter.shape[0]}) are not compatible."
         )
 
@@ -386,7 +388,143 @@ def lu_solve_banded(
     )
 
 
-def slodget_cho_banded(decomposition: tuple[np.ndarray, bool]) -> tuple[float, float]:
+def slogdet_lu_banded(
+    lub_factorization: BandedLUFactorization,
+) -> tuple[float, float]:
+    """
+    Computes the logarithm of the absolute value and the sign of the determinant of a
+    banded matrix A using its LU-decomposition. This is way more efficient than
+    computing the determinant directly because the LU-decompositions main diagonals
+    already encode the determinant as the product of the diagonal entries of the
+    factors.
+
+    Parameters
+    ----------
+    lub_factorization : BandedLUFactorization
+        The LU-decomposition of the matrix ``A`` in banded storage format as returned by
+        the function :func:`lu_banded`.
+
+    Returns
+    -------
+    sign : float
+        A number representing the sign of the determinant.
+    logabsdet : float
+        The natural log of the absolute value of the determinant.
+        If the determinant is zero, then `sign` will be 0 and `logabsdet` will be
+        -Inf. In all cases, the determinant is equal to ``sign * np.exp(logabsdet)``.
+
+    Raises
+    ------
+    OverflowError
+        If any of the diagonal entries of the LU-decomposition leads to an overflow in
+        the natural logarithm.
+
+    """
+
+    # first, the number of actual row exchanges needs to be counted
+    unchanged_row_idxs = np.arange(
+        start=0,
+        stop=lub_factorization.n_rows,
+        step=1,
+        dtype=lub_factorization.ipiv.dtype,
+    )
+    num_row_exchanges = np.count_nonzero(lub_factorization.ipiv - unchanged_row_idxs)
+
+    # the sign-prefactor of the determinant is either +1 or -1 depending on whether the
+    # number of row exchanges is even or odd
+    sign = -1.0 if num_row_exchanges % 2 == 1 else 1.0
+
+    # since the determinant (without sign prefactor) is just the product of the diagonal
+    # product of L and the diagonal product of U, the calculation simplifies. As the
+    # main diagonal of L is a vector of ones, only the diagonal product of U is required
+    main_diag = lub_factorization.lub[lub_factorization.main_diag_row_idx, ::]
+    u_diaprod_sign = np.prod(np.sign(main_diag))
+    with np.errstate(divide="ignore", over="ignore"):
+        logabsdet = np.sum(np.log(np.abs(main_diag)))
+
+    # logarithms of zero are already properly handled, so there is not reason to worry
+    # about, since they are -inf which will result in a zero determinant in exp();
+    # overflow however needs to lead to a raise and in this case the log(det) is either
+    # +inf in case of overflow only or NaN in case of the simultaneous occurrence of
+    # zero and overflow
+    if np.isnan(logabsdet) or np.isposinf(logabsdet):
+        raise OverflowError(
+            "\nFloating point overflow in natural logarithm. At least 1 main diagonal "
+            "entry results in overflow, thereby corrupting the determinant."
+        )
+
+    # finally, the absolute value of the natural logarithm of the determinant is
+    # returned together with its sign
+    if np.isneginf(logabsdet):
+        return 0.0, logabsdet
+    elif float(u_diaprod_sign) > 0.0:
+        return sign, logabsdet
+
+    return -sign, logabsdet
+
+
+def cholesky_banded(
+    ab: np.ndarray,
+    overwrite_ab: bool = False,
+    lower: bool = False,
+    check_finite: bool = True,
+) -> BandedCholeskyFactorization:
+    """
+    A drop-in replacement for SciPy's ``cholesky_banded`` that stores the factorization
+    in a dataclass.
+
+    Please refer to the SciPy documentation for further information that is not
+    mentioned here.
+
+    Returns
+    -------
+    chob_factorization : BandedCholeskyFactorization
+        A dataclass containing the Cholesky-factorization of the matrix ``A`` as
+        follows:
+            ``lb``: The Cholesky-decomposition of ``A`` in banded storage format.
+            ``lower``: A boolean indicating whether the Cholesky-decomposition is in
+                lower triangular form (``True``) or in upper triangular form
+                (``False``).
+    """
+
+    return BandedCholeskyFactorization(
+        lb=scipy_cholesky_banded(**locals()),
+        lower=lower,
+    )
+
+
+def cho_solve_banded(
+    chob_factorization: BandedCholeskyFactorization,
+    b: np.ndarray,
+    overwrite_b: bool = False,
+    check_finite: bool = True,
+) -> np.ndarray:
+    """
+    A drop-in replacement for SciPy's ``cho_solve_banded`` that relies on the
+    factorization being stored in a dataclass.
+
+    Please refer to the SciPy documentation for further information that is not
+    mentioned here.
+
+    Parameters
+    ----------
+    chob_factorization : BandedCholeskyFactorization
+        The Cholesky-factorization of the matrix ``A`` in banded storage format as
+        returned by the function :func:`cholesky_banded`.
+
+    """
+
+    return scipy_cho_solve_banded(
+        cb_and_lower=(chob_factorization.lb, chob_factorization.lower),
+        b=b,
+        overwrite_b=overwrite_b,
+        check_finite=check_finite,
+    )
+
+
+def slodget_cho_banded(
+    chob_factorization: BandedCholeskyFactorization,
+) -> tuple[float, float]:
     """Computes the logarithm of the absolute value of the determinant of a banded
     hermitian matrix `A` using its Cholesky-decomposition. This is way more efficient
     than computing the determinant directly because the Cholesky factors' main
@@ -394,12 +532,9 @@ def slodget_cho_banded(decomposition: tuple[np.ndarray, bool]) -> tuple[float, f
 
     Parameters
     ----------
-    (cb, lower) : tuple, (np.ndarray, bool)
-        `cb` is a NumPy-2D-Array resembling the Cholesky-decomposition of `A` in banded
-        storage format as returned by ``cholesky_banded``.
-        `lower` is a boolean indicating whether the Cholesky-decomposition the lower
-        triangular form (``True``) or the upper triangular form was of `A` was used
-        (``False``).
+    chob_factorization : BandedCholeskyFactorization
+        The Cholesky-factorization of the matrix `A` in banded storage format as
+        returned by the function :func:`cholesky_banded`.
 
     Returns
     -------
@@ -410,9 +545,29 @@ def slodget_cho_banded(decomposition: tuple[np.ndarray, bool]) -> tuple[float, f
         The natural log of the absolute value of the determinant. It cannot be zero
         since the matrix under consideration is positive definite.
 
+    Raises
+    ------
+    OverflowError
+        If any of the diagonal entries of the Cholesky-decomposition leads to an
+        overflow in the natural logarithm.
+
     """
 
-    lower = decomposition[1]
-    main_diag_idx = 0 if lower else -1
+    # the sign-prefactor of the determinant is always +1 since the matrix is positive
+    # definite, so only the diagonal product of the Cholesky-decomposition is required
+    main_diag = chob_factorization.lb[chob_factorization.main_diag_row_idx, ::]
+    with np.errstate(divide="ignore", over="ignore"):
+        logabsdet = 2.0 * np.sum(np.log(main_diag))
 
-    return 1.0, 2.0 * np.sum(np.log(decomposition[0][main_diag_idx, ::]))
+    # logarithms of zero are already properly handled, so there is not reason to worry
+    # about, since they are -inf which will result in a zero determinant in exp();
+    # overflow however needs to lead to a raise and in this case the log(det) is either
+    # +inf in case of overflow only or NaN in case of the simultaneous occurrence of
+    # zero and overflow
+    if np.isnan(logabsdet) or np.isposinf(logabsdet):
+        raise OverflowError(
+            "\nFloating point overflow in natural logarithm. At least 1 main diagonal "
+            "entry results in overflow, thereby corrupting the determinant."
+        )
+
+    return 1.0, logabsdet
