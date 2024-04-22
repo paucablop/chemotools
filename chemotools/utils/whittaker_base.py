@@ -8,7 +8,7 @@ derived methods like Asymmetric Least Squares (ALS) baseline correction.
 
 ### Imports ###
 
-from typing import Generator, Optional, Union, overload
+from typing import Generator, Optional, Tuple, Union, overload
 
 import numpy as np
 
@@ -26,6 +26,7 @@ from chemotools.utils.models import (
     BandedLUFactorization,
     BandedPentapyFactorization,
     BandedSolvers,
+    WhittakerSmoothLambda,
 )
 
 if _PENTAPY_AVAILABLE:
@@ -34,6 +35,10 @@ if _PENTAPY_AVAILABLE:
 ### Type Aliases ###
 
 _Decomposition = Union[BandedLUFactorization, BandedPentapyFactorization]
+_WhittakerSmoothLambdaPlain = Tuple[
+    Union[int, float], Union[int, float], AutoSmoothMethods
+]
+_LambdaInternal = Union[int, float, WhittakerSmoothLambda]
 
 
 ### Class Implementation ###
@@ -52,11 +57,11 @@ class WhittakerLikeSolver:
         The number of data points within the series to smooth. It is equivalent to
         ``n_features_in_``, but it was renamed to be allow for definition after the
         initialisation.
-    lam_ : int or float or AutoSmoothMethods
+    lam_ : int or float or WhittakerSmoothLambda
         The lambda parameter to use for the smoothing, a.k.a. the penalty weight or
         smoothing parameter.
-        If a member of :class:`AutoSmoothMethods` is provided, the lambda parameter is
-        fitted automatically, but then the pre-computations in meth:`_setup_for_fit`
+        If a member of :class:`WhittakerSmoothLambda` is provided, the lambda parameter
+        is fitted automatically, but then the pre-computations in meth:`_setup_for_fit`
         and/or :meth:`_whittaker_solve` might take significantly longer because more
         pre-computations are required and multiple penalty weights are tested.
     differences_ : int
@@ -180,7 +185,7 @@ class WhittakerLikeSolver:
     def _setup_for_fit(
         self,
         n_data: int,
-        lam: Union[int, float, AutoSmoothMethods],
+        lam: Union[int, float, _WhittakerSmoothLambdaPlain, WhittakerSmoothLambda],
         differences: int,
     ) -> None:
         """
@@ -193,7 +198,11 @@ class WhittakerLikeSolver:
 
         # the input arguments are stored
         self.n_data_: int = n_data
-        self.lam_: Union[int, float, AutoSmoothMethods] = lam
+        if isinstance(lam, (int, float, WhittakerSmoothLambda)):
+            self.lam_: _LambdaInternal = lam
+        elif isinstance(lam, tuple):
+            self.lam_: _LambdaInternal = WhittakerSmoothLambda(*lam)
+
         self.differences_: int = differences
 
         # the squared forward finite difference matrix D.T @ D is computed ...
@@ -215,15 +224,16 @@ class WhittakerLikeSolver:
         # if the penalty weight is fitted automatically by maximization of the
         # log marginal likelihood, the natural logarithm of the pseudo-determinant of
         # D.T @ D is pre-computed
-        self._auto_fit_lam_: bool = isinstance(self.lam_, AutoSmoothMethods)
+        self._auto_fit_lam_: bool = isinstance(self.lam_, WhittakerSmoothLambda)
         self._penalty_mat_log_pseudo_det_: float = float("nan")
-        if (
-            self._auto_fit_lam_
-            and self.lam_ == AutoSmoothMethods.LOG_MARGINAL_LIKELIHOOD
-        ):
-            self._penalty_mat_log_pseudo_det_: float = (
-                self._calc_penalty_log_pseudo_det()
-            )
+        try:
+            if self._auto_fit_lam_ and self.lam_.method in {  # type: ignore
+                AutoSmoothMethods.LOG_MARGINAL_LIKELIHOOD,
+            }:
+                self._penalty_mat_log_pseudo_det_ = self._calc_penalty_log_pseudo_det()
+
+        except AttributeError:
+            pass
 
         # finally, Pentapy is enabled if available, the number of differences is 2,
         # and the lambda parameter is not fitted automatically
@@ -531,7 +541,7 @@ class WhittakerLikeSolver:
         self,
         X: np.ndarray,
         *,
-        w_vect: np.ndarray | None = None,
+        w_vect: Optional[np.ndarray] = None,
         use_same_w_for_all: bool = False,
     ) -> tuple[np.ndarray, np.ndarray]:
         """
