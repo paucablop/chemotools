@@ -17,10 +17,10 @@ except ImportError:
 # banded matrices
 
 
-class BandedSolveDecompositions(str, Enum):
+class BandedSolvers(str, Enum):
     """
-    Defines the types of decompositions that can be used to solve linear systems
-    involving banded matrices, i.e.,
+    Defines the types of solvers that can be used to solve linear systems involving
+    banded matrices, i.e.,
 
     - ``CHOLESKY``: Cholesky decomposition
     - ``PIVOTED_LU``: LU decomposition with partial pivoting
@@ -28,9 +28,20 @@ class BandedSolveDecompositions(str, Enum):
 
     """
 
-    CHOLESKY = "cholesky"
-    PIVOTED_LU = "lu"
-    PENTAPY = "pentapy"
+    CHOLESKY = "Cholesky decomposition"
+    PIVOTED_LU = "pivoted LU decomposition"
+    PENTAPY = "direct pentadiagonal solver"
+
+
+class BandedPentapyFactorization:
+    """
+    A class that resembles the factorization of a pentadiagonal matrix with ``pentapy``.
+    It has no attributes since the factorization is not stored, but the class is used to
+    provide an easy way to check if the factorization is available.
+
+    """
+
+    pass
 
 
 @dataclass()
