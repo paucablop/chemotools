@@ -1,3 +1,11 @@
+"""
+This utility submodule implements important models, i.e., constants, Enums, and
+dataclasses used throughout the package.
+
+"""
+
+### Imports ###
+
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -13,8 +21,11 @@ try:
 except ImportError:
     _PENTAPY_AVAILABLE = False
 
-# an Enum class for the decomposition types used for solving linear systems that involve
-# banded matrices
+
+### Enums ###
+
+# an Enum class for the solve types used for solving linear systems that involve banded
+# matrices
 
 
 class BandedSolvers(str, Enum):
@@ -23,12 +34,32 @@ class BandedSolvers(str, Enum):
     banded matrices, i.e.,
 
     - ``PIVOTED_LU``: LU decomposition with partial pivoting
-    - ``PENTAPY``: Pentadiagonal "decomposition" (it's actually a direct solve)
+    - ``PENTAPY``: pentadiagonal "decomposition" (it's actually a direct solve)
 
     """
 
     PIVOTED_LU = "pivoted LU decomposition"
     PENTAPY = "direct pentadiagonal solver"
+
+
+# an Enum class for the kinds of automated smoothing by the Whittaker-Henderson smoother
+# that can be applied to the data
+
+
+class AutoSmoothMethods(str, Enum):
+    """
+    Defines the types of automated smoothing methods that can be applied to the data
+    using the Whittaker-Henderson smoother, i.e.,
+
+    - ``LOG_MARGINAL_LIKELIHOOD``: smoothing based on the maximization of the log
+        marginal likelihood
+
+    """
+
+    LOG_MARGINAL_LIKELIHOOD = "log marginal likelihood"
+
+
+### (Data) Classes ###
 
 
 class BandedPentapyFactorization:
