@@ -22,13 +22,11 @@ class BandedSolvers(str, Enum):
     Defines the types of solvers that can be used to solve linear systems involving
     banded matrices, i.e.,
 
-    - ``CHOLESKY``: Cholesky decomposition
     - ``PIVOTED_LU``: LU decomposition with partial pivoting
     - ``PENTAPY``: Pentadiagonal "decomposition" (it's actually a direct solve)
 
     """
 
-    CHOLESKY = "Cholesky decomposition"
     PIVOTED_LU = "pivoted LU decomposition"
     PENTAPY = "direct pentadiagonal solver"
 
@@ -42,41 +40,6 @@ class BandedPentapyFactorization:
     """
 
     pass
-
-
-@dataclass()
-class BandedCholeskyFactorization:
-    """
-    A dataclass that holds the Cholesky factorization of a symmetric positive-definite
-    matrix.
-
-    Attributes
-    ----------
-    lb: ndarray of shape (n_low_bands + 1, n_cols) or (1 + n_upp_bands, n_cols)
-        The lower or upper Cholesky factor of the matrix ``A`` in banded storage format.
-    lower : bool
-        If ``True``, the lower Cholesky factor is stored, otherwise the upper one.
-    shape : (int, int)
-        The shape of the matrix ``A`` in dense form.
-    n_rows, n_cols : int
-        The number of rows and columns of the matrix ``A`` in dense form.
-    main_diag_row_idx : int
-        The index of the main diagonal in the banded storage format.
-
-    """
-
-    lb: np.ndarray
-    lower: bool
-
-    shape: tuple[int, int] = field(default=(-1, -1), init=False)
-    n_rows: int = field(default=-1, init=False)
-    n_cols: int = field(default=-1, init=False)
-    main_diag_row_idx: int = field(default=-1, init=False)
-
-    def __post_init__(self):
-        self.shape = self.lb.shape  # type: ignore
-        self.n_rows, self.n_cols = self.shape
-        self.main_diag_row_idx = 0 if self.lower else self.n_rows - 1
 
 
 @dataclass()
