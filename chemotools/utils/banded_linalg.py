@@ -1,3 +1,22 @@
+"""
+This utility submodule provides functions for the linear algebra with banded matrices,
+namely
+
+- conversion from the upper banded storage for LAPACK's banded Cholesky decomposition
+    to the banded storage for LAPACK's banded LU decomposition,
+- wrappers for SciPy's LAPACK-routines for the banded Cholesky decomposition and the
+    corresponding linear solver,
+- LU decomposition of a banded matrix and the corresponding linear solver,
+- computation of the log-determinant of a banded matrix using its Cholesky or LU
+    decomposition
+
+The decomposition functions return dataclasses that facilitate the handling of the
+factorizations.
+
+"""
+
+### Imports ###
+
 from numbers import Integral
 
 import numpy as np
@@ -9,6 +28,13 @@ from scipy.sparse import spmatrix
 from sklearn.utils import check_array, check_scalar
 
 from chemotools.utils.models import BandedCholeskyFactorization, BandedLUFactorization
+
+### Type Aliases ###
+
+LAndUBandCounts = tuple[int, int]
+
+
+### Auxiliary Functions ###
 
 
 def _datacopied(arr, original):
@@ -34,7 +60,7 @@ def _check_full_arr_n_diag_counts_for_lu_banded(
     l_and_u: tuple[int, int],
 ) -> None:
     """Validates the shape of a full array and the number of sub- and superdiagonals
-    for LU-decomposition of a banded (sparse) matrix.
+    for LU decomposition of a banded (sparse) matrix.
     """
     num_rows, num_cols = a_shape
     num_low_diags, num_upp_diags = l_and_u
@@ -75,12 +101,99 @@ def _check_full_arr_n_diag_counts_for_lu_banded(
     # else nothing
 
 
+def conv_upper_chol_banded_to_lu_banded_storage(
+    ab: np.ndarray,
+) -> tuple[LAndUBandCounts, np.ndarray]:
+    """
+    Converts the upper banded storage format used by LAPACK's banded Cholesky
+    decomposition to the banded storage format used by LAPACK's banded LU
+    decomposition.
+
+    Parameters
+    ----------
+    ab : np.ndarray of shape (n_upp_bands + 1, n_cols)
+        The matrix ``A`` stored in the upper banded storage format used by LAPACK's
+        banded Cholesky decomposition (see Notes for details).
+
+    Returns
+    -------
+    l_and_u : (int, int)
+        The number of sub- (first) and superdiagonals (second element) aside the main
+        diagonal which does not need to be considered here.
+    ab : np.ndarray of shape (l_and_u[0] + 1 + l_and_u[1], n_cols)
+        The matrix ``A`` stored in the banded storage format used by LAPACK's banded LU
+        decomposition (see Notes for details).
+
+    Notes
+    -----
+    The upper diagonal ordered form for LAPACK's Cholesky decomposition is given by the
+    following ordering
+
+    ```python
+    ab[u + i - j, j] == a[i,j]
+    ```
+
+    e.g., for a symmetric matrix ``A`` of shape (7, 7) with in total 3 superdiagonals,
+    3 subdiagonals, and the main diagonal, the ordering is as follows:
+
+    ```python
+    *   *   *   a03 a14 a25 a36
+    *   *   a02 a13 a24 a35 a46
+    *   a01 a12 a23 a34 a45 a56 # ^ superdiagonals
+    a00 a11 a22 a33 a44 a55 a66 # main diagonal
+    ```
+
+    where each `*` denotes a zero element.
+
+    For LAPACK's LU decomposition, the matrix `A` is stored in `ab` using the matrix
+    diagonal ordered form:
+
+    ```python
+    ab[u + i - j, j] == a[i,j]
+    ```
+
+    The example from above would then look like this where basicall, all the
+    superdiagonal rows are just copied to the subdiagonal rows and moved to the left so
+    that the first non-zero element of each row is in the first column:
+
+    ```python
+    *   *   *   a03 a14 a25 a36
+    *   *   a02 a13 a24 a35 a46
+    *   a01 a12 a23 a34 a45 a56 # ^ superdiagonals
+    a00 a11 a22 a33 a44 a55 a66 # main diagonal
+    a01 a12 a23 a34 a45 a56 *   # v subdiagonals
+    a02 a13 a24 a35 a46 *   *
+    a03 a14 a25 a36 *   *   *
+    ```
+
+    where all entries marked with `*` are as well zero elements although they will be
+    set to arbitrary values by this function.
+
+    """
+
+    # an Array is initialised to store the subdiagonal part
+    num_low_diags = ab.shape[0] - 1
+    main_diag_idx = num_low_diags
+    n_cols = ab.shape[1]
+    ab_subdiags = np.zeros(shape=(num_low_diags, n_cols), dtype=ab.dtype)
+
+    for offset in range(1, num_low_diags + 1):
+        ab_subdiags[offset - 1, 0 : n_cols - offset] = ab[
+            main_diag_idx - offset, offset:None
+        ]
+
+    # the subdiagonal part is then concatenated to the original array and the result is
+    # returned
+    l_and_u = (num_low_diags, num_low_diags)
+    return l_and_u, np.row_stack((ab, ab_subdiags))
+
+
 def conv_to_lu_banded_storage(
     a: np.ndarray | spmatrix,
     l_and_u: tuple[int, int],
 ) -> np.ndarray:
     """Converts a (sparse) square banded matrix A to its banded storage required for
-    LU-decomposition in LAPACK-routines like the function ``lu_banded`` or SciPy's
+    LU decomposition in LAPACK-routines like the function ``lu_banded`` or SciPy's
     ``solve_banded``. This format is identical for pentapy where it is referred to as
     "column-wise flattened".
     Cholesky-decompositions require a different format.
@@ -116,7 +229,7 @@ def conv_to_lu_banded_storage(
 
     Notes
     -----
-    For LAPACK LU-decomposition, the matrix `a` is stored in `ab` using the matrix
+    For LAPACK's LU decomposition, the matrix `a` is stored in `ab` using the matrix
     diagonal ordered form:
 
         ```python
@@ -172,15 +285,18 @@ def conv_to_lu_banded_storage(
     return ab
 
 
+### LAPACK-Wrappers for banded LU decomposition ###
+
+
 def lu_banded(
-    l_and_u: tuple[int, int],
+    l_and_u: LAndUBandCounts,
     ab: ArrayLike,
     *,
     check_finite: bool = True,
 ) -> BandedLUFactorization:
     """
-    Computes the LU-decomposition of a banded matrix ``A`` using LAPACK-routines.
-    This function is a wrapper of the LAPACK-routine ``gbtrf`` which computes the LU-
+    Computes the LU decomposition of a banded matrix ``A`` using LAPACK-routines.
+    This function is a wrapper of the LAPACK-routine ``gbtrf`` which computes the LU
     decomposition of a banded matrix ``A`` in-place. It wraps the routine in an
     analogous way to SciPy's ``scipy.linalg.cholesky_banded``.
 
@@ -206,8 +322,8 @@ def lu_banded(
     Returns
     -------
     lub_factorization : BandedLUFactorization
-        A dataclass containing the LU-factorization of the matrix ``A`` as follows:
-            ``lub``: The LU-decomposition of ``A`` in banded storage format (see Notes).
+        A dataclass containing the LU factorization of the matrix ``A`` as follows:
+            ``lub``: The LU decomposition of ``A`` in banded storage format (see Notes).
             ``ipiv``: The pivoting indices.
             ``l_and_u``: The number of sub- and superdiagonals of the matrix ``A`` that
                 are non-zero.
@@ -215,8 +331,8 @@ def lu_banded(
 
     Notes
     -----
-    For LAPACK LU-decomposition, the matrix ``a`` is stored in ``ab`` using the matrix
-    diagonal ordered form:
+    For LAPACK's banded LU decomposition, the matrix ``a`` is stored in ``ab`` using the
+    matrix diagonal ordered form:
 
         ```python
         ab[u + i - j, j] == a[i,j] # see below for u
@@ -234,12 +350,13 @@ def lu_banded(
             a20  a31  a42  a53  a64   *    *
         ```
 
-    where all entries marked with ``*`` are arbitrary values when returned by this
-    function.
+    where all entries marked with `*` are zero elements although they will be set to
+    arbitrary values by this function.
+
     Internally LAPACK relies on an expanded version of this format to perform inplace
     operations that adds another ``l`` superdiagonals to the matrix in order to
     overwrite them for the purpose of pivoting. The output is thus an expanded version
-    of the LU-decomposition of ``A`` in the same format where the main diagonal of
+    of the LU decomposition of ``A`` in the same format where the main diagonal of
     ``L`` is implicitly taken to be a vector of ones. The output can directly be used
     for the LAPACK-routine ``gbtrs`` to solve linear systems of equations based on this
     decomposition.
@@ -302,14 +419,14 @@ def lu_solve_banded(
 ) -> np.ndarray:
     """
     Solves a linear system of equations ``Ax=b`` with a banded matrix ``A`` using its
-    precomputed LU-decomposition.
+    precomputed LU decomposition.
     This function wraps the LAPACK-routine ``gbtrs`` in an analogous way to SciPy's
     ``scipy.linalg.cho_solve_banded``.
 
     Parameters
     ----------
     lub_factorization : BandedLUFactorization
-        The LU-decomposition of the matrix ``A`` in banded storage format as returned by
+        The LU decomposition of the matrix ``A`` in banded storage format as returned by
         the function :func:`lu_banded`.
     b : ndarray of shape (n,)
         A 1D-Array containing the right-hand side of the linear system of equations.
@@ -349,7 +466,7 @@ def lu_solve_banded(
 
     overwrite_b = overwrite_b or _datacopied(b_inter, b)
 
-    # then, the shapes of the LU-decomposition and ``b`` need to be validated against
+    # then, the shapes of the LU decomposition and ``b`` need to be validated against
     # each other
     if lub_factorization.n_cols != b_inter.shape[0]:
         raise ValueError(
@@ -393,15 +510,15 @@ def slogdet_lu_banded(
 ) -> tuple[float, float]:
     """
     Computes the logarithm of the absolute value and the sign of the determinant of a
-    banded matrix A using its LU-decomposition. This is way more efficient than
-    computing the determinant directly because the LU-decompositions main diagonals
+    banded matrix A using its LU decomposition. This is way more efficient than
+    computing the determinant directly because the LU decompositions main diagonals
     already encode the determinant as the product of the diagonal entries of the
     factors.
 
     Parameters
     ----------
     lub_factorization : BandedLUFactorization
-        The LU-decomposition of the matrix ``A`` in banded storage format as returned by
+        The LU decomposition of the matrix ``A`` in banded storage format as returned by
         the function :func:`lu_banded`.
 
     Returns
@@ -416,7 +533,7 @@ def slogdet_lu_banded(
     Raises
     ------
     OverflowError
-        If any of the diagonal entries of the LU-decomposition leads to an overflow in
+        If any of the diagonal entries of the LU decomposition leads to an overflow in
         the natural logarithm.
 
     """
@@ -461,6 +578,9 @@ def slogdet_lu_banded(
         return sign, logabsdet
 
     return -sign, logabsdet
+
+
+### SciPy-Wrappers for banded Cholesky-decomposition ###
 
 
 def cholesky_banded(
