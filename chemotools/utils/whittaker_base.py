@@ -461,25 +461,6 @@ class WhittakerLikeSolver:
         # finally, the solution is returned together with the lambda parameter
         return self._solve(b_pen_weighted=b * w_pen, w_pen=w_pen)[0], self.lam_  # type: ignore
 
-    def _solve_single_b(
-        self,
-        b: np.ndarray,
-        w: Optional[np.ndarray],
-    ) -> tuple[np.ndarray, float]:
-        """
-        Solves for the Whittaker-like smoother solution for a single series with a fixed
-        or fitted lambda parameter.
-
-        For the parameters, please refer to the documentation of ``solve``. Instead of
-        2D-Arrays, 1D-Arrays are expected for ``x`` and ``w``.
-
-        """
-        # then, the solution of the linear system of equations is computed
-        # NOTE: this is a placeholder where an if-else-statement needs to be inserted
-        #       for then the lambda parameter needs to be evaluated automatically
-        if not self._auto_fit_lam_:
-            return self._solve_single_b_fixed_lam(b=b, w=w)
-
     def _solve_multiple_b(
         self,
         X: np.ndarray,
@@ -585,11 +566,21 @@ class WhittakerLikeSolver:
 
         # otherwise, the solution of the linear system of equations is computed for
         # each series
+        # first, the smoothing method is specified depending on whether the penalty
+        # weight lambda is fitted automatically or not
+        smooth_method = self._solve_single_b_fixed_lam
+        if self._auto_fit_lam_:
+            smooth_method_assignment = {
+                AutoSmoothMethods.LOG_MARGINAL_LIKELIHOOD: self._solve_single_b_fixed_lam,
+            }
+            smooth_method = smooth_method_assignment[self.lam_.method]  # type: ignore
+
+        # then, the solution is computed for each series by means of a loop
         X_smooth = np.empty_like(X)
         lam = np.empty(shape=(X.shape[0],))
         w_gen = self._get_weight_generator(w=w_vect, n_series=X.shape[0])
         for iter_i, (x_vect, w_vect) in enumerate(zip(X, w_gen)):
-            X_smooth[iter_i], lam[iter_i] = self._solve_single_b(b=x_vect, w=w_vect)
+            X_smooth[iter_i], lam[iter_i] = smooth_method(b=x_vect, w=w_vect)
 
         return X_smooth, lam
 
