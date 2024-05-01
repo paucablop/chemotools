@@ -168,6 +168,8 @@ class WhittakerSmoothLambda:
             self.fixed_lambda = float(self.bounds)
             self.fit_auto = False
 
+            return
+
         # Case 2: a tuple of two values is provided
         elif isinstance(self.bounds, tuple):
 
@@ -206,6 +208,8 @@ class WhittakerSmoothLambda:
             self.method_used = WhittakerSmoothMethods.FIXED
             self.fixed_lambda = float(upp_bound)
             self.fit_auto = False
+
+            return
 
         # Case 3: the bounds are neither a scalar nor a tuple of two values
         raise TypeError(
