@@ -9,7 +9,7 @@ dataclasses used throughout the package.
 from dataclasses import dataclass, field
 from enum import Enum
 from math import log
-from typing import Literal, Optional, Tuple, Union
+from typing import Literal, Tuple, Union
 
 import numpy as np
 
