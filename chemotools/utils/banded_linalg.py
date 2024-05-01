@@ -536,7 +536,7 @@ def slogdet_lu_banded(
     # first, the number of actual row exchanges needs to be counted
     unchanged_row_idxs = np.arange(
         start=0,
-        stop=lub_factorization.n_rows,
+        stop=lub_factorization.n_cols,
         step=1,
         dtype=lub_factorization.ipiv.dtype,
     )
@@ -550,9 +550,9 @@ def slogdet_lu_banded(
     # product of L and the diagonal product of U, the calculation simplifies. As the
     # main diagonal of L is a vector of ones, only the diagonal product of U is required
     main_diag = lub_factorization.lub[lub_factorization.main_diag_row_idx, ::]
-    u_diaprod_sign = np.prod(np.sign(main_diag))
+    u_diaprod_sign = np.sign(main_diag).prod()
     with np.errstate(divide="ignore", over="ignore"):
-        logabsdet = np.sum(np.log(np.abs(main_diag)))
+        logabsdet = np.log(np.abs(main_diag)).sum()
 
     # logarithms of zero are already properly handled, so there is not reason to worry
     # about, since they are -inf which will result in a zero determinant in exp();
@@ -569,7 +569,7 @@ def slogdet_lu_banded(
     # returned together with its sign
     if np.isneginf(logabsdet):
         return 0.0, logabsdet
-    elif float(u_diaprod_sign) > 0.0:
+    elif u_diaprod_sign > 0.0:
         return sign, logabsdet
 
     return -sign, logabsdet
