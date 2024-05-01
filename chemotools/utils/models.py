@@ -8,7 +8,8 @@ dataclasses used throughout the package.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Union
+from math import log
+from typing import Literal, Optional, Tuple, Union
 
 import numpy as np
 
@@ -43,22 +44,30 @@ class BandedSolvers(str, Enum):
     PENTAPY = "direct pentadiagonal solver"
 
 
-# an Enum class for the kinds of automated smoothing by the Whittaker-Henderson smoother
-# that can be applied to the data
+# an Enum class for the kinds of smoothing by the Whittaker-Henderson smoother that can
+# be applied to the data
 
 
-class AutoSmoothMethods(str, Enum):
+class WhittakerSmoothMethods(str, Enum):
     """
-    Defines the types of automated smoothing methods that can be applied to the data
-    using the Whittaker-Henderson smoother, i.e.,
+    Defines the types of smoothing methods that can be applied to the data using the
+    Whittaker-Henderson smoother, i.e.,
 
-    - ``LOG_MARGINAL_LIKELIHOOD``: smoothing based on the maximization of the log
-        marginal likelihood
+    - ``FIXED``: fixed penalty weight (shorthand "fixed")
+    - ``LOGML``: smoothing based on the maximization of the log marginal likelihood
+        (shorthand "logml")
+
+    Except for ``FIXED``, the penalty weight is automatically determined when using the
+    other methods.
 
     """
 
-    LOG_MARGINAL_LIKELIHOOD = "log marginal likelihood"
+    FIXED = "fixed"
+    LOGML = "logml"
 
+
+# a type hint is defined for the Whittaker-Henderson smoother specification
+_WhittakerSmoothMethodsAll = Union[WhittakerSmoothMethods, Literal["fixed", "logml"]]
 
 ### (Data) Classes ###
 
@@ -75,51 +84,148 @@ class WhittakerSmoothLambda:
 
     Attributes
     ----------
-    low_bound, upp_bound: int or float
-        The lower and upper bound of the search space for the penalty weight.
-        Flipped bounds are automatically corrected, but they have to differ by at least
-        a factor of 10.
-    method: AutoSmoothMethods
-        The method to use for the automatic selection of the penalty weight.
+    bounds: int or float or (int or float, int or float)
+        The bounds for the search space of the penalty weight lambda. The specification
+        can be either
+
+        - a single value for a fixed penalty weight (requires ``method`` to be set to
+            ``WhittakerSmoothMethods.FIXED``), or
+        - a tuple of two values for the lower and upper bounds of the search space
+            (then ``method`` may not be set to ``WhittakerSmoothMethods.FIXED`` unless
+            the bounds are too close to each other as described below).
+
+        Independently of the specification, the values have to be greater than or equal
+        to the zero tolerance ``1e-25``.
+        If a lower and an upper bound are provided, they are flipped if necessary.
+        After that, the difference ``abs(upp_bound - low_bound)`` has to be at least
+        ``1e-5 * upp_bound`` for any method other than ``WhittakerSmoothMethods.FIXED``.
+        Otherwise, the method is set to ``WhittakerSmoothMethods.FIXED`` and the
+        ``fixed_lambda`` is set to the upper bound.
+    method: WhittakerSmoothMethods or {"fixed", "logml"}
+        The method to use for the selection of the penalty weight. If the bounds are too
+        close to each other, this will be set to ``WhittakerSmoothMethods.FIXED``.
 
     Raises
     ------
     ValueError
-        If ``upp_bound`` is not greater than 10 times ``low_bound`` after eventually
-        flipping the bounds.
+        If ``method`` is invalid, i.e., it does not correspond to any of the
+        ``WhittakerSmoothMethods`` or their shorthands, or if it cannot be used in
+        combination with ``bounds``.
+    ValueError
+        If the bounds are invalid, i.e., they are not greater than or equal to the zero
+        tolerance ``1e-25``.
 
     """
 
-    low_bound: Union[int, float]
-    upp_bound: Union[int, float]
-    method: AutoSmoothMethods
+    bounds: Union[int, float, tuple[Union[int, float], Union[int, float]]]
+    method: _WhittakerSmoothMethodsAll
+
+    fixed_lambda: float = field(default=float("nan"), init=False)
+    auto_bounds: tuple[float, float] = field(
+        default=(float("nan"), float("nan")), init=False
+    )
+    method_used: WhittakerSmoothMethods = field(
+        default=WhittakerSmoothMethods.FIXED, init=False
+    )
+    fit_auto: bool = field(default=False, init=False)
+
+    __zero_tol: float = field(default=1e-25, init=False, repr=False)
+    __diff_tol: float = field(default=1e-5, init=False, repr=False)
+
+    def _validate_n_set_method(self) -> None:
+        try:
+            self.method_used = WhittakerSmoothMethods(self.method)
+        except ValueError:
+            raise ValueError(
+                f"\nThe method '{self.method}' is not valid. "
+                f"Please choose one of the following: "
+                f"'fixed', 'logml', {WhittakerSmoothMethods.FIXED.name}, "
+                f"{WhittakerSmoothMethods.LOGML.name}."
+            )
 
     def __post_init__(self):
-        # firs, the input types are checked
-        if not isinstance(self.low_bound, (int, float)) or not isinstance(
-            self.upp_bound, (int, float)
-        ):
-            raise TypeError(
-                f"\nThe lower bound ({self.low_bound}) and upper bound "
-                f"({self.upp_bound}) have to be integers or floats."
-            )
+        # the bounds are checked for validity
+        # Case 1: a single value is provided
+        if isinstance(self.bounds, (int, float)):
+            # first, the method is validated
+            self._validate_n_set_method()
 
-        if not isinstance(self.method, AutoSmoothMethods):
-            raise TypeError(
-                f"\nThe method ({self.method}) has to be a member of the "
-                f"AutoSmoothMethods."
-            )
+            # in this case, the method has to be set to FIXED
+            if self.method_used != WhittakerSmoothMethods.FIXED:
+                raise ValueError(
+                    f"\nThe method '{self.method_used.name}' was selected for a fixed "
+                    f"penalty weight (i.e., bounds are just a scalar)."
+                )
 
-        # then, the lower and upper bound are sanitized by swapping them if necessary
-        # and checking if the upper bound is at least 10 times the lower bound
-        if self.low_bound >= self.upp_bound:
-            self.low_bound, self.upp_bound = self.upp_bound, self.low_bound
+            # the bound has to be greater than or equal to the zero tolerance
+            if self.bounds < self.__zero_tol:
+                raise ValueError(
+                    f"\nThe penalty weight lambda has to be greater than or equal to "
+                    f"the zero tolerance {self.__zero_tol}."
+                )
 
-        if self.upp_bound < 10 * self.low_bound:
-            raise ValueError(
-                f"\nThe upper bound ({self.upp_bound}) has to be at least 10 times the "
-                f"lower bound ({self.low_bound})."
-            )
+            # the fixed lambda is set to the bound
+            self.fixed_lambda = float(self.bounds)
+            self.fit_auto = False
+
+        # Case 2: a tuple of two values is provided
+        elif isinstance(self.bounds, tuple):
+
+            # the bounds are flipped if necessary
+            low_bound, upp_bound = sorted(self.bounds)
+
+            # the bounds have to be greater than or equal to the zero tolerance
+            if low_bound < self.__zero_tol or upp_bound < self.__zero_tol:
+                raise ValueError(
+                    f"\nThe bounds for the penalty weight lambda have to be greater "
+                    f"than or equal to the zero tolerance {self.__zero_tol}, but "
+                    f"they are {low_bound} and {upp_bound}."
+                )
+
+            # the difference has to be at least 1e-5 * upp_bound to be considered
+            # as a search space
+            if abs(upp_bound - low_bound) >= self.__diff_tol * upp_bound:
+                # for this, the method is validated
+                self._validate_n_set_method()
+
+                # if the method is not FIXED, the bounds are set as the search space
+                if self.method_used != WhittakerSmoothMethods.FIXED:
+                    self.auto_bounds = (float(low_bound), float(upp_bound))
+                    self.fit_auto = True
+                    return
+
+                # if the bounds are a search space, but the method is set to FIXED,
+                # an error is raised
+                raise ValueError(
+                    f"\nThe bounds for the penalty weight lambda are a search space "
+                    f"({low_bound}, {upp_bound}), but the method is set to FIXED."
+                )
+
+            # otherwise, if the penalty weights is fixed, the method is set to FIXED as
+            # well
+            self.method_used = WhittakerSmoothMethods.FIXED
+            self.fixed_lambda = float(upp_bound)
+            self.fit_auto = False
+
+        # Case 3: the bounds are neither a scalar nor a tuple of two values
+        raise TypeError(
+            f"\nThe bounds for the penalty weight lambda have to be either a scalar "
+            f"or a tuple of two values, but they are {self.bounds}."
+        )
+
+    @property
+    def log_auto_bounds(self) -> Tuple[float, float]:
+        """
+        The natural logarithms of the search space bounds for the penalty weight lambda.
+
+        Returns
+        -------
+        log_auto_bounds : (float, float)
+            The natural logarithms of the lower and upper bounds of the search space.
+
+        """
+
+        return (log(self.auto_bounds[0]), log(self.auto_bounds[1]))
 
 
 # a fake class for representing the factorization of a pentadiagonal matrix with
@@ -179,4 +285,4 @@ class BandedLUFactorization:
     def __post_init__(self):
         self.shape = self.lub.shape  # type: ignore
         self.n_rows, self.n_cols = self.shape
-        self.main_diag_row_idx = self.l_and_u[1]
+        self.main_diag_row_idx = self.n_rows - 1 - self.l_and_u[0]
