@@ -768,8 +768,8 @@ class WhittakerLikeSolver:
         else:
             X_smooth, _, _ = self._solve(
                 lam=self._lam_inter_.fixed_lambda,
-                b_weighted=(X * w[np.newaxis, ::]).transpose(),
-                w=w,
+                b_weighted=(X * w).transpose(),
+                w=w[0, ::],
             )
 
         return (
@@ -867,4 +867,3 @@ class WhittakerLikeSolver:
             X_smooth[iter_i], lam[iter_i] = smooth_method(b=x_vect, w=w_vect)
 
         return X_smooth, lam
-

@@ -20,14 +20,13 @@ def check_input(X, y=None, dtype: type | Literal["numeric"] | None = "numeric"):
 def check_weights(
     weights: np.ndarray | None, n_samples: int, n_features: int
 ) -> tuple[np.ndarray | None, bool]:
-    # if the weights are None, return None and a flag that the same weights should be
-    # applied for all samples
+    # if the weights are None, None is returned and a flag that the same weights should
+    # be applied for all samples
     if weights is None:
         return None, True
-    # else nothing
 
-    # if the weights are an effectively 1D-array, make them a 2D-array
-    if weights.ndim == 1 or (weights.ndim == 2 and weights.shape[0] == 1):
+    # if the weights are a 1D array, they are reshaped to a 2D array with one row
+    if weights.ndim == 1:
         weights_checked = weights.reshape((1, -1))
     else:
         weights_checked = weights
