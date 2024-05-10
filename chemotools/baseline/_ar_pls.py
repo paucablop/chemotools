@@ -20,6 +20,7 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 
 import logging
 from numbers import Integral
+from typing import Union
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
@@ -76,12 +77,12 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
 
     def __init__(
         self,
-        lam: float | int = 1e4,
+        lam: Union[float, int] = 1e4,
         differences: int = 2,
         ratio: float = 0.01,
         nr_iterations: int = 100,
     ):
-        self.lam: float | int = lam
+        self.lam: Union[float, int] = lam
         self.differences: int = differences
         self.ratio: float = ratio
         self.nr_iterations: int = nr_iterations

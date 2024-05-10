@@ -14,6 +14,8 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 
 """
 
+from typing import Optional, Union
+
 from numpy import ndarray
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -76,11 +78,11 @@ class WhittakerSmooth(
 
     def __init__(
         self,
-        lam: int | float = 1e2,
+        lam: Union[float, int] = 1e2,
         differences: int = 1,
     ):
-        self.lam = lam
-        self.differences = differences
+        self.lam: Union[float, int] = lam
+        self.differences: int = differences
 
     def fit(self, X: ndarray, y=None) -> "WhittakerSmooth":
         """
@@ -125,7 +127,7 @@ class WhittakerSmooth(
         self,
         X: ndarray,
         y: None = None,
-        sample_weight: ndarray | None = None,
+        sample_weight: Optional[ndarray] = None,
     ) -> ndarray:
         """
         Transform the input data by calculating the Whittaker smooth.
@@ -178,7 +180,10 @@ class WhittakerSmooth(
         )[0]
 
     def fit_transform(
-        self, X: ndarray, y: None = None, sample_weight: ndarray | None = None
+        self,
+        X: ndarray,
+        y: None = None,
+        sample_weight: Optional[ndarray] = None,
     ) -> ndarray:
         """Fit the transformer to the input data and transform it.
 

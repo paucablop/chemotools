@@ -1,10 +1,14 @@
-from typing import Literal
+from typing import Literal, Optional, Tuple, Type, Union
 
 import numpy as np
 from sklearn.utils.validation import check_array
 
 
-def check_input(X, y=None, dtype: type | Literal["numeric"] | None = "numeric"):
+def check_input(
+    X,
+    y=None,
+    dtype: Union[Type, Literal["numeric"], None] = "numeric",
+):
     # Check that X is a 2D array and has only finite values
     X = check_array(X, ensure_2d=True, force_all_finite=True, dtype=dtype)
 
@@ -18,8 +22,10 @@ def check_input(X, y=None, dtype: type | Literal["numeric"] | None = "numeric"):
 
 
 def check_weights(
-    weights: np.ndarray | None, n_samples: int, n_features: int
-) -> tuple[np.ndarray | None, bool]:
+    weights: Optional[np.ndarray],
+    n_samples: int,
+    n_features: int,
+) -> Tuple[Optional[np.ndarray], bool]:
     # if the weights are None, None is returned and a flag that the same weights should
     # be applied for all samples
     if weights is None:

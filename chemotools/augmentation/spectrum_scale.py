@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
@@ -35,7 +37,11 @@ class SpectrumScale(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Transform the input data by scaling the spectrum.
     """
 
-    def __init__(self, scale: float = 0.0, random_state: int | None = None):
+    def __init__(
+        self,
+        scale: float = 0.0,
+        random_state: Optional[int] = None,
+    ):
         self.scale = scale
         self.random_state = random_state
 

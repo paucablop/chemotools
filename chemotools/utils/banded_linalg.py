@@ -15,6 +15,7 @@ factorizations.
 ### Imports ###
 
 from numbers import Integral
+from typing import Union
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -184,7 +185,7 @@ def conv_upper_chol_banded_to_lu_banded_storage(
 
 
 def conv_to_lu_banded_storage(
-    a: np.ndarray | spmatrix,
+    a: Union[np.ndarray, spmatrix],
     l_and_u: tuple[int, int],
 ) -> np.ndarray:
     """Converts a (sparse) square banded matrix A to its banded storage required for

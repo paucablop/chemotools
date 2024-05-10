@@ -841,7 +841,6 @@ def test_whittaker_with_pentapy(
     # this test is skipped with a warning if pentapy is not installed
     if not PENTAPY_AVAILABLE:
         pytest.skip("Pentapy is not installed, test cannot be performed")
-    # else nothing
 
     # Arrange
     np.random.seed(42)

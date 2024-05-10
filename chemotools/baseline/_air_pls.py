@@ -17,6 +17,7 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 """
 
 import logging
+from typing import Union
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
@@ -84,11 +85,11 @@ class AirPls(
     # TODO: polynomial order is actually differences
     def __init__(
         self,
-        lam: int | float = 100,
+        lam: Union[float, int] = 100,
         polynomial_order: int = 1,
         nr_iterations: int = 15,
     ):
-        self.lam: int | float = lam
+        self.lam: Union[float, int] = lam
         self.polynomial_order: int = polynomial_order
         self.nr_iterations: int = nr_iterations
 
