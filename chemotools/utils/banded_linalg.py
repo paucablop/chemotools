@@ -550,7 +550,7 @@ def slogdet_lu_banded(
     # product of L and the diagonal product of U, the calculation simplifies. As the
     # main diagonal of L is a vector of ones, only the diagonal product of U is required
     main_diag = lub_factorization.lub[lub_factorization.main_diag_row_idx, ::]
-    u_diaprod_sign = np.sign(main_diag).prod()
+    u_diag_sign_is_pos = np.count_nonzero(main_diag < 0.0) % 2 == 0
     with np.errstate(divide="ignore", over="ignore"):
         logabsdet = np.log(np.abs(main_diag)).sum()
 
@@ -569,7 +569,7 @@ def slogdet_lu_banded(
     # returned together with its sign
     if np.isneginf(logabsdet):
         return 0.0, logabsdet
-    elif u_diaprod_sign > 0.0:
+    elif u_diag_sign_is_pos:
         return sign, logabsdet
 
     return -sign, logabsdet
