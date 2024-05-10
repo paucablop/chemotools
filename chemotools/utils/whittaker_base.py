@@ -677,15 +677,21 @@ class WhittakerLikeSolver:
 
         """
 
+        # if the weights are not provided, the log marginal likelihood cannot be
+        # computed - at least not in a meaningful way
+        if isinstance(w, (float, int)):
+            raise ValueError(
+                "\nAutomatic fitting of the penalty weight lambda by maximizing the "
+                "log marginal likelihood is only possible if weights are provided.\n"
+                "Please provide weights for the series to smooth."
+            )
+
         # first, the constant terms of the log marginal likelihood are computed starting
         # from the log pseudo-determinant of the weight matrix, i.e., the product of the
         # non-zero elements of the weight vector
-        nnz_w = self.n_data_
-        log_pseudo_det_w = 0.0  # ln(1**nnz_w) = 0.0
-        if isinstance(w, np.ndarray):
-            nonzero_w_idxs = np.where(w > w.max() * self.__zero_weight_tol)[0]
-            nnz_w = nonzero_w_idxs.size
-            log_pseudo_det_w = np.log(w[nonzero_w_idxs]).sum()
+        nonzero_w_idxs = np.where(w > w.max() * self.__zero_weight_tol)[0]
+        nnz_w = nonzero_w_idxs.size
+        log_pseudo_det_w = np.log(w[nonzero_w_idxs]).sum()
 
         # the constant term of the log marginal likelihood is computed
         w_plus_n_samples_term = (
