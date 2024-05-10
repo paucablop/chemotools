@@ -128,9 +128,9 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
 
         # the internal solver is setup
         self._setup_for_fit(
-            series_size=X.shape[1],
-            lam=self.lam,
+            n_data=X.shape[1],
             differences=self.differences,
+            lam=self.lam,
         )
 
         return self
@@ -194,21 +194,20 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLike
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for _ in range(self.nr_iterations):
             # the baseline is fitted using the Whittaker smoother framework
-            z, _ = self._solve_single_x(
-                x=x, w=w, mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_
-            )
+            z, _ = self._solve_single_b_fixed_lam(b=x, w=w)
             d = x - z
 
             # if there is no data point below the baseline, the baseline is considered
             # to be fitted
-            d_negative = d[d < 0]
+            d_negative = d[np.where(d < 0)[0]]
             if len(d_negative) == 0:
                 break
-            m = np.mean(d_negative)
-            s = np.std(d_negative)
+            m = d_negative.mean()
+            s = d_negative.std()
             exponent = np.clip(2.0 * (d - (2.0 * s - m)) / s, -709, 709)  # type: ignore
             wt = 1.0 / (1.0 + np.exp(exponent))
             if np.linalg.norm(w - wt) / np.linalg.norm(w) < self.ratio:  # type: ignore
                 break
             w = wt
+
         return z

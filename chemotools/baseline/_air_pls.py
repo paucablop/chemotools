@@ -16,7 +16,6 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 
 """
 
-
 import logging
 
 import numpy as np
@@ -123,9 +122,9 @@ class AirPls(
 
         # the internal solver is set up
         self._setup_for_fit(
-            series_size=X.shape[1],
-            lam=self.lam,
+            n_data=X.shape[1],
             differences=self.polynomial_order,
+            lam=self.lam,
         )
 
         return self
@@ -185,14 +184,12 @@ class AirPls(
         # FIXME: this initialisation will will fail for many signals and produce a
         #        zero-baseline
         z = np.zeros_like(x)
-        dssn_thresh = max(1e-3 * np.abs(x).sum(), 1e-308) # to avoid 0 equalities
+        dssn_thresh = max(1e-3 * np.abs(x).sum(), 1e-308)  # to avoid 0 equalities
 
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for i in range(0, self.nr_iterations - 1):
             # the baseline is fitted using the Whittaker smoother framework
-            z, _ = self._solve_single_x(
-                x=x, w=w, mod_squ_fin_diff_mat_lub=self.base_squ_fw_fin_diff_mat_lub_
-            )
+            z, _ = self._solve_single_b_fixed_lam(b=x, w=w)
             d = x - z
             dssn = np.abs(d[d < 0].sum())
 
