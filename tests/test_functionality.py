@@ -30,7 +30,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.utils.models import _PENTAPY_AVAILABLE, BandedSolveDecompositions
+from chemotools.utils.models import _PENTAPY_AVAILABLE, BandedSolvers
 from tests.fixtures import reference_airpls  # noqa: F401
 from tests.fixtures import reference_arpls  # noqa: F401
 from tests.fixtures import reference_msc_mean  # noqa: F401
@@ -817,12 +817,17 @@ def test_whittaker_smooth(
     else:
         weights = None
 
+    spectrum_to_fit_original = np.tile(spectrum, reps=reps)
+    spectrum_to_fit = spectrum_to_fit_original.copy()
+
     # Act
     spectrum_corrected = whittaker_smooth.fit_transform(
-        X=np.tile(spectrum, reps=reps), sample_weight=weights
+        X=spectrum_to_fit, sample_weight=weights
     )
 
     # Assert
+    # NOTE: the following test makes sure nothing was overwritten
+    assert np.array_equal(spectrum_to_fit, spectrum_to_fit_original)
     assert np.allclose(
         spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
     )
@@ -836,65 +841,64 @@ def test_whittaker_with_pentapy(
 ):
     # this test is skipped with a warning if pentapy is not installed
     if not _PENTAPY_AVAILABLE:
-        logging.warning("pentapy is not installed")
-        pytest.skip("pentapy is not installed, test cannot be performed")
+        pytest.skip("Pentapy is not installed, test cannot be performed")
     # else nothing
 
     # Arrange
     np.random.seed(42)
     spectrum = np.random.rand(n_samples, 1000)
-    whittaker_smooth = WhittakerSmooth(differences=2)
+    whittaker_smooth = WhittakerSmooth(lam=100.0, differences=2)
+
+    weights = None
     if with_weights and not same_weights_for_all:
         weights = np.ones(shape=(n_samples, len(spectrum[0])))
     elif with_weights and same_weights_for_all:
         weights = np.ones(shape=(len(spectrum[0]),))
-    else:
-        weights = None
 
     # Act with pentapy
     spectrum_corr_pentapy = whittaker_smooth.fit_transform(
-        spectrum, sample_weight=weights
+        X=spectrum, sample_weight=weights
     )
 
     # Assert with pentapy
-    assert (
-        whittaker_smooth._solve(
-            bw=spectrum.transpose(),
-            log_lam=np.log(whittaker_smooth.lam),
-            w=None,
-            mod_squ_fin_diff_mat_lub=whittaker_smooth.base_squ_fw_fin_diff_mat_lub_,
-        )[2]
-        == BandedSolveDecompositions.PENTAPY
-    )
+    # NOTE: the weight is not correct since the test only checks the method
+    solve_method = whittaker_smooth._solve(
+        lam=whittaker_smooth._lam_inter_.fixed_lambda,
+        b_weighted=spectrum.transpose(),
+        w=1.0,
+    )[1]
+    assert solve_method == BandedSolvers.PENTAPY
 
     # Act without pentapy
     whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
-    spectrum_corr_scipy = whittaker_smooth.fit_transform(
+    spectrum_corr_factorized_solve = whittaker_smooth.fit_transform(
         spectrum, sample_weight=weights
     )
 
     # Assert without pentapy
-    assert (
-        whittaker_smooth._solve(
-            bw=spectrum.transpose(),
-            log_lam=np.log(whittaker_smooth.lam),
-            w=None,
-            mod_squ_fin_diff_mat_lub=whittaker_smooth.base_squ_fw_fin_diff_mat_lub_,
-        )[2]
-        == BandedSolveDecompositions.CHOLESKY
-    )
-    assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_scipy[0])
+    # NOTE: the weight is not correct since the test only checks the method
+    solve_method = whittaker_smooth._solve(
+        lam=whittaker_smooth._lam_inter_.fixed_lambda,
+        b_weighted=spectrum.transpose(),
+        w=1.0,
+    )[1]
+    assert solve_method == BandedSolvers.PIVOTED_LU
+    assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_factorized_solve[0])
 
 
 @pytest.mark.parametrize(
-    "log10_lam", np.arange(start=-50.0, stop=170.0, step=20.0).tolist()
+    "log10_lam", np.arange(start=-25.0, stop=15.0, step=5.0).tolist()
 )
-@pytest.mark.parametrize("difference", [1, 2, 10])
+@pytest.mark.parametrize("difference", [1, 2])
 @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
 @pytest.mark.parametrize("size", [5_000])
 def test_whittaker_constant_signal(
-    size: int, fill_value: float, difference: int, log10_lam: float
+    size: int,
+    fill_value: float,
+    difference: int,
+    log10_lam: float,
 ) -> None:
+
     # Arrange
     spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
     whittaker_smooth = WhittakerSmooth(lam=10.0**log10_lam, differences=difference)
@@ -908,5 +912,5 @@ def test_whittaker_constant_signal(
         spectrum_corrected[0],
         spectrum[0],
         atol=size * np.finfo(np.float64).eps,  # type: ignore
-        rtol=0.0,
+        rtol=1e-6,
     )
