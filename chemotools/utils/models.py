@@ -123,7 +123,7 @@ class WhittakerSmoothLambda:
 
     def _validate_n_set_method(self) -> None:
         try:
-            self.method_used = WhittakerSmoothMethods(self.method)
+            self.method_used = WhittakerSmoothMethods(self.method.lower())
         except ValueError:
             raise ValueError(
                 f"\nThe method '{self.method}' is not valid. "
