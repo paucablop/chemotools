@@ -14,6 +14,7 @@ from typing import Generator, Optional, Tuple, Union
 import numpy as np
 from scipy.optimize import minimize_scalar
 
+from chemotools._runtime import PENTAPY_AVAILABLE
 from chemotools.utils.banded_linalg import (
     LAndUBandCounts,
     conv_upper_chol_banded_to_lu_banded_storage,
@@ -26,7 +27,6 @@ from chemotools.utils.finite_differences import (
     gen_squ_fw_fin_diff_mat_cho_banded,
 )
 from chemotools.utils.models import (
-    _PENTAPY_AVAILABLE,
     BandedLUFactorization,
     BandedPentapyFactorization,
     BandedSolvers,
@@ -34,7 +34,7 @@ from chemotools.utils.models import (
     WhittakerSmoothMethods,
 )
 
-if _PENTAPY_AVAILABLE:
+if PENTAPY_AVAILABLE:
     import pentapy as pp
 
 ### Type Aliases ###
@@ -273,7 +273,7 @@ class WhittakerLikeSolver:
         # finally, Pentapy is enabled if available, the number of differences is 2,
         # and the lambda parameter is not fitted automatically
         self._pentapy_enabled_: bool = (
-            _PENTAPY_AVAILABLE
+            PENTAPY_AVAILABLE
             and self.differences_ == 2
             and self.__allow_pentapy
             and not self._lam_inter_.fit_auto

@@ -13,17 +13,6 @@ from typing import Literal, Tuple, Union
 
 import numpy as np
 
-# if possible, pentapy is imported since it provides a more efficient implementation
-# of solving pentadiagonal systems of equations, but the package is not in the
-# dependencies, so ``chemotools`` needs to be made aware of whether it is available
-try:
-    import pentapy as pp  # noqa: F401
-
-    _PENTAPY_AVAILABLE = True
-except ImportError:
-    _PENTAPY_AVAILABLE = False
-
-
 ### Enums ###
 
 # an Enum class for the solve types used for solving linear systems that involve banded
