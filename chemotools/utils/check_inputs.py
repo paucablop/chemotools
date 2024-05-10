@@ -30,7 +30,6 @@ def check_weights(
         weights_checked = weights.reshape((1, -1))
     else:
         weights_checked = weights
-    # else nothing
 
     # now, the need to be checked for having the right shape
     weights_checked = check_array(
@@ -48,7 +47,6 @@ def check_weights(
             f"Weights must have {n_features} columns, but they have "
             f"{weights_checked.shape[1]} columns."
         )
-    # else nothing
 
     # finally, it needs to be checked that the weights are all non-negative ...
     if np.any(weights < 0.0):
@@ -61,7 +59,6 @@ def check_weights(
         raise ValueError(
             "At least one weights needs to be > 0, but all weights were 0.0."
         )
-    # else nothing
 
     # the weights are returned together with a flag whether to apply the same weights
     # for all samples or not

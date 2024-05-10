@@ -93,7 +93,7 @@ def _check_full_arr_n_diag_counts_for_lu_banded(
 
     if num_rows != num_cols:
         raise ValueError(f"\nThe matrix must be square, but it has shape {a_shape}.")
-    # else nothing
+
 
 
 def conv_upper_chol_banded_to_lu_banded_storage(
