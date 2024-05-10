@@ -170,14 +170,7 @@ class AirPls(
         for i, x in enumerate(X_):
             X_[i] = x - self._calculate_air_pls(x)
 
-        # FIXME: can this even happen because X is ensured to be 2D?
-        if X_.ndim == 1:
-            # FIXME: shouldn't this be a row and not a column vector because
-            #        Scikit-Learn works with shape (n_samples, n_features), i.e.,
-            #        (1, n_features) for a single sample?
-            return X_.reshape((-1, 1))
-        else:
-            return X_
+        return X_
 
     def _calculate_air_pls(self, x):
         # FIXME: this initial weighting strategy might not yield the best results
