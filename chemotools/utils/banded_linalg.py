@@ -14,14 +14,9 @@ factorizations.
 
 ### Imports ###
 
-from numbers import Integral
-from typing import Union
-
 import numpy as np
 from numpy.typing import ArrayLike
 from scipy.linalg import lapack
-from scipy.sparse import spmatrix
-from sklearn.utils import check_array, check_scalar
 
 from chemotools.utils.models import BandedLUFactorization
 
@@ -49,52 +44,6 @@ def _datacopied(arr, original):
         return False
 
     return arr.base is None
-
-
-def _check_full_arr_n_diag_counts_for_lu_banded(
-    a_shape: tuple[int, int],
-    l_and_u: tuple[int, int],
-) -> None:
-    """Validates the shape of a full array and the number of sub- and superdiagonals
-    for LU decomposition of a banded (sparse) matrix.
-    """
-    num_rows, num_cols = a_shape
-    num_low_diags, num_upp_diags = l_and_u
-
-    check_scalar(
-        x=num_rows,
-        name="num_rows",
-        target_type=Integral,
-        min_val=1,
-        include_boundaries="left",
-    )
-    check_scalar(
-        x=num_cols,
-        name="num_cols",
-        target_type=Integral,
-        min_val=1,
-        include_boundaries="left",
-    )
-    check_scalar(
-        x=num_low_diags,
-        name="num_low_diags",
-        target_type=Integral,
-        min_val=0,
-        max_val=num_rows - 1,
-        include_boundaries="both",
-    )
-    check_scalar(
-        x=num_upp_diags,
-        name="num_upp_diags",
-        target_type=Integral,
-        min_val=0,
-        max_val=num_rows - 1,
-        include_boundaries="both",
-    )
-
-    if num_rows != num_cols:
-        raise ValueError(f"\nThe matrix must be square, but it has shape {a_shape}.")
-
 
 
 def conv_upper_chol_banded_to_lu_banded_storage(
@@ -184,103 +133,6 @@ def conv_upper_chol_banded_to_lu_banded_storage(
     return l_and_u, np.row_stack((ab, ab_subdiags))
 
 
-def conv_to_lu_banded_storage(
-    a: Union[np.ndarray, spmatrix],
-    l_and_u: tuple[int, int],
-) -> np.ndarray:
-    """Converts a (sparse) square banded matrix A to its banded storage required for
-    LU decomposition in LAPACK-routines like the function ``lu_banded`` or SciPy's
-    ``solve_banded``. This format is identical for pentapy where it is referred to as
-    "column-wise flattened".
-    Cholesky-decompositions require a different format.
-
-    Parameters
-    ----------
-    a : np.ndarray or sparse matrix of shape (n, n)
-        A square banded NumPy-2D-Array or SciPy sparse matrix. "Square" means that the
-        row count equals the column count while "banded" implies that only the main
-        diagonal and a few sub- and/or superdiagonals are non-zero (see `l_and_u`).
-    l_and_u : tuple[int, int]
-        The number of "non-zero" sub- (first) and superdiagonals (second element) aside
-        the main diagonal which does not need to be considered here. "Non-zero" can be
-        a bit misleading in this context. These numbers should count up to the diagonal
-        after which all following diagonals are zero. Zero-diagonals that come before
-        still need to be included.
-        Wrong specification of this can lead to non-zero-diagonals being ignored or
-        zero-diagonals being included which corrupts the results or reduces the
-        performance.
-
-    Returns
-    -------
-    ab : np.ndarray of shape (l_and_u[0] + 1 + l_and_u[1], n)
-        A NumPy-2D-Array resembling `a` in banded storage format (see Notes).
-
-    Raises
-    ------
-    ValueError
-        If `a` is not square.
-    ValueError
-        If the number of rows of `a` does not match the number of rows given by
-        the diagonal number.
-
-    Notes
-    -----
-    For LAPACK's LU decomposition, the matrix `a` is stored in `ab` using the matrix
-    diagonal ordered form:
-
-        ```python
-        ab[u + i - j, j] == a[i,j] # see below for u
-        ```
-
-    An example of `ab` (shape of a is ``(7,7)``, `u`=3 superdiagonals, `l`=2
-    subdiagonals) looks like:
-
-        ```python
-         *    *    *   a03  a14  a25  a36
-         *    *   a02  a13  a24  a35  a46
-         *   a01  a12  a23  a34  a45  a56   # ^ superdiagonals
-        a00  a11  a22  a33  a44  a55  a66   # main diagonal
-        a10  a21  a32  a43  a54  a65   *    # v subdiagonals
-        a20  a31  a42  a53  a64   *    *
-        ```
-
-    where all entries marked with ``*`` are ``0`` when returned by this function.
-    Internally LAPACK relies on an expanded version of this format to perform inplace
-    operations, but the respective functions handle the conversion themselves.
-
-    """
-
-    # the matrix is checked for being square and for having the correct number of rows
-    num_low_diags, num_upp_diags = l_and_u
-    a = check_array(array=a, accept_sparse=True, ensure_2d=True)
-    _check_full_arr_n_diag_counts_for_lu_banded(
-        a_shape=a.shape, l_and_u=l_and_u  # type: ignore
-    )
-
-    # first, the number of lower and upper diagonals is extracted and turned into two
-    # offset vectors
-    main_diag_idx = num_upp_diags
-    num_cols = a.shape[-1]
-
-    # now, the diagonal extraction method is specified based and the banded storage is
-    # filled by it
-    diag_method = a.diagonal  # type: ignore
-    ab = np.zeros(
-        shape=(num_low_diags + 1 + num_upp_diags, num_cols),
-        dtype=a.dtype,  # type: ignore
-    )
-
-    # the superdiagonals and the main diagonal
-    for offset in range(num_upp_diags, -1, -1):
-        ab[main_diag_idx - offset, offset::] = diag_method(offset)
-
-    # the subdiagonals
-    for offset in range(-1, -num_low_diags - 1, -1):
-        ab[main_diag_idx - offset, 0:offset] = diag_method(offset)
-
-    return ab
-
-
 ### LAPACK-Wrappers for banded LU decomposition ###
 
 
@@ -368,7 +220,7 @@ def lu_banded(
     # then, the number of lower and upper subdiagonals needs to be checked for being
     # consistent with the shape of ``ab``
     num_low_diags, num_upp_diags = l_and_u
-    if num_low_diags + num_upp_diags + 1 != ab.shape[0]:
+    if num_low_diags + num_upp_diags + 1 != ab.shape[0]:  # pragma: no cover
         raise ValueError(
             f"\nInvalid values for the number of lower and upper "
             f"diagonals: l+u+1 ({num_low_diags + num_upp_diags + 1}) does not equal "
@@ -403,7 +255,9 @@ def lu_banded(
         )
 
     # Case 2: the factorisation was not completed due to invalid input
-    raise ValueError(f"\nIllegal value in {-info}-th argument of internal gbtrf.")
+    raise ValueError(  # pragma: no cover # noqa: E501
+        f"\nIllegal value in {-info}-th argument of internal gbtrf."
+    )
 
 
 def lu_solve_banded(
@@ -464,7 +318,7 @@ def lu_solve_banded(
 
     # then, the shapes of the LU decomposition and ``b`` need to be validated against
     # each other
-    if lub_factorization.n_cols != b_inter.shape[0]:
+    if lub_factorization.n_cols != b_inter.shape[0]:  # pragma: no cover
         raise ValueError(
             f"\nShapes of lub ({lub_factorization.n_cols}) and b "
             f"({b_inter.shape[0]}) are not compatible."
@@ -492,11 +346,11 @@ def lu_solve_banded(
         raise np.linalg.LinAlgError("\nMatrix is singular.")
 
     # Case 3: the solution could not be computed due to invalid input
-    elif info < 0:
+    elif info < 0:  # pragma: no cover
         raise ValueError(f"\nIllegal value in {-info}-th argument of internal gbtrs.")
 
     # Case 4: unexpected error
-    raise AssertionError(
+    raise AssertionError(  # pragma: no cover
         f"\nThe internal gbtrs returned info > 0 ({info}) which should not happen."
     )
 
@@ -560,7 +414,7 @@ def slogdet_lu_banded(
     # overflow however needs to lead to a raise and in this case the log(det) is either
     # +inf in case of overflow only or NaN in case of the simultaneous occurrence of
     # zero and overflow
-    if np.isnan(logabsdet) or np.isposinf(logabsdet):
+    if np.isnan(logabsdet) or np.isposinf(logabsdet):  # pragma: no cover
         raise OverflowError(
             "\nFloating point overflow in natural logarithm. At least 1 main diagonal "
             "entry results in overflow, thereby corrupting the determinant."
@@ -568,9 +422,10 @@ def slogdet_lu_banded(
 
     # finally, the absolute value of the natural logarithm of the determinant is
     # returned together with its sign
-    if np.isneginf(logabsdet):
+    if np.isneginf(logabsdet):  # pragma: no cover
         return 0.0, logabsdet
-    elif u_diag_sign_is_pos:
+
+    if u_diag_sign_is_pos:
         return sign, logabsdet
 
     return -sign, logabsdet
