@@ -13,6 +13,7 @@ test utilities are working as expected as well.
 from typing import Tuple
 
 import numpy as np
+from scipy.linalg import eigvals_banded
 from scipy.sparse import csr_matrix
 from scipy.sparse import diags as sp_diags
 
@@ -588,6 +589,128 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     )
     # NOTE: since NumPy already flips the kernel internally, there is no need to flip it
     return np.convolve(vector_padded, kernel, mode="valid")
+
+
+def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
+    """
+    Computes the sign and the logarithm of the determinant of a banded matrix stored
+    in the upper banded storage used for LAPACK's banded Cholesky decomposition.
+
+    Doctests
+    --------
+    >>> # Imports
+    >>> import numpy as np
+    >>> from tests.test_for_utils.utils import (
+    ...     conv_upper_cho_banded_storage_to_sparse,
+    ...     get_banded_slogdet,
+    ... )
+
+    >>> # Generating a set of test matrices
+    >>> np.random.seed(42)
+
+    >>> # Matrix 1 (positive definite)
+    >>> semi_bw_plus_one = 3
+    >>> # NOTE: the diagonal lifting makes the matrix positive definite
+    >>> ab_for_chol = np.random.rand(semi_bw_plus_one, 100)
+    >>> ab_for_chol[semi_bw_plus_one - 1, ::] += 1.0 + 2.0 * float(semi_bw_plus_one)
+    >>> # the sign and the log determinant are computed by the utility function ...
+    >>> sign, logabsdet = get_banded_slogdet(ab=ab_for_chol)
+    >>> sign, logabsdet
+    (1.0, 200.55218150013826)
+    >>> # ... and by NumPy's dense log determinant function for comparison
+    >>> ab_dense = conv_upper_cho_banded_storage_to_sparse(ab=ab_for_chol).toarray()
+    >>> sign_ref, logabsdet_ref = np.linalg.slogdet(ab_dense)
+    >>> sign_ref, logabsdet_ref
+    (1.0, 200.55218150013826)
+    >>> np.isclose(sign, sign_ref)
+    True
+    >>> np.isclose(logabsdet, logabsdet_ref)
+    True
+
+    >>> # Matrix 2 (positive definite)
+    >>> semi_bw_plus_one = 5
+    >>> ab_for_chol = np.random.rand(semi_bw_plus_one, 1000)
+    >>> ab_for_chol[semi_bw_plus_one - 1, ::] += 1.0 + 2.0 * float(semi_bw_plus_one)
+    >>> # the sign and the log determinant are computed by the utility function ...
+    >>> sign, logabsdet = get_banded_slogdet(ab=ab_for_chol)
+    >>> sign, logabsdet
+    (1.0, 2432.2672133727287)
+    >>> # ... and by NumPy's dense log determinant function for comparison
+    >>> ab_dense = conv_upper_cho_banded_storage_to_sparse(ab=ab_for_chol).toarray()
+    >>> sign_ref, logabsdet_ref = np.linalg.slogdet(ab_dense)
+    >>> sign_ref, logabsdet_ref
+    (1.0, 2432.267213372733)
+    >>> np.isclose(sign, sign_ref)
+    True
+    >>> np.isclose(logabsdet, logabsdet_ref)
+    True
+
+    >>> # Matrix 3 (positive definite)
+    >>> semi_bw_plus_one = 1
+    >>> ab_for_chol = np.random.rand(semi_bw_plus_one, 5000)
+    >>> ab_for_chol[semi_bw_plus_one - 1, ::] += 1.0 + 2.0 * float(semi_bw_plus_one)
+    >>> # the sign and the log determinant are computed by the utility function ...
+    >>> sign, logabsdet = get_banded_slogdet(ab=ab_for_chol)
+    >>> sign, logabsdet
+    (1.0, 6234.8131295042585)
+    >>> # ... and by NumPy's dense log determinant function for comparison
+    >>> ab_dense = conv_upper_cho_banded_storage_to_sparse(ab=ab_for_chol).toarray()
+    >>> sign_ref, logabsdet_ref = np.linalg.slogdet(ab_dense)
+    >>> sign_ref, logabsdet_ref
+    (1.0, 6234.8131295042585)
+    >>> np.isclose(sign, sign_ref)
+    True
+    >>> np.isclose(logabsdet, logabsdet_ref)
+    True
+
+    >>> # Matrix 4 (indefinite)
+    >>> semi_bw_plus_one = 2
+    >>> ab_for_chol = -1.0 + 2.0 * np.random.rand(semi_bw_plus_one, 1000)
+    >>> # the sign and the log determinant are computed by the utility function ...
+    >>> sign, logabsdet = get_banded_slogdet(ab=ab_for_chol)
+    >>> sign, logabsdet
+    (-1.0, -437.7731132082764)
+    >>> # ... and by NumPy's dense log determinant function for comparison
+    >>> ab_dense = conv_upper_cho_banded_storage_to_sparse(ab=ab_for_chol).toarray()
+    >>> sign_ref, logabsdet_ref = np.linalg.slogdet(ab_dense)
+    >>> sign_ref, logabsdet_ref
+    (-1.0, -437.7731132082757)
+    >>> np.isclose(sign, sign_ref)
+    True
+    >>> np.isclose(logabsdet, logabsdet_ref)
+    True
+
+    >>> # Matrix 5 (indefinite)
+    >>> semi_bw_plus_one = 1
+    >>> ab_for_chol = -1.0 + 2.0 * np.random.rand(semi_bw_plus_one, 5000)
+    >>> # the sign and the log determinant are computed by the utility function ...
+    >>> sign, logabsdet = get_banded_slogdet(ab=ab_for_chol)
+    >>> sign, logabsdet
+    (1.0, -5001.0078551404185)
+    >>> # ... and by NumPy's dense log determinant function for comparison
+    >>> ab_dense = conv_upper_cho_banded_storage_to_sparse(ab=ab_for_chol).toarray()
+    >>> sign_ref, logabsdet_ref = np.linalg.slogdet(ab_dense)
+    >>> sign_ref, logabsdet_ref
+    (1.0, -5001.007855140422)
+    >>> np.isclose(sign, sign_ref)
+    True
+    >>> np.isclose(logabsdet, logabsdet_ref)
+    True
+
+    """
+    # since the log determinant can be expressed as the sum of the logarithms of the
+    # absolute eigenvalues, an eigenvalue evaluation is sufficient to determine the
+    # sign and the log determinant
+    eigvals = eigvals_banded(a_band=ab, lower=False, select="a")
+    if np.count_nonzero(eigvals < 0.0) % 2 == 0:  # type: ignore
+        sign = 1.0
+    else:
+        sign = -1.0
+
+    with np.errstate(divide="ignore", over="ignore"):
+        logabsdet = np.log(np.abs(eigvals)).sum()  # type: ignore
+
+    return sign, logabsdet
 
 
 ### Doctests ###

@@ -8,7 +8,6 @@ module.
 
 import numpy as np
 import pytest
-from scipy.linalg import eigvals_banded
 from scipy.linalg import solve_banded as scipy_solve_banded
 
 from chemotools.utils.banded_linalg import (
@@ -17,6 +16,7 @@ from chemotools.utils.banded_linalg import (
     lu_solve_banded,
     slogdet_lu_banded,
 )
+from tests.test_for_utils.utils import get_banded_slogdet
 
 ### Test Suite ###
 
@@ -80,7 +80,7 @@ def test_lu_banded_solve(
 
     # a random banded matrix and right-hand-side-vector/-matrix are generated
     np.random.seed(seed=42)
-    ab = np.random.rand(n_low_bands + n_upp_bands + 1, n_rows)
+    ab = -1.0 + 2.0 * np.random.rand(n_low_bands + n_upp_bands + 1, n_rows)
     b = np.random.rand(n_rows) if n_rhs == 0 else np.random.rand(n_rows, n_rhs)
 
     # first, the Scipy solution is computed because if this fails due to singularity,
@@ -142,6 +142,7 @@ def test_lu_banded_solve(
 
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
+@pytest.mark.parametrize("ensure_posdef", [True, False])
 @pytest.mark.parametrize("n_upp_low_bands", [1, 2, 3, 4, 5, 6])
 @pytest.mark.parametrize(
     "n_rows",
@@ -172,6 +173,7 @@ def test_lu_banded_solve(
 def test_lu_banded_slogdet(
     n_rows: int,
     n_upp_low_bands: int,
+    ensure_posdef: bool,
     with_finite_check: bool,
 ) -> None:
     """
@@ -192,26 +194,27 @@ def test_lu_banded_slogdet(
     # a random banded matrix is generated in the upper banded storage used for Cholesky
     # decomposition
     np.random.seed(seed=42)
-    # NOTE: the following ensures that the matrix is diagonally dominant
-    ab_chol = np.abs(np.random.rand(n_upp_low_bands + 1, n_rows))
-    ab_chol[n_upp_low_bands, ::] += 1.0 + 2.0 * float(n_upp_low_bands)
-    l_and_u, ab_lu = conv_upper_chol_banded_to_lu_banded_storage(ab=ab_chol)
+    # NOTE: the diagonal lifting ensures that the matrix is positive and diagonally
+    #       dominant, which makes it positive definite, but this is only done if the
+    #       flag is set
+    # NOTE: for an indefinite matrix, the matrix is shifted and scaled to be in the
+    #       interval [-1, 1]
+    ab_for_chol = np.random.rand(n_upp_low_bands + 1, n_rows)
+    if ensure_posdef:
+        ab_for_chol[n_upp_low_bands, ::] += 1.0 + 2.0 * float(n_upp_low_bands)
+    else:
+        ab_for_chol = -1.0 + 2.0 * ab_for_chol
+
+    l_and_u, ab_for_lu = conv_upper_chol_banded_to_lu_banded_storage(ab=ab_for_chol)
 
     # first, the log determinant is computed with the literal definition as the sum of
     # the logarithms of the eigenvalues of the matrix
-    eigvals_ref = eigvals_banded(a_band=ab_chol, lower=False, select="a")
-    if np.count_nonzero(eigvals_ref < 0.0) % 2 == 0:  # type: ignore
-        sign_ref = 1.0
-    else:
-        sign_ref = -1.0
-
-    with np.errstate(divide="ignore", over="ignore"):
-        logabsdet_ref = np.log(np.abs(eigvals_ref)).sum()
+    sign_ref, logabsdet_ref = get_banded_slogdet(ab=ab_for_chol)
 
     # the banded matrix is LU decomposed with the respective Chemotools function ...
     lu_fact = lu_banded(
         l_and_u=l_and_u,
-        ab=ab_lu,
+        ab=ab_for_lu,
         check_finite=with_finite_check,
     )
     # ... and the sign and log determinant are computed
