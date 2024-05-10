@@ -649,7 +649,7 @@ class WhittakerLikeSolver:
             return (
                 self._solve(
                     lam=lam,
-                    b_weighted=b,
+                    b_weighted=b.copy(),
                     w=w,
                 )[0],
                 lam,
