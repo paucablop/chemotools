@@ -3,4 +3,5 @@ isort
 matplotlib
 pentapy
 pytest
+pytest-cov
 pytest-xdist
