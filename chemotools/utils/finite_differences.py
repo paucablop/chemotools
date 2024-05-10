@@ -238,13 +238,18 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
 
     # first, it needs to be ensured that the number of data points is enough to
     # support the kernel for the respective difference order at least once
-    check_scalar(
-        n_data,
-        name="n_data",
-        target_type=Integral,
-        min_val=differences + 1,
-        include_boundaries="left",
-    )
+    try:
+        check_scalar(
+            n_data,
+            name="n_data",
+            target_type=Integral,
+            min_val=differences + 1,
+            include_boundaries="left",
+        )
+
+    # NOTE: this is only for Sklearn compatibility
+    except ValueError:
+        raise ValueError(f"Got n_features = {n_data}, must be >= {differences + 1}.")
 
     # afterwards, the squared forward finite differences matrix is computed
     if orig_first:
