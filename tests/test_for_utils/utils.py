@@ -10,6 +10,8 @@ test utilities are working as expected as well.
 
 ### Imports ###
 
+from dataclasses import dataclass
+from math import isnan
 from typing import Tuple
 
 import numpy as np
@@ -17,7 +19,65 @@ from scipy.linalg import eigvals_banded
 from scipy.sparse import csr_matrix
 from scipy.sparse import diags as sp_diags
 
+from chemotools.utils.models import WhittakerSmoothMethods
+
+### Dataclasses ###
+
+
+@dataclass
+class ExpectedWhittakerSmoothLambda:
+    """
+    Dataclass for checking the expected results for the class :class:`WhittakerSmoothLambda`
+    from the module :mod:`chemotools.utils.models`.
+
+    """  # noqa: E501
+
+    fixed_lambda: float
+    auto_bounds: Tuple[float, float]
+    fit_auto: bool
+    method_used: WhittakerSmoothMethods
+    log_auto_bounds: Tuple[float, float] = (0.0, 0.0)
+
+
 ### Utility Functions ###
+
+
+def float_is_bit_equal(value: float, reference: float) -> bool:
+    """
+    Checks if two floating-point numbers are equal up to the last bit and handles the
+    case of NaN values as well.
+
+    Doctests
+    --------
+    >>> # Imports
+    >>> from tests.test_for_utils.utils import float_is_bit_equal
+
+    >>> # Test 1
+    >>> float_is_bit_equal(value=1.0, reference=1.0)
+    True
+
+    >>> # Test 2
+    >>> float_is_bit_equal(value=1.0, reference=10.0)
+    False
+
+    >>> # Test 3
+    >>> float_is_bit_equal(value=1.0, reference=float("nan"))
+    False
+
+    >>> # Test 4
+    >>> float_is_bit_equal(value=float("nan"), reference=float("nan"))
+    True
+
+    >>> # Test 5
+    >>> float_is_bit_equal(value=float("nan"), reference=1.0)
+    False
+
+    """
+
+    if isnan(reference):
+        return isnan(value)
+
+    return value == reference
 
 
 def conv_upper_cho_banded_storage_to_sparse(
