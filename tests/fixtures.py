@@ -1,4 +1,5 @@
 import os
+from typing import List
 
 import numpy as np
 import pytest
@@ -9,88 +10,119 @@ path_to_resources = os.path.join(test_directory, "resources")
 
 
 @pytest.fixture
-def spectrum() -> list[np.ndarray]:
+def spectrum() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "spectrum.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "spectrum.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def spectrum_arpls() -> list[np.ndarray]:
+def spectrum_arpls() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "spectrum_arpls.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "spectrum_arpls.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_airpls() -> list[np.ndarray]:
+def reference_airpls() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_airpls.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_airpls.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_arpls() -> list[np.ndarray]:
+def reference_arpls() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_arpls.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_arpls.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_msc_mean() -> list[np.ndarray]:
+def reference_msc_mean() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_msc_mean.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_msc_mean.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_msc_median() -> list[np.ndarray]:
+def reference_msc_median() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_msc_median.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_msc_median.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_sg_15_2() -> list[np.ndarray]:
+def reference_sg_15_2() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_sg_15_2.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_sg_15_2.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_snv() -> list[np.ndarray]:
+def reference_snv() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_snv.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_snv.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_whittaker() -> list[np.ndarray]:
+def reference_whittaker() -> List[np.ndarray]:
     return [
         np.loadtxt(
-            os.path.join(path_to_resources, "reference_whittaker.csv"), delimiter=","
-        ).tolist()
+            os.path.join(path_to_resources, "reference_whittaker.csv"),
+            delimiter=",",
+        )
     ]
 
 
 @pytest.fixture
-def reference_finite_differences() -> list[tuple[int, int, np.ndarray]]:
+def spectrum_whittaker_auto_lambda() -> np.ndarray:
+    spectral_data = np.loadtxt(
+        os.path.join(path_to_resources, "spectrum_whittaker_auto_lambda.csv"),
+        delimiter=",",
+        skiprows=1,
+    )
+
+    return spectral_data[::, 1]
+
+
+@pytest.fixture
+def noise_level_whittaker_auto_lambda() -> np.ndarray:
+    spectral_data = np.loadtxt(
+        os.path.join(path_to_resources, "spectrum_whittaker_auto_lambda.csv"),
+        delimiter=",",
+        skiprows=1,
+    )
+
+    return spectral_data[::, 2]
+
+
+@pytest.fixture
+def reference_finite_differences() -> List[tuple[int, int, np.ndarray]]:
     fin_diff_table = np.genfromtxt(
         os.path.join(path_to_resources, "reference_finite_differences.csv"),
         skip_header=2,
@@ -114,3 +146,6 @@ def reference_finite_differences() -> list[tuple[int, int, np.ndarray]]:
         )
 
     return fin_diff_ordered_coeffs
+
+
+spectrum_whittaker_auto_lambda()
