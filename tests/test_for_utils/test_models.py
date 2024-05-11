@@ -15,8 +15,8 @@ from tests.test_for_utils.utils import ExpectedWhittakerSmoothLambda
 
 ### Type aliases ###
 
-_Numeric = Union[float, int]
-_LambdaValueNumeric = Union[_Numeric, Tuple[_Numeric, _Numeric]]
+_RealNumeric = Union[float, int]
+_LambdaValueNumeric = Union[_RealNumeric, Tuple[_RealNumeric, _RealNumeric]]
 _LambdaValueNumericOrFlawed = Union[_LambdaValueNumeric, str]
 _WhittakerMethod = Union[str, models.WhittakerSmoothMethods]
 _WhittakerMethodSequence = List[_WhittakerMethod]
