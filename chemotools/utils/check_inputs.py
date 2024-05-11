@@ -48,22 +48,23 @@ def check_weights(
             f"Weights must have either 1 or {n_samples} rows, but they have "
             f"{weights_checked.shape[0]} rows."
         )
-    elif weights_checked.shape[1] != n_features:
+    if weights_checked.shape[1] != n_features:
         raise ValueError(
             f"Weights must have {n_features} columns, but they have "
             f"{weights_checked.shape[1]} columns."
         )
 
     # finally, it needs to be checked that the weights are all non-negative ...
-    if np.any(weights < 0.0):
+    if (weights_checked < 0.0).any():
         raise ValueError(
-            f"Weights may not be negative, but {np.sum(weights < 0.0)} negative "
-            f"weights were found."
+            f"Weights may not be negative, but {(weights_checked < 0.0).sum(axis=1)} "
+            f"negative weights were found (one entry per vector)."
         )
     # ... and also at least one of them is positive
-    elif np.sum(weights) <= 0.0:
+    if (weights_checked.sum(axis=1) <= 0.0).any():
         raise ValueError(
-            "At least one weights needs to be > 0, but all weights were 0.0."
+            f"At least one weights needs to be > 0, but all weights were 0.0 for "
+            f"vector index {np.where(weights_checked.sum(axis=1) <= 0.0)[0]}."
         )
 
     # the weights are returned together with a flag whether to apply the same weights
