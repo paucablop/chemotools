@@ -20,11 +20,10 @@ _LambdaValueNumeric = Union[_RealNumeric, Tuple[_RealNumeric, _RealNumeric]]
 _LambdaValueNumericOrFlawed = Union[_LambdaValueNumeric, str]
 _WhittakerMethod = Union[str, models.WhittakerSmoothMethods]
 _WhittakerMethodSequence = List[_WhittakerMethod]
-_ExpectedLambdaResult = Union[ExpectedWhittakerSmoothLambda, Type[Exception]]
 _LambdaTestCombination = Tuple[
     _LambdaValueNumericOrFlawed,
     _WhittakerMethodSequence,
-    _ExpectedLambdaResult,
+    Union[ExpectedWhittakerSmoothLambda, Type[Exception]],
 ]
 
 ### Constants ###
