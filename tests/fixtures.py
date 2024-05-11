@@ -146,6 +146,3 @@ def reference_finite_differences() -> List[tuple[int, int, np.ndarray]]:
         )
 
     return fin_diff_ordered_coeffs
-
-
-spectrum_whittaker_auto_lambda()
