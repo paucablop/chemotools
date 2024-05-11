@@ -8,42 +8,23 @@ derived methods like Asymmetric Least Squares (ALS) baseline correction.
 
 ### Imports ###
 
-from math import ceil, exp
-from typing import Generator, Optional, Tuple, Union
+from math import exp
+from typing import Optional, Union
 
 import numpy as np
-from scipy.optimize import minimize_scalar
 
 from chemotools._runtime import PENTAPY_AVAILABLE
-from chemotools.utils.banded_linalg import (
-    LAndUBandCounts,
-    conv_upper_chol_banded_to_lu_banded_storage,
-    lu_banded,
-    lu_solve_banded,
-    slogdet_lu_banded,
-)
-from chemotools.utils.finite_differences import (
-    calc_forward_diff_kernel,
-    gen_squ_fw_fin_diff_mat_cho_banded,
-)
-from chemotools.utils.models import (
-    BandedLUFactorization,
-    BandedPentapyFactorization,
-    BandedSolvers,
-    WhittakerSmoothLambda,
-    WhittakerSmoothMethods,
-)
-
-if PENTAPY_AVAILABLE:
-    import pentapy as pp
+from chemotools.utils import models
+from chemotools.utils.banded_linalg import LAndUBandCounts, slogdet_lu_banded
+from chemotools.utils.whittaker_base import auto_lambda as auto
+from chemotools.utils.whittaker_base import initialisation as init
+from chemotools.utils.whittaker_base import solvers
+from chemotools.utils.whittaker_base.misc import get_weight_generator
 
 ### Type Aliases ###
 
-_Factorization = Union[BandedLUFactorization, BandedPentapyFactorization]
-_FactorizationForLogMarginalLikelihood = BandedLUFactorization
-_WhittakerSmoothLambdaPlain = Tuple[
-    Union[int, float], Union[int, float], WhittakerSmoothMethods
-]
+_Factorization = Union[models.BandedLUFactorization, models.BandedPentapyFactorization]
+_FactorizationForLogMarginalLikelihood = models.BandedLUFactorization
 
 
 ### Class Implementation ###
@@ -81,7 +62,7 @@ class WhittakerLikeSolver:
         required for the automatic fitting of the lambda parameter by maximizing the log
         marginal likelihood, i.e., when ``lam_ == WhittakerSmoothMethods.LOG_MARGINAL_LIKELIHOOD``.
         Flipping is required due to NumPy's definition of convolution.
-    _penalty_matb_ : ndarray of shape (n_data - differences + 1, n_data - differences + 1)
+    _penalty_mat_banded_ : ndarray of shape (n_data - differences + 1, n_data - differences + 1)
         The squared forward finite differences matrix ``D.T @ D`` stored in the banded
         storage format used for LAPACK's banded LU decomposition.
     _penalty_mat_log_pseudo_det_ : float
@@ -113,92 +94,16 @@ class WhittakerLikeSolver:
     __allow_pentapy: bool = True
     __zero_weight_tol: float = 1e-10
 
-    def __init__(
-        self,
-    ) -> None:
+    def __init__(self) -> None:  # pragma: no cover
         pass
 
     ### Initialization and Setup Methods ###
-
-    def _calc_penalty_log_pseudo_det(self) -> float:
-        """
-        Computes the natural logarithm of the pseudo-determinant of the squared forward
-        finite differences matrix ``D.T @ D`` which is necessary for the calculation of
-        the log marginal likelihood for the automatic fitting of the penalty weight.
-
-        Returns
-        -------
-        log_pseudo_det : float
-            The natural logarithm of the pseudo-determinant of the penalty matrix.
-
-        Raises
-        ------
-        RuntimeError
-            If the pseudo-determinant of the penalty matrix is negative, thereby
-            indicating that the system is extremely ill-conditioned and the automatic
-            fitting of the penalty weight is not possible.
-
-        Notes
-        -----
-        Basically, this could be solved by evaluation of the eigenvalues of ``D.T @ D``
-        with a banded eigensolver, but this is computationally expensive and not
-        necessary.
-        The pseudo-determinant of ``D.T @ D`` is the determinant of ``D @ D.T`` because
-        ``D.T @ D`` is rank-deficient with ``differences`` zero eigenvalues while
-        ``D @ D.T`` has full rank.
-        Since both matrices share the same non-zero eigenvalues, the pseudo-determinant
-        is easily computed as the determinant of ``D @ D.T`` via a partially pivoted
-        LU decomposition.
-
-        Throughout this method, the matrix ``D.T @ D`` is referred to as the "flipped
-        penalty matrix" even though it is not actually flipped.
-
-        """
-
-        # the flipped penalty matrix D @ D.T is computed
-        # NOTE: the matrix is returned with integer entries because integer computations
-        #       can be carried out at maximum precision; this has to be converted to
-        #       double precision for the LU decomposition
-        flipped_penalty_matb = gen_squ_fw_fin_diff_mat_cho_banded(
-            n_data=self.n_data_,
-            differences=self.differences_,
-            orig_first=True,
-        ).astype(self.__dtype)
-
-        # the pseudo-determinant is computed from the partially pivoted LU decomposition
-        # of the flipped penalty matrix
-        flipped_l_and_u, flipped_penalty_matb = (
-            conv_upper_chol_banded_to_lu_banded_storage(ab=flipped_penalty_matb)
-        )
-        log_pseudo_det_sign, log_pseudo_det = slogdet_lu_banded(
-            lub_factorization=lu_banded(
-                l_and_u=flipped_l_and_u,
-                ab=flipped_penalty_matb,
-                check_finite=False,
-            ),
-        )
-
-        # if the sign of the pseudo-determinant is positive, the log pseudo-determinant
-        # is returned
-        if log_pseudo_det_sign > 0.0:
-            return log_pseudo_det
-
-        # otherwise, if is negative, the penalty matrix is extremely ill-conditioned and
-        # the automatic fitting of the penalty weight is not possible
-        raise RuntimeError(
-            f"\nThe pseudo-determinant of the penalty D.T @ D matrix is negative, "
-            f"indicating that the system is extremely ill-conditioned.\n"
-            f"Automatic fitting for {self.n_data_} data points and difference order "
-            f"{self.differences_} is not possible.\n"
-            f"Please consider reducing the number of data points to smooth by, e.g., "
-            f"binning or lowering the difference order."
-        )
 
     def _setup_for_fit(
         self,
         n_data: int,
         differences: int,
-        lam: Union[int, float, _WhittakerSmoothLambdaPlain, WhittakerSmoothLambda],
+        lam: init._LambdaSpecs,
     ) -> None:
         """
         Pre-computes everything that can be computed for the smoothing in general as
@@ -211,48 +116,19 @@ class WhittakerLikeSolver:
         # the input arguments are stored and validated
         self.n_data_: int = n_data
         self.differences_: int = differences
+        self._lam_inter_: models.WhittakerSmoothLambda = init.get_checked_lambda(
+            lam=lam
+        )
 
-        self._lam_inter_: WhittakerSmoothLambda
-        if isinstance(lam, (int, float)):
-            self._lam_inter_ = WhittakerSmoothLambda(
-                bounds=lam,
-                method=WhittakerSmoothMethods.FIXED,
-            )
-        elif isinstance(lam, WhittakerSmoothLambda):
-            self._lam_inter_ = lam
-        elif isinstance(lam, tuple):
-            if len(lam) != 3:
-                raise ValueError(
-                    f"\nThe lambda parameter must be a tuple of three elements (lower "
-                    f"bound, upper bound, method), but it has {len(lam)} elements "
-                    f"instead."
-                )
-
-            self._lam_inter_ = WhittakerSmoothLambda(
-                bounds=(lam[0], lam[1]),
-                method=lam[2],
-            )
-        else:
-            raise TypeError(
-                f"\nThe lambda parameter must be an integer, a float, a tuple of "
-                f"(lower bound, upper bound, method), or an instance of "
-                f"WhittakerSmoothLambda, but it is {type(lam)} instead."
-            )
-
-        # the squared forward finite difference matrix D.T @ D is computed ...
-        # NOTE: the matrix is returned with integer entries because integer computations
-        #       can be carried out at maximum precision; this has to be converted to
-        #       double precision for the LU decomposition
+        # the squared forward finite difference matrix D.T @ D is computed in band
+        # storage format for LAPACK's banded LU decomposition
         self._l_and_u_: LAndUBandCounts
-        self._penalty_matb_: np.ndarray = gen_squ_fw_fin_diff_mat_cho_banded(
+        self._penalty_mat_banded_: np.ndarray
+        self._l_and_u_, self._penalty_mat_banded_ = init.get_squ_fw_diff_mat_banded(
             n_data=self.n_data_,
             differences=self.differences_,
             orig_first=False,
-        ).astype(self.__dtype)
-
-        # ... and cast to the banded storage format for LAPACK's LU decomposition
-        self._l_and_u_, self._penalty_matb_ = (
-            conv_upper_chol_banded_to_lu_banded_storage(ab=self._penalty_matb_)
+            dtype=self.__dtype,
         )
 
         # if the penalty weight is fitted automatically by maximization of the
@@ -261,14 +137,19 @@ class WhittakerLikeSolver:
         self._diff_kernel_flipped_: np.ndarray = np.ndarray([], dtype=self.__dtype)
         self._penalty_mat_log_pseudo_det_: float = float("nan")
         if self._lam_inter_.fit_auto and self._lam_inter_.method_used in {
-            WhittakerSmoothMethods.LOGML,
+            models.WhittakerSmoothMethods.LOGML,
         }:
             # NOTE: the kernel is also returned with integer entries because integer
             #       computations can be carried out at maximum precision
-            self._diff_kernel_flipped_ = np.flip(
-                calc_forward_diff_kernel(differences=self.differences_)
-            ).astype(self.__dtype)
-            self._penalty_mat_log_pseudo_det_ = self._calc_penalty_log_pseudo_det()
+            self._diff_kernel_flipped_ = init.get_flipped_fw_diff_kernel(
+                differences=self.differences_,
+                dtype=self.__dtype,
+            )
+            self._penalty_mat_log_pseudo_det_ = init.get_penalty_log_pseudo_det(
+                n_data=self.n_data_,
+                differences=self.differences_,
+                dtype=self.__dtype,
+            )
 
         # finally, Pentapy is enabled if available, the number of differences is 2,
         # and the lambda parameter is not fitted automatically
@@ -281,172 +162,35 @@ class WhittakerLikeSolver:
 
     ### Solver Methods ###
 
-    def _solve_pentapy(self, ab: np.ndarray, b_weighted: np.ndarray) -> np.ndarray:
-        """
-        Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b``
-        with the ``pentapy`` package. This is the same as solving the linear system
-        ``A @ x = b`` where ``A = W + lam * D.T @ D`` and ``b = W @ b``.
-
-        Notes
-        -----
-        Pentapy does not (maybe yet) allow for 2D right-hand side matrices, so the
-        solution is computed for each column of ``bw`` separately.
-
-        """  # noqa: E501
-
-        # for 1-dimensional right-hand side vectors, the solution is computed directly
-        if b_weighted.ndim == 1:
-            return pp.solve(
-                mat=ab,
-                rhs=b_weighted,
-                is_flat=True,
-                index_row_wise=False,
-                solver=1,
-            )
-
-        # for 2-dimensional right-hand side matrices, the solution is computed for each
-        # column separately
-        else:
-            # NOTE: the solutions are first written into the rows of the solution matrix
-            #       because row-access is more efficient for C-contiguous arrays;
-            #       afterwards, the solution matrix is transposed
-            solution = np.empty(shape=(b_weighted.shape[1], b_weighted.shape[0]))
-            for iter_j in range(0, b_weighted.shape[1]):
-                solution[iter_j, ::] = pp.solve(
-                    mat=ab,
-                    rhs=b_weighted[::, iter_j],
-                    is_flat=True,
-                    index_row_wise=False,
-                    solver=1,
-                )
-
-            return solution.transpose()
-
-    def _solve_pivoted_lu(
-        self,
-        ab: np.ndarray,
-        b_weighted: np.ndarray,
-    ) -> tuple[np.ndarray, BandedLUFactorization]:
-        """
-        Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b``
-        with the LU decomposition. This is the same as solving the linear system
-        ``A @ x = b`` where ``A = W + lam * D.T @ D`` and ``b = W @ b``.
-
-        If the LU decomposition fails, a ``LinAlgError`` is raised which is fatal since
-        the next level of escalation would be using a QR-decomposition which is not
-        implemented (yet).
-
-        """  # noqa: E501
-
-        lub_factorization = lu_banded(
-            l_and_u=self._l_and_u_,
-            ab=ab,
-            check_finite=False,
-        )
-        return (
-            lu_solve_banded(
-                lub_factorization=lub_factorization,
-                b=b_weighted,
-                check_finite=False,
-                overwrite_b=True,
-            ),
-            lub_factorization,
-        )
-
+    # TODO: implement solver that does not rely on normal equations
     def _solve(
         self,
         lam: float,
         b_weighted: np.ndarray,
         w: Union[float, np.ndarray],
-    ) -> tuple[np.ndarray, BandedSolvers, _Factorization]:
+    ) -> tuple[np.ndarray, models.BandedSolvers, _Factorization]:
         """
-        Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b``
-        where ``W`` is a diagonal matrix with the weights ``w`` on the main diagonal and
-        ``D`` is the finite difference matrix of order ``differences``. ``lam``
-        represents the penalty weight for the smoothing.
-        For details on why the system is not formulated in a more efficient way, please
-        refer to the Notes section.
-
-        Parameters
-        ----------
-        lam : float
-            The penalty weight lambda to use for the smoothing.
-        b_weighted : ndarray of shape (m,) or (m, n)
-            The weighted right-hand side vector or matrix of the linear system of
-            equations given by ``W @ b``.
-        w : float or ndarray of shape (m,)
-            The weights to use for the linear system of equations given in terms of the
-            main diagonal of the weight matrix ``W``.
-            It can either be a vector of weights for each data point or a single
-            scalar - namely ``1.0`` - if no weights are provided.
-
-        Returns
-        -------
-        x : np.ndarray of shape (m,)
-            The solution vector of the linear system of equations.
-        decomposition_type : BandedSolveDecompositions
-            The type of decomposition used to solve the linear system of equations.
-        decomposition : BandedLUFactorization or BandedPentapyFactorization
-            The decomposition used to solve the linear system of equations which is
-            stored as a class instance specifying everything required to solve the
-            system with the ``decomposition_type`` used.
-
-        Raises
-        ------
-        RuntimeError
-            If all available solvers failed to solve the linear system of equations
-            which indicates a highly ill-conditioned system.
-
-        Notes
-        -----
-        It might seem more efficient to solve the linear system ``((1.0 / lam) * W + D.T @ D) @ x = (1.0 / lam) * W @ b``
-        because this only requires a multiplication of ``m`` weights with the reciprocal
-        of the penalty weight whereas the multiplication with ``D.T @ D`` requires
-        roughly ``m * (1 + 2 * differences)`` multiplications with ``m`` as the number
-        of data points and ``differences`` as the difference order. On top of that,
-        ``m * differences`` multiplications - so roughly 50% - would be redundant given
-        that the penalty ``D.T @ D`` matrix is symmetric.
-        However, NumPy's scalar multiplication is so highly optimized that the
-        multiplication with ``D.T @ D`` without considering symmetry is almost as fast
-        as the multiplication with the diagonal matrix ``W``, especially when compared
-        to the computational load of the banded solvers.
+        Internal wrapper for the solver methods to solve the linear system of equations
+        for the Whittaker-like smoother.
+        It will first attempt to solve the system via the normal equations via either
+        a direct pentadiagonal solve or an LU decomposition of the banded normal
+        equations matrix. This is less numerically stable because the condition number
+        of the normal equations matrix is the square of the condition number of the
+        original system, but on the other hand, it can be way faster.
+        If this fails, it will fall back to the more numerically stable QR
+        decomposition (to be implemented).
 
         """  # noqa: E501
 
-        # the banded storage format for the LAPACK LU decomposition is computed by
-        # scaling the penalty matrix with the penalty weight lambda and then adding the
-        # diagonal matrix with the weights
-        ab = lam * self._penalty_matb_
-        ab[self.differences_, ::] += w
-
-        # the linear system of equations is solved with the most efficient method
-        # Case 1: Pentapy can be used
-        if self._pentapy_enabled_:
-            x = self._solve_pentapy(ab=ab, b_weighted=b_weighted)
-            if np.isfinite(x).all():
-                return (
-                    x,
-                    BandedSolvers.PENTAPY,
-                    BandedPentapyFactorization(),
-                )
-
-        # Case 2: LU decomposition (final fallback for pentapy)
-        try:
-            x, lub_factorization = self._solve_pivoted_lu(ab=ab, b_weighted=b_weighted)
-            return x, BandedSolvers.PIVOTED_LU, lub_factorization
-
-        except np.linalg.LinAlgError:
-            available_solvers = f"{BandedSolvers.PIVOTED_LU}"
-            if self._pentapy_enabled_:
-                available_solvers = f"{BandedSolvers.PENTAPY}, {available_solvers}"
-
-            raise RuntimeError(
-                f"\nAll available solvers ({available_solvers}) failed to solve the "
-                f"linear system of equations which indicates a highly ill-conditioned "
-                f"system.\n"
-                f"Please consider reducing the number of data points to smooth by, "
-                f"e.g., binning or lowering the difference order."
-            )
+        return solvers.solve_normal_equations(
+            lam=lam,
+            differences=self.differences_,
+            l_and_u=self._l_and_u_,
+            penalty_mat_banded=self._penalty_mat_banded_,
+            b_weighted=b_weighted,
+            w=w,
+            pentapy_enabled=self._pentapy_enabled_,
+        )
 
     ### Auxiliary Methods to prepare the data for the solver ###
 
@@ -700,50 +444,16 @@ class WhittakerLikeSolver:
             - self._penalty_mat_log_pseudo_det_
         )
 
-        # unless the search space spans less than 1 decade, i.e., ln(10) ~= 2.3, a grid
-        # search is carried out to shrink the search space for the final optimization;
-        # the grid is spanned with an integer number of steps of half a decade
-        log_low_bound, log_upp_bound = self._lam_inter_.log_auto_bounds
-        bound_log_diff = log_upp_bound - log_low_bound
-        if bound_log_diff > self.__LN_TEN:
-            half_decade = 0.5 * self.__LN_TEN
-            target_best = float("inf")
-            n_steps = 1 + ceil(bound_log_diff / half_decade)  #
-            # NOTE: the following ensures that the upper bound is not exceeded
-            step_size = bound_log_diff / (n_steps - 1)
-
-            # all the trial values are evaluated and the best one is stored
-            for trial in range(0, n_steps):
-                log_lam_curr = log_low_bound + trial * step_size
-                target_curr = self._marginal_likelihood_objective(
-                    log_lam=log_lam_curr,
-                    b=b,
-                    w=w,
-                    w_plus_penalty_plus_n_samples_term=w_plus_n_samples_term,
-                )
-
-                if target_curr < target_best:
-                    log_lam_best = log_lam_curr
-                    target_best = target_curr
-
-            # then, the bounds for the final optimization are shrunk to plus/minus half
-            # a decade around the best trial value
-            # NOTE: the following ensures that the bounds are not violated
-            log_low_bound = max(log_lam_best - half_decade, log_low_bound)
-            log_upp_bound = min(log_lam_best + half_decade, log_upp_bound)
-
         # the optimization of the log marginal likelihood is carried out
-        opt_res = minimize_scalar(
+        opt_lambda = auto.get_optimized_lambda(
             fun=self._marginal_likelihood_objective,
-            bounds=(log_low_bound, log_upp_bound),
+            lam=self._lam_inter_,
             args=(b, w, w_plus_n_samples_term),
-            method="bounded",
-            options={"xatol": 0.05},
         )
 
         # the optimal penalty weight lambda is returned together with the smoothed
         # series
-        return self._solve_single_b_fixed_lam(b=b, w=w, lam=exp(opt_res.x))
+        return self._solve_single_b_fixed_lam(b=b, w=w, lam=opt_lambda)
 
     def _solve_multiple_b(
         self,
@@ -782,30 +492,6 @@ class WhittakerLikeSolver:
             X_smooth.transpose(),
             np.full(shape=(X.shape[0],), fill_value=self._lam_inter_.fixed_lambda),
         )
-
-    def _get_weight_generator(
-        self, w: Optional[np.ndarray], n_series: int
-    ) -> Generator[Union[float, np.ndarray], None, None]:
-        """
-        Generates a generator that yields the weights for each series in a series matrix
-        ``X``.
-
-        """
-
-        # Case 1: No weights
-        if w is None:
-            for _ in range(n_series):
-                yield 1.0
-
-        # Case 2: 1D weights
-        elif w.ndim == 1:
-            for _ in range(n_series):
-                yield w
-
-        # Case 3: 2D weights
-        elif w.ndim == 2:
-            for w_vect in w:
-                yield w_vect
 
     ### Main Solver Entry Point ###
 
@@ -860,15 +546,15 @@ class WhittakerLikeSolver:
         # first, the smoothing method is specified depending on whether the penalty
         # weight lambda is fitted automatically or not
         smooth_method_assignment = {
-            WhittakerSmoothMethods.FIXED: self._solve_single_b_fixed_lam,
-            WhittakerSmoothMethods.LOGML: self._solve_single_b_auto_lam_lml,
+            models.WhittakerSmoothMethods.FIXED: self._solve_single_b_fixed_lam,
+            models.WhittakerSmoothMethods.LOGML: self._solve_single_b_auto_lam_lml,
         }
         smooth_method = smooth_method_assignment[self._lam_inter_.method_used]
 
         # then, the solution is computed for each series by means of a loop
         X_smooth = np.empty_like(X)
         lam = np.empty(shape=(X.shape[0],))
-        w_gen = self._get_weight_generator(w=w, n_series=X.shape[0])
+        w_gen = get_weight_generator(w=w, n_series=X.shape[0])
         for iter_i, (x_vect, w_vect) in enumerate(zip(X, w_gen)):
             X_smooth[iter_i], lam[iter_i] = smooth_method(b=x_vect, w=w_vect)
 
