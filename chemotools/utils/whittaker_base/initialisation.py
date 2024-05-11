@@ -153,7 +153,7 @@ def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> fl
     """
 
     # the flipped penalty matrix D @ D.T is computed
-    _, flipped_penalty_matb = get_squ_fw_diff_mat_banded(
+    flipped_l_and_u, flipped_penalty_matb = get_squ_fw_diff_mat_banded(
         n_data=n_data,
         differences=differences,
         orig_first=True,
@@ -162,9 +162,6 @@ def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> fl
 
     # the pseudo-determinant is computed from the partially pivoted LU decomposition
     # of the flipped penalty matrix
-    flipped_l_and_u, flipped_penalty_matb = (
-        bla.conv_upper_chol_banded_to_lu_banded_storage(ab=flipped_penalty_matb)
-    )
     log_pseudo_det_sign, log_pseudo_det = bla.slogdet_lu_banded(
         lub_factorization=bla.lu_banded(
             l_and_u=flipped_l_and_u,
