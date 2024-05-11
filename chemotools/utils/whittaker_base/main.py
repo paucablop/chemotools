@@ -126,7 +126,8 @@ class WhittakerLikeSolver:
                 f"of the smoothing cannot be guaranteed for difference orders higher "
                 f"than 2.\n"
                 f"Please refer to the documentation of the class "
-                f"'{self.__child_class_name}' for further information."
+                f"'{self.__child_class_name}' for further information.",
+                UserWarning,
             )
 
         # the squared forward finite difference matrix D.T @ D is computed in band
