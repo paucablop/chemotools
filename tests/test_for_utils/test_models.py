@@ -5,9 +5,9 @@ Test suite for the utility models in the :mod:`chemotools.utils.models` module.
 
 ### Imports ###
 
+from math import log
 from typing import List, Tuple, Type, Union
 
-import numpy as np
 import pytest
 
 from chemotools.utils import models
@@ -147,7 +147,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
                 method_used=models.WhittakerSmoothMethods.LOGML,
-                log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
+                log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 9 (search space integers; logml method)
@@ -158,7 +158,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
                 method_used=models.WhittakerSmoothMethods.LOGML,
-                log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
+                log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 10 (flipped search space floats; logml method)
@@ -169,7 +169,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
                 method_used=models.WhittakerSmoothMethods.LOGML,
-                log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
+                log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 11 (flipped search space integers; logml method)
@@ -180,7 +180,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
                 method_used=models.WhittakerSmoothMethods.LOGML,
-                log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
+                log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 12 (fixed zero float; fixed method)
