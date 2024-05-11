@@ -23,11 +23,11 @@ def get_weight_generator(
 
     """
 
-    # if the weights are neither None, nor a 1D- or a 2D-Array, an error is raised
+    # if the weights are neither None nor a 2D-Array, an error is raised
     if not (w is None or isinstance(w, np.ndarray)):
         raise TypeError(
-            f"The weights must either be None, a NumPy-1D-, or a NumPy-2D-Array, but "
-            f"they are of type '{type(w)}'."
+            f"The weights must either be None or a NumPy-2D-Array, but they are of "
+            f"type '{type(w)}'."
         )
 
     # Case 1: No weights
@@ -35,19 +35,14 @@ def get_weight_generator(
         for _ in range(n_series):
             yield 1.0
 
-    # Case 2: 1D or 2D weights
-    elif w.ndim == 1:
-        for _ in range(n_series):
-            yield w
-
-    # Case 3: 2D weights
+    # Case 2: 2D weights
     elif w.ndim == 2:
         for idx in range(0, n_series):
             yield w[idx]
 
-    # Case 4: Invalid weights
-    elif w.ndim > 2:
+    # Case 3: Invalid weights
+    elif w.ndim != 2:
         raise ValueError(
-            f"The weights must be either a 1D- or a 2D-array, but they are "
+            f"If provided as an Array, the weights must be a 2D-Array, but they are "
             f"{w.ndim}-dimensional with shape {w.shape}."
         )
