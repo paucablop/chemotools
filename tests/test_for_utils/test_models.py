@@ -5,25 +5,25 @@ Test suite for the utility models in the :mod:`chemotools.utils.models` module.
 
 ### Imports ###
 
-from typing import List, Tuple, Union
+from typing import List, Tuple, Type, Union
 
 import numpy as np
 import pytest
 
-from chemotools.utils.models import WhittakerSmoothLambda, WhittakerSmoothMethods
-from tests.test_for_utils.utils import ExpectedWhittakerSmoothLambda, float_is_bit_equal
+from chemotools.utils import models
+from tests.test_for_utils.utils import ExpectedWhittakerSmoothLambda
 
 ### Type aliases ###
 
 _Numeric = Union[float, int]
 _LambdaValueNumeric = Union[_Numeric, Tuple[_Numeric, _Numeric]]
 _LambdaValueNumericOrFlawed = Union[_LambdaValueNumeric, str]
-_WhittakerMethod = Union[str, WhittakerSmoothMethods]
+_WhittakerMethod = Union[str, models.WhittakerSmoothMethods]
 _WhittakerMethodSequence = List[_WhittakerMethod]
 _ExpectedLambdaResult = Union[
     ExpectedWhittakerSmoothLambda,
-    ValueError,
-    TypeError,
+    Type[ValueError],
+    Type[TypeError],
 ]
 _LambdaTestCombination = Tuple[
     _LambdaValueNumericOrFlawed,
@@ -31,16 +31,16 @@ _LambdaTestCombination = Tuple[
     _ExpectedLambdaResult,
 ]
 
-### Global constants ###
+### Constants ###
 
 _NAN: float = float("nan")
 _FIXED_WHITTAKER_METHODS: _WhittakerMethodSequence = [
     "fixed",
-    WhittakerSmoothMethods.FIXED,
+    models.WhittakerSmoothMethods.FIXED,
 ]
 _LOGML_WHITTAKER_METHODS: _WhittakerMethodSequence = [
     "logml",
-    WhittakerSmoothMethods.LOGML,
+    models.WhittakerSmoothMethods.LOGML,
 ]
 # NOTE: "aauto" is not a typo, but helps to not confuse it with "all"
 _aauto_whittaker_methods: _WhittakerMethodSequence = _LOGML_WHITTAKER_METHODS + []
@@ -62,7 +62,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -73,7 +73,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -84,7 +84,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.000001,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -95,7 +95,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.000001,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -106,7 +106,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.000001,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -117,7 +117,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.000001,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -128,7 +128,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=100.000001,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=WhittakerSmoothMethods.FIXED,
+                method_used=models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -139,7 +139,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=WhittakerSmoothMethods.LOGML,
+                method_used=models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
             ),
         ),
@@ -150,7 +150,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=WhittakerSmoothMethods.LOGML,
+                method_used=models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(np.log(100.0), np.log(10_000.0)),
             ),
         ),
@@ -211,7 +211,7 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
     if not isinstance(expected_result, ExpectedWhittakerSmoothLambda):
         for meth in methods:
             with pytest.raises(expected_result):  # type: ignore
-                WhittakerSmoothLambda(
+                models.WhittakerSmoothLambda(
                     bounds=lambda_value,  # type: ignore
                     method=meth,  # type: ignore
                 )
@@ -221,32 +221,9 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
     # if the expected result is a valid result, the class is instantiated and the
     # attributes are tested
     for meth in methods:
-        lambda_model = WhittakerSmoothLambda(
+        lambda_model = models.WhittakerSmoothLambda(
             bounds=lambda_value,  # type: ignore
             method=meth,  # type: ignore
         )
 
-        assert lambda_model.fit_auto == expected_result.fit_auto
-        assert lambda_model.method_used == expected_result.method_used
-        # NOTE: since NAN-values are used, the comparison is split into two parts for
-        #       the fixed lambda value and each of the bounds
-        assert float_is_bit_equal(
-            value=lambda_model.fixed_lambda,
-            reference=expected_result.fixed_lambda,
-        )
-        assert float_is_bit_equal(
-            value=lambda_model.auto_bounds[0],
-            reference=expected_result.auto_bounds[0],
-        )
-        assert float_is_bit_equal(
-            value=lambda_model.auto_bounds[1],
-            reference=expected_result.auto_bounds[1],
-        )
-        assert float_is_bit_equal(
-            value=lambda_model.log_auto_bounds[0],
-            reference=expected_result.log_auto_bounds[0],
-        )
-        assert float_is_bit_equal(
-            value=lambda_model.log_auto_bounds[1],
-            reference=expected_result.log_auto_bounds[1],
-        )
+        expected_result.assert_is_equal_to(other=lambda_model)
