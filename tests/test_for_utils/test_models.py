@@ -270,7 +270,7 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
 
     - the lambda value(s) to be used,
     - the method(s) to be used, and
-    - the expected result(s) of the instantiation (will be an exception if the input
+    - the expected result of the instantiation (will be an exception if the input
         should be considered invalid by the dataclass).
 
     """
