@@ -6,7 +6,7 @@ that would have cluttered the class implementation.
 
 ### Imports ###
 
-from typing import Generator, Optional, Union
+from typing import Any, Generator, Union
 
 import numpy as np
 
@@ -14,7 +14,7 @@ import numpy as np
 
 
 def get_weight_generator(
-    w: Optional[np.ndarray],
+    w: Any,
     n_series: int,
 ) -> Generator[Union[float, np.ndarray], None, None]:
     """
@@ -23,17 +23,31 @@ def get_weight_generator(
 
     """
 
+    # if the weights are neither None, nor a 1D- or a 2D-Array, an error is raised
+    if not (w is None or isinstance(w, np.ndarray)):
+        raise TypeError(
+            f"The weights must either be None, a NumPy-1D-, or a NumPy-2D-Array, but "
+            f"they are of type '{type(w)}'."
+        )
+
     # Case 1: No weights
     if w is None:
         for _ in range(n_series):
             yield 1.0
 
-    # Case 2: 1D weights
+    # Case 2: 1D or 2D weights
     elif w.ndim == 1:
         for _ in range(n_series):
             yield w
 
     # Case 3: 2D weights
     elif w.ndim == 2:
-        for w_vect in w:
-            yield w_vect
+        for idx in range(0, n_series):
+            yield w[idx]
+
+    # Case 4: Invalid weights
+    elif w.ndim > 2:
+        raise ValueError(
+            f"The weights must be either a 1D- or a 2D-array, but they are "
+            f"{w.ndim}-dimensional with shape {w.shape}."
+        )
