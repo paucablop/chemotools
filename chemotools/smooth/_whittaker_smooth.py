@@ -21,11 +21,15 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input, check_weights
+from chemotools.utils.models import WhittakerSmoothLambda
 from chemotools.utils.whittaker_base import WhittakerLikeSolver
 
 
 class WhittakerSmooth(
-    OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver
+    OneToOneFeatureMixin,
+    BaseEstimator,
+    TransformerMixin,
+    WhittakerLikeSolver,
 ):
     """
     A transformer that performs smoothing on data according to the Whittaker-Henderson
@@ -78,10 +82,10 @@ class WhittakerSmooth(
 
     def __init__(
         self,
-        lam: Union[float, int] = 1e2,
+        lam: Union[float, int, WhittakerSmoothLambda] = 1e2,
         differences: int = 1,
     ):
-        self.lam: Union[float, int] = lam
+        self.lam: Union[float, int, WhittakerSmoothLambda] = lam
         self.differences: int = differences
 
     def fit(self, X: ndarray, y=None) -> "WhittakerSmooth":

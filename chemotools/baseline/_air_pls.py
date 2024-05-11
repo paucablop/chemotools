@@ -31,7 +31,10 @@ logger = logging.getLogger(__name__)
 
 # TODO: is polynomial_order actually differences and if so, is the description correct?
 class AirPls(
-    OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver
+    OneToOneFeatureMixin,
+    BaseEstimator,
+    TransformerMixin,
+    WhittakerLikeSolver,
 ):
     """
     This class implements the Adaptive Iteratively Reweighted Penalized Least Squares

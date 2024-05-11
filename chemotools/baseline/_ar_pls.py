@@ -32,7 +32,12 @@ from chemotools.utils.whittaker_base import WhittakerLikeSolver
 logger = logging.getLogger(__name__)
 
 
-class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin, WhittakerLikeSolver):
+class ArPls(
+    OneToOneFeatureMixin,
+    BaseEstimator,
+    TransformerMixin,
+    WhittakerLikeSolver,
+):
     """
     This class implements the Asymmetrically Reweighted Penalized Least Squares a.k.a
     ArPLS which is a baseline correction method for spectroscopy data. It uses an
