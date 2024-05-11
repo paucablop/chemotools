@@ -10,6 +10,7 @@ derived methods like Asymmetric Least Squares (ALS) baseline correction.
 
 from math import exp
 from typing import Optional, Union
+from warnings import warn
 
 import numpy as np
 
@@ -70,6 +71,9 @@ class WhittakerLikeSolver:
         (``False``).
         It can only be used if the number of differences is 2 and the lambda parameter
         is fixed (and of course if ``pentapy`` is available).
+    __child_class_name : str
+        The name of the child class that inherits from this base class. It is used for
+        warning messages and debugging purposes.
     __dtype : type, default=np.float64
         The data type to which the series to be smoothed will be converted to. To avoid
         numerical issues, all series are converted to double precision.
@@ -96,6 +100,7 @@ class WhittakerLikeSolver:
         n_data: int,
         differences: int,
         lam: init._LambdaSpecs,
+        child_class_name: str,
     ) -> None:
         """
         Pre-computes everything that can be computed for the smoothing in general as
@@ -111,6 +116,18 @@ class WhittakerLikeSolver:
         self._lam_inter_: models.WhittakerSmoothLambda = init.get_checked_lambda(
             lam=lam
         )
+        self.__child_class_name: str = child_class_name
+
+        # if the difference order exceeds 2, a warning is issued because then the
+        # current implementation cannot guarantee numerical stability
+        if self.differences_ > 2:
+            warn(
+                f"\nWARNING: With the current implementation, the numerical stability "
+                f"of the smoothing cannot be guaranteed for difference orders higher "
+                f"than 2.\n"
+                f"Please refer to the documentation of the class "
+                f"'{self.__child_class_name}' for further information."
+            )
 
         # the squared forward finite difference matrix D.T @ D is computed in band
         # storage format for LAPACK's banded LU decomposition
@@ -188,7 +205,7 @@ class WhittakerLikeSolver:
 
     def _marginal_likelihood_objective(
         self,
-        log_lam: float,
+        log_lam: Union[np.ndarray, float],
         b: np.ndarray,
         w: Union[float, np.ndarray],
         w_plus_penalty_plus_n_samples_term: float,
@@ -203,6 +220,9 @@ class WhittakerLikeSolver:
 
         # first, the linear system of equations is solved with the given penalty weight
         # lambda
+        if isinstance(log_lam, np.ndarray):
+            log_lam = log_lam[0]
+
         lam = exp(log_lam)
 
         # Case 1: no weights are provided
@@ -226,7 +246,7 @@ class WhittakerLikeSolver:
         # to be maximized)
         return (-1.0) * auto.get_log_marginal_likelihood(
             factorization=factorization,  # type: ignore
-            log_lam=log_lam,
+            log_lam=log_lam,  # type: ignore
             lam=lam,
             differences=self.differences_,
             diff_kernel_flipped=self._diff_kernel_flipped_,

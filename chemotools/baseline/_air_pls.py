@@ -129,6 +129,7 @@ class AirPls(
             n_data=X.shape[1],
             differences=self.polynomial_order,
             lam=self.lam,
+            child_class_name=self.__class__.__name__,
         )
 
         return self

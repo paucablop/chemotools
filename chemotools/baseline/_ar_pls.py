@@ -137,6 +137,7 @@ class ArPls(
             n_data=X.shape[1],
             differences=self.differences,
             lam=self.lam,
+            child_class_name=self.__class__.__name__,
         )
 
         return self
