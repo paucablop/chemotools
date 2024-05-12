@@ -278,7 +278,12 @@ class WhittakerLikeSolver:
         # the weights and the weighted series are computed depending on whether weights
         # are provided or not
         # Case 1: no weights are provided
-        if isinstance(w, float):
+        # TODO: this case is not possible under the current implementations for the
+        #       calls of any of the child classes because they either use weights or
+        #       the most efficient way around going into this method in the first place;
+        #       in the future this might change and thus, this case is kept for now, but
+        #       ignored for coverage
+        if isinstance(w, float):  # pragma: no cover
             return (
                 self._solve(
                     lam=lam,
