@@ -282,7 +282,7 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
     # is raised
     if not isinstance(expected_result, ExpectedWhittakerSmoothLambda):
         for meth in methods:
-            with pytest.raises(expected_result):  # type: ignore
+            with pytest.raises(expected_result):
                 models.WhittakerSmoothLambda(
                     bounds=lambda_value,  # type: ignore
                     method=meth,  # type: ignore
@@ -291,7 +291,7 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
         return
 
     # if the expected result is a valid result, the class is instantiated and the
-    # attributes are tested
+    # generated object is compared to the expected result
     for meth in methods:
         lambda_model = models.WhittakerSmoothLambda(
             bounds=lambda_value,  # type: ignore
