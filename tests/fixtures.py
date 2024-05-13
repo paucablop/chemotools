@@ -107,7 +107,7 @@ def spectrum_whittaker_auto_lambda() -> np.ndarray:
         skiprows=1,
     )
 
-    return spectral_data[::, 1]
+    return spectral_data[::, 2]
 
 
 @pytest.fixture
@@ -118,7 +118,7 @@ def noise_level_whittaker_auto_lambda() -> np.ndarray:
         skiprows=1,
     )
 
-    return spectral_data[::, 2]
+    return spectral_data[::, 3]
 
 
 @pytest.fixture
