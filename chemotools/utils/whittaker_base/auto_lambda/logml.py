@@ -64,9 +64,9 @@ def get_log_marginal_likelihood_constant_term(
     # first, the constant terms of the log marginal likelihood are computed starting
     # from the log pseudo-determinant of the weight matrix, i.e., the product of the
     # non-zero elements of the weight vector
-    nonzero_w_idxs = np.where(w > w.max() * zero_weight_tol)[0]
-    nnz_w = nonzero_w_idxs.size
-    log_pseudo_det_w = np.log(w[nonzero_w_idxs]).sum()
+    nonzero_w_flags = w > w.max() * zero_weight_tol
+    nnz_w = nonzero_w_flags.sum()
+    log_pseudo_det_w = np.log(w[nonzero_w_flags]).sum()
 
     # the constant term of the log marginal likelihood is computed
     return (
