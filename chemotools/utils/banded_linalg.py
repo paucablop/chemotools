@@ -30,7 +30,7 @@ LAndUBandCounts = tuple[int, int]
 
 def _datacopied(arr, original):
     """
-    Strictly check for ``arr`` not sharing any data wit ``original``, under the
+    Strictly check for ``arr`` not sharing any data with ``original``, under the
     assumption that ``arr = asarray(original)``
 
     Was copied from Scipy to be consistent in the LAPACK-wrappers implemented here.
