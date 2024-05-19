@@ -10,16 +10,18 @@ test utilities are working as expected as well.
 
 ### Imports ###
 
-from dataclasses import dataclass
-from math import isnan
-from typing import Tuple
+from math import exp, isnan
+from typing import Tuple, Union
 
 import numpy as np
 from scipy.linalg import eigvals_banded
-from scipy.sparse import csr_matrix
+from scipy.optimize import brute, minimize_scalar
+from scipy.sparse import csc_matrix, csr_matrix
 from scipy.sparse import diags as sp_diags
+from scipy.sparse import linalg as spla
 
-from chemotools.utils import models
+from chemotools.utils.finite_differences import calc_forward_diff_kernel
+from chemotools.utils.whittaker_base import WhittakerLikeSolver
 
 ### Utility Functions ###
 
@@ -32,7 +34,7 @@ def float_is_bit_equal(value: float, reference: float) -> bool:
     Doctests
     --------
     >>> # Imports
-    >>> from tests.test_for_utils.utils import float_is_bit_equal
+    >>> from tests.test_for_utils.utils_funcs import float_is_bit_equal
 
     >>> # Test 1
     >>> float_is_bit_equal(value=1.0, reference=1.0)
@@ -76,7 +78,9 @@ def conv_upper_cho_banded_storage_to_sparse(
     >>> # Imports
     >>> import numpy as np
     >>> from numpy import nan
-    >>> from tests.test_for_utils.utils import conv_upper_cho_banded_storage_to_sparse
+    >>> from tests.test_for_utils.utils_funcs import (
+    ...     conv_upper_cho_banded_storage_to_sparse,
+    ... )
 
     >>> # Generating a set of test matrices
     >>> # Matrix 1
@@ -216,7 +220,9 @@ def conv_lu_banded_storage_to_sparse(
     >>> # Imports
     >>> import numpy as np
     >>> from numpy import nan
-    >>> from tests.test_for_utils.utils import conv_lu_banded_storage_to_sparse
+    >>> from tests.test_for_utils.utils_funcs import (
+    ...     conv_lu_banded_storage_to_sparse,
+    ... )
 
     >>> # Generating a set of test matrices
     >>> # Matrix 1
@@ -373,7 +379,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils import (
+    >>> from tests.test_for_utils.utils_funcs import (
     ...     multiply_vect_with_squ_fw_fin_diff_orig_first,
     ... )
 
@@ -513,7 +519,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils import (
+    >>> from tests.test_for_utils.utils_funcs import (
     ...     multiply_vect_with_squ_fw_fin_diff_transpose_first,
     ... )
 
@@ -642,7 +648,7 @@ def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils import (
+    >>> from tests.test_for_utils.utils_funcs import (
     ...     conv_upper_cho_banded_storage_to_sparse,
     ...     get_banded_slogdet,
     ... )
@@ -755,57 +761,486 @@ def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
     return sign, logabsdet
 
 
-### Dataclasses ###
-
-
-@dataclass
-class ExpectedWhittakerSmoothLambda:
+def get_dense_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
     """
-    Dataclass for checking the expected results for the class :class:`WhittakerSmoothLambda`
-    from the module :mod:`chemotools.utils.models`.
+    Creates a dense forward finite difference matrix ``D`` of a given difference order.
+
+    Doctests
+    --------
+    >>> # Imports
+    >>> from tests.test_for_utils.utils_funcs import get_dense_fw_fin_diff_mat
+
+    >>> # Matrix 1
+    >>> n_data, differences = 5, 1
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[-1.,  1.,  0.,  0.,  0.],
+           [ 0., -1.,  1.,  0.,  0.],
+           [ 0.,  0., -1.,  1.,  0.],
+           [ 0.,  0.,  0., -1.,  1.]])
+
+    >>> # Matrix 2
+    >>> n_data, differences = 10, 1
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[-1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0., -1.,  1.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0., -1.,  1.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0., -1.,  1.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0., -1.,  1.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  1.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  1.]])
+
+    >>> # Matrix 3
+    >>> n_data, differences = 5, 2
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[ 1., -2.,  1.,  0.,  0.],
+           [ 0.,  1., -2.,  1.,  0.],
+           [ 0.,  0.,  1., -2.,  1.]])
+
+    >>> # Matrix 4
+    >>> n_data, differences = 10, 2
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[ 1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  1., -2.,  1.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  1., -2.,  1.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  1., -2.,  1.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0.,  1., -2.,  1.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  1., -2.,  1.]])
+
+    >>> # Matrix 4
+    >>> n_data, differences = 5, 3
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[-1.,  3., -3.,  1.,  0.],
+           [ 0., -1.,  3., -3.,  1.]])
+
+    >>> # Matrix 5
+    >>> n_data, differences = 10, 3
+    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    array([[-1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  0., -1.,  3., -3.,  1.,  0.,  0.,  0.],
+           [ 0.,  0.,  0.,  0., -1.,  3., -3.,  1.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0., -1.,  3., -3.,  1.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0., -1.,  3., -3.,  1.]])
+
+    """
+
+    # first, the required constants are obtained from the ``WhittakerLikeSolver``-class
+    dtype = WhittakerLikeSolver._WhittakerLikeSolver__dtype  # type: ignore
+
+    # then, the dense finite difference matrix D is created from the forward difference
+    # kernel
+    diff_kernel = calc_forward_diff_kernel(differences=differences)
+    offsets = np.arange(start=0, stop=diff_kernel.size, step=1, dtype=np.int64)
+    return sp_diags(
+        diagonals=diff_kernel,
+        offsets=offsets,  # type: ignore
+        shape=(n_data - diff_kernel.size + 1, n_data),
+        dtype=dtype,
+        format="csc",
+    )
+
+
+def sparse_slogdet_from_superlu(splu: spla.SuperLU) -> Tuple[float, float]:
+    """
+    Computes the sign and the logarithm of the determinant of a sparse matrix from its
+    SuperLU decomposition.
+
+    References
+    ----------
+    This function is based on the following GIST and its discussion:
+    https://gist.github.com/luizfelippesr/5965a536d202b913beda9878a2f8ef3e
+
+    Doctests
+    --------
+    >>> # Imports
+    >>> import numpy as np
+    >>> import scipy.sparse as sprs
+
+    >>> from tests.test_for_utils.utils_funcs import (
+    ...     sparse_slogdet_from_superlu,
+    ... )
+
+    >>> # Setup of a test with random matrices
+    >>> np.random.seed(42)
+    >>> n_rows = np.random.randint(low=10, high=1_001, size=20)
+    >>> density = 0.5 # chosen to have a high probability of a solvable system
+    >>> n_rows
+    array([112, 445, 870, 280, 116,  81, 710,  30, 624, 131, 476, 224, 340,
+           468,  97, 382, 109, 881, 673, 140])
+
+    >>> # Running the tests in a loop
+    >>> for m in n_rows:
+    ...     iter_i = 0
+    ...     attempts = 10
+    ...     failed = False
+    ...     while iter_i < 10:
+    ...         # a random matrix is generated and if the LU decomposition fails, the
+    ...         # test is repeated (this test is not there to test the LU decomposition)
+    ...         attempts += 1
+    ...         matrix = sprs.random(m=m, n=m, density=density, format="csc")
+    ...         try:
+    ...             splu = sprs.linalg.splu(matrix)
+    ...         except RuntimeError:
+    ...             continue
+    ...
+    ...         # first, the utility function is used to compute the sign and the log
+    ...         # determinant of the matrix
+    ...         sign, logabsdet = sparse_slogdet_from_superlu(splu=splu)
+    ...
+    ...         # then, the sign and the log determinant are computed by NumPy's dense
+    ...         # log determinant function for comparison
+    ...         sign_ref, logabsdet_ref = np.linalg.slogdet(matrix.toarray())
+    ...
+    ...         # the results are compared and if they differ, the test is stopped
+    ...         # with a diagnostic message
+    ...         if not (
+    ...             np.isclose(sign, sign_ref)
+    ...             and np.isclose(logabsdet, logabsdet_ref)
+    ...         ):
+    ...             print(
+    ...                 f"Failed for matrix with shape {m}x{m}: "
+    ...                 f"sign: {sign} vs. {sign_ref} and "
+    ...                 f"logabsdet: {logabsdet} vs. {logabsdet_ref}"
+    ...             )
+    ...             failed = True
+    ...             break
+    ...
+    ...         # if the test is successful, the loop is continued if the number of
+    ...         # attempts is less than 100
+    ...         del splu
+    ...         iter_i += 1
+    ...         if attempts >= 100:
+    ...             print(
+    ...                 f"Could not generate a solvable system for matrix with shape "
+    ...                 f"{m}x{m}"
+    ...             )
+    ...
+    ...     if failed:
+    ...         break
+
+    """
+
+    ### Auxiliary Function ###
+
+    def find_min_num_swaps(arr: np.ndarray):
+        """
+        Minimum number of swaps needed to order a permutation array.
+
+        """
+        # from https://www.thepoorcoder.com/hackerrank-minimum-swaps-2-solution/
+        a = dict(enumerate(arr))
+        b = {v: k for k, v in a.items()}
+        count = 0
+        for i in a:
+            x = a[i]
+            if x != i:
+                y = b[i]
+                a[y] = x
+                b[x] = y
+                count += 1
+
+        return count
+
+    ### Main Part ###
+
+    # the logarithm of the determinant is the sum of the logarithms of the diagonal
+    # elements of the LU decomposition, but since L is unit lower triangular, only the
+    # diagonal elements of U are considered
+    diagU = splu.U.diagonal()
+    logabsdet = np.log(np.abs(diagU)).sum()
+
+    # then, the sign is determined from the diagonal elements of U as well as the row
+    # and column permutations
+    # NOTE: odd number of negative elements/swaps leads to a negative sign
+    fact_sign = -1 if np.count_nonzero(diagU < 0.0) % 2 == 1 else 1
+    row_sign = -1 if find_min_num_swaps(splu.perm_r) % 2 == 1 else 1
+    col_sign = -1 if find_min_num_swaps(splu.perm_c) % 2 == 1 else 1
+    sign = -1.0 if fact_sign * row_sign * col_sign < 0 else 1.0
+
+    return sign, logabsdet
+
+
+def calc_whittaker_smooth_log_marginal_likelihood_const_term(
+    differences: int,
+    diff_mat: csr_matrix,
+    weight_vect: np.ndarray,
+) -> float:
+    """
+    Calculates the constant term of the log marginal likelihood of a Whittaker smoother
+    with a given set of parameters.
+
+    It is given by
+
+    ``(n^ - d) * ln(2 * pi) - ln(pseudo_det(W)) - ln(pseudo_det(D.T @ D))``
+
+    or better
+
+    ``(n^ - d) * ln(2 * pi) - ln(pseudo_det(W)) - ln(det(D @ D.T))``
+
+    For further details, please see the documentation of the function :func:`get_log_marginal_likelihood_constant_term`
+    from the module :mod:`chemotools.utils.whittaker_base.logml`.
+
+    Doctest
+    -------
+    >>> # Imports
+    >>> import numpy as np
+    >>> from tests.test_for_utils.utils_funcs import (
+    ...     calc_whittaker_smooth_log_marginal_likelihood_const_term,
+    ...     get_dense_fw_fin_diff_mat,
+    ... )
+
+    >>> # Generation of the weight matrix W and the finite difference matrix D
+    >>> weights = np.array([0.5, 1.0, 0.5, 1.0, 0.5])
+    >>> n_data, differences = weights.size, 1
+    >>> diff_mat = get_dense_fw_fin_diff_mat(
+    ...     n_data=n_data,
+    ...     differences=differences,
+    ... )
+    >>> diff_mat_dense = diff_mat.toarray()
+
+    >>> # Test 1 with all weights being non-zero
+
+    >>> # Calculation of the log pseudo-determinant of the weight matrix W
+    >>> # since it is diagonal, the log-determinant is the sum of the logarithms of the
+    >>> # diagonal elements
+    >>> log_pseudo_det_w = np.log(weights).sum()
+    >>> log_pseudo_det_w
+    -2.0794415416798357
+
+    >>> # Calculation of the log pseudo-determinant via the Cholesky decomposition of
+    >>> # the product D @ D.T
+    >>> squ_diff_mat_chol = np.linalg.cholesky(diff_mat_dense @ diff_mat_dense.T)
+    >>> squ_diff_mat_chol
+    array([[ 1.41421356,  0.        ,  0.        ,  0.        ],
+           [-0.70710678,  1.22474487,  0.        ,  0.        ],
+           [ 0.        , -0.81649658,  1.15470054,  0.        ],
+           [ 0.        ,  0.        , -0.8660254 ,  1.11803399]])
+    >>> # the sum of the doubled logarithms of the main diagonal elements is the log
+    >>> # pseudo-determinant of the matrix D.T @ D
+    >>> log_pseudo_det_dtd = 2.0 * np.log(np.diag(squ_diff_mat_chol)).sum()
+    >>> log_pseudo_det_dtd
+    1.6094379124341003
+
+    >>> # Calculation of the theoretical constant term
+    >>> logml_theoretical = (
+    ...    (n_data - differences) * np.log(2.0 * np.pi)
+    ...    - log_pseudo_det_w
+    ...    - log_pseudo_det_dtd
+    ... )
+
+    >>> # Calculation of the constant term via the utility function
+    >>> logml_via_function = calc_whittaker_smooth_log_marginal_likelihood_const_term(
+    ...     differences=differences,
+    ...     diff_mat=diff_mat,
+    ...     weight_vect=weights,
+    ... )
+    >>> logml_via_function
+    7.821511894883117
+    >>> np.isclose(logml_via_function, logml_theoretical)
+    True
+
+    >>> # Test 2 with 2 weights being zero
+    >>> weights[1] = 0.0
+    >>> weights[3] = 0.0
+    >>> nonzero_weights_flags = weights > 0.0
+    >>> log_pseudo_det_w = np.log(weights[nonzero_weights_flags]).sum()
+
+    >>> # Calculation of the theoretical constant term
+    >>> logml_theoretical = (
+    ...    (nonzero_weights_flags.sum() - differences) * np.log(2.0 * np.pi)
+    ...    - log_pseudo_det_w
+    ...    - log_pseudo_det_dtd
+    ... )
+
+    >>> # Calculation of the constant term via the utility function
+    >>> logml_via_function = calc_whittaker_smooth_log_marginal_likelihood_const_term(
+    ...     differences=differences,
+    ...     diff_mat=diff_mat,
+    ...     weight_vect=weights,
+    ... )
+    >>> logml_via_function
+    4.145757762064426
+    >>> np.isclose(logml_via_function, logml_theoretical)
+    True
 
     """  # noqa: E501
 
-    fixed_lambda: float
-    auto_bounds: Tuple[float, float]
-    fit_auto: bool
-    method_used: models.WhittakerSmoothMethods
-    log_auto_bounds: Tuple[float, float] = (0.0, 0.0)
+    ### Pre-computation of the constant term ###
 
-    def assert_is_equal_to(self, other: models.WhittakerSmoothLambda) -> None:
+    # first, the required constants are obtained from the ``WhittakerLikeSolver``-class
+    zero_weight_tol = WhittakerLikeSolver._WhittakerLikeSolver__zero_weight_tol  # type: ignore
+
+    # for W, the log pseudo-determinant is calculated ...
+    w_nonzero_idxs = weight_vect > weight_vect.max() * zero_weight_tol
+    nnz_w = w_nonzero_idxs.sum()
+    w_log_pseudo_det = np.log(weight_vect[w_nonzero_idxs]).sum()
+
+    # ... followed by the log pseudo-determinant of the penalty matrix D.T @ D which is
+    # equivalent to the determinant of the flipped matrix D @ D.T which is not
+    # rank-deficient
+    _, penalty_log_pseudo_det = sparse_slogdet_from_superlu(
+        splu=spla.splu(A=diff_mat @ diff_mat.T)
+    )
+
+    # from all of this, the constant term is computed
+    return (
+        (nnz_w - differences) * np.log(2.0 * np.pi)
+        - w_log_pseudo_det
+        - penalty_log_pseudo_det
+    )
+
+
+def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
+    b_vect: np.ndarray,
+    weight_vect: np.ndarray,
+    differences: int,
+    log_lambda_bounds: Tuple[float, float],
+    n_opts: int,
+) -> Tuple[float, float, np.ndarray]:
+    """
+    Finds the optimal lambda value for a Whittaker smoother by maximising the log
+    marginal likelihood via a nested brute-force optimisation followed by a bounded
+    scalar minimisation.
+
+    Since it relies purely on dense linear algebra for highly sparse matrices, this
+    utility function is only suitable for small to medium-sized datasets (n < 500 ...
+    1000).
+
+    """
+
+    ### Definition of the target function ###
+
+    def get_smooth_solution(
+        log_lam: Union[np.ndarray, float]
+    ) -> Tuple[np.ndarray, np.ndarray, float, float]:
         """
-        Checks if the current instance is equal to another instance of the same class.
+        Computes the smooth solution for the Whittaker smoother.
 
         """
 
-        assert other.fit_auto is self.fit_auto
-        assert other.method_used == self.method_used
-        # NOTE: since NAN-values are used, the comparison is split into two parts for
-        #       the fixed lambda value and each of the bounds
-        assert float_is_bit_equal(
-            value=other.fixed_lambda,
-            reference=self.fixed_lambda,
+        # first, the linear system (left hand side) has to be set up for calculating the
+        # smooth solution
+        if isinstance(log_lam, np.ndarray):
+            log_lam = log_lam[0]
+
+        lam = exp(log_lam)
+
+        lhs_matrix = lam * penalty_mat_dense
+        np.fill_diagonal(a=lhs_matrix, val=np.diag(lhs_matrix) + weight_vect)
+
+        # then, the solution is obtained
+        smooth_solution = np.linalg.solve(lhs_matrix, weight_vect * b_vect)
+
+        return (
+            smooth_solution,
+            lhs_matrix,
+            lam,
+            log_lam,  # type: ignore
         )
-        assert float_is_bit_equal(
-            value=other.auto_bounds[0], reference=self.auto_bounds[0]
+
+    def logml_target_func(log_lam: Union[np.ndarray, float]) -> float:
+        """
+        The target function to minimize for maximizing the log marginal likelihood.
+
+        """
+
+        # first, the smooth solution is calculated together with the left-hand side
+        # matrix and the lambda value
+        smooth_solution, lhs_matrix, lam, log_lam = get_smooth_solution(log_lam=log_lam)
+
+        # the log-determinant of the lhs matrix is calculated
+        _, logdet_lhs = np.linalg.slogdet(lhs_matrix)
+
+        # finally, the log marginal likelihood is computed from:
+        # 1) the weighted residual sum of squares
+        wrss = (weight_vect * np.square(b_vect - smooth_solution)).sum()
+
+        # 2) the sum of squared penalties
+        # NOTE: the order of multiplications for the following term is important because
+        #       the last multiplication is a matrix-vector resulting in another vector;
+        #       the other way around would result in another matrix followed by
+        #       a matrix-vector multiplication
+        pss = lam * (smooth_solution @ (penalty_mat_dense @ smooth_solution))
+
+        # 3) the log-determinant of the lhs matrix and the constant term
+        # NOTE: the sign is positive because the log marginal likelihood is maximised
+        #       and not minimised
+        return 0.5 * (
+            wrss
+            + pss
+            - (b_vect.size - differences) * log_lam
+            + logdet_lhs
+            + logml_constant_term
         )
-        assert float_is_bit_equal(
-            value=other.auto_bounds[1],
-            reference=self.auto_bounds[1],
-        )
-        assert float_is_bit_equal(
-            value=other.log_auto_bounds[0],
-            reference=self.log_auto_bounds[0],
-        )
-        assert float_is_bit_equal(
-            value=other.log_auto_bounds[1],
-            reference=self.log_auto_bounds[1],
-        )
+
+    ### Pre-computations ###
+
+    # then, some pre-computations are made
+    n_data = b_vect.size
+    log_lambda_min, log_lambda_max = log_lambda_bounds
+    diff_mat_dense = get_dense_fw_fin_diff_mat(
+        n_data=n_data,
+        differences=differences,
+    )
+    penalty_mat_dense = diff_mat_dense.transpose() @ diff_mat_dense
+    logml_constant_term = calc_whittaker_smooth_log_marginal_likelihood_const_term(
+        differences=differences,
+        diff_mat_dense=diff_mat_dense,
+        weight_vect=weight_vect,
+    )
+
+    ### Running the optimisation ###
+
+    # the first optimisation is run with the target function to narrow down the
+    # search space
+    opt_log_lam = brute(
+        func=logml_target_func,
+        ranges=((log_lambda_min, log_lambda_max),),
+        Ns=n_opts,
+        finish=None,
+        full_output=False,
+    )
+
+    # the search space is narrowed down for the second optimisation to roughly one
+    # decade in the natural log space
+    log_lambda_min = opt_log_lam - 1.2  # type: ignore
+    log_lambda_max = opt_log_lam + 1.2  # type: ignore
+
+    # the second optimisation is run with the target function to find the optimal lambda
+    opt_log_lam = brute(
+        func=logml_target_func,
+        ranges=((log_lambda_min, log_lambda_max),),
+        Ns=n_opts,
+        finish=None,
+        full_output=False,
+    )
+
+    # one more optimisation is run to ensure that the optimal lambda is found
+    log_lambda_min = opt_log_lam - 0.1  # type: ignore
+    log_lambda_max = opt_log_lam + 0.1  # type: ignore
+    opt_log_lam = minimize_scalar(
+        fun=logml_target_func,
+        bounds=(log_lambda_min, log_lambda_max),
+        method="bounded",
+    ).x
+
+    # finally, the solutions for the optimal lambda are returned
+    return (
+        exp(opt_log_lam),
+        (-1.0) * logml_target_func(log_lam=opt_log_lam),
+        get_smooth_solution(log_lam=opt_log_lam)[0],
+    )
 
 
 ### Doctests ###
 
 if __name__ == "__main__":  # pragma: no cover
+
     import doctest
 
     doctest.testmod()

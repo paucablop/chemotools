@@ -16,7 +16,7 @@ from chemotools.utils.finite_differences import (
     gen_squ_fw_fin_diff_mat_cho_banded,
 )
 from tests.fixtures import reference_finite_differences  # noqa: F401
-from tests.test_for_utils.utils import (
+from tests.test_for_utils.utils_funcs import (
     conv_upper_cho_banded_storage_to_sparse,
     multiply_vect_with_squ_fw_fin_diff_orig_first,
     multiply_vect_with_squ_fw_fin_diff_transpose_first,

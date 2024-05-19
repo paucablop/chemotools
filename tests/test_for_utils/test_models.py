@@ -11,7 +11,7 @@ from typing import List, Tuple, Type, Union
 import pytest
 
 from chemotools.utils import models
-from tests.test_for_utils.utils import ExpectedWhittakerSmoothLambda
+from tests.test_for_utils.utils_models import ExpectedWhittakerSmoothLambda
 
 ### Type aliases ###
 
