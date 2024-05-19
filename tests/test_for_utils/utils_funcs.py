@@ -64,9 +64,7 @@ def float_is_bit_equal(value: float, reference: float) -> bool:
     return value == reference
 
 
-def conv_upper_cho_banded_storage_to_sparse(
-    ab: np.ndarray,
-) -> csr_matrix:
+def conv_upper_cho_banded_storage_to_sparse(ab: np.ndarray) -> csr_matrix:
     """
     Converts a banded matrix stored in the upper banded storage used for LAPACK's banded
     Cholesky decomposition to a sparse ``CSR`` matrix.
@@ -207,7 +205,8 @@ def conv_upper_cho_banded_storage_to_sparse(
 
 
 def conv_lu_banded_storage_to_sparse(
-    ab: np.ndarray, l_and_u: Tuple[int, int]
+    ab: np.ndarray,
+    l_and_u: Tuple[int, int],
 ) -> csr_matrix:
     """
     Converts a banded matrix stored in the banded storage used for LAPACK's banded LU
@@ -761,18 +760,18 @@ def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
     return sign, logabsdet
 
 
-def get_dense_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
+def get_sparse_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
     """
     Creates a dense forward finite difference matrix ``D`` of a given difference order.
 
     Doctests
     --------
     >>> # Imports
-    >>> from tests.test_for_utils.utils_funcs import get_dense_fw_fin_diff_mat
+    >>> from tests.test_for_utils.utils_funcs import get_sparse_fw_fin_diff_mat
 
     >>> # Matrix 1
     >>> n_data, differences = 5, 1
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[-1.,  1.,  0.,  0.,  0.],
            [ 0., -1.,  1.,  0.,  0.],
            [ 0.,  0., -1.,  1.,  0.],
@@ -780,7 +779,7 @@ def get_dense_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
 
     >>> # Matrix 2
     >>> n_data, differences = 10, 1
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[-1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
@@ -793,14 +792,14 @@ def get_dense_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
 
     >>> # Matrix 3
     >>> n_data, differences = 5, 2
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[ 1., -2.,  1.,  0.,  0.],
            [ 0.,  1., -2.,  1.,  0.],
            [ 0.,  0.,  1., -2.,  1.]])
 
     >>> # Matrix 4
     >>> n_data, differences = 10, 2
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[ 1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.],
@@ -812,13 +811,13 @@ def get_dense_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
 
     >>> # Matrix 4
     >>> n_data, differences = 5, 3
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[-1.,  3., -3.,  1.,  0.],
            [ 0., -1.,  3., -3.,  1.]])
 
     >>> # Matrix 5
     >>> n_data, differences = 10, 3
-    >>> get_dense_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
     array([[-1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.],
@@ -967,7 +966,7 @@ def sparse_slogdet_from_superlu(splu: spla.SuperLU) -> Tuple[float, float]:
 
 def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     differences: int,
-    diff_mat: csr_matrix,
+    diff_mat: csc_matrix,
     weight_vect: np.ndarray,
 ) -> float:
     """
@@ -991,13 +990,13 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     >>> import numpy as np
     >>> from tests.test_for_utils.utils_funcs import (
     ...     calc_whittaker_smooth_log_marginal_likelihood_const_term,
-    ...     get_dense_fw_fin_diff_mat,
+    ...     get_sparse_fw_fin_diff_mat,
     ... )
 
     >>> # Generation of the weight matrix W and the finite difference matrix D
     >>> weights = np.array([0.5, 1.0, 0.5, 1.0, 0.5])
     >>> n_data, differences = weights.size, 1
-    >>> diff_mat = get_dense_fw_fin_diff_mat(
+    >>> diff_mat = get_sparse_fw_fin_diff_mat(
     ...     n_data=n_data,
     ...     differences=differences,
     ... )
@@ -1084,7 +1083,7 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     # equivalent to the determinant of the flipped matrix D @ D.T which is not
     # rank-deficient
     _, penalty_log_pseudo_det = sparse_slogdet_from_superlu(
-        splu=spla.splu(A=diff_mat @ diff_mat.T)
+        splu=spla.splu(A=diff_mat @ diff_mat.transpose())
     )
 
     # from all of this, the constant term is computed
@@ -1117,7 +1116,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
 
     def get_smooth_solution(
         log_lam: Union[np.ndarray, float]
-    ) -> Tuple[np.ndarray, np.ndarray, float, float]:
+    ) -> Tuple[np.ndarray, spla.SuperLU, float, float]:
         """
         Computes the smooth solution for the Whittaker smoother.
 
@@ -1130,15 +1129,21 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
 
         lam = exp(log_lam)
 
-        lhs_matrix = lam * penalty_mat_dense
-        np.fill_diagonal(a=lhs_matrix, val=np.diag(lhs_matrix) + weight_vect)
+        lhs_mat = lam * penalty_mat
+        lhs_mat += sp_diags(
+            diagonals=weight_vect,
+            offsets=0,
+            shape=(b_vect.size, b_vect.size),
+            format="csc",
+        )
 
         # then, the solution is obtained
-        smooth_solution = np.linalg.solve(lhs_matrix, weight_vect * b_vect)
+        lhs_splu = spla.splu(A=lhs_mat)
+        smooth_solution = lhs_splu.solve(rhs=weight_vect * b_vect)
 
         return (
             smooth_solution,
-            lhs_matrix,
+            lhs_splu,
             lam,
             log_lam,  # type: ignore
         )
@@ -1151,10 +1156,10 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
 
         # first, the smooth solution is calculated together with the left-hand side
         # matrix and the lambda value
-        smooth_solution, lhs_matrix, lam, log_lam = get_smooth_solution(log_lam=log_lam)
+        smooth_solution, lhs_splu, lam, log_lam = get_smooth_solution(log_lam=log_lam)
 
         # the log-determinant of the lhs matrix is calculated
-        _, logdet_lhs = np.linalg.slogdet(lhs_matrix)
+        _, logdet_lhs = sparse_slogdet_from_superlu(splu=lhs_splu)
 
         # finally, the log marginal likelihood is computed from:
         # 1) the weighted residual sum of squares
@@ -1165,7 +1170,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
         #       the last multiplication is a matrix-vector resulting in another vector;
         #       the other way around would result in another matrix followed by
         #       a matrix-vector multiplication
-        pss = lam * (smooth_solution @ (penalty_mat_dense @ smooth_solution))
+        pss = lam * (smooth_solution @ (penalty_mat @ smooth_solution))
 
         # 3) the log-determinant of the lhs matrix and the constant term
         # NOTE: the sign is positive because the log marginal likelihood is maximised
@@ -1183,14 +1188,14 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
     # then, some pre-computations are made
     n_data = b_vect.size
     log_lambda_min, log_lambda_max = log_lambda_bounds
-    diff_mat_dense = get_dense_fw_fin_diff_mat(
+    diff_mat = get_sparse_fw_fin_diff_mat(
         n_data=n_data,
         differences=differences,
     )
-    penalty_mat_dense = diff_mat_dense.transpose() @ diff_mat_dense
+    penalty_mat = (diff_mat.transpose() @ diff_mat).tocsc()  # type: ignore
     logml_constant_term = calc_whittaker_smooth_log_marginal_likelihood_const_term(
         differences=differences,
-        diff_mat_dense=diff_mat_dense,
+        diff_mat=diff_mat,
         weight_vect=weight_vect,
     )
 
