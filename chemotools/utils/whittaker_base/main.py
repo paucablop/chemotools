@@ -208,7 +208,7 @@ class WhittakerLikeSolver:
         self,
         log_lam: float,
         b: np.ndarray,
-        w: Union[float, np.ndarray],
+        w: np.ndarray,
         w_plus_penalty_plus_n_samples_term: float,
     ) -> float:
         """
@@ -223,21 +223,12 @@ class WhittakerLikeSolver:
         # lambda
         lam = exp(log_lam)
 
-        # Case 1: no weights are provided
-        if isinstance(w, float):
-            b_smooth, _, factorization = self._solve(
-                lam=lam,
-                b_weighted=b,
-                w=w,
-            )
-
-        # Case 2: weights are provided
-        else:
-            b_smooth, _, factorization = self._solve(
-                lam=lam,
-                b_weighted=b * w,
-                w=w,
-            )
+        # the solution of the linear system of equations is computed
+        b_smooth, _, factorization = self._solve(
+            lam=lam,
+            b_weighted=b * w,
+            w=w,
+        )
 
         # finally, the log marginal likelihood is computed and returned (negative since
         # the objective function is minimized, but the log marginal likelihood is

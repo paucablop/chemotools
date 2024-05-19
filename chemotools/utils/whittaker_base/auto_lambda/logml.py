@@ -181,7 +181,9 @@ def get_log_marginal_likelihood(
 
     # otherwise, if the determinant is negative, the system is extremely
     # ill-conditioned and the log marginal likelihood cannot be computed
-    raise RuntimeError(
+    # NOTE: since it is very hard to trigger this exception, it is not covered by the
+    #       tests
+    raise RuntimeError( # pragma: no cover
         "\nThe determinant of the combined left hand side matrix "
         "W + lambda * D.T @ D is negative, indicating that the system is extremely "
         "ill-conditioned.\n"
