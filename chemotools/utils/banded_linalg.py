@@ -395,7 +395,7 @@ def slogdet_lu_banded(
         step=1,
         dtype=lub_factorization.ipiv.dtype,
     )
-    num_row_exchanges = np.count_nonzero(lub_factorization.ipiv - unchanged_row_idxs)
+    num_row_exchanges = np.count_nonzero(lub_factorization.ipiv != unchanged_row_idxs)
 
     # the sign-prefactor of the determinant is either +1 or -1 depending on whether the
     # number of row exchanges is even or odd
