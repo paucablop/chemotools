@@ -206,7 +206,7 @@ class WhittakerLikeSolver:
 
     def _marginal_likelihood_objective(
         self,
-        log_lam: Union[np.ndarray, float],
+        log_lam: float,
         b: np.ndarray,
         w: Union[float, np.ndarray],
         w_plus_penalty_plus_n_samples_term: float,
@@ -221,9 +221,6 @@ class WhittakerLikeSolver:
 
         # first, the linear system of equations is solved with the given penalty weight
         # lambda
-        if isinstance(log_lam, np.ndarray):
-            log_lam = log_lam[0]
-
         lam = exp(log_lam)
 
         # Case 1: no weights are provided

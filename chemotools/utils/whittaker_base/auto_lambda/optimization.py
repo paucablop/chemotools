@@ -10,7 +10,7 @@ cluttered the class implementation.
 from math import ceil, exp
 from typing import Callable, Tuple
 
-from scipy.optimize import OptimizeResult, brute, minimize_scalar
+from scipy.optimize import minimize_scalar
 
 from chemotools.utils.models import WhittakerSmoothLambda
 
@@ -18,36 +18,9 @@ from chemotools.utils.models import WhittakerSmoothLambda
 
 _LN_TEN: float = 2.302585092994046  # ln(10)
 _half_log_decade: float = 0.5 * _LN_TEN
-_X_ABS_LOG_TOL: float = 0.05
+_X_ABS_LOG_TOL: float = 0.0049  # ~0.5% when converted from log to real
 
 ### Optimization Functions ###
-
-
-def finish_lambda_optimization(
-    fun: Callable[..., float],
-    xmin: float,
-    args: Tuple,
-) -> OptimizeResult:
-    """
-    This function is used to finish the optimization of the penalty weight lambda
-    after the initial optimization has been performed with the ``brute`` method.
-
-    It spans an interval of +- half a decade around the minimum found by the brute force
-    method and then performs a scalar optimization with the ``minimize_scalar`` method.
-
-    """
-
-    # first, the bounds for the scalar optimization are set
-    bounds = (xmin - _half_log_decade, xmin + _half_log_decade)
-
-    # now, the scalar optimization is performed
-    return minimize_scalar(
-        fun=fun,
-        bounds=bounds,
-        args=args,
-        method="bounded",
-        options={"xatol": _X_ABS_LOG_TOL},
-    )
 
 
 def get_optimized_lambda(
@@ -56,39 +29,51 @@ def get_optimized_lambda(
     args: Tuple,
 ) -> float:
     """
-    This function optimizes the penalty weight lambda with the brute force method.
+    This function optimises the penalty weight lambda with the brute force method.
+
+    Since the number of optimisations carried out is so little, the function uses a
+    custom from-scratch-implementation of a brute force search to tackle the problem
+    directly without too much overhead.
+    This will also allow for a more direct control in case this is taken to a lower
+    level implementation in the future.
 
     """
 
-    # first, the number of steps is computed in a way that the step size is roughly
-    # half a decade
-    # if the bounds are at max one decade apart, the finish optimization can be run
-    # directly
+    # unless the search space spans less than 1 decade, i.e., ln(10) ~= 2.3, a grid
+    # search is carried out to shrink the search space for the final optimization;
+    # the grid is spanned with an integer number of steps of half a decade
     log_low_bound, log_upp_bound = lam.log_auto_bounds
     bound_log_diff = log_upp_bound - log_low_bound
-    if bound_log_diff <= _LN_TEN:
-        return minimize_scalar(
+    if bound_log_diff > _LN_TEN:
+        target_best = float("inf")
+        n_steps = 1 + ceil(bound_log_diff / _half_log_decade)
+        # NOTE: the following ensures that the upper bound is not exceeded
+        step_size = bound_log_diff / (n_steps - 1)
+
+        # all the trial values are evaluated and the best one is stored
+        for trial in range(0, n_steps):
+            log_lam_curr = log_low_bound + trial * step_size
+            target_curr = fun(log_lam_curr, *args)
+
+            if target_curr < target_best:
+                log_lam_best = log_lam_curr
+                target_best = target_curr
+
+        # then, the bounds for the final optimization are shrunk to plus/minus half
+        # a decade around the best trial value
+        # NOTE: the following ensures that the bounds are not violated
+        log_low_bound = max(log_lam_best - _half_log_decade, log_low_bound)
+        log_upp_bound = min(log_lam_best + _half_log_decade, log_upp_bound)
+
+    # finally, a scalar optimization is performed
+    # NOTE: since the optimization is carried out over the log of lambda, the
+    #       exponential of the result is returned
+    return exp(
+        minimize_scalar(
             fun=fun,
             bounds=(log_low_bound, log_upp_bound),
             args=args,
             method="bounded",
             options={"xatol": _X_ABS_LOG_TOL},
         ).x
-
-    # otherwise, the number of steps is computed ...
-    n_steps = 1 + ceil(bound_log_diff / _half_log_decade)
-
-    # ...and the brute force optimization with final polish is performed
-    # NOTE: ``brute`` can work with floats internally and this is exploited here
-    # NOTE: since the optimization is carried out over the log of lambda, the
-    #       exponential of the result is returned
-    return exp(
-        brute(  # type: ignore
-            func=fun,
-            ranges=(lam.log_auto_bounds,),
-            Ns=n_steps,
-            args=args,
-            finish=finish_lambda_optimization,
-            full_output=False,
-        )
     )
