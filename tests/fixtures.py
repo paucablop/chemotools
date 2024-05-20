@@ -1,12 +1,23 @@
+### Imports ###
+
 import os
 from typing import List
 
 import numpy as np
 import pytest
 
+from tests.test_for_utils.utils_models import (
+    NoiseEstimationReference,
+    RefDifferenceKernel,
+)
+
+### Constants ###
+
 test_directory = os.path.dirname(os.path.abspath(__file__))
 
 path_to_resources = os.path.join(test_directory, "resources")
+
+### Fixtures ###
 
 
 @pytest.fixture
@@ -122,12 +133,11 @@ def noise_level_whittaker_auto_lambda() -> np.ndarray:
 
 
 @pytest.fixture
-def reference_finite_differences() -> List[tuple[int, int, np.ndarray]]:
+def reference_forward_finite_differences() -> List[RefDifferenceKernel]:
     fin_diff_table = np.genfromtxt(
         os.path.join(path_to_resources, "reference_finite_differences.csv"),
         skip_header=2,
         delimiter=",",
-        missing_values="#N/A",
         filling_values=np.nan,
         dtype=np.float64,
     )
@@ -138,11 +148,73 @@ def reference_finite_differences() -> List[tuple[int, int, np.ndarray]]:
         # removed
         row = fin_diff_table[row_idx, ::]
         fin_diff_ordered_coeffs.append(
-            (
-                int(row[0]),
-                int(row[1]),
-                row[2:][~np.isnan(row[2:])],
+            RefDifferenceKernel(
+                differences=round(row[0]),
+                accuracy=round(row[1]),
+                kernel=row[2:][~np.isnan(row[2:])],
             )
         )
 
     return fin_diff_ordered_coeffs
+
+
+@pytest.fixture
+def noise_level_estimation_signal() -> np.ndarray:
+    fpath = os.path.join(
+        path_to_resources,
+        "noise_level_estimation/noise_estimation_refs.csv",
+    )
+    data = np.genfromtxt(
+        fpath,
+        delimiter=",",
+        skip_header=1,
+        filling_values=np.nan,
+        dtype=np.float64,
+    )
+
+    # the original signal is indicated by the first 4 columns with metadata being NaN
+    metadata = data[::, 0:4]
+    signal_idx = np.where(np.isnan(metadata).all(axis=1))[0][0]
+
+    return data[signal_idx, 4:]
+
+
+@pytest.fixture
+def noise_level_estimation_refs() -> List[NoiseEstimationReference]:
+    fpath = os.path.join(
+        path_to_resources,
+        "noise_level_estimation/noise_estimation_refs.csv",
+    )
+    data = np.genfromtxt(
+        fpath,
+        delimiter=",",
+        skip_header=1,
+        filling_values=np.nan,
+        dtype=np.float64,
+    )
+
+    # the original signal is indicated by the first 4 columns with metadata being NaN
+    # it has to be excluded from the references
+    metadata = data[::, 0:4]
+    signal_idx = np.where(np.isnan(metadata).all(axis=1))[0][0]
+    data = np.delete(data, obj=signal_idx, axis=0)
+
+    # then, all the references are extracted
+    noise_level_refs = []
+    for row_idx in range(0, data.shape[0]):
+        row = data[row_idx, ::]
+        # if the window size is 0, it is set to None because this indicates that the
+        # global noise level is to be estimated rather than a local one
+        window_size = int(row[0])
+        window_size = window_size if window_size > 0 else None
+        noise_level_refs.append(
+            NoiseEstimationReference(
+                window_size=window_size,
+                min_noise_level=row[1],
+                differences=round(row[2]),
+                accuracy=round(row[3]),
+                noise_level=row[4:],
+            )
+        )
+
+    return noise_level_refs

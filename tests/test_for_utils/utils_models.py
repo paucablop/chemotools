@@ -6,13 +6,53 @@ This script implements utility models required for testing the
 
 ### Imports ###
 
-from dataclasses import dataclass
-from typing import Tuple
+from dataclasses import dataclass, field
+from typing import Dict, Literal, Optional, Tuple
+
+import numpy as np
 
 from chemotools.utils import _models
 from tests.test_for_utils.utils_funcs import float_is_bit_equal
 
 ### Dataclasses ###
+
+
+@dataclass
+class RefDifferenceKernel:
+    """
+    Dataclass for storing the reference for the difference kernel validity check.
+
+    """
+
+    differences: int
+    accuracy: int
+    kernel: np.ndarray
+
+    size: int = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.size = self.kernel.size
+
+
+@dataclass
+class NoiseEstimationReference:
+    """
+    Dataclass for storing the reference for the noise estimation validity check.
+
+    """
+
+    window_size: Optional[int]
+    min_noise_level: float
+    differences: int
+    accuracy: int
+    noise_level: np.ndarray
+
+    raised_noise_levels: Dict[Literal[-2, -1, 1, 2], np.ndarray] = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.raised_noise_levels = {
+            power: self.noise_level**power for power in (-2, -1, 1, 2)
+        }
 
 
 @dataclass
