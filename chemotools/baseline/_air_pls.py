@@ -24,7 +24,7 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input
-from chemotools.utils.whittaker_base import WhittakerLikeSolver
+from chemotools.utils._whittaker_base import WhittakerLikeSolver
 
 logger = logging.getLogger(__name__)
 

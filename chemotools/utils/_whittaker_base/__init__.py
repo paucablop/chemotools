@@ -18,4 +18,4 @@ from chemotools.utils.models import (  # noqa: F401
     WhittakerSmoothLambda,
     WhittakerSmoothMethods,
 )
-from chemotools.utils.whittaker_base.main import WhittakerLikeSolver  # noqa: F401
+from chemotools.utils._whittaker_base.main import WhittakerLikeSolver  # noqa: F401

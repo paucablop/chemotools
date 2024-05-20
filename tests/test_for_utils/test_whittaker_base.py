@@ -13,14 +13,14 @@ import numpy as np
 import pytest
 
 from chemotools.utils import models
-from chemotools.utils.whittaker_base.auto_lambda.shared import get_smooth_wrss
-from chemotools.utils.whittaker_base.initialisation import (
+from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
+from chemotools.utils._whittaker_base.initialisation import (
     get_checked_lambda,
     get_penalty_log_pseudo_det,
 )
-from chemotools.utils.whittaker_base.main import WhittakerLikeSolver
-from chemotools.utils.whittaker_base.misc import get_weight_generator
-from chemotools.utils.whittaker_base.solvers import solve_normal_equations
+from chemotools.utils._whittaker_base.main import WhittakerLikeSolver
+from chemotools.utils._whittaker_base.misc import get_weight_generator
+from chemotools.utils._whittaker_base.solvers import solve_normal_equations
 from tests.fixtures import noise_level_whittaker_auto_lambda  # noqa: F401
 from tests.fixtures import spectrum_whittaker_auto_lambda  # noqa: F401
 from tests.test_for_utils.utils_funcs import (

@@ -13,7 +13,7 @@ import numpy as np
 
 from chemotools.utils import banded_linalg as bla
 from chemotools.utils import models
-from chemotools.utils.whittaker_base.auto_lambda.shared import get_smooth_wrss
+from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
 
 ### Constants ###
 
