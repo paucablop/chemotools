@@ -29,7 +29,7 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.utils.models import BandedSolvers
+from chemotools.utils._models import BandedSolvers
 from tests.fixtures import reference_airpls  # noqa: F401
 from tests.fixtures import reference_arpls  # noqa: F401
 from tests.fixtures import reference_msc_mean  # noqa: F401

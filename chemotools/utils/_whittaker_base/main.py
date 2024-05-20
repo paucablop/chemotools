@@ -15,7 +15,7 @@ from warnings import warn
 import numpy as np
 
 from chemotools._runtime import PENTAPY_AVAILABLE
-from chemotools.utils import models
+from chemotools.utils import _models
 from chemotools.utils._banded_linalg import LAndUBandCounts
 from chemotools.utils._whittaker_base import auto_lambda as auto
 from chemotools.utils._whittaker_base import initialisation as init
@@ -113,7 +113,7 @@ class WhittakerLikeSolver:
         # the input arguments are stored and validated
         self.n_data_: int = n_data
         self.differences_: int = differences
-        self._lam_inter_: models.WhittakerSmoothLambda = init.get_checked_lambda(
+        self._lam_inter_: _models.WhittakerSmoothLambda = init.get_checked_lambda(
             lam=lam
         )
         self.__child_class_name: str = child_class_name
@@ -147,7 +147,7 @@ class WhittakerLikeSolver:
         self._diff_kernel_flipped_: np.ndarray = np.ndarray([], dtype=self.__dtype)
         self._penalty_mat_log_pseudo_det_: float = float("nan")
         if self._lam_inter_.fit_auto and self._lam_inter_.method_used in {
-            models.WhittakerSmoothMethods.LOGML,
+            _models.WhittakerSmoothMethods.LOGML,
         }:
             # NOTE: the kernel is also returned with integer entries because integer
             #       computations can be carried out at maximum precision
@@ -178,7 +178,7 @@ class WhittakerLikeSolver:
         lam: float,
         b_weighted: np.ndarray,
         w: Union[float, np.ndarray],
-    ) -> tuple[np.ndarray, models.BandedSolvers, auto._Factorization]:
+    ) -> tuple[np.ndarray, _models.BandedSolvers, auto._Factorization]:
         """
         Internal wrapper for the solver methods to solve the linear system of equations
         for the Whittaker-like smoother.
@@ -422,8 +422,8 @@ class WhittakerLikeSolver:
         # first, the smoothing method is specified depending on whether the penalty
         # weight lambda is fitted automatically or not
         smooth_method_assignment = {
-            models.WhittakerSmoothMethods.FIXED: self._solve_single_b_fixed_lam,
-            models.WhittakerSmoothMethods.LOGML: self._solve_single_b_auto_lam_logml,
+            _models.WhittakerSmoothMethods.FIXED: self._solve_single_b_fixed_lam,
+            _models.WhittakerSmoothMethods.LOGML: self._solve_single_b_auto_lam_logml,
         }
         smooth_method = smooth_method_assignment[self._lam_inter_.method_used]
 

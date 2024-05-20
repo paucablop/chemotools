@@ -16,7 +16,7 @@ as well as auxiliary models to allow for convenient usage of the them:
 
 ### Imports ###
 
-from chemotools.utils.models import (   # noqa: F401
+from chemotools.utils._models import (   # noqa: F401
     WhittakerSmoothLambda,
     WhittakerSmoothMethods,
 )

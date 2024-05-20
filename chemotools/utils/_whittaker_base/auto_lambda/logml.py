@@ -12,7 +12,7 @@ from typing import Union
 import numpy as np
 
 from chemotools.utils import _banded_linalg as bla
-from chemotools.utils import models
+from chemotools.utils import _models
 from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
 
 ### Constants ###
@@ -22,7 +22,7 @@ _LN_TWO_PI: float = 1.8378770664093453  # ln(2 * pi)
 ### Type Aliases ###
 
 # TODO: add QR factorization
-_FactorizationForLogMarginalLikelihood = models.BandedLUFactorization
+_FactorizationForLogMarginalLikelihood = _models.BandedLUFactorization
 
 ### Functions ###
 

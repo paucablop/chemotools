@@ -12,7 +12,7 @@ from typing import Any, Tuple, Type, Union
 import numpy as np
 import pytest
 
-from chemotools.utils import models
+from chemotools.utils import _models
 from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
 from chemotools.utils._whittaker_base.initialisation import (
     get_checked_lambda,
@@ -31,7 +31,7 @@ from tests.test_for_utils.utils_models import ExpectedWhittakerSmoothLambda
 ### Type Aliases ###
 
 _RealNumeric = Union[float, int]
-_WhittakerMethod = Union[str, models.WhittakerSmoothMethods]
+_WhittakerMethod = Union[str, _models.WhittakerSmoothMethods]
 _LambdaSpecs = Union[_RealNumeric, Tuple[_RealNumeric, _RealNumeric, _WhittakerMethod]]
 _LambdaSpecsOrFlawed = Union[_LambdaSpecs, str]
 
@@ -51,7 +51,7 @@ _NAN: float = float("nan")
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=models.WhittakerSmoothMethods.FIXED,
+                method_used=_models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
@@ -61,17 +61,17 @@ _NAN: float = float("nan")
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=models.WhittakerSmoothMethods.FIXED,
+                method_used=_models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
         (  # Number 2 (float search space, log marginal likelihood method enum)
-            (100.0, 10_000.0, models.WhittakerSmoothMethods.LOGML),
+            (100.0, 10_000.0, _models.WhittakerSmoothMethods.LOGML),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
@@ -81,17 +81,17 @@ _NAN: float = float("nan")
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 4 (integer search space, log marginal likelihood method enum)
-            (100, 10_000, models.WhittakerSmoothMethods.LOGML),
+            (100, 10_000, _models.WhittakerSmoothMethods.LOGML),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
@@ -101,59 +101,59 @@ _NAN: float = float("nan")
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 6 (dataclass float specification; fixed method)
-            models.WhittakerSmoothLambda(
+            _models.WhittakerSmoothLambda(
                 bounds=100.0,
-                method=models.WhittakerSmoothMethods.FIXED,
+                method=_models.WhittakerSmoothMethods.FIXED,
             ),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=models.WhittakerSmoothMethods.FIXED,
+                method_used=_models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
         (  # Number 7 (dataclass integer specification; fixed method)
-            models.WhittakerSmoothLambda(
+            _models.WhittakerSmoothLambda(
                 bounds=100,
-                method=models.WhittakerSmoothMethods.FIXED,
+                method=_models.WhittakerSmoothMethods.FIXED,
             ),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=100.0,
                 auto_bounds=(_NAN, _NAN),
                 fit_auto=False,
-                method_used=models.WhittakerSmoothMethods.FIXED,
+                method_used=_models.WhittakerSmoothMethods.FIXED,
                 log_auto_bounds=(_NAN, _NAN),
             ),
         ),
         (  # Number 8 (dataclass float specification; log marginal likelihood method)
-            models.WhittakerSmoothLambda(
+            _models.WhittakerSmoothLambda(
                 bounds=(100.0, 10_000.0),
-                method=models.WhittakerSmoothMethods.LOGML,
+                method=_models.WhittakerSmoothMethods.LOGML,
             ),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
         (  # Number 9 (dataclass integer specification; log marginal likelihood method)
-            models.WhittakerSmoothLambda(
+            _models.WhittakerSmoothLambda(
                 bounds=(100, 10_000),
-                method=models.WhittakerSmoothMethods.LOGML,
+                method=_models.WhittakerSmoothMethods.LOGML,
             ),
             ExpectedWhittakerSmoothLambda(
                 fixed_lambda=_NAN,
                 auto_bounds=(100.0, 10_000.0),
                 fit_auto=True,
-                method_used=models.WhittakerSmoothMethods.LOGML,
+                method_used=_models.WhittakerSmoothMethods.LOGML,
                 log_auto_bounds=(log(100.0), log(10_000.0)),
             ),
         ),
@@ -195,7 +195,7 @@ def test_get_checked_lambda(
 
     # otherwise, the output dataclass is compared to the expected output
     lambda_model = get_checked_lambda(lam=lam)
-    if isinstance(lambda_model, models.WhittakerSmoothLambda):
+    if isinstance(lambda_model, _models.WhittakerSmoothLambda):
         expected_result.assert_is_equal_to(other=lambda_model)
 
         return
@@ -422,9 +422,9 @@ def test_whittakerlike_issues_warning_difference_order_too_high() -> None:
         whitt_base._setup_for_fit(
             n_data=500,
             differences=3,
-            lam=models.WhittakerSmoothLambda(
+            lam=_models.WhittakerSmoothLambda(
                 bounds=(100.0, 10_000.0),
-                method=models.WhittakerSmoothMethods.LOGML,
+                method=_models.WhittakerSmoothMethods.LOGML,
             ),
             child_class_name="pytest_run",
         )
@@ -452,9 +452,9 @@ def test_auto_lambda_log_marginal_likelihood_refuses_no_weights(
     whitt_base._setup_for_fit(
         n_data=n_data,
         differences=differences,
-        lam=models.WhittakerSmoothLambda(
+        lam=_models.WhittakerSmoothLambda(
             bounds=(100.0, 10_000.0),
-            method=models.WhittakerSmoothMethods.LOGML,
+            method=_models.WhittakerSmoothMethods.LOGML,
         ),
         child_class_name="pytest_run",
     )
@@ -531,9 +531,9 @@ def test_auto_lambda_log_marginal_likelihood(
     whitt_base._setup_for_fit(
         n_data=X.shape[1],
         differences=differences,
-        lam=models.WhittakerSmoothLambda(
+        lam=_models.WhittakerSmoothLambda(
             bounds=lambda_bounds,
-            method=models.WhittakerSmoothMethods.LOGML,
+            method=_models.WhittakerSmoothMethods.LOGML,
         ),
         child_class_name="pytest_run",
     )

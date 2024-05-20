@@ -11,11 +11,13 @@ from typing import Union
 
 import numpy as np
 
-from chemotools.utils import models
+from chemotools.utils import _models
 
 ### Type Aliases ###
 
-_Factorization = Union[models.BandedLUFactorization, models.BandedPentapyFactorization]
+_Factorization = Union[
+    _models.BandedLUFactorization, _models.BandedPentapyFactorization
+]
 
 ### Functions ###
 

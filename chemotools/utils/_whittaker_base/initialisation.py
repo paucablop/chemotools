@@ -12,14 +12,14 @@ import numpy as np
 
 from chemotools.utils import _banded_linalg as bla
 from chemotools.utils import finite_differences as fdiff
-from chemotools.utils import models
-from chemotools.utils.types import RealNumeric
+from chemotools.utils import _models
+from chemotools.utils._types import RealNumeric
 
 ### Type Aliases ###
 
 _StrWhittakerSmoothMethods = Literal["fixed", "logml"]
 _AllWhittakerSmoothMethods = Union[
-    models.WhittakerSmoothMethods, _StrWhittakerSmoothMethods
+    _models.WhittakerSmoothMethods, _StrWhittakerSmoothMethods
 ]
 _WhittakerSmoothLambdaPlain = Tuple[
     RealNumeric,
@@ -29,7 +29,7 @@ _WhittakerSmoothLambdaPlain = Tuple[
 _LambdaSpecs = Union[
     RealNumeric,
     _WhittakerSmoothLambdaPlain,
-    models.WhittakerSmoothLambda,
+    _models.WhittakerSmoothLambda,
 ]
 
 ### Constants ###
@@ -39,7 +39,7 @@ RealNumericTypes = (int, float)
 ### Functions ###
 
 
-def get_checked_lambda(lam: Any) -> models.WhittakerSmoothLambda:
+def get_checked_lambda(lam: Any) -> _models.WhittakerSmoothLambda:
     """
     Checks the penalty weights lambda and casts it to the respective dataclass used
     inside the ``WhittakerLikeSolver`` class.
@@ -48,14 +48,14 @@ def get_checked_lambda(lam: Any) -> models.WhittakerSmoothLambda:
 
     # if lambda is already the correct dataclass, it can be returned directly since all
     # the checks have already been performed
-    if isinstance(lam, models.WhittakerSmoothLambda):
+    if isinstance(lam, _models.WhittakerSmoothLambda):
         return lam
 
     # now, there are other cases to check
     # Case 1: lambda is a single number
     if isinstance(lam, RealNumericTypes):
-        return models.WhittakerSmoothLambda(
-            bounds=lam, method=models.WhittakerSmoothMethods.FIXED
+        return _models.WhittakerSmoothLambda(
+            bounds=lam, method=_models.WhittakerSmoothMethods.FIXED
         )
 
     # Case 2: lambda is a tuple
@@ -69,7 +69,7 @@ def get_checked_lambda(lam: Any) -> models.WhittakerSmoothLambda:
             )
 
         # otherwise, the tuple is unpacked and the dataclass is created
-        return models.WhittakerSmoothLambda(
+        return _models.WhittakerSmoothLambda(
             bounds=(lam[0], lam[1]),
             method=lam[2],
         )

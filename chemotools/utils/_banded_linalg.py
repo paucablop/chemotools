@@ -18,7 +18,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 from scipy.linalg import lapack
 
-from chemotools.utils.models import BandedLUFactorization
+from chemotools.utils._models import BandedLUFactorization
 
 ### Type Aliases ###
 

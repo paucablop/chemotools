@@ -9,7 +9,7 @@ This script implements utility models required for testing the
 from dataclasses import dataclass
 from typing import Tuple
 
-from chemotools.utils import models
+from chemotools.utils import _models
 from tests.test_for_utils.utils_funcs import float_is_bit_equal
 
 ### Dataclasses ###
@@ -26,10 +26,10 @@ class ExpectedWhittakerSmoothLambda:
     fixed_lambda: float
     auto_bounds: Tuple[float, float]
     fit_auto: bool
-    method_used: models.WhittakerSmoothMethods
+    method_used: _models.WhittakerSmoothMethods
     log_auto_bounds: Tuple[float, float] = (0.0, 0.0)
 
-    def assert_is_equal_to(self, other: models.WhittakerSmoothLambda) -> None:
+    def assert_is_equal_to(self, other: _models.WhittakerSmoothLambda) -> None:
         """
         Checks if the current instance is equal to another instance of the same class.
 

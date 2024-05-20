@@ -14,7 +14,7 @@ utility functions used by the class.
 
 ### Imports ###
 
-from chemotools.utils.models import (  # noqa: F401
+from chemotools.utils._models import (  # noqa: F401
     WhittakerSmoothLambda,
     WhittakerSmoothMethods,
 )

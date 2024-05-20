@@ -13,14 +13,16 @@ import numpy as np
 
 from chemotools._runtime import PENTAPY_AVAILABLE
 from chemotools.utils import _banded_linalg as bla
-from chemotools.utils import models
+from chemotools.utils import _models
 
 if PENTAPY_AVAILABLE:
     import pentapy as pp
 
 ### Type Aliases ###
 
-_Factorization = Union[models.BandedLUFactorization, models.BandedPentapyFactorization]
+_Factorization = Union[
+    _models.BandedLUFactorization, _models.BandedPentapyFactorization
+]
 
 ### Functions ###
 
@@ -71,7 +73,7 @@ def solve_ppivoted_lu(
     l_and_u: bla.LAndUBandCounts,
     a_banded: np.ndarray,
     b_weighted: np.ndarray,
-) -> tuple[np.ndarray, models.BandedLUFactorization]:
+) -> tuple[np.ndarray, _models.BandedLUFactorization]:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` with a
     partially pivoted LU decomposition. This is the same as solving the linear system
@@ -107,7 +109,7 @@ def solve_normal_equations(
     b_weighted: np.ndarray,
     w: Union[float, np.ndarray],
     pentapy_enabled: bool,
-) -> tuple[np.ndarray, models.BandedSolvers, _Factorization]:
+) -> tuple[np.ndarray, _models.BandedSolvers, _Factorization]:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` where
     ``W`` is a diagonal matrix with the weights ``w`` on the main diagonal and ``D`` is
@@ -185,8 +187,8 @@ def solve_normal_equations(
         if np.isfinite(x).all():
             return (
                 x,
-                models.BandedSolvers.PENTAPY,
-                models.BandedPentapyFactorization(),
+                _models.BandedSolvers.PENTAPY,
+                _models.BandedPentapyFactorization(),
             )
 
     # Case 2: LU decomposition (final fallback for pentapy)
@@ -198,14 +200,14 @@ def solve_normal_equations(
         )
         return (
             x,
-            models.BandedSolvers.PIVOTED_LU,
+            _models.BandedSolvers.PIVOTED_LU,
             lub_factorization,
         )
 
     except np.linalg.LinAlgError:
-        available_solvers = f"{models.BandedSolvers.PIVOTED_LU}"
+        available_solvers = f"{_models.BandedSolvers.PIVOTED_LU}"
         if pentapy_enabled:
-            available_solvers = f"{models.BandedSolvers.PENTAPY}, {available_solvers}"
+            available_solvers = f"{_models.BandedSolvers.PENTAPY}, {available_solvers}"
 
         raise RuntimeError(
             f"\nAll available solvers ({available_solvers}) failed to solve the "

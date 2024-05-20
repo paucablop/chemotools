@@ -27,7 +27,7 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
 from chemotools.utils.check_inputs import check_input, check_weights
-from chemotools.utils.types import RealNumeric
+from chemotools.utils._types import RealNumeric
 from chemotools.utils._whittaker_base import (
     WhittakerLikeSolver,
     WhittakerSmoothLambda,

@@ -12,7 +12,7 @@ from typing import Callable, Tuple
 
 from scipy.optimize import minimize_scalar
 
-from chemotools.utils.models import WhittakerSmoothLambda
+from chemotools.utils._models import WhittakerSmoothLambda
 
 ### Constants ###
 
