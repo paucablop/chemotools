@@ -73,7 +73,7 @@ class WhittakerSmoothLambda:
 
     Attributes
     ----------
-    bounds: int or float or (int or float, int or float)
+    bounds: int or float or (int or float, int or float), default=100.0
         The bounds for the search space of the penalty weight lambda. The specification
         can be either
 
@@ -90,7 +90,7 @@ class WhittakerSmoothLambda:
         ``1e-5 * upp_bound`` for any method other than ``WhittakerSmoothMethods.FIXED``.
         Otherwise, the method is set to ``WhittakerSmoothMethods.FIXED`` and the
         ``fixed_lambda`` is set to the upper bound.
-    method: WhittakerSmoothMethods or {"fixed", "logml"}
+    method: WhittakerSmoothMethods or {"fixed", "logml"}, default="fixed"
         The method to use for the selection of the penalty weight. If the bounds are too
         close to each other, this will be set to ``WhittakerSmoothMethods.FIXED``.
 
@@ -106,8 +106,8 @@ class WhittakerSmoothLambda:
 
     """
 
-    bounds: Union[int, float, tuple[Union[int, float], Union[int, float]]]
-    method: _WhittakerSmoothMethodsAll
+    bounds: Union[int, float, tuple[Union[int, float], Union[int, float]]] = 100.0
+    method: _WhittakerSmoothMethodsAll = field(default=WhittakerSmoothMethods.FIXED)
 
     fixed_lambda: float = field(default=float("nan"), init=False)
     auto_bounds: tuple[float, float] = field(
