@@ -18,6 +18,13 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 
 """
 
+# Authors:
+# Pau Cabaneros
+# Niklas Zell <nik.zoe@web.de>
+
+
+### Imports ###
+
 import logging
 from numbers import Integral
 from typing import Union
@@ -26,10 +33,12 @@ import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, check_scalar
 
-from chemotools.utils.check_inputs import check_input
 from chemotools.utils._whittaker_base import WhittakerLikeSolver
+from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
+
+### Main Class ###
 
 
 class ArPls(
@@ -194,7 +203,7 @@ class ArPls(
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for _ in range(self.nr_iterations):
             # the baseline is fitted using the Whittaker smoother framework
-            z, _ = self._solve_single_b_fixed_lam(b=x, w=w)
+            z, _ = self._solve_single_b_fixed_lam(rhs_b=x, weights=w)
             d = x - z
 
             # if there is no data point below the baseline, the baseline is considered

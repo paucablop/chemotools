@@ -16,6 +16,14 @@ adaption of [2]_ was required to make it numerically stable ([3]_).
 
 """
 
+# Authors:
+# Pau Cabaneros
+# Niklas Zell <nik.zoe@web.de>
+
+
+### Imports ###
+
+
 import logging
 from typing import Union
 
@@ -23,10 +31,12 @@ import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from chemotools.utils.check_inputs import check_input
 from chemotools.utils._whittaker_base import WhittakerLikeSolver
+from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
+
+### Main Class ###
 
 
 # TODO: is polynomial_order actually differences and if so, is the description correct?
@@ -187,7 +197,7 @@ class AirPls(
         # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
         for i in range(0, self.nr_iterations - 1):
             # the baseline is fitted using the Whittaker smoother framework
-            z, _ = self._solve_single_b_fixed_lam(b=x, w=w)
+            z, _ = self._solve_single_b_fixed_lam(rhs_b=x, weights=w)
             d = x - z
             dssn = np.abs(d[d < 0].sum())
 
