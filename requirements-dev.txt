@@ -1,5 +1,6 @@
 black
 isort
+line_profiler
 matplotlib
 pentapy
 pytest
