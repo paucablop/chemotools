@@ -1,13 +1,13 @@
 ---
-title: Variable selection
+title: Feature selection
 layout: default
 parent: Docs
 ---
 
-# __Variable selection__
-Variable selection is a preprocessing technique in spectroscopy that selects the most relevant variables. The following algorithms are available:
+# __Feature selection__
+Feature selection is a preprocessing technique in spectroscopy that selects the most relevant features. The following algorithms are available:
 - [Range cut](#range-cut)
-- [SelectFeatures](#range-cut-by-wavenumber)
+- [IndexSelector](#index-selector)
 
 {: .note }
 > The variable selection algorithms implemented in ```chemotools``` allow you to select a subset of variables/features from the spectra. They are not designed to find the most relevant variables/features for a given task. 
@@ -31,7 +31,7 @@ Range cut by index is a preprocessing technique in spectroscopy that selects all
 #### __Case 1: Range cut by index__
 
 ```python
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 
 rcbi = RangeCut(0, 200)
 spectra_rcbi = rcbi.fit_transform(spectra)
@@ -41,11 +41,14 @@ spectra_rcbi = rcbi.fit_transform(spectra)
 
 
 ```python
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 
 rcbw = RangeCut(950, 1100, wavenumbers=wn)
 spectra_rcbw = rcbw.fit_transform(spectra)
 ```
+
+After fitting the method with the wavenumbers, the selected wavenumbers can be accessed using the ```wavenumbers_``` attribute.
+
 
 ### __Plotting example__:
 
@@ -53,8 +56,9 @@ spectra_rcbw = rcbw.fit_transform(spectra)
 
 <iframe src="figures/range_cut_by_wavenumber.html" width="800px" height="400px" style="border: none;"></iframe>
 
-## __SelectFeatures__
-SelectFeatures is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
+
+## __Index selector__
+IndexSelector is a preprocessing technique in spectroscopy that selects the most relevant variables. The selected features do not need to be continuous in the spectra, but they can be located at different locations. The algorithm allows selecting the features by imputing a list of indices or wavenumbers.
 
 ### __Arguments__:
 
@@ -72,9 +76,9 @@ In the example below, the selected wavenumbers ```wn_select``` are used to selec
 
 
 ```python
-from chemotools.variable_selection import SelectFeatures
+from chemotools.feature_selection import IndexSelector
 
-sfbw = SelectFeatures(features=wn_select,wavenumbers=wn)
+sfbw = IndexSelector(features=wn_select,wavenumbers=wn)
 spectra_sfbw = sfbw.fit_transform(spectra)
 ```
 

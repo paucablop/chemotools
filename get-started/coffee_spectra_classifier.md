@@ -10,12 +10,15 @@ nav_order: 5
 
 ## What will you learn?
 
-- [The coffee dataset](#the-coffee-dataset-🌍)
-- [Importing the data](#importing-the-data)
-- [Explore, plot and color](#explore-plot-and-color)
-- [Exploring the data](#exploring-the-data-🤓)
-- [Preprocessing the spectra](#preprocessing-the-spectra-🌊)
-- [Modelling the data](#modelling-the-data)
+- [__Coffee Spectra Classifier__](#coffee-spectra-classifier)
+  - [What will you learn?](#what-will-you-learn)
+  - [__Unlocking the Secrets of Coffee: A Spectral Journey ☕__](#unlocking-the-secrets-of-coffee-a-spectral-journey-)
+    - [__The Coffee Dataset 🌍__](#the-coffee-dataset-)
+  - [__Importing the data__](#importing-the-data)
+  - [__Explore, plot and color__](#explore-plot-and-color)
+  - [__Preprocessing the spectra  🌊__](#preprocessing-the-spectra--)
+  - [__Modelling the data__](#modelling-the-data)
+  - [__Recap__](#recap)
 
 ## __Unlocking the Secrets of Coffee: A Spectral Journey ☕__
 
@@ -41,7 +44,7 @@ So, grab your favorite coffee mug, prepare to delve into the world of data-drive
 
 ## __Importing the data__
 
-Fantastic! Now that we've set the stage with our coffee dataset, it's time to take the plunge into the rich world of data analysis. No need to worry about complicated data wrangling – with ```chemotools``` we've made it effortless for you. We've gracefully loaded our coffee spectra into a sleek and ready-to-explore ```pandas.DataFrame```. Let's start brewing some data magic! ☕🔮📊. 
+Fantastic! Now that we've set the stage with our coffee dataset, it's time to take the plunge into the rich world of data analysis. No need to worry about complicated data wrangling – with ```chemotools``` we've made it effortless for you. We've gracefully loaded our coffee spectra into a sleek and ready-to-explore ```pandas.DataFrame``` or ```polars.DataFrame```, your choice! For this example, we will use ```pandas.DataFrame```. Let's start brewing some data magic! ☕🔮📊. 
 
 
 ```python
@@ -54,6 +57,9 @@ The ```load_coffee()``` function returns two variables: ```spectra``` and ```lab
 
 - ```spectra```: A ```pandas.DataFrame``` containing the spectra of the coffee samples as rows.
 - ```labels```: A ```pandas.DataFrame``` containing the origin of each sample.
+
+{: .highlight }
+> If you are interested in working with ```polars.DataFrame``` you can simply use the  ```load_coffee(set_output="polars")```  (```chemotools```>=0.1.5).
 
 ## __Explore, plot and color__
 
@@ -160,7 +166,7 @@ We will build the preprocessing steps in a pipeline using the ``` make_pipeline(
 
 - __[Derivative](https://paucablop.github.io/chemotools/docs/derivative.html#savitzky-golay-derivative)__ to remove both additive and multiplicative scattering effects.
 
-- __[Range cut](https://paucablop.github.io/chemotools/docs/variable_selection.html#range-cut)__ to select the most relevant wavenumbers.
+- __[Range cut](https://paucablop.github.io/chemotools/docs/feature_selection.html#range-cut)__ to select the most relevant wavenumbers.
 
 - __[Standardize](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)__ remove the mean from the dataset.
 
@@ -170,7 +176,7 @@ from sklearn.preprocessing import StandardScaler
 
 from chemotools.derivative import SavitzkyGolay
 from chemotools.scatter import StandardNormalVariate
-from chemotools.variable_selection import RangeCut
+from chemotools.feature_selection import RangeCut
 
 pipeline = make_pipeline(
     StandardNormalVariate(),

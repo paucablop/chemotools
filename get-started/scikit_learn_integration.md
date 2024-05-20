@@ -11,7 +11,7 @@ This page shows how to use ```chemotools``` in combination with ```scikit-learn`
 
 - [Working with single spectra](#working-with-single-spectra)
 - [Working with pipelines](#working-with-pipelines)
-- [Working with pandas DataFrames](#working-with-pandas-dataframes)
+- [Working with pandas DataFrames](#working-with-dataframes-🐼-and-🐻‍❄️)
 - [Persisting your models](#persisting-your-models)
 
 ## __Working with single spectra__
@@ -126,8 +126,8 @@ The preprocessed spectra produced by the previous pipeline is shown in the figur
 > Notice that in the traditional workflow, the different preprocessing objects had to be persisted individually. In the pipeline workflow, the entire pipeline can be persisted and deployed to a production environment. See the [Persisting your models](#persisting-your-models) section for more information.
 
 
-## __Working with pandas DataFrames__
-For the ```pandas.DataFrame``` lovers. By default, all ```scikit-learn``` and ```chemotools``` transformers output ```numpy.ndarray```. However, now it is possible to configure your ```chemotools``` preprocessing methods to produce ```pandas.DataFrame``` objects as output. This is possible after implementing the new ```set_output()``` API from ```scikit-learn```>= 1.2.2 ([documentation](https://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html)). The same API implemented in other ```scikit-learn``` preprocessing methods like the ```StandardScaler()``` is now available for the ```chemotools``` transformers. 
+## __Working with DataFrames (🐼 and 🐻‍❄️ )__
+For the ```pandas.DataFrame``` and ```polars.DataFrame``` lovers. By default, all ```scikit-learn``` and ```chemotools``` transformers output ```numpy.ndarray```. However, now it is possible to configure your ```chemotools``` preprocessing methods to produce either a ```pandas.DataFrame``` or a ```polars.DataFrame``` objects as output. This is possible after implementing the new ```set_output()``` API from ```scikit-learn``` (>= 1.2.2 for ```pandas``` and >= 1.4.0 for ```polars```)([documentation](https://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html)). The same API implemented in other ```scikit-learn``` preprocessing methods like the ```StandardScaler()``` is now available for the ```chemotools``` transformers. 
 
 {: .note }
 > From version 0.1.3, the ```set_output()``` is available for all ```chemotools``` functions!
@@ -150,13 +150,13 @@ spectra = pd.read_csv('data/spectra.csv', index_col=0)
 
 The ```spectra``` variable is a ```pandas.DataFrame``` object with the indices representing the sample names and the columns representing the wavenumbers. The first 5 rows of the ```spectra``` DataFrame look like this:
 
-|    |    900.0 |    901.0 |    903.0 |    904.0 |    905.0 |    906.0 |    908.0 |    909.0 |    910.0 |
-|---:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|
-|  0 | 0.246749 | 0.268549 | 0.279464 | 0.280701 | 0.292982 | 0.288912 | 0.297167 | 0.310435 | 0.325145 |
-|  1 | 0.235092 | 0.249278 | 0.25094  | 0.251326 | 0.266078 | 0.263885 | 0.279901 | 0.295895 | 0.297663 |
-|  2 | 0.227894 | 0.223541 | 0.226005 | 0.23621  | 0.249276 | 0.26032  | 0.258642 | 0.282584 | 0.285163 |
-|  3 | 0.204115 | 0.213624 | 0.220228 | 0.222264 | 0.225996 | 0.232336 | 0.235273 | 0.261938 | 0.26663  |
-|  4 | 0.195615 | 0.195829 | 0.203789 | 0.220114 | 0.233223 | 0.240248 | 0.246378 | 0.261398 | 0.267355 |
+|      |    900.0 |    901.0 |    903.0 |    904.0 |    905.0 |    906.0 |    908.0 |    909.0 |    910.0 |
+| ---: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: |
+|    0 | 0.246749 | 0.268549 | 0.279464 | 0.280701 | 0.292982 | 0.288912 | 0.297167 | 0.310435 | 0.325145 |
+|    1 | 0.235092 | 0.249278 |  0.25094 | 0.251326 | 0.266078 | 0.263885 | 0.279901 | 0.295895 | 0.297663 |
+|    2 | 0.227894 | 0.223541 | 0.226005 |  0.23621 | 0.249276 |  0.26032 | 0.258642 | 0.282584 | 0.285163 |
+|    3 | 0.204115 | 0.213624 | 0.220228 | 0.222264 | 0.225996 | 0.232336 | 0.235273 | 0.261938 |  0.26663 |
+|    4 | 0.195615 | 0.195829 | 0.203789 | 0.220114 | 0.233223 | 0.240248 | 0.246378 | 0.261398 | 0.267355 |
 
 
 #### __2. Create a ```chemotools``` preprocessing object and set the output to ```pandas```.__
@@ -170,6 +170,9 @@ airpls = AirPls().set_output(transform='pandas')
 The ```set_output()``` method accepts the following arguments:
 
 - ```transform```: The output format. Can be ```'pandas'``` or ```'default'``` (the default format will output a ```numpy.ndarray```).
+
+{: .highlight }
+> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the ```set_output()``` method (```AirPLS().set_output(transform='polars')```).
 
 
 #### __3. Fit and transform the spectra__
@@ -186,13 +189,13 @@ The output of the ```fit_transform()``` method is now a ```pandas.DataFrame``` o
 
 The ```spectra_airpls``` DataFrame has the following structure:
 
-|    |       x0 |       x1 |       x2 |       x3 |       x4 |       x5 |       x6 |       x7 |       x8 |       x9 |
-|---:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|---------:|
-|  0 | 0.210838 | 0.213002 | 0.217275 | 0.222833 | 0.229342 | 0.236683 | 0.245315 | 0.254254 | 0.263244 | 0.272121 |
-|  1 | 0.219816 | 0.220637 | 0.223478 | 0.227481 | 0.233518 | 0.240035 | 0.247666 | 0.256066 | 0.264704 | 0.273879 |
-|  2 | 0.220096 | 0.221503 | 0.224515 | 0.22905  | 0.23486  | 0.242032 | 0.250077 | 0.25948  | 0.268111 | 0.276561 |
-|  3 | 0.211932 | 0.213675 | 0.216953 | 0.222211 | 0.22891  | 0.235941 | 0.243654 | 0.252518 | 0.261452 | 0.270276 |
-|  4 | 0.212528 | 0.21408  | 0.217522 | 0.222005 | 0.228657 | 0.236576 | 0.244935 | 0.253593 | 0.262239 | 0.271826 |
+|      |       x0 |       x1 |       x2 |       x3 |       x4 |       x5 |       x6 |       x7 |       x8 |       x9 |
+| ---: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: | -------: |
+|    0 | 0.210838 | 0.213002 | 0.217275 | 0.222833 | 0.229342 | 0.236683 | 0.245315 | 0.254254 | 0.263244 | 0.272121 |
+|    1 | 0.219816 | 0.220637 | 0.223478 | 0.227481 | 0.233518 | 0.240035 | 0.247666 | 0.256066 | 0.264704 | 0.273879 |
+|    2 | 0.220096 | 0.221503 | 0.224515 |  0.22905 |  0.23486 | 0.242032 | 0.250077 |  0.25948 | 0.268111 | 0.276561 |
+|    3 | 0.211932 | 0.213675 | 0.216953 | 0.222211 |  0.22891 | 0.235941 | 0.243654 | 0.252518 | 0.261452 | 0.270276 |
+|    4 | 0.212528 |  0.21408 | 0.217522 | 0.222005 | 0.228657 | 0.236576 | 0.244935 | 0.253593 | 0.262239 | 0.271826 |
 
 ### __Example 2: Using the ```set_output()``` API with a pipeline__
 
@@ -212,6 +215,9 @@ pipeline.set_output(transform="pandas")
 
 output = pipeline.fit_transform(spectra)
 ```
+
+{: .highlight }
+> If you wanted to set the output to ```polars``` you would use ```transform='polars'``` in the ```set_output()``` method (```pipeline.set_output(transform='polars')```).
 
 ## __Persisting your models__
 

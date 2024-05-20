@@ -27,8 +27,10 @@ setuptools.setup(
     install_requires=[
         "numpy",
         "pandas",
+        "polars",
+        "pyarrow",
         "scipy",
-        "scikit-learn",
+        "scikit-learn>=1.4.0",
     ],
     include_package_data=True,
     package_data={'': ['tests/resources/*.csv',

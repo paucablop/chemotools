@@ -10,6 +10,8 @@ pytest = "*"
 dtuprosys = "*"
 cairocffi = "*"
 numba = "*"
+polars = "*"
+pyarrow = "*"
 
 [dev-packages]
 black = "*"
