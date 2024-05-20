@@ -44,7 +44,7 @@ It is an automated smoothing algorithm that uses a penalized least squares appro
 
 | Argument | Description | Type | Default |
 | --- | --- | --- | --- |
-| ```lam``` | smoothing factor. | ```float``` | ```1e2``` |
+| ```lam``` | smoothing factor. | ```float or tuple[float, float, str] or WhittakerSmoothLambda``` | ```1e2``` |
 | ```differences``` | The number of differences to use. | ```int``` | ```1``` |
 
 ### __Usage examples__:
