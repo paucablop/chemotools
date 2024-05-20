@@ -23,9 +23,9 @@ _Factorization = Union[
 
 
 def get_smooth_wrss(
-    b: np.ndarray,
-    b_smooth: np.ndarray,
-    w: Union[float, np.ndarray],
+    rhs_b: np.ndarray,
+    rhs_b_smooth: np.ndarray,
+    weights: Union[float, np.ndarray],
 ) -> float:
     """
     Computes the (weighted) Sum of Squared Residuals (w)RSS between the original and
@@ -34,8 +34,8 @@ def get_smooth_wrss(
     """
 
     # Case 1: no weights are provided
-    if isinstance(w, float):
-        return np.square(b - b_smooth).sum()
+    if isinstance(weights, float):
+        return np.square(rhs_b - rhs_b_smooth).sum()
 
     # Case 2: weights are provided
-    return (w * np.square(b - b_smooth)).sum()
+    return (weights * np.square(rhs_b - rhs_b_smooth)).sum()

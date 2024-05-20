@@ -252,7 +252,7 @@ def test_weight_generator(
     # if the expected output is an exception, the test is run in a context manager
     if not isinstance(expected_output, (np.ndarray, float, int)):
         with pytest.raises(expected_output):
-            for _ in get_weight_generator(w=weights, n_series=n_series):
+            for _ in get_weight_generator(weights=weights, n_series=n_series):
                 pass
 
         return
@@ -260,14 +260,14 @@ def test_weight_generator(
     # otherwise, the output is compared to the expected output
     # Case 1: the expected output is a scalar
     if isinstance(expected_output, (float, int)):
-        for w in get_weight_generator(w=weights, n_series=n_series):
+        for w in get_weight_generator(weights=weights, n_series=n_series):
             assert isinstance(w, (float, int))
             assert w == expected_output
 
         return
 
     # Case 2: the expected output is an array
-    for w in get_weight_generator(w=weights, n_series=n_series):
+    for w in get_weight_generator(weights=weights, n_series=n_series):
         assert isinstance(w, np.ndarray)
         assert np.array_equal(w, expected_output)
 
@@ -302,7 +302,7 @@ def test_smooth_wrss(combination: Tuple[bool, float]) -> None:
     )
 
     # the wrss is calculated ...
-    wrss = get_smooth_wrss(b=a_series, b_smooth=b_series, w=weights)
+    wrss = get_smooth_wrss(rhs_b=a_series, rhs_b_smooth=b_series, weights=weights)
 
     # ... and compared to the expected value with a very strict tolerance
     assert np.isclose(wrss, wrss_expected, atol=1e-13, rtol=0.0)
@@ -404,8 +404,8 @@ def test_normal_condition_solve_breaks_ill_conditioned(with_pentapy: bool) -> No
             differences=differences,
             l_and_u=(differences, differences),
             penalty_mat_banded=a_banded,
-            b_weighted=b_vect,
-            w=weights,
+            rhs_b_weighted=b_vect,
+            weights=weights,
             pentapy_enabled=with_pentapy,
         )
 
@@ -465,7 +465,7 @@ def test_auto_lambda_log_marginal_likelihood_refuses_no_weights(
     with pytest.raises(ValueError):
         whitt_base._whittaker_solve(
             X=X,
-            w=None,
+            weights=None,
             use_same_w_for_all=same_weights_for_all,
         )
 
@@ -539,7 +539,7 @@ def test_auto_lambda_log_marginal_likelihood(
     )
     _, lambda_opts = whitt_base._whittaker_solve(
         X=X,
-        w=weights,
+        weights=weights,
         use_same_w_for_all=same_weights_for_all,
     )
 

@@ -862,8 +862,8 @@ def test_whittaker_with_pentapy(
     # NOTE: the weight is not correct since the test only checks the method
     solve_method = whittaker_smooth._solve(
         lam=whittaker_smooth._lam_inter_.fixed_lambda,
-        b_weighted=spectrum.transpose(),
-        w=1.0,
+        rhs_b_weighted=spectrum.transpose(),
+        weights=1.0,
     )[1]
     assert solve_method == BandedSolvers.PENTAPY
 
@@ -877,8 +877,8 @@ def test_whittaker_with_pentapy(
     # NOTE: the weight is not correct since the test only checks the method
     solve_method = whittaker_smooth._solve(
         lam=whittaker_smooth._lam_inter_.fixed_lambda,
-        b_weighted=spectrum.transpose(),
-        w=1.0,
+        rhs_b_weighted=spectrum.transpose(),
+        weights=1.0,
     )[1]
     assert solve_method == BandedSolvers.PIVOTED_LU
     assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_factorized_solve[0])

@@ -176,8 +176,8 @@ class WhittakerLikeSolver:
     def _solve(
         self,
         lam: float,
-        b_weighted: np.ndarray,
-        w: Union[float, np.ndarray],
+        rhs_b_weighted: np.ndarray,
+        weights: Union[float, np.ndarray],
     ) -> tuple[np.ndarray, _models.BandedSolvers, auto._Factorization]:
         """
         Internal wrapper for the solver methods to solve the linear system of equations
@@ -197,8 +197,8 @@ class WhittakerLikeSolver:
             differences=self.differences_,
             l_and_u=self._l_and_u_,
             penalty_mat_banded=self._penalty_mat_banded_,
-            b_weighted=b_weighted,
-            w=w,
+            rhs_b_weighted=rhs_b_weighted,
+            weights=weights,
             pentapy_enabled=self._pentapy_enabled_,
         )
 
@@ -207,8 +207,8 @@ class WhittakerLikeSolver:
     def _marginal_likelihood_objective(
         self,
         log_lam: float,
-        b: np.ndarray,
-        w: np.ndarray,
+        rhs_b: np.ndarray,
+        weights: np.ndarray,
         w_plus_penalty_plus_n_samples_term: float,
     ) -> float:
         """
@@ -226,8 +226,8 @@ class WhittakerLikeSolver:
         # the solution of the linear system of equations is computed
         b_smooth, _, factorization = self._solve(
             lam=lam,
-            b_weighted=b * w,
-            w=w,
+            rhs_b_weighted=rhs_b * weights,
+            weights=weights,
         )
 
         # finally, the log marginal likelihood is computed and returned (negative since
@@ -239,9 +239,9 @@ class WhittakerLikeSolver:
             lam=lam,
             differences=self.differences_,
             diff_kernel_flipped=self._diff_kernel_flipped_,
-            b=b,
-            b_smooth=b_smooth,
-            w=w,
+            rhs_b=rhs_b,
+            rhs_b_smooth=b_smooth,
+            weights=weights,
             w_plus_penalty_plus_n_samples_term=w_plus_penalty_plus_n_samples_term,
         )
 
@@ -249,8 +249,8 @@ class WhittakerLikeSolver:
 
     def _solve_single_b_fixed_lam(
         self,
-        b: np.ndarray,
-        w: Union[float, np.ndarray],
+        rhs_b: np.ndarray,
+        weights: Union[float, np.ndarray],
         lam: Optional[float] = None,
     ) -> tuple[np.ndarray, float]:
         """
@@ -271,12 +271,12 @@ class WhittakerLikeSolver:
         #       the most efficient way around going into this method in the first place;
         #       in the future this might change and thus, this case is kept for now, but
         #       ignored for coverage
-        if isinstance(w, float):  # pragma: no cover
+        if isinstance(weights, float):  # pragma: no cover
             return (
                 self._solve(
                     lam=lam,
-                    b_weighted=b,
-                    w=w,
+                    rhs_b_weighted=rhs_b,
+                    weights=weights,
                 )[0],
                 lam,
             )
@@ -285,16 +285,16 @@ class WhittakerLikeSolver:
         return (
             self._solve(
                 lam=lam,
-                b_weighted=b * w,
-                w=w,
+                rhs_b_weighted=rhs_b * weights,
+                weights=weights,
             )[0],
             lam,
         )
 
     def _solve_single_b_auto_lam_logml(
         self,
-        b: np.ndarray,
-        w: Union[float, np.ndarray],
+        rhs_b: np.ndarray,
+        weights: Union[float, np.ndarray],
     ) -> tuple[np.ndarray, float]:
         """
         Solves for the Whittaker-like smoother solution for a single series with an
@@ -305,7 +305,7 @@ class WhittakerLikeSolver:
 
         # if the weights are not provided, the log marginal likelihood cannot be
         # computed - at least not in a meaningful way
-        if isinstance(w, (float, int)):
+        if isinstance(weights, (float, int)):
             raise ValueError(
                 "\nAutomatic fitting of the penalty weight lambda by maximizing the "
                 "log marginal likelihood is only possible if weights are provided.\n"
@@ -316,7 +316,7 @@ class WhittakerLikeSolver:
         w_plus_n_samples_term = auto.get_log_marginal_likelihood_constant_term(
             differences=self.differences_,
             penalty_mat_log_pseudo_det=self._penalty_mat_log_pseudo_det_,
-            w=w,
+            weights=weights,
             zero_weight_tol=self.__zero_weight_tol,
         )
 
@@ -324,17 +324,21 @@ class WhittakerLikeSolver:
         opt_lambda = auto.get_optimized_lambda(
             fun=self._marginal_likelihood_objective,
             lam=self._lam_inter_,
-            args=(b, w, w_plus_n_samples_term),
+            args=(rhs_b, weights, w_plus_n_samples_term),
         )
 
         # the optimal penalty weight lambda is returned together with the smoothed
         # series
-        return self._solve_single_b_fixed_lam(b=b, w=w, lam=opt_lambda)
+        return self._solve_single_b_fixed_lam(
+            rhs_b=rhs_b,
+            weights=weights,
+            lam=opt_lambda,
+        )
 
     def _solve_multiple_b(
         self,
         X: np.ndarray,
-        w: Optional[np.ndarray],
+        weights: Optional[np.ndarray],
     ) -> tuple[np.ndarray, np.ndarray]:
         """
         Solves for the Whittaker-like smoother solution for multiple series when the
@@ -349,19 +353,19 @@ class WhittakerLikeSolver:
         # then, the solution of the linear system of equations is computed for the
         # transposed series matrix (expected right-hand side format for the solvers)
         # Case 1: no weights are provided
-        if w is None:
+        if weights is None:
             X_smooth, _, _ = self._solve(
                 lam=self._lam_inter_.fixed_lambda,
-                b_weighted=X.transpose(),
-                w=1.0,
+                rhs_b_weighted=X.transpose(),
+                weights=1.0,
             )
 
         # Case 2: weights are provided
         else:
             X_smooth, _, _ = self._solve(
                 lam=self._lam_inter_.fixed_lambda,
-                b_weighted=(X * w).transpose(),
-                w=w[0, ::],
+                rhs_b_weighted=(X * weights).transpose(),
+                weights=weights[0, ::],
             )
 
         return (
@@ -375,7 +379,7 @@ class WhittakerLikeSolver:
         self,
         X: np.ndarray,
         *,
-        w: Optional[np.ndarray] = None,
+        weights: Optional[np.ndarray] = None,
         use_same_w_for_all: bool = False,
     ) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -389,7 +393,7 @@ class WhittakerLikeSolver:
         ----------
         X : ndarray of shape (m, n)
             The series to be smoothed stored as individual rows.
-        w : ndarray of shape(1, n) or shape(m, n) or None
+        weights : ndarray of shape(1, n) or shape(m, n) or None
             The weights to be applied for smoothing. If only a single row is provided
             and ``use_same_w_for_all`` is ``True``, the same weights can be applied
             for all series in ``X``, which enhances the smoothing a lot for fixed
@@ -415,7 +419,7 @@ class WhittakerLikeSolver:
         # can be done more efficiently by leveraging LAPACK'S (not pentapy's) ability to
         # perform multiple solves from the same inversion at once
         if use_same_w_for_all and not self._lam_inter_.fit_auto:
-            return self._solve_multiple_b(X=X, w=w)
+            return self._solve_multiple_b(X=X, weights=weights)
 
         # otherwise, the solution of the linear system of equations is computed for
         # each series
@@ -430,8 +434,11 @@ class WhittakerLikeSolver:
         # then, the solution is computed for each series by means of a loop
         X_smooth = np.empty_like(X)
         lam = np.empty(shape=(X.shape[0],))
-        w_gen = get_weight_generator(w=w, n_series=X.shape[0])
-        for iter_i, (x_vect, w_vect) in enumerate(zip(X, w_gen)):
-            X_smooth[iter_i], lam[iter_i] = smooth_method(b=x_vect, w=w_vect)
+        w_gen = get_weight_generator(weights=weights, n_series=X.shape[0])
+        for iter_i, (x_vect, wght) in enumerate(zip(X, w_gen)):
+            X_smooth[iter_i], lam[iter_i] = smooth_method(
+                rhs_b=x_vect,
+                weights=wght,
+            )
 
         return X_smooth, lam

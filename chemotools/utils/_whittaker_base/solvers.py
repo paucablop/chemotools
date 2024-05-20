@@ -27,7 +27,10 @@ _Factorization = Union[
 ### Functions ###
 
 
-def solve_pentapy(a_banded: np.ndarray, b_weighted: np.ndarray) -> np.ndarray:
+def solve_pentapy(
+    lhs_a_banded: np.ndarray,
+    rhs_b_weighted: np.ndarray,
+) -> np.ndarray:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` with the
     ``pentapy`` package. This is the same as solving the linear system ``A @ x = b``
@@ -41,10 +44,10 @@ def solve_pentapy(a_banded: np.ndarray, b_weighted: np.ndarray) -> np.ndarray:
     """
 
     # for 1-dimensional right-hand side vectors, the solution is computed directly
-    if b_weighted.ndim == 1:
+    if rhs_b_weighted.ndim == 1:
         return pp.solve(
-            mat=a_banded,
-            rhs=b_weighted,
+            mat=lhs_a_banded,
+            rhs=rhs_b_weighted,
             is_flat=True,
             index_row_wise=False,
             solver=1,
@@ -56,11 +59,11 @@ def solve_pentapy(a_banded: np.ndarray, b_weighted: np.ndarray) -> np.ndarray:
         # NOTE: the solutions are first written into the rows of the solution matrix
         #       because row-access is more efficient for C-contiguous arrays;
         #       afterwards, the solution matrix is transposed
-        solution = np.empty(shape=(b_weighted.shape[1], b_weighted.shape[0]))
-        for iter_j in range(0, b_weighted.shape[1]):
+        solution = np.empty(shape=(rhs_b_weighted.shape[1], rhs_b_weighted.shape[0]))
+        for iter_j in range(0, rhs_b_weighted.shape[1]):
             solution[iter_j, ::] = pp.solve(
-                mat=a_banded,
-                rhs=b_weighted[::, iter_j],
+                mat=lhs_a_banded,
+                rhs=rhs_b_weighted[::, iter_j],
                 is_flat=True,
                 index_row_wise=False,
                 solver=1,
@@ -71,8 +74,8 @@ def solve_pentapy(a_banded: np.ndarray, b_weighted: np.ndarray) -> np.ndarray:
 
 def solve_ppivoted_lu(
     l_and_u: bla.LAndUBandCounts,
-    a_banded: np.ndarray,
-    b_weighted: np.ndarray,
+    lhs_a_banded: np.ndarray,
+    rhs_b_weighted: np.ndarray,
 ) -> tuple[np.ndarray, _models.BandedLUFactorization]:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` with a
@@ -87,13 +90,13 @@ def solve_ppivoted_lu(
 
     lub_factorization = bla.lu_banded(
         l_and_u=l_and_u,
-        ab=a_banded,
+        ab=lhs_a_banded,
         check_finite=False,
     )
     return (
         bla.lu_solve_banded(
             lub_factorization=lub_factorization,
-            b=b_weighted,
+            b=rhs_b_weighted,
             check_finite=False,
             overwrite_b=True,
         ),
@@ -106,8 +109,8 @@ def solve_normal_equations(
     differences: int,
     l_and_u: bla.LAndUBandCounts,
     penalty_mat_banded: np.ndarray,
-    b_weighted: np.ndarray,
-    w: Union[float, np.ndarray],
+    rhs_b_weighted: np.ndarray,
+    weights: Union[float, np.ndarray],
     pentapy_enabled: bool,
 ) -> tuple[np.ndarray, _models.BandedSolvers, _Factorization]:
     """
@@ -177,13 +180,16 @@ def solve_normal_equations(
     # the banded storage format for the LAPACK LU decomposition is computed by
     # scaling the penalty matrix with the penalty weight lambda and then adding the
     # diagonal matrix with the weights
-    a_banded = lam * penalty_mat_banded
-    a_banded[differences, ::] += w
+    lhs_a_banded = lam * penalty_mat_banded
+    lhs_a_banded[differences, ::] += weights
 
     # the linear system of equations is solved with the most efficient method
     # Case 1: Pentapy can be used
     if pentapy_enabled:
-        x = solve_pentapy(a_banded=a_banded, b_weighted=b_weighted)
+        x = solve_pentapy(
+            lhs_a_banded=lhs_a_banded,
+            rhs_b_weighted=rhs_b_weighted,
+        )
         if np.isfinite(x).all():
             return (
                 x,
@@ -195,8 +201,8 @@ def solve_normal_equations(
     try:
         x, lub_factorization = solve_ppivoted_lu(
             l_and_u=l_and_u,
-            a_banded=a_banded,
-            b_weighted=b_weighted,
+            lhs_a_banded=lhs_a_banded,
+            rhs_b_weighted=rhs_b_weighted,
         )
         return (
             x,

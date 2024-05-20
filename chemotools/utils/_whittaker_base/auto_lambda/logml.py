@@ -30,7 +30,7 @@ _FactorizationForLogMarginalLikelihood = _models.BandedLUFactorization
 def get_log_marginal_likelihood_constant_term(
     differences: int,
     penalty_mat_log_pseudo_det: float,
-    w: np.ndarray,
+    weights: np.ndarray,
     zero_weight_tol: float,
 ) -> float:
     """
@@ -64,9 +64,9 @@ def get_log_marginal_likelihood_constant_term(
     # first, the constant terms of the log marginal likelihood are computed starting
     # from the log pseudo-determinant of the weight matrix, i.e., the product of the
     # non-zero elements of the weight vector
-    nonzero_w_flags = w > w.max() * zero_weight_tol
+    nonzero_w_flags = weights > weights.max() * zero_weight_tol
     nnz_w = nonzero_w_flags.sum()
-    log_pseudo_det_w = np.log(w[nonzero_w_flags]).sum()
+    log_pseudo_det_w = np.log(weights[nonzero_w_flags]).sum()
 
     # the constant term of the log marginal likelihood is computed
     return (
@@ -82,9 +82,9 @@ def get_log_marginal_likelihood(
     lam: float,
     differences: int,
     diff_kernel_flipped: np.ndarray,
-    b: np.ndarray,
-    b_smooth: np.ndarray,
-    w: Union[float, np.ndarray],
+    rhs_b: np.ndarray,
+    rhs_b_smooth: np.ndarray,
+    weights: Union[float, np.ndarray],
     w_plus_penalty_plus_n_samples_term: float,
 ) -> float:
     """
@@ -153,13 +153,18 @@ def get_log_marginal_likelihood(
     """  # noqa: E501
 
     # first, the weighted Sum of Squared Residuals is computed ...
-    wrss = get_smooth_wrss(b=b, b_smooth=b_smooth, w=w)
+    wrss = get_smooth_wrss(
+        rhs_b=rhs_b,
+        rhs_b_smooth=rhs_b_smooth,
+        weights=weights,
+    )
     # ... followed by the Penalty Sum of Squares which requires the squared forward
     # finite differences of the smoothed series
     # NOTE: ``np.convolve`` is used to compute the forward finite differences and
     #       since it flips the provided kernel, an already flipped kernel is used
     pss = (
-        lam * np.square(np.convolve(b_smooth, diff_kernel_flipped, mode="valid")).sum()
+        lam
+        * np.square(np.convolve(rhs_b_smooth, diff_kernel_flipped, mode="valid")).sum()
     )
 
     # besides the determinant of the combined left hand side matrix has to be
@@ -174,7 +179,7 @@ def get_log_marginal_likelihood(
         return -0.5 * (
             wrss
             + pss
-            - (b.size - differences) * log_lam
+            - (rhs_b.size - differences) * log_lam
             + lhs_logabsdet
             + w_plus_penalty_plus_n_samples_term
         )
@@ -183,7 +188,7 @@ def get_log_marginal_likelihood(
     # ill-conditioned and the log marginal likelihood cannot be computed
     # NOTE: since it is very hard to trigger this exception, it is not covered by the
     #       tests
-    raise RuntimeError( # pragma: no cover
+    raise RuntimeError(  # pragma: no cover
         "\nThe determinant of the combined left hand side matrix "
         "W + lambda * D.T @ D is negative, indicating that the system is extremely "
         "ill-conditioned.\n"

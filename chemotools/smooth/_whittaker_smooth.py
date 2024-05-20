@@ -26,13 +26,13 @@ from numpy import ndarray
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
-from chemotools.utils.check_inputs import check_input, check_weights
 from chemotools.utils._types import RealNumeric
 from chemotools.utils._whittaker_base import (
     WhittakerLikeSolver,
     WhittakerSmoothLambda,
     WhittakerSmoothMethods,
 )
+from chemotools.utils.check_inputs import check_input, check_weights
 
 ### Main Class ###
 
@@ -288,7 +288,7 @@ class WhittakerSmooth(
 
         # Calculate the whittaker smooth
         return self._whittaker_solve(
-            X=X_, w=sample_weight_checked, use_same_w_for_all=use_same_w_for_all
+            X=X_, weights=sample_weight_checked, use_same_w_for_all=use_same_w_for_all
         )[0]
 
     def fit_transform(
