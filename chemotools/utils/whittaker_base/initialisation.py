@@ -6,31 +6,35 @@ This submodule contains the utility functions used at the initialisation of the
 
 ### Imports ###
 
-from typing import Any, Tuple, Type, Union
+from typing import Any, Literal, Tuple, Type, Union
 
 import numpy as np
 
 from chemotools.utils import banded_linalg as bla
 from chemotools.utils import finite_differences as fdiff
 from chemotools.utils import models
+from chemotools.utils.types import RealNumeric
 
 ### Type Aliases ###
 
-_RealNumeric = Union[int, float]
+_StrWhittakerSmoothMethods = Literal["fixed", "logml"]
+_AllWhittakerSmoothMethods = Union[
+    models.WhittakerSmoothMethods, _StrWhittakerSmoothMethods
+]
 _WhittakerSmoothLambdaPlain = Tuple[
-    _RealNumeric,
-    _RealNumeric,
-    models.WhittakerSmoothMethods,
+    RealNumeric,
+    RealNumeric,
+    _AllWhittakerSmoothMethods,
 ]
 _LambdaSpecs = Union[
-    _RealNumeric,
+    RealNumeric,
     _WhittakerSmoothLambdaPlain,
     models.WhittakerSmoothLambda,
 ]
 
 ### Constants ###
 
-_RealNumericTypes = (int, float)
+RealNumericTypes = (int, float)
 
 ### Functions ###
 
@@ -49,7 +53,7 @@ def get_checked_lambda(lam: Any) -> models.WhittakerSmoothLambda:
 
     # now, there are other cases to check
     # Case 1: lambda is a single number
-    if isinstance(lam, _RealNumericTypes):
+    if isinstance(lam, RealNumericTypes):
         return models.WhittakerSmoothLambda(
             bounds=lam, method=models.WhittakerSmoothMethods.FIXED
         )
