@@ -58,7 +58,7 @@ class WhittakerSmooth(
         Please refer to the Notes section for further details.
 
     differences : int, default=1
-        The number of differences to use for the Whittaker smooth. If the aim is to
+        The order of differences to use for the Whittaker smooth. If the aim is to
         obtain a smooth estimate of the ``m``-th order derivative, this should be set to
         at least ``m + 2``.
         Currently, values ``>= 3`` are highly discouraged due to numerical instability

@@ -59,6 +59,13 @@ class ArPls(
         The lambda parameter that controls the smoothness of the baseline. Higher values
         will result in a smoother baseline.
 
+    differences : int, default=2
+        The order of the differences used for the penalty terms that enforces smoothness
+        of the baseline.
+        Higher values will result in a smoother baseline.
+        Currently, values ``>= 3`` are highly discouraged due to numerical instability
+        that might obscure the smoothing effect.
+
     ratio : float, default=0.01
         The convergence threshold for the weight updating scheme. Lower values will
         result in a more accurate baseline at the cost of computation time and even

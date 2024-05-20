@@ -61,6 +61,9 @@ class AirPls(
     polynomial_order : int, optional default=1
         The degree of the polynomial used to fit the baseline. A value of 1 corresponds
         to a linear fit, while higher values correspond to higher-order polynomials.
+        Higher values will result in a smoother baseline.
+        Currently, values ``>= 3`` are highly discouraged due to numerical instability
+        that might obscure the smoothing effect.
 
     nr_iterations : int, optional default=15
         The number of iterations used to calculate the baseline. Increasing the number
