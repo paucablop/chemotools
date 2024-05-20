@@ -11,7 +11,7 @@ from typing import Any, Literal, Tuple, Type, Union
 import numpy as np
 
 from chemotools.utils import _banded_linalg as bla
-from chemotools.utils import finite_differences as fdiff
+from chemotools.utils import _finite_differences as fdiff
 from chemotools.utils import _models
 from chemotools.utils._types import RealNumeric
 

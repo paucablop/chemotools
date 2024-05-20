@@ -20,7 +20,7 @@ from scipy.sparse import csc_matrix, csr_matrix
 from scipy.sparse import diags as sp_diags
 from scipy.sparse import linalg as spla
 
-from chemotools.utils.finite_differences import calc_forward_diff_kernel
+from chemotools.utils._finite_differences import calc_forward_diff_kernel
 from chemotools.utils._whittaker_base import WhittakerLikeSolver
 
 ### Utility Functions ###

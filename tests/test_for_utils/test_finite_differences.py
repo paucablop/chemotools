@@ -11,7 +11,7 @@ from typing import List, Tuple
 import numpy as np
 import pytest
 
-from chemotools.utils.finite_differences import (
+from chemotools.utils._finite_differences import (
     calc_forward_diff_kernel,
     gen_squ_fw_fin_diff_mat_cho_banded,
 )
