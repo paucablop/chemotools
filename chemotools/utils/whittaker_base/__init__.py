@@ -9,12 +9,13 @@ utility functions used by the class.
 
 """
 
+# Authors:
+# Niklas Zell <nik.zoe@web.de>
+
 ### Imports ###
 
 from chemotools.utils.models import (  # noqa: F401
     WhittakerSmoothLambda,
     WhittakerSmoothMethods,
 )
-from chemotools.utils.whittaker_base.main import (  # noqa: F401
-    WhittakerLikeSolver,
-)
+from chemotools.utils.whittaker_base.main import WhittakerLikeSolver  # noqa: F401
