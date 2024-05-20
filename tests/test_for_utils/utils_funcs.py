@@ -382,6 +382,8 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     ...     multiply_vect_with_squ_fw_fin_diff_orig_first,
     ... )
 
+    >>> # All the following tests were checked using LibreOffice Calc
+
     >>> # Test 1
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
