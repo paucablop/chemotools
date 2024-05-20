@@ -152,13 +152,14 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
 
 
 @pytest.mark.parametrize(
-    "series, differences, accuracy, window_size, stddev_min",
+    "series, differences, accuracy, window_size, power, stddev_min",
     [
         (  # Number 0 series is too small for difference kernel
             np.arange(start=0, stop=5),
             10,
             2,
             3,
+            1,
             1e-10,
         ),
         (  # Number 1 series is too small for difference kernel
@@ -166,6 +167,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             10,
             2,
             None,
+            1,
             1e-10,
         ),
         (  # Number 2 series is too small for window size
@@ -173,6 +175,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             1,
             2,
             11,
+            1,
             1e-10,
         ),
         (  # Number 3 the difference order is 0
@@ -180,6 +183,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             0,
             2,
             3,
+            1,
             1e-10,
         ),
         (  # Number 4 the difference order is negative
@@ -187,6 +191,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             -1,
             2,
             3,
+            1,
             1e-10,
         ),
         (  # Number 5 the accuracy is odd
@@ -194,6 +199,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             2,
             3,
             3,
+            1,
             1e-10,
         ),
         (  # Number 6 the accuracy is odd
@@ -201,6 +207,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             2,
             5,
             3,
+            1,
             1e-10,
         ),
         (  # Number 7 the accuracy is 1
@@ -208,6 +215,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             2,
             1,
             3,
+            1,
             1e-10,
         ),
         (  # Number 8 the accuracy is 0
@@ -215,6 +223,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             2,
             0,
             3,
+            1,
             1e-10,
         ),
         (  # Number 9 the accuracy is negative
@@ -222,6 +231,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             2,
             -1,
             3,
+            1,
             1e-10,
         ),
         (  # Number 10 the window size is even
@@ -229,6 +239,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             1,
             2,
             6,
+            1,
             1e-10,
         ),
         (  # Number 11 the window size is 0
@@ -236,6 +247,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             1,
             2,
             0,
+            1,
             1e-10,
         ),
         (  # Number 12 the window size is negative
@@ -243,20 +255,39 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
             1,
             2,
             -1,
+            1,
             1e-10,
         ),
-        (  # Number 13 the minimum standard deviation is zero
+        (  # Number 13 the power is -3
+            np.arange(start=0, stop=10),
+            1,
+            2,
+            3,
+            -3,
+            1e-10,
+        ),
+        (  # Number 14 the power is 3
+            np.arange(start=0, stop=10),
+            1,
+            2,
+            3,
+            3,
+            1e-10,
+        ),
+        (  # Number 15 the minimum standard deviation is zero
             np.arange(start=0, stop=5),
             1,
             2,
             3,
+            1,
             0.0,
         ),
-        (  # Number 14 the minimum standard deviation is negative
+        (  # Number 16 the minimum standard deviation is negative
             np.arange(start=0, stop=5),
             1,
             2,
             3,
+            1,
             -10.0,
         ),
     ],
@@ -266,6 +297,7 @@ def test_estimate_noise_stddev_invalid_input(
     differences: int,
     accuracy: int,
     window_size: Optional[int],
+    power: int,
     stddev_min: float,
 ) -> None:
     """
@@ -276,7 +308,8 @@ def test_estimate_noise_stddev_invalid_input(
     - the series length,
     - the difference order,
     - the accuracy,
-    - the window size, and
+    - the window size,
+    - the power to which the noise level is raised, and
     - the minimum standard deviation
 
     are chosen such that the input is invalid.
@@ -289,6 +322,7 @@ def test_estimate_noise_stddev_invalid_input(
             differences=differences,
             diff_accuracy=accuracy,
             window_size=window_size,
+            power=power, # type: ignore
             stddev_min=stddev_min,
         )
 
