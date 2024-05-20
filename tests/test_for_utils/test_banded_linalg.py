@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 from scipy.linalg import solve_banded as scipy_solve_banded
 
-from chemotools.utils.banded_linalg import (
+from chemotools.utils._banded_linalg import (
     _datacopied,
     conv_upper_chol_banded_to_lu_banded_storage,
     lu_banded,

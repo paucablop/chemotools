@@ -11,7 +11,7 @@ from typing import Union
 
 import numpy as np
 
-from chemotools.utils import banded_linalg as bla
+from chemotools.utils import _banded_linalg as bla
 from chemotools.utils import models
 from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
 

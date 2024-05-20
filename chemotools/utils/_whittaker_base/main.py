@@ -16,7 +16,7 @@ import numpy as np
 
 from chemotools._runtime import PENTAPY_AVAILABLE
 from chemotools.utils import models
-from chemotools.utils.banded_linalg import LAndUBandCounts
+from chemotools.utils._banded_linalg import LAndUBandCounts
 from chemotools.utils._whittaker_base import auto_lambda as auto
 from chemotools.utils._whittaker_base import initialisation as init
 from chemotools.utils._whittaker_base import solvers

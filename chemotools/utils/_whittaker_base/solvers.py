@@ -12,7 +12,7 @@ from typing import Union
 import numpy as np
 
 from chemotools._runtime import PENTAPY_AVAILABLE
-from chemotools.utils import banded_linalg as bla
+from chemotools.utils import _banded_linalg as bla
 from chemotools.utils import models
 
 if PENTAPY_AVAILABLE:
