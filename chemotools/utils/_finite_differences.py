@@ -12,7 +12,7 @@ differences, namely
 
 from math import comb, factorial
 from numbers import Integral, Real
-from typing import Any, Callable, Literal, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Literal, Optional, Tuple, Union
 
 import numpy as np
 from scipy.ndimage import median_filter
@@ -380,6 +380,7 @@ def estimate_noise_stddev(
     window_size: Optional[int] = None,
     extrapolator: Callable[..., np.ndarray] = np.pad,
     extrapolator_args: Tuple[Any, ...] = ("reflect",),
+    extrapolator_kwargs: Optional[Dict[str, Any]] = None,
     power: Literal[-2, -1, 1, 2] = 1,
     stddev_min: Union[float, int] = 1e-10,
 ) -> np.ndarray:
@@ -387,7 +388,7 @@ def estimate_noise_stddev(
     EXPERIMENTAL FEATURE
 
     Estimates the local/global noise standard deviation of a series even in the presence
-    of trends, like baselines and peaks, as well as outliers by using forward finite
+    of trends, like baselines and peaks, as well as outliers by using central finite
     differences.
     Please see the Notes section for further details.
 
@@ -405,6 +406,8 @@ def estimate_noise_stddev(
     diff_accuracy : int, default=2
         The accuracy of the finite difference approximation, which has to be an even
         integer ``>= 2``.
+        Higher values will enhance the effect of outliers that will corrupt the noise
+        estimation of their neighborhood.
     window_size : int or None, default=None
         The odd window size around a datapoint to estimate its local noise standard
         deviation.
@@ -423,7 +426,12 @@ def estimate_noise_stddev(
         It has to be a callable with the following signature:
 
         ```python
-        series_extrap = extrapolator(series, pad_width, *extrapolator_args)
+        series_extrap = extrapolator(
+            series,
+            pad_width,
+            *extrapolator_args,
+            **extrapolator_kwargs,
+        )
         ```
 
         If ``window_size`` is ``None``, only the central finite differences kernel is
@@ -432,8 +440,12 @@ def estimate_noise_stddev(
         side, but of course the quality of the noise estimation can be improved by using
         a more sophisticated extrapolation method.
     extrapolator_args : tuple, default=("reflect",)
-        Additional arguments that are passed to the extrapolator function as described
-        for ``extrapolator``.
+        Additional positional arguments that are passed to the extrapolator function as
+        described for ``extrapolator``.
+    extrapolator_kwargs : dict or None, default=None
+        Additional keyword arguments that are passed to the extrapolator function as
+        described for ``extrapolator``.
+        If ``None``, no additional keyword arguments are passed.
     power : {-2, -1, 1, 2}, default=1
         The power to which the noise standard deviation is raised.
         This can be used to compute the:
@@ -447,6 +459,8 @@ def estimate_noise_stddev(
         The minimum noise standard deviation that is allowed.
         Any estimated noise standard deviation below this value will be set to this
         value.
+        Borrowing an idea from image processing, the minimum noise standard deviation
+        can, e.g., be estimated from one or more feature-free regions of ``series``.
         It must be at least ``1e-15``.
 
     Returns
@@ -483,7 +497,17 @@ def estimate_noise_stddev(
     applying a modified version of the Median Absolute Deviation (MAD) to the
     derivative/differences of the signal. By using a moving MAD filter, the local noise
     level can be estimated as well.
-    The algorithms does not work well for signals that are perfectly noise-free.
+
+    From a workflow perspective, the following steps are performed on the signal:
+
+    - The signal is extrapolated to avoid edge effects.
+    - The central finite differences are computed.
+    - Their absolute values are taken.
+    - The median (global) or median filter (local) is applied to these absolute
+        differences. With proper scaling, this will give an estimate of the noise level.
+
+    There is one limitation, namely that the algorithm does not work well for signals
+    that are perfectly noise-free, but this is a rare case in practice.
 
     The kernel size for the central finite difference kernel is given by
     ``2 * floor((differences + 1) / 2) - 1 + diff_accuracy``.
@@ -506,7 +530,7 @@ def estimate_noise_stddev(
         )
         if window_size % 2 == 0:
             raise ValueError(
-                "Got window_size = {window_size}, expected an odd integer."
+                f"Got window_size = {window_size}, expected an odd integer."
             )
 
     # power
@@ -543,6 +567,13 @@ def estimate_noise_stddev(
                 "size)."
             )
 
+    ### Preparation ###
+
+    # the keyword arguments for the extrapolator are set up
+    extrapolator_kwargs = (
+        extrapolator_kwargs if extrapolator_kwargs is not None else dict()
+    )
+
     ### Noise Standard Deviation Estimation ###
 
     # the signal is extrapolated to avoid edge effects
@@ -552,9 +583,10 @@ def estimate_noise_stddev(
         series,
         pad_width,
         *extrapolator_args,
+        **extrapolator_kwargs,
     )
 
-    # the absolute forward finite differences are computed ...
+    # the absolute central finite differences are computed ...
     abs_diff_series = np.abs(
         np.convolve(series_extrap, np.flip(diff_kernel), mode="valid")
     )
