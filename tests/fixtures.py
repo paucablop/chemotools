@@ -133,10 +133,10 @@ def noise_level_whittaker_auto_lambda() -> np.ndarray:
 
 
 @pytest.fixture
-def reference_forward_finite_differences() -> List[RefDifferenceKernel]:
+def reference_finite_differences(kind: str) -> List[RefDifferenceKernel]:
     fpath = os.path.join(
         path_to_resources,
-        "./finite_differences/reference_forward_differences.csv",
+        f"./finite_differences/reference_{kind}_differences.csv",
     )
     fin_diff_table = np.genfromtxt(
         fpath,

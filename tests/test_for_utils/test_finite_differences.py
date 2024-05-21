@@ -12,13 +12,14 @@ import numpy as np
 import pytest
 
 from chemotools.utils._finite_differences import (
+    calc_central_diff_kernel,
     calc_forward_diff_kernel,
     estimate_noise_stddev,
     gen_squ_fw_fin_diff_mat_cho_banded,
 )
 from tests.fixtures import noise_level_estimation_refs  # noqa: F401
 from tests.fixtures import noise_level_estimation_signal  # noqa: F401
-from tests.fixtures import reference_forward_finite_differences  # noqa: F401
+from tests.fixtures import reference_finite_differences  # noqa: F401
 from tests.test_for_utils.utils_funcs import (
     conv_upper_cho_banded_storage_to_sparse,
     multiply_vect_with_squ_fw_fin_diff_orig_first,
@@ -32,20 +33,61 @@ from tests.test_for_utils.utils_models import (
 ### Test Suite ###
 
 
+# parametrizes the fixture ``reference_finite_differences``
+@pytest.mark.parametrize("kind", ["forward"])
 def test_forward_diff_kernel(
-    reference_forward_finite_differences: List[RefDifferenceKernel],  # noqa: F811
+    reference_finite_differences: List[RefDifferenceKernel],  # noqa: F811
 ) -> None:
+    """
+    Tests the calculation of the forward finite difference kernel.
+
+    """
+
     # each kernel is calculated and compared to the reference
-    for ref_diff_kernel in reference_forward_finite_differences:
+    for ref_diff_kernel in reference_finite_differences:
         kernel = calc_forward_diff_kernel(differences=ref_diff_kernel.differences)
 
+        # first, the size of the kernel is checked ...
         assert kernel.size == ref_diff_kernel.size, (
-            f"Difference order {ref_diff_kernel.differences} with accuracy 1 expected "
-            f"kernel size {ref_diff_kernel.size} but got {kernel.size}"
+            f"Difference order {ref_diff_kernel.differences} with accuracy 1 - "
+            f"Expected kernel size {ref_diff_kernel.size} but got {kernel.size}"
         )
+        # ...  followed by the comparison of the kernel itself
         assert np.allclose(kernel, ref_diff_kernel.kernel, atol=1e-8), (
-            f"Difference order {ref_diff_kernel.differences} with accuracy 1 expected "
-            f"kernel {ref_diff_kernel.kernel.tolist()} but got {kernel.tolist()}"
+            f"Difference order {ref_diff_kernel.differences} with accuracy 1 - "
+            f"Expected kernel {ref_diff_kernel.kernel.tolist()} but got "
+            f"{kernel.tolist()}"
+        )
+
+
+# parametrizes the fixture ``reference_finite_differences``
+@pytest.mark.parametrize("kind", ["central"])
+def test_central_diff_kernel(
+    reference_finite_differences: List[RefDifferenceKernel],  # noqa: F811
+) -> None:
+    """
+    Tests the calculation of the central finite difference kernel.
+
+    """
+
+    # each kernel is calculated and compared to the reference
+    for ref_diff_kernel in reference_finite_differences:
+        kernel = calc_central_diff_kernel(
+            differences=ref_diff_kernel.differences,
+            accuracy=ref_diff_kernel.accuracy,
+        )
+
+        # first, the size of the kernel is checked ...
+        assert kernel.size == ref_diff_kernel.size, (
+            f"Difference order {ref_diff_kernel.differences} with accuracy "
+            f"{ref_diff_kernel.accuracy} - Expected kernel size {ref_diff_kernel.size} "
+            f"but got {kernel.size}"
+        )
+        # ...  followed by the comparison of the kernel itself
+        assert np.allclose(kernel, ref_diff_kernel.kernel, atol=1e-8), (
+            f"Difference order {ref_diff_kernel.differences} with accuracy "
+            f"{ref_diff_kernel.accuracy} - Expected kernel "
+            f"{ref_diff_kernel.kernel.tolist()} but got {kernel.tolist()}"
         )
 
 
@@ -322,7 +364,7 @@ def test_estimate_noise_stddev_invalid_input(
             differences=differences,
             diff_accuracy=accuracy,
             window_size=window_size,
-            power=power, # type: ignore
+            power=power,  # type: ignore
             stddev_min=stddev_min,
         )
 
@@ -353,7 +395,12 @@ def test_noise_level_estimation(
         # way because both results were computed in the same way with the only
         # difference being that Chemotools uses Python and the reference uses
         # LibreOffice Calc
-        assert np.allclose(noise_level, ref.noise_level, rtol=1e-12)
+        assert np.allclose(noise_level, ref.noise_level, rtol=1e-12), (
+            f"Original noise level differs from reference noise for differences "
+            f"{ref.differences} with accuracy {ref.accuracy} and window size "
+            f"{ref.window_size} given a minimum standard deviation of "
+            f"{ref.min_noise_level}."
+        )
 
         # then, all the available powers to which the noise level can be raised are
         # compared to the reference
@@ -368,6 +415,13 @@ def test_noise_level_estimation(
             )
 
             # again, the comparison is quite strict
-            assert np.allclose(raised_noise_level, raised_noise_level_ref, atol=1e-12)
+            assert np.allclose(
+                raised_noise_level, raised_noise_level_ref, atol=1e-12
+            ), (
+                f"Raised noise level differs from reference noise for differences "
+                f"{ref.differences} with accuracy {ref.accuracy} and window size "
+                f"{ref.window_size} given a minimum standard deviation of "
+                f"{ref.min_noise_level} and a power of {power}."
+            )
 
     return
