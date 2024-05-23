@@ -599,16 +599,16 @@
         },
         "polars": {
             "hashes": [
-                "sha256:0c504cfdc88f3e4262d5ecf637c10ae154565b94250ee4263a9f5f346397cf98",
-                "sha256:2b48593c44a20f09f1eb1449ea43e2e5a4adf3c82faf1fba797fb7364cfa2ca4",
-                "sha256:7530148621b541221b8a36cfad27cc576d77c0739e82d8383ee3a699935a5f63",
-                "sha256:7a9ebb85bfc9dd964490612b6fee2afbde91eee6bfaa590b731c7868d225210b",
-                "sha256:92241d9aeb29de7c503d3b4f9191181f0831dd546ee6770e5c6fae3cead98edb",
-                "sha256:a1fa24ea374ff05766e43fe2f079d62edd682ade19e3e2d68526e9c7a3e23ddf"
+                "sha256:18eb471826edaf00b9f4ff0885d19b824e48b4a16521ee173e24ef17691b623e",
+                "sha256:2258ab7ee65e1cfc86f9e762ae10c9959e79f8650f121d30404bef2a266922e0",
+                "sha256:4524bc108ddacd337c096abeabcd3310f42f10ba0f53c52d3ac5c9a17a9e71af",
+                "sha256:53b2d164ae9645fffb54920eed91e0a48f72fcc3dc9414c9e67871cdcf94533d",
+                "sha256:ac3a59032b88a7e036eebe03f393f4f7e24f5197a5311f51b9f2b59458031fc6",
+                "sha256:eae3549c3748e4323ca038314484215823bc7c3f764bb685ea1080e132fd29fd"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.8'",
-            "version": "==0.20.16"
+            "version": "==0.20.28"
         },
         "pyarrow": {
             "hashes": [
