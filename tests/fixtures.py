@@ -209,11 +209,11 @@ def noise_level_estimation_refs() -> List[NoiseEstimationReference]:
         row = data[row_idx, ::]
         # if the window size is 0, it is set to None because this indicates that the
         # global noise level is to be estimated rather than a local one
-        window_size = int(row[0])
-        window_size = window_size if window_size > 0 else None
+        window_length = int(row[0])
+        window_length = window_length if window_length > 0 else None
         noise_level_refs.append(
             NoiseEstimationReference(
-                window_size=window_size,
+                window_length=window_length,
                 min_noise_level=row[1],
                 differences=round(row[2]),
                 accuracy=round(row[3]),

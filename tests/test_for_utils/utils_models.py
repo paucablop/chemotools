@@ -41,7 +41,7 @@ class NoiseEstimationReference:
 
     """
 
-    window_size: Optional[int]
+    window_length: Optional[int]
     min_noise_level: float
     differences: int
     accuracy: int
