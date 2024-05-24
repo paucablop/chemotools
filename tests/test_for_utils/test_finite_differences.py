@@ -194,7 +194,7 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
 
 
 @pytest.mark.parametrize(
-    "series, differences, accuracy, window_length, power, stddev_min",
+    "series, differences, accuracy, window_size, power, stddev_min",
     [
         (  # Number 0 series is too small for difference kernel
             np.arange(start=0, stop=5),
@@ -338,7 +338,7 @@ def test_estimate_noise_stddev_invalid_input(
     series: np.ndarray,
     differences: int,
     accuracy: int,
-    window_length: Optional[int],
+    window_size: Optional[int],
     power: int,
     stddev_min: float,
 ) -> None:
@@ -363,7 +363,7 @@ def test_estimate_noise_stddev_invalid_input(
             series=series,
             differences=differences,
             diff_accuracy=accuracy,
-            window_length=window_length,
+            window_size=window_size,
             power=power,  # type: ignore
             stddev_min=stddev_min,
         )
@@ -388,7 +388,7 @@ def test_noise_level_estimation(
             series=noise_level_estimation_signal,
             differences=ref.differences,
             diff_accuracy=ref.accuracy,
-            window_length=ref.window_length,
+            window_size=ref.window_size,
             stddev_min=ref.min_noise_level,
         )
         # then, the noise level itself is compared to the reference in a quite strict
@@ -398,7 +398,7 @@ def test_noise_level_estimation(
         assert np.allclose(noise_level, ref.noise_level, rtol=1e-12), (
             f"Original noise level differs from reference noise for differences "
             f"{ref.differences} with accuracy {ref.accuracy} and window size "
-            f"{ref.window_length} given a minimum standard deviation of "
+            f"{ref.window_size} given a minimum standard deviation of "
             f"{ref.min_noise_level}."
         )
 
@@ -409,7 +409,7 @@ def test_noise_level_estimation(
                 series=noise_level_estimation_signal,
                 differences=ref.differences,
                 diff_accuracy=ref.accuracy,
-                window_length=ref.window_length,
+                window_size=ref.window_size,
                 stddev_min=ref.min_noise_level,
                 power=power,
             )
@@ -420,7 +420,7 @@ def test_noise_level_estimation(
             ), (
                 f"Raised noise level differs from reference noise for differences "
                 f"{ref.differences} with accuracy {ref.accuracy} and window size "
-                f"{ref.window_length} given a minimum standard deviation of "
+                f"{ref.window_size} given a minimum standard deviation of "
                 f"{ref.min_noise_level} and a power of {power}."
             )
 

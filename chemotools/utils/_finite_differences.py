@@ -377,7 +377,7 @@ def estimate_noise_stddev(
     series: np.ndarray,
     differences: int = 6,
     diff_accuracy: int = 2,
-    window_length: Optional[int] = None,
+    window_size: Optional[int] = None,
     extrapolator: Callable[..., np.ndarray] = np.pad,
     extrapolator_args: Tuple[Any, ...] = ("reflect",),
     extrapolator_kwargs: Optional[Dict[str, Any]] = None,
@@ -408,7 +408,7 @@ def estimate_noise_stddev(
         integer ``>= 2``.
         Higher values will enhance the effect of outliers that will corrupt the noise
         estimation of their neighborhood.
-    window_length : int or None, default=None
+    window_size : int or None, default=None
         The odd window size around a datapoint to estimate its local noise standard
         deviation.
         Higher values will lead to a smoother noise standard deviation estimate by
@@ -420,7 +420,7 @@ def estimate_noise_stddev(
     extrapolator : callable, default=np.pad
         The extrapolator function that is used to pad the series before the finite
         differences and the median filter are applied. It will pad the signal with
-        ``pad_width = (diff_kernel_size // 2) + (window_length // 2)`` elements on each
+        ``pad_width = (diff_kernel_size // 2) + (window_size // 2)`` elements on each
         side where ``diff_kernel_size`` is the size of the central finite differences
         kernel (see the Notes for details).
         It has to be a callable with the following signature:
@@ -434,7 +434,7 @@ def estimate_noise_stddev(
         )
         ```
 
-        If ``window_length`` is ``None``, only the central finite differences kernel is
+        If ``window_size`` is ``None``, only the central finite differences kernel is
         considered.
         By default, the signal is padded by reflecting ``series`` at the edges on either
         side, but of course the quality of the noise estimation can be improved by using
@@ -479,7 +479,7 @@ def estimate_noise_stddev(
     ValueError
         If ``diff_accuracy`` is not an even integer ``>= 2``.
     ValueError
-        If ``window_length`` is below 1.
+        If ``window_size`` is below 1.
 
 
     References
@@ -520,17 +520,17 @@ def estimate_noise_stddev(
     # NOTE: the difference order and accuracy are by the central finite differences
     #       kernel function
     # window size
-    if window_length is not None:
+    if window_size is not None:
         check_scalar(
-            window_length,
-            name="window_length",
+            window_size,
+            name="window_size",
             target_type=Integral,
             min_val=1,
             include_boundaries="left",
         )
-        if window_length % 2 == 0:
+        if window_size % 2 == 0:
             raise ValueError(
-                f"Got window_length = {window_length}, expected an odd integer."
+                f"Got window_size = {window_size}, expected an odd integer."
             )
 
     # power
@@ -560,10 +560,10 @@ def estimate_noise_stddev(
             f"size)."
         )
 
-    if window_length is not None:
-        if series.size < window_length:
+    if window_size is not None:
+        if series.size < window_size:
             raise ValueError(
-                f"Got series.size = {series.size}, must be >= {window_length} (window "
+                f"Got series.size = {series.size}, must be >= {window_size} (window "
                 "size)."
             )
 
@@ -578,7 +578,7 @@ def estimate_noise_stddev(
 
     # the signal is extrapolated to avoid edge effects
     pad_width = diff_kernel.size // 2
-    pad_width += 0 if window_length is None else window_length // 2
+    pad_width += 0 if window_size is None else window_size // 2
     series_extrap = extrapolator(
         series,
         pad_width,
@@ -595,7 +595,7 @@ def estimate_noise_stddev(
     # ... and the median filter is applied to theses differences
     prefactor = _MAD_PREFACTOR / np.linalg.norm(diff_kernel)
     # Case 1: the global noise standard deviation is estimated
-    if window_length is None:
+    if window_size is None:
         noise_stddev = np.full_like(
             series,
             fill_value=prefactor * np.median(abs_diff_series),
@@ -603,14 +603,14 @@ def estimate_noise_stddev(
 
     # Case 2: the local noise standard deviation is estimated
     else:
-        half_window_length = window_length // 2
+        half_window_size = window_size // 2
         noise_stddev = (
             prefactor
             * median_filter(
                 abs_diff_series,
-                size=window_length,
+                size=window_size,
                 mode="constant",
-            )[half_window_length : size_after_diff - half_window_length]
+            )[half_window_size : size_after_diff - half_window_size]
         )
 
     # the minimum-bounded noise standard deviation is raised to the power
