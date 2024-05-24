@@ -5,4 +5,4 @@ matplotlib
 pentapy
 pytest
 pytest-cov
-pytest-xdist
+pytest-xdist[psutil]
