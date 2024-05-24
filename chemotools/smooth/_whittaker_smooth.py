@@ -283,7 +283,7 @@ class WhittakerSmooth(
         considerations are not appropriate and replicate measurements are not available/
         feasible. In such scenarios, the weights can still be estimated by making use of
         the function :func:`chemotools.smooth.estimate_noise_stddev` with a `power=-2`.
-        It relies on the parameter ``window_length`` to estimate the local/global noise
+        It relies on the parameter ``window_size`` to estimate the local/global noise
         standard deviation of the spectrum, but please refer to the documentation of the
         function for further details.
 
@@ -362,7 +362,7 @@ class WhittakerSmooth(
         considerations are not appropriate and replicate measurements are not available/
         feasible. In such scenarios, the weights can still be estimated by making use of
         the function :func:`chemotools.smooth.estimate_noise_stddev` with a `power=-2`.
-        It relies on the parameter ``window_length`` to estimate the local/global noise
+        It relies on the parameter ``window_size`` to estimate the local/global noise
         standard deviation of the spectrum, but please refer to the documentation of the
         function for further details.
 
