@@ -256,12 +256,36 @@ class WhittakerSmooth(
         sample_weight : ndarray of shape (n_features,), (n_samples, n_features), (1, n_features), or None, default=None
             Individual weights for each of the input data. If only 1 weight vector is
             provided, it is assumed to be the same for the features all samples.
+            No weights may be negative (< 0.0) and at least one weight needs to be
+            positive (> 0.0).
+            Providing them is mandatory when the optimum penalty weight ``lam`` is to be
+            determined automatically via the log marginal likelihood (``"logml"``)
+            method.
             If ``None``, all features are assumed to have the same weight.
+            Please refer to the Notes section for further details on selecting the
+            weights.
 
         Returns
         -------
         X_smoothed : ndarray of shape (n_samples, n_features)
             The transformed data.
+
+        Notes
+        -----
+        If estimates of the standard deviations ``s_i`` of each data point are
+        available, e.g., from theoretical considerations or repeated measurements, it is
+        recommended to use the inverse of the squared standard deviations as weights,
+        i.e., ``w_i = 1 / (s_i * s_i)``. This is a very effective way to down-weight
+        noisy data points and thus reduce the risk of noise-induced artifacts in the
+        smoothed signal. On the other hand, features measured with high confidence will
+        remain well-preserved even under strong smoothing.
+        Sometimes, it is infeasible to provide standard deviations because theoretical
+        considerations are not appropriate and replicate measurements are not available/
+        feasible. In such scenarios, the weights can still be estimated by making use of
+        the function :func:`chemotools.smooth.estimate_noise_stddev` with a `power=-2`.
+        It relies on the parameter ``window_length`` to estimate the local/global noise
+        standard deviation of the spectrum, but please refer to the documentation of the
+        function for further details.
 
         """  # noqa: E501
 
@@ -313,12 +337,34 @@ class WhittakerSmooth(
             provided, it is assumed to be the same for the features all samples.
             No weights may be negative (< 0.0) and at least one weight needs to be
             positive (> 0.0).
+            Providing them is mandatory when the optimum penalty weight ``lam`` is to be
+            determined automatically via the log marginal likelihood (``"logml"``)
+            method.
             If ``None``, all features are assumed to have the same weight.
+            Please refer to the Notes section for further details on selecting the
+            weights.
 
         Returns
         -------
         X_smoothed : ndarray of shape (n_samples, n_features)
             The transformed data.
+
+        Notes
+        -----
+        If estimates of the standard deviations ``s_i`` of each data point are
+        available, e.g., from theoretical considerations or repeated measurements, it is
+        recommended to use the inverse of the squared standard deviations as weights,
+        i.e., ``w_i = 1 / (s_i * s_i)``. This is a very effective way to down-weight
+        noisy data points and thus reduce the risk of noise-induced artifacts in the
+        smoothed signal. On the other hand, features measured with high confidence will
+        remain well-preserved even under strong smoothing.
+        Sometimes, it is infeasible to provide standard deviations because theoretical
+        considerations are not appropriate and replicate measurements are not available/
+        feasible. In such scenarios, the weights can still be estimated by making use of
+        the function :func:`chemotools.smooth.estimate_noise_stddev` with a `power=-2`.
+        It relies on the parameter ``window_length`` to estimate the local/global noise
+        standard deviation of the spectrum, but please refer to the documentation of the
+        function for further details.
 
         """  # noqa: E501
 
