@@ -12,17 +12,19 @@ from typing import Union
 import numpy as np
 
 from chemotools._runtime import PENTAPY_AVAILABLE
-from chemotools.utils import _banded_linalg as bla
-from chemotools.utils import _models
+from chemotools.utils._banded_linalg import LAndUBandCounts, lu_banded, lu_solve_banded
+from chemotools.utils._models import (
+    BandedLUFactorization,
+    BandedPentapyFactorization,
+    BandedSolvers,
+)
 
 if PENTAPY_AVAILABLE:
     import pentapy as pp
 
 ### Type Aliases ###
 
-_Factorization = Union[
-    _models.BandedLUFactorization, _models.BandedPentapyFactorization
-]
+_Factorization = Union[BandedLUFactorization, BandedPentapyFactorization]
 
 ### Functions ###
 
@@ -59,9 +61,11 @@ def solve_pentapy(
         # NOTE: the solutions are first written into the rows of the solution matrix
         #       because row-access is more efficient for C-contiguous arrays;
         #       afterwards, the solution matrix is transposed
-        solution = np.empty(shape=(rhs_b_weighted.shape[1], rhs_b_weighted.shape[0]))
+        solution_matrix = np.empty(
+            shape=(rhs_b_weighted.shape[1], rhs_b_weighted.shape[0])
+        )
         for iter_j in range(0, rhs_b_weighted.shape[1]):
-            solution[iter_j, ::] = pp.solve(
+            solution_matrix[iter_j, ::] = pp.solve(
                 mat=lhs_a_banded,
                 rhs=rhs_b_weighted[::, iter_j],
                 is_flat=True,
@@ -69,14 +73,14 @@ def solve_pentapy(
                 solver=1,
             )
 
-        return solution.transpose()
+        return solution_matrix.transpose()
 
 
 def solve_ppivoted_lu(
-    l_and_u: bla.LAndUBandCounts,
+    l_and_u: LAndUBandCounts,
     lhs_a_banded: np.ndarray,
     rhs_b_weighted: np.ndarray,
-) -> tuple[np.ndarray, _models.BandedLUFactorization]:
+) -> tuple[np.ndarray, BandedLUFactorization]:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` with a
     partially pivoted LU decomposition. This is the same as solving the linear system
@@ -88,13 +92,13 @@ def solve_ppivoted_lu(
 
     """
 
-    lub_factorization = bla.lu_banded(
+    lub_factorization = lu_banded(
         l_and_u=l_and_u,
         ab=lhs_a_banded,
         check_finite=False,
     )
     return (
-        bla.lu_solve_banded(
+        lu_solve_banded(
             lub_factorization=lub_factorization,
             b=rhs_b_weighted,
             check_finite=False,
@@ -107,12 +111,12 @@ def solve_ppivoted_lu(
 def solve_normal_equations(
     lam: float,
     differences: int,
-    l_and_u: bla.LAndUBandCounts,
-    penalty_mat_banded: np.ndarray,
+    l_and_u: LAndUBandCounts,
+    penalty_matrix_banded: np.ndarray,
     rhs_b_weighted: np.ndarray,
     weights: Union[float, np.ndarray],
     pentapy_enabled: bool,
-) -> tuple[np.ndarray, _models.BandedSolvers, _Factorization]:
+) -> tuple[np.ndarray, BandedSolvers, _Factorization]:
     """
     Solves the linear system of equations ``(W + lam * D.T @ D) @ x = W @ b`` where
     ``W`` is a diagonal matrix with the weights ``w`` on the main diagonal and ``D`` is
@@ -129,7 +133,7 @@ def solve_normal_equations(
         The order of the finite differences to use for the smoothing.
     l_and_u : LAndUBandCounts
         The number of sub- and super-diagonals of ``penalty_mat_banded``.
-    penalty_mat_banded : ndarray of shape (2 * differences + 1, m)
+    penalty_matrix_banded : ndarray of shape (2 * differences + 1, m)
         The penalty matrix ``D.T @ D`` in the banded storage format used for LAPACK's
         banded LU decomposition.
     b_weighted : ndarray of shape (m,) or (m, n)
@@ -180,7 +184,7 @@ def solve_normal_equations(
     # the banded storage format for the LAPACK LU decomposition is computed by
     # scaling the penalty matrix with the penalty weight lambda and then adding the
     # diagonal matrix with the weights
-    lhs_a_banded = lam * penalty_mat_banded
+    lhs_a_banded = lam * penalty_matrix_banded
     lhs_a_banded[differences, ::] += weights
 
     # the linear system of equations is solved with the most efficient method
@@ -193,8 +197,8 @@ def solve_normal_equations(
         if np.isfinite(x).all():
             return (
                 x,
-                _models.BandedSolvers.PENTAPY,
-                _models.BandedPentapyFactorization(),
+                BandedSolvers.PENTAPY,
+                BandedPentapyFactorization(),
             )
 
     # Case 2: LU decomposition (final fallback for pentapy)
@@ -206,14 +210,14 @@ def solve_normal_equations(
         )
         return (
             x,
-            _models.BandedSolvers.PIVOTED_LU,
+            BandedSolvers.PIVOTED_LU,
             lub_factorization,
         )
 
     except np.linalg.LinAlgError:
-        available_solvers = f"{_models.BandedSolvers.PIVOTED_LU}"
+        available_solvers = f"{BandedSolvers.PIVOTED_LU}"
         if pentapy_enabled:
-            available_solvers = f"{_models.BandedSolvers.PENTAPY}, {available_solvers}"
+            available_solvers = f"{BandedSolvers.PENTAPY}, {available_solvers}"
 
         raise RuntimeError(
             f"\nAll available solvers ({available_solvers}) failed to solve the "

@@ -11,13 +11,15 @@ from typing import Union
 
 import numpy as np
 
-from chemotools.utils import _banded_linalg as bla
 from chemotools.utils import _models
-from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
+from chemotools.utils._banded_linalg import slogdet_lu_banded
+from chemotools.utils._whittaker_base.auto_lambda.shared import (
+    smooth_weighted_sum_of_squared_residuals,
+)
 
 ### Constants ###
 
-_LN_TWO_PI: float = 1.8378770664093453  # ln(2 * pi)
+_LN_OF_TWO_PI: float = 1.8378770664093453  # ln(2 * pi)
 
 ### Type Aliases ###
 
@@ -29,7 +31,7 @@ _FactorizationForLogMarginalLikelihood = _models.BandedLUFactorization
 
 def get_log_marginal_likelihood_constant_term(
     differences: int,
-    penalty_mat_log_pseudo_det: float,
+    penalty_matrix_log_pseudo_determinant: float,
     weights: np.ndarray,
     zero_weight_tol: float,
 ) -> float:
@@ -65,14 +67,14 @@ def get_log_marginal_likelihood_constant_term(
     # from the log pseudo-determinant of the weight matrix, i.e., the product of the
     # non-zero elements of the weight vector
     nonzero_w_flags = weights > weights.max() * zero_weight_tol
-    nnz_w = nonzero_w_flags.sum()
-    log_pseudo_det_w = np.log(weights[nonzero_w_flags]).sum()
+    num_nonzero_w = nonzero_w_flags.sum()
+    log_pseudo_determinant_w = np.log(weights[nonzero_w_flags]).sum()
 
     # the constant term of the log marginal likelihood is computed
     return (
-        (nnz_w - differences) * _LN_TWO_PI
-        - log_pseudo_det_w
-        - penalty_mat_log_pseudo_det
+        (num_nonzero_w - differences) * _LN_OF_TWO_PI
+        - log_pseudo_determinant_w
+        - penalty_matrix_log_pseudo_determinant
     )
 
 
@@ -81,11 +83,11 @@ def get_log_marginal_likelihood(
     log_lam: float,
     lam: float,
     differences: int,
-    diff_kernel_flipped: np.ndarray,
+    difference_kernel_flipped: np.ndarray,
     rhs_b: np.ndarray,
     rhs_b_smooth: np.ndarray,
     weights: Union[float, np.ndarray],
-    w_plus_penalty_plus_n_samples_term: float,
+    w_plus_penalty_plus_num_samples_term: float,
 ) -> float:
     """
     Computes the log marginal likelihood for the automatic fitting of the penalty
@@ -105,13 +107,13 @@ def get_log_marginal_likelihood(
         The penalty weight lambda used for the smoothing, i.e., ``exp(log_lam)``.
     differences : int
         The order of the finite differences to use for the smoothing.
-    diff_kernel_flipped : ndarray of shape (differences + 1,)
+    difference_kernel_flipped : ndarray of shape (differences + 1,)
         The flipped forward finite differences kernel used for the smoothing.
     b, b_smooth : ndarray of shape (m,)
         The original series and its smoothed counterpart.
     w : float or ndarray of shape (m,)
         The weights to use for the smoothing.
-    w_plus_penalty_plus_n_samples_term : float
+    w_plus_penalty_plus_num_samples_term : float
         The last term of the log marginal likelihood that is constant since it
         involves the weights, the penalty matrix, and the number of data points
         which are all constant themselves (see the Notes for details).
@@ -153,7 +155,7 @@ def get_log_marginal_likelihood(
     """  # noqa: E501
 
     # first, the weighted Sum of Squared Residuals is computed ...
-    wrss = get_smooth_wrss(
+    weighted_sum_of_squared_residuals = smooth_weighted_sum_of_squared_residuals(
         rhs_b=rhs_b,
         rhs_b_smooth=rhs_b_smooth,
         weights=weights,
@@ -162,14 +164,16 @@ def get_log_marginal_likelihood(
     # finite differences of the smoothed series
     # NOTE: ``np.convolve`` is used to compute the forward finite differences and
     #       since it flips the provided kernel, an already flipped kernel is used
-    pss = (
+    sum_of_squared_penalties = (
         lam
-        * np.square(np.convolve(rhs_b_smooth, diff_kernel_flipped, mode="valid")).sum()
+        * np.square(
+            np.convolve(rhs_b_smooth, difference_kernel_flipped, mode="valid")
+        ).sum()
     )
 
     # besides the determinant of the combined left hand side matrix has to be
     # computed from its decomposition
-    lhs_logdet_sign, lhs_logabsdet = bla.slogdet_lu_banded(
+    lhs_logdet_sign, lhs_logabsdet = slogdet_lu_banded(
         lub_factorization=factorization,
     )
 
@@ -177,11 +181,11 @@ def get_log_marginal_likelihood(
     # computed and returned
     if lhs_logdet_sign > 0.0:
         return -0.5 * (
-            wrss
-            + pss
+            weighted_sum_of_squared_residuals
+            + sum_of_squared_penalties
             - (rhs_b.size - differences) * log_lam
             + lhs_logabsdet
-            + w_plus_penalty_plus_n_samples_term
+            + w_plus_penalty_plus_num_samples_term
         )
 
     # otherwise, if the determinant is negative, the system is extremely

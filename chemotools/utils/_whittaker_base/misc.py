@@ -15,7 +15,7 @@ import numpy as np
 
 def get_weight_generator(
     weights: Any,
-    n_series: int,
+    num_series: int,
 ) -> Generator[Union[float, np.ndarray], None, None]:
     """
     Generates a generator that yields the weights for each series in a series matrix
@@ -32,12 +32,12 @@ def get_weight_generator(
 
     # Case 1: No weights
     if weights is None:
-        for _ in range(n_series):
+        for _ in range(num_series):
             yield 1.0
 
     # Case 2: 2D weights
     elif weights.ndim == 2:
-        for idx in range(0, n_series):
+        for idx in range(0, num_series):
             yield weights[idx]
 
     # Case 3: Invalid weights

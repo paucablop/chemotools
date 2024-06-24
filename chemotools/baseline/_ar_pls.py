@@ -150,7 +150,7 @@ class ArPls(
 
         # the internal solver is setup
         self._setup_for_fit(
-            n_data=X.shape[1],
+            num_data=X.shape[1],
             differences=self.differences,
             lam=self.lam,
             child_class_name=self.__class__.__name__,

@@ -323,18 +323,18 @@ def squared_forward_difference_matrix_banded(
 
     Returns
     -------
-    squ_fw_fin_diff_mat_cho_banded : ndarray of shape (n_bands, n_data - differences + 1) or (n_bands, n_data)
+    squ_fw_fin_diff_mat_cho_banded : ndarray of shape (num_bands, num_data - differences + 1) or (n_bands, num_data)
         The squared forward finite differences matrix in the upper banded storage format
         used for LAPACK's banded Cholesky decomposition (see Notes for details).
         When ``orig_first`` is ``True``, the matrix has at maximum ``differences + 1``
-        bands (rows) and ``n_data - differences + 1`` columns.
+        bands (rows) and ``num_data - differences + 1`` columns.
         Otherwise, the matrix has at maximum ``differences + 1`` bands (rows) and
-        ``n_data`` columns.
+        ``num_data`` columns.
 
     Raises
     ------
     ValueError
-        If ``n_data`` is below ``differences + 1``, i.e., the kernel does not fit into
+        If ``num_data`` is below ``differences + 1``, i.e., the kernel does not fit into
         the data at least once.
     ValueError
         If ``differences`` is below 1.
@@ -379,7 +379,7 @@ def squared_forward_difference_matrix_banded(
     try:
         check_scalar(
             num_data,
-            name="n_data",
+            name="num_data",
             target_type=Integral,
             min_val=differences + 1,
             include_boundaries="left",
@@ -423,7 +423,7 @@ def estimate_noise_stddev(
 
     Parameters
     ----------
-    series : ndarray of shape (n_data,)
+    series : ndarray of shape (num_data,)
         The series for which the noise standard deviation is estimated.
     differences : int, default=6
         The order of the differences starting from 0 for the original curve, 1 for the
@@ -494,7 +494,7 @@ def estimate_noise_stddev(
 
     Returns
     -------
-    noise_stddev : ndarray of shape (n_data,)
+    noise_stddev : ndarray of shape (num_data,)
         The estimated noise standard deviation raised to ``power`` for each data point
         in the series.
 

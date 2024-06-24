@@ -22,7 +22,7 @@ _Factorization = Union[
 ### Functions ###
 
 
-def get_smooth_wrss(
+def smooth_weighted_sum_of_squared_residuals(
     rhs_b: np.ndarray,
     rhs_b_smooth: np.ndarray,
     weights: Union[float, np.ndarray],

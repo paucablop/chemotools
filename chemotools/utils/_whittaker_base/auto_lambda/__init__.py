@@ -7,7 +7,7 @@ class implementation.
 
 ### Imports ###
 
-from chemotools.utils._whittaker_base.auto_lambda.logml import (  # noqa: F401
+from chemotools.utils._whittaker_base.auto_lambda.log_marginal_likelihood import (  # noqa: F401
     get_log_marginal_likelihood,
     get_log_marginal_likelihood_constant_term,
 )

@@ -16,9 +16,9 @@ from chemotools.utils._models import WhittakerSmoothLambda
 
 ### Constants ###
 
-_LN_TEN: float = 2.302585092994046  # ln(10)
-_half_log_decade: float = 0.5 * _LN_TEN
-_X_ABS_LOG_TOL: float = 0.0049  # ~0.5% when converted from log to real
+_LN_OF_A_DECADE: float = 2.302585092994046  # ln(10)
+_half_ln_of_a_decade: float = 0.5 * _LN_OF_A_DECADE
+_X_ABS_LN_TOL: float = 0.0049  # ~0.5% when converted from log to real
 
 ### Optimization Functions ###
 
@@ -42,28 +42,34 @@ def get_optimized_lambda(
     # unless the search space spans less than 1 decade, i.e., ln(10) ~= 2.3, a grid
     # search is carried out to shrink the search space for the final optimization;
     # the grid is spanned with an integer number of steps of half a decade
-    log_low_bound, log_upp_bound = lam.log_auto_bounds
-    bound_log_diff = log_upp_bound - log_low_bound
-    if bound_log_diff > _LN_TEN:
-        target_best = float("inf")
-        n_steps = 1 + ceil(bound_log_diff / _half_log_decade)
+    log_lower_bound, log_upper_bound = lam.log_auto_bounds
+    bound_log_difference = log_upper_bound - log_lower_bound
+    if bound_log_difference > _LN_OF_A_DECADE:
+        target_best_so_far = float("inf")
+        num_steps = 1 + ceil(bound_log_difference / _half_ln_of_a_decade)
         # NOTE: the following ensures that the upper bound is not exceeded
-        step_size = bound_log_diff / (n_steps - 1)
+        step_size = bound_log_difference / (num_steps - 1)
 
         # all the trial values are evaluated and the best one is stored
-        for trial in range(0, n_steps):
-            log_lam_curr = log_low_bound + trial * step_size
-            target_curr = fun(log_lam_curr, *args)
+        for trial in range(0, num_steps):
+            log_lam_current = log_lower_bound + trial * step_size
+            target_current = fun(log_lam_current, *args)
 
-            if target_curr < target_best:
-                log_lam_best = log_lam_curr
-                target_best = target_curr
+            if target_current < target_best_so_far:
+                log_lam_best_so_far = log_lam_current
+                target_best_so_far = target_current
 
         # then, the bounds for the final optimization are shrunk to plus/minus half
         # a decade around the best trial value
         # NOTE: the following ensures that the bounds are not violated
-        log_low_bound = max(log_lam_best - _half_log_decade, log_low_bound)
-        log_upp_bound = min(log_lam_best + _half_log_decade, log_upp_bound)
+        log_lower_bound = max(
+            log_lam_best_so_far - _half_ln_of_a_decade,
+            log_lower_bound,
+        )
+        log_upper_bound = min(
+            log_lam_best_so_far + _half_ln_of_a_decade,
+            log_upper_bound,
+        )
 
     # finally, a scalar optimization is performed
     # NOTE: since the optimization is carried out over the log of lambda, the
@@ -71,9 +77,9 @@ def get_optimized_lambda(
     return exp(
         minimize_scalar(
             fun=fun,
-            bounds=(log_low_bound, log_upp_bound),
+            bounds=(log_lower_bound, log_upper_bound),
             args=args,
             method="bounded",
-            options={"xatol": _X_ABS_LOG_TOL},
+            options={"xatol": _X_ABS_LN_TOL},
         ).x
     )

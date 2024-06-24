@@ -10,9 +10,17 @@ from typing import Any, Literal, Tuple, Type, Union
 
 import numpy as np
 
-from chemotools.utils import _banded_linalg as bla
-from chemotools.utils import _finite_differences as fdiff
 from chemotools.utils import _models
+from chemotools.utils._banded_linalg import (
+    LAndUBandCounts,
+    convert_upper_chol_banded_to_lu_banded_storage,
+    lu_banded,
+    slogdet_lu_banded,
+)
+from chemotools.utils._finite_differences import (
+    forward_finite_difference_kernel,
+    squared_forward_difference_matrix_banded,
+)
 from chemotools.utils._types import RealNumeric
 
 ### Type Aliases ###
@@ -82,12 +90,12 @@ def get_checked_lambda(lam: Any) -> _models.WhittakerSmoothLambda:
     )
 
 
-def get_squ_fw_diff_mat_banded(
-    n_data: int,
+def get_squared_forward_finite_difference_matrix_banded(
+    num_data: int,
     differences: int,
-    orig_first: bool,
+    original_first: bool,
     dtype: Type,
-) -> Tuple[bla.LAndUBandCounts, np.ndarray]:
+) -> Tuple[LAndUBandCounts, np.ndarray]:
     """
     Returns the squared forward finite difference penalty matrix ``D.T @ D`` or its
     "flipped" counterpart ``D @ D.T`` in the banded storage format used for LAPACK's
@@ -99,29 +107,36 @@ def get_squ_fw_diff_mat_banded(
     # NOTE: the matrix is returned with integer entries because integer computations
     #       can be carried out at maximum precision; this has to be converted to
     #       double precision for the LU decomposition
-    penalty_mat_banded = fdiff.squared_forward_difference_matrix_banded(
-        num_data=n_data,
+    penalty_matrix_banded = squared_forward_difference_matrix_banded(
+        num_data=num_data,
         differences=differences,
-        original_first=orig_first,
+        original_first=original_first,
     ).astype(dtype)
 
     # ... and cast to the banded storage format for LAPACK's LU decomposition
-    return bla.convert_upper_chol_banded_to_lu_banded_storage(ab=penalty_mat_banded)
+    return convert_upper_chol_banded_to_lu_banded_storage(ab=penalty_matrix_banded)
 
 
-def get_flipped_fw_diff_kernel(differences: int, dtype: Type) -> np.ndarray:
+def get_flipped_fw_diff_kernel(
+    differences: int,
+    dtype: Type,
+) -> np.ndarray:
     """
     Returns the flipped forward finite difference kernel for the specified difference
     order.
 
     """
 
-    return np.flip(
-        fdiff.forward_finite_difference_kernel(differences=differences)
-    ).astype(dtype)
+    return np.flip(forward_finite_difference_kernel(differences=differences)).astype(
+        dtype
+    )
 
 
-def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> float:
+def get_penalty_log_pseudo_determinant(
+    num_data: int,
+    differences: int,
+    dtype: Type,
+) -> float:
     """
     Computes the natural logarithm of the pseudo-determinant of the squared forward
     finite differences matrix ``D.T @ D`` which is necessary for the calculation of
@@ -129,7 +144,7 @@ def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> fl
 
     Returns
     -------
-    log_pseudo_det : float
+    log_pseudo_determinant : float
         The natural logarithm of the pseudo-determinant of the penalty matrix.
 
     Raises
@@ -157,19 +172,21 @@ def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> fl
     """
 
     # the flipped penalty matrix D @ D.T is computed
-    flipped_l_and_u, flipped_penalty_matb = get_squ_fw_diff_mat_banded(
-        n_data=n_data,
-        differences=differences,
-        orig_first=True,
-        dtype=dtype,
+    flipped_l_and_u, flipped_penalty_matrix_banded = (
+        get_squared_forward_finite_difference_matrix_banded(
+            num_data=num_data,
+            differences=differences,
+            original_first=True,
+            dtype=dtype,
+        )
     )
 
     # the pseudo-determinant is computed from the partially pivoted LU decomposition
     # of the flipped penalty matrix
-    log_pseudo_det_sign, log_pseudo_det = bla.slogdet_lu_banded(
-        lub_factorization=bla.lu_banded(
+    log_pseudo_det_sign, log_pseudo_determinant = slogdet_lu_banded(
+        lub_factorization=lu_banded(
             l_and_u=flipped_l_and_u,
-            ab=flipped_penalty_matb,
+            ab=flipped_penalty_matrix_banded,
             check_finite=False,
         ),
     )
@@ -177,14 +194,14 @@ def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> fl
     # if the sign of the pseudo-determinant is positive, the log pseudo-determinant
     # is returned
     if log_pseudo_det_sign > 0.0:
-        return log_pseudo_det
+        return log_pseudo_determinant
 
     # otherwise, if is negative, the penalty matrix is extremely ill-conditioned and
     # the automatic fitting of the penalty weight is not possible
     raise RuntimeError(
         f"\nThe pseudo-determinant of the penalty D.T @ D matrix is negative, "
         f"indicating that the system is extremely ill-conditioned.\n"
-        f"Automatic fitting for {n_data} data points and difference order "
+        f"Automatic fitting for {num_data} data points and difference order "
         f"{differences} is not possible.\n"
         f"Please consider reducing the number of data points to smooth by, e.g., "
         f"binning or lowering the difference order."

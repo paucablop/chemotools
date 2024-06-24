@@ -17,10 +17,21 @@ import numpy as np
 from chemotools._runtime import PENTAPY_AVAILABLE
 from chemotools.utils import _models
 from chemotools.utils._banded_linalg import LAndUBandCounts
-from chemotools.utils._whittaker_base import auto_lambda as auto
-from chemotools.utils._whittaker_base import initialisation as init
-from chemotools.utils._whittaker_base import solvers
+from chemotools.utils._whittaker_base.auto_lambda import (
+    _Factorization,
+    get_log_marginal_likelihood,
+    get_log_marginal_likelihood_constant_term,
+    get_optimized_lambda,
+)
+from chemotools.utils._whittaker_base.initialisation import (
+    _LambdaSpecs,
+    get_checked_lambda,
+    get_flipped_fw_diff_kernel,
+    get_penalty_log_pseudo_determinant,
+    get_squared_forward_finite_difference_matrix_banded,
+)
 from chemotools.utils._whittaker_base.misc import get_weight_generator
+from chemotools.utils._whittaker_base.solvers import solve_normal_equations
 
 ### Class Implementation ###
 
@@ -34,7 +45,7 @@ class WhittakerLikeSolver:
 
     Attributes
     ----------
-    n_data_ : int
+    num_data_ : int
         The number of data points within the series to smooth. It is equivalent to
         ``n_features_in_``, but it was renamed to be allow for definition after the
         initialisation.
@@ -43,24 +54,24 @@ class WhittakerLikeSolver:
         smooth estimate of the ``m``-th order derivative, this should be set to
         at least ``m + 2``.
         For higher orders, the systems to solve tend to get numerically instable,
-        especially when ``n_data_`` grows large and high values for ``lam_`` are used.
+        especially when ``num_data_`` grows large and high values for ``lam_`` are used.
         Values below 1 are not allowed.
-    _lam_inter_ : WhittakerSmoothLambda
+    _lam_internal_ : WhittakerSmoothLambda
         The internal representation of the lambda parameter to use for the smoothing,
         a.k.a. the penalty weight or smoothing parameter.
         It is internally stored as an instance of the dataclass :class:`WhittakerSmoothLambda`.
     _l_and_u_ : (int, int)
         The number of sub- (first) and superdiagonals (second element) of the final
         matrix to solve for smoothing. Both elements will equal ``differences_``.
-    _diff_kernel_flipped_ : ndarray of shape (0, ) or (differences + 1,)
+    _difference_kernel_flipped_ : ndarray of shape (0, ) or (differences + 1,)
         The flipped kernel to use for the forward finite differences. It is only
         required for the automatic fitting of the lambda parameter by maximizing the log
         marginal likelihood, i.e., when ``lam_ == WhittakerSmoothMethods.LOG_MARGINAL_LIKELIHOOD``.
         Flipping is required due to NumPy's definition of convolution.
-    _penalty_mat_banded_ : ndarray of shape (n_data - differences + 1, n_data - differences + 1)
+    _penalty_matrix_banded_ : ndarray of shape (num_data - differences + 1, num_data - differences + 1)
         The squared forward finite differences matrix ``D.T @ D`` stored in the banded
         storage format used for LAPACK's banded LU decomposition.
-    _penalty_mat_log_pseudo_det_ : float
+    _penalty_matrix_log_pseudo_determinant_ : float
         The natural logarithm of the pseudo-determinant of the squared forward finite
         differences matrix ``D.T @ D`` which is used for the automatic fitting of the
         lambda parameter by maximizing the log marginal likelihood, i.e., when
@@ -97,9 +108,9 @@ class WhittakerLikeSolver:
 
     def _setup_for_fit(
         self,
-        n_data: int,
+        num_data: int,
         differences: int,
-        lam: init._LambdaSpecs,
+        lam: _LambdaSpecs,
         child_class_name: str,
     ) -> None:
         """
@@ -111,11 +122,9 @@ class WhittakerLikeSolver:
         """
 
         # the input arguments are stored and validated
-        self.n_data_: int = n_data
+        self.num_data_: int = num_data
         self.differences_: int = differences
-        self._lam_inter_: _models.WhittakerSmoothLambda = init.get_checked_lambda(
-            lam=lam
-        )
+        self._lam_internal_: _models.WhittakerSmoothLambda = get_checked_lambda(lam=lam)
         self.__child_class_name: str = child_class_name
 
         # if the difference order exceeds 2, a warning is issued because then the
@@ -133,32 +142,38 @@ class WhittakerLikeSolver:
         # the squared forward finite difference matrix D.T @ D is computed in band
         # storage format for LAPACK's banded LU decomposition
         self._l_and_u_: LAndUBandCounts
-        self._penalty_mat_banded_: np.ndarray
-        self._l_and_u_, self._penalty_mat_banded_ = init.get_squ_fw_diff_mat_banded(
-            n_data=self.n_data_,
-            differences=self.differences_,
-            orig_first=False,
-            dtype=self.__dtype,
+        self._penalty_matrix_banded_: np.ndarray
+        self._l_and_u_, self._penalty_matrix_banded_ = (
+            get_squared_forward_finite_difference_matrix_banded(
+                num_data=self.num_data_,
+                differences=self.differences_,
+                original_first=False,
+                dtype=self.__dtype,
+            )
         )
 
         # if the penalty weight is fitted automatically by maximization of the
         # log marginal likelihood, the natural logarithm of the pseudo-determinant of
         # D.T @ D is pre-computed together with the forward finite difference kernel
-        self._diff_kernel_flipped_: np.ndarray = np.ndarray([], dtype=self.__dtype)
-        self._penalty_mat_log_pseudo_det_: float = float("nan")
-        if self._lam_inter_.fit_auto and self._lam_inter_.method_used in {
+        self._difference_kernel_flipped_: np.ndarray = np.ndarray(
+            [], dtype=self.__dtype
+        )
+        self._penalty_matrix_log_pseudo_determinant_: float = float("nan")
+        if self._lam_internal_.fit_auto and self._lam_internal_.method_used in {
             _models.WhittakerSmoothMethods.LOGML,
         }:
             # NOTE: the kernel is also returned with integer entries because integer
             #       computations can be carried out at maximum precision
-            self._diff_kernel_flipped_ = init.get_flipped_fw_diff_kernel(
+            self._difference_kernel_flipped_ = get_flipped_fw_diff_kernel(
                 differences=self.differences_,
                 dtype=self.__dtype,
             )
-            self._penalty_mat_log_pseudo_det_ = init.get_penalty_log_pseudo_det(
-                n_data=self.n_data_,
-                differences=self.differences_,
-                dtype=self.__dtype,
+            self._penalty_matrix_log_pseudo_determinant_ = (
+                get_penalty_log_pseudo_determinant(
+                    num_data=self.num_data_,
+                    differences=self.differences_,
+                    dtype=self.__dtype,
+                )
             )
 
         # finally, Pentapy is enabled if available, the number of differences is 2,
@@ -167,7 +182,7 @@ class WhittakerLikeSolver:
             PENTAPY_AVAILABLE
             and self.differences_ == 2
             and self.__allow_pentapy
-            and not self._lam_inter_.fit_auto
+            and not self._lam_internal_.fit_auto
         )
 
     ### Solver Methods ###
@@ -178,7 +193,7 @@ class WhittakerLikeSolver:
         lam: float,
         rhs_b_weighted: np.ndarray,
         weights: Union[float, np.ndarray],
-    ) -> tuple[np.ndarray, _models.BandedSolvers, auto._Factorization]:
+    ) -> tuple[np.ndarray, _models.BandedSolvers, _Factorization]:
         """
         Internal wrapper for the solver methods to solve the linear system of equations
         for the Whittaker-like smoother.
@@ -192,11 +207,11 @@ class WhittakerLikeSolver:
 
         """  # noqa: E501
 
-        return solvers.solve_normal_equations(
+        return solve_normal_equations(
             lam=lam,
             differences=self.differences_,
             l_and_u=self._l_and_u_,
-            penalty_mat_banded=self._penalty_mat_banded_,
+            penalty_matrix_banded=self._penalty_matrix_banded_,
             rhs_b_weighted=rhs_b_weighted,
             weights=weights,
             pentapy_enabled=self._pentapy_enabled_,
@@ -233,16 +248,16 @@ class WhittakerLikeSolver:
         # finally, the log marginal likelihood is computed and returned (negative since
         # the objective function is minimized, but the log marginal likelihood is
         # to be maximized)
-        return (-1.0) * auto.get_log_marginal_likelihood(
+        return (-1.0) * get_log_marginal_likelihood(
             factorization=factorization,  # type: ignore
             log_lam=log_lam,  # type: ignore
             lam=lam,
             differences=self.differences_,
-            diff_kernel_flipped=self._diff_kernel_flipped_,
+            difference_kernel_flipped=self._difference_kernel_flipped_,
             rhs_b=rhs_b,
             rhs_b_smooth=b_smooth,
             weights=weights,
-            w_plus_penalty_plus_n_samples_term=w_plus_penalty_plus_n_samples_term,
+            w_plus_penalty_plus_num_samples_term=w_plus_penalty_plus_n_samples_term,
         )
 
     ### Solver management methods ###
@@ -261,7 +276,7 @@ class WhittakerLikeSolver:
 
         # if no value was provided for the penalty weight lambda, the respective class
         # attribute is used instead
-        lam = self._lam_inter_.fixed_lambda if lam is None else lam
+        lam = self._lam_internal_.fixed_lambda if lam is None else lam
 
         # the weights and the weighted series are computed depending on whether weights
         # are provided or not
@@ -313,18 +328,18 @@ class WhittakerLikeSolver:
             )
 
         # the term that is constant for the log marginal likelihood is computed
-        w_plus_n_samples_term = auto.get_log_marginal_likelihood_constant_term(
+        w_plus_num_samples_term = get_log_marginal_likelihood_constant_term(
             differences=self.differences_,
-            penalty_mat_log_pseudo_det=self._penalty_mat_log_pseudo_det_,
+            penalty_matrix_log_pseudo_determinant=self._penalty_matrix_log_pseudo_determinant_,
             weights=weights,
             zero_weight_tol=self.__zero_weight_tol,
         )
 
         # the optimization of the log marginal likelihood is carried out
-        opt_lambda = auto.get_optimized_lambda(
+        opt_lambda = get_optimized_lambda(
             fun=self._marginal_likelihood_objective,
-            lam=self._lam_inter_,
-            args=(rhs_b, weights, w_plus_n_samples_term),
+            lam=self._lam_internal_,
+            args=(rhs_b, weights, w_plus_num_samples_term),
         )
 
         # the optimal penalty weight lambda is returned together with the smoothed
@@ -355,7 +370,7 @@ class WhittakerLikeSolver:
         # Case 1: no weights are provided
         if weights is None:
             X_smooth, _, _ = self._solve(
-                lam=self._lam_inter_.fixed_lambda,
+                lam=self._lam_internal_.fixed_lambda,
                 rhs_b_weighted=X.transpose(),
                 weights=1.0,
             )
@@ -363,14 +378,17 @@ class WhittakerLikeSolver:
         # Case 2: weights are provided
         else:
             X_smooth, _, _ = self._solve(
-                lam=self._lam_inter_.fixed_lambda,
+                lam=self._lam_internal_.fixed_lambda,
                 rhs_b_weighted=(X * weights).transpose(),
                 weights=weights[0, ::],
             )
 
         return (
             X_smooth.transpose(),
-            np.full(shape=(X.shape[0],), fill_value=self._lam_inter_.fixed_lambda),
+            np.full(
+                shape=(X.shape[0],),
+                fill_value=self._lam_internal_.fixed_lambda,
+            ),
         )
 
     ### Main Solver Entry Point ###
@@ -418,7 +436,7 @@ class WhittakerLikeSolver:
         # if multiple x with the same weights are to be solved for fixed lambda, this
         # can be done more efficiently by leveraging LAPACK'S (not pentapy's) ability to
         # perform multiple solves from the same inversion at once
-        if use_same_w_for_all and not self._lam_inter_.fit_auto:
+        if use_same_w_for_all and not self._lam_internal_.fit_auto:
             return self._solve_multiple_b(X=X, weights=weights)
 
         # otherwise, the solution of the linear system of equations is computed for
@@ -429,12 +447,12 @@ class WhittakerLikeSolver:
             _models.WhittakerSmoothMethods.FIXED: self._solve_single_b_fixed_lam,
             _models.WhittakerSmoothMethods.LOGML: self._solve_single_b_auto_lam_logml,
         }
-        smooth_method = smooth_method_assignment[self._lam_inter_.method_used]
+        smooth_method = smooth_method_assignment[self._lam_internal_.method_used]
 
         # then, the solution is computed for each series by means of a loop
         X_smooth = np.empty_like(X)
         lam = np.empty(shape=(X.shape[0],))
-        w_gen = get_weight_generator(weights=weights, n_series=X.shape[0])
+        w_gen = get_weight_generator(weights=weights, num_series=X.shape[0])
         for iter_i, (x_vect, wght) in enumerate(zip(X, w_gen)):
             X_smooth[iter_i], lam[iter_i] = smooth_method(
                 rhs_b=x_vect,

@@ -42,14 +42,14 @@ from tests.fixtures import spectrum_arpls  # noqa: F401
 from tests.fixtures import spectrum
 
 
-@pytest.mark.parametrize("n_samples", [1, 5])
+@pytest.mark.parametrize("num_series", [1, 5])
 def test_air_pls(
     spectrum,
     reference_airpls,  # noqa: F811
-    n_samples: int,
-):
+    num_series: int,
+) -> None:
     # Arrange
-    reps = (n_samples, 1)
+    repetitions = (num_series, 1)
     air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
 
     # Act
@@ -57,7 +57,7 @@ def test_air_pls(
 
     # Assert
     assert np.allclose(
-        spectrum_corrected[0], np.tile(reference_airpls, reps=reps), atol=1e-7
+        spectrum_corrected[0], np.tile(reference_airpls, reps=repetitions), atol=1e-7
     )
 
 
@@ -78,10 +78,14 @@ def test_air_pls(
 
 # FIXME: working with such a high ``atol`` indicates that the reference is not up to
 #        date anymore
-@pytest.mark.parametrize("n_samples", [1, 5])
-def test_ar_pls(spectrum_arpls, reference_arpls, n_samples: int):  # noqa: F811
+@pytest.mark.parametrize("num_series", [1, 5])
+def test_ar_pls(
+    spectrum_arpls,  # noqa: F811
+    reference_arpls,  # noqa: F811
+    num_series: int,
+) -> None:
     # Arrange
-    reps = (n_samples, 1)
+    repetitions = (num_series, 1)
     arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
@@ -89,7 +93,9 @@ def test_ar_pls(spectrum_arpls, reference_arpls, n_samples: int):  # noqa: F811
     spectrum_corrected = arpls.fit_transform(spectrum_arpls)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], np.tile(reference, reps=reps), atol=1e-4)
+    assert np.allclose(
+        spectrum_corrected[0], np.tile(reference, reps=repetitions), atol=1e-4
+    )
 
 
 # FIXME: Deactivated because it fails; Issue created:
@@ -688,7 +694,9 @@ def test_range_cut_by_wavenumber_with_polars_dataframe():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pl.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
-    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='polars')
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(
+        transform="polars"
+    )
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
@@ -813,25 +821,25 @@ def test_uniform_noise():
 
 @pytest.mark.parametrize("same_weights_for_all", [True, False])
 @pytest.mark.parametrize("with_weights", [True, False])
-@pytest.mark.parametrize("n_samples", [1, 5])
+@pytest.mark.parametrize("num_series", [1, 5])
 def test_whittaker_smooth(
     spectrum,
     reference_whittaker,  # noqa: F811
-    n_samples: int,
+    num_series: int,
     with_weights: bool,
     same_weights_for_all: bool,
-):
+) -> None:
     # Arrange
-    reps = (n_samples, 1)
+    repetitions = (num_series, 1)
     whittaker_smooth = WhittakerSmooth()
     if with_weights and not same_weights_for_all:
-        weights = np.ones(shape=(n_samples, len(spectrum[0])))
+        weights = np.ones(shape=(num_series, len(spectrum[0])))
     elif with_weights and same_weights_for_all:
         weights = np.ones(shape=(len(spectrum[0]),))
     else:
         weights = None
 
-    spectrum_to_fit_original = np.tile(spectrum, reps=reps)
+    spectrum_to_fit_original = np.tile(spectrum, reps=repetitions)
     spectrum_to_fit = spectrum_to_fit_original.copy()
 
     # Act
@@ -843,15 +851,17 @@ def test_whittaker_smooth(
     # NOTE: the following test makes sure nothing was overwritten
     assert np.array_equal(spectrum_to_fit, spectrum_to_fit_original)
     assert np.allclose(
-        spectrum_corrected, np.tile(reference_whittaker, reps=reps), atol=1e-8
+        spectrum_corrected, np.tile(reference_whittaker, reps=repetitions), atol=1e-8
     )
 
 
 @pytest.mark.parametrize("same_weights_for_all", [True, False])
 @pytest.mark.parametrize("with_weights", [True, False])
-@pytest.mark.parametrize("n_samples", [1, 5])
+@pytest.mark.parametrize("num_series", [1, 5])
 def test_whittaker_with_pentapy(
-    n_samples: int, with_weights: bool, same_weights_for_all: bool
+    num_series: int,
+    with_weights: bool,
+    same_weights_for_all: bool,
 ):
     # this test is skipped with a warning if pentapy is not installed
     if not PENTAPY_AVAILABLE:
@@ -859,12 +869,12 @@ def test_whittaker_with_pentapy(
 
     # Arrange
     np.random.seed(42)
-    spectrum = np.random.rand(n_samples, 1000)
+    spectrum = np.random.rand(num_series, 1000)
     whittaker_smooth = WhittakerSmooth(lam=100.0, differences=2)
 
     weights = None
     if with_weights and not same_weights_for_all:
-        weights = np.ones(shape=(n_samples, len(spectrum[0])))
+        weights = np.ones(shape=(num_series, len(spectrum[0])))
     elif with_weights and same_weights_for_all:
         weights = np.ones(shape=(len(spectrum[0]),))
 
@@ -876,7 +886,7 @@ def test_whittaker_with_pentapy(
     # Assert with pentapy
     # NOTE: the weight is not correct since the test only checks the method
     solve_method = whittaker_smooth._solve(
-        lam=whittaker_smooth._lam_inter_.fixed_lambda,
+        lam=whittaker_smooth._lam_internal_.fixed_lambda,
         rhs_b_weighted=spectrum.transpose(),
         weights=1.0,
     )[1]
@@ -891,7 +901,7 @@ def test_whittaker_with_pentapy(
     # Assert without pentapy
     # NOTE: the weight is not correct since the test only checks the method
     solve_method = whittaker_smooth._solve(
-        lam=whittaker_smooth._lam_inter_.fixed_lambda,
+        lam=whittaker_smooth._lam_internal_.fixed_lambda,
         rhs_b_weighted=spectrum.transpose(),
         weights=1.0,
     )[1]
@@ -904,16 +914,16 @@ def test_whittaker_with_pentapy(
 )
 @pytest.mark.parametrize("difference", [1, 2])
 @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
-@pytest.mark.parametrize("size", [5_000])
+@pytest.mark.parametrize("num_data", [5_000])
 def test_whittaker_constant_signal(
-    size: int,
+    num_data: int,
     fill_value: float,
     difference: int,
     log10_lam: float,
 ) -> None:
 
     # Arrange
-    spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+    spectrum = np.full(shape=(num_data,), fill_value=fill_value).reshape((1, -1))
     whittaker_smooth = WhittakerSmooth(lam=10.0**log10_lam, differences=difference)
 
     # Act
@@ -924,6 +934,6 @@ def test_whittaker_constant_signal(
     assert np.allclose(
         spectrum_corrected[0],
         spectrum[0],
-        atol=size * np.finfo(np.float64).eps,  # type: ignore
+        atol=num_data * np.finfo(np.float64).eps,  # type: ignore
         rtol=1e-6,
     )

@@ -224,7 +224,7 @@ class WhittakerSmooth(
         self.n_features_in_ = X.shape[1]
         # ... and all the required attributes for fitting
         self._setup_for_fit(
-            n_data=self.n_features_in_,
+            num_data=self.n_features_in_,
             lam=self.lam,
             differences=self.differences,
             child_class_name=self.__class__.__name__,

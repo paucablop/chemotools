@@ -7,16 +7,18 @@ module.
 ### Imports ###
 
 from math import log
-from typing import Any, Tuple, Type, Union
+from typing import Any, Tuple, Union
 
 import numpy as np
 import pytest
 
 from chemotools.utils import _models
-from chemotools.utils._whittaker_base.auto_lambda.shared import get_smooth_wrss
+from chemotools.utils._whittaker_base.auto_lambda.shared import (
+    smooth_weighted_sum_of_squared_residuals,
+)
 from chemotools.utils._whittaker_base.initialisation import (
     get_checked_lambda,
-    get_penalty_log_pseudo_det,
+    get_penalty_log_pseudo_determinant,
 )
 from chemotools.utils._whittaker_base.main import WhittakerLikeSolver
 from chemotools.utils._whittaker_base.misc import get_weight_generator
@@ -43,7 +45,7 @@ _NAN: float = float("nan")
 
 
 @pytest.mark.parametrize(
-    "combination",
+    "lam, expected_result",
     [
         (  # Number 0 (fixed float)
             100.0,
@@ -159,36 +161,27 @@ _NAN: float = float("nan")
         ),
         (  # Number 10 (wrong length tuple)
             (100.0, 10_000.0),
-            ValueError,
+            ValueError("must be a tuple of three elements"),
         ),
         (  # Number 11 (wrong type)
             "error",
-            TypeError,
+            TypeError("must be an integer, a float, a tuple of"),
         ),
     ],
 )
 def test_get_checked_lambda(
-    combination: Tuple[
-        _LambdaSpecsOrFlawed, Union[ExpectedWhittakerSmoothLambda, Type[Exception]]
-    ]
+    lam: _LambdaSpecsOrFlawed,
+    expected_result: Union[ExpectedWhittakerSmoothLambda, Exception],
 ) -> None:
     """
     Tests the function that casts a penalty weight lambda to the respective dataclass.
 
-    The ``combination`` parameter defines
-
-    - the lambda specification to be used and
-    - the expected result (will be an exception if the input should be considered
-        invalid by the function).
-
     """
 
-    # the input parameters are unpacked
-    lam, expected_result = combination
-
     # if the expected output is an exception, the test is run in a context manager
-    if not isinstance(expected_result, ExpectedWhittakerSmoothLambda):
-        with pytest.raises(expected_result):
+    if isinstance(expected_result, Exception):
+        error_catch_phrase = str(expected_result)
+        with pytest.raises(type(expected_result), match=error_catch_phrase):
             get_checked_lambda(lam=lam)
 
         return
@@ -207,53 +200,49 @@ def test_get_checked_lambda(
 
 
 @pytest.mark.parametrize(
-    "combination",
+    "weights, expected_output",
     [
-        (None, 1.0),  # Number 0
-        (  # Number 1
+        (None, 1.0),  # Number 0 (no weights)
+        (  # Number 1 (2D weights)
             np.ones(shape=(10, 1_000), dtype=np.float64),
             np.ones(shape=(1_000), dtype=np.float64),
         ),
-        (  # Number 2
+        (  # Number 2 (2D weights out of bounds)
             np.ones(shape=(5, 1_000), dtype=np.float64),
-            IndexError,
+            IndexError("is out of bounds for axis 0 with size"),
         ),
-        (  # Number 3
+        (  # Number 3 (1D weights)
             np.ones(shape=(1_000), dtype=np.float64),
-            ValueError,
+            ValueError("If provided as an Array, the weights must be a 2D-Array"),
         ),
-        (  # Number 4
+        (  # Number 4 (3D weights)
             np.ones(shape=(1, 5, 1_000), dtype=np.float64),
-            ValueError,
+            ValueError("If provided as an Array, the weights must be a 2D-Array"),
         ),
-        ("error", TypeError),  # Number 5
+        (  # Number 5 (wrong type)
+            "error",
+            TypeError("must either be None or a NumPy-2D-Array"),
+        ),
     ],
 )
 def test_weight_generator_identical_weights(
-    combination: Tuple[Any, Union[np.ndarray, float, Type[Exception]]]
+    weights: Any,
+    expected_output: Union[np.ndarray, float, Exception],
 ) -> None:
     """
     Tests the weight generator when provided with weights that are identical for all
     signals.
 
-    The ``combination`` parameter defines
-
-    - the weights to be used and
-    - the expected output at each iteration (will be an exception if the input should
-        be considered invalid by the function).
-
     """
 
-    # the input parameters are unpacked
-    weights, expected_output = combination
-
     # the number of series is defined
-    n_series = 10
+    num_series = 10
 
     # if the expected output is an exception, the test is run in a context manager
-    if not isinstance(expected_output, (np.ndarray, float, int)):
-        with pytest.raises(expected_output):
-            for _ in get_weight_generator(weights=weights, n_series=n_series):
+    if isinstance(expected_output, Exception):
+        error_catch_phrase = str(expected_output)
+        with pytest.raises(type(expected_output), match=error_catch_phrase):
+            for _ in get_weight_generator(weights=weights, num_series=num_series):
                 pass
 
         return
@@ -261,14 +250,14 @@ def test_weight_generator_identical_weights(
     # otherwise, the output is compared to the expected output
     # Case 1: the expected output is a scalar
     if isinstance(expected_output, (float, int)):
-        for wght in get_weight_generator(weights=weights, n_series=n_series):
+        for wght in get_weight_generator(weights=weights, num_series=num_series):
             assert isinstance(wght, (float, int))
             assert wght == expected_output
 
         return
 
     # Case 2: the expected output is an array
-    for wght in get_weight_generator(weights=weights, n_series=n_series):
+    for wght in get_weight_generator(weights=weights, num_series=num_series):
         assert isinstance(wght, np.ndarray)
         assert np.array_equal(wght, expected_output)
 
@@ -288,54 +277,68 @@ def test_weight_generator_different_weights() -> None:
             [11.0, 12.0, 13.0, 14.0, 15.0],
         ]
     )
-    weights_ref = weights.copy()
+    weights_reference = weights.copy()
 
     # the generator is tested
-    for idx, wght in enumerate(get_weight_generator(weights=weights, n_series=3)):
-        assert np.array_equal(wght, weights_ref[idx, ::])
+    for index, wght in enumerate(
+        get_weight_generator(weights=weights, num_series=weights.shape[0])
+    ):
+        assert np.array_equal(wght, weights_reference[index, ::])
 
 
-@pytest.mark.parametrize("combination", [(True, 244_9755_000.0), (False, 490_000.0)])
-def test_smooth_wrss(combination: Tuple[bool, float]) -> None:
+@pytest.mark.parametrize(
+    "with_weights, weighted_residual_sum_of_squared_expected",
+    [
+        (True, 244_9755_000.0),
+        (False, 490_000.0),
+    ],
+)
+def test_smooth_weighted_residual_sum_of_squares(
+    with_weights: bool,
+    weighted_residual_sum_of_squared_expected: float,
+) -> None:
     """
     Tests the weighted residual sum of squares calculation.
 
-    The ``combination`` parameter defines
-
-    - whether weights are used (``True``) or not (``False``) and
-    - the expected weighted residual sum of squares.
-
     """
-
-    # the input parameters are unpacked
-    with_weights, wrss_expected = combination
 
     # two series are generated where the difference between the elements is 7.0
     np.random.seed(42)
-    n_data = 10_000
-    a_signs = np.random.choice([-1.0, 1.0], size=(n_data,), replace=True)
+    num_data = 10_000
+    a_signs = np.random.choice([-1.0, 1.0], size=(num_data,), replace=True)
     a_series = a_signs * 4.5
     b_series = (-1.0) * a_signs * 2.5
 
     # the weights are generated
     weights = (
-        np.arange(start=0, stop=n_data, step=1.0, dtype=np.float64)
+        np.arange(start=0, stop=num_data, step=1.0, dtype=np.float64)
         if with_weights
         else 1.0
     )
 
     # the wrss is calculated ...
-    wrss = get_smooth_wrss(rhs_b=a_series, rhs_b_smooth=b_series, weights=weights)
+    weighted_sum_of_squared_residuals_chemotools = (
+        smooth_weighted_sum_of_squared_residuals(
+            rhs_b=a_series,
+            rhs_b_smooth=b_series,
+            weights=weights,
+        )
+    )
 
     # ... and compared to the expected value with a very strict tolerance
-    assert np.isclose(wrss, wrss_expected, atol=1e-13, rtol=0.0)
+    assert np.isclose(
+        weighted_sum_of_squared_residuals_chemotools,
+        weighted_residual_sum_of_squared_expected,
+        atol=1e-13,
+        rtol=0.0,
+    )
 
 
 # TODO: due to ill-conditioning, this is highly limited in the differences and number
 #       of data points; in the future, this should be tackled by QR-decomposition for
 #       extra numerical stability
 @pytest.mark.parametrize(
-    "differences_and_n_data_from_to",
+    "differences, num_data_from, num_data_to",
     [
         (1, 0, 2_000),
         (1, 2_001, 4_000),
@@ -350,17 +353,23 @@ def test_smooth_wrss(combination: Tuple[bool, float]) -> None:
     ],
 )
 def test_penalty_log_pseudo_det_can_compute(
-    differences_and_n_data_from_to: Tuple[int, int, int]
+    differences: int,
+    num_data_from: int,
+    num_data_to: int,
 ) -> None:
     """
     Tests the log pseudo-determinant of the penalty matrix for all the difference orders
     and number of data points.
+    The test is successful if the function does not raise an exception.
 
     """
 
-    differences, n_data_from, n_data_to = differences_and_n_data_from_to
-    for nd in range(max(differences + 1, n_data_from), n_data_to + 1):
-        get_penalty_log_pseudo_det(n_data=nd, differences=differences, dtype=np.float64)
+    for num_data in range(max(differences + 1, num_data_from), num_data_to + 1):
+        get_penalty_log_pseudo_determinant(
+            num_data=num_data,
+            differences=differences,
+            dtype=np.float64,
+        )
 
 
 # TODO: this test will not 100% reflect reality as intended; in the future this should
@@ -368,7 +377,7 @@ def test_penalty_log_pseudo_det_can_compute(
 #       right now, it is set to a number of data points that causes the intended
 #       failure, but in the future, the condition number has to be used to detect
 #       ill-conditioning
-def test_penalty_log_pseudo_det_breaks_ill_conditioned() -> None:
+def test_penalty_log_pseudo_determinant_breaks_ill_conditioned() -> None:
     """
     Tests that the log pseudo-determinant of the penalty matrix breaks when the matrix
     is ill-conditioned.
@@ -377,13 +386,18 @@ def test_penalty_log_pseudo_det_breaks_ill_conditioned() -> None:
 
     # the difference order and number of data points are set so high that the matrix
     # becomes ill-conditioned
-    n_data = 1_000
+    num_data = 1_000
     differences = 10
 
     # the function is tested for breaking
-    with pytest.raises(RuntimeError):
-        get_penalty_log_pseudo_det(
-            n_data=n_data, differences=differences, dtype=np.float64
+    with pytest.raises(
+        RuntimeError,
+        match="The pseudo-determinant of the penalty D.T @ D matrix is negative",
+    ):
+        get_penalty_log_pseudo_determinant(
+            num_data=num_data,
+            differences=differences,
+            dtype=np.float64,
         )
 
         return
@@ -410,23 +424,25 @@ def test_normal_condition_solve_breaks_ill_conditioned(with_pentapy: bool) -> No
             pytest.skip("Pentapy is not installed.")
 
     # a banded ill-conditioned matrix is created that has zeros on the diagonal
-    n_data = 10_000
+    num_data = 10_000
     differences = 2
-    a_banded = np.ones(shape=(2 * differences + 1, n_data), dtype=np.float64)
+    a_banded = np.ones(shape=(2 * differences + 1, num_data), dtype=np.float64)
     a_banded[differences, :] = 0.0
 
     # some further required variables are initialised
     lam = 1e100
-    b_vect = np.ones(shape=(n_data,), dtype=np.float64)
+    b_vect = np.ones(shape=(num_data,), dtype=np.float64)
     weights = 0.0
 
     # Test that the solver breaks
-    with pytest.raises(RuntimeError):
+    with pytest.raises(
+        RuntimeError, match="failed to solve the linear system of equations"
+    ):
         solve_normal_equations(
             lam=lam,
             differences=differences,
             l_and_u=(differences, differences),
-            penalty_mat_banded=a_banded,
+            penalty_matrix_banded=a_banded,
             rhs_b_weighted=b_vect,
             weights=weights,
             pentapy_enabled=with_pentapy,
@@ -440,10 +456,13 @@ def test_whittakerlike_issues_warning_difference_order_too_high() -> None:
 
     """
 
-    with pytest.warns(UserWarning):
-        whitt_base = WhittakerLikeSolver()
-        whitt_base._setup_for_fit(
-            n_data=500,
+    with pytest.warns(
+        UserWarning,
+        match="WARNING: With the current implementation, the numerical stability",
+    ):
+        whittaker_base = WhittakerLikeSolver()
+        whittaker_base._setup_for_fit(
+            num_data=500,
             differences=3,
             lam=_models.WhittakerSmoothLambda(
                 bounds=(100.0, 10_000.0),
@@ -470,10 +489,10 @@ def test_auto_lambda_log_marginal_likelihood_refuses_no_weights(
     """
 
     # the smoother is initialised ...
-    n_data = 500
-    whitt_base = WhittakerLikeSolver()
-    whitt_base._setup_for_fit(
-        n_data=n_data,
+    num_data = 500
+    whittaker_base = WhittakerLikeSolver()
+    whittaker_base._setup_for_fit(
+        num_data=num_data,
         differences=differences,
         lam=_models.WhittakerSmoothLambda(
             bounds=(100.0, 10_000.0),
@@ -484,9 +503,12 @@ def test_auto_lambda_log_marginal_likelihood_refuses_no_weights(
 
     # ... and the log marginal likelihood method is called without weights
     np.random.seed(42)
-    X = np.random.rand(n_data)
-    with pytest.raises(ValueError):
-        whitt_base._whittaker_solve(
+    X = np.random.rand(num_data)
+    with pytest.raises(
+        ValueError,
+        match="is only possible if weights are provided",
+    ):
+        whittaker_base._whittaker_solve(
             X=X,
             weights=None,
             use_same_w_for_all=same_weights_for_all,
@@ -496,11 +518,11 @@ def test_auto_lambda_log_marginal_likelihood_refuses_no_weights(
 @pytest.mark.parametrize("with_zero_weights", [True, False])
 @pytest.mark.parametrize("same_weights_for_all", [True, False])
 @pytest.mark.parametrize("differences", [1, 2])
-@pytest.mark.parametrize("n_series", [1, 5])
+@pytest.mark.parametrize("num_series", [1, 5])
 def test_auto_lambda_log_marginal_likelihood(
     spectrum_whittaker_auto_lambda: np.ndarray,  # noqa: F811
     noise_level_whittaker_auto_lambda: np.ndarray,  # noqa: F811
-    n_series: int,
+    num_series: int,
     differences: int,
     same_weights_for_all: bool,
     with_zero_weights: bool,
@@ -543,16 +565,16 @@ def test_auto_lambda_log_marginal_likelihood(
     # then, the weights are computed as the square of the inverse noise level ...
     weights = (1.0 / np.square(noise_level))[np.newaxis, ::]
     # ... and stacked as many times as required
-    weights = np.tile(weights, reps=(n_series, 1))
+    weights = np.tile(weights, reps=(num_series, 1))
 
     # then, the spectrum is repeated as many times as required
-    X = np.tile(spectrum_whittaker_auto_lambda[np.newaxis, ::], reps=(n_series, 1))
+    X = np.tile(spectrum_whittaker_auto_lambda[np.newaxis, ::], reps=(num_series, 1))
 
     # the smoothing is performed using the chemotools implementation
     lambda_bounds = (1e-15, 1e10)
-    whitt_base = WhittakerLikeSolver()
-    whitt_base._setup_for_fit(
-        n_data=X.shape[1],
+    whittaker_base = WhittakerLikeSolver()
+    whittaker_base._setup_for_fit(
+        num_data=X.shape[1],
         differences=differences,
         lam=_models.WhittakerSmoothLambda(
             bounds=lambda_bounds,
@@ -560,7 +582,7 @@ def test_auto_lambda_log_marginal_likelihood(
         ),
         child_class_name="pytest_run",
     )
-    _, lambda_opts = whitt_base._whittaker_solve(
+    _, lambda_opts = whittaker_base._whittaker_solve(
         X=X,
         weights=weights,
         use_same_w_for_all=same_weights_for_all,

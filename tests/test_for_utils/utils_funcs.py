@@ -1216,7 +1216,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
         #       the last multiplication is a matrix-vector resulting in another vector;
         #       the other way around would result in another matrix followed by
         #       a matrix-vector multiplication
-        weights_sum_of_squared_penalties = lam * (
+        sum_of_squared_penalties = lam * (
             smooth_solution @ (penalty_matrix @ smooth_solution)
         )
 
@@ -1225,7 +1225,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
         #       and not minimised
         return 0.5 * (
             weighted_sum_of_squared_residuals
-            + weights_sum_of_squared_penalties
+            + sum_of_squared_penalties
             - (b_vect.size - differences) * log_lam
             + log_determinant_lhs
             + logml_constant_term

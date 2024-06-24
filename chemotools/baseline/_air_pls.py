@@ -139,7 +139,7 @@ class AirPls(
 
         # the internal solver is set up
         self._setup_for_fit(
-            n_data=X.shape[1],
+            num_data=X.shape[1],
             differences=self.polynomial_order,
             lam=self.lam,
             child_class_name=self.__class__.__name__,
