@@ -2,13 +2,12 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.augmentation import (
     BaselineShift,
-    ExponentialNoise, 
-    NormalNoise,
+    ExponentialNoise,
     IndexShift,
-    SpectrumScale, 
+    NormalNoise,
+    SpectrumScale,
     UniformNoise,
 )
-
 from chemotools.baseline import (
     AirPls,
     ArPls,
@@ -20,6 +19,7 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
+from chemotools.feature_selection import IndexSelector, RangeCut
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
@@ -33,9 +33,6 @@ from chemotools.smooth import (
     SavitzkyGolayFilter,
     WhittakerSmooth,
 )
-from chemotools.feature_selection import RangeCut, IndexSelector
-
-from tests.fixtures import spectrum
 
 
 # AirPls
@@ -49,7 +46,7 @@ def test_compliance_air_pls():
 # ArPls
 def test_compliance_ar_pls():
     # Arrange
-    transformer = ArPls()
+    transformer = ArPls(differences=1)
     # Act & Assert
     check_estimator(transformer)
 
@@ -60,7 +57,7 @@ def test_compliance_baseline_shift():
     transformer = BaselineShift()
     # Act & Assert
     check_estimator(transformer)
-    
+
 
 # ConstantBaselineCorrection
 def test_compliance_constant_baseline_correction():
@@ -91,7 +88,7 @@ def test_compliance_extended_multiplicative_scatter_correction():
     # Arrange
     transformer = ExtendedMultiplicativeScatterCorrection()
     # Act & Assert
-    check_estimator(transformer) 
+    check_estimator(transformer)
 
 
 # IndexSelector
@@ -108,6 +105,7 @@ def test_compliance_spectrum_shift():
     transformer = IndexShift()
     # Act & Assert
     check_estimator(transformer)
+
 
 # LinearCorrection
 def test_compliance_linear_correction():
@@ -196,7 +194,7 @@ def test_compliance_point_scaler():
     # Act & Assert
     check_estimator(transformer)
 
-    
+
 # PolynomialCorrection
 def test_compliance_polynomial_correction():
     # Arrange

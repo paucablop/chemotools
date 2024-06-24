@@ -1,34 +1,74 @@
+"""
+This module contains the ``AirPLS`` transformer, which performs baseline correction on
+data according to the Whittaker-Henderson formulation of Penalized Least Squares which
+was modified by the introduction of weights that are updated iteratively to improve the
+baseline identification.
+
+References
+----------
+It's based on the algorithms described in [1]_ and [2]_ where an implementational
+adaption of [2]_ was required to make it numerically stable ([3]_).
+
+.. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
+   iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146 (2010)
+.. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932 (2023)
+.. [3] https://math.stackexchange.com/q/4819039/1261538
+
+"""
+
+# Authors:
+# Pau Cabaneros
+# Niklas Zell <nik.zoe@web.de>
+
+
+### Imports ###
+
+
 import logging
+from typing import Union
+
 import numpy as np
-from scipy.sparse import csc_matrix, eye, diags
-from scipy.sparse.linalg import spsolve
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted
 
+from chemotools.utils._whittaker_base import WhittakerLikeSolver
 from chemotools.utils.check_inputs import check_input
 
 logger = logging.getLogger(__name__)
 
+### Main Class ###
 
-class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+
+# TODO: is polynomial_order actually differences and if so, is the description correct?
+class AirPls(
+    OneToOneFeatureMixin,
+    BaseEstimator,
+    TransformerMixin,
+    WhittakerLikeSolver,
+):
     """
-    This class implements the AirPLS (Adaptive Iteratively Reweighted Penalized Least Squares) algorithm for baseline
-    correction of spectra data. AirPLS is a common approach for removing the baseline from spectra, which can be useful
-    in various applications such as spectroscopy and chromatography.
+    This class implements the Adaptive Iteratively Reweighted Penalized Least Squares
+    a.k.a AirPLS algorithm for baseline correction of spectra data. AirPLS is a common
+    approach for removing the baseline from spectra, which can be useful in various
+    applications such as spectroscopy and chromatography.
 
     Parameters
     ----------
-    lam : float, optional default=1e2
-        The lambda parameter controls the smoothness of the baseline. Increasing the value of lambda results in
-        a smoother baseline.
+    lam : float or int, optional default=1e2
+        The lambda parameter that controls the smoothness of the baseline. Higher values
+        will result in a smoother baseline.
 
     polynomial_order : int, optional default=1
-        The polynomial order determines the degree of the polynomial used to fit the baseline. A value of 1 corresponds
+        The degree of the polynomial used to fit the baseline. A value of 1 corresponds
         to a linear fit, while higher values correspond to higher-order polynomials.
+        Higher values will result in a smoother baseline.
+        Currently, values ``>= 3`` are highly discouraged due to numerical instability
+        that might obscure the smoothing effect.
 
     nr_iterations : int, optional default=15
-        The number of iterations used to calculate the baseline. Increasing the number of iterations can improve the
-        accuracy of the baseline correction, but also increases the computation time.
+        The number of iterations used to calculate the baseline. Increasing the number
+        of iterations can improve the accuracy of the baseline correction at the cost of
+        computation time.
 
     Methods
     -------
@@ -40,25 +80,34 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     _calculate_whittaker_smooth(x, w)
         Calculate the Whittaker smooth of a given input vector x, with weights w.
-        
+
     _calculate_air_pls(x)
         Calculate the AirPLS baseline of a given input vector x.
 
     References
     ----------
-    - Z.-M. Zhang, S. Chen, and Y.-Z. Liang, Baseline correction using adaptive iteratively reweighted penalized least
-      squares. Analyst 135 (5), 1138-1146 (2010).
+    It's based on the algorithms described in [1]_ and [2]_ where an implementational
+    adaption of [2]_ was required to make it numerically stable ([3]_).
+
+    .. [1] Z.-M. Zhang, S. Chen, and Y.-Z. Liang, "Baseline correction using adaptive
+       iteratively reweighted penalized least squares", Analyst 135 (5), 1138-1146
+       (2010)
+    .. [2] G. Biessy, "Revisiting Whittaker-Henderson smoothing", arXiv:2306.06932
+       (2023)
+    .. [3] https://math.stackexchange.com/q/4819039/1261538
+
     """
 
+    # TODO: polynomial order is actually differences
     def __init__(
         self,
-        lam: int = 100,
+        lam: Union[float, int] = 100,
         polynomial_order: int = 1,
         nr_iterations: int = 15,
     ):
-        self.lam = lam
-        self.polynomial_order = polynomial_order
-        self.nr_iterations = nr_iterations
+        self.lam: Union[float, int] = lam
+        self.polynomial_order: int = polynomial_order
+        self.nr_iterations: int = nr_iterations
 
     def fit(self, X: np.ndarray, y=None) -> "AirPls":
         """Fit the AirPls baseline correction estimator to the input data.
@@ -66,7 +115,8 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            The input data.
+            The input data. It is internally promoted to ``np.float64`` to avoid loss of
+            precision.
 
         y : array-like of shape (n_samples,), optional (default=None)
             The target values.
@@ -75,9 +125,25 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         -------
         self : AirPls
             Returns the instance itself.
+
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
+        X = BaseEstimator._validate_data(  # type: ignore
+            self,
+            X,
+            reset=True,
+            ensure_2d=True,
+            force_all_finite=True,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
+
+        # the internal solver is set up
+        self._setup_for_fit(
+            num_data=X.shape[1],
+            differences=self.polynomial_order,
+            lam=self.lam,
+            child_class_name=self.__class__.__name__,
+        )
 
         return self
 
@@ -96,60 +162,63 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         -------
         X_ : array-like of shape (n_samples, n_features)
             The transformed data with the baseline removed.
+
         """
 
         # Check that the estimator is fitted
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
+        X = check_input(
+            X,
+            dtype=WhittakerLikeSolver._WhittakerLikeSolver__dtype,  # type: ignore
+        )
         X_ = X.copy()
 
         # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
+        # NOTE: ``n_features_in_`` is set in ``BaseEstimator._validate_data`` when
+        #       ``reset`` is True
+        if X_.shape[1] != self.n_features_in_:  # type: ignore
             raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"  # type: ignore # noqa: E501
             )
 
         # Calculate the air pls smooth
         for i, x in enumerate(X_):
             X_[i] = x - self._calculate_air_pls(x)
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _calculate_whittaker_smooth(self, x, w):
-        X = np.array(x)
-        m = X.size
-        E = eye(m, format="csc")
-        for i in range(self.polynomial_order):
-            E = E[1:] - E[:-1]
-        W = diags(w, 0, shape=(m, m))
-        A = csc_matrix(W + (self.lam * E.T @ E))
-        B = csc_matrix(W @ X.T).toarray().ravel()
-        background = spsolve(A, B)
-        return np.array(background)
+        return X_
 
     def _calculate_air_pls(self, x):
-        m = x.shape[0]
-        w = np.ones(m)
+        # FIXME: this initial weighting strategy might not yield the best results
+        w = np.ones_like(x)
+        # FIXME: this initialisation will will fail for many signals and produce a
+        #        zero-baseline
+        z = np.zeros_like(x)
+        dssn_thresh = max(1e-3 * np.abs(x).sum(), 1e-308)  # to avoid 0 equalities
 
-        for i in range(1, self.nr_iterations):
-            z = self._calculate_whittaker_smooth(x, w)
+        # FIXME: work on full Arrays and use internal loop of ``whittaker_solve``
+        for i in range(0, self.nr_iterations - 1):
+            # the baseline is fitted using the Whittaker smoother framework
+            z, _ = self._solve_single_b_fixed_lam(rhs_b=x, weights=w)
             d = x - z
             dssn = np.abs(d[d < 0].sum())
 
-            if dssn < 0.001 * np.abs(x).sum():
+            # the algorithm is stopped if the threshold is reached
+            if dssn <= dssn_thresh:
                 break
 
-            if i == self.nr_iterations - 1:
-                break
+            # the weights are updated
+            below_base_indics = d < 0
+            w[~below_base_indics] = 0.0
+            exp_mult = i + 1
+            w[below_base_indics] = np.exp(exp_mult * np.abs(d[d < 0]) / dssn)
 
-            w[d >= 0] = 0
-            w[d < 0] = np.exp(i * np.abs(d[d < 0]) / dssn)
-
-            negative_d = d[d < 0]
-            if negative_d.size > 0:
-                w[0] = np.exp(i * negative_d.max() / dssn)
+            d_negative = d[below_base_indics]
+            if d_negative.size > 0:
+                # FIXME: this might easily yield a weight of 1 if the maximum of the
+                #        negative_d is very close to zero
+                w[0] = np.exp(exp_mult * d_negative.max() / dssn)
 
             w[-1] = w[0]
 
