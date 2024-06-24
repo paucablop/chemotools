@@ -184,7 +184,7 @@ def noise_level_estimation_signal() -> np.ndarray:
 
 
 @pytest.fixture
-def noise_level_estimation_refs() -> List[NoiseEstimationReference]:
+def noise_level_estimation_references() -> List[NoiseEstimationReference]:
     fpath = os.path.join(
         path_to_resources,
         "noise_level_estimation/noise_estimation_refs.csv",

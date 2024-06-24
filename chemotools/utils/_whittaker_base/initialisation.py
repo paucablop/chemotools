@@ -99,14 +99,14 @@ def get_squ_fw_diff_mat_banded(
     # NOTE: the matrix is returned with integer entries because integer computations
     #       can be carried out at maximum precision; this has to be converted to
     #       double precision for the LU decomposition
-    penalty_mat_banded = fdiff.gen_squ_fw_fin_diff_mat_cho_banded(
-        n_data=n_data,
+    penalty_mat_banded = fdiff.squared_forward_difference_matrix_banded(
+        num_data=n_data,
         differences=differences,
-        orig_first=orig_first,
+        original_first=orig_first,
     ).astype(dtype)
 
     # ... and cast to the banded storage format for LAPACK's LU decomposition
-    return bla.conv_upper_chol_banded_to_lu_banded_storage(ab=penalty_mat_banded)
+    return bla.convert_upper_chol_banded_to_lu_banded_storage(ab=penalty_mat_banded)
 
 
 def get_flipped_fw_diff_kernel(differences: int, dtype: Type) -> np.ndarray:
@@ -116,9 +116,9 @@ def get_flipped_fw_diff_kernel(differences: int, dtype: Type) -> np.ndarray:
 
     """
 
-    return np.flip(fdiff.calc_forward_diff_kernel(differences=differences)).astype(
-        dtype
-    )
+    return np.flip(
+        fdiff.forward_finite_difference_kernel(differences=differences)
+    ).astype(dtype)
 
 
 def get_penalty_log_pseudo_det(n_data: int, differences: int, dtype: Type) -> float:

@@ -20,7 +20,7 @@ from scipy.sparse import csc_matrix, csr_matrix
 from scipy.sparse import diags as sp_diags
 from scipy.sparse import linalg as spla
 
-from chemotools.utils._finite_differences import calc_forward_diff_kernel
+from chemotools.utils._finite_differences import forward_finite_difference_kernel
 from chemotools.utils._whittaker_base import WhittakerLikeSolver
 
 ### Utility Functions ###
@@ -177,29 +177,34 @@ def conv_upper_cho_banded_storage_to_sparse(ab: np.ndarray) -> csr_matrix:
     """
 
     # the offset vector is initialised
-    n_diags, n_cols = ab.shape
-    n_diags -= 1
-    main_diag_idx = n_diags
-    offsets = np.arange(start=-n_diags, stop=n_diags + 1, step=1, dtype=np.int64)
+    num_diagonals, num_columns = ab.shape
+    num_diagonals -= 1
+    main_diagonal_index = num_diagonals
+    offsets = np.arange(
+        start=-num_diagonals,
+        stop=num_diagonals + 1,
+        step=1,
+        dtype=np.int64,
+    )
 
     # then, the list of diagonals is created
     diagonals = []
     # the subdiagonals are added first ...
-    for offset in range(n_diags, 0, -1):
-        diagonals.append(ab[main_diag_idx - offset, offset:n_cols])
+    for offset in range(num_diagonals, 0, -1):
+        diagonals.append(ab[main_diagonal_index - offset, offset:num_columns])
 
     # ... followed by the main diagonal ...
-    diagonals.append(ab[main_diag_idx, ::])
+    diagonals.append(ab[main_diagonal_index, ::])
 
     # ... and finally the superdiagonals
-    for offset in range(1, n_diags + 1):
-        diagonals.append(ab[main_diag_idx - offset, offset:n_cols])
+    for offset in range(1, num_diagonals + 1):
+        diagonals.append(ab[main_diagonal_index - offset, offset:num_columns])
 
     # the sparse matrix is created
     return sp_diags(  # type: ignore
         diagonals=diagonals,
         offsets=offsets,  # type: ignore
-        shape=(n_cols, n_cols),
+        shape=(num_columns, num_columns),
         format="csr",
     )
 
@@ -326,12 +331,12 @@ def conv_lu_banded_storage_to_sparse(
     """
 
     # the offset vector is initialised
-    n_low_bands, n_upp_bands = l_and_u
-    main_diag_idx = n_upp_bands
-    n_cols = ab.shape[1]
+    num_subdiagonals, num_superdiagonals = l_and_u
+    main_diagonal_index = num_superdiagonals
+    num_columns = ab.shape[1]
     offsets = np.arange(
-        start=-n_low_bands,
-        stop=n_upp_bands + 1,
+        start=-num_subdiagonals,
+        stop=num_superdiagonals + 1,
         step=1,
         dtype=np.int64,
     )
@@ -339,26 +344,26 @@ def conv_lu_banded_storage_to_sparse(
     # then, the list of diagonals is created
     diagonals = []
     # the subdiagonals are added first ...
-    for offset in range(n_low_bands, 0, -1):
-        diagonals.append(ab[main_diag_idx + offset, 0 : n_cols - offset])
+    for offset in range(num_subdiagonals, 0, -1):
+        diagonals.append(ab[main_diagonal_index + offset, 0 : num_columns - offset])
 
     # ... followed by the main diagonal ...
-    diagonals.append(ab[main_diag_idx, ::])
+    diagonals.append(ab[main_diagonal_index, ::])
 
     # ... and finally the superdiagonals
-    for offset in range(1, n_upp_bands + 1):
-        diagonals.append(ab[main_diag_idx - offset, offset:n_cols])
+    for offset in range(1, num_superdiagonals + 1):
+        diagonals.append(ab[main_diagonal_index - offset, offset:num_columns])
 
     # the matrix is created from the diagonals
     return sp_diags(  # type: ignore
         diagonals=diagonals,
         offsets=offsets,  # type: ignore
-        shape=(n_cols, n_cols),
+        shape=(num_columns, num_columns),
         format="csr",
     )
 
 
-def multiply_vect_with_squ_fw_fin_diff_orig_first(
+def multiply_vect_with_squared_forward_finite_differences_original_first(
     differences: int,
     kernel: np.ndarray,
     vector: np.ndarray,
@@ -379,7 +384,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> # Imports
     >>> import numpy as np
     >>> from tests.test_for_utils.utils_funcs import (
-    ...     multiply_vect_with_squ_fw_fin_diff_orig_first,
+    ...     multiply_vect_with_squared_forward_finite_differences_original_first,
     ... )
 
     >>> # All the following tests were checked using LibreOffice Calc
@@ -388,7 +393,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([1, 2])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -399,7 +404,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([-10,   3,  11])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -410,7 +415,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([ 25,  17, -13, -12])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -421,7 +426,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([1, 2, 3])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -432,7 +437,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([-10,   3,  11,  27])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -443,7 +448,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([ 25,  17, -13, -12,  38])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -454,7 +459,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([1, 2, 3, 4])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -465,7 +470,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([-10,   3,  11,  27,  -5])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -476,7 +481,7 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([ 25,  17, -13, -12,  38,  -8])
-    >>> multiply_vect_with_squ_fw_fin_diff_orig_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_original_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -494,14 +499,14 @@ def multiply_vect_with_squ_fw_fin_diff_orig_first(
         constant_values=0,
     )
     # NOTE: since NumPy already flips the kernel internally, there is no need to flip it
-    vector_conv = np.convolve(vector_padded, kernel, mode="valid")
+    vector_convolved = np.convolve(vector_padded, kernel, mode="valid")
 
     # then, the result is convolved with the kernel
     # NOTE: here, the kernel has to be flipped to counteract NumPy's internal flipping
-    return np.convolve(vector_conv, np.flip(kernel), mode="valid")
+    return np.convolve(vector_convolved, np.flip(kernel), mode="valid")
 
 
-def multiply_vect_with_squ_fw_fin_diff_transpose_first(
+def multiply_vect_with_squared_forward_finite_differences_transpose_first(
     differences: int,
     kernel: np.ndarray,
     vector: np.ndarray,
@@ -521,14 +526,14 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> # Imports
     >>> import numpy as np
     >>> from tests.test_for_utils.utils_funcs import (
-    ...     multiply_vect_with_squ_fw_fin_diff_transpose_first,
+    ...     multiply_vect_with_squared_forward_finite_differences_transpose_first,
     ... )
 
     >>> # Test 1
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([1, 2])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -539,7 +544,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([-10,   3,  11])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -550,7 +555,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 1
     >>> kernel = np.array([-1, 1])
     >>> vector = np.array([ 25,  17, -13, -12])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -561,7 +566,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([1, 2, 3])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -572,7 +577,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([-10,   3,  11,  27])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -583,7 +588,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 2
     >>> kernel = np.array([1, -2, 1])
     >>> vector = np.array([ 25,  17, -13, -12,  38])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -594,7 +599,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([1, 2, 3, 4])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -605,7 +610,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([-10,   3,  11,  27,  -5])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -616,7 +621,7 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
     >>> differences = 3
     >>> kernel = np.array([-1, 3, -3, 1])
     >>> vector = np.array([ 25,  17, -13, -12,  38,  -8])
-    >>> multiply_vect_with_squ_fw_fin_diff_transpose_first(
+    >>> multiply_vect_with_squared_forward_finite_differences_transpose_first(
     ...     differences=differences,
     ...     kernel=kernel,
     ...     vector=vector,
@@ -627,11 +632,11 @@ def multiply_vect_with_squ_fw_fin_diff_transpose_first(
 
     # first, the vector is convolved with the kernel
     # NOTE: here, the kernel has to be flipped to counteract NumPy's internal flipping
-    vector_conv = np.convolve(vector, np.flip(kernel), mode="valid")
+    vector_convolved = np.convolve(vector, np.flip(kernel), mode="valid")
 
     # then, the result is convolved with the flipped kernel and zero-padded
     vector_padded = np.pad(
-        vector_conv,
+        vector_convolved,
         pad_width=(differences, differences),
         mode="constant",
         constant_values=0,
@@ -750,38 +755,53 @@ def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
     # since the log determinant can be expressed as the sum of the logarithms of the
     # absolute eigenvalues, an eigenvalue evaluation is sufficient to determine the
     # sign and the log determinant
-    eigvals = eigvals_banded(a_band=ab, lower=False, select="a")
-    if np.count_nonzero(eigvals < 0.0) % 2 == 0:  # type: ignore
+    eigenvalues = eigvals_banded(
+        a_band=ab,
+        lower=False,
+        select="a",
+    )
+    if np.count_nonzero(eigenvalues < 0.0) % 2 == 0:  # type: ignore
         sign = 1.0
     else:
         sign = -1.0
 
     with np.errstate(divide="ignore", over="ignore"):
-        logabsdet = np.log(np.abs(eigvals)).sum()  # type: ignore
+        logabsdet = np.log(np.abs(eigenvalues)).sum()  # type: ignore
 
     return sign, logabsdet
 
 
-def get_sparse_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
+def get_sparse_forward_finite_difference_matrix(
+    num_data: int,
+    differences: int,
+) -> csc_matrix:
     """
     Creates a dense forward finite difference matrix ``D`` of a given difference order.
 
     Doctests
     --------
     >>> # Imports
-    >>> from tests.test_for_utils.utils_funcs import get_sparse_fw_fin_diff_mat
+    >>> from tests.test_for_utils.utils_funcs import (
+    ...     get_sparse_forward_finite_difference_matrix,
+    ... )
 
     >>> # Matrix 1
-    >>> n_data, differences = 5, 1
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 5, 1
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[-1.,  1.,  0.,  0.,  0.],
            [ 0., -1.,  1.,  0.,  0.],
            [ 0.,  0., -1.,  1.,  0.],
            [ 0.,  0.,  0., -1.,  1.]])
 
     >>> # Matrix 2
-    >>> n_data, differences = 10, 1
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 10, 1
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[-1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0., -1.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
@@ -793,15 +813,21 @@ def get_sparse_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
            [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.,  1.]])
 
     >>> # Matrix 3
-    >>> n_data, differences = 5, 2
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 5, 2
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[ 1., -2.,  1.,  0.,  0.],
            [ 0.,  1., -2.,  1.,  0.],
            [ 0.,  0.,  1., -2.,  1.]])
 
     >>> # Matrix 4
-    >>> n_data, differences = 10, 2
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 10, 2
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[ 1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0.,  1., -2.,  1.,  0.,  0.,  0.,  0.,  0.],
@@ -812,14 +838,20 @@ def get_sparse_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
            [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  1., -2.,  1.]])
 
     >>> # Matrix 4
-    >>> n_data, differences = 5, 3
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 5, 3
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[-1.,  3., -3.,  1.,  0.],
            [ 0., -1.,  3., -3.,  1.]])
 
     >>> # Matrix 5
-    >>> n_data, differences = 10, 3
-    >>> get_sparse_fw_fin_diff_mat(n_data=n_data, differences=differences).toarray()
+    >>> num_data, differences = 10, 3
+    >>> get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
+    ...     differences=differences,
+    ... ).toarray()
     array([[-1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.,  0.],
            [ 0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.,  0.],
            [ 0.,  0., -1.,  3., -3.,  1.,  0.,  0.,  0.,  0.],
@@ -835,12 +867,12 @@ def get_sparse_fw_fin_diff_mat(n_data: int, differences: int) -> csc_matrix:
 
     # then, the dense finite difference matrix D is created from the forward difference
     # kernel
-    diff_kernel = calc_forward_diff_kernel(differences=differences)
+    diff_kernel = forward_finite_difference_kernel(differences=differences)
     offsets = np.arange(start=0, stop=diff_kernel.size, step=1, dtype=np.int64)
     return sp_diags(
         diagonals=diff_kernel,
         offsets=offsets,  # type: ignore
-        shape=(n_data - diff_kernel.size + 1, n_data),
+        shape=(num_data - diff_kernel.size + 1, num_data),
         dtype=dtype,
         format="csc",
     )
@@ -952,23 +984,27 @@ def sparse_slogdet_from_superlu(splu: spla.SuperLU) -> Tuple[float, float]:
     # the logarithm of the determinant is the sum of the logarithms of the diagonal
     # elements of the LU decomposition, but since L is unit lower triangular, only the
     # diagonal elements of U are considered
-    diagU = splu.U.diagonal()
-    logabsdet = np.log(np.abs(diagU)).sum()
+    u_diagonal = splu.U.diagonal()
+    logabsdet = np.log(np.abs(u_diagonal)).sum()
 
     # then, the sign is determined from the diagonal elements of U as well as the row
     # and column permutations
     # NOTE: odd number of negative elements/swaps leads to a negative sign
-    fact_sign = -1 if np.count_nonzero(diagU < 0.0) % 2 == 1 else 1
-    row_sign = -1 if find_min_num_swaps(splu.perm_r) % 2 == 1 else 1
-    col_sign = -1 if find_min_num_swaps(splu.perm_c) % 2 == 1 else 1
-    sign = -1.0 if fact_sign * row_sign * col_sign < 0 else 1.0
+    factorization_sign = -1 if np.count_nonzero(u_diagonal < 0.0) % 2 == 1 else 1
+    row_permutation_sign = -1 if find_min_num_swaps(splu.perm_r) % 2 == 1 else 1
+    column_permutation_sign = -1 if find_min_num_swaps(splu.perm_c) % 2 == 1 else 1
+    total_sign = (
+        -1.0
+        if factorization_sign * row_permutation_sign * column_permutation_sign < 0
+        else 1.0
+    )
 
-    return sign, logabsdet
+    return total_sign, logabsdet
 
 
 def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     differences: int,
-    diff_mat: csc_matrix,
+    difference_matrix: csc_matrix,
     weight_vect: np.ndarray,
 ) -> float:
     """
@@ -992,52 +1028,56 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     >>> import numpy as np
     >>> from tests.test_for_utils.utils_funcs import (
     ...     calc_whittaker_smooth_log_marginal_likelihood_const_term,
-    ...     get_sparse_fw_fin_diff_mat,
+    ...     get_sparse_forward_finite_difference_matrix,
     ... )
 
     >>> # Generation of the weight matrix W and the finite difference matrix D
     >>> weights = np.array([0.5, 1.0, 0.5, 1.0, 0.5])
-    >>> n_data, differences = weights.size, 1
-    >>> diff_mat = get_sparse_fw_fin_diff_mat(
-    ...     n_data=n_data,
+    >>> num_data, differences = weights.size, 1
+    >>> difference_matrix_sparse = get_sparse_forward_finite_difference_matrix(
+    ...     num_data=num_data,
     ...     differences=differences,
     ... )
-    >>> diff_mat_dense = diff_mat.toarray()
+    >>> difference_matrix_dense = difference_matrix_sparse.toarray()
 
     >>> # Test 1 with all weights being non-zero
 
     >>> # Calculation of the log pseudo-determinant of the weight matrix W
     >>> # since it is diagonal, the log-determinant is the sum of the logarithms of the
     >>> # diagonal elements
-    >>> log_pseudo_det_w = np.log(weights).sum()
-    >>> log_pseudo_det_w
+    >>> log_pseudo_determinant_w = np.log(weights).sum()
+    >>> log_pseudo_determinant_w
     -2.0794415416798357
 
     >>> # Calculation of the log pseudo-determinant via the Cholesky decomposition of
     >>> # the product D @ D.T
-    >>> squ_diff_mat_chol = np.linalg.cholesky(diff_mat_dense @ diff_mat_dense.T)
-    >>> squ_diff_mat_chol
+    >>> squared_difference_matrix_chol = np.linalg.cholesky(
+    ...     difference_matrix_dense @ difference_matrix_dense.T
+    ... )
+    >>> squared_difference_matrix_chol
     array([[ 1.41421356,  0.        ,  0.        ,  0.        ],
            [-0.70710678,  1.22474487,  0.        ,  0.        ],
            [ 0.        , -0.81649658,  1.15470054,  0.        ],
            [ 0.        ,  0.        , -0.8660254 ,  1.11803399]])
     >>> # the sum of the doubled logarithms of the main diagonal elements is the log
     >>> # pseudo-determinant of the matrix D.T @ D
-    >>> log_pseudo_det_dtd = 2.0 * np.log(np.diag(squ_diff_mat_chol)).sum()
-    >>> log_pseudo_det_dtd
+    >>> log_pseudo_determinant_dt_dot_d = (
+    ...     2.0 * np.log(np.diag(squared_difference_matrix_chol)).sum()
+    ... )
+    >>> log_pseudo_determinant_dt_dot_d
     1.6094379124341003
 
     >>> # Calculation of the theoretical constant term
     >>> logml_theoretical = (
-    ...    (n_data - differences) * np.log(2.0 * np.pi)
-    ...    - log_pseudo_det_w
-    ...    - log_pseudo_det_dtd
+    ...    (num_data - differences) * np.log(2.0 * np.pi)
+    ...    - log_pseudo_determinant_w
+    ...    - log_pseudo_determinant_dt_dot_d
     ... )
 
     >>> # Calculation of the constant term via the utility function
     >>> logml_via_function = calc_whittaker_smooth_log_marginal_likelihood_const_term(
     ...     differences=differences,
-    ...     diff_mat=diff_mat,
+    ...     difference_matrix=difference_matrix_sparse,
     ...     weight_vect=weights,
     ... )
     >>> logml_via_function
@@ -1049,19 +1089,19 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     >>> weights[1] = 0.0
     >>> weights[3] = 0.0
     >>> nonzero_weights_flags = weights > 0.0
-    >>> log_pseudo_det_w = np.log(weights[nonzero_weights_flags]).sum()
+    >>> log_pseudo_determinant_w = np.log(weights[nonzero_weights_flags]).sum()
 
     >>> # Calculation of the theoretical constant term
     >>> logml_theoretical = (
     ...    (nonzero_weights_flags.sum() - differences) * np.log(2.0 * np.pi)
-    ...    - log_pseudo_det_w
-    ...    - log_pseudo_det_dtd
+    ...    - log_pseudo_determinant_w
+    ...    - log_pseudo_determinant_dt_dot_d
     ... )
 
     >>> # Calculation of the constant term via the utility function
     >>> logml_via_function = calc_whittaker_smooth_log_marginal_likelihood_const_term(
     ...     differences=differences,
-    ...     diff_mat=diff_mat,
+    ...     difference_matrix=difference_matrix_sparse,
     ...     weight_vect=weights,
     ... )
     >>> logml_via_function
@@ -1077,22 +1117,22 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     zero_weight_tol = WhittakerLikeSolver._WhittakerLikeSolver__zero_weight_tol  # type: ignore
 
     # for W, the log pseudo-determinant is calculated ...
-    w_nonzero_idxs = weight_vect > weight_vect.max() * zero_weight_tol
-    nnz_w = w_nonzero_idxs.sum()
-    w_log_pseudo_det = np.log(weight_vect[w_nonzero_idxs]).sum()
+    w_nonzero_indices = weight_vect > weight_vect.max() * zero_weight_tol
+    num_nonzero_w = w_nonzero_indices.sum()
+    w_log_pseudo_determinant = np.log(weight_vect[w_nonzero_indices]).sum()
 
     # ... followed by the log pseudo-determinant of the penalty matrix D.T @ D which is
     # equivalent to the determinant of the flipped matrix D @ D.T which is not
     # rank-deficient
-    _, penalty_log_pseudo_det = sparse_slogdet_from_superlu(
-        splu=spla.splu(A=diff_mat @ diff_mat.transpose())
+    _, penalty_log_pseudo_determinant = sparse_slogdet_from_superlu(
+        splu=spla.splu(A=difference_matrix @ difference_matrix.transpose())
     )
 
     # from all of this, the constant term is computed
     return (
-        (nnz_w - differences) * np.log(2.0 * np.pi)
-        - w_log_pseudo_det
-        - penalty_log_pseudo_det
+        (num_nonzero_w - differences) * np.log(2.0 * np.pi)
+        - w_log_pseudo_determinant
+        - penalty_log_pseudo_determinant
     )
 
 
@@ -1101,7 +1141,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
     weight_vect: np.ndarray,
     differences: int,
     log_lambda_bounds: Tuple[float, float],
-    n_opts: int,
+    num_optimizations: int,
 ) -> Tuple[float, float, np.ndarray]:
     """
     Finds the optimal lambda value for a Whittaker smoother by maximising the log
@@ -1131,8 +1171,9 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
 
         lam = exp(log_lam)
 
-        lhs_mat = lam * penalty_mat
-        lhs_mat += sp_diags(
+        # NOTE: lhs is "left-hand side"
+        lhs_matrix = lam * penalty_matrix
+        lhs_matrix += sp_diags(
             diagonals=weight_vect,
             offsets=0,
             shape=(b_vect.size, b_vect.size),
@@ -1140,7 +1181,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
         )
 
         # then, the solution is obtained
-        lhs_splu = spla.splu(A=lhs_mat)
+        lhs_splu = spla.splu(A=lhs_matrix)
         smooth_solution = lhs_splu.solve(rhs=weight_vect * b_vect)
 
         return (
@@ -1160,44 +1201,51 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
         # matrix and the lambda value
         smooth_solution, lhs_splu, lam, log_lam = get_smooth_solution(log_lam=log_lam)
 
-        # the log-determinant of the lhs matrix is calculated
-        _, logdet_lhs = sparse_slogdet_from_superlu(splu=lhs_splu)
+        # the log-determinant of the left-hand-side matrix is calculated
+        # NOTE: lhs is "left-hand side"
+        _, log_determinant_lhs = sparse_slogdet_from_superlu(splu=lhs_splu)
 
         # finally, the log marginal likelihood is computed from:
         # 1) the weighted residual sum of squares
-        wrss = (weight_vect * np.square(b_vect - smooth_solution)).sum()
+        weighted_sum_of_squared_residuals = (
+            weight_vect * np.square(b_vect - smooth_solution)
+        ).sum()
 
         # 2) the sum of squared penalties
         # NOTE: the order of multiplications for the following term is important because
         #       the last multiplication is a matrix-vector resulting in another vector;
         #       the other way around would result in another matrix followed by
         #       a matrix-vector multiplication
-        pss = lam * (smooth_solution @ (penalty_mat @ smooth_solution))
+        weights_sum_of_squared_penalties = lam * (
+            smooth_solution @ (penalty_matrix @ smooth_solution)
+        )
 
         # 3) the log-determinant of the lhs matrix and the constant term
         # NOTE: the sign is positive because the log marginal likelihood is maximised
         #       and not minimised
         return 0.5 * (
-            wrss
-            + pss
+            weighted_sum_of_squared_residuals
+            + weights_sum_of_squared_penalties
             - (b_vect.size - differences) * log_lam
-            + logdet_lhs
+            + log_determinant_lhs
             + logml_constant_term
         )
 
     ### Pre-computations ###
 
     # then, some pre-computations are made
-    n_data = b_vect.size
+    num_data = b_vect.size
     log_lambda_min, log_lambda_max = log_lambda_bounds
-    diff_mat = get_sparse_fw_fin_diff_mat(
-        n_data=n_data,
+    difference_matrix_sparse = get_sparse_forward_finite_difference_matrix(
+        num_data=num_data,
         differences=differences,
     )
-    penalty_mat = (diff_mat.transpose() @ diff_mat).tocsc()  # type: ignore
+    penalty_matrix = (
+        difference_matrix_sparse.transpose() @ difference_matrix_sparse
+    ).tocsc()  # type: ignore
     logml_constant_term = calc_whittaker_smooth_log_marginal_likelihood_const_term(
         differences=differences,
-        diff_mat=diff_mat,
+        difference_matrix=difference_matrix_sparse,
         weight_vect=weight_vect,
     )
 
@@ -1208,7 +1256,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
     opt_log_lam = brute(
         func=logml_target_func,
         ranges=((log_lambda_min, log_lambda_max),),
-        Ns=n_opts,
+        Ns=num_optimizations,
         finish=None,
         full_output=False,
     )
@@ -1222,7 +1270,7 @@ def find_whittaker_smooth_opt_lambda_log_marginal_likelihood(
     opt_log_lam = brute(
         func=logml_target_func,
         ranges=((log_lambda_min, log_lambda_max),),
-        Ns=n_opts,
+        Ns=num_optimizations,
         finish=None,
         full_output=False,
     )

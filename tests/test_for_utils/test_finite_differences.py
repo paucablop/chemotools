@@ -12,18 +12,18 @@ import numpy as np
 import pytest
 
 from chemotools.utils._finite_differences import (
-    calc_central_diff_kernel,
-    calc_forward_diff_kernel,
+    central_finite_difference_coefficients,
     estimate_noise_stddev,
-    gen_squ_fw_fin_diff_mat_cho_banded,
+    forward_finite_difference_kernel,
+    squared_forward_difference_matrix_banded,
 )
-from tests.fixtures import noise_level_estimation_refs  # noqa: F401
+from tests.fixtures import noise_level_estimation_references  # noqa: F401
 from tests.fixtures import noise_level_estimation_signal  # noqa: F401
 from tests.fixtures import reference_finite_differences  # noqa: F401
 from tests.test_for_utils.utils_funcs import (
     conv_upper_cho_banded_storage_to_sparse,
-    multiply_vect_with_squ_fw_fin_diff_orig_first,
-    multiply_vect_with_squ_fw_fin_diff_transpose_first,
+    multiply_vect_with_squared_forward_finite_differences_original_first,
+    multiply_vect_with_squared_forward_finite_differences_transpose_first,
 )
 from tests.test_for_utils.utils_models import (
     NoiseEstimationReference,
@@ -44,19 +44,22 @@ def test_forward_diff_kernel(
     """
 
     # each kernel is calculated and compared to the reference
-    for ref_diff_kernel in reference_finite_differences:
-        kernel = calc_forward_diff_kernel(differences=ref_diff_kernel.differences)
+    for kernel_reference in reference_finite_differences:
+        kernel_chemotools = forward_finite_difference_kernel(
+            differences=kernel_reference.differences
+        )
 
         # first, the size of the kernel is checked ...
-        assert kernel.size == ref_diff_kernel.size, (
-            f"Difference order {ref_diff_kernel.differences} with accuracy 1 - "
-            f"Expected kernel size {ref_diff_kernel.size} but got {kernel.size}"
+        assert kernel_chemotools.size == kernel_reference.size, (
+            f"Difference order {kernel_reference.differences} with accuracy 1 - "
+            f"Expected kernel size {kernel_reference.size} but got "
+            f"{kernel_chemotools.size}"
         )
         # ...  followed by the comparison of the kernel itself
-        assert np.allclose(kernel, ref_diff_kernel.kernel, atol=1e-8), (
-            f"Difference order {ref_diff_kernel.differences} with accuracy 1 - "
-            f"Expected kernel {ref_diff_kernel.kernel.tolist()} but got "
-            f"{kernel.tolist()}"
+        assert np.allclose(kernel_chemotools, kernel_reference.kernel, atol=1e-8), (
+            f"Difference order {kernel_reference.differences} with accuracy 1 - "
+            f"Expected kernel {kernel_reference.kernel.tolist()} but got "
+            f"{kernel_chemotools.tolist()}"
         )
 
 
@@ -71,33 +74,34 @@ def test_central_diff_kernel(
     """
 
     # each kernel is calculated and compared to the reference
-    for ref_diff_kernel in reference_finite_differences:
-        kernel = calc_central_diff_kernel(
-            differences=ref_diff_kernel.differences,
-            accuracy=ref_diff_kernel.accuracy,
+    for kernel_reference in reference_finite_differences:
+        kernel_chemotools = central_finite_difference_coefficients(
+            differences=kernel_reference.differences,
+            accuracy=kernel_reference.accuracy,
         )
 
         # first, the size of the kernel is checked ...
-        assert kernel.size == ref_diff_kernel.size, (
-            f"Difference order {ref_diff_kernel.differences} with accuracy "
-            f"{ref_diff_kernel.accuracy} - Expected kernel size {ref_diff_kernel.size} "
-            f"but got {kernel.size}"
+        assert kernel_chemotools.size == kernel_reference.size, (
+            f"Difference order {kernel_reference.differences} with accuracy "
+            f"{kernel_reference.accuracy} - Expected kernel size "
+            f"{kernel_reference.size} but got {kernel_chemotools.size}"
         )
         # ...  followed by the comparison of the kernel itself
-        assert np.allclose(kernel, ref_diff_kernel.kernel, atol=1e-8), (
-            f"Difference order {ref_diff_kernel.differences} with accuracy "
-            f"{ref_diff_kernel.accuracy} - Expected kernel "
-            f"{ref_diff_kernel.kernel.tolist()} but got {kernel.tolist()}"
+        assert np.allclose(kernel_chemotools, kernel_reference.kernel, atol=1e-8), (
+            f"Difference order {kernel_reference.differences} with accuracy "
+            f"{kernel_reference.accuracy} - Expected kernel "
+            f"{kernel_reference.kernel.tolist()} but got {kernel_chemotools.tolist()}"
         )
 
 
 @pytest.mark.parametrize(
-    "n_add_size",
+    "num_additional_values",
     list(range(0, 11)) + list(range(20, 101, 10)) + list(range(200, 1001, 100)),
 )
 @pytest.mark.parametrize("differences", list(range(1, 11)))
 def test_squ_fw_fin_diff_mat_cho_banded_orig_first(
-    differences: int, n_add_size: int
+    differences: int,
+    num_additional_values: int,
 ) -> None:
     """
     Tests the generation of the squared forward finite difference matrix ``D @ D.T``
@@ -110,45 +114,53 @@ def test_squ_fw_fin_diff_mat_cho_banded_orig_first(
     """
 
     # first, the finite difference kernel is calculated
-    kernel = calc_forward_diff_kernel(differences=differences)
+    kernel = forward_finite_difference_kernel(differences=differences)
 
     # then, the banded matrix D @ D.T is generated ...
-    n_data = kernel.size + n_add_size
-    ddt_banded = gen_squ_fw_fin_diff_mat_cho_banded(
-        n_data=n_data,
+    num_data = kernel.size + num_additional_values
+    d_dot_dt_banded = squared_forward_difference_matrix_banded(
+        num_data=num_data,
         differences=differences,
-        orig_first=True,
+        original_first=True,
     )
     # ... and converted to a sparse matrix
-    ddt_sparse = conv_upper_cho_banded_storage_to_sparse(ab=ddt_banded)
+    d_dot_dt_sparse = conv_upper_cho_banded_storage_to_sparse(ab=d_dot_dt_banded)
 
     # a random vector is created
     np.random.seed(42)
-    vector = np.random.rand(n_add_size + 1)
+    vector = np.random.rand(num_additional_values + 1)
 
     # this vector is multiplied with the matrix
-    result = ddt_sparse @ vector
+    result_chemotools = d_dot_dt_sparse @ vector
 
     # afterwards, the result is compared to the result of the convolution
-    result_conv = multiply_vect_with_squ_fw_fin_diff_orig_first(
-        differences=differences,
-        kernel=kernel,
-        vector=vector,
+    result_reference = (
+        multiply_vect_with_squared_forward_finite_differences_original_first(
+            differences=differences,
+            kernel=kernel,
+            vector=vector,
+        )
     )
 
     # the results are compared
     # NOTE: the following check has to be fairly strict when it comes to equivalence
     #       since the NumPy and Chemotools are basically doing the same under the hood
-    assert np.allclose(result, result_conv, atol=1e-10, rtol=1e-10)
+    assert np.allclose(
+        result_chemotools,
+        result_reference,
+        atol=1e-10,
+        rtol=1e-10,
+    )
 
 
 @pytest.mark.parametrize(
-    "n_add_size",
+    "num_additional_values",
     list(range(0, 11)) + list(range(20, 101, 10)) + list(range(200, 1001, 100)),
 )
 @pytest.mark.parametrize("differences", list(range(1, 11)))
 def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
-    differences: int, n_add_size: int
+    differences: int,
+    num_additional_values: int,
 ) -> None:
     """
     Tests the generation of the squared forward finite difference matrix ``D.T @ D``
@@ -161,40 +173,42 @@ def test_squ_fw_fin_diff_mat_cho_banded_transpose_first(
     """
 
     # first, the finite difference kernel is calculated
-    kernel = calc_forward_diff_kernel(differences=differences)
+    kernel = forward_finite_difference_kernel(differences=differences)
 
     # then, the banded matrix D.T @ D is generated ...
-    n_data = kernel.size + n_add_size
-    dtd_banded = gen_squ_fw_fin_diff_mat_cho_banded(
-        n_data=n_data,
+    num_data = kernel.size + num_additional_values
+    dt_dot_d_banded = squared_forward_difference_matrix_banded(
+        num_data=num_data,
         differences=differences,
-        orig_first=False,
+        original_first=False,
     )
     # ... and converted to a sparse matrix
-    dtd_sparse = conv_upper_cho_banded_storage_to_sparse(ab=dtd_banded)
+    dt_dot_d_sparse = conv_upper_cho_banded_storage_to_sparse(ab=dt_dot_d_banded)
 
     # a random vector is created
     np.random.seed(42)
-    vector = np.random.rand(n_data)
+    vector = np.random.rand(num_data)
 
     # this vector is multiplied with the matrix
-    result = dtd_sparse @ vector
+    result_chemotools = dt_dot_d_sparse @ vector
 
     # afterwards, the result is compared to the result of the convolution
-    result_conv = multiply_vect_with_squ_fw_fin_diff_transpose_first(
-        differences=differences,
-        kernel=kernel,
-        vector=vector,
+    result_reference = (
+        multiply_vect_with_squared_forward_finite_differences_transpose_first(
+            differences=differences,
+            kernel=kernel,
+            vector=vector,
+        )
     )
 
     # the results are compared
     # NOTE: the following check has to be fairly strict when it comes to equivalence
     #       since the NumPy and Chemotools are basically doing the same under the hood
-    assert np.allclose(result, result_conv, atol=1e-10, rtol=1e-10)
+    assert np.allclose(result_chemotools, result_reference, atol=1e-10, rtol=1e-10)
 
 
 @pytest.mark.parametrize(
-    "series, differences, accuracy, window_size, power, stddev_min",
+    "series, differences, accuracy, window_size, stddev_power, stddev_min",
     [
         (  # Number 0 series is too small for difference kernel
             np.arange(start=0, stop=5),
@@ -339,7 +353,7 @@ def test_estimate_noise_stddev_invalid_input(
     differences: int,
     accuracy: int,
     window_size: Optional[int],
-    power: int,
+    stddev_power: int,
     stddev_min: float,
 ) -> None:
     """
@@ -362,9 +376,9 @@ def test_estimate_noise_stddev_invalid_input(
         estimate_noise_stddev(
             series=series,
             differences=differences,
-            diff_accuracy=accuracy,
+            differences_accuracy=accuracy,
             window_size=window_size,
-            power=power,  # type: ignore
+            stddev_power=stddev_power,  # type: ignore
             stddev_min=stddev_min,
         )
 
@@ -373,7 +387,7 @@ def test_estimate_noise_stddev_invalid_input(
 
 def test_noise_level_estimation(
     noise_level_estimation_signal: np.ndarray,  # noqa: F811
-    noise_level_estimation_refs: List[NoiseEstimationReference],  # noqa: F811
+    noise_level_estimation_references: List[NoiseEstimationReference],  # noqa: F811
 ) -> None:
     """
     Tests the noise level estimation function :func:`estimate_noise_stddev`.
@@ -382,46 +396,58 @@ def test_noise_level_estimation(
 
     """
 
-    for ref in noise_level_estimation_refs:
+    for noise_level_reference in noise_level_estimation_references:
         # the noise level is estimated
-        noise_level = estimate_noise_stddev(
+        noise_level_chemotools = estimate_noise_stddev(
             series=noise_level_estimation_signal,
-            differences=ref.differences,
-            diff_accuracy=ref.accuracy,
-            window_size=ref.window_size,
-            stddev_min=ref.min_noise_level,
+            differences=noise_level_reference.differences,
+            differences_accuracy=noise_level_reference.accuracy,
+            window_size=noise_level_reference.window_size,
+            stddev_min=noise_level_reference.min_noise_level,
         )
         # then, the noise level itself is compared to the reference in a quite strict
         # way because both results were computed in the same way with the only
         # difference being that Chemotools uses Python and the reference uses
         # LibreOffice Calc
-        assert np.allclose(noise_level, ref.noise_level, rtol=1e-12), (
+        assert np.allclose(
+            noise_level_chemotools,
+            noise_level_reference.noise_level,
+            rtol=1e-12,
+        ), (
             f"Original noise level differs from reference noise for differences "
-            f"{ref.differences} with accuracy {ref.accuracy} and window size "
-            f"{ref.window_size} given a minimum standard deviation of "
-            f"{ref.min_noise_level}."
+            f"{noise_level_reference.differences} with accuracy "
+            f"{noise_level_reference.accuracy} and window size "
+            f"{noise_level_reference.window_size} given a minimum standard deviation "
+            f"of {noise_level_reference.min_noise_level}."
         )
 
         # then, all the available powers to which the noise level can be raised are
         # compared to the reference
-        for power, raised_noise_level_ref in ref.raised_noise_levels.items():
+        for (
+            stddev_power,
+            raised_noise_level_ref,
+        ) in noise_level_reference.raised_noise_levels.items():
             raised_noise_level = estimate_noise_stddev(
                 series=noise_level_estimation_signal,
-                differences=ref.differences,
-                diff_accuracy=ref.accuracy,
-                window_size=ref.window_size,
-                stddev_min=ref.min_noise_level,
-                power=power,
+                differences=noise_level_reference.differences,
+                differences_accuracy=noise_level_reference.accuracy,
+                window_size=noise_level_reference.window_size,
+                stddev_min=noise_level_reference.min_noise_level,
+                stddev_power=stddev_power,
             )
 
             # again, the comparison is quite strict
             assert np.allclose(
-                raised_noise_level, raised_noise_level_ref, atol=1e-12
+                raised_noise_level,
+                raised_noise_level_ref,
+                atol=1e-12,
             ), (
                 f"Raised noise level differs from reference noise for differences "
-                f"{ref.differences} with accuracy {ref.accuracy} and window size "
-                f"{ref.window_size} given a minimum standard deviation of "
-                f"{ref.min_noise_level} and a power of {power}."
+                f"{noise_level_reference.differences} with accuracy "
+                f"{noise_level_reference.accuracy} and window size "
+                f"{noise_level_reference.window_size} given a minimum standard "
+                f"deviation of {noise_level_reference.min_noise_level} and a power of "
+                f"{stddev_power}."
             )
 
     return

@@ -46,7 +46,7 @@ def _datacopied(arr, original):
     return arr.base is None
 
 
-def conv_upper_chol_banded_to_lu_banded_storage(
+def convert_upper_chol_banded_to_lu_banded_storage(
     ab: np.ndarray,
 ) -> tuple[LAndUBandCounts, np.ndarray]:
     """
@@ -117,20 +117,20 @@ def conv_upper_chol_banded_to_lu_banded_storage(
     """
 
     # an Array is initialised to store the subdiagonal part
-    num_low_diags = ab.shape[0] - 1
-    main_diag_idx = num_low_diags
-    n_cols = ab.shape[1]
-    ab_subdiags = np.zeros(shape=(num_low_diags, n_cols), dtype=ab.dtype)
+    num_subdiagonals = ab.shape[0] - 1
+    main_diagonal_index = num_subdiagonals
+    num_columns = ab.shape[1]
+    ab_subdiagonals = np.zeros(shape=(num_subdiagonals, num_columns), dtype=ab.dtype)
 
-    for offset in range(1, num_low_diags + 1):
-        ab_subdiags[offset - 1, 0 : n_cols - offset] = ab[
-            main_diag_idx - offset, offset:None
+    for offset in range(1, num_subdiagonals + 1):
+        ab_subdiagonals[offset - 1, 0 : num_columns - offset] = ab[
+            main_diagonal_index - offset, offset:None
         ]
 
     # the subdiagonal part is then concatenated to the original array and the result is
     # returned
-    l_and_u = (num_low_diags, num_low_diags)
-    return l_and_u, np.row_stack((ab, ab_subdiags))
+    l_and_u = (num_subdiagonals, num_subdiagonals)
+    return l_and_u, np.row_stack((ab, ab_subdiagonals))
 
 
 ### LAPACK-Wrappers for banded LU decomposition ###
@@ -219,12 +219,12 @@ def lu_banded(
 
     # then, the number of lower and upper subdiagonals needs to be checked for being
     # consistent with the shape of ``ab``
-    num_low_diags, num_upp_diags = l_and_u
-    if num_low_diags + num_upp_diags + 1 != ab.shape[0]:  # pragma: no cover
+    num_subdiagonals, num_superdiagonals = l_and_u
+    if num_subdiagonals + num_superdiagonals + 1 != ab.shape[0]:  # pragma: no cover
         raise ValueError(
-            f"\nInvalid values for the number of lower and upper "
-            f"diagonals: l+u+1 ({num_low_diags + num_upp_diags + 1}) does not equal "
-            f"ab.shape[0] ({ab.shape[0]})."
+            f"\nInvalid values for the number of sub- and super "
+            f"diagonals: l+u+1 ({num_subdiagonals + num_superdiagonals + 1}) does not "
+            f"equal ab.shape[0] ({ab.shape[0]})."
         )
 
     # now, the LAPACK-routines can be called
@@ -235,12 +235,12 @@ def lu_banded(
     (gbtrf,) = lapack.get_lapack_funcs((lapack_routine,), (ab,))
     lpkc_ab = np.row_stack(
         (
-            np.zeros((num_low_diags, ab.shape[1]), dtype=ab.dtype),
+            np.zeros((num_subdiagonals, ab.shape[1]), dtype=ab.dtype),
             ab,
         )
     )
     lub, ipiv, info = gbtrf(
-        ab=lpkc_ab, kl=num_low_diags, ku=num_upp_diags, overwrite_ab=True
+        ab=lpkc_ab, kl=num_subdiagonals, ku=num_superdiagonals, overwrite_ab=True
     )
 
     # then, the results needs to be validated and returned
@@ -308,29 +308,29 @@ def lu_solve_banded(
     if check_finite:
         lub_factorization.lub = np.asarray_chkfinite(lub_factorization.lub)
         lub_factorization.ipiv = np.asarray_chkfinite(lub_factorization.ipiv)
-        b_inter = np.asarray_chkfinite(b)
+        b_internal = np.asarray_chkfinite(b)
     else:
         lub_factorization.lub = np.asarray(lub_factorization.lub)
         lub_factorization.ipiv = np.asarray(lub_factorization.ipiv)
-        b_inter = np.asarray(b)
+        b_internal = np.asarray(b)
 
-    overwrite_b = overwrite_b or _datacopied(b_inter, b)
+    overwrite_b = overwrite_b or _datacopied(b_internal, b)
 
     # then, the shapes of the LU decomposition and ``b`` need to be validated against
     # each other
-    if lub_factorization.n_cols != b_inter.shape[0]:  # pragma: no cover
+    if lub_factorization.num_cols != b_internal.shape[0]:  # pragma: no cover
         raise ValueError(
-            f"\nShapes of lub ({lub_factorization.n_cols}) and b "
-            f"({b_inter.shape[0]}) are not compatible."
+            f"\nShapes of lub ({lub_factorization.num_cols}) and b "
+            f"({b_internal.shape[0]}) are not compatible."
         )
 
     # now, the LAPACK-routine is called
-    (gbtrs,) = lapack.get_lapack_funcs(("gbtrs",), (lub_factorization.lub, b))
+    (gbtrs,) = lapack.get_lapack_funcs(("gbtrs",), (lub_factorization.lub, b_internal))
     x, info = gbtrs(
         ab=lub_factorization.lub,
         kl=lub_factorization.l_and_u[0],
         ku=lub_factorization.l_and_u[1],
-        b=b,
+        b=b_internal,
         ipiv=lub_factorization.ipiv,
         overwrite_b=overwrite_b,
     )
@@ -338,7 +338,7 @@ def lu_solve_banded(
     # then, the results needs to be validated and returned
     # Case 1: the solution could be computed truly successfully, i.e., without any
     # NaN-values
-    if info == 0 and not np.any(np.isnan(x)):
+    if info == 0 and not np.isnan(x).any():
         return x
 
     # Case 2: the solution was computed, but there were NaN-values in it
@@ -389,13 +389,15 @@ def slogdet_lu_banded(
     """
 
     # first, the number of actual row exchanges needs to be counted
-    unchanged_row_idxs = np.arange(
+    unchanged_row_indices = np.arange(
         start=0,
-        stop=lub_factorization.n_cols,
+        stop=lub_factorization.num_cols,
         step=1,
         dtype=lub_factorization.ipiv.dtype,
     )
-    num_row_exchanges = np.count_nonzero(lub_factorization.ipiv != unchanged_row_idxs)
+    num_row_exchanges = np.count_nonzero(
+        lub_factorization.ipiv != unchanged_row_indices
+    )
 
     # the sign-prefactor of the determinant is either +1 or -1 depending on whether the
     # number of row exchanges is even or odd
@@ -404,10 +406,10 @@ def slogdet_lu_banded(
     # since the determinant (without sign prefactor) is just the product of the diagonal
     # product of L and the diagonal product of U, the calculation simplifies. As the
     # main diagonal of L is a vector of ones, only the diagonal product of U is required
-    main_diag = lub_factorization.lub[lub_factorization.main_diag_row_idx, ::]
-    u_diag_sign_is_pos = np.count_nonzero(main_diag < 0.0) % 2 == 0
+    main_diagonal = lub_factorization.lub[lub_factorization.main_diagonal_row_index, ::]
+    u_diagonal_sign_is_positive = np.count_nonzero(main_diagonal < 0.0) % 2 == 0
     with np.errstate(divide="ignore", over="ignore"):
-        logabsdet = np.log(np.abs(main_diag)).sum()
+        logabsdet = np.log(np.abs(main_diagonal)).sum()
 
     # logarithms of zero are already properly handled, so there is not reason to worry
     # about, since they are -inf which will result in a zero determinant in exp();
@@ -425,7 +427,7 @@ def slogdet_lu_banded(
     if np.isneginf(logabsdet):  # pragma: no cover
         return 0.0, logabsdet
 
-    if u_diag_sign_is_pos:
+    if u_diagonal_sign_is_positive:
         return sign, logabsdet
 
     return -sign, logabsdet

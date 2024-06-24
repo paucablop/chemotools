@@ -121,7 +121,7 @@ class WhittakerSmoothLambda:
     __zero_tol: float = field(default=1e-25, init=False, repr=False)
     __diff_tol: float = field(default=1e-5, init=False, repr=False)
 
-    def _validate_n_set_method(self) -> None:
+    def _set_validated_method(self) -> None:
         try:
             self.method_used = WhittakerSmoothMethods(self.method.lower())
         except ValueError:
@@ -137,7 +137,7 @@ class WhittakerSmoothLambda:
         # Case 1: a single value is provided
         if isinstance(self.bounds, (int, float)):
             # first, the method is validated
-            self._validate_n_set_method()
+            self._set_validated_method()
 
             # in this case, the method has to be set to FIXED
             if self.method_used != WhittakerSmoothMethods.FIXED:
@@ -163,25 +163,25 @@ class WhittakerSmoothLambda:
         elif isinstance(self.bounds, tuple):
 
             # the bounds are flipped if necessary
-            low_bound, upp_bound = sorted(self.bounds)
+            lower_bound, upper_bound = sorted(self.bounds)
 
             # the bounds have to be greater than or equal to the zero tolerance
-            if low_bound < self.__zero_tol or upp_bound < self.__zero_tol:
+            if lower_bound < self.__zero_tol or upper_bound < self.__zero_tol:
                 raise ValueError(
                     f"\nThe bounds for the penalty weight lambda have to be greater "
                     f"than or equal to the zero tolerance {self.__zero_tol}, but "
-                    f"they are {low_bound} and {upp_bound}."
+                    f"they are {lower_bound} and {upper_bound}."
                 )
 
             # the difference has to be at least 1e-5 * upp_bound to be considered
             # as a search space
-            if abs(upp_bound - low_bound) >= self.__diff_tol * upp_bound:
+            if abs(upper_bound - lower_bound) >= self.__diff_tol * upper_bound:
                 # for this, the method is validated
-                self._validate_n_set_method()
+                self._set_validated_method()
 
                 # if the method is not FIXED, the bounds are set as the search space
                 if self.method_used != WhittakerSmoothMethods.FIXED:
-                    self.auto_bounds = (float(low_bound), float(upp_bound))
+                    self.auto_bounds = (float(lower_bound), float(upper_bound))
                     self.fit_auto = True
                     return
 
@@ -189,13 +189,13 @@ class WhittakerSmoothLambda:
                 # an error is raised
                 raise ValueError(
                     f"\nThe bounds for the penalty weight lambda are a search space "
-                    f"({low_bound}, {upp_bound}), but the method is set to FIXED."
+                    f"({lower_bound}, {upper_bound}), but the method is set to FIXED."
                 )
 
             # otherwise, if the penalty weights is fixed, the method is set to FIXED as
             # well
             self.method_used = WhittakerSmoothMethods.FIXED
-            self.fixed_lambda = float(upp_bound)
+            self.fixed_lambda = float(upper_bound)
             self.fit_auto = False
 
             return
@@ -271,11 +271,11 @@ class BandedLUFactorization:
     singular: bool
 
     shape: tuple[int, int] = field(default=(-1, -1), init=False)
-    n_rows: int = field(default=-1, init=False)
-    n_cols: int = field(default=-1, init=False)
-    main_diag_row_idx: int = field(default=-1, init=False)
+    num_rows: int = field(default=-1, init=False)
+    num_cols: int = field(default=-1, init=False)
+    main_diagonal_row_index: int = field(default=-1, init=False)
 
     def __post_init__(self):
         self.shape = self.lub.shape  # type: ignore
-        self.n_rows, self.n_cols = self.shape
-        self.main_diag_row_idx = self.n_rows - 1 - self.l_and_u[0]
+        self.num_rows, self.num_cols = self.shape
+        self.main_diagonal_row_index = self.num_rows - 1 - self.l_and_u[0]

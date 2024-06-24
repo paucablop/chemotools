@@ -25,7 +25,7 @@ _MAD_PREFACTOR = 1.482602
 ### Functions ###
 
 
-def calc_forward_diff_kernel(
+def forward_finite_difference_kernel(
     *,
     differences: int,
 ) -> np.ndarray:
@@ -68,17 +68,22 @@ def calc_forward_diff_kernel(
         include_boundaries="left",
     )
 
-    # afterwards, the kernel is computed using the binomial coefficients
+    # afterwards, the kernel is computed using the binomial coefficients with
+    # alternating signs
     return np.array(
         [
-            ((-1) ** iter_i) * comb(differences, iter_i)
+            (-1 if iter_i % 2 == 1 else 1) * comb(differences, iter_i)
             for iter_i in range(differences, -1, -1)
         ],
         dtype=np.int64,
     )
 
 
-def calc_central_diff_kernel(*, differences: int, accuracy: int = 2) -> np.ndarray:
+def central_finite_difference_coefficients(
+    *,
+    differences: int,
+    accuracy: int = 2,
+) -> np.ndarray:
     """
     Computes the kernel for central finite differences which can be applied to a
     series by means of a convolution, e.g.,
@@ -153,23 +158,31 @@ def calc_central_diff_kernel(*, differences: int, accuracy: int = 2) -> np.ndarr
     half_kernel_size = kernel_size // 2
 
     # then, the linear system to solve for the coefficients is set up
-    grid_vect = np.arange(
+    grid_point_vect = np.arange(
         start=-half_kernel_size,
         stop=half_kernel_size + 1,
         step=1,
         dtype=np.int64,
     )
-    lhs_mat = np.vander(grid_vect, N=kernel_size, increasing=True).transpose()
+    # NOTE: lhs is "left-hand side" and rhs is "right-hand side"
+    lhs_matrix = np.vander(
+        grid_point_vect,
+        N=kernel_size,
+        increasing=True,
+    )
     rhs_vect = np.zeros(shape=(kernel_size,), dtype=np.int64)
     rhs_vect[differences] = factorial(differences)
 
     # the coefficients are computed by solving the linear system
-    return np.linalg.solve(lhs_mat, rhs_vect)
+    return np.linalg.solve(
+        lhs_matrix.transpose(),
+        rhs_vect,
+    )
 
 
-def _gen_squ_fw_fin_diff_mat_cho_banded_transp_first(
+def _squared_forward_difference_matrix_banded_transpose_first(
     *,
-    n_data: int,
+    num_data: int,
     differences: int,
 ) -> np.ndarray:
     """
@@ -184,31 +197,40 @@ def _gen_squ_fw_fin_diff_mat_cho_banded_transp_first(
     # the problems has to be split into a leading, a central, and a trailing part
     # first, the leading part is computed because it might be that this is already
     # enough
-    # first, the kernel for the forward differences is computed and the bandwidth is
+    # for this, the kernel for the forward differences is computed and the bandwidth is
     # determined
-    kernel = calc_forward_diff_kernel(differences=differences)
-    n_bands = 1 + 2 * differences
-    lead_n_rows = min(kernel.size, n_data - kernel.size + 1)
-    lead_n_cols = kernel.size + lead_n_rows - 1
+    kernel = forward_finite_difference_kernel(differences=differences)
+    num_diagonals = 1 + 2 * differences
+    leading_num_rows = min(kernel.size, num_data - kernel.size + 1)
+    leading_num_cols = kernel.size + leading_num_rows - 1
 
     # the leading matrix is computed as a dense matrix
-    dtd = np.zeros(shape=(lead_n_rows, lead_n_cols), dtype=np.int64)
-    for row_idx in range(0, lead_n_rows):
-        dtd[row_idx, row_idx : row_idx + kernel.size] = kernel
+    leading_dt_dot_d_dense = np.zeros(
+        shape=(leading_num_rows, leading_num_cols),
+        dtype=np.int64,
+    )
+    for row_index in range(0, leading_num_rows):
+        leading_dt_dot_d_dense[row_index, row_index : row_index + kernel.size] = kernel
 
     # its squared form is computed
-    dtd = dtd.T @ dtd
+    leading_dt_dot_d_dense = leading_dt_dot_d_dense.T @ leading_dt_dot_d_dense
 
     # now, the leading matrix is converted to a banded matrix
-    dtd_banded = np.zeros(shape=(differences + 1, lead_n_cols), dtype=np.int64)
-    for diag_idx in range(0, differences + 1):
-        offset = differences - diag_idx
-        dtd_banded[diag_idx, offset:None] = np.diag(dtd, k=offset)
+    leading_dt_dot_d_banded = np.zeros(
+        shape=(differences + 1, leading_num_cols),
+        dtype=np.int64,
+    )
+    for diagonal_index in range(0, differences + 1):
+        offset = differences - diagonal_index
+        leading_dt_dot_d_banded[diagonal_index, offset:None] = np.diag(
+            leading_dt_dot_d_dense,
+            k=offset,
+        )
 
     # if the number of data points is less than the kernel size minus one, the
     # leading matrix is already the final matrix
-    if n_data <= n_bands:
-        return dtd_banded
+    if num_data <= num_diagonals:
+        return leading_dt_dot_d_banded
 
     # otherwise, a central part has to be inserted
     # this turns out to be just a column-wise repetition of the kernel computed with
@@ -216,21 +238,23 @@ def _gen_squ_fw_fin_diff_mat_cho_banded_transp_first(
     # computed leading D.T @ D matrix
     # NOTE: the doubled kernel is the most central column of the banded D.T @ D already
     #       computed
-    central_n_cols = n_data - dtd_banded.shape[1]
-    kernel_double = dtd_banded[::, kernel.size - 1].reshape((-1, 1))
+    central_n_cols = num_data - leading_dt_dot_d_banded.shape[1]
+    kernel_double_differences = leading_dt_dot_d_banded[::, kernel.size - 1].reshape(
+        (-1, 1)
+    )
     return np.concatenate(
         (
-            dtd_banded[::, 0 : kernel.size],
-            np.tile(kernel_double, (1, central_n_cols)),
-            dtd_banded[::, kernel.size :],
+            leading_dt_dot_d_banded[::, 0 : kernel.size],
+            np.tile(kernel_double_differences, (1, central_n_cols)),
+            leading_dt_dot_d_banded[::, kernel.size :],
         ),
         axis=1,
     )
 
 
-def _gen_squ_fw_fin_diff_mat_cho_banded_orig_first(
+def _squared_forward_difference_matrix_banded_original_first(
     *,
-    n_data: int,
+    num_data: int,
     differences: int,
 ) -> np.ndarray:
     """
@@ -244,30 +268,35 @@ def _gen_squ_fw_fin_diff_mat_cho_banded_orig_first(
 
     # this case is simpler than the transposed case because the matrix is just a
     # Toeplitz matrix with the kernel of double the difference order on the diagonal
-    kernel_double = calc_forward_diff_kernel(differences=2 * differences)[
-        differences:None
-    ]
+    kernel_double_differences = forward_finite_difference_kernel(
+        differences=2 * differences
+    )[differences:None]
     # for an odd difference order, the sign of the kernel has to be flipped
     if differences % 2 == 1:
-        kernel_double = np.negative(kernel_double)
+        kernel_double_differences = np.negative(kernel_double_differences)
 
-    n_rows = n_data - kernel_double.size + 1
-    n_upp_plus_central_bands = min(n_rows, 1 + differences)
+    num_rows = num_data - kernel_double_differences.size + 1
+    num_upper_plus_central_diagonals = min(num_rows, 1 + differences)
 
     # the matrix is computed as a dense and simple filled by means of a loop
-    ddt_banded = np.zeros(shape=(n_upp_plus_central_bands, n_rows), dtype=np.int64)
-    main_diag_idx = min(differences, n_upp_plus_central_bands - 1)
-    for offset in range(0, n_upp_plus_central_bands):
-        ddt_banded[main_diag_idx - offset, offset:None] = kernel_double[offset]
+    d_dot_dt_banded = np.zeros(
+        shape=(num_upper_plus_central_diagonals, num_rows),
+        dtype=np.int64,
+    )
+    main_diagonal_row_index = min(differences, num_upper_plus_central_diagonals - 1)
+    for offset in range(0, num_upper_plus_central_diagonals):
+        d_dot_dt_banded[main_diagonal_row_index - offset, offset:None] = (
+            kernel_double_differences[offset]
+        )
 
-    return ddt_banded
+    return d_dot_dt_banded
 
 
-def gen_squ_fw_fin_diff_mat_cho_banded(
+def squared_forward_difference_matrix_banded(
     *,
-    n_data: int,
+    num_data: int,
     differences: int,
-    orig_first: bool,
+    original_first: bool,
 ) -> np.ndarray:
     """
     Generates the squared forward finite differences matrix ``D @ D.T`` or ``D.T @ D``
@@ -279,7 +308,7 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
 
     Parameters
     ----------
-    n_data : int
+    num_data : int
         The number of data points in the series to which the forward finite differences
         are applied.
     differences : int
@@ -287,7 +316,7 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
         first order, 2 for the second order, ..., and ``m`` for the ``m``-th order
         differences.
         Values below 1 are not allowed.
-    orig_first : bool
+    original_first : bool
         If ``True``, the squared forward finite differences matrix ``D @ D.T`` is
         computed. Otherwise, the squared forward finite differences matrix ``D.T @ D``
         is computed.
@@ -349,7 +378,7 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
     # support the kernel for the respective difference order at least once
     try:
         check_scalar(
-            n_data,
+            num_data,
             name="n_data",
             target_type=Integral,
             min_val=differences + 1,
@@ -358,17 +387,17 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
 
     # NOTE: this is only for Sklearn compatibility
     except ValueError:
-        raise ValueError(f"Got n_features = {n_data}, must be >= {differences + 1}.")
+        raise ValueError(f"Got n_features = {num_data}, must be >= {differences + 1}.")
 
     # afterwards, the squared forward finite differences matrix is computed
-    if orig_first:
-        return _gen_squ_fw_fin_diff_mat_cho_banded_orig_first(
-            n_data=n_data,
+    if original_first:
+        return _squared_forward_difference_matrix_banded_original_first(
+            num_data=num_data,
             differences=differences,
         )
 
-    return _gen_squ_fw_fin_diff_mat_cho_banded_transp_first(
-        n_data=n_data,
+    return _squared_forward_difference_matrix_banded_transpose_first(
+        num_data=num_data,
         differences=differences,
     )
 
@@ -376,12 +405,12 @@ def gen_squ_fw_fin_diff_mat_cho_banded(
 def estimate_noise_stddev(
     series: np.ndarray,
     differences: int = 6,
-    diff_accuracy: int = 2,
+    differences_accuracy: int = 2,
     window_size: Optional[int] = None,
     extrapolator: Callable[..., np.ndarray] = np.pad,
     extrapolator_args: Tuple[Any, ...] = ("reflect",),
     extrapolator_kwargs: Optional[Dict[str, Any]] = None,
-    power: Literal[-2, -1, 1, 2] = 1,
+    stddev_power: Literal[-2, -1, 1, 2] = 1,
     stddev_min: Union[float, int] = 1e-10,
 ) -> np.ndarray:
     """
@@ -403,7 +432,7 @@ def estimate_noise_stddev(
         Empirically, 5-6 was found as a sweet spot, but even numbers work better with
         the default ``extrapolator``.
         Values below 1 are not allowed.
-    diff_accuracy : int, default=2
+    differences_accuracy : int, default=2
         The accuracy of the finite difference approximation, which has to be an even
         integer ``>= 2``.
         Higher values will enhance the effect of outliers that will corrupt the noise
@@ -446,7 +475,7 @@ def estimate_noise_stddev(
         Additional keyword arguments that are passed to the extrapolator function as
         described for ``extrapolator``.
         If ``None``, no additional keyword arguments are passed.
-    power : {-2, -1, 1, 2}, default=1
+    stddev_power : {-2, -1, 1, 2}, default=1
         The power to which the noise standard deviation is raised.
         This can be used to compute the:
 
@@ -534,8 +563,10 @@ def estimate_noise_stddev(
             )
 
     # power
-    if power not in {-2, -1, 1, 2}:
-        raise ValueError(f"Got power = {power}, expected -2, -1, 1, or 2.")
+    if stddev_power not in {-2, -1, 1, 2}:
+        raise ValueError(
+            f"Got stddeev_power = {stddev_power}, expected -2, -1, 1, or 2."
+        )
 
     # minimum standard deviation
     check_scalar(
@@ -548,16 +579,16 @@ def estimate_noise_stddev(
 
     # for validation of the series, the central finite differences kernel has to be
     # computed
-    diff_kernel = calc_central_diff_kernel(
+    difference_kernel = central_finite_difference_coefficients(
         differences=differences,
-        accuracy=diff_accuracy,
+        accuracy=differences_accuracy,
     )
 
     # afterwards, the series is validated
-    if series.size < diff_kernel.size:
+    if series.size < difference_kernel.size:
         raise ValueError(
-            f"Got series.size = {series.size}, must be >= {diff_kernel.size} (kernel "
-            f"size)."
+            f"Got series.size = {series.size}, must be >= {difference_kernel.size} "
+            f"(kernel size)."
         )
 
     if window_size is not None:
@@ -577,9 +608,9 @@ def estimate_noise_stddev(
     ### Noise Standard Deviation Estimation ###
 
     # the signal is extrapolated to avoid edge effects
-    pad_width = diff_kernel.size // 2
+    pad_width = difference_kernel.size // 2
     pad_width += 0 if window_size is None else window_size // 2
-    series_extrap = extrapolator(
+    extrapolated_series = extrapolator(
         series,
         pad_width,
         *extrapolator_args,
@@ -587,18 +618,22 @@ def estimate_noise_stddev(
     )
 
     # the absolute central finite differences are computed ...
-    abs_diff_series = np.abs(
-        np.convolve(series_extrap, np.flip(diff_kernel), mode="valid")
+    absolute_differences_series = np.abs(
+        np.convolve(
+            extrapolated_series,
+            np.flip(difference_kernel),
+            mode="valid",
+        )
     )
-    size_after_diff = abs_diff_series.size
+    size_after_differentiation = absolute_differences_series.size
 
     # ... and the median filter is applied to theses differences
-    prefactor = _MAD_PREFACTOR / np.linalg.norm(diff_kernel)
+    prefactor = _MAD_PREFACTOR / np.linalg.norm(difference_kernel)
     # Case 1: the global noise standard deviation is estimated
     if window_size is None:
         noise_stddev = np.full_like(
             series,
-            fill_value=prefactor * np.median(abs_diff_series),
+            fill_value=prefactor * np.median(absolute_differences_series),
         )
 
     # Case 2: the local noise standard deviation is estimated
@@ -607,19 +642,19 @@ def estimate_noise_stddev(
         noise_stddev = (
             prefactor
             * median_filter(
-                abs_diff_series,
+                absolute_differences_series,
                 size=window_size,
                 mode="constant",
-            )[half_window_size : size_after_diff - half_window_size]
+            )[half_window_size : size_after_differentiation - half_window_size]
         )
 
     # the minimum-bounded noise standard deviation is raised to the power
     noise_stddev = np.maximum(noise_stddev, stddev_min)
 
-    if power in {-2, 2}:
+    if stddev_power in {-2, 2}:
         noise_stddev = np.square(noise_stddev)
 
-    if power in {-2, -1}:
+    if stddev_power in {-2, -1}:
         noise_stddev = np.reciprocal(noise_stddev)
 
     return noise_stddev

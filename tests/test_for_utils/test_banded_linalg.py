@@ -14,7 +14,7 @@ from scipy.linalg import solve_banded as scipy_solve_banded
 
 from chemotools.utils._banded_linalg import (
     _datacopied,
-    conv_upper_chol_banded_to_lu_banded_storage,
+    convert_upper_chol_banded_to_lu_banded_storage,
     lu_banded,
     lu_solve_banded,
     slogdet_lu_banded,
@@ -80,11 +80,11 @@ def test_datacopied(
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
 @pytest.mark.parametrize("overwrite_b", [True, False])
-@pytest.mark.parametrize("n_rhs", [0, 1, 2])
-@pytest.mark.parametrize("n_upp_bands", [1, 2, 3, 4, 5, 6])
-@pytest.mark.parametrize("n_low_bands", [1, 2, 3, 4, 5, 6])
+@pytest.mark.parametrize("num_right_hand_sides", [0, 1, 2])
+@pytest.mark.parametrize("num_superdiagonals", [1, 2, 3, 4, 5, 6])
+@pytest.mark.parametrize("num_subdiagonals", [1, 2, 3, 4, 5, 6])
 @pytest.mark.parametrize(
-    "n_rows",
+    "num_rows",
     [
         1,
         2,
@@ -110,10 +110,10 @@ def test_datacopied(
     ],
 )
 def test_lu_banded_solve(
-    n_rows: int,
-    n_low_bands: int,
-    n_upp_bands: int,
-    n_rhs: int,
+    num_rows: int,
+    num_subdiagonals: int,
+    num_superdiagonals: int,
+    num_right_hand_sides: int,
     overwrite_b: bool,
     with_finite_check: bool,
 ) -> None:
@@ -127,28 +127,34 @@ def test_lu_banded_solve(
     """
 
     # if the matrix cannot exist with the given shape, the test is skipped
-    n_rows_min = n_low_bands + n_upp_bands + 1
-    if n_rows < n_rows_min:
+    num_rows_min = num_subdiagonals + num_superdiagonals + 1
+    if num_rows < num_rows_min:
         pytest.skip(
-            f"Test skipped because the number of rows {n_rows} is smaller than the "
-            f"minimum number of rows {n_rows_min} required by the number of sub- "
-            f"{n_low_bands} and superdiagonals {n_upp_bands}."
+            f"Test skipped because the number of rows {num_rows} is smaller than the "
+            f"minimum number of rows {num_rows_min} required by the number of sub- "
+            f"{num_subdiagonals} and superdiagonals {num_superdiagonals}."
         )
 
     # a random banded matrix and right-hand-side-vector/-matrix are generated
     np.random.seed(seed=42)
-    ab = -1.0 + 2.0 * np.random.rand(n_low_bands + n_upp_bands + 1, n_rows)
-    b = np.random.rand(n_rows) if n_rhs == 0 else np.random.rand(n_rows, n_rhs)
+    ab = -1.0 + 2.0 * np.random.rand(
+        num_subdiagonals + num_superdiagonals + 1, num_rows
+    )
+    b = (
+        np.random.rand(num_rows)
+        if num_right_hand_sides == 0
+        else np.random.rand(num_rows, num_right_hand_sides)
+    )
 
     # first, the Scipy solution is computed because if this fails due to singularity,
     # the test has to not test for equivalent results, but for failure
     # NOTE: failure is indicated by the solution being ``None``
     # NOTE: this order of evaluation is also better for testing if the overwrite flag
     #       is working correctly because otherwise SciPy would get the overwritten b
-    l_and_u = (n_low_bands, n_upp_bands)
-    x_ref = None
+    l_and_u = (num_subdiagonals, num_superdiagonals)
+    x_reference = None
     try:
-        x_ref = scipy_solve_banded(
+        x_reference = scipy_solve_banded(
             l_and_u=l_and_u,
             ab=ab,
             b=b,
@@ -157,14 +163,14 @@ def test_lu_banded_solve(
 
         # NOTE: even if SciPy computes the solution "successfully", there might be NaNs
         # NOTE: in the result, so the test has to check for that as well
-        if np.any(np.isnan(x_ref)):
-            x_ref = None
+        if np.any(np.isnan(x_reference)):
+            x_reference = None
 
     except np.linalg.LinAlgError:
         pass
 
     # the banded matrix is LU decomposed with the respective Chemotools function
-    lu_fact = lu_banded(
+    lu_factorization = lu_banded(
         l_and_u=l_and_u,
         ab=ab,
         check_finite=with_finite_check,
@@ -172,11 +178,11 @@ def test_lu_banded_solve(
 
     # the linear system is solved with the respective Chemotools function
     # Case 1: Scipy failed
-    if x_ref is None:
+    if x_reference is None:
         # in this case, the Chemotools function has to raise an exception as well
         with pytest.raises(np.linalg.LinAlgError):
-            x = lu_solve_banded(
-                lub_factorization=lu_fact,
+            x_chemotools = lu_solve_banded(
+                lub_factorization=lu_factorization,
                 b=b,
                 overwrite_b=overwrite_b,
                 check_finite=with_finite_check,
@@ -185,8 +191,8 @@ def test_lu_banded_solve(
 
     # Case 2: Scipy succeeded
     # in this case, the Chemotools function has to return the same result as Scipy
-    x = lu_solve_banded(
-        lub_factorization=lu_fact,
+    x_chemotools = lu_solve_banded(
+        lub_factorization=lu_factorization,
         b=b,
         overwrite_b=overwrite_b,
         check_finite=with_finite_check,
@@ -195,14 +201,19 @@ def test_lu_banded_solve(
     # NOTE: the following check has to be fairly strict when it comes to equivalence
     # NOTE: since the SciPy and Chemotools are basically doing the same under the hood
     # NOTE: when it comes to the solution process (first LU, then triangular solve)
-    assert np.allclose(x, x_ref, atol=1e-10, rtol=1e-10)
+    assert np.allclose(
+        x_chemotools,
+        x_reference,
+        atol=1e-10,
+        rtol=1e-10,
+    )
 
 
 @pytest.mark.parametrize("with_finite_check", [True, False])
-@pytest.mark.parametrize("ensure_posdef", [True, False])
-@pytest.mark.parametrize("n_upp_low_bands", [1, 2, 3, 4, 5, 6])
+@pytest.mark.parametrize("ensure_positive_definite", [True, False])
+@pytest.mark.parametrize("num_sub_and_superdiagonals", [1, 2, 3, 4, 5, 6])
 @pytest.mark.parametrize(
-    "n_rows",
+    "num_rows",
     [
         1,
         2,
@@ -228,9 +239,9 @@ def test_lu_banded_solve(
     ],
 )
 def test_lu_banded_slogdet(
-    n_rows: int,
-    n_upp_low_bands: int,
-    ensure_posdef: bool,
+    num_rows: int,
+    num_sub_and_superdiagonals: int,
+    ensure_positive_definite: bool,
     with_finite_check: bool,
 ) -> None:
     """
@@ -240,12 +251,13 @@ def test_lu_banded_slogdet(
     """
 
     # if the matrix cannot exist with the given shape, the test is skipped
-    n_rows_min = 2 * n_upp_low_bands + 1
-    if n_rows < n_rows_min:
+    n_rows_min = 2 * num_sub_and_superdiagonals + 1
+    if num_rows < n_rows_min:
         pytest.skip(
-            f"Test skipped because the number of rows {n_rows} is smaller than the "
+            f"Test skipped because the number of rows {num_rows} is smaller than the "
             f"minimum number of rows {n_rows_min} required by the number of sub- "
-            f"{n_upp_low_bands} and superdiagonals {n_upp_low_bands}."
+            f"{num_sub_and_superdiagonals} and superdiagonals "
+            f"{num_sub_and_superdiagonals}."
         )
 
     # a random banded matrix is generated in the upper banded storage used for Cholesky
@@ -256,17 +268,19 @@ def test_lu_banded_slogdet(
     #       flag is set
     # NOTE: for an indefinite matrix, the matrix is shifted and scaled to be in the
     #       interval [-1, 1]
-    ab_for_chol = np.random.rand(n_upp_low_bands + 1, n_rows)
-    if ensure_posdef:
-        ab_for_chol[n_upp_low_bands, ::] += 1.0 + 2.0 * float(n_upp_low_bands)
+    ab_for_chol = np.random.rand(num_sub_and_superdiagonals + 1, num_rows)
+    if ensure_positive_definite:
+        ab_for_chol[num_sub_and_superdiagonals, ::] += 1.0 + 2.0 * float(
+            num_sub_and_superdiagonals
+        )
     else:
         ab_for_chol = -1.0 + 2.0 * ab_for_chol
 
-    l_and_u, ab_for_lu = conv_upper_chol_banded_to_lu_banded_storage(ab=ab_for_chol)
+    l_and_u, ab_for_lu = convert_upper_chol_banded_to_lu_banded_storage(ab=ab_for_chol)
 
     # first, the log determinant is computed with the literal definition as the sum of
     # the logarithms of the eigenvalues of the matrix
-    sign_ref, logabsdet_ref = get_banded_slogdet(ab=ab_for_chol)
+    sign_reference, logabsdet_reference = get_banded_slogdet(ab=ab_for_chol)
 
     # the banded matrix is LU decomposed with the respective Chemotools function ...
     lu_fact = lu_banded(
@@ -275,8 +289,18 @@ def test_lu_banded_slogdet(
         check_finite=with_finite_check,
     )
     # ... and the sign and log determinant are computed
-    sign, logabsdet = slogdet_lu_banded(lub_factorization=lu_fact)
+    sign_chemotools, logabsdet_chemotools = slogdet_lu_banded(lub_factorization=lu_fact)
 
     # the results are compared
-    assert np.isclose(sign, sign_ref, atol=1e-5, rtol=1e-5)
-    assert np.isclose(logabsdet, logabsdet_ref, atol=1e-5, rtol=1e-5)
+    assert np.isclose(
+        sign_chemotools,
+        sign_reference,
+        atol=1e-5,
+        rtol=1e-5,
+    )
+    assert np.isclose(
+        logabsdet_chemotools,
+        logabsdet_reference,
+        atol=1e-5,
+        rtol=1e-5,
+    )

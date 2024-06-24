@@ -573,7 +573,7 @@ def test_auto_lambda_log_marginal_likelihood(
         weight_vect=weights[0, ::],
         differences=differences,
         log_lambda_bounds=(log(lambda_bounds[0]), log(lambda_bounds[1])),
-        n_opts=100,
+        num_optimizations=100,
     )
 
     # the results are compared with 1% relative tolerance
