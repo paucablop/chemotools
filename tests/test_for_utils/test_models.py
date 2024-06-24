@@ -6,7 +6,7 @@ Test suite for the utility models in the :mod:`chemotools.utils.models` module.
 ### Imports ###
 
 from math import log
-from typing import List, Tuple, Type, Union
+from typing import List, Tuple, Union
 
 import pytest
 
@@ -20,11 +20,6 @@ _LambdaValueNumeric = Union[_RealNumeric, Tuple[_RealNumeric, _RealNumeric]]
 _LambdaValueNumericOrFlawed = Union[_LambdaValueNumeric, str]
 _WhittakerMethod = Union[str, _models.WhittakerSmoothMethods]
 _WhittakerMethodSequence = List[_WhittakerMethod]
-_LambdaTestCombination = Tuple[
-    _LambdaValueNumericOrFlawed,
-    _WhittakerMethodSequence,
-    Union[ExpectedWhittakerSmoothLambda, Type[Exception]],
-]
 
 ### Constants ###
 
@@ -48,7 +43,7 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
 
 
 @pytest.mark.parametrize(
-    "combination",
+    "lam, methods, expected",
     [
         (  # Number 0 (fixed float; fixed method)
             100.0,
@@ -185,106 +180,104 @@ _all_whittaker_methods: _WhittakerMethodSequence = (
         (  # Number 12 (fixed zero float; fixed method)
             0.0,
             _FIXED_WHITTAKER_METHODS,
-            ValueError,
+            ValueError("has to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 13 (fixed zero integer; fixed method)
             0,
             _FIXED_WHITTAKER_METHODS,
-            ValueError,
+            ValueError("has to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 14 (search space floats; fixed method)
             (100.0, 10_000.0),
             _FIXED_WHITTAKER_METHODS,
-            ValueError,
+            ValueError("for the penalty weight lambda are a search space"),
         ),
         (
             # Number 15 (search space integers; fixed method)
             (100, 10_000),
             _FIXED_WHITTAKER_METHODS,
-            ValueError,
+            ValueError("for the penalty weight lambda are a search space"),
         ),
         (  # Number 16 (fixed float; automated method)
             100.0,
             _aauto_whittaker_methods,
-            ValueError,
+            ValueError("was selected for a fixed penalty weight"),
         ),
         (
             # Number 17 (fixed integer; automated method)
             100,
             _aauto_whittaker_methods,
-            ValueError,
+            ValueError("was selected for a fixed penalty weight"),
         ),
         (  # Number 18 (search space floats with zero; all methods)
             (0.0, 100.0),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 19 (search space integers with zero; all methods)
             (0, 100),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 20 (flipped search space floats with zero; all methods)
             (100.0, 0.0),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 21 (flipped search space integer with zero; all methods)
             (100, 0),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 22 (all float zeros; all methods)
             (0.0, 0.0),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 23 (all float integers; all methods)
             (0, 0),
             _all_whittaker_methods,
-            ValueError,
+            ValueError("have to be greater than or equal to the zero tolerance"),
         ),
         (  # Number 24 (wrong type; all methods)
             "error",
             _all_whittaker_methods,
-            TypeError,
+            TypeError("have to be either a scalar or a tuple of two values"),
         ),
         (  # Number 25 (fixed float; wrong method)
             100.0,
             "error",
-            ValueError,
+            ValueError("is not valid. Please choose one of the following"),
         ),
         (  # Number 26 (fixed integer; wrong method)
             100,
             "error",
-            ValueError,
+            ValueError("is not valid. Please choose one of the following"),
         ),
     ],
 )
-def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> None:
+def test_whittaker_smooth_lambda_model(
+    lam: _LambdaValueNumericOrFlawed,
+    methods: _WhittakerMethodSequence,
+    expected: Union[ExpectedWhittakerSmoothLambda, Exception],
+) -> None:
     """
     Tests the class :class:`WhittakerSmoothLambda` for the correct behavior of its
     ``__post_init__`` method.
 
-    The ``combination`` parameter defines
-
-    - the lambda value(s) to be used,
-    - the method(s) to be used, and
-    - the expected result of the instantiation (will be an exception if the input
-        should be considered invalid by the dataclass).
-
     """
-
-    # the combination is unpacked
-    lambda_value, methods, expected_result = combination
 
     # if the expected result is an exception, it is tested whether the correct exception
     # is raised
-    if not isinstance(expected_result, ExpectedWhittakerSmoothLambda):
+    if isinstance(expected, Exception):
+        error_catch_phrase = str(expected)
         for meth in methods:
-            with pytest.raises(expected_result):
+            with pytest.raises(
+                type(expected),
+                match=error_catch_phrase,
+            ):
                 _models.WhittakerSmoothLambda(
-                    bounds=lambda_value,  # type: ignore
+                    bounds=lam,  # type: ignore
                     method=meth,  # type: ignore
                 )
 
@@ -294,8 +287,8 @@ def test_whittaker_smooth_lambda_model(combination: _LambdaTestCombination) -> N
     # generated object is compared to the expected result
     for meth in methods:
         lambda_model = _models.WhittakerSmoothLambda(
-            bounds=lambda_value,  # type: ignore
+            bounds=lam,  # type: ignore
             method=meth,  # type: ignore
         )
 
-        expected_result.assert_is_equal_to(other=lambda_model)
+        expected.assert_is_equal_to(other=lambda_model)

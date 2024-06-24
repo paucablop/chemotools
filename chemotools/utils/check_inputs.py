@@ -39,7 +39,9 @@ def check_weights(
 
     # now, the need to be checked for having the right shape
     weights_checked = check_array(
-        weights_checked, ensure_2d=True, force_all_finite=True
+        weights_checked,
+        ensure_2d=True,
+        force_all_finite=True,
     )
 
     # afterwards, they are checked for having the right shape
