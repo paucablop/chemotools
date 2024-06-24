@@ -6,7 +6,7 @@ from typing import List
 import numpy as np
 import pytest
 
-from tests.test_for_utils.utils_models import (
+from tests.tests_for_utils.utils_models import (
     NoiseEstimationReference,
     RefDifferenceKernel,
 )

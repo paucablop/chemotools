@@ -20,12 +20,12 @@ from chemotools.utils._finite_differences import (
 from tests.fixtures import noise_level_estimation_references  # noqa: F401
 from tests.fixtures import noise_level_estimation_signal  # noqa: F401
 from tests.fixtures import reference_finite_differences  # noqa: F401
-from tests.test_for_utils.utils_funcs import (
+from tests.tests_for_utils.utils_funcs import (
     conv_upper_cho_banded_storage_to_sparse,
     multiply_vect_with_squared_forward_finite_differences_original_first,
     multiply_vect_with_squared_forward_finite_differences_transpose_first,
 )
-from tests.test_for_utils.utils_models import (
+from tests.tests_for_utils.utils_models import (
     NoiseEstimationReference,
     RefDifferenceKernel,
 )

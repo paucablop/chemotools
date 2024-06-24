@@ -25,10 +25,10 @@ from chemotools.utils._whittaker_base.misc import get_weight_generator
 from chemotools.utils._whittaker_base.solvers import solve_normal_equations
 from tests.fixtures import noise_level_whittaker_auto_lambda  # noqa: F401
 from tests.fixtures import spectrum_whittaker_auto_lambda  # noqa: F401
-from tests.test_for_utils.utils_funcs import (
+from tests.tests_for_utils.utils_funcs import (
     find_whittaker_smooth_opt_lambda_log_marginal_likelihood,
 )
-from tests.test_for_utils.utils_models import ExpectedWhittakerSmoothLambda
+from tests.tests_for_utils.utils_models import ExpectedWhittakerSmoothLambda
 
 ### Type Aliases ###
 

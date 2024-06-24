@@ -12,7 +12,7 @@ from typing import Dict, Literal, Optional, Tuple
 import numpy as np
 
 from chemotools.utils import _models
-from tests.test_for_utils.utils_funcs import float_is_bit_equal
+from tests.tests_for_utils.utils_funcs import float_is_bit_equal
 
 ### Dataclasses ###
 

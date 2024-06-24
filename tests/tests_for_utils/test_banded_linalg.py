@@ -19,7 +19,7 @@ from chemotools.utils._banded_linalg import (
     lu_solve_banded,
     slogdet_lu_banded,
 )
-from tests.test_for_utils.utils_funcs import get_banded_slogdet
+from tests.tests_for_utils.utils_funcs import get_banded_slogdet
 
 ### Constants ###
 

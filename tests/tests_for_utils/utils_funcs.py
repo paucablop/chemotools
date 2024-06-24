@@ -34,7 +34,7 @@ def float_is_bit_equal(value: float, reference: float) -> bool:
     Doctests
     --------
     >>> # Imports
-    >>> from tests.test_for_utils.utils_funcs import float_is_bit_equal
+    >>> from tests.tests_for_utils.utils_funcs import float_is_bit_equal
 
     >>> # Test 1
     >>> float_is_bit_equal(value=1.0, reference=1.0)
@@ -76,7 +76,7 @@ def conv_upper_cho_banded_storage_to_sparse(ab: np.ndarray) -> csr_matrix:
     >>> # Imports
     >>> import numpy as np
     >>> from numpy import nan
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     conv_upper_cho_banded_storage_to_sparse,
     ... )
 
@@ -224,7 +224,7 @@ def conv_lu_banded_storage_to_sparse(
     >>> # Imports
     >>> import numpy as np
     >>> from numpy import nan
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     conv_lu_banded_storage_to_sparse,
     ... )
 
@@ -383,7 +383,7 @@ def multiply_vect_with_squared_forward_finite_differences_original_first(
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     multiply_vect_with_squared_forward_finite_differences_original_first,
     ... )
 
@@ -525,7 +525,7 @@ def multiply_vect_with_squared_forward_finite_differences_transpose_first(
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     multiply_vect_with_squared_forward_finite_differences_transpose_first,
     ... )
 
@@ -654,7 +654,7 @@ def get_banded_slogdet(ab: np.ndarray) -> Tuple[float, float]:
     --------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     conv_upper_cho_banded_storage_to_sparse,
     ...     get_banded_slogdet,
     ... )
@@ -781,7 +781,7 @@ def get_sparse_forward_finite_difference_matrix(
     Doctests
     --------
     >>> # Imports
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     get_sparse_forward_finite_difference_matrix,
     ... )
 
@@ -894,7 +894,7 @@ def sparse_slogdet_from_superlu(splu: spla.SuperLU) -> Tuple[float, float]:
     >>> import numpy as np
     >>> import scipy.sparse as sprs
 
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     sparse_slogdet_from_superlu,
     ... )
 
@@ -1026,7 +1026,7 @@ def calc_whittaker_smooth_log_marginal_likelihood_const_term(
     -------
     >>> # Imports
     >>> import numpy as np
-    >>> from tests.test_for_utils.utils_funcs import (
+    >>> from tests.tests_for_utils.utils_funcs import (
     ...     calc_whittaker_smooth_log_marginal_likelihood_const_term,
     ...     get_sparse_forward_finite_difference_matrix,
     ... )
