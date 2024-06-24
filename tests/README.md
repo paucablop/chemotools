@@ -95,6 +95,7 @@ def test_sum_is_correct(
 ```
 
 ## 4) 💣❌ Test your error handling thoroughly based on error messages
+Functions that have error handling which is not properly covered by the tests should be classified as not tested at all because all kind of unexpected behavior can occur.<br>
 If your function raises an error, you should test that it raises the correct error. You can use the ``pytest.raises`` context manager to check that the function raises the expected error.
 
 ```python
