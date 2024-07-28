@@ -27,14 +27,14 @@ bibliography: ./paper.bib
 
 # Statement of need
 
-Spectroscopy comprises a group of several analytical techniques used to understand the composition of materials using light. Traditionally, spectroscopic data is analyzed by a discipline called *chemometrics*, a branch of machine learning specialized on extracting chemical information from multivariate spectra. Over the last decades, *chemometricians*, have excelled by developing advanced preprocessing methods designed to attenuate instrument and measuring artifacts from the spectra, and to enhance the pure chemical information of the samples [@RINNAN20091201], [@MISHRA2020116045]. 
+Spectroscopy comprises a group of several analytical techniques used to understand the composition of materials using light. Traditionally, spectroscopic data is analyzed by a discipline called *chemometrics*, a branch of machine learning specialized on extracting chemical information from multivariate spectra. Over the last decades, *chemometricians*, have excelled by developing advanced preprocessing methods designed to attenuate instrument and measuring noise from the spectra, and to enhance the pure chemical information of the samples [@RINNAN20091201], [@MISHRA2020116045]. 
 
 Spectroscopic methods are very suited for a wide range of applications because they allow analyzing the chemical properties of various samples in a fast and simple manner. For this reason, their adoption as integral components of Process Analytical Technology (PAT) has witnessed significant growth across industries, including chemical, biotech, food, and pharmaceuticals. Despite this surge, a notable obstacle has been the absence of open-source standardized, accessible toolkit for *chemometric* model development and deployment. ```chemotools```, positioned as a comprehensive solution, addresses this void by integrating *chemometric* methods into the Python machine learning ecosystem. By implementing a variety of preprocessing and feature selection tools with the ```scikit-learn``` API [@pedregosa2018scikitlearn], ```chemotools``` opens up the entire ```scikit-learn``` toolbox to users, encompassing features such as:
 
 - a rich collection of estimators for regression, classification, and clustering
 - cross-validation and hyper-parameter optimization algorithms
 - pipelining for efficient workflows
-- and model persistence to standardized files such as ```joblib``` or ```pickle```
+- and model persistence using standardized libraries such as ```joblib``` or ```pickle```
 
 This integration empowers users with a versatile array of tools for robust model development and evaluation (\autoref{fig:1}).
 
@@ -48,7 +48,7 @@ In addition to its foundational capabilities, ```chemotools``` not only enables 
 
 # Features and functionality
 
-```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighed penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (\autoref{fig:2}). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
+```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighted penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (\autoref{fig:2}). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
 
 ![Overview of the pipelines. A: Preprocessing pipeline. B: Augmentation pipeline.\label{fig:2}](../assets/images/pipelines.png)
 
