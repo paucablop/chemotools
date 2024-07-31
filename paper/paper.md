@@ -40,7 +40,7 @@ This integration empowers users with a versatile array of tools for robust model
 
 In addition to its foundational capabilities, ```chemotools``` not only enables users to preprocess data and train models using ```scikit-learn``` but also streamlines the transition of these models into a production setting. By enabling users with a well defined interface, ```chemotools``` facilitates the reception of input data and delivery of predictions from the trained model. This can then be containerized using Docker, providing an efficient means for the distribution and implementation of the model in any Docker-compatible environment, facilitating the deployment of models to cloud environments. This adaptive capability not only enables organizations to scale model usage but also allows them to monitor performance and promptly update or rollback the model as necessary.
 
-```chemotools``` also introduces a practical innovation by providing a streamlined framework for data augmentation of spectroscopic datasets through the ```scikit-learn``` API. This feature offers users a straightforward and consistent method to enhance spectral datasets, by introducing stochastic artifacts that represent real-world variations. By integrating data augmentation into the *chemometric* workflow, ```chemotools``` provides users with an efficient tool for improving their datasets to generale the models and optimize their performance. 
+```chemotools``` also introduces a practical innovation by providing a streamlined framework for data augmentation of spectroscopic datasets through the ```scikit-learn``` API. This feature offers users a straightforward and consistent method to enhance spectral datasets, by introducing stochastic artifacts that represent real-world variations. By integrating data augmentation into the *chemometric* workflow, ```chemotools``` provides users with an efficient tool for improving their datasets to generalize the models and optimize their performance. 
 
 
 ![chemotools in the Python machine learning environment .\label{fig:1}](../assets/images/overview_2.png)
@@ -48,7 +48,7 @@ In addition to its foundational capabilities, ```chemotools``` not only enables 
 
 # Features and functionality
 
-```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighted penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (\autoref{fig:2}). An example of code used to create a preprocessing pipelines mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
+```chemotools``` implements a collection of ```scikit-learn``` transformers and selectors. Transformers are divided in preprocessing and augmentation methods. Preprocessing functions range from well-established *chemometric* methods such as the multiplicative scatter correction or the standard normal variate [@RINNAN20091201], to more recent methods such as the asymmetrically reweighted penalized least squares method to remove complex baselines [@arpls2]. Several preprocessing methods can be conveniently concatenated using ```scikit-learn``` pipelines (\autoref{fig:2}). An example of code used to create a preprocessing pipeline mixing ```scikit-learn``` and ```chemotools``` methods is shown in below:
 
 ![Overview of the pipelines. A: Preprocessing pipeline. B: Augmentation pipeline.\label{fig:2}](../assets/images/pipelines.png)
 
@@ -81,14 +81,16 @@ augmentation_pipeline = make_pipeline(
     IndexShift(3),
 )
 
-spectra_augmented = np.array([augmentation_pipeline.fit_transform(spectrum) for _ in range(5)])
+spectra_augmented = np.array(
+    [augmentation_pipeline.fit_transform(spectrum) for _ in range(5)]
+)
 ```
 
 \autoref{fig:3} shows five spectra augmented with the pipeline depicted in \autoref{fig:2} and the original spectrum.
 
 ![Spectral augmentation. Five augmented spectra (in magenta) are generated from an original spectrum (in blue) using an augmentation pipeline.\label{fig:3}](../assets/images/augmentation_pipeline.svg)
 
-In addition to the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset based on a given criteria. Selectors are used to select the features that contain the chemical information of the sample, making the models more robust and generalizable.
+In addition to the transformers, ```chemotools``` also implements selectors. Selectors are mathematical functions used to select the relevant features from the spectral dataset based on a given criterion. Selectors are used to select the features that contain the chemical information of the sample, making the models more robust and generalizable.
 
 Beyond its mathematical features, ```chemotools``` goes a step further by providing real-world spectral datasets [@cabaneros1]. Accompanied by guides demonstrating the integration of scikit-learn and ```chemotools``` for training regression and classification models, these datasets immerse learners in practical applications. This hands-on approach bridges theoretical concepts and real-world implementation, nurturing a deeper understanding of potential challenges in real-world scenarios.
 
@@ -96,9 +98,9 @@ The documentation page (https://paucablop.github.io/chemotools/) meticulously ou
 
 # Adoption and applications
 
-The ultimate objective of developing *chemometric* and machine learning models is either to gain insights about complex datasets and/or to train models that can be used in production applications (\autoref{fig:4}). From a research and development perspective, ```chemotools``` offers a wide range of transformers and selectors that, combined with the rest of the Python machine learning environment, enables researchers to investigate and understand their spectral datasets. From an industrial point of view, ```chemotools``` allows users to streamline the deployment of their trained models into production environments adhering to standard frameworks developed by the machine learning community in Python (\autoref{fig:1}).  
+The ultimate objective of developing *chemometric* and machine learning models is either to gain insights about complex datasets or to train models that can be used in production applications (\autoref{fig:4}). From a research and development perspective, ```chemotools``` offers a wide range of transformers and selectors that, combined with the rest of the Python machine learning environment, enables researchers to investigate and understand their spectral datasets. From an industrial point of view, ```chemotools``` allows users to streamline the deployment of their trained models into production environments adhering to standard frameworks developed by the machine learning community in Python (\autoref{fig:1}).  
 
-Beyond its practical applications, ```chemotools``` has being utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Integrating chemotools into academic curricula using Jupyter notebooks, offers students a valuable opportunity to gain hands-on experience with real-world datasets, providing practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user friendly interface, coupled with comprehensive documentation, has proven an enriching learning experience for students pursuing education in fields relate to analytical chemistry, process analytical technology, data science or *chemometrics*.
+Beyond its practical applications, ```chemotools``` has been utilized as an educational tool at universities for both Master's (MSc) and Doctoral (PhD) levels. Integrating chemotools into academic curricula using Jupyter notebooks, offers students a valuable opportunity to gain hands-on experience with real-world datasets, providing practical insights into the application of sophisticated techniques for preprocessing and analyzing spectral data. The tool's user friendly interface, coupled with comprehensive documentation, has proven an enriching learning experience for students pursuing education in fields relate to analytical chemistry, process analytical technology, data science or *chemometrics*.
 
 ![Applications of ```chemotools```.\label{fig:4}](../assets/images/applications.png)
 
