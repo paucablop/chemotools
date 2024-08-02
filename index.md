@@ -13,14 +13,6 @@ nav_order: 1
 [![Downloads](https://static.pepy.tech/badge/chemotools)](https://pepy.tech/project/chemotools)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06802/status.svg)](https://doi.org/10.21105/joss.06802)
 
-HTML:
-<a style="border-width:0" href="https://doi.org/10.21105/joss.06802">
-  <img src="https://joss.theoj.org/papers/10.21105/joss.06802/status.svg" alt="DOI badge" >
-</a>
-
-reStructuredText:
-.. image:: https://joss.theoj.org/papers/10.21105/joss.06802/status.svg
-   :target: https://doi.org/10.21105/joss.06802
 
 scikit-learn 
 {: .label .label-yellow } 
