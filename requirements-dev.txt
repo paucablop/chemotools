@@ -1,0 +1,8 @@
+black
+isort
+line_profiler
+matplotlib
+pentapy
+pytest
+pytest-cov
+pytest-xdist[psutil]

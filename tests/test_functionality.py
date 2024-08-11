@@ -3,15 +3,15 @@ import pandas as pd
 import polars as pl
 import pytest
 
+from chemotools._runtime import PENTAPY_AVAILABLE
 from chemotools.augmentation import (
     BaselineShift,
-    ExponentialNoise, 
+    ExponentialNoise,
     IndexShift,
-    NormalNoise, 
+    NormalNoise,
     SpectrumScale,
     UniformNoise,
 )
-
 from chemotools.baseline import (
     AirPls,
     ArPls,
@@ -21,6 +21,7 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
+from chemotools.feature_selection import IndexSelector, RangeCut
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
@@ -29,41 +30,87 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.feature_selection import IndexSelector, RangeCut
-from tests.fixtures import (
+from chemotools.utils._models import BandedSolvers
+from tests.fixtures import reference_airpls  # noqa: F401
+from tests.fixtures import reference_arpls  # noqa: F401
+from tests.fixtures import reference_msc_mean  # noqa: F401
+from tests.fixtures import reference_msc_median  # noqa: F401
+from tests.fixtures import reference_sg_15_2  # noqa: F401
+from tests.fixtures import reference_snv  # noqa: F401
+from tests.fixtures import reference_whittaker  # noqa: F401
+from tests.fixtures import spectrum_arpls  # noqa: F401
+from tests.fixtures import spectrum
+
+
+@pytest.mark.parametrize("num_series", [1, 5])
+def test_air_pls(
     spectrum,
-    spectrum_arpls,
-    reference_airpls,
-    reference_arpls,
-    reference_msc_mean,
-    reference_msc_median,
-    reference_sg_15_2,
-    reference_snv,
-    reference_whitakker,
-)
-
-
-def test_air_pls(spectrum, reference_airpls):
+    reference_airpls,  # noqa: F811
+    num_series: int,
+) -> None:
     # Arrange
-    air_pls = AirPls()
+    repetitions = (num_series, 1)
+    air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
+    assert np.allclose(
+        spectrum_corrected[0], np.tile(reference_airpls, reps=repetitions), atol=1e-7
+    )
 
 
-def test_ar_pls(spectrum_arpls, reference_arpls):
+# FIXME: Deactivated because it fails; Issue created:
+# @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+# @pytest.mark.parametrize("size", [5_000])
+# def test_air_pls_constant_signal(size: int, fill_value: float) -> None:
+#     # Arrange
+#     spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+#     air_pls = AirPls(lam=100, polynomial_order=1, nr_iterations=15)
+
+#     # Act
+#     spectrum_corrected = air_pls.fit_transform(spectrum)
+
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0])
+
+
+# FIXME: working with such a high ``atol`` indicates that the reference is not up to
+#        date anymore
+@pytest.mark.parametrize("num_series", [1, 5])
+def test_ar_pls(
+    spectrum_arpls,  # noqa: F811
+    reference_arpls,  # noqa: F811
+    num_series: int,
+) -> None:
     # Arrange
-    arpls = ArPls(1e2, 0.0001)
+    repetitions = (num_series, 1)
+    arpls = ArPls(lam=1e2, differences=2, ratio=0.0001)
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
     # Act
     spectrum_corrected = arpls.fit_transform(spectrum_arpls)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+    assert np.allclose(
+        spectrum_corrected[0], np.tile(reference, reps=repetitions), atol=1e-4
+    )
+
+
+# FIXME: Deactivated because it fails; Issue created:
+# @pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+# @pytest.mark.parametrize("size", [5_000])
+# def test_ar_pls_constant_signal(size: int, fill_value: float) -> None:
+#     # Arrange
+#     spectrum = np.full(shape=(size,), fill_value=fill_value).reshape((1, -1))
+#     ar_pls = ArPls(lam=1e2, differences=2, ratio=0.0001)
+
+#     # Act
+#     spectrum_corrected = ar_pls.fit_transform(spectrum)
+
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0])
 
 
 def test_baseline_shift():
@@ -76,9 +123,11 @@ def test_baseline_shift():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0]) 
+    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0])
     assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
-    assert np.isclose(np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8)
+    assert np.isclose(
+        np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8
+    )
 
 
 def test_constant_baseline_correction():
@@ -120,8 +169,7 @@ def test_exponential_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0.1, atol=1e-2)
-
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
 
 
 def test_extended_baseline_correction():
@@ -165,7 +213,6 @@ def test_extended_baseline_correction_with_no_reference():
     # Assert
     with pytest.raises(ValueError):
         emsc.fit_transform(spectrum)
-
 
 
 def test_extended_baseline_correction_with_wrong_reference():
@@ -222,7 +269,7 @@ def test_extended_baseline_correction_through_msc(spectrum):
 
 
 def test_extended_baseline_correction_through_msc_median(spectrum):
-    # EMSC of 0 order should be equivalient to MSC
+    # EMSC of 0 order should be equivalent to MSC
     # Arrange
     msc = MultiplicativeScatterCorrection(use_median=True)
     emsc = ExtendedMultiplicativeScatterCorrection(order=0, use_median=True)
@@ -233,7 +280,6 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
 
     # Assert
     assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
-    
 
 
 def test_index_selector():
@@ -280,13 +326,16 @@ def test_index_selector_with_wavenumbers():
 def test_index_selector_with_wavenumbers_and_dataframe():
     # Arrange
     wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
-    spectrum = pd.DataFrame(np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]]))
+    spectrum = pd.DataFrame(
+        np.array([[1.0, 2.0, 3.0, 5.0, 8.0, 13.0, 21.0, 34.0, 55.0, 89.0]])
+    )
+    # FIXME: this is not used
     expected = np.array([[1.0, 2.0, 3.0, 34.0, 55.0, 89.0]])
 
     # Act
     select_features = IndexSelector(
         features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
-    ).set_output(transform='pandas')
+    ).set_output(transform="pandas")
 
     spectrum_corrected = select_features.fit_transform(spectrum)
 
@@ -524,7 +573,7 @@ def test_normal_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0, atol=1e-2)
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
 
 
@@ -630,7 +679,9 @@ def test_range_cut_by_wavenumber_with_pandas_dataframe():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
-    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='pandas')
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(
+        transform="pandas"
+    )
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
@@ -643,7 +694,9 @@ def test_range_cut_by_wavenumber_with_polars_dataframe():
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pl.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
-    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(transform='polars')
+    range_cut = RangeCut(start=2.5, end=7.9, wavenumbers=wavenumbers).set_output(
+        transform="polars"
+    )
 
     # Act
     spectrum_corrected = range_cut.fit_transform(spectrum)
@@ -762,16 +815,125 @@ def test_uniform_noise():
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0])-1, 0, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1/3), atol=1e-2)
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
+    assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1 / 3), atol=1e-2)
 
 
-def test_whitakker_smooth(spectrum, reference_whitakker):
+@pytest.mark.parametrize("same_weights_for_all", [True, False])
+@pytest.mark.parametrize("with_weights", [True, False])
+@pytest.mark.parametrize("num_series", [1, 5])
+def test_whittaker_smooth(
+    spectrum,
+    reference_whittaker,  # noqa: F811
+    num_series: int,
+    with_weights: bool,
+    same_weights_for_all: bool,
+) -> None:
     # Arrange
-    whitakker_smooth = WhittakerSmooth()
+    repetitions = (num_series, 1)
+    whittaker_smooth = WhittakerSmooth()
+    if with_weights and not same_weights_for_all:
+        weights = np.ones(shape=(num_series, len(spectrum[0])))
+    elif with_weights and same_weights_for_all:
+        weights = np.ones(shape=(len(spectrum[0]),))
+    else:
+        weights = None
+
+    spectrum_to_fit_original = np.tile(spectrum, reps=repetitions)
+    spectrum_to_fit = spectrum_to_fit_original.copy()
 
     # Act
-    spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
+    spectrum_corrected = whittaker_smooth.fit_transform(
+        X=spectrum_to_fit, sample_weight=weights
+    )
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
+    # NOTE: the following test makes sure nothing was overwritten
+    assert np.array_equal(spectrum_to_fit, spectrum_to_fit_original)
+    assert np.allclose(
+        spectrum_corrected, np.tile(reference_whittaker, reps=repetitions), atol=1e-8
+    )
+
+
+@pytest.mark.parametrize("same_weights_for_all", [True, False])
+@pytest.mark.parametrize("with_weights", [True, False])
+@pytest.mark.parametrize("num_series", [1, 5])
+def test_whittaker_with_pentapy(
+    num_series: int,
+    with_weights: bool,
+    same_weights_for_all: bool,
+):
+    # this test is skipped with a warning if pentapy is not installed
+    if not PENTAPY_AVAILABLE:
+        pytest.skip("Pentapy is not installed, test cannot be performed")
+
+    # Arrange
+    np.random.seed(42)
+    spectrum = np.random.rand(num_series, 1000)
+    whittaker_smooth = WhittakerSmooth(lam=100.0, differences=2)
+
+    weights = None
+    if with_weights and not same_weights_for_all:
+        weights = np.ones(shape=(num_series, len(spectrum[0])))
+    elif with_weights and same_weights_for_all:
+        weights = np.ones(shape=(len(spectrum[0]),))
+
+    # Act with pentapy
+    spectrum_corr_pentapy = whittaker_smooth.fit_transform(
+        X=spectrum, sample_weight=weights
+    )
+
+    # Assert with pentapy
+    # NOTE: the weight is not correct since the test only checks the method
+    solve_method = whittaker_smooth._solve(
+        lam=whittaker_smooth._lam_internal_.fixed_lambda,
+        rhs_b_weighted=spectrum.transpose(),
+        weights=1.0,
+    )[1]
+    assert solve_method == BandedSolvers.PENTAPY
+
+    # Act without pentapy
+    whittaker_smooth._WhittakerLikeSolver__allow_pentapy = False  # type: ignore
+    spectrum_corr_factorized_solve = whittaker_smooth.fit_transform(
+        spectrum, sample_weight=weights
+    )
+
+    # Assert without pentapy
+    # NOTE: the weight is not correct since the test only checks the method
+    solve_method = whittaker_smooth._solve(
+        lam=whittaker_smooth._lam_internal_.fixed_lambda,
+        rhs_b_weighted=spectrum.transpose(),
+        weights=1.0,
+    )[1]
+    assert solve_method == BandedSolvers.PIVOTED_LU
+    assert np.allclose(spectrum_corr_pentapy[0], spectrum_corr_factorized_solve[0])
+
+
+@pytest.mark.parametrize(
+    "log10_lam", np.arange(start=-25.0, stop=15.0, step=5.0).tolist()
+)
+@pytest.mark.parametrize("difference", [1, 2])
+@pytest.mark.parametrize("fill_value", [-5.0, 0.0, 5.0])
+@pytest.mark.parametrize("num_data", [5_000])
+def test_whittaker_constant_signal(
+    num_data: int,
+    fill_value: float,
+    difference: int,
+    log10_lam: float,
+) -> None:
+
+    # Arrange
+    spectrum = np.full(shape=(num_data,), fill_value=fill_value).reshape((1, -1))
+    whittaker_smooth = WhittakerSmooth(lam=10.0**log10_lam, differences=difference)
+
+    # Act
+    spectrum_corrected = whittaker_smooth.fit_transform(spectrum)
+
+    # Assert
+    # this test needs to be as strict as possible because the result has to be exact
+    assert np.allclose(
+        spectrum_corrected[0],
+        spectrum[0],
+        atol=num_data * np.finfo(np.float64).eps,  # type: ignore
+        rtol=1e-6,
+    )
