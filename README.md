@@ -102,6 +102,14 @@ Other useful commands include:
     make lint-flake8
     ```
 
+- testing only selected tests:
+    ```bash
+    pytest ./tests -k "test_load_coffee_pandas"
+
+    # or using the Makefile
+    make test TEST=test_load_coffee_pandas
+    ```
+
 - parallelized testing the package with a coverage report:
     ```bash
     pytest --cov=chemotools ./tests -n="auto" --cov-report=html -x  # for an HTML report
