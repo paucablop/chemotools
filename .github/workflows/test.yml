@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 130-add-initial-makefile-version-and-tiny-test-ci-pipeline
   pull_request:
     branches:
       - main
