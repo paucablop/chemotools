@@ -54,9 +54,9 @@ test:
 .PHONY: test-htmlcov
 test-htmlcov:
 	@echo Running the tests with HTML coverage report ...
-	pytest --cov=chemotools .\tests -n="auto" --cov-report=html -x
+	pytest --cov=chemotools ./tests -n="auto" --cov-report=html -x
 
 .PHONY: test-xmlcov
 test-xmlcov:
 	@echo Running the tests with XML coverage report ...
-	pytest --cov=chemotools .\tests -n="auto" --cov-report=html -x
+	pytest --cov=chemotools ./tests -n="auto" --cov-report=html -x

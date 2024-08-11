@@ -104,8 +104,8 @@ Other useful commands include:
 
 - parallelized testing the package with a coverage report:
     ```bash
-    pytest --cov=chemotools .\tests -n="auto" --cov-report=html -x  # for an HTML report
-    pytest --cov=chemotools .\tests -n="auto" --cov-report=xml -x  # for an XML report
+    pytest --cov=chemotools ./tests -n="auto" --cov-report=html -x  # for an HTML report
+    pytest --cov=chemotools ./tests -n="auto" --cov-report=xml -x  # for an XML report
 
     # or using the Makefile
     make test-htmlcov
