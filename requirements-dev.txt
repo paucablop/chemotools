@@ -1,0 +1,9 @@
+black
+build
+flake8
+isort[color]
+line_profiler
+matplotlib
+pytest
+pytest-cov
+pytest-xdist[psutil]

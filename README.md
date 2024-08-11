@@ -15,7 +15,7 @@ Welcome to Chemotools, a Python package that integrates chemometrics with Scikit
 
 ## Note
 
-Since I released Chemotools, I have received a fantastic response from the community. I am really happy for the interest in the project 🤗. This also means that I have received a lot of good feedback and suggestions for improvements. I have been intensively working on releasing new versions of Chemotools to address the feedback and suggestions. If you use Chemotools, __make sure you are using the latest version__ (see installation), which will be aligned with the documentation. 
+Since I released Chemotools, I have received a fantastic response from the community. I am really happy for the interest in the project 🤗. This also means that I have received a lot of good feedback and suggestions for improvements. I have been intensively working on releasing new versions of Chemotools to address the feedback and suggestions. If you use Chemotools, __make sure you are using the latest version__ (see installation), which will be aligned with the documentation.
 
 👉👉 Check the [latest version](https://pypi.org/project/chemotools/) and make sure you don't miss out on cool new features.
 
@@ -63,12 +63,54 @@ from sklearn.pipeline import make_pipeline
 from chemotools.baseline import AirPls
 from chemotools.scatter import MultiplicativeScatterCorrection
 
-preprocessing = make_pipeline(AirPls(), MultiplicativeScatterCorrection(), StandardScaler(with_std=False)) 
+preprocessing = make_pipeline(AirPls(), MultiplicativeScatterCorrection(), StandardScaler(with_std=False))
 spectra_transformed = preprocessing.fit_transform(spectra)
 ```
 
 Check the [documentation](https://paucablop.github.io/chemotools/) for more information on how to use chemotools.
 
+## Development
+
+To install/update the package and its development dependencies, the following command can be used:
+
+```bash
+python -m pip install --upgrade . -r requirements.txt -r requirements-dev.txt
+```
+
+``chemotools`` also comes with a ``Makefile`` that provides shortcuts for common development tasks. The equivalent command to the one above would be:
+
+```bash
+make install-dev
+```
+
+Other useful commands include:
+
+- building the package:
+    ```bash
+    python -m build
+
+    # or using the Makefile
+    make build
+    ```
+
+- checking the linting of the package:
+    ```bash
+    flake8 ./chemotools ./tests --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 ./chemotools ./tests --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # or using the Makefile
+    make lint-flake8
+    ```
+
+- parallelized testing the package with a coverage report:
+    ```bash
+    pytest --cov=chemotools .\tests -n="auto" --cov-report=html -x  # for an HTML report
+    pytest --cov=chemotools .\tests -n="auto" --cov-report=xml -x  # for an XML report
+
+    # or using the Makefile
+    make test-htmlcov
+    make test-xmlcov
+    ```
 
 ## Contributing
 
