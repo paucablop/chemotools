@@ -120,9 +120,9 @@ class ArPls(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _calculate_diff(self, N):
-        I = sp.eye(N, format="csc")
+        identity_matrix = sp.eye(N, format="csc")
         D2 = sp.diags([1, -2, 1], [0, 1, 2], shape=(N - 2, N), format="csc")
-        return D2.dot(I).T
+        return D2.dot(identity_matrix).T
 
     def _calculate_ar_pls(self, x):
         N = len(x)
