@@ -20,6 +20,10 @@ black = "^24.8.0"
 ruff = "^0.8.0"
 mypy = "^1.13.0"
 
+[tool.pytest.ini_options]
+filterwarnings = "always"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
