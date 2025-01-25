@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -56,8 +54,9 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         # Set the point index
         if self.wavenumbers is None:
             self.point_index_ = self.point
@@ -87,8 +86,15 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         check_is_fitted(self, "point_index_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:

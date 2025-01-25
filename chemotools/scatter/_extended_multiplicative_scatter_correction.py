@@ -1,9 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.preprocessing import StandardScaler
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class ExtendedMultiplicativeScatterCorrection(
@@ -80,8 +77,10 @@ class ExtendedMultiplicativeScatterCorrection(
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
+        
         # Check that the length of the reference is the same as the number of features
         if self.reference is not None:
             if len(self.reference) != self.n_features_in_:
@@ -141,17 +140,15 @@ class ExtendedMultiplicativeScatterCorrection(
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
-
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
-        # Calculate the extended multiplicative scatter correction
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         if self.weights is None:
             for i, x in enumerate(X_):

@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class RangeCut(BaseEstimator, SelectorMixin):
+class RangeCut(SelectorMixin, BaseEstimator):
     """
     A selector that cuts the input data to a specified range. The range is specified:
     - by the indices of the start and end of the range,
@@ -71,8 +71,9 @@ class RangeCut(BaseEstimator, SelectorMixin):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         # Set the start and end indices
         if self.wavenumbers is None:
             self.start_index_ = self.start
@@ -84,7 +85,6 @@ class RangeCut(BaseEstimator, SelectorMixin):
             self.wavenumbers_ = self.wavenumbers[self.start_index_ : self.end_index_]
 
         return self
-    
 
     def _get_support_mask(self):
         """

@@ -2,12 +2,10 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class IndexSelector(BaseEstimator, SelectorMixin):
+class IndexSelector(SelectorMixin, BaseEstimator):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:
@@ -66,8 +64,9 @@ class IndexSelector(BaseEstimator, SelectorMixin):
             The fitted transformer.
         """
         # validate that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         # Set the fitted attribute to True
         self._is_fitted = True
 

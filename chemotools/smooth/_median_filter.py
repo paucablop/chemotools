@@ -1,9 +1,7 @@
 import numpy as np
 from scipy.ndimage import median_filter
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -27,7 +25,8 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     transform(X, y=0, copy=True)
         Transform the input data by calculating the median filter.
     """
-    def __init__(self, window_size: int = 3, mode: str = 'nearest') -> None:
+
+    def __init__(self, window_size: int = 3, mode: str = "nearest") -> None:
         self.window_size = window_size
         self.mode = mode
 
@@ -49,8 +48,9 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -74,8 +74,15 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         if X_.shape[1] != self.n_features_in_:
             raise ValueError(

@@ -2,13 +2,12 @@ import numpy as np
 from scipy.sparse import csc_matrix, eye, diags
 from scipy.sparse.linalg import spsolve
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
-
-# This code is adapted from the following source:
-# Z.-M. Zhang, S. Chen, and Y.-Z. Liang, 
-# Baseline correction using adaptive iteratively reweighted penalized least squares. 
+from sklearn.utils.validation import (
+    check_is_fitted,
+    validate_data,
+)  # This code is adapted from the following source:
+# Z.-M. Zhang, S. Chen, and Y.-Z. Liang,
+# Baseline correction using adaptive iteratively reweighted penalized least squares.
 # Analyst 135 (5), 1138-1146 (2010).
 
 
@@ -32,6 +31,7 @@ class WhittakerSmooth(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     transform(X, y=0, copy=True)
         Transform the input data by calculating the Whittaker smooth.
     """
+
     def __init__(
         self,
         lam: float = 1e2,
@@ -58,8 +58,9 @@ class WhittakerSmooth(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -83,8 +84,15 @@ class WhittakerSmooth(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:

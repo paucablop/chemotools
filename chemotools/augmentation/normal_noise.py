@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -16,7 +14,7 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     random_state : int, default=None
         The random state to use for the random number generator.
-    
+
     Attributes
     ----------
     n_features_in_ : int
@@ -24,7 +22,7 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     _is_fitted : bool
         Whether the transformer has been fitted to data.
-    
+
     Methods
     -------
     fit(X, y=None)
@@ -34,7 +32,6 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by adding random noise.
     """
 
-
     def __init__(self, scale: float = 0.0, random_state: int = None):
         self.scale = scale
         self.random_state = random_state
@@ -42,7 +39,7 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def fit(self, X: np.ndarray, y=None) -> "NormalNoise":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -57,8 +54,10 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
+        
         # Set the number of features
         self.n_features_in_ = X.shape[1]
 
@@ -91,12 +90,21 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         check_is_fitted(self, "_is_fitted")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
