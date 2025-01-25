@@ -110,12 +110,12 @@ def load_coffee(set_output="pandas"):
         coffee_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels
-    
+
     if set_output == "polars":
         coffee_spectra = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels
-    
+
     else:
         raise ValueError(
             "Invalid value for set_output. Please use 'pandas' or 'polars'."

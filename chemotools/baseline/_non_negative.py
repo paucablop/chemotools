@@ -78,7 +78,6 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
             raise ValueError(

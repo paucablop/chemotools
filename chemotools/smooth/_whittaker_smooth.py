@@ -6,6 +6,7 @@ from sklearn.utils.validation import (
     check_is_fitted,
     validate_data,
 )  # This code is adapted from the following source:
+
 # Z.-M. Zhang, S. Chen, and Y.-Z. Liang,
 # Baseline correction using adaptive iteratively reweighted penalized least squares.
 # Analyst 135 (5), 1138-1146 (2010).

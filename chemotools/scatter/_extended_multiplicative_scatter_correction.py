@@ -80,7 +80,7 @@ class ExtendedMultiplicativeScatterCorrection(
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        
+
         # Check that the length of the reference is the same as the number of features
         if self.reference is not None:
             if len(self.reference) != self.n_features_in_:

@@ -1,10 +1,12 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+
+
 class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Shift the spectrum a given number of indices between - shift and + shift drawn
-    from a discrete uniform distribution. 
+    from a discrete uniform distribution.
 
     Parameters
     ----------
@@ -13,7 +15,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     random_state : int, default=None
         The random state to use for the random number generator.
-    
+
     Attributes
     ----------
     n_features_in_ : int
@@ -21,7 +23,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     _is_fitted : bool
         Whether the transformer has been fitted to data.
-    
+
     Methods
     -------
     fit(X, y=None)
@@ -31,7 +33,6 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by shifting the spectrum.
     """
 
-
     def __init__(self, shift: int = 0, random_state: int = None):
         self.shift = shift
         self.random_state = random_state
@@ -39,7 +40,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def fit(self, X: np.ndarray, y=None) -> "IndexShift":
         """
         Fit the transformer to the input data.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -57,7 +58,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        
+
         # Set the number of features
         self.n_features_in_ = X.shape[1]
 
@@ -100,10 +101,11 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
@@ -114,4 +116,3 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def _shift_spectrum(self, x) -> np.ndarray:
         shift_amount = self._rng.integers(-self.shift, self.shift, endpoint=True)
         return np.roll(x, shift_amount)
-    

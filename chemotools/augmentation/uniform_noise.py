@@ -61,7 +61,7 @@ class UniformNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        
+
         # Set the number of features
         self.n_features_in_ = X.shape[1]
 

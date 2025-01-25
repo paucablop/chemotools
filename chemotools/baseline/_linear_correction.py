@@ -97,7 +97,9 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:
-            raise ValueError(f"Expected {self.n_features_in_} features but got {X_.shape[1]}")
+            raise ValueError(
+                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+            )
 
         # Calculate non-negative values
         for i, x in enumerate(X_):

@@ -106,14 +106,14 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
-                    self,
-                    X,
-                    y="no_validation",
-                    ensure_2d=True,
-                    copy=True,
-                    reset=False,
-                    dtype=np.float64,
-                )
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Base line correct the spectra
         for i, x in enumerate(X_):
