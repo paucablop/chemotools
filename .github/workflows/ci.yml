@@ -12,32 +12,45 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 5
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version}}
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: ${{ matrix.python-version}}
+
       - name: Install dependencies
         run: |
-          pip install flake8 pytest build
-          if [ -f requirements.txt ]
-          then
-            pip install \
-            -r requirements.txt
-            pip install pytest-cov
-          fi
-      - name: Lint with flake8
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install
+
+      - name: Print versions
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test with pytest
+          echo "Python version:"
+          python --version
+          echo "Black version:"
+          poetry run black --version
+
+      - name: Run tests
+        run: poetry run pytest --cov
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
+      - name: Run formatting
         run: |
-          PYTHONPATH=./chemotools pytest --cov
+          poetry run black chemotools
+          git diff --exit-code
+
+      - name: Run linting
+        run: |
+          poetry run black --check chemotools
+          poetry run flake8 chemotools
+
       - name: Python build package
         run: |
           python -m build
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
