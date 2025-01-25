@@ -1,11 +1,11 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that corrects a baseline by subtracting a constant value.
     The constant value is taken by the mean of the features between the start
@@ -43,7 +43,7 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
         self,
         start: int = 0,
         end: int = 1,
-        wavenumbers: np.ndarray = None,
+        wavenumbers: Optional[np.ndarray] = None,
     ) -> None:
         self.start = start
         self.end = end
@@ -67,7 +67,9 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
 
         # Set the start and end indices
         if self.wavenumbers is None:
@@ -100,17 +102,18 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
             The transformed input data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, ["start_index_", "end_index_"])
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
-
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
+        X_ = validate_data(
+                    self,
+                    X,
+                    y="no_validation",
+                    ensure_2d=True,
+                    copy=True,
+                    reset=False,
+                    dtype=np.float64,
+                )
 
         # Base line correct the spectra
         for i, x in enumerate(X_):
@@ -120,4 +123,4 @@ class ConstantBaselineCorrection(OneToOneFeatureMixin, BaseEstimator, Transforme
 
     def _find_index(self, target: float) -> int:
         wavenumbers = np.array(self.wavenumbers)
-        return np.argmin(np.abs(wavenumbers - target))
+        return np.argmin(np.abs(wavenumbers - target)).astype(int)

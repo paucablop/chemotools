@@ -1,12 +1,10 @@
 import numpy as np
 from scipy.interpolate import CubicSpline
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that corrects a baseline by subtracting a cubic spline through the
     points defined by the indices.
@@ -55,8 +53,10 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
-
+        X = validate_data(
+                    self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+                )
+        
         if self.indices is None:
             self.indices_ = [0, len(X[0]) - 1]
         else:
@@ -88,8 +88,15 @@ class CubicSplineCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixi
         check_is_fitted(self, "indices_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Check that the number of features is the same as the fitted data
         if X_.shape[1] != self.n_features_in_:

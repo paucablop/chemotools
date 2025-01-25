@@ -5,14 +5,12 @@ from scipy.sparse import spdiags, csc_matrix
 from scipy.sparse.linalg import splu
 
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 logger = logging.getLogger(__name__)
 
 
-class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class ArPls(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     This class implements the Assymmetrically Reweighted Penalized Least Squares (ArPls) is a baseline
     correction method for spectroscopy data. It uses an iterative process
@@ -46,8 +44,8 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     References
     ----------
-    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo 
-    Baseline correction using asymmetrically reweighted penalized 
+    - Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo
+    Baseline correction using asymmetrically reweighted penalized
     least squares smoothing
     """
 
@@ -79,7 +77,9 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         """
 
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
 
         return self
 
@@ -104,14 +104,14 @@ class ArPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
-
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+        )
 
         # Calculate the ar pls baseline
         for i, x in enumerate(X_):
