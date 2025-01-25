@@ -6,8 +6,8 @@ from ._robust_normal_variate import RobustNormalVariate
 from ._standard_normal_variate import StandardNormalVariate
 
 __all__ = [
-    ExtendedMultiplicativeScatterCorrection,
-    MultiplicativeScatterCorrection,
-    RobustNormalVariate,
-    StandardNormalVariate,
+    "ExtendedMultiplicativeScatterCorrection",
+    "MultiplicativeScatterCorrection",
+    "RobustNormalVariate",
+    "StandardNormalVariate",
 ]

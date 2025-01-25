@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -27,7 +29,7 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     def __init__(
         self,
-        reference: np.ndarray = None,
+        reference: Optional[np.ndarray] = None,
     ):
         self.reference = reference
 

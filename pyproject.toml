@@ -19,6 +19,8 @@ pytest = "^8.3.0"
 black = "^24.8.0"
 ruff = "^0.8.0"
 mypy = "^1.13.0"
+pandas-stubs = "^2.2.3.241126"
+scipy-stubs = "^1.15.1.0"
 
 [tool.pytest.ini_options]
 filterwarnings = "always"
@@ -26,4 +28,8 @@ filterwarnings = "always"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[[tool.mypy.overrides]]
+module = ["sklearn", "sklearn.*"]
+ignore_missing_imports = true
 

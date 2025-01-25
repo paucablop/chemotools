@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -29,7 +31,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
         Subtract the polynomial baseline from a single spectrum.
     """
 
-    def __init__(self, order: int = 1, indices: list = None) -> None:
+    def __init__(self, order: int = 1, indices: Optional[list] = None) -> None:
         self.order = order
         self.indices = indices
 
@@ -55,7 +57,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
         if self.indices is None:
-            self.indices_ = range(0, len(X[0]))
+            self.indices_ = list(range(0, len(X[0])))
         else:
             self.indices_ = self.indices
 
@@ -82,7 +84,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "indices_")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(

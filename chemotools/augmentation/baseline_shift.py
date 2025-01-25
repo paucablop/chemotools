@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -33,7 +35,7 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by adding a baseline the spectrum.
     """
 
-    def __init__(self, scale: int = 0.0, random_state: int = None):
+    def __init__(self, scale: float = 0.0, random_state: Optional[int] = None):
         self.scale = scale
         self.random_state = random_state
 

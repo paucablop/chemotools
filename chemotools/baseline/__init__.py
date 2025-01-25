@@ -9,12 +9,12 @@ from ._subtract_reference import SubtractReference
 
 
 __all__ = [
-    AirPls,
-    ArPls,
-    ConstantBaselineCorrection,
-    CubicSplineCorrection,
-    LinearCorrection,
-    NonNegative,
-    PolynomialCorrection,
-    SubtractReference,
+    "AirPls",
+    "ArPls",
+    "ConstantBaselineCorrection",
+    "CubicSplineCorrection",
+    "LinearCorrection",
+    "NonNegative",
+    "PolynomialCorrection",
+    "SubtractReference",
 ]

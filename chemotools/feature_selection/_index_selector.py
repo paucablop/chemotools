@@ -1,3 +1,5 @@
+from typing import Optional, Union
+
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
@@ -40,8 +42,8 @@ class IndexSelector(SelectorMixin, BaseEstimator):
 
     def __init__(
         self,
-        features: np.ndarray = None,
-        wavenumbers: np.ndarray = None,
+        features: Optional[np.ndarray] = None,
+        wavenumbers: Optional[np.ndarray] = None,
     ):
         self.features = features
         self.wavenumbers = wavenumbers
@@ -79,9 +81,9 @@ class IndexSelector(SelectorMixin, BaseEstimator):
             self.features_index_ = self.features
             return self
 
-        self.features_index_ = self._find_indices()
-
-        return self
+        if self.features is not None and self.wavenumbers is not None:
+            self.features_index_ = self._find_indices()
+            return self
 
     def _get_support_mask(self):
         """
@@ -101,11 +103,11 @@ class IndexSelector(SelectorMixin, BaseEstimator):
 
         return mask
 
-    def _find_index(self, target: float) -> int:
+    def _find_index(self, target: Union[float, int]) -> int:
         if self.wavenumbers is None:
-            return target
+            return int(target)
         wavenumbers = np.array(self.wavenumbers)
-        return np.argmin(np.abs(wavenumbers - target))
+        return int(np.argmin(np.abs(wavenumbers - target)))
 
     def _find_indices(self) -> np.ndarray:
         return np.array([self._find_index(feature) for feature in self.features])

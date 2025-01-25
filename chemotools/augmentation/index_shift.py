@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -33,7 +35,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by shifting the spectrum.
     """
 
-    def __init__(self, shift: int = 0, random_state: int = None):
+    def __init__(self, shift: int = 0, random_state: Optional[int] = None):
         self.shift = shift
         self.random_state = random_state
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from scipy.interpolate import CubicSpline
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -32,7 +34,7 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
 
     """
 
-    def __init__(self, indices: list = None) -> None:
+    def __init__(self, indices: Optional[list] = None) -> None:
         self.indices = indices
 
     def fit(self, X: np.ndarray, y=None) -> "CubicSplineCorrection":

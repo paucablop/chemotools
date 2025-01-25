@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 from scipy.ndimage import median_filter
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -26,7 +28,20 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by calculating the median filter.
     """
 
-    def __init__(self, window_size: int = 3, mode: str = "nearest") -> None:
+    def __init__(
+        self,
+        window_size: int = 3,
+        mode: Literal[
+            "reflect",
+            "constant",
+            "nearest",
+            "mirror",
+            "wrap",
+            "grid-constant",
+            "grid-mirror",
+            "grid-wrap",
+        ] = "nearest",
+    ) -> None:
         self.window_size = window_size
         self.mode = mode
 

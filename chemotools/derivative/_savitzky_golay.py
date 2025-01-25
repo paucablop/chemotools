@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 from scipy.signal import savgol_filter
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -39,7 +41,7 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         window_size: int = 3,
         polynomial_order: int = 1,
         derivate_order: int = 1,
-        mode: str = "nearest",
+        mode: Literal['mirror', 'constant', 'nearest', 'wrap', 'interp'] = "nearest",
     ) -> None:
         self.window_size = window_size
         self.polynomial_order = polynomial_order
@@ -107,12 +109,7 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
-            X_[i] = self._calculate_derivative(x)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _calculate_derivative(self, x) -> np.ndarray:
-        return savgol_filter(
+            X_[i] = savgol_filter(
             x,
             self.window_size,
             self.polynomial_order,
@@ -120,3 +117,6 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             axis=0,
             mode=self.mode,
         )
+
+        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+
