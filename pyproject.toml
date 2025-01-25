@@ -1,6 +1,25 @@
+[tool.poetry]
+name = "chemotools"
+version = "0.1.5"
+description = "chemotools: A Python Package that Integrates Chemometrics and scikit-learn"
+authors = ["Pau Cabaneros"]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.0.0"
+pandas = "^2.0.0"
+polars = "^1.17.0"
+pyarrow = "^18.0.0"
+scikit-learn = "^1.4.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.0"
+black = "^24.8.0"
+ruff = "^0.8.0"
+mypy = "^1.13.0"
+
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
