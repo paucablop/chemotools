@@ -8,4 +8,13 @@ from ._polynomial_correction import PolynomialCorrection
 from ._subtract_reference import SubtractReference
 
 
-__all__ = [AirPls, ArPls, ConstantBaselineCorrection, CubicSplineCorrection, LinearCorrection, NonNegative, PolynomialCorrection, SubtractReference]
+__all__ = [
+    AirPls,
+    ArPls,
+    ConstantBaselineCorrection,
+    CubicSplineCorrection,
+    LinearCorrection,
+    NonNegative,
+    PolynomialCorrection,
+    SubtractReference,
+]
