@@ -48,7 +48,7 @@ jobs:
 
       - name: Run linting
         run: |
-          poetry run black --check chemotools
+          poetry run ruff --check chemotools
           
 
       - name: Python build package
