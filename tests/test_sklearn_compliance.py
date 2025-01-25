@@ -35,7 +35,7 @@ from chemotools.smooth import (
 )
 from chemotools.feature_selection import RangeCut, IndexSelector
 
-from tests.fixtures import spectrum
+from tests.conftest import spectrum
 
 
 # AirPls

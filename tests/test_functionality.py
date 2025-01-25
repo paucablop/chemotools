@@ -30,17 +30,6 @@ from chemotools.scatter import (
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from chemotools.feature_selection import IndexSelector, RangeCut
-from tests.fixtures import (
-    spectrum,
-    spectrum_arpls,
-    reference_airpls,
-    reference_arpls,
-    reference_msc_mean,
-    reference_msc_median,
-    reference_sg_15_2,
-    reference_snv,
-    reference_whitakker,
-)
 
 
 def test_air_pls(spectrum, reference_airpls):
