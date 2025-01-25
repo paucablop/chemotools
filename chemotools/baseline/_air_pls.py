@@ -3,14 +3,12 @@ import numpy as np
 from scipy.sparse import csc_matrix, eye, diags
 from scipy.sparse.linalg import spsolve
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted
-
-from chemotools.utils.check_inputs import check_input
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 logger = logging.getLogger(__name__)
 
 
-class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class AirPls(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     This class implements the AirPLS (Adaptive Iteratively Reweighted Penalized Least Squares) algorithm for baseline
     correction of spectra data. AirPLS is a common approach for removing the baseline from spectra, which can be useful
@@ -40,7 +38,7 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
 
     _calculate_whittaker_smooth(x, w)
         Calculate the Whittaker smooth of a given input vector x, with weights w.
-        
+
     _calculate_air_pls(x)
         Calculate the AirPLS baseline of a given input vector x.
 
@@ -76,8 +74,11 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         self : AirPls
             Returns the instance itself.
         """
+
         # Check that X is a 2D array and has only finite values
-        X = self._validate_data(X)
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
 
         return self
 
@@ -102,14 +103,15 @@ class AirPls(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
         check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
-        X = check_input(X)
-        X_ = X.copy()
-
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         # Calculate the air pls smooth
         for i, x in enumerate(X_):
