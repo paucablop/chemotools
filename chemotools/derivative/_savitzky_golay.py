@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class SavitzkyGolay(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the Savitzky-Golay derivative of the input data.
 

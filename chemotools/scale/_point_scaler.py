@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class PointScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that scales the input data by the intensity value at a given point.
     The point can be specified by an index or by a wavenumber.

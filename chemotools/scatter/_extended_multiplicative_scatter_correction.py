@@ -7,7 +7,7 @@ from chemotools.utils.check_inputs import check_input
 
 
 class ExtendedMultiplicativeScatterCorrection(
-    OneToOneFeatureMixin, BaseEstimator, TransformerMixin
+    TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 ):
     """Extended multiplicative scatter correction (EMSC) is a preprocessing technique for
     removing non linear scatter effects from spectra. It is based on fitting a polynomial

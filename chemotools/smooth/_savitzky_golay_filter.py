@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class SavitzkyGolayFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the Savitzky-Golay filter of the input data.
 

@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MinMaxScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that scales the input data by subtracting the minimum and dividing by
     the difference between the maximum and the minimum. When the use_min parameter is False,

@@ -6,7 +6,7 @@ from chemotools.utils.check_inputs import check_input
 
 
 class MultiplicativeScatterCorrection(
-    OneToOneFeatureMixin, BaseEstimator, TransformerMixin
+    TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 ):
     """Multiplicative scatter correction (MSC) is a preprocessing technique for
     removing scatter effects from spectra. It is based on fitting a linear

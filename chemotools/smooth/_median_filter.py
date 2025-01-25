@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MedianFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the median filter of the input data.
 

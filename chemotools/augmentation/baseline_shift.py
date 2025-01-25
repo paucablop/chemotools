@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class BaselineShift(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Adds a constant baseline to the data. The baseline is drawn from a one-sided
     uniform distribution between 0 and 0 + scale.

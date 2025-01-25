@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NormalNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Add normal noise to the input data.
 

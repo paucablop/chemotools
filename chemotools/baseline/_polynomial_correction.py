@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class PolynomialCorrection(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that subtracts a polynomial baseline from the input data. The polynomial is
     fitted to the points in the spectrum specified by the indices parameter.

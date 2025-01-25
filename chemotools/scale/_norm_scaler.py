@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NormScaler(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that scales the input data by the L-norm of the spectrum.
 

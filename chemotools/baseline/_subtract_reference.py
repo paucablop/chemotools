@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class SubtractReference(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that subtracts a reference spectrum from the input data.
 

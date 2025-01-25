@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class RobustNormalVariate(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the robust normal variate of the input data.
 

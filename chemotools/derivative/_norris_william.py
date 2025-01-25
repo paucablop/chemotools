@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NorrisWilliams(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the Norris-Williams derivative of the input data.
 

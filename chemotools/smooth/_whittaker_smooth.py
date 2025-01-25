@@ -12,7 +12,7 @@ from chemotools.utils.check_inputs import check_input
 # Analyst 135 (5), 1138-1146 (2010).
 
 
-class WhittakerSmooth(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class WhittakerSmooth(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the Whittaker smooth of the input data.
 

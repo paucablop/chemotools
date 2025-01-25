@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class ExponentialNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class ExponentialNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Add exponential noise to the input data.
 

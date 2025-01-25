@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class NonNegative(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that sets all negative values to zero or to abs.
 

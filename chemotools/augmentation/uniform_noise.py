@@ -5,7 +5,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class UniformNoise(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class UniformNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Add uniform noise to the input data.
 

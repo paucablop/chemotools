@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from chemotools.utils.check_inputs import check_input
 
 
-class MeanFilter(OneToOneFeatureMixin, BaseEstimator, TransformerMixin):
+class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the mean filter of the input data.
 
