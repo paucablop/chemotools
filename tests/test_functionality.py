@@ -281,7 +281,8 @@ def test_index_selector_with_wavenumbers_and_dataframe():
     spectrum_corrected = select_features.fit_transform(spectrum)
 
     # Assert
-    assert type(spectrum_corrected) == pd.DataFrame
+    assert isinstance(spectrum_corrected, pd.DataFrame)
+    assert np.allclose(spectrum_corrected.values[0], expected, atol=1e-8)
 
 
 def test_index_shift():
@@ -472,7 +473,6 @@ def test_multiplicative_scatter_correction_with_wrong_reference(spectrum):
 
 def test_multiplicative_scatter_correction_no_mean_no_median_no_reference(spectrum):
     # Arrange
-    reference = np.ones(10)
     msc = MultiplicativeScatterCorrection(use_mean=False)
 
     # Act & Assert
@@ -628,7 +628,7 @@ def test_range_cut_by_wavenumber_with_pandas_dataframe():
     spectrum_corrected = range_cut.fit_transform(spectrum)
 
     # Assert
-    assert type(spectrum_corrected) == pd.DataFrame
+    assert isinstance(spectrum_corrected, pd.DataFrame)
 
 
 def test_range_cut_by_wavenumber_with_polars_dataframe():
@@ -643,7 +643,7 @@ def test_range_cut_by_wavenumber_with_polars_dataframe():
     spectrum_corrected = range_cut.fit_transform(spectrum)
 
     # Assert
-    assert type(spectrum_corrected) == pl.DataFrame
+    assert isinstance(spectrum_corrected, pl.DataFrame)
 
 
 def test_robust_normal_variate():
