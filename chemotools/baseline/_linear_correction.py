@@ -18,7 +18,6 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
 
     def _drift_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
-
         # Can take any array and returns with a linear baseline correction
         # Find the x values at the edges of the spectrum
         y1: float = x[0]
