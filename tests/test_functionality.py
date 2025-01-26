@@ -150,7 +150,7 @@ def test_extended_baseline_correction_with_no_reference():
     spectrum = np.array([1.0, 2.0, 3.0, 4.0, 5.0]).reshape(1, -1)
 
     # Act
-    emsc = ExtendedMultiplicativeScatterCorrection(use_mean=False, use_median=False)
+    emsc = ExtendedMultiplicativeScatterCorrection(method="meant")
 
     # Assert
     with pytest.raises(ValueError):
@@ -189,7 +189,7 @@ def test_extended_baseline_correction_with_wrong_weights():
 
 def test_extended_baseline_correction_with_noreference_no_median_no_mean(spectrum):
     # Arrange
-    emsc = ExtendedMultiplicativeScatterCorrection(use_mean=False)
+    emsc = ExtendedMultiplicativeScatterCorrection(method="meant") 
 
     # Act & Assert
     with pytest.raises(ValueError):
@@ -214,7 +214,7 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
     # EMSC of 0 order should be equivalient to MSC
     # Arrange
     msc = MultiplicativeScatterCorrection(method="median")
-    emsc = ExtendedMultiplicativeScatterCorrection(order=0, use_median=True)
+    emsc = ExtendedMultiplicativeScatterCorrection(order=0, method="median")
 
     # Act
     spectrum_msc = msc.fit_transform(spectrum)
