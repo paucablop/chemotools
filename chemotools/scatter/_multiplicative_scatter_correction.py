@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -37,16 +37,18 @@ class MultiplicativeScatterCorrection(
 
     """
 
+    ALLOWED_METHODS = ["mean", "median"]
+
+    # TODO: Check method is valid in instantiation. Right now it is check on fit because it breaks the scikitlearn check_estimator()
+
     def __init__(
         self,
+        method: Literal["mean", "median"] = "mean",
         reference: Optional[np.ndarray] = None,
-        use_mean: bool = True,
-        use_median: bool = False,
         weights: Optional[np.ndarray] = None,
     ):
+        self.method = method
         self.reference = reference
-        self.use_mean = use_mean
-        self.use_median = use_median
         self.weights = weights
 
     def fit(self, X: np.ndarray, y=None) -> "MultiplicativeScatterCorrection":
@@ -91,17 +93,22 @@ class MultiplicativeScatterCorrection(
             self.weights_ = np.array(self.weights)
             return self
 
-        if self.use_median:
+        if self.method == "mean":
+            self.reference_ = X.mean(axis=0)
+            self.A_ = self._calculate_A(self.reference_)
+            self.weights_ = np.array(self.weights)
+            return self
+
+        elif self.method == "median":
             self.reference_ = np.median(X, axis=0)
             self.A_ = self._calculate_A(self.reference_)
             self.weights_ = np.array(self.weights)
             return self
 
-        if self.use_mean:
-            self.reference_ = X.mean(axis=0)
-            self.A_ = self._calculate_A(self.reference_)
-            self.weights_ = np.array(self.weights)
-            return self
+        else:
+            raise ValueError(
+                f"Invalid method: {self.method}. Must be one of {self.ALLOWED_METHODS}"
+            )
 
         raise ValueError("No reference was provided")
 

@@ -213,7 +213,7 @@ def test_extended_baseline_correction_through_msc(spectrum):
 def test_extended_baseline_correction_through_msc_median(spectrum):
     # EMSC of 0 order should be equivalient to MSC
     # Arrange
-    msc = MultiplicativeScatterCorrection(use_median=True)
+    msc = MultiplicativeScatterCorrection(method="median")
     emsc = ExtendedMultiplicativeScatterCorrection(order=0, use_median=True)
 
     # Act
@@ -412,7 +412,7 @@ def test_multiplicative_scatter_correction_with_reference(spectrum, reference_ms
 
 def test_multiplicative_scatter_correction_median(spectrum, reference_msc_median):
     # Arrange
-    msc = MultiplicativeScatterCorrection(use_median=True)
+    msc = MultiplicativeScatterCorrection(method="median")
 
     # Act
     spectrum_corrected = msc.fit_transform(spectrum)
@@ -426,7 +426,8 @@ def test_multiplicative_scatter_correction_with_reference_median(
 ):
     # Arrange
     msc = MultiplicativeScatterCorrection(
-        reference=reference_msc_median[0], use_median=True
+        method="median",
+        reference=reference_msc_median[0],
     )
 
     # Act
@@ -449,9 +450,7 @@ def test_multiplicative_scatter_correction_with_weights(spectrum, reference_msc_
     assert np.allclose(spectrum_corrected[0], reference_msc_mean[0], atol=1e-8)
 
 
-def test_multiplicative_scatter_correction_with_wrong_weights(
-    spectrum, reference_msc_mean
-):
+def test_multiplicative_scatter_correction_with_wrong_weights(spectrum):
     # Arrange
     weights = np.ones(10)
     msc = MultiplicativeScatterCorrection(weights=weights)
@@ -471,10 +470,9 @@ def test_multiplicative_scatter_correction_with_wrong_reference(spectrum):
         msc.fit_transform(spectrum)
 
 
-def test_multiplicative_scatter_correction_no_mean_no_median_no_reference(spectrum):
+def test_multiplicative_scatter_correction_with_wrong_method(spectrum):
     # Arrange
-    msc = MultiplicativeScatterCorrection(use_mean=False)
-
+    msc = MultiplicativeScatterCorrection(method="meant")
     # Act & Assert
     with pytest.raises(ValueError):
         msc.fit_transform(spectrum)
