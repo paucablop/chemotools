@@ -22,6 +22,9 @@ mypy = "^1.13.0"
 pandas-stubs = "^2.2.3.241126"
 scipy-stubs = "^1.15.1.0"
 
+[tool.poetry-dynamic-versioning]
+enable = true
+
 [tool.pytest.ini_options]
 filterwarnings = "always"
 
