@@ -1,3 +1,5 @@
+from typing import Literal
+
 import numpy as np
 from scipy.signal import savgol_filter
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -32,7 +34,10 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     """
 
     def __init__(
-        self, window_size: int = 3, polynomial_order: int = 1, mode: str = "nearest"
+        self,
+        window_size: int = 3,
+        polynomial_order: int = 1,
+        mode: Literal["mirror", "constant", "nearest", "wrap", "interp"] = "nearest",
     ) -> None:
         self.window_size = window_size
         self.polynomial_order = polynomial_order
