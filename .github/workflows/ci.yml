@@ -41,6 +41,9 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
 
+      - name: Run type checking
+        run: poetry run mypy chemotools
+
       - name: Run formatting
         run: |
           poetry run ruff format chemotools
