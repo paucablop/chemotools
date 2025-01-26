@@ -285,17 +285,54 @@ def test_index_selector_with_wavenumbers_and_dataframe():
     assert np.allclose(spectrum_corrected.values[0], expected, atol=1e-8)
 
 
-def test_index_shift():
+def test_index_shift_constant_fill():
     # Arrange
-    spectrum = np.array([[1, 1, 1, 1, 1, 2, 1, 1, 1, 1]])
-    spectrum_shift = IndexShift(shift=1, random_state=42)
+    spectrum = np.array([[5, 4, 3, 2, 1, 2, 1, 2, 3, 4, 5]])
+    spectrum_positive_shift = IndexShift(shift=1, fill_method="constant", random_state=44)
+    spectrum_negative_shift = IndexShift(shift=1, fill_method="constant", random_state=42)
 
     # Act
-    spectrum_corrected = spectrum_shift.fit_transform(spectrum)
+    spectrum_positive_shifted = spectrum_positive_shift.fit_transform(spectrum)
+    spectrum_negative_shifted = spectrum_negative_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_corrected[0][4] == 2
+    assert spectrum_positive_shifted[0][6] == 2
+    assert spectrum_negative_shifted[0][4] == 2
+    assert spectrum_positive_shifted[0][0] == 5
+    assert spectrum_negative_shifted[0][-1] == 5
 
+
+def test_index_shift_linear_fill():
+    # Arrange
+    spectrum = np.array([[5, 4, 3, 2, 1, 2, 1, 2, 3, 4, 5]])
+    spectrum_positive_shift = IndexShift(shift=1, fill_method="linear", random_state=44)
+    spectrum_negative_shift = IndexShift(shift=1, fill_method="linear", random_state=42)
+
+    # Act
+    spectrum_positive_shifted = spectrum_positive_shift.fit_transform(spectrum)
+    spectrum_negative_shifted = spectrum_negative_shift.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum_positive_shifted[0][6] == 2
+    assert spectrum_negative_shifted[0][4] == 2
+    assert np.isclose(spectrum_positive_shifted[0][0], 6.0, atol=1e-6)
+    assert np.isclose(spectrum_negative_shifted[0][-1], 6.0, atol=1e-6)
+
+def test_index_shift_quadratic_fill():
+    # Arrange
+    spectrum = np.array([[5, 4, 3, 2, 1, 2, 1, 4, 9, 16, 25]])
+    spectrum_positive_shift = IndexShift(shift=1, fill_method="quadratic", random_state=44)
+    spectrum_negative_shift = IndexShift(shift=1, fill_method="quadratic", random_state=42)
+
+    # Act
+    spectrum_positive_shifted = spectrum_positive_shift.fit_transform(spectrum)
+    spectrum_negative_shifted = spectrum_negative_shift.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum_positive_shifted[0][6] == 2
+    assert spectrum_negative_shifted[0][4] == 2
+    assert np.isclose(spectrum_positive_shifted[0][0], 6.0, atol=1e-6)
+    assert np.isclose(spectrum_negative_shifted[0][-1], 36.0, atol=1e-6)
 
 def test_l1_norm(spectrum):
     # Arrange

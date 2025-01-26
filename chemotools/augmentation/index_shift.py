@@ -1,6 +1,7 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
+from numpy.polynomial import polynomial as poly
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
@@ -35,8 +36,14 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by shifting the spectrum.
     """
 
-    def __init__(self, shift: int = 0, random_state: Optional[int] = None):
+    def __init__(
+        self,
+        shift: int = 0,
+        fill_method: Literal["constant", "linear", "quadratic"] = "constant",
+        random_state: Optional[int] = None,
+    ):
         self.shift = shift
+        self.fill_method = fill_method
         self.random_state = random_state
 
     def fit(self, X: np.ndarray, y=None) -> "IndexShift":
@@ -111,10 +118,82 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
-            X_[i] = self._shift_spectrum(x)
+            X_[i] = self._shift_vector(x)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _shift_spectrum(self, x) -> np.ndarray:
         shift_amount = self._rng.integers(-self.shift, self.shift, endpoint=True)
         return np.roll(x, shift_amount)
+
+    def _shift_vector(
+        self,
+        x: np.ndarray,
+    ) -> np.ndarray:
+        """
+        Shift vector with option to fill missing values.
+
+        Args:
+            arr: Input numpy array
+            shift: Number of positions to shift
+            fill_method: Method to fill missing values
+                'constant': fill with first/last value
+                'linear': fill using linear regression
+                'quadratic': fill using quadratic regression
+
+        Returns:
+            Shifted numpy array
+        """
+        shift = self._rng.integers(-self.shift, self.shift, endpoint=True)
+
+        result = np.roll(x, shift)
+
+        if self.fill_method == "constant":
+            if shift > 0:
+                result[:shift] = x[0]
+            elif shift < 0:
+                result[shift:] = x[-1]
+
+        elif self.fill_method == "linear":
+            if shift > 0:
+                x_ = np.arange(5)
+                coeffs = poly.polyfit(x_, x[:5], 1)
+
+                extrapolate_x = np.arange(-shift, 0)
+                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+
+                result[:shift] = extrapolated_values
+
+            elif shift < 0:
+                x_ = np.arange(5)
+                coeffs = poly.polyfit(x_, x[-5:], 1)
+
+                extrapolate_x = np.arange(len(x_), len(x_) - shift)
+                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+
+                result[shift:] = extrapolated_values
+
+        elif self.fill_method == "quadratic":
+            if shift > 0:
+                # Use first 3 values for quadratic regression
+                x_ = np.arange(5)
+                coeffs = poly.polyfit(x_, x[:5], 2)
+
+                # Extrapolate to fill shifted region
+                extrapolate_x = np.arange(-shift, 0)
+                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+
+                result[:shift] = extrapolated_values
+
+            elif shift < 0:
+                # Use last 3 values for quadratic regression
+                x_ = np.arange(5)
+                coeffs = poly.polyfit(x_, x[-5:], 2)
+
+                # Extrapolate to fill shifted region
+                extrapolate_x = np.arange(len(x_), len(x_) - shift)
+                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+
+                result[shift:] = extrapolated_values
+
+        return result
