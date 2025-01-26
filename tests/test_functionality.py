@@ -288,8 +288,12 @@ def test_index_selector_with_wavenumbers_and_dataframe():
 def test_index_shift_constant_fill():
     # Arrange
     spectrum = np.array([[5, 4, 3, 2, 1, 2, 1, 2, 3, 4, 5]])
-    spectrum_positive_shift = IndexShift(shift=1, fill_method="constant", random_state=44)
-    spectrum_negative_shift = IndexShift(shift=1, fill_method="constant", random_state=42)
+    spectrum_positive_shift = IndexShift(
+        shift=1, fill_method="constant", random_state=44
+    )
+    spectrum_negative_shift = IndexShift(
+        shift=1, fill_method="constant", random_state=42
+    )
 
     # Act
     spectrum_positive_shifted = spectrum_positive_shift.fit_transform(spectrum)
@@ -318,11 +322,16 @@ def test_index_shift_linear_fill():
     assert np.isclose(spectrum_positive_shifted[0][0], 6.0, atol=1e-6)
     assert np.isclose(spectrum_negative_shifted[0][-1], 6.0, atol=1e-6)
 
+
 def test_index_shift_quadratic_fill():
     # Arrange
     spectrum = np.array([[5, 4, 3, 2, 1, 2, 1, 4, 9, 16, 25]])
-    spectrum_positive_shift = IndexShift(shift=1, fill_method="quadratic", random_state=44)
-    spectrum_negative_shift = IndexShift(shift=1, fill_method="quadratic", random_state=42)
+    spectrum_positive_shift = IndexShift(
+        shift=1, fill_method="quadratic", random_state=44
+    )
+    spectrum_negative_shift = IndexShift(
+        shift=1, fill_method="quadratic", random_state=42
+    )
 
     # Act
     spectrum_positive_shifted = spectrum_positive_shift.fit_transform(spectrum)
@@ -333,6 +342,7 @@ def test_index_shift_quadratic_fill():
     assert spectrum_negative_shifted[0][4] == 2
     assert np.isclose(spectrum_positive_shifted[0][0], 6.0, atol=1e-6)
     assert np.isclose(spectrum_negative_shifted[0][-1], 36.0, atol=1e-6)
+
 
 def test_l1_norm(spectrum):
     # Arrange
