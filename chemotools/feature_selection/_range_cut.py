@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
@@ -47,7 +49,7 @@ class RangeCut(SelectorMixin, BaseEstimator):
         self,
         start: int = 0,
         end: int = -1,
-        wavenumbers: np.ndarray = None,
+        wavenumbers: Optional[np.ndarray] = None,
     ):
         self.start = start
         self.end = end
@@ -106,4 +108,4 @@ class RangeCut(SelectorMixin, BaseEstimator):
 
     def _find_index(self, target: float) -> int:
         wavenumbers = np.array(self.wavenumbers)
-        return np.argmin(np.abs(wavenumbers - target))
+        return int(np.argmin(np.abs(wavenumbers - target)))

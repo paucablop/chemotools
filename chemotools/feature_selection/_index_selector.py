@@ -77,12 +77,12 @@ class IndexSelector(SelectorMixin, BaseEstimator):
             self.features_index_ = self.features
             return self
 
-        if self.wavenumbers is None:
+        elif self.wavenumbers is None:
             self.features_index_ = self.features
             return self
 
-        if self.features is not None and self.wavenumbers is not None:
-            self.features_index_ = self._find_indices()
+        else:
+            self.features_index_ = self._find_indices(self.features)
             return self
 
     def _get_support_mask(self):
@@ -109,5 +109,5 @@ class IndexSelector(SelectorMixin, BaseEstimator):
         wavenumbers = np.array(self.wavenumbers)
         return int(np.argmin(np.abs(wavenumbers - target)))
 
-    def _find_indices(self) -> np.ndarray:
-        return np.array([self._find_index(feature) for feature in self.features])
+    def _find_indices(self, features: np.ndarray) -> np.ndarray:
+        return np.array([self._find_index(feature) for feature in features])

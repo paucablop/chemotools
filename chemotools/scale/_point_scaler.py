@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -32,7 +34,7 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Transform the input data by scaling by the value at a given Point.
     """
 
-    def __init__(self, point: int = 0, wavenumbers: np.ndarray = None):
+    def __init__(self, point: int = 0, wavenumbers: Optional[np.ndarray] = None):
         self.point = point
         self.wavenumbers = wavenumbers
 
@@ -110,4 +112,4 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     def _find_index(self, target: float) -> int:
         wavenumbers = np.array(self.wavenumbers)
-        return np.argmin(np.abs(wavenumbers - target))
+        return int(np.argmin(np.abs(wavenumbers - target)))

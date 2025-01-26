@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -37,10 +39,10 @@ class MultiplicativeScatterCorrection(
 
     def __init__(
         self,
-        reference: np.ndarray = None,
+        reference: Optional[np.ndarray] = None,
         use_mean: bool = True,
         use_median: bool = False,
-        weights: np.ndarray = None,
+        weights: Optional[np.ndarray] = None,
     ):
         self.reference = reference
         self.use_mean = use_mean
