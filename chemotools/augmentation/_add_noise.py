@@ -133,3 +133,4 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def _add_exponential_noise(self, X: np.ndarray) -> np.ndarray:
         """Add exponential noise to the input array."""
         return X + self._rng.exponential(self.scale, size=X.shape)
+
