@@ -41,32 +41,30 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.random_state = random_state
 
     def fit(self, X: np.ndarray, y=None) -> "AddNoise":
-        """
-        Fit the transformer to the input data.
+        """Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit the transformer to.
-
+        X : array-like of shape (n_samples, n_features)
+            Training data.
         y : None
-            Ignored.
+            Ignored. Present for API consistency.
 
         Returns
         -------
-        self : NormalNoise
-            The fitted transformer.
+        self : AddNoise
+            Fitted transformer.
+
+        Raises
+        ------
+        ValueError
+            If X is not a 2D array or contains non-finite values.
         """
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
 
         # Instantiate the random number generator
         self._rng = np.random.default_rng(self.random_state)
@@ -74,22 +72,27 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """
-        Transform the input data by adding random normal noise.
+        """Transform the input data by adding random noise.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
-
+        X : array-like of shape (n_samples, n_features)
+            Input data to transform.
         y : None
-            Ignored.
+            Ignored. Present for API consistency.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+        X_noisy : ndarray of shape (n_samples, n_features)
+            Transformed data with added noise.
+
+        Raises
+        ------
+        ValueError
+            If X has different number of features than the training data,
+            or if an invalid noise distribution is specified.
         """
+
         # Check that the estimator is fitted
         check_is_fitted(self, "n_features_in_")
 
