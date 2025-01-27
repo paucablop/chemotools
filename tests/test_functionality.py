@@ -33,7 +33,7 @@ from chemotools.feature_selection import IndexSelector, RangeCut
 def test_add_noise_exponential():
     # Arrange
     spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(noise_distribution="exponential", scale=0.1, random_state=42)
+    add_noise = AddNoise(distribution="exponential", scale=0.1, random_state=42)
 
     # Act
     spectrum_corrected = add_noise.fit_transform(spectrum)
@@ -46,7 +46,8 @@ def test_add_noise_exponential():
 def test_add_noise_gaussian():
     # Arrange
     spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(noise_distribution="gaussian", scale=0.5, random_state=42)
+    add_noise = AddNoise(distribution="gaussian", scale=0.5, random_state=42)
+
 
     # Act
     spectrum_corrected = add_noise.fit_transform(spectrum)
@@ -60,14 +61,14 @@ def test_add_noise_gaussian():
 def test_add_noise_poisson():
     # Arrange
     spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(noise_distribution="poisson", scale=0.5, random_state=42)
+    add_noise = AddNoise(distribution="poisson", scale=0.5, random_state=42)
 
     # Act
     spectrum_corrected = add_noise.fit_transform(spectrum)
 
     # Assert
     assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]), 0.5011, atol=1e-2)
+    assert np.allclose(np.mean(spectrum_corrected[0]), 1.5011, atol=1e-2)
     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
 
 
