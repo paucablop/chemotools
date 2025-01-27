@@ -48,7 +48,6 @@ def test_add_noise_gaussian():
     spectrum = np.ones(10000).reshape(1, -1)
     add_noise = AddNoise(distribution="gaussian", scale=0.5, random_state=42)
 
-
     # Act
     spectrum_corrected = add_noise.fit_transform(spectrum)
 
