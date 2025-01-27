@@ -6,11 +6,8 @@ import pytest
 from chemotools.augmentation import (
     AddNoise,
     BaselineShift,
-    ExponentialNoise,
     IndexShift,
-    NormalNoise,
     SpectrumScale,
-    UniformNoise,
 )
 
 from chemotools.baseline import (
