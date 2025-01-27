@@ -6,17 +6,37 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
-    """
-    Add normal noise to the input data.
+    """Add noise to input data from various probability distributions.
+
+    This transformer adds random noise from specified probability distributions
+    to the input data. Supported distributions include Gaussian, Poisson, and
+    exponential.
+
+    Parameters
+    ----------
+    distribution : {'gaussian', 'poisson', 'exponential'}, default='gaussian'
+        The probability distribution to sample noise from.
+    scale : float, default=0.0
+        Scale parameter for the noise distribution:
+        - For gaussian: standard deviation
+        - For poisson: multiplication factor for sampled values
+        - For exponential: scale parameter (1/λ)
+    random_state : int, optional
+        Random seed for reproducibility.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of features in the training data.
     """
 
     def __init__(
         self,
-        noise_distribution: Literal["gaussian", "poisson", "exponential"] = "gaussian",
+        distribution: Literal["gaussian", "poisson", "exponential"] = "gaussian",
         scale: float = 0.0,
         random_state: Optional[int] = None,
     ):
-        self.noise_distribution = noise_distribution
+        self.distribution = distribution
         self.scale = scale
         self.random_state = random_state
 
@@ -71,7 +91,7 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
@@ -84,31 +104,29 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
+        # Select the noise function based on the selected distribution
+        noise_func = {
+            "gaussian": self._add_gaussian_noise,
+            "poisson": self._add_poisson_noise,
+            "exponential": self._add_exponential_noise,
+        }.get(self.distribution)
+
+        if noise_func is None:
             raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
+                f"Invalid noise distribution: {self.distribution}. "
+                "Expected one of: gaussian, poisson, exponential"
             )
 
-        # Calculate the standard normal variate
-        for i, x in enumerate(X_):
-            match self.noise_distribution:
-                case "gaussian":
-                    X_[i] = self._add_gaussian_noise(x)
-                case "poisson":
-                    X_[i] = self._add_poisson_noise(x)
-                case "exponential":
-                    X_[i] = self._add_exponential_noise(x)
-                case _:
-                    raise ValueError("Invalid noise distribution")
+        return noise_func(X_)
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+    def _add_gaussian_noise(self, X: np.ndarray) -> np.ndarray:
+        """Add Gaussian noise to the input array."""
+        return X + self._rng.normal(0, self.scale, size=X.shape)
 
-    def _add_gaussian_noise(self, x) -> np.ndarray:
-        return x + self._rng.normal(0, self.scale, size=x.shape)
+    def _add_poisson_noise(self, X: np.ndarray) -> np.ndarray:
+        """Add Poisson noise to the input array."""
+        return X + self._rng.poisson(X, size=X.shape) * self.scale
 
-    def _add_poisson_noise(self, x) -> np.ndarray:
-        return self._rng.poisson(x, size=x.shape) * self.scale
-
-    def _add_exponential_noise(self, x) -> np.ndarray:
-        return x + self._rng.exponential(self.scale, size=x.shape)
+    def _add_exponential_noise(self, X: np.ndarray) -> np.ndarray:
+        """Add exponential noise to the input array."""
+        return X + self._rng.exponential(self.scale, size=X.shape)
