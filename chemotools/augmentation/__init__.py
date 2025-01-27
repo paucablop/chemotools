@@ -1,3 +1,4 @@
+from ._add_noise import AddNoise
 from .baseline_shift import BaselineShift
 from .exponential_noise import ExponentialNoise
 from .normal_noise import NormalNoise
@@ -7,6 +8,7 @@ from .uniform_noise import UniformNoise
 
 
 __all__ = [
+    "AddNoise",
     "BaselineShift",
     "ExponentialNoise",
     "NormalNoise",

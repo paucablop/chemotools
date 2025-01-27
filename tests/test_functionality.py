@@ -4,6 +4,7 @@ import polars as pl
 import pytest
 
 from chemotools.augmentation import (
+    AddNoise,
     BaselineShift,
     ExponentialNoise,
     IndexShift,
@@ -30,6 +31,47 @@ from chemotools.scatter import (
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from chemotools.feature_selection import IndexSelector, RangeCut
+
+
+def test_add_noise_exponential():
+    # Arrange
+    spectrum = np.ones(10000).reshape(1, -1)
+    add_noise = AddNoise(noise_distribution="exponential", scale=0.1, random_state=42)
+
+    # Act
+    spectrum_corrected = add_noise.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum.shape == spectrum_corrected.shape
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
+
+
+def test_add_noise_gaussian():
+    # Arrange
+    spectrum = np.ones(10000).reshape(1, -1)
+    add_noise = AddNoise(noise_distribution="gaussian", scale=0.5, random_state=42)
+
+    # Act
+    spectrum_corrected = add_noise.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum.shape == spectrum_corrected.shape
+    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
+    assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
+
+
+def test_add_noise_poisson():
+    # Arrange
+    spectrum = np.ones(10000).reshape(1, -1)
+    add_noise = AddNoise(noise_distribution="poisson", scale=0.5, random_state=42)
+
+    # Act
+    spectrum_corrected = add_noise.fit_transform(spectrum)
+
+    # Assert
+    assert spectrum.shape == spectrum_corrected.shape
+    assert np.allclose(np.mean(spectrum_corrected[0]), 0.5011, atol=1e-2)
+    assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
 
 
 def test_air_pls(spectrum, reference_airpls):
@@ -99,19 +141,6 @@ def test_constant_baseline_correction_with_wavenumbers():
     # Assert
     expected = np.array([-1, -1, -1, -1, -1, -1, -1, 0, 0, -1])
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
-
-
-def test_exponential_noise():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    exponential_noise = ExponentialNoise(scale=0.1, random_state=42)
-
-    # Act
-    spectrum_corrected = exponential_noise.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
 
 
 def test_extended_baseline_correction():
@@ -549,20 +578,6 @@ def test_non_negative_absolute():
     assert np.allclose(spectrum_corrected[0], [1, 0, 1], atol=1e-8)
 
 
-def test_normal_noise():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    normal_noise = NormalNoise(scale=0.5, random_state=42)
-
-    # Act
-    spectrum_corrected = normal_noise.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
-
-
 def test_norris_williams_filter_1():
     # Arrange
     norris_williams_filter = NorrisWilliams()
@@ -789,20 +804,6 @@ def test_subtract_reference_without_reference(spectrum):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum, atol=1e-8)
-
-
-def test_uniform_noise():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    uniform_noise = UniformNoise(min=-1, max=1, random_state=42)
-
-    # Act
-    spectrum_corrected = uniform_noise.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), np.sqrt(1 / 3), atol=1e-2)
 
 
 def test_whitakker_smooth(spectrum, reference_whitakker):
