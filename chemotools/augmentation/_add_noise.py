@@ -1,44 +1,26 @@
-from typing import Optional
+from typing import Literal, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Add normal noise to the input data.
-
-    Parameters
-    ----------
-    scale : float, default=0.0
-        The scale of the noise to add to the input data.
-
-    random_state : int, default=None
-        The random state to use for the random number generator.
-
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by adding random noise.
     """
 
-    def __init__(self, scale: float = 0.0, random_state: Optional[int] = None):
+    def __init__(
+        self,
+        noise_distribution: Literal["gaussian", "poisson", "exponential"] = "gaussian",
+        scale: float = 0.0,
+        random_state: Optional[int] = None,
+    ):
+        self.noise_distribution = noise_distribution
         self.scale = scale
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "NormalNoise":
+    def fit(self, X: np.ndarray, y=None) -> "AddNoise":
         """
         Fit the transformer to the input data.
 
@@ -110,9 +92,23 @@ class NormalNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
-            X_[i] = self._add_random_noise(x)
+            match self.noise_distribution:
+                case "gaussian":
+                    X_[i] = self._add_gaussian_noise(x)
+                case "poisson":
+                    X_[i] = self._add_poisson_noise(x)
+                case "exponential":
+                    X_[i] = self._add_exponential_noise(x)
+                case _:
+                    raise ValueError("Invalid noise distribution")
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _add_random_noise(self, x) -> np.ndarray:
+    def _add_gaussian_noise(self, x) -> np.ndarray:
         return x + self._rng.normal(0, self.scale, size=x.shape)
+
+    def _add_poisson_noise(self, x) -> np.ndarray:
+        return self._rng.poisson(x, size=x.shape) * self.scale
+
+    def _add_exponential_noise(self, x) -> np.ndarray:
+        return x + self._rng.exponential(self.scale, size=x.shape)

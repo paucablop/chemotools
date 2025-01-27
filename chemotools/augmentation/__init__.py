@@ -1,16 +1,12 @@
-from .baseline_shift import BaselineShift
-from .exponential_noise import ExponentialNoise
-from .normal_noise import NormalNoise
-from .index_shift import IndexShift
-from .spectrum_scale import SpectrumScale
-from .uniform_noise import UniformNoise
+from ._add_noise import AddNoise
+from ._baseline_shift import BaselineShift
+from ._index_shift import IndexShift
+from ._spectrum_scale import SpectrumScale
 
 
 __all__ = [
+    "AddNoise",
     "BaselineShift",
-    "ExponentialNoise",
-    "NormalNoise",
     "IndexShift",
     "SpectrumScale",
-    "UniformNoise",
 ]
