@@ -6,6 +6,7 @@ from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+
 class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Shift the spectrum by a fractional amount, allowing shifts below one index.
@@ -32,9 +33,15 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The random seed for reproducibility.
     """
 
-    def __init__(self, shift: float = 0.0, padding_mode: Literal[
-                    "zeros", "constant", "extend", "mirror", "linear"] = "linear", 
-                    pad_value: float = 0.0, random_state: Optional[int] = None):
+    def __init__(
+        self,
+        shift: float = 0.0,
+        padding_mode: Literal[
+            "zeros", "constant", "extend", "mirror", "linear"
+        ] = "linear",
+        pad_value: float = 0.0,
+        random_state: Optional[int] = None,
+    ):
         self.shift = shift
         self.padding_mode = padding_mode
         self.pad_value = pad_value
@@ -57,7 +64,9 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self : FractionalShift
             The fitted transformer.
         """
-        X = validate_data(self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64)
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         self._rng = np.random.default_rng(self.random_state)
         return self
 
@@ -79,11 +88,19 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The transformed data with the applied shifts.
         """
         check_is_fitted(self, "n_features_in_")
-        X_ = validate_data(self, X, y="no_validation", ensure_2d=True, copy=True, reset=False, dtype=np.float64)
+        X_ = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            copy=True,
+            reset=False,
+            dtype=np.float64,
+        )
 
         for i, x in enumerate(X_):
             X_[i] = self._shift_signal(x)
-        
+
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
     def _shift_signal(self, x: np.ndarray) -> np.ndarray:
@@ -104,14 +121,14 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         n = len(x)
         indices = np.arange(n)
         shifted_indices = indices + shift
-        
+
         # Create cubic spline interpolator
-        spline = CubicSpline(indices, x, bc_type='not-a-knot')
+        spline = CubicSpline(indices, x, bc_type="not-a-knot")
         shifted_signal = spline(shifted_indices)
 
         # Determine padding direction and length
         if shift >= 0:
-            pad_length = len(shifted_indices[shifted_indices >= n-1])
+            pad_length = len(shifted_indices[shifted_indices >= n - 1])
             pad_left = False
         else:
             pad_length = len(shifted_indices[shifted_indices < 0])
@@ -120,42 +137,42 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         # Handle padding based on mode
         if self.padding_mode == "zeros":
             shifted_signal[shifted_indices < 0] = 0
-            shifted_signal[shifted_indices >= n-1] = 0
-        
+            shifted_signal[shifted_indices >= n - 1] = 0
+
         elif self.padding_mode == "constant":
             shifted_signal[shifted_indices < 0] = self.pad_value
-            shifted_signal[shifted_indices >= n-1] = self.pad_value
-        
+            shifted_signal[shifted_indices >= n - 1] = self.pad_value
+
         elif self.padding_mode == "mirror":
             if pad_left:
-                pad_values = x[pad_length-1::-1]
+                pad_values = x[pad_length - 1 :: -1]
                 shifted_signal[shifted_indices < 0] = pad_values[:pad_length]
             else:
                 pad_values = x[:-1][::-1]
-                shifted_signal[shifted_indices >= n-1] = pad_values[:pad_length]
-        
+                shifted_signal[shifted_indices >= n - 1] = pad_values[:pad_length]
+
         elif self.padding_mode == "extend":
             if pad_left:
                 shifted_signal[shifted_indices < 0] = x[0]
             else:
-                shifted_signal[shifted_indices >= n-1] = x[-1]
-        
+                shifted_signal[shifted_indices >= n - 1] = x[-1]
+
         elif self.padding_mode == "linear":
             if pad_left:
                 # Use first 5 points for regression
                 if len(x) < 5:
-                    points = x[:len(x)]  # Use all points if less than 5
+                    points = x[: len(x)]  # Use all points if less than 5
                 else:
                     points = x[:5]
                 x_coords = np.arange(len(points))
-                
+
                 # Reshape arrays for linregress
                 x_coords = x_coords.reshape(-1)
                 points = points.reshape(-1)
-                
+
                 # Perform regression
                 slope, intercept, _, _, _ = stats.linregress(x_coords, points)
-                
+
                 # Generate new points using linear regression
                 new_x = np.arange(-pad_length, 0)
                 extrapolated = slope * new_x + intercept
@@ -163,23 +180,23 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             else:
                 # Use last 5 points for regression
                 if len(x) < 5:
-                    points = x[-len(x):]  # Use all points if less than 5
+                    points = x[-len(x) :]  # Use all points if less than 5
                 else:
                     points = x[-5:]
                 x_coords = np.arange(len(points))
-                
+
                 # Reshape arrays for linregress
                 x_coords = x_coords.reshape(-1)
                 points = points.reshape(-1)
-                
+
                 # Perform regression
                 slope, intercept, _, _, _ = stats.linregress(x_coords, points)
-                
+
                 # Generate new points using linear regression
                 new_x = np.arange(len(points), len(points) + pad_length)
                 extrapolated = slope * new_x + intercept
                 shifted_signal[shifted_indices >= n] = extrapolated
-        
+
         else:
             raise ValueError(f"Unknown padding mode: {self.padding_mode}")
 
