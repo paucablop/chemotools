@@ -142,7 +142,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         if self.padding_mode == "wrap":
             return np.roll(x, shift)
 
-        # Create kernel with proper dimensions
+        # Create Dirac delta kernel with proper dimensions
 
         if shift >= 0:
             kernel = np.zeros(shift + 1)
