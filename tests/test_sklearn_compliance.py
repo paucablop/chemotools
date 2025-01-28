@@ -3,6 +3,7 @@ from sklearn.utils.estimator_checks import check_estimator
 from chemotools.augmentation import (
     AddNoise,
     BaselineShift,
+    FractionalShift,
     IndexShift,
     SpectrumScale,
 )
@@ -86,6 +87,14 @@ def test_compliance_cubic_spline_correction():
 def test_compliance_extended_multiplicative_scatter_correction():
     # Arrange
     transformer = ExtendedMultiplicativeScatterCorrection()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# FractionalShift
+def test_compliance_fractional_shift():
+    # Arrange
+    transformer = FractionalShift()
     # Act & Assert
     check_estimator(transformer)
 
