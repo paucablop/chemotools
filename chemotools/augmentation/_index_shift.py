@@ -44,10 +44,13 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     _rng : numpy.random.Generator
         Random number generator instance used for shifting.
     """
+
     def __init__(
         self,
         shift: int = 0,
-        padding_mode: Literal["zeros", "constant", "wrap", "extend", "mirror", "linear"] = "linear",
+        padding_mode: Literal[
+            "zeros", "constant", "wrap", "extend", "mirror", "linear"
+        ] = "linear",
         pad_value: float = 0.0,
         random_state: Optional[int] = None,
     ):
@@ -123,7 +126,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def _shift_signal(self, x: np.ndarray):
         """
         Shifts a discrete signal using convolution with a Dirac delta kernel.
-        
+
         Parameters
         ----------
         x : np.ndarray of shape (n_features,)
@@ -136,11 +139,11 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         """
         shift = self._rng.integers(-self.shift, self.shift, endpoint=True)
 
-        if self.padding_mode == 'wrap':
+        if self.padding_mode == "wrap":
             return np.roll(x, shift)
-        
+
         # Create kernel with proper dimensions
-        
+
         if shift >= 0:
             kernel = np.zeros(shift + 1)
             kernel[-1] = 1
@@ -148,64 +151,64 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             kernel = np.zeros(-shift + 1)
             kernel[0] = 1
 
-        # Convolve signal with kernel         
-        shifted = convolve(x, kernel, mode='full')
-        
+        # Convolve signal with kernel
+        shifted = convolve(x, kernel, mode="full")
+
         if shift >= 0:
-            result = shifted[:len(x)] if x.ndim == 1 else shifted[:x.shape[0]]
+            result = shifted[: len(x)] if x.ndim == 1 else shifted[: x.shape[0]]
             pad_length = shift
             pad_left = True
         else:
-            result = shifted[-len(x):] if x.ndim == 1 else shifted[-x.shape[0]:]
+            result = shifted[-len(x) :] if x.ndim == 1 else shifted[-x.shape[0] :]
             pad_length = -shift
             pad_left = False
-        
-        if self.padding_mode == 'zeros':
+
+        if self.padding_mode == "zeros":
             return result
-        
-        elif self.padding_mode == 'constant':
+
+        elif self.padding_mode == "constant":
             mask = np.abs(result) < 1e-10
             result[mask] = self.pad_value
             return result
-        
-        elif self.padding_mode == 'mirror':          
+
+        elif self.padding_mode == "mirror":
             if pad_left:
-                pad_values = x[pad_length-1::-1]
+                pad_values = x[pad_length - 1 :: -1]
                 result[:pad_length] = pad_values[-pad_length:]
             else:
                 pad_values = x[:-1][::-1]
                 result[-pad_length:] = pad_values[:pad_length]
-            
+
             return result
-        
-        elif self.padding_mode == 'extend':        
+
+        elif self.padding_mode == "extend":
             if pad_left:
                 result[:pad_length] = x[0]
             else:
                 result[-pad_length:] = x[-1]
             return result
-        
-        elif self.padding_mode == 'linear':
+
+        elif self.padding_mode == "linear":
             # Get points for linear regression
             if pad_left:
-                points = x[:pad_length+1]  # Take first pad_length+1 points
+                points = x[: pad_length + 1]  # Take first pad_length+1 points
                 x_coords = np.arange(len(points))
                 slope, intercept, _, _, _ = stats.linregress(x_coords, points)
-                
+
                 # Generate new points using linear regression
                 new_x = np.arange(-pad_length, 0)
                 extrapolated = slope * new_x + intercept
                 result[:pad_length] = extrapolated
             else:
-                points = x[-pad_length-1:]  # Take last pad_length+1 points
+                points = x[-pad_length - 1 :]  # Take last pad_length+1 points
                 x_coords = np.arange(len(points))
                 slope, intercept, _, _, _ = stats.linregress(x_coords, points)
-                
+
                 # Generate new points using linear regression
                 new_x = np.arange(len(points), len(points) + pad_length)
                 extrapolated = slope * new_x + intercept
                 result[-pad_length:] = extrapolated
             return result
-        
+
         else:
             raise ValueError(f"Unknown padding mode: {self.padding_mode}")
