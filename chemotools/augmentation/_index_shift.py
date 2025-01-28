@@ -1,23 +1,37 @@
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.polynomial import polynomial as poly
+from scipy.signal import convolve
+from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    Shift the spectrum a given number of indices between - shift and + shift drawn
+    Shift the spectrum a given number of indices between -shift and +shift drawn
     from a discrete uniform distribution.
 
     Parameters
     ----------
-    shift : float, default=0.0
-        Shifts the data by a random integer between -shift and shift.
+    shift : int, default=0
+        Maximum number of indices by which the data is randomly shifted.
+        The actual shift is a random integer between -shift and shift (inclusive).
 
-    random_state : int, default=None
-        The random state to use for the random number generator.
+    padding_mode : {'zeros', 'constant', 'wrap', 'extend', 'mirror', 'linear'}, default='linear'
+        Specifies how to handle padding when shifting the data:
+            - 'zeros': Pads with zeros.
+            - 'constant': Pads with a constant value defined by `pad_value`.
+            - 'wrap': Circular shift (wraps around).
+            - 'extend': Extends using edge values.
+            - 'mirror': Mirrors the signal.
+            - 'linear': Uses linear regression to extrapolate values.
+
+    pad_value : float, default=0.0
+        The value used for padding when `padding_mode='constant'`.
+
+    random_state : int, optional, default=None
+        The random seed for reproducibility.
 
     Attributes
     ----------
@@ -27,23 +41,22 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     _is_fitted : bool
         Whether the transformer has been fitted to data.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by shifting the spectrum.
+    _rng : numpy.random.Generator
+        Random number generator instance used for shifting.
     """
 
     def __init__(
         self,
         shift: int = 0,
-        fill_method: Literal["constant", "linear", "quadratic"] = "constant",
+        padding_mode: Literal[
+            "zeros", "constant", "wrap", "extend", "mirror", "linear"
+        ] = "linear",
+        pad_value: float = 0.0,
         random_state: Optional[int] = None,
     ):
         self.shift = shift
-        self.fill_method = fill_method
+        self.padding_mode = padding_mode
+        self.pad_value = pad_value
         self.random_state = random_state
 
     def fit(self, X: np.ndarray, y=None) -> "IndexShift":
@@ -68,12 +81,6 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
-
         # Instantiate the random number generator
         self._rng = np.random.default_rng(self.random_state)
 
@@ -94,10 +101,10 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Returns
         -------
         X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+            The transformed data with the applied shifts.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
@@ -110,90 +117,98 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
-            X_[i] = self._shift_vector(x)
+            X_[i] = self._shift_signal(x)
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _shift_spectrum(self, x) -> np.ndarray:
-        shift_amount = self._rng.integers(-self.shift, self.shift, endpoint=True)
-        return np.roll(x, shift_amount)
-
-    def _shift_vector(
-        self,
-        x: np.ndarray,
-    ) -> np.ndarray:
+    def _shift_signal(self, x: np.ndarray):
         """
-        Shift vector with option to fill missing values.
+        Shifts a discrete signal using convolution with a Dirac delta kernel.
 
-        Args:
-            arr: Input numpy array
-            shift: Number of positions to shift
-            fill_method: Method to fill missing values
-                'constant': fill with first/last value
-                'linear': fill using linear regression
-                'quadratic': fill using quadratic regression
+        Parameters
+        ----------
+        x : np.ndarray of shape (n_features,)
+            The input signal to shift.
 
-        Returns:
-            Shifted numpy array
+        Returns
+        -------
+        result : np.ndarray of shape (n_features,)
+            The shifted signal.
         """
         shift = self._rng.integers(-self.shift, self.shift, endpoint=True)
 
-        result = np.roll(x, shift)
+        if self.padding_mode == "wrap":
+            return np.roll(x, shift)
 
-        if self.fill_method == "constant":
-            if shift > 0:
-                result[:shift] = x[0]
-            elif shift < 0:
-                result[shift:] = x[-1]
+        # Create Dirac delta kernel with proper dimensions
 
-        elif self.fill_method == "linear":
-            if shift > 0:
-                x_ = np.arange(5)
-                coeffs = poly.polyfit(x_, x[:5], 1)
+        if shift >= 0:
+            kernel = np.zeros(shift + 1)
+            kernel[-1] = 1
+        else:
+            kernel = np.zeros(-shift + 1)
+            kernel[0] = 1
 
-                extrapolate_x = np.arange(-shift, 0)
-                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+        # Convolve signal with kernel
+        shifted = convolve(x, kernel, mode="full")
 
-                result[:shift] = extrapolated_values
+        if shift >= 0:
+            result = shifted[: len(x)] if x.ndim == 1 else shifted[: x.shape[0]]
+            pad_length = shift
+            pad_left = True
+        else:
+            result = shifted[-len(x) :] if x.ndim == 1 else shifted[-x.shape[0] :]
+            pad_length = -shift
+            pad_left = False
 
-            elif shift < 0:
-                x_ = np.arange(5)
-                coeffs = poly.polyfit(x_, x[-5:], 1)
+        if self.padding_mode == "zeros":
+            return result
 
-                extrapolate_x = np.arange(len(x_), len(x_) - shift)
-                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+        elif self.padding_mode == "constant":
+            mask = np.abs(result) < 1e-10
+            result[mask] = self.pad_value
+            return result
 
-                result[shift:] = extrapolated_values
+        elif self.padding_mode == "mirror":
+            if pad_left:
+                pad_values = x[pad_length - 1 :: -1]
+                result[:pad_length] = pad_values[-pad_length:]
+            else:
+                pad_values = x[:-1][::-1]
+                result[-pad_length:] = pad_values[:pad_length]
 
-        elif self.fill_method == "quadratic":
-            if shift > 0:
-                # Use first 3 values for quadratic regression
-                x_ = np.arange(5)
-                coeffs = poly.polyfit(x_, x[:5], 2)
+            return result
 
-                # Extrapolate to fill shifted region
-                extrapolate_x = np.arange(-shift, 0)
-                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+        elif self.padding_mode == "extend":
+            if pad_left:
+                result[:pad_length] = x[0]
+            else:
+                result[-pad_length:] = x[-1]
+            return result
 
-                result[:shift] = extrapolated_values
+        elif self.padding_mode == "linear":
+            # Get points for linear regression
+            if pad_left:
+                points = x[: pad_length + 1]  # Take first pad_length+1 points
+                x_coords = np.arange(len(points))
+                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
 
-            elif shift < 0:
-                # Use last 3 values for quadratic regression
-                x_ = np.arange(5)
-                coeffs = poly.polyfit(x_, x[-5:], 2)
+                # Generate new points using linear regression
+                new_x = np.arange(-pad_length, 0)
+                extrapolated = slope * new_x + intercept
+                result[:pad_length] = extrapolated
+            else:
+                points = x[-pad_length - 1 :]  # Take last pad_length+1 points
+                x_coords = np.arange(len(points))
+                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
 
-                # Extrapolate to fill shifted region
-                extrapolate_x = np.arange(len(x_), len(x_) - shift)
-                extrapolated_values = poly.polyval(extrapolate_x, coeffs)
+                # Generate new points using linear regression
+                new_x = np.arange(len(points), len(points) + pad_length)
+                extrapolated = slope * new_x + intercept
+                result[-pad_length:] = extrapolated
+            return result
 
-                result[shift:] = extrapolated_values
-
-        return result
+        else:
+            raise ValueError(f"Unknown padding mode: {self.padding_mode}")
