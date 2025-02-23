@@ -214,4 +214,3 @@ class _ModelDiagnosticsBase(ABC):
         ndarray of shape (n_samples,)
             Predicted values
         """
-        
