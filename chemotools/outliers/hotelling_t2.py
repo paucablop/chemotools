@@ -73,7 +73,7 @@ class HotellingT2(_ModelResidualsBase):
         Returns
         -------
         ndarray of shape (n_samples,)
-            DModX statistics for each sample
+            Hotellin's T-squared statistics for each sample
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

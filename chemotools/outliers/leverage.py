@@ -17,9 +17,6 @@ class Leverage(_ModelDiagnosticsBase):
     model : Union[ModelType, Pipeline]
         A fitted PCA/PLS model or Pipeline ending with such a model
 
-    confidence : float, default=0.95
-        Confidence level for statistical calculations (between 0 and 1)
-
     Attributes
     ----------
     model_ : ModelType
@@ -37,7 +34,7 @@ class Leverage(_ModelDiagnosticsBase):
         super().__init__(model)
 
     def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
-        """Calculate Hotelling's T-squared statistics for input data.
+        """Calculate Leverage for training data on the model.
 
         Parameters
         ----------
@@ -47,7 +44,7 @@ class Leverage(_ModelDiagnosticsBase):
         Returns
         -------
         ndarray of shape (n_samples,)
-            DModX statistics for each sample
+            Leverage of each sample
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
