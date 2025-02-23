@@ -36,7 +36,7 @@ class Leverage(_ModelDiagnosticsBase):
     def __init__(self, model: Union[ModelType, Pipeline]) -> None:
         super().__init__(model)
 
-    def predict(self, X: np.ndarray, y: Optional[np.ndarray]=None) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Calculate Hotelling's T-squared statistics for input data.
 
         Parameters
