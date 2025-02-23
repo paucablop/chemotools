@@ -6,10 +6,10 @@ from sklearn.utils.validation import validate_data
 from scipy.stats import f as f_distribution
 
 
-from ._base import _ModelDiagnostics, ModelType
+from ._base import _ModelResidualsBase, ModelType
 
 
-class DModX(_ModelDiagnostics):
+class DModX(_ModelResidualsBase):
     """Calculate Distance to Model (DModX) statistics.
 
     DModX measures the distance between an observation and the model plane

@@ -6,10 +6,10 @@ from scipy.stats import norm, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 
-from ._base import _ModelDiagnostics, ModelType
+from ._base import _ModelResidualsBase, ModelType
 
 
-class QResiduals(_ModelDiagnostics):
+class QResiduals(_ModelResidualsBase):
     """
     Calculate Q residuals (Squared Prediction Error - SPE) for PCA or PLS models.
 

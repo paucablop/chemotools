@@ -8,10 +8,10 @@ from sklearn.utils.validation import validate_data
 from scipy.stats import f as f_distribution
 
 
-from ._base import _ModelDiagnostics, ModelType
+from ._base import _ModelResidualsBase, ModelType
 
 
-class HotellingT2(_ModelDiagnostics):
+class HotellingT2(_ModelResidualsBase):
     """
     Calculate Hotelling's T-squared statistics for PCA or PLS models.
 
