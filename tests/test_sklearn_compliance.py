@@ -4,6 +4,7 @@ from chemotools.augmentation import (
     AddNoise,
     BaselineShift,
     FractionalShift,
+    GaussianBroadening,
     IndexShift,
     SpectrumScale,
 )
@@ -95,6 +96,14 @@ def test_compliance_extended_multiplicative_scatter_correction():
 def test_compliance_fractional_shift():
     # Arrange
     transformer = FractionalShift()
+    # Act & Assert
+    check_estimator(transformer)
+
+
+# GaussianBroadening
+def test_compliance_gaussian_broadening():
+    # Arrange
+    transformer = GaussianBroadening()
     # Act & Assert
     check_estimator(transformer)
 
