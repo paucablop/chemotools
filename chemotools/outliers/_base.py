@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union, Optional, Tuple
+from typing import Union, Optional
 
 import numpy as np
 
@@ -9,7 +9,7 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-from ._utils import get_model_parameters, ModelTypes, validate_confidence
+from ._utils import ModelTypes, validate_confidence, validate_and_extract_model
 
 
 class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
@@ -57,44 +57,10 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             self.n_features_in_,
             self.n_components_,
             self.n_samples_,
-        ) = self._validate_and_extract_model(model)
+        ) = validate_and_extract_model(model)
         self.confidence = validate_confidence(confidence)
         self.critical_value_ = self._calculate_critical_value()
 
-    def _validate_and_extract_model(
-        self, model: Union[ModelTypes, Pipeline]
-    ) -> Tuple[ModelTypes, Optional[Pipeline], int, int, int]:
-        """Validate and extract the model and preprocessing steps.
-
-        Parameters
-        ----------
-        model : Union[ModelTypes, Pipeline]
-            A fitted PCA/PLS model or Pipeline ending with such a model
-
-        Returns
-        -------
-        Tuple[ModelTypes, Optional[Pipeline]]
-            The extracted model and preprocessing steps
-
-        Raises
-        ------
-        ValueError
-            If the model is not of type _BasePCA or _PLS or a Pipeline ending with one of these types or if the model is not fitted
-        """
-        if isinstance(model, Pipeline):
-            preprocessing = model[:-1]
-            model = model[-1]
-        else:
-            preprocessing = None
-
-        if not isinstance(model, (_BasePCA, _PLS)):
-            raise ValueError(
-                "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
-            )
-
-        check_is_fitted(model)
-        n_features_in, n_components, n_samples = get_model_parameters(model)
-        return model, preprocessing, n_features_in, n_components, n_samples
 
     @abstractmethod
     def _calculate_critical_value(self) -> float:
