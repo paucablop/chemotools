@@ -100,7 +100,7 @@ def test_compliance_fractional_shift():
 
 
 # GaussianBroadening
-#def test_compliance_gaussian_broadening():
+# def test_compliance_gaussian_broadening():
 #    # Arrange
 #    transformer = GaussianBroadening()
 #    # Act & Assert

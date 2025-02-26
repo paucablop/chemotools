@@ -23,6 +23,7 @@ def get_model_parameters(model: ModelType) -> Tuple[int, int, int]:
             "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
         )
 
+
 class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
     """Base class for model outlier calculations.
 

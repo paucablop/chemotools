@@ -19,25 +19,28 @@ test_directory = os.path.dirname(os.path.abspath(__file__))
 path_to_resources = os.path.join(test_directory, "resources")
 
 
-
 class _DummyModelResiduals(_ModelResidualsBase):
     """Dummy class to test _ModelResidualsBase"""
+
     def __init__(self, model, confidence):
         super().__init__(model, confidence)
 
     def _calculate_critical_value(self):
         return 1.96
-        
+
 
 @pytest.fixture
-def dummy_data_loader(scale: int = 0.2, seed: int = 42) -> Tuple[np.ndarray, np.ndarray]:
-    np.random.seed(seed) 
-    x1 = np.linspace(0, 100, 100) + np.random.normal(size=100) * scale 
+def dummy_data_loader(
+    scale: float = 0.2, seed: int = 42
+) -> Tuple[np.ndarray, np.ndarray]:
+    np.random.seed(seed)
+    x1 = np.linspace(0, 100, 100) + np.random.normal(size=100) * scale
     x2 = np.linspace(0, 200, 100) + np.random.normal(size=100) * scale
     x3 = np.linspace(0, 300, 100) + np.random.normal(size=100) * scale
     X = np.column_stack((x1, x2, x3))
     y = np.sum(X, axis=1) + np.random.normal(size=100) * scale
     return X, y
+
 
 @pytest.fixture
 def fitted_pca(dummy_data_loader):
@@ -55,27 +58,33 @@ def fitted_pls(dummy_data_loader):
     X, y = dummy_data_loader
     return PLSRegression(n_components=2).fit(X, y)
 
+
 @pytest.fixture
 def unfitted_pls():
     return PLSRegression(n_components=2)
+
 
 @pytest.fixture
 def fitted_pipeline_pca(dummy_data_loader):
     X, _ = dummy_data_loader
     return make_pipeline(StandardScaler(), PCA(n_components=2)).fit(X)
 
+
 @pytest.fixture
 def unfitted_pipeline():
     return make_pipeline(StandardScaler(with_std=False), PCA(n_components=2))
+
 
 @pytest.fixture
 def invalid_pipeline(dummy_data_loader):
     X, _ = dummy_data_loader
     return make_pipeline(StandardScaler(), StandardScaler())
 
+
 @pytest.fixture
 def invalid_model():
     return SVR()
+
 
 @pytest.fixture
 def pipeline_with_invalid_model():
@@ -143,5 +152,3 @@ def reference_whitakker() -> np.ndarray:
     return np.loadtxt(
         os.path.join(path_to_resources, "reference_whitakker.csv"), delimiter=","
     ).reshape(1, -1)
-
-
