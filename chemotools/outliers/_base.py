@@ -81,10 +81,12 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             The residuals of the model
         """
         self.fit(X, y)
-        return self.predict_residuals(X, validate=True)
+        return self.predict_residuals(X, y, validate=True)
 
     @abstractmethod
-    def predict_residuals(self, X: np.ndarray, validate: bool) -> np.ndarray:
+    def predict_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray], validate: bool
+    ) -> np.ndarray:
         """Calculate the residuals of the model.
 
         Returns

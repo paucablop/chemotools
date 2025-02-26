@@ -66,7 +66,7 @@ class Leverage(_ModelResidualsBase):
         Returns
         -------
         ndarray of shape (n_samples,)
-            Leverage of each sample
+            Bool with samples with a leverage above the critical value
         """
         # Check the estimator has been fitted
         check_is_fitted(self, ["critical_value_"])
@@ -84,7 +84,9 @@ class Leverage(_ModelResidualsBase):
         leverage = calculate_leverage(self.model_, X)
         return np.where(leverage > self.critical_value_, -1, 1)
 
-    def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
+    def predict_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray], validate: bool = True
+    ) -> np.ndarray:
         """Calculate the leverage of the samples.
 
         Parameters

@@ -90,7 +90,9 @@ class DModX(_ModelResidualsBase):
         dmodx_values = self.predict_residuals(X, validate=False)
         return np.where(dmodx_values > self.critical_value_, -1, 1)
 
-    def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
+    def predict_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
+    ) -> np.ndarray:
         """Calculate DModX statistics for input data.
 
         Parameters

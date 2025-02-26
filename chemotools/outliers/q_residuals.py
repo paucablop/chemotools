@@ -112,7 +112,9 @@ class QResiduals(_ModelResidualsBase):
         Q_residuals = self.predict_residuals(X, validate=False)
         return np.where(Q_residuals > self.critical_value_, -1, 1)
 
-    def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
+    def predict_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
+    ) -> np.ndarray:
         """Calculate Q residuals (Squared Prediction Error - SPE) for input data.
 
         Parameters
