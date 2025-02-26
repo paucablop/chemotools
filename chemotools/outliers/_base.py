@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Union, Optional, Tuple
+from typing import Union, Optional, Tuple
 
 import numpy as np
 
@@ -9,7 +9,7 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-from .utils import ModelType, get_model_parameters
+from ._utils import get_model_parameters, ModelTypes, validate_confidence
 
 
 class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
@@ -20,14 +20,14 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
 
     Parameters
     ----------
-    model : Union[ModelType, Pipeline]
+    model : Union[ModelTypes, Pipeline]
         A fitted _BasePCA or _PLS models or Pipeline ending with such a model
     confidence : float
         Confidence level for statistical calculations (between 0 and 1)
 
     Attributes
     ----------
-    model_ : ModelType
+    model_ : ModelTypes
         The fitted model of type _BasePCA or _PLS
 
     preprocessing_ : Optional[Pipeline]
@@ -48,7 +48,7 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
 
     def __init__(
         self,
-        model: Union[ModelType, Pipeline],
+        model: Union[ModelTypes, Pipeline],
         confidence: float,
     ) -> None:
         (
@@ -58,44 +58,22 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             self.n_components_,
             self.n_samples_,
         ) = self._validate_and_extract_model(model)
-        self.confidence = self._validate_confidence(confidence)
+        self.confidence = validate_confidence(confidence)
         self.critical_value_ = self._calculate_critical_value()
 
-    def _validate_confidence(self, confidence: float) -> float:
-        """Validate parameters using sklearn conventions.
-
-        Parameters
-        ----------
-        confidence : float
-            Confidence level for statistical calculations (between 0 and 1)
-
-        Returns
-        -------
-        float
-            The validated confidence level
-
-        Raises
-        ------
-        ValueError
-            If confidence is not between 0 and 1
-        """
-        if not 0 < confidence < 1:
-            raise ValueError("Confidence must be between 0 and 1")
-        return confidence
-
     def _validate_and_extract_model(
-        self, model: Union[ModelType, Pipeline]
-    ) -> Tuple[ModelType, Optional[Pipeline], int, int, int]:
+        self, model: Union[ModelTypes, Pipeline]
+    ) -> Tuple[ModelTypes, Optional[Pipeline], int, int, int]:
         """Validate and extract the model and preprocessing steps.
 
         Parameters
         ----------
-        model : Union[ModelType, Pipeline]
+        model : Union[ModelTypes, Pipeline]
             A fitted PCA/PLS model or Pipeline ending with such a model
 
         Returns
         -------
-        Tuple[ModelType, Optional[Pipeline]]
+        Tuple[ModelTypes, Optional[Pipeline]]
             The extracted model and preprocessing steps
 
         Raises
@@ -135,12 +113,12 @@ class _ModelDiagnosticsBase(ABC):
 
     Parameters
     ----------
-    model : Union[ModelType, Pipeline]
+    model : Union[ModelTypes, Pipeline]
         A fitted PCA/PLS model or Pipeline ending with such a model
 
     Attributes
     ----------
-    model_ : ModelType
+    model_ : ModelTypes
         The fitted model of type _BasePCA or _PLS
 
     preprocessing_ : Optional[Pipeline]
@@ -148,7 +126,7 @@ class _ModelDiagnosticsBase(ABC):
 
     """
 
-    def __init__(self, model: Union[ModelType, Pipeline]):
+    def __init__(self, model: Union[ModelTypes, Pipeline]):
         self.model_, self.preprocessing_ = self._validate_and_extract_model(model)
 
     def _validate_and_extract_model(self, model):
@@ -156,12 +134,12 @@ class _ModelDiagnosticsBase(ABC):
 
         Parameters
         ----------
-        model : Union[ModelType, Pipeline]
+        model : Union[ModelTypes, Pipeline]
             A fitted PCA/PLS model or Pipeline ending with such a model
 
         Returns
         -------
-        Tuple[ModelType, Optional[Pipeline]]
+        Tuple[ModelTypes, Optional[Pipeline]]
             The extracted model and preprocessing steps
 
         Raises
