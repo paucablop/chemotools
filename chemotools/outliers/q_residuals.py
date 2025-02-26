@@ -6,8 +6,7 @@ from scipy.stats import norm, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 
-from ._base import _ModelResidualsBase
-from ._utils import ModelTypes
+from ._base import _ModelResidualsBase, ModelTypes
 
 
 class QResiduals(_ModelResidualsBase):
@@ -83,18 +82,12 @@ class QResiduals(_ModelResidualsBase):
         if self.preprocessing_:
             X = self.preprocessing_.fit_transform(X)
 
-        # Compute Q residuals for training data
-        X_transformed = self.model_.transform(X)
-        X_reconstructed = self.model_.inverse_transform(X_transformed)
-
         # Compute the critical threshold using the chosen method
-        self.critical_value_ = self._calculate_critical_value(
-            X, X_reconstructed, self.method
-        )
+        self.critical_value_ = self._calculate_critical_value(X)
 
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray[bool]:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """Identify outliers in the input data based on Q residuals threshold.
 
         Parameters
@@ -139,7 +132,8 @@ class QResiduals(_ModelResidualsBase):
         check_is_fitted(self, ["critical_value_"])
 
         # Validate the input data
-        X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
+        if validate:
+            X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
         # Apply preprocessing if available
         if self.preprocessing_:
@@ -154,9 +148,7 @@ class QResiduals(_ModelResidualsBase):
 
     def _calculate_critical_value(
         self,
-        X: np.ndarray,
-        X_reconstructed: np.ndarray,
-        method: Literal["chi-square", "jackson-mudholkar", "percentile"],
+        X: Optional[np.ndarray] = None,
     ) -> float:
         """Calculate the critical value for outlier detection.
 
@@ -177,12 +169,17 @@ class QResiduals(_ModelResidualsBase):
             The calculated critical value for outlier detection.
 
         """
-        if method == "chi-square":
-            return self._chi_square_threshold(X, X_reconstructed)
-        elif method == "jackson-mudholkar":
-            return self._jackson_mudholkar_threshold(X, X_reconstructed)
-        elif method == "percentile":
-            Q_residuals = np.sum((X - X_reconstructed) ** 2, axis=1)
+        # Compute Q residuals for training data
+        X_transformed = self.model_.transform(X)
+        X_reconstructed = self.model_.inverse_transform(X_transformed)
+        residuals = X - X_reconstructed
+
+        if self.method == "chi-square":
+            return self._chi_square_threshold(residuals)
+        elif self.method == "jackson-mudholkar":
+            return self._jackson_mudholkar_threshold(residuals)
+        elif self.method == "percentile":
+            Q_residuals = np.sum((residuals) ** 2, axis=1)
             return self._percentile_threshold(Q_residuals)
         else:
             raise ValueError(
@@ -190,11 +187,10 @@ class QResiduals(_ModelResidualsBase):
             )
 
     def _chi_square_threshold(
-        self, X: np.ndarray, X_reconstructed: np.ndarray
+        self, residuals: np.ndarray
     ) -> float:
         """Compute Q residual threshold using Chi-Square Approximation."""
-        residual = X - X_reconstructed
-        eigenvalues = np.linalg.trace(np.cov(residual.T))
+        eigenvalues = np.linalg.trace(np.cov(residuals.T))
 
         theta_1 = np.sum(eigenvalues)
         theta_2 = np.sum(eigenvalues**2)
@@ -209,11 +205,11 @@ class QResiduals(_ModelResidualsBase):
         return g * chi_critical
 
     def _jackson_mudholkar_threshold(
-        self, X: np.ndarray, X_reconstructed: np.ndarray
+        self, residuals: np.ndarray
     ) -> float:
         """Compute Q residual threshold using Jackson & Mudholkar’s analytical method."""
-        residual = X - X_reconstructed
-        eigenvalues = np.linalg.trace(np.cov(residual.T))
+
+        eigenvalues = np.linalg.trace(np.cov(residuals.T))
         theta_1 = np.sum(eigenvalues)
         theta_2 = np.sum(eigenvalues**2)
         theta_3 = np.sum(eigenvalues**3)

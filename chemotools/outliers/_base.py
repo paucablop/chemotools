@@ -9,7 +9,9 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-from ._utils import ModelTypes, validate_confidence, validate_and_extract_model
+from ._utils import validate_confidence, validate_and_extract_model
+
+ModelTypes = Union[_BasePCA, _PLS]
 
 
 class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
@@ -79,10 +81,10 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             The residuals of the model
         """
         self.fit(X, y)
-        return self.predict_residuals()
+        return self.predict_residuals(X, validate=True)
 
     @abstractmethod
-    def predict_residuals(self) -> np.ndarray:
+    def predict_residuals(self, X: np.ndarray, validate: bool) -> np.ndarray:
         """Calculate the residuals of the model.
 
         Returns
@@ -92,7 +94,7 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         """
 
     @abstractmethod
-    def _calculate_critical_value(self) -> float:
+    def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
         """Calculate the critical value for outlier detection.
 
         Returns

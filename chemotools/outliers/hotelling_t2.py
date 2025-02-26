@@ -7,9 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 from scipy.stats import f as f_distribution
 
-
-from ._base import _ModelResidualsBase
-from ._utils import ModelTypes
+from ._base import _ModelResidualsBase, ModelTypes
 
 
 class HotellingT2(_ModelResidualsBase):
@@ -69,7 +67,7 @@ class HotellingT2(_ModelResidualsBase):
         self.critical_value_ = self._calculate_critical_value()
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray[bool]:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """Identify outliers in the input data.
 
         Parameters
@@ -134,7 +132,7 @@ class HotellingT2(_ModelResidualsBase):
 
         return np.sum((X_transformed**2) / variances, axis=1)
 
-    def _calculate_critical_value(self):
+    def _calculate_critical_value(self, X: Optional[np.ndarray] = None) -> float:
         """
         Calculate the critical value for the Hotelling's T-squared statistics.
 

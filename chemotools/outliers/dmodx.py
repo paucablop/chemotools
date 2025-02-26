@@ -6,8 +6,8 @@ from sklearn.utils.validation import validate_data, check_is_fitted
 from scipy.stats import f as f_distribution
 
 
-from ._base import _ModelResidualsBase
-from ._utils import ModelTypes
+from ._base import _ModelResidualsBase, ModelTypes
+
 
 
 class DModX(_ModelResidualsBase):
@@ -66,7 +66,7 @@ class DModX(_ModelResidualsBase):
         self.critical_value_ = self._calculate_critical_value()
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray[bool]:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """Identify outliers in the input data.
 
         Parameters
@@ -127,7 +127,7 @@ class DModX(_ModelResidualsBase):
 
         return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
 
-    def _calculate_critical_value(self) -> float:
+    def _calculate_critical_value(self, X: Optional[np.ndarray] = None) -> float:
         """Calculate F-distribution based critical value.
 
         Returns

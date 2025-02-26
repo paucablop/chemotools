@@ -1,11 +1,11 @@
-from typing import Optional, TypeVar, Tuple, Union
+from typing import Optional, Tuple, Union
 
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-ModelTypes = TypeVar("ModelType", _BasePCA, _PLS)
+ModelTypes = Union[_BasePCA, _PLS]
 
 
 def get_model_parameters(model: ModelTypes) -> Tuple[int, int, int]:
