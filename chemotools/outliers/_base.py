@@ -3,7 +3,7 @@ from typing import TypeVar, Union, Optional, Tuple
 
 import numpy as np
 
-from sklearn.base import OutlierMixin
+from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.decomposition._base import _BasePCA
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
@@ -20,11 +20,10 @@ def get_model_parameters(model: ModelType) -> Tuple[int, int, int]:
         return model.n_features_in_, model.n_components, len(model.x_scores_)
     else:
         raise ValueError(
-            "Model must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
+            "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
         )
 
-
-class _ModelResidualsBase(ABC, OutlierMixin):
+class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
     """Base class for model outlier calculations.
 
     Implements statistical calculations for outlier detection in dimensionality
@@ -123,8 +122,7 @@ class _ModelResidualsBase(ABC, OutlierMixin):
 
         if not isinstance(model, (_BasePCA, _PLS)):
             raise ValueError(
-                "Model must be of type _BasePCA or _PLS or a Pipeline "
-                "ending with one of these types."
+                "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
             )
 
         check_is_fitted(model)
@@ -192,7 +190,7 @@ class _ModelDiagnosticsBase(ABC):
             check_is_fitted(model)
         else:
             raise ValueError(
-                "Model must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
+                "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
             )
         check_is_fitted(model)
         return model, preprocessing

@@ -20,6 +20,15 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
+
+from chemotools.outliers import (
+    HotellingT2,
+    QResiduals,
+    DModX,
+    Leverage,
+    StudentizedResiduals,
+)
+
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
