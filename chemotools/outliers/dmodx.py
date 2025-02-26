@@ -2,7 +2,7 @@ from typing import Optional, Union
 import numpy as np
 
 from sklearn.pipeline import Pipeline
-from sklearn.utils.validation import validate_data
+from sklearn.utils.validation import validate_data, check_is_fitted
 from scipy.stats import f as f_distribution
 
 
@@ -80,11 +80,15 @@ class DModX(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers
         """
+        # Check the estimator has been fitted
+        check_is_fitted(self, ["critical_value_"])
 
+        # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
+        # Calculate outliers based on the DModX statistics
         dmodx_values = self.predict_residuals(X, validate=False)
         return np.where(dmodx_values > self.critical_value_, -1, 1)
     
@@ -97,19 +101,29 @@ class DModX(_ModelResidualsBase):
         X : array-like of shape (n_samples, n_features)
             Input data
 
+        validate : bool, default=True
+            Whether to validate the input data
+
         Returns
         -------
         ndarray of shape (n_samples,)
             DModX statistics for each sample
         """
+        # Check the estimator has been fitted
+        check_is_fitted(self, ["critical_value_"])
+
+        # Validate the input data
         if validate:
             X = validate_data(
                 self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
             )
 
+        # Apply preprocessing if available
         if self.preprocessing_:
             X = self.preprocessing_.transform(X)
 
+
+        # Calculate the DModX statistics
         X_transformed = self.model_.transform(X)
         X_reconstructed = self.model_.inverse_transform(X_transformed)
         squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)

@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
-from sklearn.utils.validation import validate_data
+from sklearn.utils.validation import validate_data, check_is_fitted
 from scipy.stats import f as f_distribution
 
 
@@ -82,12 +82,15 @@ class HotellingT2(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers
         """
+        # Check the estimator has been fitted
+        check_is_fitted(self, ["critical_value_"])
 
+        # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-
+        # Calculate the Hotelling's T-squared statistics
         hotelling_t2_values = self.predict_residuals(X, validate=False)
         return np.where(hotelling_t2_values > self.critical_value_, -1, 1)
 
@@ -105,14 +108,20 @@ class HotellingT2(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Hotellin's T-squared statistics for each sample
         """
+        # Check the estimator has been fitted
+        check_is_fitted(self, ["critical_value_"])
+
+        # Validate the input data
         if validate:
             X = validate_data(
                 self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
             )
 
+        # Apply preprocessing steps
         if self.preprocessing_:
             X = self.preprocessing_.transform(X)
 
+        # Calculate the Hotelling's T-squared statistics
         if isinstance(self.model_, _BasePCA):
             # For PCA-like models
             variances = self.model_.explained_variance_
