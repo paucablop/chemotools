@@ -186,9 +186,7 @@ class QResiduals(_ModelResidualsBase):
                 "Invalid method. Choose from 'chi-square', 'jackson-mudholkar', or 'percentile'."
             )
 
-    def _chi_square_threshold(
-        self, residuals: np.ndarray
-    ) -> float:
+    def _chi_square_threshold(self, residuals: np.ndarray) -> float:
         """Compute Q residual threshold using Chi-Square Approximation."""
         eigenvalues = np.linalg.trace(np.cov(residuals.T))
 
@@ -204,9 +202,7 @@ class QResiduals(_ModelResidualsBase):
         # Compute final Q residual threshold
         return g * chi_critical
 
-    def _jackson_mudholkar_threshold(
-        self, residuals: np.ndarray
-    ) -> float:
+    def _jackson_mudholkar_threshold(self, residuals: np.ndarray) -> float:
         """Compute Q residual threshold using Jackson & Mudholkar’s analytical method."""
 
         eigenvalues = np.linalg.trace(np.cov(residuals.T))

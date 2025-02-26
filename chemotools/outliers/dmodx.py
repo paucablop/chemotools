@@ -9,7 +9,6 @@ from scipy.stats import f as f_distribution
 from ._base import _ModelResidualsBase, ModelTypes
 
 
-
 class DModX(_ModelResidualsBase):
     """Calculate Distance to Model (DModX) statistics.
 
