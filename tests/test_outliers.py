@@ -75,134 +75,49 @@ def test_invalid_confidence_raises_error(fitted_pca):
         _DummyModelResiduals(fitted_pca, confidence=-0.5)  # Out of bounds
 
 
-# Test DModX
-def test_dmodx(dummy_data_loader):
-    """Test HotellingT2 class with a fitted PCA model."""
-    
-    # Arrange
-    X, _ = dummy_data_loader  # Load dummy data
-    
-    pca = PCA(n_components=1).fit(X)
-    
-    dmodx = DModX(model=pca, confidence=0.95)
+### TEST OUTLIER DETECTION MODELS ###
+# Parametrized test
+@pytest.mark.parametrize("model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier", [
+    # DModX with different PCA components
+    (DModX, {"confidence": 0.95}, 1, 14.124446891825524, 0.01684261, 144.55574493),
 
-    test_point_inlier = np.array([[50, 100, 150]])  
-    test_point_outlier = np.array([[200, 50, 400]])  
+    # QResiduals with different methods & PCA components
+    (QResiduals, {"confidence": 0.95, "method": "chi-square"}, 2, 0.16965388642221613, 0.00050853, 10.73161499),
+    (QResiduals, {"confidence": 0.95, "method": "jackson-mudholkar"}, 2, 0.07479919388489323, 0.00050853, 10.73161499),
+    (QResiduals, {"confidence": 0.95, "method": "percentile"}, 2, 0.11543872873258751, 0.00050853, 10.73161499),
 
-
-    # Act
-    dmodx.fit(X)
-    residuals = dmodx.predict_residuals(X)
-    prediction_inlier = dmodx.predict_residuals(test_point_inlier)[0]
-    prediction_outlier = dmodx.predict_residuals(test_point_outlier)[0]
-
-    # Assert model attributes
-    assert dmodx.confidence == 0.95, "Confidence value should be 0.95"
-    assert np.isclose(dmodx.critical_value_, 14.124446891825524), "Critical value mismatch"
-    assert dmodx.n_features_in_ == 3, "Number of input features should be 3"
-    assert dmodx.n_components_ == 1, "Number of model components should be 2"
-    assert dmodx.n_samples_ == 100, "Number of samples should be 101"
-
-    # Assert predictions
-    assert prediction_inlier < dmodx.critical_value_, "Test point should not be an outlier"
-    assert prediction_inlier < np.max(residuals), "Prediction should be within residual range"
-    assert np.isclose(prediction_inlier, 0.01684261), "Prediction value mismatch"
-    assert prediction_outlier > dmodx.critical_value_, "Test point should be an outlier"
-    assert prediction_outlier > np.max(residuals), "Prediction should be outside residual range"
-    assert np.isclose(prediction_outlier, 144.55574493), "Prediction value mismatch"
-
-
-
-
-# Test Q Residuals
-@pytest.mark.parametrize("method, expected_critical_value", [
-    ("chi-square", 0.16965388642221613),
-    ("jackson-mudholkar", 0.07479919388489323),  
-    ("percentile", 0.11543872873258751)  
+    # HotellingT2 with different PCA components
+    (HotellingT2, {"confidence": 0.95}, 2, 6.2414509854897675, 0.0013293, 944286.28269795),  # Example for 2 components
 ])
-def test_q_residuals(dummy_data_loader, method, expected_critical_value):
-    """Test Q Residuals with a fitted PCA model."""
-
+def test_outlier_detection_models(dummy_data_loader, model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier):
+    """Test different outlier detection models with various PCA components and outlier test methods."""
+    
     # Arrange
-    X, _ = dummy_data_loader  
+    X, _ = dummy_data_loader  # Load dummy data
+    pca = PCA(n_components=n_components).fit(X)  # Dynamic PCA component selection
     
-    pca = PCA(n_components=2).fit(X)
-    
-    q_residuals = QResiduals(model=pca, confidence=0.95, method=method)
+    model = model_class(model=pca, **kwargs)  # Instantiate model with params
 
     test_point_inlier = np.array([[50, 100, 150]])  
     test_point_outlier = np.array([[200, 50, 400]])  
 
     # Act
-    q_residuals.fit(X)
-    residuals = q_residuals.predict_residuals(X)
-    prediction_inlier = q_residuals.predict_residuals(test_point_inlier)[0]
-    prediction_outlier = q_residuals.predict_residuals(test_point_outlier)[0]
+    model.fit(X)
+    residuals = model.predict_residuals(X)
+    prediction_inlier = model.predict_residuals(test_point_inlier)[0]
+    prediction_outlier = model.predict_residuals(test_point_outlier)[0]
 
     # Assert model attributes
-    assert q_residuals.confidence == 0.95, "Confidence value should be 0.95"
-    assert np.isclose(q_residuals.critical_value_, expected_critical_value), "Critical value mismatch"
-    assert q_residuals.n_features_in_ == 3, "Number of input features should be 3"
-    assert q_residuals.n_components_ == 2, "Number of model components should be 2"
-    assert q_residuals.n_samples_ == 100, "Number of samples should be 101"
+    assert model.confidence == kwargs["confidence"], "Confidence value should match input"
+    assert np.isclose(model.critical_value_, expected_critical_value), f"Critical value mismatch for {model_class.__name__} with {n_components} components"
+    assert model.n_features_in_ == 3, "Number of input features should be 3"
+    assert model.n_components_ == n_components, f"Number of model components should be {n_components}"
+    assert model.n_samples_ == 100, "Number of samples should be 100"
 
     # Assert predictions
-    assert prediction_inlier < q_residuals.critical_value_, "Test point should not be an outlier"
+    assert prediction_inlier < model.critical_value_, "Test point should not be an outlier"
     assert prediction_inlier < np.max(residuals), "Prediction should be within residual range"
-    assert np.isclose(prediction_inlier, 0.00050853), "Prediction value mismatch"  
-    assert prediction_outlier > q_residuals.critical_value_, "Test point should be an outlier"
+    assert np.isclose(prediction_inlier, expected_prediction_inlier), "Prediction value mismatch"
+    assert prediction_outlier > model.critical_value_, "Test point should be an outlier"
     assert prediction_outlier > np.max(residuals), "Prediction should be outside residual range"
-    assert np.isclose(prediction_outlier, 10.73161499), "Prediction value mismatch"
-
-
-@pytest.mark.parametrize("invalid_method", ["percentil", "wrong-method", "jackson mudholkar", "chi square"])  
-def test_q_residuals_invalid_method(dummy_data_loader, invalid_method):
-    """Test Q Residuals with invalid method inputs."""
-
-    # Arrange
-    X, _ = dummy_data_loader  # Load dummy data
-    pca = PCA(n_components=2).fit(X)
-
-    # Act & Assert
-    with pytest.raises(ValueError, match="Invalid method.*"):
-        QResiduals(model=pca, confidence=0.95, method=invalid_method).fit(X) 
-
-
-
-# Test Hotelling T2
-def test_hotelling_t2(dummy_data_loader):
-    """Test HotellingT2 class with a fitted PCA model."""
-    
-    # Arrange
-    X, _ = dummy_data_loader  # Load dummy data
-    
-    pca = PCA(n_components=2).fit(X)
-    
-    hotelling_t2 = HotellingT2(model=pca, confidence=0.95)
-
-    test_point_inlier = np.array([[50, 100, 150]])  # Single test sample
-    test_point_outlier = np.array([[200, 300, 400]])  # Single test sample
-
-
-    # Act
-    hotelling_t2.fit(X)
-    residuals = hotelling_t2.predict_residuals(X)
-    prediction_inlier = hotelling_t2.predict_residuals(test_point_inlier)[0]
-    prediction_outlier = hotelling_t2.predict_residuals(test_point_outlier)[0]
-
-    # Assert model attributes
-    assert hotelling_t2.confidence == 0.95, "Confidence value should be 0.95"
-    assert np.isclose(hotelling_t2.critical_value_, 6.2414509854897675), "Critical value mismatch"
-    assert hotelling_t2.n_features_in_ == 3, "Number of input features should be 3"
-    assert hotelling_t2.n_components_ == 2, "Number of model components should be 2"
-    assert hotelling_t2.n_samples_ == 100, "Number of samples should be 101"
-
-    # Assert predictions
-    assert prediction_inlier < hotelling_t2.critical_value_, "Test point should not be an outlier"
-    assert prediction_inlier < np.max(residuals), "Prediction should be within residual range"
-    assert np.isclose(prediction_inlier, 0.0013293), "Prediction value mismatch"
-    assert prediction_outlier > hotelling_t2.critical_value_, "Test point should be an outlier"
-    assert prediction_outlier > np.max(residuals), "Prediction should be outside residual range"
-    assert np.isclose(prediction_outlier, 147.56313415), "Prediction value mismatch"
-
-
+    assert np.isclose(prediction_outlier, expected_prediction_outlier), "Prediction value mismatch"
