@@ -4,7 +4,6 @@ from chemotools.augmentation import (
     AddNoise,
     BaselineShift,
     FractionalShift,
-    GaussianBroadening,
     IndexShift,
     SpectrumScale,
 )

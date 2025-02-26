@@ -1,19 +1,13 @@
 import numpy as np
-import pandas as pd
-import polars as pl
 import pytest
 
 from sklearn.decomposition import PCA
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
 
 from chemotools.outliers import (
     HotellingT2,
     QResiduals,
     DModX,
-    Leverage,
-    StudentizedResiduals,
 )
 
 from .conftest import _DummyModelResiduals
