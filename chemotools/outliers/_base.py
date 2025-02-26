@@ -9,19 +9,7 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-
-ModelType = TypeVar("ModelType", _BasePCA, _PLS)
-
-
-def get_model_parameters(model: ModelType) -> Tuple[int, int, int]:
-    if isinstance(model, _BasePCA):
-        return model.n_features_in_, model.n_components_, model.n_samples_
-    elif isinstance(model, _PLS):
-        return model.n_features_in_, model.n_components, len(model.x_scores_)
-    else:
-        raise ValueError(
-            "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
-        )
+from .utils import ModelType, get_model_parameters
 
 
 class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
