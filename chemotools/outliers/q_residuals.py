@@ -6,7 +6,8 @@ from scipy.stats import norm, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 
-from ._base import _ModelResidualsBase, ModelType
+from ._base import _ModelResidualsBase
+from ._utils import ModelTypes
 
 
 class QResiduals(_ModelResidualsBase):
@@ -56,7 +57,7 @@ class QResiduals(_ModelResidualsBase):
 
     def __init__(
         self,
-        model: Union[ModelType, Pipeline],
+        model: Union[ModelTypes, Pipeline],
         confidence: float = 0.95,
         method: Literal["chi-square", "jackson-mudholkar", "percentile"] = "percentile",
     ) -> None:

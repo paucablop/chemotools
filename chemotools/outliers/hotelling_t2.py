@@ -8,7 +8,8 @@ from sklearn.utils.validation import validate_data
 from scipy.stats import f as f_distribution
 
 
-from ._base import _ModelResidualsBase, ModelType
+from ._base import _ModelResidualsBase
+from ._utils import ModelTypes
 
 
 class HotellingT2(_ModelResidualsBase):
@@ -50,7 +51,7 @@ class HotellingT2(_ModelResidualsBase):
     """
 
     def __init__(
-        self, model: Union[ModelType, Pipeline], confidence: float = 0.95
+        self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
     ) -> None:
         super().__init__(model, confidence)
 

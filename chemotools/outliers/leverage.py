@@ -5,7 +5,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data
 
 
-from ._base import _ModelDiagnosticsBase, ModelType
+from ._base import _ModelDiagnosticsBase
+from ._utils import ModelTypes
 
 
 class Leverage(_ModelDiagnosticsBase):
@@ -30,7 +31,7 @@ class Leverage(_ModelDiagnosticsBase):
 
     """
 
-    def __init__(self, model: Union[ModelType, Pipeline]) -> None:
+    def __init__(self, model: Union[ModelTypes, Pipeline]) -> None:
         super().__init__(model)
 
     def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
@@ -57,7 +58,7 @@ class Leverage(_ModelDiagnosticsBase):
         return calculate_leverage(self.model_, X)
 
 
-def calculate_leverage(model: ModelType, X: np.ndarray) -> np.ndarray:
+def calculate_leverage(model: ModelTypes, X: np.ndarray) -> np.ndarray:
     """
     Calculate the leverage of the training samples in a PLS/PCA-like model.
 

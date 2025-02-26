@@ -6,7 +6,8 @@ from sklearn.utils.validation import validate_data
 from scipy.stats import f as f_distribution
 
 
-from ._base import _ModelResidualsBase, ModelType
+from ._base import _ModelResidualsBase
+from ._utils import ModelTypes
 
 
 class DModX(_ModelResidualsBase):
@@ -46,7 +47,7 @@ class DModX(_ModelResidualsBase):
 
     def __init__(
         self,
-        model: Union[ModelType, Pipeline],
+        model: Union[ModelTypes, Pipeline],
         confidence: float = 0.95,
     ) -> None:
         super().__init__(model, confidence)
