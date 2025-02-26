@@ -93,7 +93,7 @@ class HotellingT2(_ModelResidualsBase):
         return np.where(hotelling_t2_values > self.critical_value_, -1, 1)
 
     def predict_residuals(
-        self, X: np.ndarray, y: Optional[np.ndarray], validate: bool = True
+        self, X: np.ndarray, y: Optional[np.ndarray]=None, validate: bool = True
     ) -> np.ndarray:
         """Calculate Hotelling's T-squared statistics for input data.
 

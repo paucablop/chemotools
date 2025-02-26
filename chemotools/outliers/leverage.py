@@ -85,7 +85,7 @@ class Leverage(_ModelResidualsBase):
         return np.where(leverage > self.critical_value_, -1, 1)
 
     def predict_residuals(
-        self, X: np.ndarray, y: Optional[np.ndarray], validate: bool = True
+        self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
     ) -> np.ndarray:
         """Calculate the leverage of the samples.
 
