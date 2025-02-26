@@ -47,10 +47,6 @@ class StudentizedResiduals(_ModelResidualsBase):
         y : array-like of shape (n_samples,)
             Target data
         """
-
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
         # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -198,4 +194,4 @@ def calculate_studentized_residuals(
     # Calculate the standard deviation of the residuals
     std = np.sqrt(np.sum(y_residuals**2, axis=0) / (X.shape[0] - model.n_components))
 
-    return y_residuals / (std * np.sqrt(1 - leverage.reshape(-1, 1)))
+    return (y_residuals / (std * np.sqrt(1 - leverage.reshape(-1, 1)))).flatten()
