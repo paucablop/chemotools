@@ -14,7 +14,7 @@ from ._utils import ModelTypes
 
 class HotellingT2(_ModelResidualsBase):
     """
-    Calculate Hotelling's T-squared statistics for PCA or PLS models.
+    Calculate Hotelling's T-squared statistics for PCA or PLS like models.
 
     Parameters
     ----------
@@ -57,46 +57,19 @@ class HotellingT2(_ModelResidualsBase):
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "HotellingT2":
         """
-        Empty fit method to comply with sklearn API. Outlier detection does not need
-        to be fitted to the data because it is based on an already fitted model and not
-        on the data itself.
-        """
-        return self
+        Fit the model to the input data.
 
-    def predict_residuals(self, X: np.ndarray) -> np.ndarray:
-        """Calculate Hotelling's T-squared statistics for input data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        Returns
-        -------
-        ndarray of shape (n_samples,)
-            Hotellin's T-squared statistics for each sample
+        This step calculates the critical value for the outlier detection. In the DmodX method,
+        the critical value is not depend on the input data but on the model parameters.
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        self.critical_value_ = self._calculate_critical_value()
+        return self
 
-        if isinstance(self.model_, _BasePCA):
-            # For PCA-like models
-            variances = self.model_.explained_variance_
-
-        if isinstance(self.model_, _PLS):
-            # For PLS-like models
-            variances = np.var(self.model_.x_scores_, axis=0)
-
-        # Equivalent to X @ model.components_.T for PCA and X @ model.x_rotations_ for PLS
-        X_transformed = self.model_.transform(X)
-
-        return np.sum((X_transformed**2) / variances, axis=1)
-
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray) -> np.ndarray[bool]:
         """Identify outliers in the input data.
 
         Parameters
@@ -109,10 +82,61 @@ class HotellingT2(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers
         """
-        hotelling_t2_values = self.predict_residuals(X)
+
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
+
+
+        hotelling_t2_values = self.predict_residuals(X, validate=False)
         return np.where(hotelling_t2_values > self.critical_value_, -1, 1)
 
+
+    def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
+        """Calculate Hotelling's T-squared statistics for input data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
+
+        Returns
+        -------
+        ndarray of shape (n_samples,)
+            Hotellin's T-squared statistics for each sample
+        """
+        if validate:
+            X = validate_data(
+                self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+            )
+
+        if self.preprocessing_:
+            X = self.preprocessing_.transform(X)
+
+        if isinstance(self.model_, _BasePCA):
+            # For PCA-like models
+            variances = self.model_.explained_variance_
+
+        if isinstance(self.model_, _PLS):
+            # For PLS-like models
+            variances = np.var(self.model_.x_scores_, axis=0)
+
+        # Equivalent to X @ model.components_.T for _BasePCA and X @ model.x_rotations_ for _PLS
+        X_transformed = self.model_.transform(X)
+
+        return np.sum((X_transformed**2) / variances, axis=1)
+
+
     def _calculate_critical_value(self):
+        """
+        Calculate the critical value for the Hotelling's T-squared statistics.
+        
+        Returns
+        -------
+        float
+            The critical value for the Hotelling's T-squared statistics
+        """
+
         critical_value = f_distribution.ppf(
             self.confidence, self.n_components_, self.n_samples_ - self.n_components_
         )
