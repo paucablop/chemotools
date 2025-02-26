@@ -99,6 +99,14 @@ def test_compliance_fractional_shift():
     check_estimator(transformer)
 
 
+# GaussianBroadening
+# def test_compliance_gaussian_broadening():
+#    # Arrange
+#    transformer = GaussianBroadening()
+#    # Act & Assert
+#    check_estimator(transformer)
+
+
 # IndexSelector
 def test_compliance_index_selector():
     # Arrange

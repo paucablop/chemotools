@@ -20,6 +20,8 @@ from chemotools.baseline import (
     SubtractReference,
 )
 from chemotools.derivative import NorrisWilliams, SavitzkyGolay
+
+
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
