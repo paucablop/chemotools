@@ -25,6 +25,9 @@ class _DummyModelResiduals(_ModelResidualsBase):
     def __init__(self, model, confidence):
         super().__init__(model, confidence)
 
+    def predict_residuals(self):
+        return np.zeros(10)
+
     def _calculate_critical_value(self):
         return 1.96
 

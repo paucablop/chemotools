@@ -59,8 +59,35 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             self.n_samples_,
         ) = validate_and_extract_model(model)
         self.confidence = validate_confidence(confidence)
-        self.critical_value_ = self._calculate_critical_value()
 
+    def fit_predict_residuals(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+        """Fit the model to the input data and calculate the residuals.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
+
+        y : array-like of shape (n_samples,), default=None
+            Target values
+
+        Returns
+        -------
+        ndarray of shape (n_samples,)
+            The residuals of the model
+        """
+        self.fit(X, y)
+        return self.predict_residuals()
+
+    @abstractmethod
+    def predict_residuals(self) -> np.ndarray:
+        """Calculate the residuals of the model.
+
+        Returns
+        -------
+        ndarray of shape (n_samples,)
+            The residuals of the model
+        """
 
     @abstractmethod
     def _calculate_critical_value(self) -> float:

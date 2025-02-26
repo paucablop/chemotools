@@ -54,39 +54,20 @@ class DModX(_ModelResidualsBase):
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "DModX":
         """
-        Empty fit method to comply with sklearn API. Outlier detection does not need
-        to be fitted to the data because it is based on an already fitted model and not
-        on the data itself.
-        """
-        return self
+        Fit the model to the input data.
 
-    def predict_residuals(self, X: np.ndarray) -> np.ndarray:
-        """Calculate DModX statistics for input data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        Returns
-        -------
-        ndarray of shape (n_samples,)
-            DModX statistics for each sample
+        This step calculates the critical value for the outlier detection. In the DmodX method,
+        the critical value is not depend on the input data but on the model parameters.
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        self.critical_value_ = self._calculate_critical_value()
+        return self
 
-        X_transformed = self.model_.transform(X)
-        X_reconstructed = self.model_.inverse_transform(X_transformed)
-        squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)
 
-        return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
-
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray) -> np.ndarray[bool]:
         """Identify outliers in the input data.
 
         Parameters
@@ -99,8 +80,42 @@ class DModX(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers
         """
-        dmodx_values = self.predict_residuals(X)
+
+        X = validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
+
+        dmodx_values = self.predict_residuals(X, validate=False)
         return np.where(dmodx_values > self.critical_value_, -1, 1)
+    
+
+    def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
+        """Calculate DModX statistics for input data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
+
+        Returns
+        -------
+        ndarray of shape (n_samples,)
+            DModX statistics for each sample
+        """
+        if validate:
+            X = validate_data(
+                self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+            )
+
+        if self.preprocessing_:
+            X = self.preprocessing_.transform(X)
+
+        X_transformed = self.model_.transform(X)
+        X_reconstructed = self.model_.inverse_transform(X_transformed)
+        squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)
+
+        return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
+    
 
     def _calculate_critical_value(self) -> float:
         """Calculate F-distribution based critical value.
