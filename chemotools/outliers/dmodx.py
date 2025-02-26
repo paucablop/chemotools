@@ -66,7 +66,6 @@ class DModX(_ModelResidualsBase):
         self.critical_value_ = self._calculate_critical_value()
         return self
 
-
     def predict(self, X: np.ndarray) -> np.ndarray[bool]:
         """Identify outliers in the input data.
 
@@ -91,7 +90,6 @@ class DModX(_ModelResidualsBase):
         # Calculate outliers based on the DModX statistics
         dmodx_values = self.predict_residuals(X, validate=False)
         return np.where(dmodx_values > self.critical_value_, -1, 1)
-    
 
     def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
         """Calculate DModX statistics for input data.
@@ -122,14 +120,12 @@ class DModX(_ModelResidualsBase):
         if self.preprocessing_:
             X = self.preprocessing_.transform(X)
 
-
         # Calculate the DModX statistics
         X_transformed = self.model_.transform(X)
         X_reconstructed = self.model_.inverse_transform(X_transformed)
         squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)
 
         return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
-    
 
     def _calculate_critical_value(self) -> float:
         """Calculate F-distribution based critical value.

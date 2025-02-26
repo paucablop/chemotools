@@ -88,10 +88,11 @@ class QResiduals(_ModelResidualsBase):
         X_reconstructed = self.model_.inverse_transform(X_transformed)
 
         # Compute the critical threshold using the chosen method
-        self.critical_value_ = self._calculate_critical_value(X, X_reconstructed, self.method)
+        self.critical_value_ = self._calculate_critical_value(
+            X, X_reconstructed, self.method
+        )
 
         return self
-
 
     def predict(self, X: np.ndarray) -> np.ndarray[bool]:
         """Identify outliers in the input data based on Q residuals threshold.
@@ -113,11 +114,10 @@ class QResiduals(_ModelResidualsBase):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        
+
         # Calculate outliers based on the Q residuals
         Q_residuals = self.predict_residuals(X, validate=False)
         return np.where(Q_residuals > self.critical_value_, -1, 1)
-    
 
     def predict_residuals(self, X: np.ndarray, validate: bool = True) -> np.ndarray:
         """Calculate Q residuals (Squared Prediction Error - SPE) for input data.
@@ -152,17 +152,21 @@ class QResiduals(_ModelResidualsBase):
 
         return Q_residuals
 
-    
-    def _calculate_critical_value(self, X: np.ndarray, X_reconstructed: np.ndarray, method: Literal["chi-square", "jackson-mudholkar", "percentile"]) -> float:
+    def _calculate_critical_value(
+        self,
+        X: np.ndarray,
+        X_reconstructed: np.ndarray,
+        method: Literal["chi-square", "jackson-mudholkar", "percentile"],
+    ) -> float:
         """Calculate the critical value for outlier detection.
-        
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
             Input data.
-            
+
         X_reconstructed : array-like of shape (n_samples, n_features)
-            Reconstructed input data. 
+            Reconstructed input data.
 
         method : str Literal["chi-square", "jackson-mudholkar", "percentile"]
             The method used to compute the confidence threshold for Q residuals.
@@ -172,7 +176,7 @@ class QResiduals(_ModelResidualsBase):
         float
             The calculated critical value for outlier detection.
 
-            """
+        """
         if method == "chi-square":
             return self._chi_square_threshold(X, X_reconstructed)
         elif method == "jackson-mudholkar":
@@ -184,7 +188,6 @@ class QResiduals(_ModelResidualsBase):
             raise ValueError(
                 "Invalid method. Choose from 'chi-square', 'jackson-mudholkar', or 'percentile'."
             )
-        
 
     def _chi_square_threshold(
         self, X: np.ndarray, X_reconstructed: np.ndarray
@@ -226,4 +229,3 @@ class QResiduals(_ModelResidualsBase):
     def _percentile_threshold(self, Q_residuals: np.ndarray) -> float:
         """Compute Q residual threshold using the empirical percentile method."""
         return np.percentile(Q_residuals, self.confidence * 100)
-

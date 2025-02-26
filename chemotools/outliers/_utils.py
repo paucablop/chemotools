@@ -30,7 +30,7 @@ def get_model_parameters(model: ModelTypes) -> Tuple[int, int, int]:
         raise ValueError(
             "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
         )
-    
+
 
 def validate_confidence(confidence: float) -> float:
     """Validate parameters using sklearn conventions.
@@ -56,36 +56,36 @@ def validate_confidence(confidence: float) -> float:
 
 
 def validate_and_extract_model(
-        model: Union[ModelTypes, Pipeline]
-    ) -> Tuple[ModelTypes, Optional[Pipeline], int, int, int]:
-        """Validate and extract the model and preprocessing steps.
+    model: Union[ModelTypes, Pipeline],
+) -> Tuple[ModelTypes, Optional[Pipeline], int, int, int]:
+    """Validate and extract the model and preprocessing steps.
 
-        Parameters
-        ----------
-        model : Union[ModelTypes, Pipeline]
-            A fitted PCA/PLS model or Pipeline ending with such a model
+    Parameters
+    ----------
+    model : Union[ModelTypes, Pipeline]
+        A fitted PCA/PLS model or Pipeline ending with such a model
 
-        Returns
-        -------
-        Tuple[ModelTypes, Optional[Pipeline]]
-            The extracted model and preprocessing steps
+    Returns
+    -------
+    Tuple[ModelTypes, Optional[Pipeline]]
+        The extracted model and preprocessing steps
 
-        Raises
-        ------
-        ValueError
-            If the model is not of type _BasePCA or _PLS or a Pipeline ending with one of these types or if the model is not fitted
-        """
-        if isinstance(model, Pipeline):
-            preprocessing = model[:-1]
-            model = model[-1]
-        else:
-            preprocessing = None
+    Raises
+    ------
+    ValueError
+        If the model is not of type _BasePCA or _PLS or a Pipeline ending with one of these types or if the model is not fitted
+    """
+    if isinstance(model, Pipeline):
+        preprocessing = model[:-1]
+        model = model[-1]
+    else:
+        preprocessing = None
 
-        if not isinstance(model, (_BasePCA, _PLS)):
-            raise ValueError(
-                "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
-            )
+    if not isinstance(model, (_BasePCA, _PLS)):
+        raise ValueError(
+            "Model not a valid model. Must be of base type _BasePCA or _PLS or a Pipeline ending with one of these types."
+        )
 
-        check_is_fitted(model)
-        n_features_in, n_components, n_samples = get_model_parameters(model)
-        return model, preprocessing, n_features_in, n_components, n_samples
+    check_is_fitted(model)
+    n_features_in, n_components, n_samples = get_model_parameters(model)
+    return model, preprocessing, n_features_in, n_components, n_samples

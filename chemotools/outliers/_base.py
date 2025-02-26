@@ -60,7 +60,9 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         ) = validate_and_extract_model(model)
         self.confidence = validate_confidence(confidence)
 
-    def fit_predict_residuals(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+    def fit_predict_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray] = None
+    ) -> np.ndarray:
         """Fit the model to the input data and calculate the residuals.
 
         Parameters
