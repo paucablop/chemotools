@@ -22,7 +22,7 @@ def calculate_decoded_spectrum(X: np.ndarray, estimator: ModelTypes):
     """
     # Project the transformed spectrum onto the latent space
     X_transformed = estimator.transform(X)
-    
+
     # Decode the spectrum back to the original space
     return estimator.inverse_transform(X_transformed)
 
@@ -49,5 +49,3 @@ def calculate_residual_spectrum(X: np.ndarray, estimator: ModelTypes):
 
     # Calculate the residual
     return X - decoded_spectrum
-
-
