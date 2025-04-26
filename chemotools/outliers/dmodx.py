@@ -7,6 +7,7 @@ from scipy.stats import f as f_distribution
 
 
 from ._base import _ModelResidualsBase, ModelTypes
+from .utils import calculate_residual_spectrum
 
 
 class DModX(_ModelResidualsBase):
@@ -123,9 +124,8 @@ class DModX(_ModelResidualsBase):
             X = self.transformer_.transform(X)
 
         # Calculate the DModX statistics
-        X_transformed = self.estimator_.transform(X)
-        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
-        squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)
+        residual = calculate_residual_spectrum(X, self.estimator_)
+        squared_errors = np.sum((residual) ** 2, axis=1)
 
         return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
 
