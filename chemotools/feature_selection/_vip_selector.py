@@ -68,7 +68,7 @@ class VIPSelector(_PLSFeatureSelectorBase):
         )
 
         # Calculate the VIP scores
-        self.feature_scores_ = self._calculate_features()
+        self.feature_scores_ = self._calculate_features(X)
 
         # Calculate the support mask
         self.support_mask_ = self._get_support_mask()
@@ -91,7 +91,7 @@ class VIPSelector(_PLSFeatureSelectorBase):
         """
         return self.feature_scores_ > self.threshold
 
-    def _calculate_features(self) -> np.ndarray:
+    def _calculate_features(self, X: np.ndarray) -> np.ndarray:
         """
         Calculate the VIP scores based on the fitted model.
 
