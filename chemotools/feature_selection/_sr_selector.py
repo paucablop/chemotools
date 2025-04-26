@@ -109,7 +109,7 @@ class SRSelector(_PLSFeatureSelectorBase):
         feature_scores_ : np.ndarray
             The calculated feature scores based on the selected method.
         """
-        bpls = self.estimator.coef_
+        bpls = self.estimator_.coef_
         bpls_norm = bpls.T / np.linalg.norm(bpls)
 
         # Handle 1D case correctly
