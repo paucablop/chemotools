@@ -59,7 +59,9 @@ class QResiduals(_ModelResidualsBase):
         self,
         model: Union[ModelTypes, Pipeline],
         confidence: float = 0.95,
-        method: Literal["chi-square", "jackson-mudholkar", "percentile"] = "jackson-mudholkar",
+        method: Literal[
+            "chi-square", "jackson-mudholkar", "percentile"
+        ] = "jackson-mudholkar",
     ) -> None:
         self.model, self.confidence, self.method = model, confidence, method
         super().__init__(model, confidence)

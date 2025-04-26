@@ -141,7 +141,10 @@ class DModX(_ModelResidualsBase):
         residual = calculate_residual_spectrum(X, self.estimator_)
         squared_errors = np.sum((residual) ** 2, axis=1)
 
-        return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_)) / self.train_spe_
+        return (
+            np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
+            / self.train_spe_
+        )
 
     def _calculate_critical_value(self, X: Optional[np.ndarray] = None) -> float:
         """Calculate F-distribution based critical value.

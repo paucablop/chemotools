@@ -87,7 +87,14 @@ def test_invalid_confidence_raises_error(fitted_pca):
     "model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier",
     [
         # DModX with different PCA components
-        (DModX, {"confidence": 0.95}, 1, 14.124446891825524, 0.39112407920976716, 3356.9164551405065),
+        (
+            DModX,
+            {"confidence": 0.95},
+            1,
+            14.124446891825524,
+            0.39112407920976716,
+            3356.9164551405065,
+        ),
         # QResiduals with different methods & PCA components
         (
             QResiduals,
