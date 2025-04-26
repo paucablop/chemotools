@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 
 from ._base import _ModelResidualsBase, ModelTypes
+from .utils import calculate_decoded_spectrum, calculate_residual_spectrum
 
 
 class QResiduals(_ModelResidualsBase):
@@ -142,9 +143,8 @@ class QResiduals(_ModelResidualsBase):
             X = self.transformer_.transform(X)
 
         # Compute reconstruction error (Q residuals)
-        X_transformed = self.estimator_.transform(X)
-        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
-        Q_residuals = np.sum((X - X_reconstructed) ** 2, axis=1)
+        residual = calculate_residual_spectrum(X, self.estimator_)
+        Q_residuals = np.sum(residual**2, axis=1)
 
         return Q_residuals
 
@@ -172,9 +172,7 @@ class QResiduals(_ModelResidualsBase):
 
         """
         # Compute Q residuals for training data
-        X_transformed = self.estimator_.transform(X)
-        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
-        residuals = X - X_reconstructed
+        residuals = calculate_residual_spectrum(X, self.estimator_)
 
         if self.method == "chi-square":
             return self._chi_square_threshold(residuals)
