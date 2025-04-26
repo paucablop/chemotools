@@ -29,10 +29,10 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
 
     Attributes
     ----------
-    model_ : ModelTypes
+    estimator_ : ModelTypes
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     n_features_in_ : int
@@ -54,8 +54,8 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         confidence: float,
     ) -> None:
         (
-            self.model_,
-            self.preprocessing_,
+            self.estimator_,
+            self.transformer_,
             self.n_features_in_,
             self.n_components_,
             self.n_samples_,
@@ -117,16 +117,16 @@ class _ModelDiagnosticsBase(ABC):
 
     Attributes
     ----------
-    model_ : ModelTypes
+    estimator_ : ModelTypes
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     """
 
     def __init__(self, model: Union[ModelTypes, Pipeline]):
-        self.model_, self.preprocessing_ = self._validate_and_extract_model(model)
+        self.estimator_, self.transformer_ = self._validate_and_extract_model(model)
 
     def _validate_and_extract_model(self, model):
         """Validate and extract the model and preprocessing steps.
