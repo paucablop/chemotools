@@ -44,7 +44,7 @@ class _PLSFeatureSelectorBase(ABC, BaseEstimator, SelectorMixin):
         self.estimator_ = _validate_and_extract_model(model)
 
     @abstractmethod
-    def calculate_features(self, X: np.ndarray) -> np.ndarray:
+    def _calculate_features(self, X: np.ndarray) -> np.ndarray:
         """Calculate the residuals of the model.
 
         Returns
