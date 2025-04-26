@@ -7,7 +7,7 @@ from ._base import _PLSFeatureSelectorBase
 class VIPSelector(_PLSFeatureSelectorBase):
     """
     This selector is used to select features that contribute significantly
-    to the latent variables in a PLS regression model using the Variables 
+    to the latent variables in a PLS regression model using the Variables
     Importance in Projection (VIP) method.
 
     Parameters

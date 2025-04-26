@@ -8,7 +8,7 @@ class SRSelector(_PLSFeatureSelectorBase):
     """
     This selector is used to select features that contribute significantly
     to the latent variables in a PLS regression model using the Selectivity
-    Ratio (SR) method. 
+    Ratio (SR) method.
 
     Parameters
     ----------
@@ -95,7 +95,7 @@ class SRSelector(_PLSFeatureSelectorBase):
         """
         Vectorized Selectivity Ratio calculation from a fitted _PLS
         like model.
-        
+
         Parameters:
         ----------
         - self: SRSelector
@@ -103,34 +103,34 @@ class SRSelector(_PLSFeatureSelectorBase):
 
         - X: array-like of shape (n_samples, n_features)
             The input training data to calculate the feature scores from.
-        
+
         Returns
         -------
         feature_scores_ : np.ndarray
             The calculated feature scores based on the selected method.
         """
-        bpls = self.estimator.coef_    
-        bpls_norm = bpls.T / np.linalg.norm(bpls)                 
-        
+        bpls = self.estimator.coef_
+        bpls_norm = bpls.T / np.linalg.norm(bpls)
+
         # Handle 1D case correctly
         if bpls.ndim == 1:
             bpls_norm = bpls_norm.reshape(-1, 1)
-        
+
         # Project X onto the regression vector
-        ttp = X @ bpls_norm                                     
-        ttp_pinv = np.linalg.pinv(ttp.T @ ttp)                  
-        ptp = X.T @ ttp @ ttp_pinv                              
-        
+        ttp = X @ bpls_norm
+        ttp_pinv = np.linalg.pinv(ttp.T @ ttp)
+        ptp = X.T @ ttp @ ttp_pinv
+
         # Predicted part of X
-        X_hat = ttp @ ptp.T                                     
-        
+        X_hat = ttp @ ptp.T
+
         # Compute squared norms directly
-        total_ss = np.sum(X ** 2, axis=0)                       
-        explained_ss = np.sum(X_hat ** 2, axis=0)               
-        residual_ss = total_ss - explained_ss                   
+        total_ss = np.sum(X**2, axis=0)
+        explained_ss = np.sum(X_hat**2, axis=0)
+        residual_ss = total_ss - explained_ss
 
         # Stability: avoid division by zero
         epsilon = 1e-12
 
         # Calculate Selectivity Ratio
-        return explained_ss / (residual_ss + epsilon)             
+        return explained_ss / (residual_ss + epsilon)
