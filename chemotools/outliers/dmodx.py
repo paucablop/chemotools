@@ -43,6 +43,9 @@ class DModX(_ModelResidualsBase):
 
     critical_value_ : float
         The calculated critical value for outlier detection
+
+    train_spe_: float
+        The training sum of squared errors (SSE) for the model normalized by degrees of freedom
     """
 
     def __init__(
@@ -64,7 +67,18 @@ class DModX(_ModelResidualsBase):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
+        # Calculate the critical value
         self.critical_value_ = self._calculate_critical_value()
+
+        # Calculate the degrees of freedom normalized SPE of the training set
+        residuals = calculate_residual_spectrum(X, self.estimator_)
+        squared_errors = np.sum((residuals) ** 2, axis=1)
+        self.train_spe_ = np.sqrt(
+            squared_errors
+            / (self.n_samples_ - self.n_components_ - 1)
+            * (self.n_features_in_ - self.n_components_)
+        )
+
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -127,7 +141,7 @@ class DModX(_ModelResidualsBase):
         residual = calculate_residual_spectrum(X, self.estimator_)
         squared_errors = np.sum((residual) ** 2, axis=1)
 
-        return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))
+        return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_)) / self.train_spe_
 
     def _calculate_critical_value(self, X: Optional[np.ndarray] = None) -> float:
         """Calculate F-distribution based critical value.
