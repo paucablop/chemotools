@@ -24,10 +24,10 @@ class HotellingT2(_ModelResidualsBase):
 
     Attributes
     ----------
-    model_ : ModelType
+    estimator_ : ModelType
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     n_features_in_ : int
@@ -51,6 +51,7 @@ class HotellingT2(_ModelResidualsBase):
     def __init__(
         self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
     ) -> None:
+        self.model, self.confidence = model, confidence
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "HotellingT2":
@@ -117,20 +118,20 @@ class HotellingT2(_ModelResidualsBase):
             )
 
         # Apply preprocessing steps
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate the Hotelling's T-squared statistics
-        if isinstance(self.model_, _BasePCA):
+        if isinstance(self.estimator_, _BasePCA):
             # For PCA-like models
-            variances = self.model_.explained_variance_
+            variances = self.estimator_.explained_variance_
 
-        if isinstance(self.model_, _PLS):
+        if isinstance(self.estimator_, _PLS):
             # For PLS-like models
-            variances = np.var(self.model_.x_scores_, axis=0)
+            variances = np.var(self.estimator_.x_scores_, axis=0)
 
         # Equivalent to X @ model.components_.T for _BasePCA and X @ model.x_rotations_ for _PLS
-        X_transformed = self.model_.transform(X)
+        X_transformed = self.estimator_.transform(X)
 
         return np.sum((X_transformed**2) / variances, axis=1)
 
