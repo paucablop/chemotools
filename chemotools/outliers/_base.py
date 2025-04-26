@@ -95,7 +95,7 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         """
 
     @abstractmethod
-    def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
+    def _calculate_critical_value(self, X: np.ndarray) -> float:
         """Calculate the critical value for outlier detection.
 
         Returns

@@ -150,7 +150,7 @@ class QResiduals(_ModelResidualsBase):
 
     def _calculate_critical_value(
         self,
-        X: Optional[np.ndarray] = None,
+        X: np.ndarray,
     ) -> float:
         """Calculate the critical value for outlier detection.
 
@@ -176,11 +176,14 @@ class QResiduals(_ModelResidualsBase):
 
         if self.method == "chi-square":
             return self._chi_square_threshold(residuals)
+        
         elif self.method == "jackson-mudholkar":
             return self._jackson_mudholkar_threshold(residuals)
+        
         elif self.method == "percentile":
             Q_residuals = np.sum((residuals) ** 2, axis=1)
             return self._percentile_threshold(Q_residuals)
+        
         else:
             raise ValueError(
                 "Invalid method. Choose from 'chi-square', 'jackson-mudholkar', or 'percentile'."
