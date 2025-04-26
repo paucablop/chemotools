@@ -48,7 +48,7 @@ def test_sr_selector_with_unfitted_model(unfitted_pls, dummy_data_loader):
 
 ### VIPSelector ###
 def test_vip_selector_with_fitted_pls(fitted_pls, dummy_data_loader):
-    """Test VIPSSelector with fitted PLS model.
+    """Test VIPSelector with fitted PLS model.
     Assertion values are taken from reference implementation.
     """
     # Arrange
