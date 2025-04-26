@@ -25,10 +25,10 @@ class DModX(_ModelResidualsBase):
 
     Attributes
     ----------
-    model_ : ModelType
+    estimator_ : ModelType
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     n_features_in_ : int
@@ -49,6 +49,7 @@ class DModX(_ModelResidualsBase):
         model: Union[ModelTypes, Pipeline],
         confidence: float = 0.95,
     ) -> None:
+        model, confidence = model, confidence
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "DModX":
@@ -118,12 +119,12 @@ class DModX(_ModelResidualsBase):
             )
 
         # Apply preprocessing if available
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate the DModX statistics
-        X_transformed = self.model_.transform(X)
-        X_reconstructed = self.model_.inverse_transform(X_transformed)
+        X_transformed = self.estimator_.transform(X)
+        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
         squared_errors = np.sum((X - X_reconstructed) ** 2, axis=1)
 
         return np.sqrt(squared_errors / (self.n_features_in_ - self.n_components_))

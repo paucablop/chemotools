@@ -20,10 +20,10 @@ class Leverage(_ModelResidualsBase):
 
     Attributes
     ----------
-    model_ : ModelType
+    estimator_ : ModelType
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     References
@@ -34,6 +34,7 @@ class Leverage(_ModelResidualsBase):
     def __init__(
         self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
     ) -> None:
+        model, confidence = model, confidence
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "Leverage":
@@ -47,8 +48,8 @@ class Leverage(_ModelResidualsBase):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        if self.preprocessing_:
-            X = self.preprocessing_.fit_transform(X)
+        if self.transformer_:
+            X = self.transformer_.fit_transform(X)
 
         # Compute the critical threshold
         self.critical_value_ = self._calculate_critical_value(X)
@@ -77,11 +78,11 @@ class Leverage(_ModelResidualsBase):
         )
 
         # Preprocess the data
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate outliers based on samples with too high leverage
-        leverage = calculate_leverage(self.model_, X)
+        leverage = calculate_leverage(self.estimator_, X)
         return np.where(leverage > self.critical_value_, -1, 1)
 
     def predict_residuals(
@@ -107,17 +108,17 @@ class Leverage(_ModelResidualsBase):
             X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
         # Apply preprocessing if available
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate the leverage
-        return calculate_leverage(self.model_, X)
+        return calculate_leverage(self.estimator_, X)
 
     def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
         """Calculate the critical value for outlier detection using the percentile outlier method."""
 
         # Calculate the leverage of the samples
-        leverage = calculate_leverage(self.model_, X)
+        leverage = calculate_leverage(self.estimator_, X)
 
         # Calculate the critical value
         return np.percentile(leverage, self.confidence * 100)

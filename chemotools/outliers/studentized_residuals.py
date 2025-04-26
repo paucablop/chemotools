@@ -21,10 +21,10 @@ class StudentizedResiduals(_ModelResidualsBase):
 
     Attributes
     ----------
-    model_ : ModelType
+    estimator_ : ModelType
         The fitted model of type _BasePCA or _PLS
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
     References
@@ -33,6 +33,7 @@ class StudentizedResiduals(_ModelResidualsBase):
     """
 
     def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
+        model, confidence = model, confidence
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "StudentizedResiduals":
@@ -53,18 +54,18 @@ class StudentizedResiduals(_ModelResidualsBase):
         )
 
         # Preprocess the data
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate y residuals
-        y_residuals = y - self.model_.predict(X)
+        y_residuals = y - self.estimator_.predict(X)
         y_residuals = (
             y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
         )
 
         # Calculate the studentized residuals
         studentized_residuals = calculate_studentized_residuals(
-            self.model_, X, y_residuals
+            self.estimator_, X, y_residuals
         )
 
         # Calculate the critical threshold
@@ -97,18 +98,18 @@ class StudentizedResiduals(_ModelResidualsBase):
         )
 
         # Preprocess the data
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate y residuals
-        y_residuals = y - self.model_.predict(X)
+        y_residuals = y - self.estimator_.predict(X)
         y_residuals = (
             y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
         )
 
         # Calculate the studentized residuals
         studentized_residuals = calculate_studentized_residuals(
-            self.model_, X, y_residuals
+            self.estimator_, X, y_residuals
         )
         return np.where(studentized_residuals > self.critical_value_, -1, 1)
 
@@ -138,16 +139,16 @@ class StudentizedResiduals(_ModelResidualsBase):
             X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
         # Apply preprocessing if available
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Calculate y residuals
-        y_residuals = y - self.model_.predict(X)
+        y_residuals = y - self.estimator_.predict(X)
         y_residuals = (
             y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
         )
 
-        return calculate_studentized_residuals(self.model_, X, y_residuals)
+        return calculate_studentized_residuals(self.estimator_, X, y_residuals)
 
     def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
         """Calculate the critical value for outlier detection.
