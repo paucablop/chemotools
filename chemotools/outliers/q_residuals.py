@@ -30,10 +30,10 @@ class QResiduals(_ModelResidualsBase):
 
     Attributes
     ----------
-    model_ : ModelType
+    estimator_ : ModelType
         The fitted model of type _BasePCA or _PLS.
 
-    preprocessing_ : Optional[Pipeline]
+    transformer_ : Optional[Pipeline]
         Preprocessing steps before the model.
 
     n_features_in_ : int
@@ -60,7 +60,7 @@ class QResiduals(_ModelResidualsBase):
         confidence: float = 0.95,
         method: Literal["chi-square", "jackson-mudholkar", "percentile"] = "percentile",
     ) -> None:
-        self.method = method
+        self.model, self.confidence, self.method = model, confidence, method
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "QResiduals":
@@ -79,8 +79,8 @@ class QResiduals(_ModelResidualsBase):
         """
         X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
-        if self.preprocessing_:
-            X = self.preprocessing_.fit_transform(X)
+        if self.transformer_:
+            X = self.transformer_.fit_transform(X)
 
         # Compute the critical threshold using the chosen method
         self.critical_value_ = self._calculate_critical_value(X)
@@ -138,12 +138,12 @@ class QResiduals(_ModelResidualsBase):
             X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
         # Apply preprocessing if available
-        if self.preprocessing_:
-            X = self.preprocessing_.transform(X)
+        if self.transformer_:
+            X = self.transformer_.transform(X)
 
         # Compute reconstruction error (Q residuals)
-        X_transformed = self.model_.transform(X)
-        X_reconstructed = self.model_.inverse_transform(X_transformed)
+        X_transformed = self.estimator_.transform(X)
+        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
         Q_residuals = np.sum((X - X_reconstructed) ** 2, axis=1)
 
         return Q_residuals
@@ -172,8 +172,8 @@ class QResiduals(_ModelResidualsBase):
 
         """
         # Compute Q residuals for training data
-        X_transformed = self.model_.transform(X)
-        X_reconstructed = self.model_.inverse_transform(X_transformed)
+        X_transformed = self.estimator_.transform(X)
+        X_reconstructed = self.estimator_.inverse_transform(X_transformed)
         residuals = X - X_reconstructed
 
         if self.method == "chi-square":
