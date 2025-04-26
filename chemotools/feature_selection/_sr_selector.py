@@ -67,7 +67,7 @@ class SRSelector(_PLSFeatureSelectorBase):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        # Calculate the VIP scores
+        # Calculate the SR scores
         self.feature_scores_ = self._calculate_features(X)
 
         # Calculate the support mask
