@@ -82,7 +82,7 @@ class Leverage(_ModelResidualsBase):
             X = self.transformer_.transform(X)
 
         # Calculate outliers based on samples with too high leverage
-        leverage = calculate_leverage(self.estimator_, X)
+        leverage = calculate_leverage(X, self.estimator_)
         return np.where(leverage > self.critical_value_, -1, 1)
 
     def predict_residuals(
