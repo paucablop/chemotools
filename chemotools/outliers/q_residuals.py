@@ -7,7 +7,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .utils import calculate_decoded_spectrum, calculate_residual_spectrum
+from .utils import calculate_residual_spectrum
 
 
 class QResiduals(_ModelResidualsBase):

@@ -112,19 +112,19 @@ class Leverage(_ModelResidualsBase):
             X = self.transformer_.transform(X)
 
         # Calculate the leverage
-        return calculate_leverage(self.estimator_, X)
+        return calculate_leverage(X, self.estimator_)
 
-    def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
+    def _calculate_critical_value(self, X: np.ndarray) -> float:
         """Calculate the critical value for outlier detection using the percentile outlier method."""
 
         # Calculate the leverage of the samples
-        leverage = calculate_leverage(self.estimator_, X)
+        leverage = calculate_leverage(X, self.estimator_)
 
         # Calculate the critical value
         return np.percentile(leverage, self.confidence * 100)
 
 
-def calculate_leverage(model: ModelTypes, X: Optional[np.ndarray]) -> np.ndarray:
+def calculate_leverage(X: np.ndarray, model: ModelTypes) -> np.ndarray:
     """
     Calculate the leverage of the training samples in a PLS/PCA-like model.
 

@@ -150,7 +150,7 @@ class StudentizedResiduals(_ModelResidualsBase):
 
         return calculate_studentized_residuals(self.estimator_, X, y_residuals)
 
-    def _calculate_critical_value(self, X: Optional[np.ndarray]) -> float:
+    def _calculate_critical_value(self, X: np.ndarray) -> float:
         """Calculate the critical value for outlier detection.
 
         Parameters
@@ -190,7 +190,7 @@ def calculate_studentized_residuals(
     """
 
     # Calculate the leverage of the samples
-    leverage = calculate_leverage(model, X)
+    leverage = calculate_leverage(X, model)
 
     # Calculate the standard deviation of the residuals
     std = np.sqrt(np.sum(y_residuals**2, axis=0) / (X.shape[0] - model.n_components))
