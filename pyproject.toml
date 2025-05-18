@@ -11,7 +11,7 @@ python = "^3.10"
 numpy = "^2.0.0"
 pandas = "^2.0.0"
 polars = "^1.17.0"
-pyarrow = "^18.0.0"
+pyarrow = ">=18,<21"
 scikit-learn = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
