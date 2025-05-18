@@ -125,8 +125,8 @@ class SRSelector(_PLSFeatureSelectorBase):
         X_hat = ttp @ ptp.T
 
         # Compute squared norms directly
-        total_ss = np.linalg.norm(X, axis=0)**2
-        explained_ss = np.linalg.norm(X_hat, axis=0)**2
+        total_ss = np.linalg.norm(X, axis=0) ** 2
+        explained_ss = np.linalg.norm(X_hat, axis=0) ** 2
 
         # Calculate residual sum of squares
         residual_ss = total_ss - explained_ss

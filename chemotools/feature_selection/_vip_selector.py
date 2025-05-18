@@ -106,8 +106,12 @@ class VIPSelector(_PLSFeatureSelectorBase):
             The calculated feature scores based on the selected method.
         """
         # Calculate sum of squares of y_loadings and x_scores
-        sum_of_squares_y_loadings = np.sum(self.estimator_.y_loadings_**2, axis=0)
-        sum_of_squares_x_scores = np.sum(self.estimator_.x_scores_**2, axis=0)
+        sum_of_squares_y_loadings = (
+            np.linalg.norm(self.estimator_.y_loadings_, ord=2, axis=0) ** 2
+        )
+        sum_of_squares_x_scores = (
+            np.linalg.norm(self.estimator_.x_scores_, ord=2, axis=0) ** 2
+        )
 
         # Calculate the sum of squares
         sum_of_squares = sum_of_squares_y_loadings * sum_of_squares_x_scores
