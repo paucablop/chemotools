@@ -118,8 +118,7 @@ class SRSelector(_PLSFeatureSelectorBase):
 
         # Project X onto the regression vector
         ttp = X @ bpls_norm
-        ttp_pinv = np.linalg.pinv(ttp.T @ ttp)
-        ptp = X.T @ ttp @ ttp_pinv
+        ptp = X.T @ np.linalg.pinv(ttp).T
 
         # Predicted part of X
         X_hat = ttp @ ptp.T
