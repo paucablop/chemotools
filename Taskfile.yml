@@ -1,0 +1,9 @@
+# Taskfile.yml
+version: '3'
+
+tasks:
+  shell:
+    desc: "Activate Poetry shell (creates venv if needed)"
+    cmds:
+      - poetry install --sync  # Ensure venv exists with all deps
+      - poetry shell
