@@ -16,7 +16,7 @@ scikit-learn = "^1.4.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"
-black = "^24.8.0"
+black = ">=24.8,<26.0"
 ruff = "^0.8.0"
 mypy = "^1.13.0"
 pandas-stubs = "^2.2.3.241126"
