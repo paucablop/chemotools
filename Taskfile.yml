@@ -1,9 +1,90 @@
 # Taskfile.yml
 version: '3'
 
+vars:
+  UV: uv
+
 tasks:
-  shell:
-    desc: "Activate Poetry shell (creates venv if needed)"
+  # 🛠️ Environment
+  install:
+    desc: Install all dependencies
     cmds:
-      - poetry install --sync  # Ensure venv exists with all deps
-      - poetry shell
+      - "{{.UV}} sync --all-groups"
+    sources:
+      - pyproject.toml
+      - uv.lock
+    generates:
+      - .venv
+
+  update:
+    desc: Update all project dependencies
+    cmds:
+      - "{{.UV}} lock --upgrade"
+      - "{{.UV}} sync --all-groups"
+
+  clean:
+    desc: Clean up build artifacts and caches
+    cmds:
+      - rm -rf .venv
+      - rm -rf .pytest_cache htmlcov .mypy_cache .ruff_cache
+      - rm -rf dist build *.egg-info
+      - find . -type d -name "__pycache__" -exec rm -rf {} +
+      - find . -type f -name "*.py[co]" -delete
+
+  # 🧹 Code quality
+  format:
+    desc: Format code with Ruff
+    cmds:
+      - "{{.UV}} run ruff format ."
+
+  format-check:
+    desc: Check formatting (without modifying files)
+    cmds:
+      - "{{.UV}} run ruff format --check ."
+
+  lint:
+    desc: Run Ruff lint checks
+    cmds:
+      - "{{.UV}} run ruff check ."
+
+  lint-fix:
+    desc: Autofix lint issues with Ruff
+    cmds:
+      - "{{.UV}} run ruff check . --fix"
+
+  type-check:
+    desc: Run MyPy type checks
+    cmds:
+      - "{{.UV}} run mypy ."
+
+  # 🧪 Testing
+  test:
+    desc: Run tests with pytest
+    cmds:
+      - "{{.UV}} run pytest tests/"
+
+  coverage:
+    desc: Run tests with coverage report
+    cmds:
+      - "{{.UV}} run pytest --cov=chemotools --cov-report=xml --cov-report=term-missing"
+
+  # 📦 Packaging
+  build:
+    desc: Build the package
+    cmds:
+      - "{{.UV}} build"
+
+  # 🚦 Meta tasks
+  check:
+    desc: Run all quality checks (format-check, lint, type-check, test)
+    cmds:
+      - task: format-check
+      - task: lint
+      - task: type-check
+      - task: test
+
+  setup:
+    desc: Set up development environment (install + checks)
+    cmds:
+      - task: install
+      - task: check

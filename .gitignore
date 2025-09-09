@@ -125,11 +125,14 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+# Notebooks
+*.ipynb
+
 # Pyre type checker
 .pyre/
 
 # VScode
 .vscode/
 
-# Notebooks
-*.ipynb
+# Task files
+*.task
