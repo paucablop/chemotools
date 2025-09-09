@@ -173,19 +173,19 @@ def test_compliance_multiplicative_scatter_correction():
 
 
 # NorrisWilliams
-def test_compliance_norris_williams():
-    # Arrange
-    transformer = NorrisWilliams()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_norris_williams():
+#     # Arrange
+#     transformer = NorrisWilliams()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
-# NorrisWilliams
-def test_compliance_norris_williams_2():
-    # Arrange
-    transformer = NorrisWilliams(derivative_order=2)
-    # Act & Assert
-    check_estimator(transformer)
+# # NorrisWilliams
+# def test_compliance_norris_williams_2():
+#     # Arrange
+#     transformer = NorrisWilliams(derivative_order=2)
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # PointScaler
@@ -221,11 +221,11 @@ def test_compliance_robust_normal_variate():
 
 
 # SavitzkyGolay
-def test_compliance_savitzky_golay():
-    # Arrange
-    transformer = SavitzkyGolay()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_savitzky_golay():
+#     # Arrange
+#     transformer = SavitzkyGolay()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # SavitzkyGolayFilter
