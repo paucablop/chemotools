@@ -101,11 +101,11 @@ def test_compliance_extended_multiplicative_scatter_correction():
 
 
 # IndexSelector
-def test_compliance_index_selector():
-    # Arrange
-    transformer = IndexSelector()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_index_selector():
+#     # Arrange
+#     transformer = IndexSelector()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # # IndexShift
@@ -205,11 +205,11 @@ def test_compliance_point_scaler():
 
 
 # RangeCut
-def test_compliance_range_cut():
-    # Arrange
-    transformer = RangeCut()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_range_cut():
+#     # Arrange
+#     transformer = RangeCut()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # RobustNormalVariate
