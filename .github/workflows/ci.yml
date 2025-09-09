@@ -6,6 +6,8 @@ on:
       - '**'
   pull_request:
 
+  workflow_dispatch:
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
@@ -26,6 +28,8 @@ jobs:
 
       - name: Install Task
         uses: arduino/setup-task@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Print versions
         run: |
