@@ -10,9 +10,7 @@ from chemotools.datasets import (
 
 
 def test_load_coffee_pandas():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     coffee_spectra, coffee_labels = load_coffee()
 
     # Assert
@@ -23,9 +21,7 @@ def test_load_coffee_pandas():
 
 
 def test_load_coffee_polars():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     coffee_spectra, coffee_labels = load_coffee(set_output="polars")
 
     # Assert
@@ -36,17 +32,13 @@ def test_load_coffee_polars():
 
 
 def test_load_coffee_exception():
-    # Arrange
-
-    # Act and Assert
+    # Arrange, Act & Assert
     with pytest.raises(ValueError):
         coffee_spectra, coffee_labels = load_coffee(set_output="plars")
 
 
 def test_load_fermentation_test_pandas():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     test_spectra, test_hplc = load_fermentation_test()
 
     # Assert
@@ -57,9 +49,7 @@ def test_load_fermentation_test_pandas():
 
 
 def test_load_fermentation_test_polars():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     test_spectra, test_hplc = load_fermentation_test(set_output="polars")
 
     # Assert
@@ -70,17 +60,13 @@ def test_load_fermentation_test_polars():
 
 
 def test_load_fermentation_test_exception():
-    # Arrange
-
-    # Act and Assert
+    # Arrange, Act & Assert
     with pytest.raises(ValueError):
         test_spectra, test_hplc = load_fermentation_test(set_output="plars")
 
 
 def test_load_fermentation_train_pandas():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     train_spectra, train_hplc = load_fermentation_train()
 
     # Assert
@@ -91,9 +77,7 @@ def test_load_fermentation_train_pandas():
 
 
 def test_load_fermentation_train_polars():
-    # Arrange
-
-    # Act
+    # Arrange & Act
     train_spectra, train_hplc = load_fermentation_train(set_output="polars")
 
     # Assert
@@ -104,8 +88,6 @@ def test_load_fermentation_train_polars():
 
 
 def test_load_fermentation_train_exception():
-    # Arrange
-
-    # Act and Assert
+    # Arrange, Act & Assert
     with pytest.raises(ValueError):
         train_spectra, train_hplc = load_fermentation_train(set_output="plars")
