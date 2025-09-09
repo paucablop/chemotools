@@ -1,13 +1,6 @@
 import numpy as np
-import pytest
 
 
-from chemotools.scatter import (
-    ExtendedMultiplicativeScatterCorrection,
-    MultiplicativeScatterCorrection,
-    RobustNormalVariate,
-    StandardNormalVariate,
-)
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 
 

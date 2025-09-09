@@ -102,4 +102,3 @@ def test_multiplicative_scatter_correction_with_wrong_method(spectrum):
     # Act & Assert
     with pytest.raises(ValueError):
         msc.fit_transform(spectrum)
-

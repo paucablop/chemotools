@@ -3,6 +3,7 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.scatter import StandardNormalVariate
 
+
 # Test compliance with scikit-learn
 def test_compliance_standard_normal_variate():
     # Arrange

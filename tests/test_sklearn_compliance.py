@@ -1,12 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
 
-from chemotools.scatter import (
-    ExtendedMultiplicativeScatterCorrection,
-    MultiplicativeScatterCorrection,
-    RobustNormalVariate,
-    StandardNormalVariate,
-)
 from chemotools.smooth import (
     MeanFilter,
     MedianFilter,

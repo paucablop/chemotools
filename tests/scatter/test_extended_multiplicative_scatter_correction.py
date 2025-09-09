@@ -2,7 +2,10 @@ import numpy as np
 import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.scatter import ExtendedMultiplicativeScatterCorrection, MultiplicativeScatterCorrection
+from chemotools.scatter import (
+    ExtendedMultiplicativeScatterCorrection,
+    MultiplicativeScatterCorrection,
+)
 
 
 # Test compliance with scikit-learn
