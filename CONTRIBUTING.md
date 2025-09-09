@@ -1,57 +1,82 @@
-We appreciate your interest in contributing to Chemotools and welcome contributions from everyone. Whether you have bug reports, ideas for new features, or want to improve the code, your contributions are valuable. Check the [Project Board](https://github.com/users/paucablop/projects/4) to see what we're working on.
+# Contributing to chemotools
 
-# Contributing to Chemotools
+Thanks for your interest in contributing to **`chemotools`** 🎉 
+We welcome bug reports, feature ideas, code improvements, and documentation updates. Every contribution helps!
 
-Chemotools is a project designed for production code, focusing on maintaining high-quality standards. Please adhere to the following guidelines when contributing:
+You can also check the [Project Board](https://github.com/users/paucablop/projects/4) to see what’s currently in progress.
 
-## Project Functionality
+---
 
-- **Scikit-Learn API Implementation:** All functions within Chemotools must implement the Scikit-Learn API for consistency and interoperability.
+## Guidelines
 
-- **Avoiding Redundancy:** Functions that are already present in other libraries implementing the Scikit-Learn API should not be implemented in Chemotools to prevent redundancy.
+`chemotools` is designed for production use, with a focus on **quality and consistency**.  
+When contributing, please keep in mind:
 
-- **Unit Testing:** Every function in Chemotools must be accompanied by thorough unit tests. This ensures the reliability and robustness of the codebase.
+- ✅ **Follow the Scikit-Learn API**  
+  All transformers must implement the [scikit-learn API](https://scikit-learn.org/stable/developers/develop.html) for interoperability.  
 
-We welcome your contributions and appreciate your commitment to maintaining the quality of Chemotools. Please follow the guidelines outlined below to ensure a smooth and effective contribution process.
+- ✅ **Avoid redundancy**  
+  Don’t re-implement functionality already available in other libraries that follow the same API.  
 
+- ✅ **Write tests**  
+  Every new function or fix must include unit tests to ensure reliability.  
 
-## Reporting Bugs
+- ✅ **Maintain quality**  
+  Use the provided tooling (formatting, linting, typing, tests) to keep the codebase consistent.  
 
-If you find a bug or unexpected behavior, please open a detailed issue on the GitHub repository. Include error messages and steps to reproduce, along with sample code or data if possible.
+---
 
-## Suggesting Enhancements
+## How to Contribute
 
-For new features or enhancements, open an issue with a detailed description and benefits. Include example code or use cases to illustrate how the feature would be used.
+1. **Report issues**  
+   - For bugs: open an [issue](https://github.com/paucablop/chemotools/issues) with steps to reproduce and sample code/data if possible.  
+   - For enhancements: describe the idea, its benefits, and example usage.  
 
-## Submitting Changes
+2. **Propose changes**  
+   - Open an issue first so we can discuss scope.  
+   - Create a new branch for your contribution.  
+   - Make your changes, including tests and documentation updates if needed. 
+   - Branches should be shor-lived with a well defined scope, follwoing a [truck-based development](https://trunkbaseddevelopment.com/) philosophy.
 
-To contribute code changes:
+3. **Check your work**  
+   Use the [Taskfile](./Taskfile.yml) for a quick workflow:  
 
-1. Open an issue describing the changes you want to implement.
-2. We'll review and discuss the issue to determine the scope.
-3. Once agreed, create a new branch for your contribution (we follow trunk-based development).
-4. Write code and tests, adhering to Chemotools coding style and conventions.
-5. Run tests using the provided framework to ensure your changes don't introduce errors.
-6. Submit a pull request with a detailed description and the problem your changes solve.
+   ```bash
+   task install     # install dependencies
+   task check       # run formatting, linting, typing, tests
+   task coverage    # run tests with coverage
+   task build       # build the package
+   ```
 
-We'll review promptly and provide feedback. If changes are requested, make them quickly to keep the process moving.
+4. **Open a Pull Request (PR)**
+
+   * Explain what the change does and why.
+   * Ensure CI checks pass (formatting, lint, type checks, tests).
+   * Be responsive to feedback.
+
 
 ## Code Style
 
-Follow Chemotools coding style:
-- Indent with four spaces
-- Use descriptive variable names
-- Avoid magic numbers or hard-coded strings
-- Format code using [Black](https://black.readthedocs.io/en/stable/)
+* Code is automatically formatted and linted using [Ruff](https://docs.astral.sh/ruff/).
+* Type checking is done with [MyPy](http://mypy-lang.org/).
+* Follow general Python best practices: descriptive names, no magic numbers, clear docstrings.
 
-## Codecov
 
-Ensure your changes don't reduce Chemotools' test coverage. We use Codecov to track coverage.
 
-## Documentation
+## Testing & Coverage
 
-Update Chemotools documentation if your changes affect the API or functionality.
+* Run tests with:
+
+  ```bash
+  task test
+  ```
+
+* Coverage is tracked with [Codecov](https://codecov.io/). PRs should not reduce coverage.
+
+---
 
 ## License
 
-By contributing to Chemotools, you agree that your contributions will be licensed under its [MIT license](link-to-license).
+By contributing, you agree that your contributions will be licensed under the project’s [MIT License](LICENSE).
+
+

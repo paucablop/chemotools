@@ -61,20 +61,14 @@ spectra_transformed = preprocessing.fit_transform(spectra)
 
 ## Development
 
-Clone the repo and install dependencies with [uv](https://github.com/astral-sh/uv):
+This project uses [uv](https://github.com/astral-sh/uv) for dependency management and [Task](https://taskfile.dev) to simplify common development workflows.
+You can get started quickly by using the predefined [Taskfile](./Taskfile.yml), which provides handy shortcuts such as:
 
 ```bash
-uv sync --all-groups
-uv pip install .[dev]
-```
-
-Common development tasks are defined in the [Taskfile](./Taskfile.yml):
-
-```bash
-task install     # install dependencies
-task check       # run linting, formatting, typing, tests
-task coverage    # run tests with coverage
-task build       # build the package
+task install     # install all dependencies
+task check       # run formatting, linting, typing, and tests
+task coverage    # run tests with coverage reporting
+task build       # build the package for distribution
 ```
 
 ## Contributing
