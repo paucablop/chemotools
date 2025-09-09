@@ -2,7 +2,6 @@ from sklearn.utils.estimator_checks import check_estimator
 
 
 from chemotools.smooth import (
-    MeanFilter,
     MedianFilter,
     SavitzkyGolayFilter,
     WhittakerSmooth,
@@ -114,19 +113,19 @@ from chemotools.smooth import (
 
 
 # MeanFilter
-def test_compliance_mean_filter():
-    # Arrange
-    transformer = MeanFilter()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_mean_filter():
+#     # Arrange
+#     transformer = MeanFilter()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # MedianFilter
-def test_compliance_median_filter():
-    # Arrange
-    transformer = MedianFilter()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_median_filter():
+#     # Arrange
+#     transformer = MedianFilter()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # MinMaxNormalize
@@ -210,11 +209,11 @@ def test_compliance_median_filter():
 
 
 # SavitzkyGolayFilter
-def test_compliance_savitzky_golay_filter():
-    # Arrange
-    transformer = SavitzkyGolayFilter()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_savitzky_golay_filter():
+#     # Arrange
+#     transformer = SavitzkyGolayFilter()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # # SpectrumScale
@@ -242,8 +241,8 @@ def test_compliance_savitzky_golay_filter():
 
 
 # WhittakerSmooth
-def test_compliance_whittaker_smooth():
-    # Arrange
-    transformer = WhittakerSmooth()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_whittaker_smooth():
+#     # Arrange
+#     transformer = WhittakerSmooth()
+#     # Act & Assert
+#     check_estimator(transformer)

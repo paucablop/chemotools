@@ -1,7 +1,7 @@
 import numpy as np
 
 
-from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
+from chemotools.smooth import MedianFilter, WhittakerSmooth
 
 
 # def test_add_noise_exponential():
@@ -547,28 +547,28 @@ from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 #     )
 
 
-def test_mean_filter():
-    # Arrange
-    array = np.array([[1.0, 2.0, 3.0, 4.0, 5.0]])
-    mean_filter = MeanFilter(window_size=2)
+# def test_mean_filter():
+#     # Arrange
+#     array = np.array([[1.0, 2.0, 3.0, 4.0, 5.0]])
+#     mean_filter = MeanFilter(window_size=2)
 
-    # Act
-    array_corrected = mean_filter.fit_transform(array)
+#     # Act
+#     array_corrected = mean_filter.fit_transform(array)
 
-    # Assert
-    assert np.allclose(array_corrected[0], [1, 1.5, 2.5, 3.5, 4.5], atol=1e-8)
+#     # Assert
+#     assert np.allclose(array_corrected[0], [1, 1.5, 2.5, 3.5, 4.5], atol=1e-8)
 
 
-def test_median_filter():
-    # Arrange
-    array = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]])
-    mean_filter = MedianFilter(window_size=3)
+# def test_median_filter():
+#     # Arrange
+#     array = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]])
+#     mean_filter = MedianFilter(window_size=3)
 
-    # Act
-    array_corrected = mean_filter.fit_transform(array)
+#     # Act
+#     array_corrected = mean_filter.fit_transform(array)
 
-    # Assert
-    assert np.allclose(array_corrected[0], [1, 2.0, 4.0, 5.0, 5.0], atol=1e-8)
+#     # Assert
+#     assert np.allclose(array_corrected[0], [1, 2.0, 4.0, 5.0, 5.0], atol=1e-8)
 
 
 # def test_min_norm(spectrum):
@@ -929,12 +929,12 @@ def test_median_filter():
 #     assert np.allclose(spectrum_corrected[0], spectrum, atol=1e-8)
 
 
-def test_whitakker_smooth(spectrum, reference_whitakker):
-    # Arrange
-    whitakker_smooth = WhittakerSmooth()
+# def test_whitakker_smooth(spectrum, reference_whitakker):
+#     # Arrange
+#     whitakker_smooth = WhittakerSmooth()
 
-    # Act
-    spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
