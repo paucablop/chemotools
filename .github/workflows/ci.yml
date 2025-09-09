@@ -22,9 +22,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-        env:
-          PATH: ~/.local/bin:$PATH
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Task
         uses: arduino/setup-task@v2
