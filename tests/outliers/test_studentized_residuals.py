@@ -4,7 +4,6 @@ from sklearn.cross_decomposition import PLSRegression
 from chemotools.outliers import StudentizedResiduals
 
 
-
 # Test functionality
 def test_studentized_residuals(dummy_data_loader):
     # Arrange

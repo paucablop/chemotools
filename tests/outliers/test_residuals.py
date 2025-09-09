@@ -13,6 +13,7 @@ from chemotools.outliers import (
 
 # Test functionality
 
+
 # Parametrized test
 @pytest.mark.parametrize(
     "model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier",
