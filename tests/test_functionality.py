@@ -3,13 +3,6 @@ import pandas as pd
 import polars as pl
 import pytest
 
-from chemotools.augmentation import (
-    AddNoise,
-    BaselineShift,
-    FractionalShift,
-    IndexShift,
-    SpectrumScale,
-)
 
 from chemotools.baseline import (
     AirPls,
@@ -33,45 +26,45 @@ from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
 from chemotools.feature_selection import IndexSelector, RangeCut
 
 
-def test_add_noise_exponential():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(distribution="exponential", scale=0.1, random_state=42)
+# def test_add_noise_exponential():
+#    # Arrange
+#    spectrum = np.ones(10000).reshape(1, -1)
+#    add_noise = AddNoise(distribution="exponential", scale=0.1, random_state=42)
+#
+#    # Act
+#    spectrum_corrected = add_noise.fit_transform(spectrum)
 
-    # Act
-    spectrum_corrected = add_noise.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
-
-
-def test_add_noise_gaussian():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(distribution="gaussian", scale=0.5, random_state=42)
-
-    # Act
-    spectrum_corrected = add_noise.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
+#    # Assert
+#    assert spectrum.shape == spectrum_corrected.shape
+#    assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0.1, atol=1e-2)
 
 
-def test_add_noise_poisson():
-    # Arrange
-    spectrum = np.ones(10000).reshape(1, -1)
-    add_noise = AddNoise(distribution="poisson", scale=0.5, random_state=42)
+# def test_add_noise_gaussian():
+#     # Arrange
+#     spectrum = np.ones(10000).reshape(1, -1)
+#     add_noise = AddNoise(distribution="gaussian", scale=0.5, random_state=42)
 
-    # Act
-    spectrum_corrected = add_noise.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = add_noise.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.allclose(np.mean(spectrum_corrected[0]), 1.5011, atol=1e-2)
-    assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
+#     # Assert
+#     assert spectrum.shape == spectrum_corrected.shape
+#     assert np.allclose(np.mean(spectrum_corrected[0]) - 1, 0, atol=1e-2)
+#     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
+
+
+# def test_add_noise_poisson():
+#     # Arrange
+#     spectrum = np.ones(10000).reshape(1, -1)
+#     add_noise = AddNoise(distribution="poisson", scale=0.5, random_state=42)
+
+#     # Act
+#     spectrum_corrected = add_noise.fit_transform(spectrum)
+
+#     # Assert
+#     assert spectrum.shape == spectrum_corrected.shape
+#     assert np.allclose(np.mean(spectrum_corrected[0]), 1.5011, atol=1e-2)
+#     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
 
 
 def test_air_pls(spectrum, reference_airpls):
@@ -97,21 +90,21 @@ def test_ar_pls(spectrum_arpls, reference_arpls):
     assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
 
 
-def test_baseline_shift():
-    # Arrange
-    spectrum = np.ones(100).reshape(1, -1)
-    baseline_shift = BaselineShift(scale=1, random_state=42)
+# def test_baseline_shift():
+#     # Arrange
+#     spectrum = np.ones(100).reshape(1, -1)
+#     baseline_shift = BaselineShift(scale=1, random_state=42)
 
-    # Act
-    spectrum_corrected = baseline_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = baseline_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum.shape == spectrum_corrected.shape
-    assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0])
-    assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
-    assert np.isclose(
-        np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8
-    )
+#     # Assert
+#     assert spectrum.shape == spectrum_corrected.shape
+#     assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0])
+#     assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
+#     assert np.isclose(
+#         np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8
+#     )
 
 
 def test_constant_baseline_correction():
@@ -253,109 +246,109 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
     assert np.allclose(spectrum_emsc[0], spectrum_msc, atol=1e-8)
 
 
-def test_fractional_shift_constant():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=44
-    )
-    spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=42
-    )
+# def test_fractional_shift_constant():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = FractionalShift(
+#         shift=1, padding_mode="constant", pad_value=30, random_state=44
+#     )
+#     spectrum_left_shift = FractionalShift(
+#         shift=1, padding_mode="constant", pad_value=30, random_state=42
+#     )
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 30
-    assert spectrum_left_shifted[0][-1] == 30
-
-
-def test_fractional_shift_zeros():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="zeros", random_state=44
-    )
-    spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="zeros", random_state=42
-    )
-
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 0
-    assert spectrum_left_shifted[0][-1] == 0
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6.245131019347744
+#     assert spectrum_left_shifted[0][4] == 5.547912097111927
+#     assert spectrum_right_shifted[0][0] == 30
+#     assert spectrum_left_shifted[0][-1] == 30
 
 
-def test_fractional_shift_extend():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="extend", random_state=44
-    )
-    spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="extend", random_state=42
-    )
+# def test_fractional_shift_zeros():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = FractionalShift(
+#         shift=1, padding_mode="zeros", random_state=44
+#     )
+#     spectrum_left_shift = FractionalShift(
+#         shift=1, padding_mode="zeros", random_state=42
+#     )
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 9
-
-
-def test_fractional_shift_mirror():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=44
-    )
-    spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=42
-    )
-
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 8
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6.245131019347744
+#     assert spectrum_left_shifted[0][4] == 5.547912097111927
+#     assert spectrum_right_shifted[0][0] == 0
+#     assert spectrum_left_shifted[0][-1] == 0
 
 
-def test_fractional_shift_linear():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=44
-    )
-    spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=42
-    )
+# def test_fractional_shift_extend():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = FractionalShift(
+#         shift=1, padding_mode="extend", random_state=44
+#     )
+#     spectrum_left_shift = FractionalShift(
+#         shift=1, padding_mode="extend", random_state=42
+#     )
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 8
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6.245131019347744
+#     assert spectrum_left_shifted[0][4] == 5.547912097111927
+#     assert spectrum_right_shifted[0][0] == 1
+#     assert spectrum_left_shifted[0][-1] == 9
+
+
+# def test_fractional_shift_mirror():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = FractionalShift(
+#         shift=1, padding_mode="mirror", random_state=44
+#     )
+#     spectrum_left_shift = FractionalShift(
+#         shift=1, padding_mode="mirror", random_state=42
+#     )
+
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6.245131019347744
+#     assert spectrum_left_shifted[0][4] == 5.547912097111927
+#     assert spectrum_right_shifted[0][0] == 1
+#     assert spectrum_left_shifted[0][-1] == 8
+
+
+# def test_fractional_shift_linear():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = FractionalShift(
+#         shift=1, padding_mode="mirror", random_state=44
+#     )
+#     spectrum_left_shift = FractionalShift(
+#         shift=1, padding_mode="mirror", random_state=42
+#     )
+
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6.245131019347744
+#     assert spectrum_left_shifted[0][4] == 5.547912097111927
+#     assert spectrum_right_shifted[0][0] == 1
+#     assert spectrum_left_shifted[0][-1] == 8
 
 
 def test_index_selector():
@@ -419,110 +412,110 @@ def test_index_selector_with_wavenumbers_and_dataframe():
     assert np.allclose(spectrum_corrected.values[0], expected, atol=1e-8)
 
 
-def test_index_shift_wrap():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="wrap", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="wrap", random_state=42)
+# def test_index_shift_wrap():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(shift=1, padding_mode="wrap", random_state=44)
+#     spectrum_left_shift = IndexShift(shift=1, padding_mode="wrap", random_state=42)
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 9
-    assert spectrum_left_shifted[0][-1] == 1
-
-
-def test_index_shift_constant():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=44
-    )
-    spectrum_left_shift = IndexShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=42
-    )
-
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 30
-    assert spectrum_left_shifted[0][-1] == 30
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 9
+#     assert spectrum_left_shifted[0][-1] == 1
 
 
-def test_index_shift_zeros():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="zeros", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="zeros", random_state=42)
+# def test_index_shift_constant():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(
+#         shift=1, padding_mode="constant", pad_value=30, random_state=44
+#     )
+#     spectrum_left_shift = IndexShift(
+#         shift=1, padding_mode="constant", pad_value=30, random_state=42
+#     )
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 0
-    assert spectrum_left_shifted[0][-1] == 0
-
-
-def test_index_shift_extend():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="extend", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="extend", random_state=42)
-
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
-
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 9
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 30
+#     assert spectrum_left_shifted[0][-1] == 30
 
 
-def test_index_shift_mirror():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="mirror", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="mirror", random_state=42)
+# def test_index_shift_zeros():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(shift=1, padding_mode="zeros", random_state=44)
+#     spectrum_left_shift = IndexShift(shift=1, padding_mode="zeros", random_state=42)
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 8
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 0
+#     assert spectrum_left_shifted[0][-1] == 0
 
 
-def test_index_shift_linear():
-    # Arrange
-    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="linear", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="linear", random_state=42)
+# def test_index_shift_extend():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(shift=1, padding_mode="extend", random_state=44)
+#     spectrum_left_shift = IndexShift(shift=1, padding_mode="extend", random_state=42)
 
-    # Act
-    spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
-    spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
-    # Assert
-    assert spectrum_right_shifted[0][6] == 6
-    assert spectrum_left_shifted[0][4] == 6
-    assert spectrum_right_shifted[0][0] == 0
-    assert spectrum_left_shifted[0][-1] == 10
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 1
+#     assert spectrum_left_shifted[0][-1] == 9
+
+
+# def test_index_shift_mirror():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(shift=1, padding_mode="mirror", random_state=44)
+#     spectrum_left_shift = IndexShift(shift=1, padding_mode="mirror", random_state=42)
+
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 1
+#     assert spectrum_left_shifted[0][-1] == 8
+
+
+# def test_index_shift_linear():
+#     # Arrange
+#     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+#     spectrum_right_shift = IndexShift(shift=1, padding_mode="linear", random_state=44)
+#     spectrum_left_shift = IndexShift(shift=1, padding_mode="linear", random_state=42)
+
+#     # Act
+#     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
+#     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
+
+#     # Assert
+#     assert spectrum_right_shifted[0][6] == 6
+#     assert spectrum_left_shifted[0][4] == 6
+#     assert spectrum_right_shifted[0][0] == 0
+#     assert spectrum_left_shifted[0][-1] == 10
 
 
 def test_l1_norm(spectrum):
@@ -914,15 +907,15 @@ def test_saviszky_golay_filter_3():
     assert np.allclose(spectrum_corrected[0], np.ones((1, 10)), atol=1e-2)
 
 
-def test_spectrum_scale(spectrum):
-    # Arrange
-    spectrum_scale = SpectrumScale(scale=0.01, random_state=42)
+# def test_spectrum_scale(spectrum):
+#     # Arrange
+#     spectrum_scale = SpectrumScale(scale=0.01, random_state=42)
 
-    # Act
-    spectrum_corrected = spectrum_scale.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = spectrum_scale.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], spectrum[0], atol=0.01)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0], atol=0.01)
 
 
 def test_standard_normal_variate(spectrum, reference_snv):

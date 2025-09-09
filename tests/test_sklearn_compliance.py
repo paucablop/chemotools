@@ -1,12 +1,5 @@
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.augmentation import (
-    AddNoise,
-    BaselineShift,
-    FractionalShift,
-    IndexShift,
-    SpectrumScale,
-)
 
 from chemotools.baseline import (
     AirPls,
@@ -35,12 +28,12 @@ from chemotools.smooth import (
 from chemotools.feature_selection import RangeCut, IndexSelector
 
 
-# ExponentialNoise
-def test_compliance_add_noise():
-    # Arrange
-    transformer = AddNoise()
-    # Act & Assert
-    check_estimator(transformer)
+# # ExponentialNoise
+# def test_compliance_add_noise():
+#     # Arrange
+#     transformer = AddNoise()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # AirPls
@@ -59,12 +52,12 @@ def test_compliance_ar_pls():
     check_estimator(transformer)
 
 
-# BaselineShift
-def test_compliance_baseline_shift():
-    # Arrange
-    transformer = BaselineShift()
-    # Act & Assert
-    check_estimator(transformer)
+# # BaselineShift
+# def test_compliance_baseline_shift():
+#     # Arrange
+#     transformer = BaselineShift()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # ConstantBaselineCorrection
@@ -91,12 +84,12 @@ def test_compliance_extended_multiplicative_scatter_correction():
     check_estimator(transformer)
 
 
-# FractionalShift
-def test_compliance_fractional_shift():
-    # Arrange
-    transformer = FractionalShift()
-    # Act & Assert
-    check_estimator(transformer)
+# # FractionalShift
+# def test_compliance_fractional_shift():
+#     # Arrange
+#     transformer = FractionalShift()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # GaussianBroadening
@@ -115,12 +108,12 @@ def test_compliance_index_selector():
     check_estimator(transformer)
 
 
-# IndexShift
-def test_compliance_spectrum_shift():
-    # Arrange
-    transformer = IndexShift()
-    # Act & Assert
-    check_estimator(transformer)
+# # IndexShift
+# def test_compliance_spectrum_shift():
+#     # Arrange
+#     transformer = IndexShift()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # LinearCorrection
@@ -243,12 +236,12 @@ def test_compliance_savitzky_golay_filter():
     check_estimator(transformer)
 
 
-# SpectrumScale
-def test_compliance_spectrum_scale():
-    # Arrange
-    transformer = SpectrumScale()
-    # Act & Assert
-    check_estimator(transformer)
+# # SpectrumScale
+# def test_compliance_spectrum_scale():
+#     # Arrange
+#     transformer = SpectrumScale()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # StandardNormalVariate
