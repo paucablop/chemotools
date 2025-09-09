@@ -36,5 +36,3 @@ def test_point_scaler_with_wavenumbers():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum[0][3], atol=1e-8)
-
-

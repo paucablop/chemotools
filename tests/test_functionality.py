@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 
-from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
     MultiplicativeScatterCorrection,

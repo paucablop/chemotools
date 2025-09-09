@@ -1,7 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
 
-from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
     MultiplicativeScatterCorrection,
