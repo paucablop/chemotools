@@ -1,18 +1,5 @@
 import numpy as np
-import pandas as pd
-import polars as pl
 import pytest
-
-
-from chemotools.baseline import (
-    AirPls,
-    ArPls,
-    ConstantBaselineCorrection,
-    LinearCorrection,
-    NonNegative,
-    SubtractReference,
-)
-from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 
 
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
@@ -23,7 +10,6 @@ from chemotools.scatter import (
     StandardNormalVariate,
 )
 from chemotools.smooth import MeanFilter, MedianFilter, WhittakerSmooth
-from chemotools.feature_selection import IndexSelector, RangeCut
 
 
 # def test_add_noise_exponential():

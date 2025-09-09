@@ -1,12 +1,3 @@
-import numpy as np
-import pytest
-
-from sklearn.exceptions import NotFittedError
-
-
-from chemotools.feature_selection import SRSelector, VIPSelector
-
-
 ### SRSelector ###
 # def test_sr_selector_with_fitted_pls(fitted_pls, dummy_data_loader):
 #     """Test SRSelector with fitted PLS model.

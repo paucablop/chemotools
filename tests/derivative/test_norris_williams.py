@@ -53,4 +53,3 @@ def test_norris_williams_wrong_filter():
     # Act & Assert
     with pytest.raises(ValueError):
         norris_williams_filter.fit_transform(array)
-

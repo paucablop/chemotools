@@ -1,17 +1,6 @@
 from sklearn.utils.estimator_checks import check_estimator
 
 
-from chemotools.baseline import (
-    AirPls,
-    ArPls,
-    ConstantBaselineCorrection,
-    CubicSplineCorrection,
-    LinearCorrection,
-    NonNegative,
-    PolynomialCorrection,
-    SubtractReference,
-)
-from chemotools.derivative import NorrisWilliams, SavitzkyGolay
 from chemotools.scale import MinMaxScaler, NormScaler, PointScaler
 from chemotools.scatter import (
     ExtendedMultiplicativeScatterCorrection,
@@ -25,7 +14,6 @@ from chemotools.smooth import (
     SavitzkyGolayFilter,
     WhittakerSmooth,
 )
-from chemotools.feature_selection import RangeCut, IndexSelector
 
 
 # # ExponentialNoise

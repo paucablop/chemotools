@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.derivative import SavitzkyGolay
