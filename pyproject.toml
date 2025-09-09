@@ -1,36 +1,37 @@
-[tool.poetry]
+[project]
 name = "chemotools"
 version = "0.1.11"
 description = "chemotools: A Python Package that Integrates Chemometrics and scikit-learn"
-authors = ["Pau Cabaneros"]
-license = "MIT License"
+authors = [{ name = "Pau Cabaneros" }]
+requires-python = ">=3.10"
 readme = "README.md"
+license = "MIT"
+dependencies = [
+    "numpy>=2.0.0,<3",
+    "pandas>=2.0.0,<3",
+    "polars>=1.17.0,<2",
+    "pyarrow>=18,<21",
+    "scikit-learn>=1.4.0,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-numpy = "^2.0.0"
-pandas = "^2.0.0"
-polars = "^1.17.0"
-pyarrow = ">=18,<21"
-scikit-learn = "^1.4.0"
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0,<9",
+    "ruff>=0.8.0,<0.9",
+    "mypy>=1.13.0,<2",
+    "pandas-stubs>=2.2.3.241126,<3",
+    "scipy-stubs>=1.15.1.0,<2",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.0"
-black = "^24.8.0"
-ruff = "^0.8.0"
-mypy = "^1.13.0"
-pandas-stubs = "^2.2.3.241126"
-scipy-stubs = "^1.15.1.0"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.poetry-dynamic-versioning]
 enable = true
 
 [tool.pytest.ini_options]
 filterwarnings = "always"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [[tool.mypy.overrides]]
 module = ["sklearn", "sklearn.*", "setuptools", "setuptools.*"]
