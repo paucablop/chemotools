@@ -1,12 +1,10 @@
-name: Python ci
+name: Python CI
 
 on:
   push:
     branches:
-      - main
-
-env:
-  DRY_RUN: false
+      - '**'
+  pull_request:
 
 jobs:
   build-linux:
@@ -17,43 +15,50 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version}}
+
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version}}
+          python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          poetry install
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        env:
+          PATH: ~/.local/bin:$PATH
+
+      - name: Install Task
+        uses: arduino/setup-task@v2
 
       - name: Print versions
         run: |
-          echo "Python version:"
           python --version
-          echo "Black version:"
-          poetry run black --version
+          uv --version
+          task --version
 
-      - name: Run tests
-        run: poetry run pytest 
+      # 1. Install dependencies
+      - name: Install dependencies
+        run: task install
 
+      # 2. Format (check-only)
+      - name: Check formatting
+        run: task format-check
+
+      # 3. Lint
+      - name: Run linting
+        run: task lint
+
+      # 4. Type-check
+      - name: Run type checking
+        run: task type-check
+
+      # 5. Tests with coverage
+      - name: Run tests with coverage
+        run: task coverage
+
+      # 6. Build package
+      - name: Build package
+        run: task build
+
+      # 7. Upload coverage reports to Codecov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
-
-      - name: Run type checking
-        run: poetry run mypy chemotools
-
-      - name: Run formatting
-        run: |
-          poetry run ruff format chemotools
-          git diff --exit-code
-
-      - name: Run linting
-        run: |
-          poetry run ruff check chemotools
-          
-
-      - name: Python build package
-        run: |
-          python -m build
