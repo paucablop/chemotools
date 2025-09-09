@@ -13,12 +13,12 @@ def test_compliance_whittaker_smooth():
 
 
 # Test functionality
-def test_whitakker_smooth(spectrum, reference_whitakker):
+def test_whittaker_smooth(spectrum, reference_whittaker):
     # Arrange
-    whitakker_smooth = WhittakerSmooth()
+    whittaker_smooth = WhittakerSmooth()
 
     # Act
-    spectrum_corrected = whitakker_smooth.fit_transform(spectrum)
+    spectrum_corrected = whittaker_smooth.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
+    assert np.allclose(spectrum_corrected[0], reference_whittaker[0], atol=1e-8)
