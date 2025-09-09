@@ -1,13 +1,3 @@
-from sklearn.utils.estimator_checks import check_estimator
-
-
-from chemotools.smooth import (
-    MedianFilter,
-    SavitzkyGolayFilter,
-    WhittakerSmooth,
-)
-
-
 # # ExponentialNoise
 # def test_compliance_add_noise():
 #     # Arrange

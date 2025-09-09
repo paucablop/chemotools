@@ -22,5 +22,3 @@ def test_whitakker_smooth(spectrum, reference_whitakker):
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference_whitakker[0], atol=1e-8)
-
-

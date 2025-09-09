@@ -1,9 +1,3 @@
-import numpy as np
-
-
-from chemotools.smooth import MedianFilter, WhittakerSmooth
-
-
 # def test_add_noise_exponential():
 #    # Arrange
 #    spectrum = np.ones(10000).reshape(1, -1)
