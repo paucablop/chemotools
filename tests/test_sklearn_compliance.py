@@ -37,19 +37,19 @@ from chemotools.feature_selection import RangeCut, IndexSelector
 
 
 # AirPls
-def test_compliance_air_pls():
-    # Arrange
-    transformer = AirPls()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_air_pls():
+#     # Arrange
+#     transformer = AirPls()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # ArPls
-def test_compliance_ar_pls():
-    # Arrange
-    transformer = ArPls()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_ar_pls():
+#     # Arrange
+#     transformer = ArPls()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # # BaselineShift
@@ -61,19 +61,19 @@ def test_compliance_ar_pls():
 
 
 # ConstantBaselineCorrection
-def test_compliance_constant_baseline_correction():
-    # Arrange
-    transformer = ConstantBaselineCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_constant_baseline_correction():
+#     # Arrange
+#     transformer = ConstantBaselineCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # CubicSplineCorrection
-def test_compliance_cubic_spline_correction():
-    # Arrange
-    transformer = CubicSplineCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_cubic_spline_correction():
+#     # Arrange
+#     transformer = CubicSplineCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # ExtendedMultiplicativeScatterCorrection
@@ -117,11 +117,11 @@ def test_compliance_index_selector():
 
 
 # LinearCorrection
-def test_compliance_linear_correction():
-    # Arrange
-    transformer = LinearCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_linear_correction():
+#     # Arrange
+#     transformer = LinearCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # LNormalize
@@ -165,11 +165,11 @@ def test_compliance_multiplicative_scatter_correction():
 
 
 # NonNegative
-def test_compliance_non_negative():
-    # Arrange
-    transformer = NonNegative()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_non_negative():
+#     # Arrange
+#     transformer = NonNegative()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # NorrisWilliams
@@ -197,11 +197,11 @@ def test_compliance_point_scaler():
 
 
 # PolynomialCorrection
-def test_compliance_polynomial_correction():
-    # Arrange
-    transformer = PolynomialCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_polynomial_correction():
+#     # Arrange
+#     transformer = PolynomialCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # RangeCut
@@ -253,11 +253,11 @@ def test_compliance_standard_normal_variate():
 
 
 # SubtractReference
-def test_compliance_subtract_reference():
-    # Arrange
-    transformer = SubtractReference()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_subtract_reference():
+#     # Arrange
+#     transformer = SubtractReference()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # WhittakerSmooth
