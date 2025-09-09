@@ -57,12 +57,12 @@ jobs:
       - name: Run tests with coverage
         run: task coverage
 
-      # 6. Build package
-      - name: Build package
-        run: task build
-
-      # 7. Upload coverage reports to Codecov
+      # 6. Upload coverage reports to Codecov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      # 7. Build package
+      - name: Build package
+        run: task build
