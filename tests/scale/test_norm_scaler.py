@@ -12,9 +12,6 @@ def test_compliance_l_norm():
     check_estimator(transformer)
 
 
-#
-
-
 # Test functionality
 def test_l1_norm(spectrum):
     # Arrange

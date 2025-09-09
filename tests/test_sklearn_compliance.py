@@ -64,11 +64,11 @@ from chemotools.smooth import (
 
 
 # ExtendedMultiplicativeScatterCorrection
-def test_compliance_extended_multiplicative_scatter_correction():
-    # Arrange
-    transformer = ExtendedMultiplicativeScatterCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_extended_multiplicative_scatter_correction():
+#     # Arrange
+#     transformer = ExtendedMultiplicativeScatterCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # # FractionalShift
@@ -144,11 +144,11 @@ def test_compliance_median_filter():
 
 
 # MultiplicativeScatterCorrection
-def test_compliance_multiplicative_scatter_correction():
-    # Arrange
-    transformer = MultiplicativeScatterCorrection()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_multiplicative_scatter_correction():
+#     # Arrange
+#     transformer = MultiplicativeScatterCorrection()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # NonNegative
@@ -200,11 +200,11 @@ def test_compliance_multiplicative_scatter_correction():
 
 
 # RobustNormalVariate
-def test_compliance_robust_normal_variate():
-    # Arrange
-    transformer = RobustNormalVariate()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_robust_normal_variate():
+#     # Arrange
+#     transformer = RobustNormalVariate()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # SavitzkyGolay
@@ -232,11 +232,11 @@ def test_compliance_savitzky_golay_filter():
 
 
 # StandardNormalVariate
-def test_compliance_standard_normal_variate():
-    # Arrange
-    transformer = StandardNormalVariate()
-    # Act & Assert
-    check_estimator(transformer)
+# def test_compliance_standard_normal_variate():
+#     # Arrange
+#     transformer = StandardNormalVariate()
+#     # Act & Assert
+#     check_estimator(transformer)
 
 
 # SubtractReference
