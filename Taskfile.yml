@@ -10,6 +10,7 @@ tasks:
     desc: Install all dependencies
     cmds:
       - "{{.UV}} sync --all-groups"
+      - "{{.UV}} pip install .[dev]"
     sources:
       - pyproject.toml
       - uv.lock
