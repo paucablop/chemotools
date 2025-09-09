@@ -1,4 +1,4 @@
-![chemotools](assets/images/banner_light.png)
+![chemotools](assets/images/banner_dark.png)
 
 # chemotools
 
