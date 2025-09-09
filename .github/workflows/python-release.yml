@@ -1,32 +1,46 @@
-name: Publish Python 🐍 distributions 📦 to PyPI with Poetry
+name: Publish Python 🐍 distributions 📦 to PyPI
 
 on:
   release:
     types: [published]
 
 jobs:
-  build-n-publish:
-    name: Build and publish with Poetry
+  release:
     runs-on: ubuntu-latest
+    permissions:
+        id-token: write
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Install Poetry and Versioning Plugin
-      run: |
-        pip install poetry
-        poetry self add "poetry-dynamic-versioning[plugin]"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
-    - name: Build package
-      run: poetry build
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.CHEMOTOOLS }}
+      - name: Print versions
+        run: |
+          python --version
+          uv --version
+          task --version
+
+      # 1. Install dependencies
+      - name: Install dependencies
+        run: task install
+
+      # 2. Build package
+      - name: Build package
+        run: task build
+
+      # 3. Publish to PyPI
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
