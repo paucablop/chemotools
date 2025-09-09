@@ -193,7 +193,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             if pad_left:
                 points = x[: pad_length + 1]  # Take first pad_length+1 points
                 x_coords = np.arange(len(points))
-                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
+                slope, intercept, *_ = stats.linregress(x_coords, points)
 
                 # Generate new points using linear regression
                 new_x = np.arange(-pad_length, 0)
@@ -202,7 +202,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             else:
                 points = x[-pad_length - 1 :]  # Take last pad_length+1 points
                 x_coords = np.arange(len(points))
-                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
+                slope, intercept, *_ = stats.linregress(x_coords, points)
 
                 # Generate new points using linear regression
                 new_x = np.arange(len(points), len(points) + pad_length)
