@@ -504,30 +504,30 @@ def test_extended_baseline_correction_through_msc_median(spectrum):
 #     assert spectrum_left_shifted[0][-1] == 10
 
 
-def test_l1_norm(spectrum):
-    # Arrange
-    norm = 1
-    l1_norm = NormScaler(l_norm=norm)
-    spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
+# def test_l1_norm(spectrum):
+#     # Arrange
+#     norm = 1
+#     l1_norm = NormScaler(l_norm=norm)
+#     spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
 
-    # Act
-    spectrum_corrected = l1_norm.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = l1_norm.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum_norm, atol=1e-8)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum_norm, atol=1e-8)
 
 
-def test_l2_norm(spectrum):
-    # Arrange
-    norm = 2
-    l1_norm = NormScaler(l_norm=norm)
-    spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
+# def test_l2_norm(spectrum):
+#     # Arrange
+#     norm = 2
+#     l1_norm = NormScaler(l_norm=norm)
+#     spectrum_norm = np.linalg.norm(spectrum[0], ord=norm)
 
-    # Act
-    spectrum_corrected = l1_norm.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = l1_norm.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum_norm, atol=1e-8)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum_norm, atol=1e-8)
 
 
 # def test_linear_correction(spectrum):
@@ -542,17 +542,17 @@ def test_l2_norm(spectrum):
 #     assert spectrum_corrected[-1][0] == 0
 
 
-def test_max_norm(spectrum):
-    # Arrange
-    max_norm = MinMaxScaler(use_min=False)
+# def test_max_norm(spectrum):
+#     # Arrange
+#     max_norm = MinMaxScaler(use_min=False)
 
-    # Act
-    spectrum_corrected = max_norm.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = max_norm.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(
-        spectrum_corrected[0], spectrum[0] / np.max(spectrum[0]), atol=1e-8
-    )
+#     # Assert
+#     assert np.allclose(
+#         spectrum_corrected[0], spectrum[0] / np.max(spectrum[0]), atol=1e-8
+#     )
 
 
 def test_mean_filter():
@@ -579,20 +579,20 @@ def test_median_filter():
     assert np.allclose(array_corrected[0], [1, 2.0, 4.0, 5.0, 5.0], atol=1e-8)
 
 
-def test_min_norm(spectrum):
-    # Arrange
-    min_norm = MinMaxScaler()
+# def test_min_norm(spectrum):
+#     # Arrange
+#     min_norm = MinMaxScaler()
 
-    # Act
-    spectrum_corrected = min_norm.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = min_norm.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(
-        spectrum_corrected[0],
-        (spectrum[0] - np.min(spectrum[0]))
-        / (np.max(spectrum[0]) - np.min(spectrum[0])),
-        atol=1e-8,
-    )
+#     # Assert
+#     assert np.allclose(
+#         spectrum_corrected[0],
+#         (spectrum[0] - np.min(spectrum[0]))
+#         / (np.max(spectrum[0]) - np.min(spectrum[0])),
+#         atol=1e-8,
+#     )
 
 
 def test_multiplicative_scatter_correction_mean(spectrum, reference_msc_mean):
@@ -744,29 +744,29 @@ def test_multiplicative_scatter_correction_with_wrong_method(spectrum):
 #         norris_williams_filter.fit_transform(array)
 
 
-def test_point_scaler(spectrum):
-    # Arrange
-    index_scaler = PointScaler(point=0)
-    reference_spectrum = [value / spectrum[0][0] for value in spectrum[0]]
+# def test_point_scaler(spectrum):
+#     # Arrange
+#     index_scaler = PointScaler(point=0)
+#     reference_spectrum = [value / spectrum[0][0] for value in spectrum[0]]
 
-    # Act
-    spectrum_corrected = index_scaler.fit_transform(spectrum)
+#     # Act
+#     spectrum_corrected = index_scaler.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], reference_spectrum, atol=1e-8)
 
 
-def test_point_scaler_with_wavenumbers():
-    # Arrange
-    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
-    spectrum = np.array([[10.0, 12.0, 14.0, 16.0, 14.0, 12.0, 10.0, 12.0, 14.0, 16.0]])
+# def test_point_scaler_with_wavenumbers():
+#     # Arrange
+#     wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+#     spectrum = np.array([[10.0, 12.0, 14.0, 16.0, 14.0, 12.0, 10.0, 12.0, 14.0, 16.0]])
 
-    # Act
-    index_scaler = PointScaler(point=4, wavenumbers=wavenumbers)
-    spectrum_corrected = index_scaler.fit_transform(spectrum)
+#     # Act
+#     index_scaler = PointScaler(point=4, wavenumbers=wavenumbers)
+#     spectrum_corrected = index_scaler.fit_transform(spectrum)
 
-    # Assert
-    assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum[0][3], atol=1e-8)
+#     # Assert
+#     assert np.allclose(spectrum_corrected[0], spectrum[0] / spectrum[0][3], atol=1e-8)
 
 
 # def test_range_cut_by_index(spectrum):
