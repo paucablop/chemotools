@@ -151,7 +151,7 @@ def reference_snv() -> np.ndarray:
 
 
 @pytest.fixture
-def reference_whitakker() -> np.ndarray:
+def reference_whittaker() -> np.ndarray:
     return np.loadtxt(
-        os.path.join(path_to_resources, "reference_whitakker.csv"), delimiter=","
+        os.path.join(path_to_resources, "reference_whittaker.csv"), delimiter=","
     ).reshape(1, -1)

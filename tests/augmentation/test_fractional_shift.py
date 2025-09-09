@@ -101,10 +101,10 @@ def test_fractional_shift_linear():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
     spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=44
+        shift=1, padding_mode="linear", random_state=44
     )
     spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="mirror", random_state=42
+        shift=1, padding_mode="linear", random_state=42
     )
 
     # Act
@@ -114,5 +114,5 @@ def test_fractional_shift_linear():
     # Assert
     assert spectrum_right_shifted[0][6] == 6.245131019347744
     assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 8
+    assert spectrum_right_shifted[0][0] == 0.0
+    assert spectrum_left_shifted[0][-1] == 9.547912097111926

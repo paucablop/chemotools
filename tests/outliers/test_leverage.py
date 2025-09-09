@@ -4,7 +4,7 @@ from sklearn.cross_decomposition import PLSRegression
 from chemotools.outliers import Leverage
 
 
-def test_leverage_cacĺcualation(dummy_data_loader):
+def test_leverage_calculation(dummy_data_loader):
     # Arrange
     X, y = dummy_data_loader
     pls = PLSRegression(n_components=1).fit(X, y)
