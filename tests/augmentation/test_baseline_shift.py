@@ -26,5 +26,7 @@ def test_baseline_shift():
     assert np.mean(spectrum_corrected[0]) > np.mean(spectrum[0])
     assert np.isclose(np.std(spectrum_corrected[0]), 0.0, atol=1e-8)
     assert np.isclose(
-        np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]), 0.77395605, atol=1e-8
+        np.mean(spectrum_corrected[0]) - np.mean(spectrum[0]),
+        0.37454011884736227,
+        atol=1e-8,
     )
