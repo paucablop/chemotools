@@ -2,7 +2,9 @@ from typing import Literal, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real
 
 
 class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -29,6 +31,12 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     n_features_in_ : int
         Number of features in the training data.
     """
+
+    _parameter_constraints: dict = {
+        "distribution": [Literal["gaussian", "poisson", "exponential"]],
+        "scale": [Interval(Real, 0, None, closed="both")],
+        "random_state": [None, int, np.random.RandomState],
+    }
 
     def __init__(
         self,
@@ -67,7 +75,7 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         )
 
         # Instantiate the random number generator
-        self._rng = np.random.default_rng(self.random_state)
+        self._rng = check_random_state(self.random_state)
 
         return self
 
