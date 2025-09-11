@@ -2,7 +2,9 @@ from typing import Literal, Optional
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 
 class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -32,6 +34,14 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Truncate the filter at this many standard deviations.
         Larger values increase computation time but improve accuracy.
     """
+
+    _parameter_constraints: dict = {
+        "sigma": [Interval(Real, 0, None, closed="both")],
+        "mode": StrOptions({"reflect", "constant", "nearest", "mirror", "wrap"}),
+        "pad_value": [Real],
+        "random_state": [None, int, np.random.RandomState],
+        "truncate": [Interval(Real, 0, None, closed="both")],
+    }
 
     def __init__(
         self,
@@ -75,7 +85,7 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             raise ValueError("sigma must be non-negative")
 
         # Initialize random number generator
-        self._rng = np.random.default_rng(self.random_state)
+        self._rng = check_random_state(self.random_state)
 
         return self
 
