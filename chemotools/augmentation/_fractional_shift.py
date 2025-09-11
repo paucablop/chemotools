@@ -1,37 +1,41 @@
 from typing import Literal, Optional
-
 import numpy as np
 from scipy.interpolate import CubicSpline
 from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 
 class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    Shift the spectrum by a fractional amount, allowing shifts below one index.
+    Shift signals by a random fractional amount using cubic spline interpolation.
 
     Parameters
     ----------
     shift : float, default=0.0
-        Maximum amount by which the data is randomly shifted.
-        The actual shift is a random float between -shift and shift.
+        Maximum absolute shift applied to each signal.
+        A random shift is drawn uniformly from [-shift, +shift].
 
     padding_mode : {'zeros', 'constant', 'wrap', 'extend', 'mirror', 'linear'}, default='linear'
-        Specifies how to handle padding when shifting the data:
-            - 'zeros': Pads with zeros.
-            - 'constant': Pads with a constant value defined by `pad_value`.
-            - 'wrap': Circular shift (wraps around).
-            - 'extend': Extends using edge values.
-            - 'mirror': Mirrors the signal.
-            - 'linear': Uses linear regression on 5 points to extrapolate values.
+        Padding strategy for extrapolated values.
 
     pad_value : float, default=0.0
-        The value used for padding when `padding_mode='constant'`.
+        Used when `padding_mode='constant'`.
 
-    random_state : int, optional, default=None
-        The random seed for reproducibility.
+    random_state : int, RandomState instance or None, default=None
+        Controls randomness.
     """
+
+    _parameter_constraints: dict = {
+        "shift": [Interval(Real, 0, None, closed="both")],
+        "padding_mode": [
+            StrOptions({"zeros", "constant", "extend", "mirror", "linear"})
+        ],
+        "pad_value": [Real],
+        "random_state": [None, int, np.random.RandomState],
+    }
 
     def __init__(
         self,
@@ -47,48 +51,16 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.pad_value = pad_value
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "FractionalShift":
-        """
-        Fit the transformer to the input data.
-
-        Parameters
-        ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit the transformer to.
-
-        y : None
-            Ignored.
-
-        Returns
-        -------
-        self : FractionalShift
-            The fitted transformer.
-        """
+    def fit(self, X, y=None):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        self._rng = np.random.default_rng(self.random_state)
+        self._rng = check_random_state(self.random_state)
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """
-        Transform the input data by shifting the spectrum.
-
-        Parameters
-        ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
-
-        y : None
-            Ignored.
-
-        Returns
-        -------
-        X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data with the applied shifts.
-        """
+    def transform(self, X, y=None):
         check_is_fitted(self, "n_features_in_")
-        X_ = validate_data(
+        X = validate_data(
             self,
             X,
             y="no_validation",
@@ -97,107 +69,61 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             reset=False,
             dtype=np.float64,
         )
+        return np.array([self._shift_signal(x) for x in X])
 
-        for i, x in enumerate(X_):
-            X_[i] = self._shift_signal(x)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _shift_signal(self, x: np.ndarray) -> np.ndarray:
-        """
-        Shifts a signal by a fractional amount using cubic spline interpolation.
-
-        Parameters
-        ----------
-        x : np.ndarray of shape (n_features,)
-            The input signal to shift.
-
-        Returns
-        -------
-        shifted_signal : np.ndarray of shape (n_features,)
-            The shifted signal.
-        """
-        shift = self._rng.uniform(-self.shift, self.shift)
+    def _shift_signal(self, x):
         n = len(x)
+        shift = self._rng.uniform(-self.shift, self.shift)
         indices = np.arange(n)
         shifted_indices = indices + shift
 
-        # Create cubic spline interpolator
         spline = CubicSpline(indices, x, bc_type="not-a-knot")
-        shifted_signal = spline(shifted_indices)
+        shifted = spline(shifted_indices)
 
-        # Determine padding direction and length
-        if shift >= 0:
-            pad_length = len(shifted_indices[shifted_indices >= n - 1])
-            pad_left = False
-        else:
-            pad_length = len(shifted_indices[shifted_indices < 0])
-            pad_left = True
-
-        # Handle padding based on mode
+        # handle padding
         if self.padding_mode == "zeros":
-            shifted_signal[shifted_indices < 0] = 0
-            shifted_signal[shifted_indices >= n - 1] = 0
-
+            shifted[shifted_indices < 0] = 0
+            shifted[shifted_indices >= n - 1] = 0
         elif self.padding_mode == "constant":
-            shifted_signal[shifted_indices < 0] = self.pad_value
-            shifted_signal[shifted_indices >= n - 1] = self.pad_value
-
-        elif self.padding_mode == "mirror":
-            if pad_left:
-                pad_values = x[pad_length - 1 :: -1]
-                shifted_signal[shifted_indices < 0] = pad_values[:pad_length]
-            else:
-                pad_values = x[:-1][::-1]
-                shifted_signal[shifted_indices >= n - 1] = pad_values[:pad_length]
-
+            shifted[shifted_indices < 0] = self.pad_value
+            shifted[shifted_indices >= n - 1] = self.pad_value
         elif self.padding_mode == "extend":
-            if pad_left:
-                shifted_signal[shifted_indices < 0] = x[0]
-            else:
-                shifted_signal[shifted_indices >= n - 1] = x[-1]
-
+            shifted[shifted_indices < 0] = x[0]
+            shifted[shifted_indices >= n - 1] = x[-1]
+        elif self.padding_mode == "mirror":
+            shifted = self._apply_mirror_padding(x, shifted, shifted_indices)
         elif self.padding_mode == "linear":
-            if pad_left:
-                # Use first 5 points for regression
-                if len(x) < 5:
-                    points = x[: len(x)]  # Use all points if less than 5
-                else:
-                    points = x[:5]
-                x_coords = np.arange(len(points))
+            shifted = self._apply_linear_padding(x, shifted, shifted_indices)
+        return shifted
 
-                # Reshape arrays for linregress
-                x_coords = x_coords.reshape(-1)
-                points = points.reshape(-1)
+    # --- helper methods ---
+    def _apply_mirror_padding(self, x, shifted, shifted_indices):
+        n = len(x)
+        left_len = np.sum(shifted_indices < 0)
+        right_len = np.sum(shifted_indices >= n - 1)
+        if left_len > 0:
+            pad = np.tile(x[1:][::-1], int(np.ceil(left_len / (n - 1))))[:left_len]
+            shifted[shifted_indices < 0] = pad
+        if right_len > 0:
+            pad = np.tile(x[:-1][::-1], int(np.ceil(right_len / (n - 1))))[:right_len]
+            shifted[shifted_indices >= n - 1] = pad
+        return shifted
 
-                # Perform regression
-                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
+    def _apply_linear_padding(self, x, shifted, shifted_indices):
+        n = len(x)
+        left_len = np.sum(shifted_indices < 0)
+        right_len = np.sum(shifted_indices >= n - 1)
 
-                # Generate new points using linear regression
-                new_x = np.arange(-pad_length, 0)
-                extrapolated = slope * new_x + intercept
-                shifted_signal[shifted_indices < 0] = extrapolated
-            else:
-                # Use last 5 points for regression
-                if len(x) < 5:
-                    points = x[-len(x) :]  # Use all points if less than 5
-                else:
-                    points = x[-5:]
-                x_coords = np.arange(len(points))
+        if left_len > 0:
+            points = x[: min(5, n)]
+            slope, intercept, *_ = stats.linregress(np.arange(len(points)), points)
+            new_x = np.arange(-left_len, 0)
+            shifted[shifted_indices < 0] = slope * new_x + intercept
 
-                # Reshape arrays for linregress
-                x_coords = x_coords.reshape(-1)
-                points = points.reshape(-1)
+        if right_len > 0:
+            points = x[-min(5, n) :]
+            slope, intercept, *_ = stats.linregress(np.arange(len(points)), points)
+            new_x = np.arange(len(points), len(points) + right_len)
+            shifted[shifted_indices >= n - 1] = slope * new_x + intercept
 
-                # Perform regression
-                slope, intercept, _, _, _ = stats.linregress(x_coords, points)
-
-                # Generate new points using linear regression
-                new_x = np.arange(len(points), len(points) + pad_length)
-                extrapolated = slope * new_x + intercept
-                shifted_signal[shifted_indices >= n] = extrapolated
-
-        else:
-            raise ValueError(f"Unknown padding mode: {self.padding_mode}")
-
-        return shifted_signal
+        return shifted

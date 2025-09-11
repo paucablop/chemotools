@@ -28,10 +28,10 @@ def test_fractional_shift_constant():
     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 30
-    assert spectrum_left_shifted[0][-1] == 30
+    assert spectrum_right_shifted[0][6] == 7.669684297331299
+    assert spectrum_left_shifted[0][4] == 4.749080237694725
+    assert spectrum_right_shifted[0][-1] == 30
+    assert spectrum_left_shifted[0][0] == 30
 
 
 def test_fractional_shift_zeros():
@@ -49,10 +49,10 @@ def test_fractional_shift_zeros():
     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 0
-    assert spectrum_left_shifted[0][-1] == 0
+    assert spectrum_right_shifted[0][6] == 7.669684297331299
+    assert spectrum_left_shifted[0][4] == 4.749080237694725
+    assert spectrum_right_shifted[0][-1] == 0
+    assert spectrum_left_shifted[0][0] == 0
 
 
 def test_fractional_shift_extend():
@@ -70,10 +70,10 @@ def test_fractional_shift_extend():
     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 9
+    assert spectrum_right_shifted[0][6] == 7.669684297331299
+    assert spectrum_left_shifted[0][4] == 4.749080237694725
+    assert spectrum_right_shifted[0][-1] == 9
+    assert spectrum_left_shifted[0][0] == 1
 
 
 def test_fractional_shift_mirror():
@@ -91,20 +91,20 @@ def test_fractional_shift_mirror():
     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 1
-    assert spectrum_left_shifted[0][-1] == 8
+    assert spectrum_right_shifted[0][6] == 7.669684297331299
+    assert spectrum_left_shifted[0][4] == 4.749080237694725
+    assert spectrum_right_shifted[0][-1] == 8
+    assert spectrum_left_shifted[0][0] == 9
 
 
 def test_fractional_shift_linear():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
     spectrum_right_shift = FractionalShift(
-        shift=1, padding_mode="linear", random_state=44
+        shift=1.5, padding_mode="linear", random_state=44
     )
     spectrum_left_shift = FractionalShift(
-        shift=1, padding_mode="linear", random_state=42
+        shift=1.5, padding_mode="linear", random_state=42
     )
 
     # Act
@@ -112,7 +112,7 @@ def test_fractional_shift_linear():
     spectrum_left_shifted = spectrum_left_shift.fit_transform(spectrum)
 
     # Assert
-    assert spectrum_right_shifted[0][6] == 6.245131019347744
-    assert spectrum_left_shifted[0][4] == 5.547912097111927
-    assert spectrum_right_shifted[0][0] == 0.0
-    assert spectrum_left_shifted[0][-1] == 9.547912097111926
+    assert spectrum_right_shifted[0][6] == 8.004526445996948
+    assert spectrum_left_shifted[0][4] == 4.623620356542087
+    assert spectrum_right_shifted[0][-1] == 11.0
+    assert spectrum_left_shifted[0][0] == 0
