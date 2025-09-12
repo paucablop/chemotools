@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.augmentation import AddNoise
@@ -52,3 +53,15 @@ def test_add_noise_poisson():
     assert spectrum.shape == spectrum_corrected.shape
     assert np.allclose(np.mean(spectrum_corrected[0]), 1.5011, atol=1e-2)
     assert np.allclose(np.std(spectrum_corrected[0]), 0.5, atol=1e-2)
+
+
+def test_invalid_noise_distribution():
+    # Arrange
+    spectrum = np.ones(10000).reshape(1, -1)
+
+    # Act
+    add_noise = AddNoise(distribution="invalid", scale=0.5, random_state=42)
+
+    # Assert
+    with pytest.raises(ValueError, match="Invalid noise distribution.*"):
+        add_noise.fit_transform(spectrum)

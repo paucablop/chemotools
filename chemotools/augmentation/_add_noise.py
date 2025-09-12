@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
-from sklearn.utils._param_validation import Interval, Real
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 
 class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -33,7 +33,7 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "distribution": [Literal["gaussian", "poisson", "exponential"]],
+        "distribution": StrOptions({"gaussian", "poisson", "exponential"}),
         "scale": [Interval(Real, 0, None, closed="both")],
         "random_state": [None, int, np.random.RandomState],
     }
