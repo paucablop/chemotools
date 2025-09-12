@@ -2,7 +2,9 @@ from typing import Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real
 
 
 class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -34,6 +36,11 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     transform(X, y=0, copy=True)
         Transform the input data by scaling the spectrum.
     """
+
+    _parameter_constraints: dict = {
+        "scale": [Interval(Real, 0, None, closed="both")],
+        "random_state": [None, int, np.random.RandomState],
+    }
 
     def __init__(self, scale: float = 0.0, random_state: Optional[int] = None):
         self.scale = scale
@@ -68,7 +75,7 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self._is_fitted = True
 
         # Instantiate the random number generator
-        self._rng = np.random.default_rng(self.random_state)
+        self._rng = check_random_state(self.random_state)
 
         return self
 
