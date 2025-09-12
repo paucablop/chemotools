@@ -222,4 +222,6 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             return result
 
         else:
-            raise ValueError(f"Unknown padding mode: {self.padding_mode}")
+            raise ValueError(
+                f"Unknown padding mode: {self.padding_mode}. Please choose from 'zeros', 'constant', 'wrap', 'extend', 'mirror', or 'linear'."
+            )

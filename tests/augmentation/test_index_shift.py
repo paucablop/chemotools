@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.augmentation import IndexShift
@@ -117,3 +118,15 @@ def test_index_shift_linear():
     assert spectrum_left_shifted[0][4] == 6
     assert spectrum_right_shifted[0][0] == 0
     assert spectrum_left_shifted[0][-1] == 10
+
+
+def test_invalid_padding_mode():
+    # Arrange
+    spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
+
+    # Act
+    spectrum_shift = IndexShift(shift=1, padding_mode="invalid", random_state=42)
+
+    # Assert
+    with pytest.raises(ValueError, match="Unknown padding mode"):
+        spectrum_shift.fit_transform(spectrum)
