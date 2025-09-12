@@ -4,7 +4,9 @@ import numpy as np
 from scipy.signal import convolve
 from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 
 class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -45,6 +47,15 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Random number generator instance used for shifting.
     """
 
+    _parameter_constraints: dict = {
+        "shift": [Interval(Real, 0, None, closed="both")],
+        "padding_mode": [
+            StrOptions({"zeros", "constant", "extend", "mirror", "linear"})
+        ],
+        "pad_value": [Real],
+        "random_state": [None, int, np.random.RandomState],
+    }
+
     def __init__(
         self,
         shift: int = 0,
@@ -82,7 +93,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         )
 
         # Instantiate the random number generator
-        self._rng = np.random.default_rng(self.random_state)
+        self._rng = check_random_state(self.random_state)
 
         return self
 
@@ -137,7 +148,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         result : np.ndarray of shape (n_features,)
             The shifted signal.
         """
-        shift = self._rng.integers(-self.shift, self.shift, endpoint=True)
+        shift = self._rng.randint(-self.shift, self.shift + 1)
 
         if self.padding_mode == "wrap":
             return np.roll(x, shift)

@@ -16,8 +16,8 @@ def test_compliance_spectrum_shift():
 def test_index_shift_wrap():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="wrap", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="wrap", random_state=42)
+    spectrum_right_shift = IndexShift(shift=1, padding_mode="wrap", random_state=42)
+    spectrum_left_shift = IndexShift(shift=1, padding_mode="wrap", random_state=44)
 
     # Act
     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
@@ -34,10 +34,10 @@ def test_index_shift_constant():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
     spectrum_right_shift = IndexShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=44
+        shift=1, padding_mode="constant", pad_value=30, random_state=42
     )
     spectrum_left_shift = IndexShift(
-        shift=1, padding_mode="constant", pad_value=30, random_state=42
+        shift=1, padding_mode="constant", pad_value=30, random_state=44
     )
 
     # Act
@@ -54,8 +54,8 @@ def test_index_shift_constant():
 def test_index_shift_zeros():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="zeros", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="zeros", random_state=42)
+    spectrum_right_shift = IndexShift(shift=1, padding_mode="zeros", random_state=42)
+    spectrum_left_shift = IndexShift(shift=1, padding_mode="zeros", random_state=44)
 
     # Act
     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
@@ -71,8 +71,8 @@ def test_index_shift_zeros():
 def test_index_shift_extend():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="extend", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="extend", random_state=42)
+    spectrum_right_shift = IndexShift(shift=1, padding_mode="extend", random_state=42)
+    spectrum_left_shift = IndexShift(shift=1, padding_mode="extend", random_state=44)
 
     # Act
     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
@@ -88,8 +88,8 @@ def test_index_shift_extend():
 def test_index_shift_mirror():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="mirror", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="mirror", random_state=42)
+    spectrum_right_shift = IndexShift(shift=1, padding_mode="mirror", random_state=42)
+    spectrum_left_shift = IndexShift(shift=1, padding_mode="mirror", random_state=44)
 
     # Act
     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
@@ -105,8 +105,8 @@ def test_index_shift_mirror():
 def test_index_shift_linear():
     # Arrange
     spectrum = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9]])
-    spectrum_right_shift = IndexShift(shift=1, padding_mode="linear", random_state=44)
-    spectrum_left_shift = IndexShift(shift=1, padding_mode="linear", random_state=42)
+    spectrum_right_shift = IndexShift(shift=1, padding_mode="linear", random_state=42)
+    spectrum_left_shift = IndexShift(shift=1, padding_mode="linear", random_state=44)
 
     # Act
     spectrum_right_shifted = spectrum_right_shift.fit_transform(spectrum)
