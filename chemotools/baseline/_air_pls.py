@@ -137,44 +137,39 @@ class AirPls(_BaseWhittaker):
         w : ndarray
             Final weights.
         """
-        x_abs_sum = np.abs(x).sum()  # reused for stopping
+        x_abs_sum = np.abs(x).sum()
 
         for i in range(max_iter):
-            # Solve Whittaker
+            # Step 1: Solve the Whittaker smoothing system for the current weights
             z = self._solve_whittaker(x, w)
 
-            # Calculate residuals
+            # Step 2: Compute residuals (difference between signal and baseline)
             d = x - z
 
-            # Early exit if all residuals are non-negative
+            # Early exit: stop if residuals are exactly zero
             if np.all(d == 0):
                 break
 
-            # vectorized negative mask: mask True where d < 0
+            # Step 3: Focus on negative residuals only (baseline should sit below peaks)
             mask = d < 0
-            # negative part (non-positive elsewhere)
-            d_neg = d * mask  # negatives are negative numbers, positives zeroed
-            dssn = -d_neg.sum()  # same as abs(sum(d[d<0]))
+            d_neg = d * mask  # keep negative values, zero out others
+            dssn = -d_neg.sum()  # total absolute deviation of negative residuals
 
-            # stopping criterion (same threshold as original)
+            # Stopping criterion: small negative deviation relative to signal size
             if dssn < 0.001 * x_abs_sum:
                 break
 
-            # ensure we don't try to use iteration index beyond configured nr_iterations
+            # Safety stop: prevent exceeding configured number of iterations
             if i == self.nr_iterations - 1:
                 break
 
-            # build new weights vectorized
+            # Step 4: Update weights using exponential reweighting
             new_w = np.zeros_like(w)
             if dssn > 0:
-                # compute exponential only for negative positions without allocating
-                # a masked subarray repeatedly (vectorized)
-                # note: i is 0-based; original code used i in exp, keep same semantics
-                # absolute of negative entries is -d_neg (since those entries are negative)
+                # Exponential weighting for negative residuals
                 new_w[mask] = np.exp(i * (-d_neg[mask]) / dssn)
 
-                # boundary handling: use max of negative d (most negative -> largest abs)
-                # extract negative d values once
+                # Boundary handling: enforce consistent weights at signal edges
                 neg_vals = d[mask]
                 if neg_vals.size > 0:
                     new_w[0] = np.exp(i * (-neg_vals).max() / dssn)
@@ -182,5 +177,5 @@ class AirPls(_BaseWhittaker):
 
             w = new_w
 
-        # return last z and weights
+        # Return final baseline estimate and weights
         return z, w
