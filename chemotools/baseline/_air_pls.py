@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._air_pls` module implements the Adaptive Iteratively Reweighted
+Penalized Least Squares (AirPLS) baseline correction algorithm
+"""
+
+# Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
+# License: MIT
+
 import logging
 
 import numpy as np

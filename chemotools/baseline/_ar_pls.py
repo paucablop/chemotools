@@ -3,7 +3,7 @@ The :mod:`chemotools.baseline._ar_pls` module implements the Asymmetrically Rewe
 Penalized Least Squares (ArPLS) baseline correction algorithm
 """
 
-# Authors: Pau Cabaneros, Niklas Zell <nik.zoe@web.de>
+# Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
 import logging
