@@ -1,6 +1,11 @@
 import logging
 
-from ._base import _BaseWhittaker, _whittaker_smooth_banded, _whittaker_smooth_sparse
+from ._base import (
+    _BaseWhittaker,
+    _whittaker_smooth_banded,
+    _whittaker_smooth_sparse,
+    _precompute_DtD_sparse,
+)
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -9,8 +14,20 @@ logger = logging.getLogger(__name__)
 class ArPls(_BaseWhittaker):
     """ARPLS baseline correction with logistic weight update."""
 
-    def __init__(self, lam=1e4, ratio=0.01):
-        super().__init__(lam=lam)
+    def __init__(
+        self,
+        lam=1e4,
+        ratio=1e-2,
+        nr_iterations=100,
+        use_banded=True,
+        max_iter_after_warmstart=20,
+    ):
+        super().__init__(
+            lam=lam,
+            nr_iterations=nr_iterations,
+            use_banded=use_banded,
+            max_iter_after_warmstart=max_iter_after_warmstart,
+        )
         self.ratio = ratio
 
     def fit(self, X, y=None):
@@ -46,12 +63,15 @@ class ArPls(_BaseWhittaker):
                 if self.use_banded:
                     z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
                 else:
-                    z = _whittaker_smooth_sparse(x, w, self.lam)
+                    z = _whittaker_smooth_sparse(x, w, self.lam, self.DtD_ab)
             except Exception as e:
                 logger.debug("Banded solver failed (%s); fallback to sparse LU.", e)
-                z = _whittaker_smooth_sparse(x, w, self.lam)
+                DtD_ab = _precompute_DtD_sparse(self.n_features_in_)
+                z = _whittaker_smooth_sparse(x, w, self.lam, DtD_ab)
 
             d = x - z
+
+            #
             dn = d[d < 0]
             if dn.size == 0:
                 break

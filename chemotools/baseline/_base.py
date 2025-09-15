@@ -42,6 +42,8 @@ def _precompute_DtD_banded(N: int):
 
 
 def _precompute_DtD_sparse(N: int):
+    if N < 3:
+        return sp.csc_matrix((N, N))
     D = sp.diags([1, -2, 1], [0, 1, 2], shape=(N - 2, N), format="csc")
     return D.T @ D
 
@@ -88,7 +90,12 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         )
 
         n_features = X.shape[1]
-        self.DtD_ab_ = _precompute_DtD_banded(n_features)
+
+        self.DtD_ab_ = (
+            _precompute_DtD_banded(n_features)
+            if self.use_banded
+            else _precompute_DtD_sparse(n_features)
+        )
 
         # warm-start weights from first spectrum
         x0 = X[0]

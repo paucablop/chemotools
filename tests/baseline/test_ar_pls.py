@@ -12,6 +12,13 @@ def test_compliance_ar_pls():
     check_estimator(transformer)
 
 
+def test_compliance_ar_pls_sparse():
+    # Arrange
+    transformer = ArPls(use_banded=False)
+    # Act & Assert
+    check_estimator(transformer)
+
+
 # Test functionality
 def test_ar_pls(spectrum_arpls, reference_arpls):
     # Arrange
