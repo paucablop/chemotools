@@ -1,158 +1,107 @@
 import logging
+
+from ._base import (
+    _BaseWhittaker,
+    _whittaker_smooth_banded,
+    _whittaker_smooth_sparse,
+    _precompute_DtD_sparse,
+)
 import numpy as np
-from scipy.sparse import csc_matrix, eye, diags
-from scipy.sparse.linalg import spsolve
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
 
 logger = logging.getLogger(__name__)
 
 
-class AirPls(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
-    """
-    This class implements the AirPLS (Adaptive Iteratively Reweighted Penalized Least Squares) algorithm for baseline
-    correction of spectra data. AirPLS is a common approach for removing the baseline from spectra, which can be useful
-    in various applications such as spectroscopy and chromatography.
-
-    Parameters
-    ----------
-    lam : float, optional default=1e2
-        The lambda parameter controls the smoothness of the baseline. Increasing the value of lambda results in
-        a smoother baseline.
-
-    polynomial_order : int, optional default=1
-        The polynomial order determines the degree of the polynomial used to fit the baseline. A value of 1 corresponds
-        to a linear fit, while higher values correspond to higher-order polynomials.
-
-    nr_iterations : int, optional default=15
-        The number of iterations used to calculate the baseline. Increasing the number of iterations can improve the
-        accuracy of the baseline correction, but also increases the computation time.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the estimator to the input data.
-
-    transform(X, y=None)
-        Transform the input data by subtracting the baseline.
-
-    _calculate_whittaker_smooth(x, w)
-        Calculate the Whittaker smooth of a given input vector x, with weights w.
-
-    _calculate_air_pls(x)
-        Calculate the AirPLS baseline of a given input vector x.
-
-    References
-    ----------
-    - Z.-M. Zhang, S. Chen, and Y.-Z. Liang, Baseline correction using adaptive iteratively reweighted penalized least
-      squares. Analyst 135 (5), 1138-1146 (2010).
-    """
+class AirPls(_BaseWhittaker):
+    """AirPLS baseline correction with exponential weight update."""
 
     def __init__(
-        self,
-        lam: int = 100,
-        polynomial_order: int = 1,
-        nr_iterations: int = 15,
+        self, lam=1e4, nr_iterations=100, use_banded=True, max_iter_after_warmstart=20
     ):
-        self.lam = lam
-        self.polynomial_order = polynomial_order
-        self.nr_iterations = nr_iterations
+        super().__init__(
+            lam=lam,
+            nr_iterations=nr_iterations,
+            use_banded=use_banded,
+            max_iter_after_warmstart=max_iter_after_warmstart,
+        )
 
-    def fit(self, X: np.ndarray, y=None) -> "AirPls":
-        """Fit the AirPls baseline correction estimator to the input data.
+    def fit(self, X, y=None):
+        """Fit AirPLS model to spectra."""
+        return super().fit(X, y)
+
+    def transform(self, X, y=None):
+        """Apply AirPLS baseline correction."""
+        return super().transform(X, y)
+
+    def _calculate_baseline(self, x, w, max_iter):
+        """
+        Run vectorized AirPLS iterations (keeps original exponential weighting).
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
-            The input data.
-
-        y : array-like of shape (n_samples,), optional (default=None)
-            The target values.
-
-        Returns
-        -------
-        self : AirPls
-            Returns the instance itself.
-        """
-
-        # Check that X is a 2D array and has only finite values
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        return self
-
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """Correct the baseline in the input data using the fitted AirPls estimator.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            The input data.
-
-        y : array-like of shape (n_samples,), optional (default=None)
-            The target values.
+        x : ndarray
+            Input spectrum.
+        w : ndarray
+            Initial weights.
+        max_iter : int
+            Maximum iterations.
 
         Returns
         -------
-        X_ : array-like of shape (n_samples, n_features)
-            The transformed data with the baseline removed.
+        z : ndarray
+            Estimated baseline.
+        w : ndarray
+            Final weights.
         """
+        x_abs_sum = np.abs(x).sum()  # reused for stopping
 
-        # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        for i in range(max_iter):
+            try:
+                if self.use_banded:
+                    z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
+                else:
+                    z = _whittaker_smooth_sparse(x, w, self.lam, self.DtD_ab_)
+            except Exception as e:
+                logger.debug("Banded solver failed (%s); fallback to sparse LU.", e)
+                DtD_ab = _precompute_DtD_sparse(self.n_features_in_)
+                z = _whittaker_smooth_sparse(x, w, self.lam, DtD_ab)
 
-        # Check that X is a 2D array and has only finite values
-        X_ = validate_data(
-            self,
-            X,
-            y="no_validation",
-            ensure_2d=True,
-            copy=True,
-            reset=False,
-            dtype=np.float64,
-        )
-
-        # Calculate the air pls smooth
-        for i, x in enumerate(X_):
-            X_[i] = x - self._calculate_air_pls(x)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _calculate_whittaker_smooth(self, x, w):
-        X = np.array(x)
-        m = X.size
-        E = eye(m, format="csc")
-        for i in range(self.polynomial_order):
-            E = E[1:] - E[:-1]
-        W = diags(w, 0, shape=(m, m))
-        A = csc_matrix(W + (self.lam * E.T @ E))
-        B = csc_matrix(W @ X.T).toarray().ravel()
-        background = spsolve(A, B)
-        return np.array(background)
-
-    def _calculate_air_pls(self, x):
-        m = x.shape[0]
-        w = np.ones(m)
-
-        for i in range(1, self.nr_iterations):
-            z = self._calculate_whittaker_smooth(x, w)
             d = x - z
-            dssn = np.abs(d[d < 0].sum())
 
-            if dssn < 0.001 * np.abs(x).sum():
+            # Early exit if all residuals are non-negative
+            if np.all(d == 0):
                 break
 
+            # vectorized negative mask: mask True where d < 0
+            mask = d < 0
+            # negative part (non-positive elsewhere)
+            d_neg = d * mask  # negatives are negative numbers, positives zeroed
+            dssn = -d_neg.sum()  # same as abs(sum(d[d<0]))
+
+            # stopping criterion (same threshold as original)
+            if dssn < 0.001 * x_abs_sum:
+                break
+
+            # ensure we don't try to use iteration index beyond configured nr_iterations
             if i == self.nr_iterations - 1:
                 break
 
-            w[d >= 0] = 0
-            w[d < 0] = np.exp(i * np.abs(d[d < 0]) / dssn)
+            # build new weights vectorized
+            new_w = np.zeros_like(w)
+            if dssn > 0:
+                # compute exponential only for negative positions without allocating
+                # a masked subarray repeatedly (vectorized)
+                # note: i is 0-based; original code used i in exp, keep same semantics
+                # absolute of negative entries is -d_neg (since those entries are negative)
+                new_w[mask] = np.exp(i * (-d_neg[mask]) / dssn)
 
-            negative_d = d[d < 0]
-            if negative_d.size > 0:
-                w[0] = np.exp(i * negative_d.max() / dssn)
+                # boundary handling: use max of negative d (most negative -> largest abs)
+                # extract negative d values once
+                neg_vals = d[mask]
+                if neg_vals.size > 0:
+                    new_w[0] = np.exp(i * (-neg_vals).max() / dssn)
+                new_w[-1] = new_w[0]
 
-            w[-1] = w[0]
+            w = new_w
 
-        return z
+        # return last z and weights
+        return z, w

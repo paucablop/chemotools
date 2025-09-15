@@ -12,10 +12,17 @@ def test_compliance_air_pls():
     check_estimator(transformer)
 
 
+def test_compliance_air_pls_sparse():
+    # Arrange
+    transformer = AirPls(use_banded=False)
+    # Act & Assert
+    check_estimator(transformer)
+
+
 # Test functionality
 def test_air_pls(spectrum, reference_airpls):
     # Arrange
-    air_pls = AirPls()
+    air_pls = AirPls(lam=100)
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
