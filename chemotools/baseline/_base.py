@@ -1,3 +1,6 @@
+# Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
+# License: MIT
+
 from abc import ABC, abstractmethod
 import logging
 
