@@ -73,17 +73,17 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
 
     def __init__(
         self,
-        lam=10000.0,
-        nr_iterations=100,
-        use_banded=True,
-        max_iter_after_warmstart=20,
+        lam: float = 10000.0,
+        nr_iterations: int = 100,
+        use_banded: bool = True,
+        max_iter_after_warmstart: int = 20,
     ):
         self.lam = lam
         self.nr_iterations = nr_iterations
         self.use_banded = use_banded
         self.max_iter_after_warmstart = max_iter_after_warmstart
 
-    def fit(self, X, y=None):
+    def fit(self, X: np.ndarray, y=None) -> "_BaseWhittaker":
         """Fit model to data, precomputing matrices and warm-start weights."""
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -103,7 +103,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         self.w_init_ = w
         return self
 
-    def transform(self, X, y=None):
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Apply baseline correction to input spectra."""
         check_is_fitted(self, ["DtD_ab_", "w_init_"])
         X_ = validate_data(
@@ -119,7 +119,21 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
             X_[i] = x - z
         return X_
 
+    def _solve_whittaker(self, x: np.ndarray, w: np.ndarray) -> np.ndarray:
+        try:
+            if self.use_banded:
+                z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
+            else:
+                z = _whittaker_smooth_sparse(x, w, self.lam, self.DtD_ab_)
+        except Exception as e:
+            logger.debug("Banded solver failed (%s); fallback to sparse LU.", e)
+            DtD_ab = _precompute_DtD_sparse(self.n_features_in_)
+            z = _whittaker_smooth_sparse(x, w, self.lam, DtD_ab)
+        return z
+
     @abstractmethod
-    def _calculate_baseline(self, x, w, max_iter):
+    def _calculate_baseline(
+        self, x: np.ndarray, w: np.ndarray, max_iter: int
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Subclasses must implement algorithm-specific baseline estimation."""
         ...

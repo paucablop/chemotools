@@ -66,7 +66,7 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
 
         return self
 
-    def transform(self, X: np.ndarray, y=None, copy=True):
+    def transform(self, X: np.ndarray, y=None, copy=True) -> np.ndarray:
         """
         Transform the input data by subtracting the baseline.
 

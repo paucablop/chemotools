@@ -1,12 +1,9 @@
 import logging
 
-from ._base import (
-    _BaseWhittaker,
-    _whittaker_smooth_banded,
-    _whittaker_smooth_sparse,
-    _precompute_DtD_sparse,
-)
 import numpy as np
+
+from ._base import _BaseWhittaker
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +12,11 @@ class AirPls(_BaseWhittaker):
     """AirPLS baseline correction with exponential weight update."""
 
     def __init__(
-        self, lam=1e4, nr_iterations=100, use_banded=True, max_iter_after_warmstart=20
+        self,
+        lam: float = 1e4,
+        nr_iterations: int = 100,
+        use_banded: bool = True,
+        max_iter_after_warmstart: int = 20,
     ):
         super().__init__(
             lam=lam,
@@ -24,15 +25,17 @@ class AirPls(_BaseWhittaker):
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
 
-    def fit(self, X, y=None):
+    def fit(self, X: np.ndarray, y=None) -> "AirPls":
         """Fit AirPLS model to spectra."""
         return super().fit(X, y)
 
-    def transform(self, X, y=None):
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Apply AirPLS baseline correction."""
         return super().transform(X, y)
 
-    def _calculate_baseline(self, x, w, max_iter):
+    def _calculate_baseline(
+        self, x: np.ndarray, w: np.ndarray, max_iter: int
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Run vectorized AirPLS iterations (keeps original exponential weighting).
 
@@ -55,16 +58,10 @@ class AirPls(_BaseWhittaker):
         x_abs_sum = np.abs(x).sum()  # reused for stopping
 
         for i in range(max_iter):
-            try:
-                if self.use_banded:
-                    z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
-                else:
-                    z = _whittaker_smooth_sparse(x, w, self.lam, self.DtD_ab_)
-            except Exception as e:
-                logger.debug("Banded solver failed (%s); fallback to sparse LU.", e)
-                DtD_ab = _precompute_DtD_sparse(self.n_features_in_)
-                z = _whittaker_smooth_sparse(x, w, self.lam, DtD_ab)
+            # Solve Whittaker
+            z = self._solve_whittaker(x, w)
 
+            # Calculate residuals
             d = x - z
 
             # Early exit if all residuals are non-negative
