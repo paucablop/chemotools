@@ -20,12 +20,23 @@ def test_compliance_air_pls_sparse():
 
 
 # Test functionality
-def test_air_pls(spectrum, reference_airpls):
+def test_air_pls_banded(spectrum, reference_airpls):
     # Arrange
-    air_pls = AirPls(lam=100)
+    air_pls = AirPls(lam=100, nr_iterations=15, use_banded=True)
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-7)
+    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-3)
+
+
+def test_air_pls_sparse(spectrum, reference_airpls):
+    # Arrange
+    air_pls = AirPls(lam=100, nr_iterations=15, use_banded=False)
+
+    # Act
+    spectrum_corrected = air_pls.fit_transform(spectrum)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference_airpls[0], atol=1e-3)

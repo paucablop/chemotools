@@ -20,9 +20,21 @@ def test_compliance_ar_pls_sparse():
 
 
 # Test functionality
-def test_ar_pls(spectrum_arpls, reference_arpls):
+def test_ar_pls_banded(spectrum_arpls, reference_arpls):
     # Arrange
-    arpls = ArPls(1e2, 0.0001)
+    arpls = ArPls(1e2, 0.0001, use_banded=True)
+    reference = np.array(spectrum_arpls) - np.array(reference_arpls)
+
+    # Act
+    spectrum_corrected = arpls.fit_transform(spectrum_arpls)
+
+    # Assert
+    assert np.allclose(spectrum_corrected[0], reference[0], atol=1e-4)
+
+
+def test_ar_pls_sparse(spectrum_arpls, reference_arpls):
+    # Arrange
+    arpls = ArPls(1e2, 0.0001, use_banded=False)
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
     # Act
