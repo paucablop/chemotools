@@ -9,7 +9,57 @@ logger = logging.getLogger(__name__)
 
 
 class AirPls(_BaseWhittaker):
-    """AirPLS baseline correction with exponential weight update."""
+    """
+    Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline correction.
+
+    AirPls is a widely used algorithm for removing baselines from spectroscopic
+    signals. It iteratively reweights residuals to suppress positive deviations
+    (peaks) while adapting baseline estimates using an exponential weight update.
+    A second-order difference operator (recommended) is used as the penalty term,
+    ensuring the estimated baseline is smooth.
+
+    The Whittaker smoothing step can be solved using either:
+    - a **banded solver** (fast and memory-efficient, recommended for most spectra), or
+    - a **sparse LU solver** (more stable for ill-conditioned problems).
+
+    For efficiency, AirPls supports warm-starting: when processing multiple spectra
+    with similar baseline structure, weights from a previous fit can be reused,
+    typically reducing the number of iterations required.
+
+    Parameters
+    ----------
+    lam : float, default=1e4
+        Regularization parameter controlling smoothness of the baseline.
+        Larger values yield smoother baselines.
+
+    nr_iterations : int, default=100
+        Maximum number of reweighting iterations.
+
+    use_banded : bool, default=True
+        If True, use the banded solver for Whittaker smoothing.
+        Otherwise, use a sparse LU decomposition.
+
+    max_iter_after_warmstart : int, default=20
+        Maximum iterations allowed when warm-starting from previous weights.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the estimator to the input spectra.
+
+    transform(X, y=None)
+        Remove baselines from the input spectra.
+
+    _calculate_baseline(x, w, max_iter)
+        Internal method: compute the baseline for a single spectrum
+        using the AirPls exponential reweighting scheme.
+
+    References
+    ----------
+    [1] Z.-M. Zhang, S. Chen, Y.-Z. Liang.
+        "Baseline correction using adaptive iteratively reweighted penalized
+        least squares." Analyst 135 (5), 1138–1146 (2010).
+    """
 
     def __init__(
         self,
@@ -26,11 +76,43 @@ class AirPls(_BaseWhittaker):
         )
 
     def fit(self, X: np.ndarray, y=None) -> "AirPls":
-        """Fit AirPLS model to spectra."""
+        """
+        Fit AirPls model to spectra.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input spectra to fit the model to.
+
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : AirPls
+            Fitted estimator.
+        """
         return super().fit(X, y)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """Apply AirPLS baseline correction."""
+        """Apply AirPls baseline correction.
+
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            The input spectra to transform.
+
+        y : None
+            Ignored.
+
+        copy : bool, default=True
+            If True, a copy of X is made before transforming.
+
+        Returns
+        -------
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            The baseline-corrected spectra.
+        """
         return super().transform(X, y)
 
     def _calculate_baseline(
