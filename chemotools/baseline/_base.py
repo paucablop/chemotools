@@ -123,6 +123,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         return X_
 
     def _solve_whittaker(self, x: np.ndarray, w: np.ndarray) -> np.ndarray:
+        # TODO: allow passing a solver function? to avoid checking use_banded every time
         try:
             if self.use_banded:
                 z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
