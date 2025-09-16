@@ -29,6 +29,14 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 
     _baseline_correct_spectrum(x)
         Subtract the polynomial baseline from a single spectrum.
+
+    Examples
+    --------
+    >>> from chemotools.baseline import PolynomialCorrection
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 4, 5]])
+    >>> pc = PolynomialCorrection(order=2, indices=[0, 2, 4])
+    >>> X_corrected = pc.fit_transform(X)
     """
 
     def __init__(self, order: int = 1, indices: Optional[list] = None) -> None:

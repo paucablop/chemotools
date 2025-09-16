@@ -25,6 +25,15 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     _subtract_reference(x)
         Subtract the reference spectrum from a single spectrum.
+
+    Examples
+    --------
+    >>> from chemotools.baseline import SubtractReference
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 4,  5]])
+    >>> reference = np.array([1, 1, 1, 1, 1])
+    >>> sr = SubtractReference(reference=reference)
+    >>> X_corrected = sr.fit_transform(X)
     """
 
     def __init__(

@@ -1,3 +1,4 @@
+from typing import Literal
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -9,8 +10,9 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    mode : str, optional
+    mode : Literal["zero", "abs"], optional
         The mode to use for the non-negative values. Can be "zero" or "abs".
+        Default is "zero".
 
     Methods
     -------
@@ -19,9 +21,17 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     transform(X, y=0, copy=True)
         Transform the input data by subtracting the constant baseline value.
+
+    Examples
+    --------
+    >>> from chemotools.baseline import NonNegative
+    >>> import numpy as np
+    >>> X = np.array([[-1, 2, -3, 4, -5]])
+    >>> nn = NonNegative(mode="zero")
+    >>> X_corrected = nn.fit_transform(X)
     """
 
-    def __init__(self, mode: str = "zero"):
+    def __init__(self, mode: Literal["zero", "abs"] = "zero"):
         self.mode = mode
 
     def fit(self, X: np.ndarray, y=None) -> "NonNegative":

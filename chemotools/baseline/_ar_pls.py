@@ -61,6 +61,14 @@ class ArPls(_BaseWhittaker):
     _calculate_baseline(x, w, max_iter)
         Internal method: compute the baseline for a single spectrum.
 
+    Examples
+    --------
+    >>> from chemotools.baseline import ArPls
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 4, 5]])
+    >>> arpls = ArPls()
+    >>> X_corrected = arpls.fit_transform(X)
+
     References
     ----------
     [1] Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo.

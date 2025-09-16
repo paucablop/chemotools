@@ -37,6 +37,22 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
     transform(X, y=0, copy=True)
         Transform the input data by subtracting the constant baseline value.
+
+    _find_index(target)
+        Find the index of the closest wavenumber to the target value.
+
+    Examples
+    --------
+    >>> from chemotools.baseline import ConstantBaselineCorrection
+    >>> import numpy as np
+    >>> # Using indices
+    >>> X = np.array([[1, 2, 3, 4, 5]])
+    >>> cbc = ConstantBaselineCorrection(start=0, end=1)
+    >>> X_corrected = cbc.fit_transform(X)
+    >>> # Using wavenumbers
+    >>> wavenumbers = np.array([100, 200, 300, 400, 500])
+    >>> cbc = ConstantBaselineCorrection(start=100, end=200, wavenumbers=wavenumbers)
+    >>> X_corrected = cbc.fit_transform(X)
     """
 
     def __init__(

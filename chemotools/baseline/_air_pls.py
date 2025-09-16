@@ -61,6 +61,14 @@ class AirPls(_BaseWhittaker):
         Internal method: compute the baseline for a single spectrum
         using the AirPls exponential reweighting scheme.
 
+    Examples
+    --------
+    >>> from chemotools.baseline import AirPls
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 4, 5]])
+    >>> airpls = AirPls()
+    >>> X_corrected = airpls.fit_transform(X)
+
     References
     ----------
     [1] Z.-M. Zhang, S. Chen, Y.-Z. Liang.
