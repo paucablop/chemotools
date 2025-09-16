@@ -7,10 +7,11 @@ Penalized Least Squares (AirPLS) baseline correction algorithm
 # License: MIT
 
 import logging
+from typing import Literal
 
 import numpy as np
 
-from ._base import _BaseWhittaker
+from ._base import _BaseWhittaker, _whittaker_solver_dispatch
 
 
 logger = logging.getLogger(__name__)
@@ -43,9 +44,9 @@ class AirPls(_BaseWhittaker):
     nr_iterations : int, default=100
         Maximum number of reweighting iterations.
 
-    use_banded : bool, default=True
-        If True, use the banded solver for Whittaker smoothing.
-        Otherwise, use a sparse LU decomposition.
+    solver_type : Literal["banded", "sparse"], default="banded"
+        If "banded", use the banded solver for Whittaker smoothing.
+        If "sparse", use a sparse LU decomposition.
 
     max_iter_after_warmstart : int, default=20
         Maximum iterations allowed when warm-starting from previous weights.
@@ -73,13 +74,13 @@ class AirPls(_BaseWhittaker):
         self,
         lam: float = 1e4,
         nr_iterations: int = 100,
-        use_banded: bool = True,
+        solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
     ):
         super().__init__(
             lam=lam,
             nr_iterations=nr_iterations,
-            use_banded=use_banded,
+            solver_type=solver_type,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
 
@@ -147,9 +148,11 @@ class AirPls(_BaseWhittaker):
         """
         x_abs_sum = np.abs(x).sum()
 
+        solver = _whittaker_solver_dispatch(self.solver_type)
+
         for i in range(max_iter):
             # Step 1: Solve the Whittaker smoothing system for the current weights
-            z = self._solve_whittaker(x, w)
+            z = self._solve_whittaker(x, w, solver)
 
             # Step 2: Compute residuals (difference between signal and baseline)
             d = x - z

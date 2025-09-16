@@ -3,6 +3,7 @@
 
 from abc import ABC, abstractmethod
 import logging
+from typing import Callable, Literal
 
 
 import numpy as np
@@ -71,6 +72,15 @@ def _whittaker_smooth_sparse(x, w, lam, DtD_sparse):
     return solver.solve(w * x)
 
 
+def _whittaker_solver_dispatch(solver_type: Literal["banded", "sparse"]):
+    if solver_type == "banded":
+        return _whittaker_smooth_banded
+    elif solver_type == "sparse":
+        return _whittaker_smooth_sparse
+    else:
+        raise ValueError(f"Unknown solver_type: {solver_type}")
+
+
 class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC):
     """Abstract base class for Whittaker-based baseline correction."""
 
@@ -78,12 +88,12 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         self,
         lam: float = 10000.0,
         nr_iterations: int = 100,
-        use_banded: bool = True,
+        solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
     ):
         self.lam = lam
         self.nr_iterations = nr_iterations
-        self.use_banded = use_banded
+        self.solver_type = solver_type
         self.max_iter_after_warmstart = max_iter_after_warmstart
 
     def fit(self, X: np.ndarray, y=None) -> "_BaseWhittaker":
@@ -96,7 +106,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
 
         self.DtD_ab_ = (
             _precompute_DtD_banded(n_features)
-            if self.use_banded
+            if self.solver_type == "banded"
             else _precompute_DtD_sparse(n_features)
         )
 
@@ -122,17 +132,15 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
             X_[i] = x - z
         return X_
 
-    def _solve_whittaker(self, x: np.ndarray, w: np.ndarray) -> np.ndarray:
-        # TODO: allow passing a solver function? to avoid checking use_banded every time
+    def _solve_whittaker(
+        self, x: np.ndarray, w: np.ndarray, solver: Callable
+    ) -> np.ndarray:
         try:
-            if self.use_banded:
-                z = _whittaker_smooth_banded(x, w, self.lam, self.DtD_ab_)
-            else:
-                z = _whittaker_smooth_sparse(x, w, self.lam, self.DtD_ab_)
+            z = solver(x, w, self.lam, self.DtD_ab_)
         except Exception as e:
             logger.debug("Banded solver failed (%s); fallback to sparse LU.", e)
-            DtD_ab = _precompute_DtD_sparse(self.n_features_in_)
-            z = _whittaker_smooth_sparse(x, w, self.lam, DtD_ab)
+            DtD = _precompute_DtD_sparse(self.n_features_in_)
+            z = _whittaker_smooth_sparse(x, w, self.lam, DtD)
         return z
 
     @abstractmethod

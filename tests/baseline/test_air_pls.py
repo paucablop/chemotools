@@ -14,7 +14,7 @@ def test_compliance_air_pls():
 
 def test_compliance_air_pls_sparse():
     # Arrange
-    transformer = AirPls(use_banded=False)
+    transformer = AirPls(solver_type="sparse")
     # Act & Assert
     check_estimator(transformer)
 
@@ -22,7 +22,7 @@ def test_compliance_air_pls_sparse():
 # Test functionality
 def test_air_pls_banded(spectrum, reference_airpls):
     # Arrange
-    air_pls = AirPls(lam=100, nr_iterations=15, use_banded=True)
+    air_pls = AirPls(lam=100, nr_iterations=15, solver_type="banded")
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)
@@ -33,7 +33,7 @@ def test_air_pls_banded(spectrum, reference_airpls):
 
 def test_air_pls_sparse(spectrum, reference_airpls):
     # Arrange
-    air_pls = AirPls(lam=100, nr_iterations=15, use_banded=False)
+    air_pls = AirPls(lam=100, nr_iterations=15, solver_type="sparse")
 
     # Act
     spectrum_corrected = air_pls.fit_transform(spectrum)

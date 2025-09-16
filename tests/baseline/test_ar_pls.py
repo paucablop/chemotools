@@ -14,7 +14,7 @@ def test_compliance_ar_pls():
 
 def test_compliance_ar_pls_sparse():
     # Arrange
-    transformer = ArPls(use_banded=False)
+    transformer = ArPls(solver_type="sparse")
     # Act & Assert
     check_estimator(transformer)
 
@@ -22,7 +22,7 @@ def test_compliance_ar_pls_sparse():
 # Test functionality
 def test_ar_pls_banded(spectrum_arpls, reference_arpls):
     # Arrange
-    arpls = ArPls(1e2, 0.0001, use_banded=True)
+    arpls = ArPls(1e2, 0.0001, solver_type="banded")
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
     # Act
@@ -34,7 +34,7 @@ def test_ar_pls_banded(spectrum_arpls, reference_arpls):
 
 def test_ar_pls_sparse(spectrum_arpls, reference_arpls):
     # Arrange
-    arpls = ArPls(1e2, 0.0001, use_banded=False)
+    arpls = ArPls(1e2, 0.0001, solver_type="sparse")
     reference = np.array(spectrum_arpls) - np.array(reference_arpls)
 
     # Act

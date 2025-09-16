@@ -7,10 +7,11 @@ Penalized Least Squares (ArPLS) baseline correction algorithm
 # License: MIT
 
 import logging
+from typing import Literal
 
 import numpy as np
 
-from ._base import _BaseWhittaker
+from ._base import _BaseWhittaker, _whittaker_solver_dispatch
 
 
 logger = logging.getLogger(__name__)
@@ -45,9 +46,9 @@ class ArPls(_BaseWhittaker):
     nr_iterations : int, default=100
         Maximum number of reweighting iterations.
 
-    use_banded : bool, default=True
-        If True, use the banded solver for Whittaker smoothing.
-        Otherwise, use a sparse LU decomposition.
+    solver_type : Literal["banded", "sparse"], default="banded"
+        If "banded", use the banded solver for Whittaker smoothing.
+        If "sparse", use a sparse LU decomposition.
 
     max_iter_after_warmstart : int, default=20
         Maximum iterations allowed when warm-starting from previous weights.
@@ -72,16 +73,16 @@ class ArPls(_BaseWhittaker):
 
     def __init__(
         self,
-        lam=1e4,
-        ratio=1e-2,
-        nr_iterations=100,
-        use_banded=True,
-        max_iter_after_warmstart=20,
+        lam: float = 1e4,
+        ratio: float = 1e-2,
+        nr_iterations: int = 100,
+        solver_type: Literal["banded", "sparse"] = "banded",
+        max_iter_after_warmstart: int = 20,
     ):
         super().__init__(
             lam=lam,
             nr_iterations=nr_iterations,
-            use_banded=use_banded,
+            solver_type=solver_type,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
         self.ratio = ratio
@@ -148,9 +149,12 @@ class ArPls(_BaseWhittaker):
         w : ndarray
             Final weights.
         """
+
+        solver = _whittaker_solver_dispatch(self.solver_type)
+
         for _ in range(max_iter):
             # Solve Whittaker
-            z = self._solve_whittaker(x, w)
+            z = self._solve_whittaker(x, w, solver)
 
             # Calculate residuals
             d = x - z
