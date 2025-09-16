@@ -6,15 +6,13 @@ Penalized Least Squares (AirPLS) baseline correction algorithm
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-import logging
 from typing import Literal
 
 import numpy as np
+from sklearn.utils._param_validation import Interval, Real, StrOptions
+
 
 from ._base import _BaseWhittaker, _whittaker_solver_dispatch
-
-
-logger = logging.getLogger(__name__)
 
 
 class AirPls(_BaseWhittaker):
@@ -69,6 +67,13 @@ class AirPls(_BaseWhittaker):
         "Baseline correction using adaptive iteratively reweighted penalized
         least squares." Analyst 135 (5), 1138–1146 (2010).
     """
+
+    _parameter_constraints: dict = {
+        "lam": [Interval(Real, 0, None, closed="both")],
+        "nr_iterations": [Interval(int, 1, None, closed="both")],
+        "solver_type": StrOptions({"banded", "sparse"}),
+        "max_iter_after_warmstart": [Interval(int, 1, None, closed="both")],
+    }
 
     def __init__(
         self,

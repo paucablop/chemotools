@@ -6,15 +6,12 @@ Penalized Least Squares (ArPLS) baseline correction algorithm
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-import logging
 from typing import Literal
 
 import numpy as np
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from ._base import _BaseWhittaker, _whittaker_solver_dispatch
-
-
-logger = logging.getLogger(__name__)
 
 
 class ArPls(_BaseWhittaker):
@@ -70,6 +67,14 @@ class ArPls(_BaseWhittaker):
         "Baseline correction using asymmetrically reweighted penalized
         least squares smoothing." Analyst 140 (1), 250–257 (2015).
     """
+
+    _parameter_constraints: dict = {
+        "lam": [Interval(Real, 0, None, closed="both")],
+        "ratio": [Interval(Real, 0, 1, closed="both")],
+        "nr_iterations": [Interval(int, 1, None, closed="both")],
+        "solver_type": StrOptions({"banded", "sparse"}),
+        "max_iter_after_warmstart": [Interval(int, 1, None, closed="both")],
+    }
 
     def __init__(
         self,
