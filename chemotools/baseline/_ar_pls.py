@@ -71,9 +71,9 @@ class ArPls(_BaseWhittaker):
     _parameter_constraints: dict = {
         "lam": [Interval(Real, 0, None, closed="both")],
         "ratio": [Interval(Real, 0, 1, closed="both")],
-        "nr_iterations": [Interval(int, 1, None, closed="both")],
+        "nr_iterations": [Interval(Real, 1, None, closed="both")],
         "solver_type": StrOptions({"banded", "sparse"}),
-        "max_iter_after_warmstart": [Interval(int, 1, None, closed="both")],
+        "max_iter_after_warmstart": [Interval(Real, 1, None, closed="both")],
     }
 
     def __init__(

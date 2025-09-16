@@ -123,6 +123,13 @@ def reference_arpls() -> np.ndarray:
 
 
 @pytest.fixture
+def reference_asls() -> np.ndarray:
+    return np.loadtxt(
+        os.path.join(path_to_resources, "reference_asls.csv"), delimiter=","
+    ).reshape(1, -1)
+
+
+@pytest.fixture
 def reference_msc_mean() -> np.ndarray:
     return np.loadtxt(
         os.path.join(path_to_resources, "reference_msc_mean.csv"), delimiter=","
