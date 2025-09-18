@@ -11,10 +11,11 @@ from typing import Literal
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
-from ._base import _BaseWhittaker, _whittaker_solver_dispatch
+from ._base import _BaselineWhittakerMixin
+from chemotools.smooth._base import _BaseWhittaker
 
 
-class AsLs(_BaseWhittaker):
+class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
     """
     Asymmetric Least Squares (AsLs) baseline correction.
 
@@ -92,10 +93,10 @@ class AsLs(_BaseWhittaker):
         solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
     ):
-        super().__init__(
-            lam=lam,
+        _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
+        _BaselineWhittakerMixin.__init__(
+            self,
             nr_iterations=nr_iterations,
-            solver_type=solver_type,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
         self.penalty = penalty
@@ -144,7 +145,7 @@ class AsLs(_BaseWhittaker):
         self, x: np.ndarray, w: np.ndarray, max_iter: int
     ) -> tuple[np.ndarray, np.ndarray]:
         """
-        Run ArPls iterations on a single spectrum.
+        Run AsLs iterations on a single spectrum.
 
         Parameters
         ----------
@@ -162,27 +163,19 @@ class AsLs(_BaseWhittaker):
         w : ndarray
             Final weights.
         """
-
-        solver = _whittaker_solver_dispatch(self.solver_type)
-
         for _ in range(max_iter):
-            # Solve Whittaker
-            z = self._solve_whittaker(x, w, solver)
+            # Whittaker smoothing
+            z = self._solve_whittaker(x, w)
 
-            # Calculate residuals
+            # Residuals
             d = x - z
 
-            # Store previous weights for convergence check
-            mask = d >= 0
-
-            # Update weights in-place
-            wt = np.where(mask, self.penalty, 1 - self.penalty)
+            # Update weights
+            new_w = np.where(d >= 0, self.penalty, 1 - self.penalty)
 
             # Convergence check
-            if np.array_equal(wt, w):
+            if np.array_equal(new_w, w):
                 break
-
-            # Update previous weights
-            w = wt
+            w = new_w
 
         return z, w

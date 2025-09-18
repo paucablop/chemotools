@@ -7,14 +7,14 @@ Penalized Least Squares (ArPLS) baseline correction algorithm
 # License: MIT
 
 from typing import Literal
-
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
-from ._base import _BaseWhittaker, _whittaker_solver_dispatch
+from ._base import _BaselineWhittakerMixin
+from chemotools.smooth._base import _BaseWhittaker
 
 
-class ArPls(_BaseWhittaker):
+class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
     """
     Asymmetrically Reweighted Penalized Least Squares (ArPLS) baseline correction.
 
@@ -92,10 +92,10 @@ class ArPls(_BaseWhittaker):
         solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
     ):
-        super().__init__(
-            lam=lam,
+        _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
+        _BaselineWhittakerMixin.__init__(
+            self,
             nr_iterations=nr_iterations,
-            solver_type=solver_type,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
         self.ratio = ratio
@@ -162,35 +162,31 @@ class ArPls(_BaseWhittaker):
         w : ndarray
             Final weights.
         """
-
-        solver = _whittaker_solver_dispatch(self.solver_type)
-
         for _ in range(max_iter):
-            # Solve Whittaker
-            z = self._solve_whittaker(x, w, solver)
+            # Step 1: Whittaker smoothing
+            z = self._solve_whittaker(x, w)
 
-            # Calculate residuals
+            # Step 2: Residuals
             d = x - z
-
-            # Update weights
             dn = d[d < 0]
 
-            # Early stopping if no negative residuals
+            # Early stopping: no negative residuals
             if dn.size == 0:
                 break
 
-            # Early stopping if std is zero
+            # Early stopping: std is zero
             m, s = dn.mean(), dn.std()
             if s == 0:
                 break
 
+            # Step 3: Update weights
             exponent = np.clip(2 * (d - (2 * s - m)) / s, -709, 709)
-            wt = 1.0 / (1.0 + np.exp(exponent))
+            new_w = 1.0 / (1.0 + np.exp(exponent))
 
-            # Early stopping if weights do not change
-            if np.linalg.norm(w - wt) / np.linalg.norm(w) < self.ratio:
-                w = wt
+            # Convergence check
+            if np.linalg.norm(w - new_w) / np.linalg.norm(w) < self.ratio:
+                w = new_w
                 break
-            w = wt
+            w = new_w
 
         return z, w

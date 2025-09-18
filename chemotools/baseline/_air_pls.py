@@ -7,15 +7,14 @@ Penalized Least Squares (AirPLS) baseline correction algorithm
 # License: MIT
 
 from typing import Literal
-
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
+from ._base import _BaselineWhittakerMixin
+from chemotools.smooth._base import _BaseWhittaker
 
-from ._base import _BaseWhittaker, _whittaker_solver_dispatch
 
-
-class AirPls(_BaseWhittaker):
+class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
     """
     Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline correction.
 
@@ -90,10 +89,10 @@ class AirPls(_BaseWhittaker):
         solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
     ):
-        super().__init__(
-            lam=lam,
+        _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
+        _BaselineWhittakerMixin.__init__(
+            self,
             nr_iterations=nr_iterations,
-            solver_type=solver_type,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
 
@@ -141,7 +140,7 @@ class AirPls(_BaseWhittaker):
         self, x: np.ndarray, w: np.ndarray, max_iter: int
     ) -> tuple[np.ndarray, np.ndarray]:
         """
-        Run vectorized AirPLS iterations (keeps original exponential weighting).
+        Compute AirPls baseline for a single spectrum.
 
         Parameters
         ----------
@@ -161,39 +160,32 @@ class AirPls(_BaseWhittaker):
         """
         x_abs_sum = np.abs(x).sum()
 
-        solver = _whittaker_solver_dispatch(self.solver_type)
-
         for i in range(max_iter):
-            # Step 1: Solve the Whittaker smoothing system for the current weights
-            z = self._solve_whittaker(x, w, solver)
+            # Step 1: Whittaker smoothing
+            z = self._solve_whittaker(x, w)
 
-            # Step 2: Compute residuals (difference between signal and baseline)
+            # Step 2: Residuals
             d = x - z
-
-            # Early exit: stop if residuals are exactly zero
             if np.all(d == 0):
                 break
 
-            # Step 3: Focus on negative residuals only (baseline should sit below peaks)
+            # Step 3: Negative residuals only
             mask = d < 0
-            d_neg = d * mask  # keep negative values, zero out others
-            dssn = -d_neg.sum()  # total absolute deviation of negative residuals
+            d_neg = d * mask
+            dssn = -d_neg.sum()
 
-            # Stopping criterion: small negative deviation relative to signal size
+            # Stopping criterion
             if dssn < 0.001 * x_abs_sum:
                 break
-
-            # Safety stop: prevent exceeding configured number of iterations
             if i == self.nr_iterations - 1:
                 break
 
-            # Step 4: Update weights using exponential reweighting
+            # Step 4: Update weights
             new_w = np.zeros_like(w)
             if dssn > 0:
-                # Exponential weighting for negative residuals
                 new_w[mask] = np.exp(i * (-d_neg[mask]) / dssn)
 
-                # Boundary handling: enforce consistent weights at signal edges
+                # Boundary handling
                 neg_vals = d[mask]
                 if neg_vals.size > 0:
                     new_w[0] = np.exp(i * (-neg_vals).max() / dssn)
@@ -201,5 +193,4 @@ class AirPls(_BaseWhittaker):
 
             w = new_w
 
-        # Return final baseline estimate and weights
         return z, w

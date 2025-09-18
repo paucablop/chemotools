@@ -1,121 +1,179 @@
+"""
+The :mod:`chemotools.smooth._whittaker_smooth` module implements the Whittaker smoothing algorithm.
+"""
+
+# Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
+# License: MIT
+
+from typing import Literal
 import numpy as np
-from scipy.sparse import csc_matrix, eye, diags
-from scipy.sparse.linalg import spsolve
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import (
-    check_is_fitted,
-    validate_data,
-)  # This code is adapted from the following source:
-
-# Z.-M. Zhang, S. Chen, and Y.-Z. Liang,
-# Baseline correction using adaptive iteratively reweighted penalized least squares.
-# Analyst 135 (5), 1138-1146 (2010).
+from ._base import _BaseWhittaker
 
 
-class WhittakerSmooth(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class WhittakerSmooth(_BaseWhittaker):
     """
-    A transformer that calculates the Whittaker smooth of the input data.
+    Whittaker smoothing for noise reduction and signal trend estimation.
+
+    Whittaker smoothing is a penalized least squares method that estimates
+    smooth trends from noisy data by balancing fidelity to the input signal
+    with a smoothness constraint. A second-order difference operator is used
+    as the penalty term, ensuring that the estimated signal is smooth while
+    preserving overall shape.
+
+    The Whittaker smoothing step can be solved using either:
+    - a **banded solver** (fast and memory-efficient, recommended for most spectra), or
+    - a **sparse LU solver** (more stable for ill-conditioned problems).
+
+    Optional weights can be provided to emphasize or downweight certain
+    observations during smoothing. If no weights are supplied, all points
+    are treated equally.
 
     Parameters
     ----------
-    lam : float, optional
-        The lambda parameter to use for the Whittaker smooth. Default is 1e2.
+    lam : float, default=1e4
+        Regularization parameter controlling smoothness of the fitted signal.
+        Larger values yield smoother trends.
 
-    differences : int, optional
-        The number of differences to use for the Whittaker smooth. Default is 1.
+    weights : ndarray of shape (n_features,), optional
+        Non-negative weights applied to each observation. If None,
+        all observations are weighted equally.
+
+    solver_type : Literal["banded", "sparse"], default="banded"
+        If "banded", use the banded solver for Whittaker smoothing.
+        If "sparse", use a sparse LU decomposition.
 
     Methods
     -------
     fit(X, y=None)
-        Fit the transformer to the input data.
+        Fit the smoother to the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the Whittaker smooth.
+    transform(X, y=None)
+        Apply Whittaker smoothing to the input data.
+
+    _fit_core(X, y=None, nr_iterations=1)
+        Internal method: store weights for smoothing.
+
+    _transform_core(X, y=None, nr_iterations=1)
+        Internal method: apply Whittaker smoothing to each input spectrum.
+
+    Examples
+    --------
+    >>> from chemotools.smooth import WhittakerSmooth
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 2, 1]], dtype=float)
+    >>> ws = WhittakerSmooth(lam=10)
+    >>> X_smooth = ws.fit_transform(X)
+
+    References
+    ----------
+    [1] Eilers, P.H. (2003).
+        "A perfect smoother." Analytical Chemistry 75 (14), 3631–3636.
     """
 
     def __init__(
         self,
-        lam: float = 1e2,
-        differences: int = 1,
+        lam: float = 1e4,
+        weights: np.ndarray | None = None,
+        solver_type: Literal["banded", "sparse"] = "banded",
     ):
-        self.lam = lam
-        self.differences = differences
+        super().__init__(lam=lam, weights=weights, solver_type=solver_type)
 
     def fit(self, X: np.ndarray, y=None) -> "WhittakerSmooth":
         """
-        Fit the transformer to the input data.
+        Fit the Whittaker smoother to input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit the transformer to.
+        X : ndarray of shape (n_samples, n_features)
+            The input data matrix, where rows correspond to samples
+            and columns correspond to features (e.g., spectra).
 
         y : None
-            Ignored.
+            Ignored, present for API consistency with scikit-learn.
 
         Returns
         -------
         self : WhittakerSmooth
-            The fitted transformer.
+            Fitted estimator.
         """
-        # Check that X is a 2D array and has only finite values
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-        return self
+        return super().fit(X, y)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by calculating the Whittaker smooth.
+        Apply Whittaker smoothing to input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
+        X : ndarray of shape (n_samples, n_features)
+            The input data matrix to smooth.
+
+        y : None
+            Ignored, present for API consistency with scikit-learn.
+
+        Returns
+        -------
+        X_smooth : ndarray of shape (n_samples, n_features)
+            The smoothed version of the input data.
+        """
+        return super().transform(X, y)
+
+    def _fit_core(
+        self, X: np.ndarray, y=None, nr_iterations: int = 1
+    ) -> "WhittakerSmooth":
+        """
+        Core fitting logic for Whittaker smoothing.
+
+        Stores the observation weights to be used in subsequent
+        smoothing operations. If no custom weights were provided,
+        uniform weights are applied.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            The input data matrix.
 
         y : None
             Ignored.
 
+        nr_iterations : int, default=1
+            Not used. Present for API consistency with subclasses.
+
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+        self : WhittakerSmooth
+            Fitted smoother with stored weights.
         """
-        # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
-
-        # Check that X is a 2D array and has only finite values
-        X_ = validate_data(
-            self,
-            X,
-            y="no_validation",
-            ensure_2d=True,
-            copy=True,
-            reset=False,
-            dtype=np.float64,
+        # Default weights if not provided
+        self.weights_ = (
+            self.weights if self.weights is not None else np.ones(X.shape[1])
         )
+        return self
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
+    def _transform_core(
+        self, X: np.ndarray, y=None, nr_iterations: int = 1
+    ) -> np.ndarray:
+        """
+        Core transformation logic for Whittaker smoothing.
 
-        # Calculate the whittaker smooth
-        for i, x in enumerate(X_):
-            X_[i] = self._calculate_whittaker_smooth(x)
+        Applies Whittaker smoothing to each input sample using
+        the stored weights and regularization parameter.
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            The input data to smooth.
 
-    def _calculate_whittaker_smooth(self, x):
-        X = np.array(x)
-        m = X.size
-        E = eye(m, format="csc")
-        w = np.ones(m)
-        for i in range(self.differences):
-            E = E[1:] - E[:-1]
-        W = diags(w, 0, shape=(m, m))
-        A = csc_matrix(W + (self.lam * E.T @ E))
-        B = csc_matrix(W @ X.T).toarray().ravel()
-        background = spsolve(A, B)
-        return np.array(background)
+        y : None
+            Ignored.
+
+        nr_iterations : int, default=1
+            Not used. Present for API consistency with subclasses.
+
+        Returns
+        -------
+        X_smooth : ndarray of shape (n_samples, n_features)
+            The smoothed input data.
+        """
+        for i, x in enumerate(X):
+            X[i] = self._solve_whittaker(x, self.weights_)
+        return X
