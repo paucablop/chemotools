@@ -5,7 +5,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
-from typing import Literal, Optional, Self
+from typing import Literal, Optional
+from typing_extensions import Self
 
 import numpy as np
 
