@@ -49,7 +49,7 @@ class _BaselineWhittakerMixin:
             z, _ = self._calculate_baseline(
                 x,
                 self.w_init_.copy(),
-                max_iter=min(nr_iterations, self.max_iter_after_warmstart),
+                max_iter=min(self.nr_iterations, self.max_iter_after_warmstart),
             )
             X[i] = x - z
         return X
