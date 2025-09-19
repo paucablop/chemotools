@@ -37,7 +37,7 @@ class _BaselineWhittakerMixin:
         _, w = self._calculate_baseline(
             x0,
             np.ones_like(x0),
-            max_iter=nr_iterations or self.nr_iterations,
+            max_iter=self.nr_iterations,
         )
         self.w_init_ = w
         return self
@@ -49,10 +49,7 @@ class _BaselineWhittakerMixin:
             z, _ = self._calculate_baseline(
                 x,
                 self.w_init_.copy(),
-                max_iter=min(
-                    nr_iterations or self.nr_iterations,
-                    self.max_iter_after_warmstart,
-                ),
+                max_iter=min(nr_iterations, self.max_iter_after_warmstart),
             )
             X[i] = x - z
         return X
