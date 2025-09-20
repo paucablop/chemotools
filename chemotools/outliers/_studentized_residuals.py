@@ -7,7 +7,7 @@ from sklearn.utils.validation import validate_data, check_is_fitted
 
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .leverage import calculate_leverage
+from ._leverage import calculate_leverage
 
 
 class StudentizedResiduals(_ModelResidualsBase):
