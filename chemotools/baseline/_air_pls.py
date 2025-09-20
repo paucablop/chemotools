@@ -177,8 +177,6 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
             # Stopping criterion
             if dssn < 0.001 * x_abs_sum:
                 break
-            if i == self.nr_iterations - 1:
-                break
 
             # Step 4: Update weights
             new_w = np.zeros_like(w)
