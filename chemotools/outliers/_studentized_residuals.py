@@ -88,6 +88,7 @@ class StudentizedResiduals(_ModelResidualsBase):
     """
 
     _parameter_constraints: dict = {
+        "model": [Pipeline, ModelTypes],
         "confidence": [Interval(Real, 0, 1, closed="both")],
     }
 

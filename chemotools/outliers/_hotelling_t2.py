@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.outliers._hotelling_t2` module implements Hotelling's T-squared
+outlier detection algorithm.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional, Union
 import numpy as np
 
@@ -5,6 +13,8 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils._param_validation import Interval, Real
+
 from scipy.stats import f as f_distribution
 
 from ._base import _ModelResidualsBase, ModelTypes
@@ -42,11 +52,47 @@ class HotellingT2(_ModelResidualsBase):
     critical_value_ : float
         The calculated critical value for outlier detection
 
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the Hotelling's T-squared model by calculating the critical value.
+
+    predict(X, y=None)
+        Identify outliers in the input data based on Hotelling's T-squared statistics.
+        Returns -1 for outliers and 1 for inliers.
+
+    predict_residuals(X, y=None, validate=True)
+        Calculate Hotelling's T-squared statistics for the input data.
+
+    _calculate_critical_value(X)
+        Calculate the critical value for Hotelling's T-squared statistics.
+
+    Examples
+    --------
+    >>> from sklearn.decomposition import PCA
+    >>> from chemotools.outliers import HotellingT2
+    >>> X = np.random.rand(100, 10)
+    >>> pca = PCA(n_components=3).fit(X)
+    >>> # Initialize HotellingT2 with the fitted PCA model
+    >>> hotelling_t2 = HotellingT2(model=pca, confidence=0.95)
+    >>> hotelling_t2.fit(X)
+    HotellingT2()
+    >>> # Predict outliers in the dataset
+    >>> outliers = hotelling_t2.predict(X)
+    >>> # Calculate Hotelling's T-squared statistics
+    >>> t2_stats = hotelling_t2.predict_residuals(X)
+
     References
     ----------
-    Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde (2001) Generalized contribution plots in multivariate statistical process
-    monitoring  Chemometrics and Intelligent Laboratory Systems 51 2000 95–114
+    [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde
+        Generalized contribution plots in multivariate statistical process
+        monitoring  Chemometrics and Intelligent Laboratory Systems 51 2000 95–114 (2001).
     """
+
+    _parameter_constraints = {
+        "model": [Pipeline, ModelTypes],
+        "confidence": [Interval(Real, 0, 1, closed="both")],
+    }
 
     def __init__(
         self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
@@ -58,8 +104,19 @@ class HotellingT2(_ModelResidualsBase):
         """
         Fit the model to the input data.
 
-        This step calculates the critical value for the outlier detection. In the DmodX method,
-        the critical value is not depend on the input data but on the model parameters.
+        This step calculates the critical value for the outlier detection.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
+        y : Ignored
+            Not used, present for API consistency by convention.
+
+        Returns
+        -------
+        self : HotellingT2
+            Fitted estimator with the critical threshold computed
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -79,7 +136,7 @@ class HotellingT2(_ModelResidualsBase):
         Returns
         -------
         ndarray of shape (n_samples,)
-            Boolean array indicating outliers
+            Boolean array indicating outliers (-1) and inliers (1)
         """
         # Check the estimator has been fitted
         check_is_fitted(self, ["critical_value_"])
@@ -103,10 +160,13 @@ class HotellingT2(_ModelResidualsBase):
         X : array-like of shape (n_samples, n_features)
             Input data
 
+        y : None
+            Ignored.
+
         Returns
         -------
         ndarray of shape (n_samples,)
-            Hotellin's T-squared statistics for each sample
+            Hotelling's T-squared statistics for each sample
         """
         # Check the estimator has been fitted
         check_is_fitted(self, ["critical_value_"])
@@ -138,6 +198,11 @@ class HotellingT2(_ModelResidualsBase):
     def _calculate_critical_value(self, X: Optional[np.ndarray] = None) -> float:
         """
         Calculate the critical value for the Hotelling's T-squared statistics.
+
+        Parameters
+        ----------
+        X : Ignored
+            Not used, present for API consistency by convention.
 
         Returns
         -------

@@ -68,7 +68,7 @@ class DModX(_ModelResidualsBase):
         the training residual variance and the critical value for outlier detection.
 
     predict(X)
-        Predict outliers in the input data based on DModX statistics.
+        Predict outliers in the input data based on DModX statistics. Returns -1 for outliers and 1 for inliers.
 
     predict_residuals(X, y=None, validate=True)
         Calculate normalized DModX statistics for the input data.
@@ -100,6 +100,7 @@ class DModX(_ModelResidualsBase):
     """
 
     _parameter_constraints: dict = {
+        "model": [Pipeline, ModelTypes],
         "confidence": [Interval(Real, 0, 1, closed="both")],
         "meancentered_data": [bool],
     }
