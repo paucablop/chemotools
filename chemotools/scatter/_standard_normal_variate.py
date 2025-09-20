@@ -22,7 +22,7 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     Raises
     ------
     UserWarning
-        If the standard deviation of a spectrum is zero, a warning is raised
+        If the standard deviation of a spectrum is zero (spectrum is flat), a warning is raised
         indicating that the result will contain NaNs.
 
     Examples
