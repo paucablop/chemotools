@@ -10,7 +10,7 @@ import numpy as np
 
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
-from sklearn.utils._param_validation import Interval, Real, StrOptions
+from sklearn.utils._param_validation import Interval, Real
 from scipy.stats import f as f_distribution
 
 
@@ -101,7 +101,7 @@ class DModX(_ModelResidualsBase):
 
     _parameter_constraints: dict = {
         "confidence": [Interval(Real, 0, 1, closed="both")],
-        "meancentered_data": [StrOptions({"true", "false"})],
+        "meancentered_data": [bool],
     }
 
     def __init__(
@@ -111,7 +111,7 @@ class DModX(_ModelResidualsBase):
         mean_centered: bool = True,
     ) -> None:
         super().__init__(model, confidence)
-        self.meancentered_data = mean_centered
+        self.mean_centered = mean_centered
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "DModX":
         """
@@ -148,7 +148,7 @@ class DModX(_ModelResidualsBase):
         self.train_sse_ = np.sum(residuals**2)
 
         # Set degrees of freedom depending on mean centering
-        self.A0_ = 1 if self.meancentered_data else 0
+        self.A0_ = 1 if self.mean_centered else 0
 
         # Compute the critical value
         self.critical_value_ = self._calculate_critical_value()
