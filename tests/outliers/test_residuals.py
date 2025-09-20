@@ -87,6 +87,9 @@ def test_outlier_detection_models(
     prediction_inlier = model.predict_residuals(test_point_inlier)[0]
     prediction_outlier = model.predict_residuals(test_point_outlier)[0]
 
+    inlier_flag = model.predict(test_point_inlier)
+    outlier_flag = model.predict(test_point_outlier)
+
     # Assert model attributes
     assert model.confidence == kwargs["confidence"], (
         "Confidence value should match input"
@@ -117,3 +120,7 @@ def test_outlier_detection_models(
     assert np.isclose(prediction_outlier, expected_prediction_outlier), (
         "Prediction value mismatch"
     )
+
+    # Assert outlier flags
+    assert inlier_flag == 1, "Inlier flag should be 1"
+    assert outlier_flag == -1, "Outlier flag should be -1"
