@@ -1,10 +1,18 @@
+"""
+The :mod:`chemotools.outliers._studentized_residuals` module implements the Studentized Residuals
+outlier detection algorithm.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional, Union
 import numpy as np
 
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
-
+from sklearn.utils._param_validation import Interval, Real
 
 from ._base import _ModelResidualsBase, ModelTypes
 from ._leverage import calculate_leverage
@@ -19,6 +27,9 @@ class StudentizedResiduals(_ModelResidualsBase):
     model : Union[ModelType, Pipeline]
         A fitted _PLS model or Pipeline ending with such a model
 
+    confidence : float, default=0.95
+        Confidence level for statistical calculations (between 0 and 1)
+
     Attributes
     ----------
     estimator_ : ModelType
@@ -27,10 +38,58 @@ class StudentizedResiduals(_ModelResidualsBase):
     transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
+    n_features_in_ : int
+        Number of features in the input data
+
+    n_components_ : int
+        Number of components in the model
+
+    n_samples_ : int
+        Number of samples used to train the model
+
+    critical_value_ : float
+        The calculated critical value for outlier detection
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the Studentized Residuals model by computing residuals from the training set.
+        Calculates the critical threshold based on the chosen method.
+
+    predict(X, y=None)
+        Identify outliers in the input data based on Studentized Residuals threshold.
+
+    predict_residuals(X, y=None, validate=True)
+        Calculate Studentized Residuals for input data.
+
+    _calculate_critical_value(X)
+        Calculate the critical value for outlier detection using the specified method.
+
+    Examples
+    --------
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.outliers import StudentizedResiduals
+    >>> X = np.random.rand(100, 10)
+    >>> y = np.random.rand(100)
+    >>> pls = PLSRegression(n_components=3).fit(X, y)
+    >>> # Initialize StudentizedResiduals with the fitted PLS model
+    >>> studentized_residuals = StudentizedResiduals(pls, confidence=0.95)
+    >>> studentized_residuals.fit(X, y)
+    StudentizedResiduals()
+    >>> # Predict outliers in the dataset
+    >>> outliers = studentized_residuals.predict(X, y)
+    >>> # Get the studentized residuals
+    >>> residuals = studentized_residuals.predict_residuals(X, y)
+
     References
     ----------
-
+    [1] Kim H. Esbensen,
+        "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
     """
+
+    _parameter_constraints: dict = {
+        "confidence": [Interval(Real, 0, 1, closed="both")],
+    }
 
     def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
         self.model, self.confidence = model, confidence
@@ -47,6 +106,11 @@ class StudentizedResiduals(_ModelResidualsBase):
 
         y : array-like of shape (n_samples,)
             Target data
+
+        Returns
+        -------
+        self : StudentizedResiduals
+            Fitted estimator with the critical threshold computed
         """
         # Validate the input data
         X = validate_data(

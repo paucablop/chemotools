@@ -1,8 +1,17 @@
+"""
+The :mod:`chemotools.outliers._leverage` module implements the Leverage
+outlier detection algorithm.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional, Union
 import numpy as np
 
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils._param_validation import Interval, Real
 
 
 from ._base import _ModelResidualsBase, ModelTypes
@@ -10,26 +19,76 @@ from ._base import _ModelResidualsBase, ModelTypes
 
 class Leverage(_ModelResidualsBase):
     """
-    Calculate the leverage of the training samples on  the latent space of a PCA or PLS models.
+    Calculate the leverage of the training samples on  the latent space of a PLS model.
     This method allows to detect datapoints with high leverage in the model.
 
     Parameters
     ----------
     model : Union[ModelType, Pipeline]
-        A fitted PCA/PLS model or Pipeline ending with such a model
+        A fitted PLSRegression model or Pipeline ending with such a model
+
+    confidence : float, default=0.95
+        Confidence level for statistical calculations (between 0 and 1)
 
     Attributes
     ----------
     estimator_ : ModelType
-        The fitted model of type _BasePCA or _PLS
+        The fitted model of type _PLS
 
     transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
 
+    n_features_in_ : int
+        Number of features in the input data
+
+    n_components_ : int
+        Number of components in the model
+
+    n_samples_ : int
+        Number of samples used to train the model
+
+    critical_value_ : float
+        The calculated critical value for outlier detection
+
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the Leverage model by computing leverage from the training set.
+        Calculates the critical threshold based on the chosen method.
+
+    predict(X, y=None)
+        Identify outliers in the input data based on Leverage threshold.
+
+    predict_residuals(X, y=None, validate=True)
+        Calculate the leverage of the samples.
+
+    _calculate_critical_value(X)
+        Calculate the critical value for outlier detection using the percentile method.
+
+    Examples
+    --------
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.outliers import Leverage
+    >>> X = np.random.rand(100, 10)
+    >>> y = np.random.rand(100)
+    >>> pls = PLSRegression(n_components=3).fit(X, y)
+    >>> # Initialize Leverage with the fitted PLS model
+    >>> leverage = Leverage(pls, confidence=0.95)
+    >>> leverage.fit(X, y)
+    >>> # Predict outliers in the dataset
+    >>> outliers = leverage.predict(X)
+    >>> # Get the studentized residuals
+    >>> residuals = leverage.predict_residuals(X)
+
     References
     ----------
-
+    [1] Kim H. Esbensen,
+        "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
     """
+
+    _parameter_constraints: dict = {
+        "confidence": [Interval(Real, 0, 1, closed="both")],
+    }
 
     def __init__(
         self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
@@ -42,7 +101,17 @@ class Leverage(_ModelResidualsBase):
         Fit the model to the input data.
 
         Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
 
+        y : array-like of shape (n_samples,), default=None
+            Target data
+
+        Returns
+        -------
+        self : Leverage
+            Fitted estimator with the critical threshold computed
         """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
