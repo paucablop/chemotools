@@ -77,7 +77,7 @@ class Leverage(_ModelResidualsBase):
     >>> leverage.fit(X, y)
     >>> # Predict outliers in the dataset
     >>> outliers = leverage.predict(X)
-    >>> # Get the studentized residuals
+    >>> # Get the leverage of the samples
     >>> residuals = leverage.predict_residuals(X)
 
     References
