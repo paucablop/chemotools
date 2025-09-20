@@ -98,11 +98,6 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         if self.derivative_order == 1:
             for i, x in enumerate(X_):
                 derivative = self._spectrum_first_derivative(x)

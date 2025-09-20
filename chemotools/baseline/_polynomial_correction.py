@@ -105,12 +105,6 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Calculate polynomial baseline correction
         for i, x in enumerate(X_):
             X_[i] = self._baseline_correct_spectrum(x)

@@ -81,12 +81,6 @@ class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Normalize the data by the maximum value
         if self.use_min:
             X_ = (X_ - np.min(X_, axis=1, keepdims=True)) / (
