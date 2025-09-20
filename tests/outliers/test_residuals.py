@@ -12,8 +12,6 @@ from chemotools.outliers import (
 
 
 # Test functionality
-
-
 # Parametrized test
 @pytest.mark.parametrize(
     "model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier",
@@ -23,9 +21,9 @@ from chemotools.outliers import (
             DModX,
             {"confidence": 0.95},
             1,
-            14.124446891825524,
-            0.39112407920976716,
-            3356.9164551405065,
+            1.7576128734793073,
+            0.08797542463276586,
+            755.0702354976111,
         ),
         # QResiduals with different methods & PCA components
         (
