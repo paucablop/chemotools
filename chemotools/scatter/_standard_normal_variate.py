@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.scatter._snv` module implements the Standard Normal Variate (SNV) transformation.
+The :mod:`chemotools.scatter._standard_normal_variate` module implements the Standard Normal Variate (SNV) transformation.
 """
 
 # Authors: Pau Cabaneros
@@ -113,5 +113,6 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
             warnings.warn(
                 "Standard deviation is zero in SNV. This indicates a flat signal and will result in NaNs.",
                 UserWarning,
+                stacklevel=2,
             )
         return (x - x.mean()) / std

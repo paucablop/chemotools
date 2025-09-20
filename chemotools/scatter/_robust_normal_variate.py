@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.scatter._rnv` module implements the Robust Normal Variate (RNV) transformation.
+The :mod:`chemotools.scatter._robust_normal_variate` module implements the Robust Normal Variate (RNV) transformation.
 """
 
 # Authors: Pau Cabaneros
@@ -9,6 +9,7 @@ import warnings
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Real
 
 
 class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -20,6 +21,10 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     percentile : float, optional
         The percentile to use for the robust normal variate. The value should be
         between 0 and 100. The default is 25.
+
+    epsilon : float, optional
+        A small value added to the denominator to avoid numerical instability
+        (division by zero). The default is 1e-10.
 
     Methods
     -------
@@ -36,7 +41,7 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     ------
     UserWarning
         If the standard deviation of the values below the specified percentile is zero,
-        a warning is raised indicating that the result will contain NaNs.
+        a warning and a small epsilon is added to the denominator to avoid NaNs.
 
     Examples
     --------
@@ -53,15 +58,21 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         recognition with near-infrared data." doi:10.1016/S0003-2670(98)00737-5
     """
 
-    def __init__(self, percentile: float = 25):
+    _parameter_constraints: dict = {
+        "percentile": [Interval(Real, 0, None, closed="both")],
+        "epsilon": [Interval(Real, 0, None, closed="both")],
+    }
+
+    def __init__(self, percentile: float = 25, epsilon: float = 1e-10):
         self.percentile = percentile
+        self.epsilon = epsilon
 
     def fit(self, X: np.ndarray, y=None) -> "RobustNormalVariate":
         """
         Fit the transformer to the input data.
 
         Parameters
-        ----------
+        ---------->
         X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
@@ -123,5 +134,6 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             warnings.warn(
                 "Denominator is zero in RNV. Adding epsilon to avoid NaNs.",
                 UserWarning,
+                stacklevel=2,
             )
-        return (x - percentile) / (denom + 1e-10)
+        return (x - percentile) / (denom + self.epsilon)
