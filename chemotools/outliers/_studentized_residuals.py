@@ -93,7 +93,6 @@ class StudentizedResiduals(_ModelResidualsBase):
     }
 
     def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
-        self.model, self.confidence = model, confidence
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "StudentizedResiduals":
