@@ -5,7 +5,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
-from typing import Literal, Optional
+from typing import Callable, Literal, Optional
 from typing_extensions import Self
 
 import numpy as np
@@ -16,7 +16,6 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 from chemotools.utils._linear_algebra import (
     compute_DtD_banded,
     compute_DtD_sparse,
-    whittaker_solver_dispatch,
     whittaker_smooth_sparse,
 )
 
@@ -70,9 +69,10 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
             else compute_DtD_sparse(n_features)
         )
 
-    def _solve_whittaker(self, x: np.ndarray, w: np.ndarray) -> np.ndarray:
+    def _solve_whittaker(
+        self, x: np.ndarray, w: np.ndarray, solver: Callable
+    ) -> np.ndarray:
         """Solve (diag(w) + lam*D^T D) z = w*x."""
-        solver = whittaker_solver_dispatch(self.solver_type)
         try:
             return solver(x, w, self.lam, self.DtD_ab_)
         except Exception as e:

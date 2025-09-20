@@ -7,6 +7,8 @@ The :mod:`chemotools.smooth._whittaker_smooth` module implements the Whittaker s
 
 from typing import Literal
 import numpy as np
+
+from chemotools.utils._linear_algebra import whittaker_solver_dispatch
 from ._base import _BaseWhittaker
 
 
@@ -174,6 +176,7 @@ class WhittakerSmooth(_BaseWhittaker):
         X_smooth : ndarray of shape (n_samples, n_features)
             The smoothed input data.
         """
+        solver = whittaker_solver_dispatch(self.solver_type)
         for i, x in enumerate(X):
-            X[i] = self._solve_whittaker(x, self.weights_)
+            X[i] = self._solve_whittaker(x, self.weights_, solver)
         return X

@@ -6,7 +6,7 @@ Penalized Least Squares (AirPLS) baseline correction algorithm
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-from typing import Literal
+from typing import Callable, Literal
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
@@ -92,6 +92,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
         _BaselineWhittakerMixin.__init__(
             self,
+            solver_type=solver_type,
             nr_iterations=nr_iterations,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )
@@ -137,7 +138,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         return super().transform(X, y)
 
     def _calculate_baseline(
-        self, x: np.ndarray, w: np.ndarray, max_iter: int
+        self, x: np.ndarray, w: np.ndarray, max_iter: int, solver: Callable
     ) -> tuple[np.ndarray, np.ndarray]:
         """
         Compute AirPls baseline for a single spectrum.
@@ -162,7 +163,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
 
         for i in range(max_iter):
             # Step 1: Whittaker smoothing
-            z = self._solve_whittaker(x, w)
+            z = self._solve_whittaker(x, w, solver=solver)
 
             # Step 2: Residuals
             d = x - z
