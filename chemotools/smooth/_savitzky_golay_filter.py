@@ -97,11 +97,6 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             dtype=np.float64,
         )
 
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
             X_[i] = self._calculate_smoothing(x)
