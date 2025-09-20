@@ -99,7 +99,7 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             The residuals of the model
         """
         self.fit(X, y)
-        return self.predict_residuals(X, y, validate=True)
+        return self.predict_residuals(X, y, validate)
 
     @abstractmethod
     def predict_residuals(
