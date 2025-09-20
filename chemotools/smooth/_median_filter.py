@@ -99,11 +99,6 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Mean filter the data
         for i, x in enumerate(X_):
             X_[i] = median_filter(x, size=self.window_size, mode=self.mode)
