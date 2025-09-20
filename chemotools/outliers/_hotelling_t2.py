@@ -138,7 +138,7 @@ class HotellingT2(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers (-1) and inliers (1)
         """
-        return super().predict(X)
+        return super().predict(X, y)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True

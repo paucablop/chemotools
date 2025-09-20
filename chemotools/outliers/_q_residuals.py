@@ -151,7 +151,7 @@ class QResiduals(_ModelResidualsBase):
             Boolean array indicating outliers (-1 for outliers, 1 for normal data).
         """
         # Check the estimator has been fitted
-        return super().predict(X)
+        return super().predict(X, y)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
