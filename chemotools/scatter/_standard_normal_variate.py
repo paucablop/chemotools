@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scatter._snv` module implements the Standard Normal Variate (SNV) transformation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 import warnings
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -32,6 +39,12 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     >>> X = np.array([[1, 2, 3, 4, 5]])
     >>> snv = StandardNormalVariate()
     >>> X_transformed = snv.fit_transform(X)
+
+    References
+    ----------
+    [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
+        "Review of the most common pre-processing techniques for near-infrared spectra,"
+        TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
     """
 
     def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":

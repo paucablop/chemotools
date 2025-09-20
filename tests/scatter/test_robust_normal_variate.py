@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.scatter import RobustNormalVariate
@@ -24,3 +25,15 @@ def test_robust_normal_variate():
 
     # Assert
     assert np.allclose(spectrum_corrected[0], reference, atol=1e-8)
+
+
+def test_rnv_zero_denom_warns():
+    # Arrange
+    X = np.array([[1.0, 1.0, 1.0, 2.0]])
+    rnv = RobustNormalVariate(percentile=50).fit(X)
+
+    # Act & Assert
+    with pytest.warns(
+        UserWarning, match="Denominator is zero in RNV. Adding epsilon to avoid NaNs."
+    ):
+        rnv.transform(X)

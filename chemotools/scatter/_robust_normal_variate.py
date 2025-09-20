@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.scatter._rnv` module implements the Robust Normal Variate (RNV) transformation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
+import warnings
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -21,10 +29,28 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     transform(X, y=0, copy=True)
         Transform the input data by calculating the standard normal variate.
 
+    _calculate_robust_normal_variate(x)
+        Calculate the robust normal variate for a single spectrum.
+
+    Raises
+    ------
+    UserWarning
+        If the standard deviation of the values below the specified percentile is zero,
+        a warning is raised indicating that the result will contain NaNs.
+
+    Examples
+    --------
+    >>> from chemotools.scatter import RobustNormalVariate
+    >>> import numpy as np
+    >>> X = np.array([[1, 2, 3, 4, 5]])
+    >>> rnv = RobustNormalVariate(percentile=25)
+    >>> X_transformed = rnv.fit_transform(X)
+
     References
     ----------
-    Q. Guo, W. Wu, D.L. Massart. The robust normal variate transform for pattern
-    recognition with near-infrared data. doi:10.1016/S0003-2670(98)00737-5
+    [1] Q. Guo, W. Wu, D.L. Massart.
+        "The robust normal variate transform for pattern
+        recognition with near-infrared data." doi:10.1016/S0003-2670(98)00737-5
     """
 
     def __init__(self, percentile: float = 25):
@@ -84,12 +110,6 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Calculate the standard normal variate
         for i, x in enumerate(X_):
             X_[i] = self._calculate_robust_normal_variate(x)
@@ -98,4 +118,10 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
 
     def _calculate_robust_normal_variate(self, x) -> np.ndarray:
         percentile = np.percentile(x, self.percentile)
-        return (x - percentile) / np.std(x[x <= percentile])
+        denom = np.std(x[x <= percentile])
+        if denom == 0:
+            warnings.warn(
+                "Denominator is zero in RNV. Adding epsilon to avoid NaNs.",
+                UserWarning,
+            )
+        return (x - percentile) / (denom + 1e-10)
