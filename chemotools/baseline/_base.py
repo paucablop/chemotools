@@ -3,7 +3,7 @@
 
 from abc import abstractmethod
 from typing import Callable
-from typing_extensions import Literal, Self
+from typing_extensions import Self
 
 import numpy as np
 
@@ -32,11 +32,9 @@ class _BaselineWhittakerMixin:
 
     def __init__(
         self,
-        solver_type: Literal["banded", "sparse"] = "banded",
         nr_iterations: int = 100,
         max_iter_after_warmstart: int = 20,
     ):
-        self.solver_type = solver_type
         self.nr_iterations = nr_iterations
         self.max_iter_after_warmstart = max_iter_after_warmstart
 
@@ -45,10 +43,10 @@ class _BaselineWhittakerMixin:
         X: np.ndarray,
         y=None,
         nr_iterations: int = 1,
+        solver: Callable = whittaker_solver_dispatch,
     ) -> "Self":
         # Warm start weights from first spectrum
         x0 = X[0]
-        solver = whittaker_solver_dispatch(self.solver_type)
         _, w = self._calculate_baseline(
             x0, np.ones_like(x0), max_iter=self.nr_iterations, solver=solver
         )
@@ -56,14 +54,18 @@ class _BaselineWhittakerMixin:
         return self
 
     def _transform_core(
-        self, X: np.ndarray, y=None, nr_iterations: int = 1
+        self,
+        X: np.ndarray,
+        y=None,
+        nr_iterations: int = 1,
+        solver: Callable = whittaker_solver_dispatch,
     ) -> np.ndarray:
         for i, x in enumerate(X):
             z, _ = self._calculate_baseline(
                 x,
                 self.w_init_.copy(),
                 max_iter=min(self.nr_iterations, self.max_iter_after_warmstart),
-                solver=whittaker_solver_dispatch(self.solver_type),
+                solver=solver,
             )
             X[i] = x - z
         return X

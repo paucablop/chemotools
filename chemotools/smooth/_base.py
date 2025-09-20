@@ -16,7 +16,9 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 from chemotools.utils._linear_algebra import (
     compute_DtD_banded,
     compute_DtD_sparse,
+    whittaker_smooth_banded,
     whittaker_smooth_sparse,
+    whittaker_solver_dispatch,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,21 +45,33 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
     def fit(self, X: np.ndarray, y=None) -> "_BaseWhittaker":
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
         self.DtD_ab_ = self._precompute_DtD(X.shape[1])
-        return self._fit_core(X, y)
+        solver = whittaker_solver_dispatch(self.solver_type)
+        return self._fit_core(X, y, solver=solver)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         check_is_fitted(self, ["DtD_ab_"])
         X_ = validate_data(self, X, ensure_2d=True, copy=True, reset=False)
-        return self._transform_core(X_, y)
+        solver = whittaker_solver_dispatch(self.solver_type)
+        return self._transform_core(X_, y, solver=solver)
 
     @abstractmethod
-    def _fit_core(self, X: np.ndarray, y=None, nr_iterations: int = 1) -> "Self":
+    def _fit_core(
+        self,
+        X: np.ndarray,
+        y=None,
+        nr_iterations: int = 1,
+        solver: Callable = whittaker_smooth_banded,
+    ) -> "Self":
         """Subclasses can extend fitting logic here."""
         ...
 
     @abstractmethod
     def _transform_core(
-        self, X: np.ndarray, y=None, nr_iterations: int = 1
+        self,
+        X: np.ndarray,
+        y=None,
+        nr_iterations: int = 1,
+        solver: Callable = whittaker_smooth_banded,
     ) -> np.ndarray:
         """Subclasses must override to implement algorithm-specific transform."""
         ...

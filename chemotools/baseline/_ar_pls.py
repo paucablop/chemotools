@@ -95,7 +95,6 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
         _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
         _BaselineWhittakerMixin.__init__(
             self,
-            solver_type=solver_type,
             nr_iterations=nr_iterations,
             max_iter_after_warmstart=max_iter_after_warmstart,
         )

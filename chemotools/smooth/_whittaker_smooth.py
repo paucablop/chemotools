@@ -5,10 +5,12 @@ The :mod:`chemotools.smooth._whittaker_smooth` module implements the Whittaker s
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-from typing import Literal
+from typing import Callable, Literal
 import numpy as np
 
-from chemotools.utils._linear_algebra import whittaker_solver_dispatch
+from chemotools.utils._linear_algebra import (
+    whittaker_smooth_banded,
+)
 from ._base import _BaseWhittaker
 
 
@@ -120,7 +122,11 @@ class WhittakerSmooth(_BaseWhittaker):
         return super().transform(X, y)
 
     def _fit_core(
-        self, X: np.ndarray, y=None, nr_iterations: int = 1
+        self,
+        X: np.ndarray,
+        y=None,
+        nr_iterations: int = 1,
+        solver: Callable = whittaker_smooth_banded,
     ) -> "WhittakerSmooth":
         """
         Core fitting logic for Whittaker smoothing.
@@ -152,7 +158,11 @@ class WhittakerSmooth(_BaseWhittaker):
         return self
 
     def _transform_core(
-        self, X: np.ndarray, y=None, nr_iterations: int = 1
+        self,
+        X: np.ndarray,
+        y=None,
+        nr_iterations: int = 1,
+        solver: Callable = whittaker_smooth_banded,
     ) -> np.ndarray:
         """
         Core transformation logic for Whittaker smoothing.
@@ -176,7 +186,6 @@ class WhittakerSmooth(_BaseWhittaker):
         X_smooth : ndarray of shape (n_samples, n_features)
             The smoothed input data.
         """
-        solver = whittaker_solver_dispatch(self.solver_type)
         for i, x in enumerate(X):
             X[i] = self._solve_whittaker(x, self.weights_, solver)
         return X
