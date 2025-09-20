@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.outliers._q_residuals` module implements the Q Residuals
+(Squared Prediction Error - SPE) outlier detection algorithm.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional, Literal, Union
 
 import numpy as np
@@ -5,6 +13,7 @@ import numpy as np
 from scipy.stats import norm, chi2
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from ._base import _ModelResidualsBase, ModelTypes
 from .utils import calculate_residual_spectrum
@@ -49,11 +58,48 @@ class QResiduals(_ModelResidualsBase):
     critical_value_ : float
         The calculated critical value for outlier detection.
 
+    Methods
+    -------
+    fit(X, y=None)
+        Fit the Q Residuals model by computing residuals from the training set.
+        Calculates the critical threshold based on the chosen method.
+
+    predict(X)
+        Identify outliers in the input data based on Q residuals threshold.
+
+    predict_residuals(X, y=None, validate=True)
+        Calculate Q residuals (Squared Prediction Error - SPE) for input data.
+
+    _calculate_critical_value(X)
+        Calculate the critical value for outlier detection using the specified method.
+
+    Examples
+    --------
+    >>> from chemotools.decomposition import PCA
+    >>> from chemotools.outliers import QResiduals
+    >>> X = np.random.rand(100, 10)
+    >>> pca = PCA(n_components=3).fit(X)
+    >>> # Initialize QResiduals with the fitted PCA model
+    >>> q_residuals = QResiduals(pca, confidence=0.95, method="jackson-mudholkar")
+    >>> q_residuals.fit(X)
+    QResiduals()
+    >>> # Predict outliers in the dataset
+    >>> outliers = q_residuals.predict(X)
+    >>> # Calculate Q residuals
+    >>> residuals = q_residuals.predict_residuals(X)
+
+
     References
     ----------
-    Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde (2001) Generalized contribution plots in multivariate statistical process
-    monitoring  Chemometrics and Intelligent Laboratory Systems 51 2000 95–114
+    [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde (2001)
+    Generalized contribution plots in multivariate statistical process
+    monitoring  Chemometrics and Intelligent Laboratory Systems 51 95–114 (2000)
     """
+
+    _parameter_constraints: dict = {
+        "confidence": [Interval(Real, 0, 1, closed="both")],
+        "method": [StrOptions({"chi-square", "jackson-mudholkar", "percentile"})],
+    }
 
     def __init__(
         self,

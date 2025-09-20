@@ -10,6 +10,7 @@ import numpy as np
 
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 from scipy.stats import f as f_distribution
 
 
@@ -97,6 +98,11 @@ class DModX(_ModelResidualsBase):
         "OPLS discriminant analysis: combining the strengths of PLS-DA and SIMCA
         classification." Journal of Chemometrics 20 (8-10), 341-351 (2006).
     """
+
+    _parameter_constraints: dict = {
+        "confidence": [Interval(Real, 0, 1, closed="both")],
+        "meancentered_data": [StrOptions({"true", "false"})],
+    }
 
     def __init__(
         self,
