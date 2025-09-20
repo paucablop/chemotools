@@ -137,7 +137,7 @@ class QResiduals(_ModelResidualsBase):
 
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Identify outliers in the input data based on Q residuals threshold.
 
         Parameters
@@ -151,16 +151,7 @@ class QResiduals(_ModelResidualsBase):
             Boolean array indicating outliers (-1 for outliers, 1 for normal data).
         """
         # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        # Calculate outliers based on the Q residuals
-        Q_residuals = self.predict_residuals(X, validate=False)
-        return np.where(Q_residuals > self.critical_value_, -1, 1)
+        return super().predict(X)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True

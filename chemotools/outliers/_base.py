@@ -61,8 +61,27 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         ) = _validate_and_extract_model(model)
         self.confidence = _validate_confidence(confidence)
 
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+        """Identify outliers in the input data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Input data
+
+        y : array-like of shape (n_samples,), default=None
+            Target values
+
+        Returns
+        -------
+        ndarray of shape (n_samples,)
+            Returns -1 for outliers and 1 for inliers
+        """
+        residuals = self.predict_residuals(X, y, validate=True)
+        return np.where(residuals > self.critical_value_, -1, 1)
+
     def fit_predict_residuals(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None
+        self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
     ) -> np.ndarray:
         """Fit the model to the input data and calculate the residuals.
 

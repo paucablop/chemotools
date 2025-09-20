@@ -137,7 +137,7 @@ class StudentizedResiduals(_ModelResidualsBase):
 
         return self
 
-    def predict(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Calculate studentized residuals in the model predictions. and return a boolean array indicating outliers.
 
         Parameters
@@ -153,29 +153,7 @@ class StudentizedResiduals(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Studentized residuals of the predictions
         """
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        # Preprocess the data
-        if self.transformer_:
-            X = self.transformer_.transform(X)
-
-        # Calculate y residuals
-        y_residuals = y - self.estimator_.predict(X)
-        y_residuals = (
-            y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
-        )
-
-        # Calculate the studentized residuals
-        studentized_residuals = calculate_studentized_residuals(
-            self.estimator_, X, y_residuals
-        )
-        return np.where(studentized_residuals > self.critical_value_, -1, 1)
+        return super().predict(X, y)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray], validate: bool = True

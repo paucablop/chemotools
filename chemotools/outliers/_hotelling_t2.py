@@ -125,7 +125,7 @@ class HotellingT2(_ModelResidualsBase):
         self.critical_value_ = self._calculate_critical_value()
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Identify outliers in the input data.
 
         Parameters
@@ -138,17 +138,7 @@ class HotellingT2(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Boolean array indicating outliers (-1) and inliers (1)
         """
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        # Calculate the Hotelling's T-squared statistics
-        hotelling_t2_values = self.predict_residuals(X, y=None, validate=False)
-        return np.where(hotelling_t2_values > self.critical_value_, -1, 1)
+        return super().predict(X)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True

@@ -156,7 +156,7 @@ class DModX(_ModelResidualsBase):
 
         return self
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """
         Identify outliers in the input data.
 
@@ -170,14 +170,7 @@ class DModX(_ModelResidualsBase):
         outliers : np.ndarray of shape (n_samples,)
             Array indicating outliers (-1) and inliers (1).
         """
-        check_is_fitted(self, ["critical_value_"])
-
-        X_validated = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        dmodx_values = self.predict_residuals(X_validated, validate=False)
-        return np.where(dmodx_values > self.critical_value_, -1, 1)
+        return super().predict(X)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True

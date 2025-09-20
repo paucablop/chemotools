@@ -139,21 +139,7 @@ class Leverage(_ModelResidualsBase):
         ndarray of shape (n_samples,)
             Bool with samples with a leverage above the critical value
         """
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        # Preprocess the data
-        if self.transformer_:
-            X = self.transformer_.transform(X)
-
-        # Calculate outliers based on samples with too high leverage
-        leverage = calculate_leverage(X, self.estimator_)
-        return np.where(leverage > self.critical_value_, -1, 1)
+        return super().predict(X, y)
 
     def predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
