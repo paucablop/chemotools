@@ -32,7 +32,7 @@ class DModX(_ModelResidualsBase):
     confidence : float, default=0.95
         Confidence level for statistical calculations (between 0 and 1)
 
-    meancentered_data : bool, default=True
+    mean_centered : bool, default=True
         Indicates if the input data was mean-centered before modeling
 
     Attributes
@@ -102,7 +102,7 @@ class DModX(_ModelResidualsBase):
     _parameter_constraints: dict = {
         "model": [Pipeline, ModelTypes],
         "confidence": [Interval(Real, 0, 1, closed="both")],
-        "meancentered_data": [bool],
+        "mean_centered": [bool],
     }
 
     def __init__(
