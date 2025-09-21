@@ -1,6 +1,15 @@
+"""
+The :mod:`chemotools.augmentation._spectrum_scale` module implements the SpectrumScale
+transformer to scale spectral data by a random factor.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -20,21 +29,19 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     random_state : int, default=None
         The random state to use for the random number generator.
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by scaling the spectrum.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.augmentation import SpectrumScale
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = SpectrumScale(scale=0.1)
+    SpectrumScale()
+    >>> transformer.fit(X)
+    >>> # Generate scaled data
+    >>> X_scaled = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -46,13 +53,13 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.scale = scale
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "SpectrumScale":
+    def fit(self, X: ArrayLike, y=None) -> "SpectrumScale":
         """
         Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -68,24 +75,18 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
-
         # Instantiate the random number generator
         self._rng = check_random_state(self.random_state)
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
         """
         Transform the input data by scaling the spectrum.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -93,11 +94,11 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_ : ArrayLike of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(

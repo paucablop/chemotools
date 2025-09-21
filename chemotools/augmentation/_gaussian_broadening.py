@@ -1,5 +1,15 @@
+"""
+The :mod:`chemotools.augmentation._gaussian_broadening` module implements the GaussianBroadening
+transformer to broaden peaks in spectral data using Gaussian convolution.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
+
 import numpy as np
+from numpy.typing import ArrayLike
 from scipy.ndimage import gaussian_filter1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
@@ -33,6 +43,20 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     truncate : float, default=4.0
         Truncate the filter at this many standard deviations.
         Larger values increase computation time but improve accuracy.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.augmentation import GaussianBroadening
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = GaussianBroadening(sigma=2.0, mode="reflect")
+    GaussianBroadening()
+    >>> transformer.fit(X)
+    >>> # Generate broadened data
+    >>> X_broadened = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -57,13 +81,13 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.random_state = random_state
         self.truncate = truncate
 
-    def fit(self, X: np.ndarray, y=None) -> "GaussianBroadening":
+    def fit(self, X: ArrayLike, y=None) -> "GaussianBroadening":
         """
         Fit the transformer to the data (in this case, only validates input).
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             Input data to validate.
 
         y : None
@@ -89,13 +113,13 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
         """
         Apply Gaussian broadening to the input data.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The data to transform.
 
         y : None

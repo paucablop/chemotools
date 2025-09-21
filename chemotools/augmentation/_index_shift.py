@@ -1,6 +1,15 @@
+"""
+The :mod:`chemotools.augmentation._index_shift` module implements the IndexShift
+transformer to randomly shift spectral data along the index axis.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 from scipy.signal import convolve
 from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -40,11 +49,19 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     n_features_in_ : int
         The number of features in the input data.
 
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    _rng : numpy.random.Generator
-        Random number generator instance used for shifting.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.augmentation import IndexShift
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = IndexShift(shift=5, padding_mode="linear")
+    IndexShift()
+    >>> transformer.fit(X)
+    >>> # Generate shifted data
+    >>> X_shifted = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -70,13 +87,13 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.pad_value = pad_value
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "IndexShift":
+    def fit(self, X: ArrayLike, y=None) -> "IndexShift":
         """
         Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -97,13 +114,13 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
         """
         Transform the input data by shifting the spectrum.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -111,7 +128,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_ : ArrayLike of shape (n_samples, n_features)
             The transformed data with the applied shifts.
         """
         # Check that the estimator is fitted

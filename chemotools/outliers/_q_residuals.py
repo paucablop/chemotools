@@ -92,8 +92,8 @@ class QResiduals(_ModelResidualsBase):
     References
     ----------
     [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde (2001)
-    Generalized contribution plots in multivariate statistical process
-    monitoring  Chemometrics and Intelligent Laboratory Systems 51 95–114 (2000)
+        Generalized contribution plots in multivariate statistical process
+        monitoring  Chemometrics and Intelligent Laboratory Systems 51 95–114 (2000)
     """
 
     _parameter_constraints: dict = {

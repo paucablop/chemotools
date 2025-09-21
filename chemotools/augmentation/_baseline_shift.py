@@ -1,6 +1,15 @@
+"""
+The :mod:`chemotools.augmentation._baseline_shift` module implements the BaselineShift
+transformer to add a constant baseline to the input data.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -49,13 +58,13 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.scale = scale
         self.random_state = random_state
 
-    def fit(self, X: np.ndarray, y=None) -> "BaselineShift":
+    def fit(self, X: ArrayLike, y=None) -> "BaselineShift":
         """
         Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -70,21 +79,19 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
 
         # Instantiate the random number generator
         self._rng = check_random_state(self.random_state)
 
         return self
 
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
         """
         Transform the input data by adding a baseline to the spectrum.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples, n_features)
+        X : ArrayLike of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -92,7 +99,7 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_ : ArrayLike of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
@@ -115,6 +122,6 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _add_baseline(self, x) -> np.ndarray:
+    def _add_baseline(self, x: np.ndarray) -> np.ndarray:
         adding_factor = self._rng.uniform(low=0, high=self.scale)
         return np.add(x, adding_factor)
