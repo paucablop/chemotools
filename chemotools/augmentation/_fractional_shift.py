@@ -9,7 +9,6 @@ transformer to shift signals by a random fractional amount using cubic spline in
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.interpolate import CubicSpline
 from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -80,12 +79,12 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.pad_value = pad_value
         self.random_state = random_state
 
-    def fit(self, X: ArrayLike, y=None) -> "FractionalShift":
+    def fit(self, X: np.ndarray, y=None) -> "FractionalShift":
         """
         Fit the transformer to the input data.
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Training data.
 
         y : None
@@ -119,7 +118,7 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             Ignored. Present for API consistency.
         Returns
         -------
-        X_shifted : NDArray of shape (n_samples, n_features)
+        X_shifted : np.ndarray of shape (n_samples, n_features)
             Transformed data with applied shifts.
 
         Raises

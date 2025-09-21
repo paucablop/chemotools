@@ -9,7 +9,6 @@ transformer to scale spectral data by a random factor.
 from typing import Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -53,13 +52,13 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.scale = scale
         self.random_state = random_state
 
-    def fit(self, X: ArrayLike, y=None) -> "SpectrumScale":
+    def fit(self, X: np.ndarray, y=None) -> "SpectrumScale":
         """
         Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -80,13 +79,13 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by scaling the spectrum.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -94,7 +93,7 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : ArrayLike of shape (n_samples, n_features)
+        X_ : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

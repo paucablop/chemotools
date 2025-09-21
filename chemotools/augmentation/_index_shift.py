@@ -9,7 +9,6 @@ transformer to randomly shift spectral data along the index axis.
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.signal import convolve
 from scipy import stats
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -87,13 +86,13 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.pad_value = pad_value
         self.random_state = random_state
 
-    def fit(self, X: ArrayLike, y=None) -> "IndexShift":
+    def fit(self, X: np.ndarray, y=None) -> "IndexShift":
         """
         Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
         y : None
@@ -114,13 +113,13 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by shifting the spectrum.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
         y : None
@@ -128,7 +127,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : ArrayLike of shape (n_samples, n_features)
+        X_ : np.ndarray of shape (n_samples, n_features)
             The transformed data with the applied shifts.
         """
         # Check that the estimator is fitted

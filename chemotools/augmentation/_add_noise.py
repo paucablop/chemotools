@@ -9,7 +9,6 @@ transformer to add random noise from various probability distributions to input 
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -74,12 +73,12 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.scale = scale
         self.random_state = random_state
 
-    def fit(self, X: ArrayLike, y=None) -> "AddNoise":
+    def fit(self, X: np.ndarray, y=None) -> "AddNoise":
         """Fit the transformer to the input data.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Training data.
 
         y : None
@@ -106,19 +105,19 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Transform the input data by adding random noise.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Input data to transform.
         y : None
             Ignored. Present for API consistency.
 
         Returns
         -------
-        X_noisy : ArrayLike of shape (n_samples, n_features)
+        X_noisy : np.ndarray of shape (n_samples, n_features)
             Transformed data with added noise.
 
         Raises

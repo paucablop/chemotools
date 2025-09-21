@@ -9,7 +9,6 @@ transformer to broaden peaks in spectral data using Gaussian convolution.
 from typing import Literal, Optional
 
 import numpy as np
-from numpy.typing import ArrayLike
 from scipy.ndimage import gaussian_filter1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils import check_random_state
@@ -81,13 +80,13 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.random_state = random_state
         self.truncate = truncate
 
-    def fit(self, X: ArrayLike, y=None) -> "GaussianBroadening":
+    def fit(self, X: np.ndarray, y=None) -> "GaussianBroadening":
         """
         Fit the transformer to the data (in this case, only validates input).
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Input data to validate.
 
         y : None
@@ -113,13 +112,13 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: ArrayLike, y=None) -> ArrayLike:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Apply Gaussian broadening to the input data.
 
         Parameters
         ----------
-        X : ArrayLike of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             The data to transform.
 
         y : None
@@ -127,7 +126,7 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_transformed : ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data with broadened peaks.
         """
         check_is_fitted(self, "n_features_in_")
