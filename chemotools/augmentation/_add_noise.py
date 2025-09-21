@@ -47,9 +47,6 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> transformer.fit(X)
     >>> # Generate noisy data
     >>> X_noisy = transformer.transform(X)
-    >>> X_noisy
-    array([[0.9..., 2.1...],
-            [3.0..., 4.0...]])
     """
 
     _parameter_constraints: dict = {

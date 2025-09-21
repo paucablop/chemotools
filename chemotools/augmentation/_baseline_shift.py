@@ -25,16 +25,19 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     n_features_in_ : int
         The number of features in the input data.
 
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by adding a baseline the spectrum.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.augmentation import BaselineShift
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = BaselineShift(scale=0.1)
+    BaselineShift()
+    >>> transformer.fit(X)
+    >>> # Generate baseline-shifted data
+    >>> X_shifted = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -70,9 +73,6 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         # Set the number of features
         self.n_features_in_ = X.shape[1]
 
-        # Set the fitted attribute to True
-        self._is_fitted = True
-
         # Instantiate the random number generator
         self._rng = check_random_state(self.random_state)
 
@@ -96,7 +96,7 @@ class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
