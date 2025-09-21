@@ -18,11 +18,14 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     ----------
     distribution : {'gaussian', 'poisson', 'exponential'}, default='gaussian'
         The probability distribution to sample noise from.
+
     scale : float, default=0.0
         Scale parameter for the noise distribution:
         - For gaussian: standard deviation
         - For poisson: multiplication factor for sampled values
         - For exponential: scale parameter (1/λ)
+        Must be non-negative.
+
     random_state : int, optional
         Random seed for reproducibility.
 
@@ -30,6 +33,23 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     ----------
     n_features_in_ : int
         Number of features in the training data.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.augmentation import AddNoise
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = AddNoise(distribution="gaussian", scale=0.1)
+    AddNoise()
+    >>> transformer.fit(X)
+    >>> # Generate noisy data
+    >>> X_noisy = transformer.transform(X)
+    >>> X_noisy
+    array([[0.9..., 2.1...],
+            [3.0..., 4.0...]])
     """
 
     _parameter_constraints: dict = {
@@ -55,6 +75,7 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         ----------
         X : array-like of shape (n_samples, n_features)
             Training data.
+
         y : None
             Ignored. Present for API consistency.
 
