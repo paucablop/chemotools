@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._linear_correction` module implements
+a linear baseline correction transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -8,24 +16,23 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     A transformer that corrects a baseline by subtracting a linear baseline through the
     initial and final points of the spectrum.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the constant baseline value.
-
-    _drift_correct_spectrum(x)
-        Internal method: compute the baseline for a single spectrum.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
     Examples
     --------
-    >>> from chemotools.baseline import LinearCorrection
     >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> lc = LinearCorrection()
-    >>> X_corrected = lc.fit_transform(X)
+    >>> from chemotools.baseline import LinearCorrection
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = LinearCorrection()
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
     """
 
     def fit(self, X: np.ndarray, y=None) -> "LinearCorrection":

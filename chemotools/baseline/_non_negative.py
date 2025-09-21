@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._non_negative` module implements
+a non-negative transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Literal
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -10,25 +18,28 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    mode : Literal["zero", "abs"], optional
-        The mode to use for the non-negative values. Can be "zero" or "abs".
-        Default is "zero".
+    mode : Literal["zero", "abs"], optional, default="zero"
+        The mode to use for the non-negative values. Can be:
+        - *zero*: set all negative values to zero.
+        - *abs*: set all negative values to their absolute value.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the constant baseline value.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
     Examples
     --------
-    >>> from chemotools.baseline import NonNegative
     >>> import numpy as np
-    >>> X = np.array([[-1, 2, -3, 4, -5]])
-    >>> nn = NonNegative(mode="zero")
-    >>> X_corrected = nn.fit_transform(X)
+    >>> from chemotools.baseline import NonNegative
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = NonNegative(mode="zero")
+    >>> transformer.fit(X)
+    >>> # Generate non-negative data
+    >>> X_non_negative = transformer.transform(X)
     """
 
     def __init__(self, mode: Literal["zero", "abs"] = "zero"):

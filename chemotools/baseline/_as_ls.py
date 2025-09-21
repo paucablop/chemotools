@@ -51,30 +51,37 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
     max_iter_after_warmstart : int, default=20
         Maximum iterations allowed when warm-starting from previous weights.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the estimator to the input spectra.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=None)
-        Remove baselines from the input spectra.
+    DtD_ab_ : np.ndarray
+        The precomputed banded representation of D^T D for the second-order
+        difference operator.
 
-    _calculate_baseline(x, w, max_iter)
-        Internal method: compute the baseline for a single spectrum.
-
-    Examples
-    --------
-    >>> from chemotools.baseline import AsLs
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> asls = AsLs()
-    >>> X_corrected = asls.fit_transform(X)
+    self.w_init_ : np.ndarray
+        The weights set for warm-starting.
 
     References
     ----------
     [1] Sung-June Baek, Aaron Park, Young-Jin Ahn, Jaebum Choo.
         "Baseline correction using asymmetrically reweighted penalized
         least squares smoothing." Analyst 140 (1), 250–257 (2015).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.baseline import AsLs
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = AsLs(lam=1e4, nr_iterations=100)
+    AsLs()
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
