@@ -118,7 +118,7 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to fit the model to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -127,7 +127,7 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
         """
         return super().fit(X, y)
 
-    def transform(self, X: np.ndarray, y=None, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Apply AsLs baseline correction.
 
         Parameters
@@ -136,10 +136,7 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to transform.
 
         y : None
-            Ignored.
-
-        copy : bool, default=True
-            If True, a copy of X is made before transforming.
+            Ignored to align with API.
 
         Returns
         -------

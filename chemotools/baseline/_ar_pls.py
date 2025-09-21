@@ -117,7 +117,7 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to fit the model to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -135,7 +135,7 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------

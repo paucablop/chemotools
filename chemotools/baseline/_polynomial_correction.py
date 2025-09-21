@@ -64,7 +64,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -82,7 +82,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 
         return self
 
-    def transform(self, X: np.ndarray, y: int = 0) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the polynomial baseline.
 
@@ -91,8 +91,8 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
         X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
-        y : int or float, optional
-            Ignored.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------

@@ -72,7 +72,7 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -94,7 +94,7 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
         return self
 
-    def transform(self, X: np.ndarray, y=0, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the constant baseline value.
 
@@ -103,11 +103,8 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
         X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
-        y : int or None, optional
-            Ignored.
-
-        copy : bool, optional
-            Whether to copy the input data before transforming it.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------

@@ -45,7 +45,7 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -59,7 +59,7 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: np.ndarray, y=0, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the constant baseline value.
 
@@ -68,11 +68,8 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
-        y : int, float, optional
-            Ignored.
-
-        copy : bool, optional
-            Whether to copy the input data or not.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------
