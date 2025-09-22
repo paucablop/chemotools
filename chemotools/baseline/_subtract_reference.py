@@ -94,7 +94,7 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

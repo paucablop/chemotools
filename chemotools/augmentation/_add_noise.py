@@ -117,7 +117,7 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_noisy : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             Transformed data with added noise.
 
         Raises

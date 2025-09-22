@@ -118,7 +118,7 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             Ignored. Present for API consistency.
         Returns
         -------
-        X_shifted : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             Transformed data with applied shifts.
 
         Raises
