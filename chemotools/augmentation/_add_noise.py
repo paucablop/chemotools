@@ -44,7 +44,6 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.augmentation import AddNoise
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data

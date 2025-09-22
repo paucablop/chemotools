@@ -43,7 +43,6 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.augmentation import FractionalShift
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data

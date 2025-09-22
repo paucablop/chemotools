@@ -39,10 +39,24 @@ class RangeCut(SelectorMixin, BaseEstimator):
     wavenuumbers_ : array-like
         The cut wavenumbers of the input data.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.feature_selection import RangeCut
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Define wavenumbers
+    >>> wavenumbers = X.columns
+    >>> # Define the range to cut
+    >>> start = 1000
+    >>> end = 2000
+    >>> # Instantiate the transformer
+    >>> cutter = RangeCut(start=start, end=end, wavenumbers=wavenumbers)
+    RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
+    >>> cutter.fit(X)
+    >>> # Transform the data
+    >>> X_cut = cutter.transform(X)
     """
 
     def __init__(
@@ -65,7 +79,7 @@ class RangeCut(SelectorMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------

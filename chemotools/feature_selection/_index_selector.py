@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.feature_selection._index_selector` module implements the IndexSelector
+to select specific features from spectral data based on indices or wavenumbers.
+"""
+
+# Author: Pau Cababeros
+# License: MIT
+
 from typing import Optional, Union
 
 import numpy as np
@@ -11,6 +19,7 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:
+
     - by the indices of the wavenumbers to select,
     - by the wavenumbers to select, the wavenumbers must be provided to the transformer
         when it is initialised. If the wavenumbers are not provided, the indices will be
@@ -31,13 +40,25 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     features_index_ : int
         The index of the features to select.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by cutting it to the specified range.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.feature_selection import IndexSelector
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Define wavenumbers
+    >>> wavenumbers = X.columns
+    >>> # Define features to select
+    >>> features = [100, 200, 300, 400, 500]
+    >>> # Instantiate the transformer
+    >>> selector = IndexSelector(features=features, wavenumbers=wavenumbers)
+    IndexSelector(features=[100, 200, 300, 400, 500], wavenumbers=wavenumbers)
+    >>> selector.fit(X)
+    >>> # Transform the data
+    >>> X_selected = selector.transform(X)
+    >>> X_selected.shape
+    (n_samples, 5)
     """
 
     def __init__(
@@ -58,7 +79,7 @@ class IndexSelector(SelectorMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------

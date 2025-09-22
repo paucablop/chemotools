@@ -55,9 +55,12 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
     n_features_in_ : int
         The number of features in the input data.
 
-    DtD_ab_ : np.ndarray
+    DtD_ : np.ndarray
         The precomputed banded representation of D^T D for the second-order
         difference operator.
+        - DtD_ is stored as a banded representation from scipy's solveh_banded if
+            solver_type is "banded".
+        - DtD_ is stored as a scipy.sparse CSC matrix if solver_type is "sparse".
 
     self.w_init_ : np.ndarray
         The weights set for warm-starting.
@@ -70,7 +73,6 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import ArPls
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data

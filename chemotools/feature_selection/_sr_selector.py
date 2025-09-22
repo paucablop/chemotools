@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.feature_selection._sr_selector` module implements the Selectivity Ratio (SR)
+feature selector for PLS regression models.
+"""
+
+# Author: Pau Cababeros
+# License: MIT
+
 import numpy as np
 from sklearn.utils.validation import validate_data
 
@@ -30,10 +38,23 @@ class SRSelector(_PLSFeatureSelectorBase):
     support_mask_ : np.ndarray
         The boolean mask indicating which features are selected.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data. It calculates the feature scores and the feature_mask.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.feature_selection import SRSelector
+    >>> from chemotools.models import PLSRegression
+    >>> # Load sample data
+    >>> X, y = load_fermentation_train()
+    >>> # Instantiate the PLS regression model
+    >>> pls_model = PLSRegression(n_components=2).fit(X, y)
+    >>> # Instantiate the SR selector with the PLS model
+    >>> selector = SRSelector(model=pls_model, threshold=0.9)
+    >>> selector.fit(X)
+    SRSelector(model=PLSRegression(n_components=2), threshold=0.9)
+    >>> # Get the selected features
+    >>> X_selected = selector.transform(X)
+
     """
 
     def __init__(

@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.feature_selection._vip_selector` module implements the Variables Importance in
+Projection (VIP) feature selector for PLS regression models.
+"""
+
+# Author: Pau Cababeros
+# License: MIT
+
 import numpy as np
 from sklearn.utils.validation import validate_data
 
@@ -30,10 +38,22 @@ class VIPSelector(_PLSFeatureSelectorBase):
     support_mask_ : np.ndarray
         The boolean mask indicating which features are selected.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data. It calculates the feature scores and the feature_mask.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.feature_selection import VIPSelector
+    >>> from chemotools.models import PLSRegression
+    >>> # Load sample data
+    >>> X, y = load_fermentation_train()
+    >>> # Instantiate the PLS regression model
+    >>> pls_model = PLSRegression(n_components=2).fit(X, y)
+    >>> # Instantiate the VIP selector with the PLS model
+    >>> selector = VIPSelector(model=pls_model, threshold=1.0)
+    >>> selector.fit(X)
+    VIPSelector(model=PLSRegression(n_components=2), threshold=1.0)
+    >>> # Get the selected features
+    >>> X_selected = selector.transform(X)
     """
 
     def __init__(

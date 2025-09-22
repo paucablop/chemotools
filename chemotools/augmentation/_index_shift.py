@@ -50,13 +50,12 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.augmentation import IndexShift
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
-    >>> transformer = IndexShift(shift=5, padding_mode="linear")
+    >>> transformer = IndexShift(shift=2, padding_mode="constant",)
     IndexShift()
     >>> transformer.fit(X)
     >>> # Generate shifted data
