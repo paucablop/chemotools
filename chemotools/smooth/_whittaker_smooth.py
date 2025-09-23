@@ -46,32 +46,27 @@ class WhittakerSmooth(_BaseWhittaker):
         If "banded", use the banded solver for Whittaker smoothing.
         If "sparse", use a sparse LU decomposition.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the smoother to the input data.
-
-    transform(X, y=None)
-        Apply Whittaker smoothing to the input data.
-
-    _fit_core(X, y=None, nr_iterations=1)
-        Internal method: store weights for smoothing.
-
-    _transform_core(X, y=None, nr_iterations=1)
-        Internal method: apply Whittaker smoothing to each input spectrum.
-
-    Examples
-    --------
-    >>> from chemotools.smooth import WhittakerSmooth
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 2, 1]], dtype=float)
-    >>> ws = WhittakerSmooth(lam=10)
-    >>> X_smooth = ws.fit_transform(X)
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
     References
     ----------
     [1] Eilers, P.H. (2003).
         "A perfect smoother." Analytical Chemistry 75 (14), 3631–3636.
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.smooth import WhittakerSmooth
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize WhittakerSmooth
+    >>> ws = WhittakerSmooth()
+    WhittakerSmooth()
+    >>> # Fit and transform the data
+    >>> X_smoothed = ws.fit_transform(X)
     """
 
     def __init__(
@@ -116,7 +111,7 @@ class WhittakerSmooth(_BaseWhittaker):
 
         Returns
         -------
-        X_smooth : ndarray of shape (n_samples, n_features)
+        X_transformed : ndarray of shape (n_samples, n_features)
             The smoothed version of the input data.
         """
         return super().transform(X, y)

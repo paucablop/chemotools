@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.smooth._median_filter` module implements the Median Filter (MD) transformation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal
 
 import numpy as np
@@ -24,13 +31,23 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the Savitzky-Golay filter.
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.smooth import SavitzkyGolayFilter
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize SavitzkyGolayFilter
+    >>> sgf = SavitzkyGolayFilter()
+    SavitzkyGolayFilter()
+    >>> # Fit and transform the data
+    >>> X_smoothed = sgf.fit_transform(X)
+
     """
 
     def __init__(
@@ -53,7 +70,7 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -76,11 +93,11 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
