@@ -16,7 +16,7 @@ from sklearn.utils.validation import validate_data, check_is_fitted
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .utils import calculate_residual_spectrum
+from ._utils import calculate_residual_spectrum
 
 
 class QResiduals(_ModelResidualsBase):

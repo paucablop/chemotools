@@ -15,7 +15,7 @@ from scipy.stats import f as f_distribution
 
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .utils import calculate_residual_spectrum
+from ._utils import calculate_residual_spectrum
 
 
 class DModX(_ModelResidualsBase):
