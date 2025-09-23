@@ -33,17 +33,20 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import SubtractReference
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
+    >>> # Convert X to a numpy array
+    >>> X = np.array(X)
     >>> # Instantiate the transformer with a reference spectrum
     >>> reference = X[0]
     >>> transformer = SubtractReference(reference=reference)
+    SubtractReference()
     >>> transformer.fit(X)
     >>> # Generate baseline-corrected data
     >>> X_corrected = transformer.transform(X)
+
     """
 
     def __init__(

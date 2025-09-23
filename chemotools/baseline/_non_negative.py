@@ -30,13 +30,13 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import NonNegative
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
     >>> transformer = NonNegative(mode="zero")
+    NonNegative(mode="zero")
     >>> transformer.fit(X)
     >>> # Generate non-negative data
     >>> X_non_negative = transformer.transform(X)

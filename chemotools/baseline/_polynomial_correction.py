@@ -38,13 +38,13 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import PolynomialCorrection
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
     >>> transformer = PolynomialCorrection(order=2, indices=[0, 100, 200, 300, 400, 500])
+    PolynomialCorrection()
     >>> transformer.fit(X)
     >>> # Generate baseline-corrected data
     >>> X_corrected = transformer.transform(X)

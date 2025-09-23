@@ -23,13 +23,13 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import LinearCorrection
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
     >>> transformer = LinearCorrection()
+    LinearCorrection()
     >>> transformer.fit(X)
     >>> # Generate baseline-corrected data
     >>> X_corrected = transformer.transform(X)

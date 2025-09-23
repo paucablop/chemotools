@@ -40,7 +40,6 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.baseline import ConstantBaselineCorrection
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data

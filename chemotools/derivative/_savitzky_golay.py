@@ -42,7 +42,6 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.derivative import SavitzkyGolay
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
