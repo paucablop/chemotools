@@ -41,22 +41,23 @@ class RangeCut(SelectorMixin, BaseEstimator):
 
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.feature_selection import RangeCut
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
-    >>> # Define wavenumbers
-    >>> wavenumbers = X.columns
+    >>> # Get wavenumbers as numpy array
+    >>> wavenumbers = X.columns.values
     >>> # Define the range to cut
     >>> start = 1000
     >>> end = 2000
     >>> # Instantiate the transformer
-    >>> cutter = RangeCut(start=start, end=end, wavenumbers=wavenumbers)
+    >>> range_cut = RangeCut(start=start, end=end, wavenumbers=wavenumbers)
     RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
-    >>> cutter.fit(X)
+    >>> range_cut.fit(X)
     >>> # Transform the data
-    >>> X_cut = cutter.transform(X)
+    >>> X_cut = range_cut.transform(X)
+    >>> X_cut.shape
+    (21, 616)
     """
 
     def __init__(

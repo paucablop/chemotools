@@ -38,12 +38,16 @@ class VIPSelector(_PLSFeatureSelectorBase):
     support_mask_ : np.ndarray
         The boolean mask indicating which features are selected.
 
+    References
+    ----------
+    [1] Kim H. Esbensen,
+        "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
+
     Examples
     --------
-    >>> import numpy as np
     >>> from chemotools.datasets import load_fermentation_train
     >>> from chemotools.feature_selection import VIPSelector
-    >>> from chemotools.models import PLSRegression
+    >>> from sklearn.cross_decomposition import PLSRegression
     >>> # Load sample data
     >>> X, y = load_fermentation_train()
     >>> # Instantiate the PLS regression model
@@ -54,6 +58,8 @@ class VIPSelector(_PLSFeatureSelectorBase):
     VIPSelector(model=PLSRegression(n_components=2), threshold=1.0)
     >>> # Get the selected features
     >>> X_selected = selector.transform(X)
+    >>> X_selected.shape
+    (21, 527)
     """
 
     def __init__(

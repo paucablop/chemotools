@@ -47,18 +47,21 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     >>> from chemotools.datasets import load_fermentation_train
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
-    >>> # Define wavenumbers
-    >>> wavenumbers = X.columns
+    >>> # Get wavenumbers as numpy array
+    >>> wavenumbers = X.columns.values
+    array([ 428.,  429.,  431., ..., 1830., 1831., 1833.], shape=(1047,))
     >>> # Define features to select
-    >>> features = [100, 200, 300, 400, 500]
+    >>> range_1 = np.arange(428, 551, 1)
+    >>> range_2 = np.arange(875, 1001, 1)
+    >>> features = np.concatenate((range_1, range_2))
     >>> # Instantiate the transformer
     >>> selector = IndexSelector(features=features, wavenumbers=wavenumbers)
-    IndexSelector(features=[100, 200, 300, 400, 500], wavenumbers=wavenumbers)
+    IndexSelector()
     >>> selector.fit(X)
     >>> # Transform the data
     >>> X_selected = selector.transform(X)
     >>> X_selected.shape
-    (n_samples, 5)
+    (21, 183)
     """
 
     def __init__(
