@@ -81,7 +81,7 @@ class SRSelector(_PLSFeatureSelectorBase):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------

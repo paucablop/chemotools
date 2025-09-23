@@ -67,19 +67,22 @@ class StudentizedResiduals(_ModelResidualsBase):
 
     Examples
     --------
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.datasets import load_fermentation_train
     >>> from chemotools.outliers import StudentizedResiduals
-    >>> X = np.random.rand(100, 10)
-    >>> y = np.random.rand(100)
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> # Load sample data
+    >>> X, y = load_fermentation_train()
+    >>> y = y.values
+    >>> # Instantiate the PLS model
     >>> pls = PLSRegression(n_components=3).fit(X, y)
     >>> # Initialize StudentizedResiduals with the fitted PLS model
-    >>> studentized_residuals = StudentizedResiduals(pls, confidence=0.95)
+    >>> studentized_residuals = StudentizedResiduals(model=pls, confidence=0.95)
+    StudentizedResiduals(model=PLSRegression(n_components=3), confidence=0.95)
     >>> studentized_residuals.fit(X, y)
-    StudentizedResiduals()
     >>> # Predict outliers in the dataset
     >>> outliers = studentized_residuals.predict(X, y)
-    >>> # Get the studentized residuals
-    >>> residuals = studentized_residuals.predict_residuals(X, y)
+    >>> # Calculate Studentized residuals
+    >>> studentized_residuals_stats = studentized_residuals.predict_residuals(X, y)
 
     References
     ----------

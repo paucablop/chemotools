@@ -50,20 +50,10 @@ class Leverage(_ModelResidualsBase):
     critical_value_ : float
         The calculated critical value for outlier detection
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the Leverage model by computing leverage from the training set.
-        Calculates the critical threshold based on the chosen method.
-
-    predict(X, y=None)
-        Identify outliers in the input data based on Leverage threshold.
-
-    predict_residuals(X, y=None, validate=True)
-        Calculate the leverage of the samples.
-
-    _calculate_critical_value(X)
-        Calculate the critical value for outlier detection using the percentile method.
+    References
+    ----------
+    [1] Kim H. Esbensen,
+        "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
 
     Examples
     --------
@@ -74,16 +64,12 @@ class Leverage(_ModelResidualsBase):
     >>> pls = PLSRegression(n_components=3).fit(X, y)
     >>> # Initialize Leverage with the fitted PLS model
     >>> leverage = Leverage(pls, confidence=0.95)
+    Leverage(model=PLSRegression(n_components=3), confidence=0.95)
     >>> leverage.fit(X, y)
     >>> # Predict outliers in the dataset
     >>> outliers = leverage.predict(X)
     >>> # Get the leverage of the samples
     >>> residuals = leverage.predict_residuals(X)
-
-    References
-    ----------
-    [1] Kim H. Esbensen,
-        "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
     """
 
     _parameter_constraints: dict = {

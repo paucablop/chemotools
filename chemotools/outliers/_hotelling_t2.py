@@ -52,41 +52,29 @@ class HotellingT2(_ModelResidualsBase):
     critical_value_ : float
         The calculated critical value for outlier detection
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the Hotelling's T-squared model by calculating the critical value.
-
-    predict(X, y=None)
-        Identify outliers in the input data based on Hotelling's T-squared statistics.
-        Returns -1 for outliers and 1 for inliers.
-
-    predict_residuals(X, y=None, validate=True)
-        Calculate Hotelling's T-squared statistics for the input data.
-
-    _calculate_critical_value(X)
-        Calculate the critical value for Hotelling's T-squared statistics.
-
-    Examples
-    --------
-    >>> from sklearn.decomposition import PCA
-    >>> from chemotools.outliers import HotellingT2
-    >>> X = np.random.rand(100, 10)
-    >>> pca = PCA(n_components=3).fit(X)
-    >>> # Initialize HotellingT2 with the fitted PCA model
-    >>> hotelling_t2 = HotellingT2(model=pca, confidence=0.95)
-    >>> hotelling_t2.fit(X)
-    HotellingT2()
-    >>> # Predict outliers in the dataset
-    >>> outliers = hotelling_t2.predict(X)
-    >>> # Calculate Hotelling's T-squared statistics
-    >>> t2_stats = hotelling_t2.predict_residuals(X)
-
     References
     ----------
     [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde
         Generalized contribution plots in multivariate statistical process
         monitoring  Chemometrics and Intelligent Laboratory Systems 51 2000 95–114 (2001).
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.outliers import HotellingT2
+    >>> from sklearn.decomposition import PCA
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the PCA model
+    >>> pca = PCA(n_components=3).fit(X)
+    >>> # Initialize HotellingT2 with the fitted PCA model
+    >>> hotelling_t2 = HotellingT2(model=pca, confidence=0.95)
+    HotellingT2(model=PCA(n_components=3), confidence=0.95)
+    >>> hotelling_t2.fit(X)
+    >>> # Predict outliers in the dataset
+    >>> outliers = hotelling_t2.predict(X)
+    >>> # Calculate Hotelling's T-squared statistics
+    >>> t2_stats = hotelling_t2.predict_residuals(X)
     """
 
     _parameter_constraints = {
@@ -132,6 +120,9 @@ class HotellingT2(_ModelResidualsBase):
         ----------
         X : array-like of shape (n_samples, n_features)
             Input data
+
+        y : None
+            Ignored to align with API.
 
         Returns
         -------
