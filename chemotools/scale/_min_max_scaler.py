@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scale._min_max_scaler` module implements a Min-Max Scaler transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -15,13 +22,22 @@ class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The normalization to use. If True, the data is subtracted by the minimum and
         scaled by the maximum. If False, the data is scaled by the maximum.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by scaling by the maximum value.
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scale import MinMaxScaler
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize MinMaxScaler
+    >>> scaler = MinMaxScaler()
+    MinMaxScaler()
+    >>> # Fit and transform the data
+    >>> X_scaled = scaler.fit_transform(X)
     """
 
     def __init__(self, use_min: bool = True):
@@ -37,7 +53,7 @@ class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -60,11 +76,11 @@ class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scale._norm_scaler` module implements a L-norm Scaler transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
@@ -12,13 +19,22 @@ class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     l_norm : int, optional
         The L-norm to use. Default is 2.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by scaling by the L-norm.
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scale import NormScaler
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize NormScaler
+    >>> scaler = NormScaler(l_norm=2)
+    NormScaler()
+    >>> # Fit and transform the data
+    >>> X_scaled = scaler.fit_transform(X)
     """
 
     def __init__(self, l_norm: int = 2):
@@ -34,7 +50,7 @@ class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -57,11 +73,11 @@ class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
