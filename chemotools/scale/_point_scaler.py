@@ -31,6 +31,7 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     ----------
     n_features_in_ : int
         The number of features in the input data.
+
     point_index_ : int
         The index of the point to scale the data by. It is 0 if the wavenumbers are not provided.
 

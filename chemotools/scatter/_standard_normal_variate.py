@@ -15,16 +15,10 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     """
     A transformer that calculates the standard normal variate of the input data.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the standard normal variate.
-
-    _calculate_standard_normal_variate(x)
-        Calculate the standard normal variate for a single spectrum.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
     Raises
     ------
@@ -32,19 +26,23 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
         If the standard deviation of a spectrum is zero (spectrum is flat), a warning is raised
         indicating that the result will contain NaNs.
 
-    Examples
-    --------
-    >>> from chemotools.scatter import StandardNormalVariate
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> snv = StandardNormalVariate()
-    >>> X_transformed = snv.fit_transform(X)
-
     References
     ----------
     [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
         "Review of the most common pre-processing techniques for near-infrared spectra,"
         TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scatter import StandardNormalVariate
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize StandardNormalVariate
+    >>> snv = StandardNormalVariate()
+    StandardNormalVariate()
+    >>> # Fit and transform the data
+    >>> X_scaled = snv.fit_transform(X)
     """
 
     def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":
@@ -57,7 +55,7 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -80,11 +78,11 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

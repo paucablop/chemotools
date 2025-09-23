@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scatter._extended_multiplicative_scatter_correction` module implements a Extended Multiplicative Scatter Correction transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
@@ -8,7 +15,8 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 class ExtendedMultiplicativeScatterCorrection(
     TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 ):
-    """Extended multiplicative scatter correction (EMSC) is a preprocessing technique for
+    """
+    Extended multiplicative scatter correction (EMSC) is a preprocessing technique for
     removing non linear scatter effects from spectra. It is based on fitting a polynomial
     regression model to the spectrum using a reference spectrum. The reference spectrum
     can be the mean or median spectrum of a set of spectra or a selected reerence.
@@ -21,29 +29,49 @@ class ExtendedMultiplicativeScatterCorrection(
     reference : np.ndarray, optional
         The reference spectrum to use for the correction. If None, the mean
         spectrum will be used. The default is None.
+
     use_mean : bool, optional
         Whether to use the mean spectrum as the reference. The default is True.
+
     use_median : bool, optional
         Whether to use the median spectrum as the reference. The default is False.
+
     order : int, optional
         The order of the polynomial to fit to the spectrum. The default is 2.
+
     weights : np.ndarray, optional
         The weights to use for the weighted EMSC. If None, the standard EMSC
         will be used. The default is None.
 
-
     Attributes
     ----------
+    n_features_in_ : int
+        The number of features in the training data.
+
     reference_ : np.ndarray
         The reference spectrum used for the correction.
 
     References
     ----------
-    Nils Kristian Afseth, Achim Kohler. Extended multiplicative signal correction
-    in vibrational spectroscopy, a tutorial, doi:10.1016/j.chemolab.2012.03.004
+    [1] Nils Kristian Afseth, Achim Kohler.
+        Extended multiplicative signal correction in vibrational spectroscopy, a
+        tutorial, doi:10.1016/j.chemolab.2012.03.004
 
-    Valeria Tafintseva et al. Correcting replicate variation in spectroscopic data by machine learning and
-    model-based pre-processing, doi:10.1016/j.chemolab.2021.104350
+    [2] Valeria Tafintseva et al.
+        Correcting replicate variation in spectroscopic data by machine learning and
+        model-based pre-processing, doi:10.1016/j.chemolab.2021.104350.
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scatter import ExtendedMultiplicativeScatterCorrection
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize ExtendedMultiplicativeScatterCorrection
+    >>> emsc = ExtendedMultiplicativeScatterCorrection()
+    ExtendedMultiplicativeScatterCorrection()
+    >>> # Fit and transform the data
+    >>> X_scaled = emsc.fit_transform(X)
     """
 
     ALLOWED_METHODS = ["mean", "median"]
@@ -73,7 +101,7 @@ class ExtendedMultiplicativeScatterCorrection(
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -136,11 +164,11 @@ class ExtendedMultiplicativeScatterCorrection(
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
