@@ -1,3 +1,7 @@
+# Authors: Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>
+# License: MIT
+
+
 from __future__ import annotations
 from typing import Literal
 import numpy as np
