@@ -33,8 +33,12 @@ def test_ms_kernel_properties_default():
 
 def test_ms_kernel_changes_with_params():
     # different alpha should yield a different kernel (not identical vector)
-    ms1 = ModifiedSincFilter(window_size=21, n=6, alpha=2.0, mode="interp").fit(np.zeros((1, 21)))
-    ms2 = ModifiedSincFilter(window_size=21, n=6, alpha=4.0, mode="interp").fit(np.zeros((1, 21)))
+    ms1 = ModifiedSincFilter(window_size=21, n=6, alpha=2.0, mode="interp").fit(
+        np.zeros((1, 21))
+    )
+    ms2 = ModifiedSincFilter(window_size=21, n=6, alpha=4.0, mode="interp").fit(
+        np.zeros((1, 21))
+    )
     assert not np.allclose(ms1.kernel_, ms2.kernel_, atol=1e-12)
     # both remain valid kernels
     assert np.isclose(ms1.kernel_.sum(), 1.0, atol=1e-12)
@@ -81,7 +85,7 @@ def test_ms_impulse_equals_kernel_all_modes(mode):
         print(f"Max difference for {mode} mode: {diff}")
     else:
         assert np.allclose(Y[0], k, atol=1e-12)
-        
+
     assert np.isclose(k.sum(), 1.0, atol=1e-12)
     assert np.allclose(k, k[::-1], atol=1e-12)
 

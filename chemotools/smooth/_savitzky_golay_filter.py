@@ -1,9 +1,6 @@
 from typing import Literal
 
 import numpy as np
-from scipy.signal import savgol_filter
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
 from ._base import _BaseFIRFilter
 
 

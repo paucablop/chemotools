@@ -1,11 +1,7 @@
 from __future__ import annotations
-from typing import Literal, Optional
-import numbers
+from typing import Literal
 import numpy as np
 
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
-from sklearn.utils._param_validation import Interval, StrOptions
 from ._base import _BaseFIRFilter
 
 
@@ -49,7 +45,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
     def _compute_kernel(self) -> np.ndarray:
         """
         Compute the Modified Sinc kernel based on parameters.
-        
+
         Returns:
             np.ndarray: Symmetric kernel with sum=1.0 (DC preserving)
         """
@@ -76,40 +72,49 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
         # Set up linear system to solve for A, B, C coefficients
         e4 = np.exp(-self.alpha * 4.0)
-        M = np.array([
-            [E0, 2.0 * e4, 1.0],               # w(0) = 1
-            [E1, (Ep + Em), 1.0],              # w(1) = 0
-            [-2 * self.alpha * E1,             # w'(1) = 0
-            2 * self.alpha * (1 * Ep - 3 * Em),
-            0],
-        ], dtype=np.float64)
+        M = np.array(
+            [
+                [E0, 2.0 * e4, 1.0],  # w(0) = 1
+                [E1, (Ep + Em), 1.0],  # w(1) = 0
+                [
+                    -2 * self.alpha * E1,  # w'(1) = 0
+                    2 * self.alpha * (1 * Ep - 3 * Em),
+                    0,
+                ],
+            ],
+            dtype=np.float64,
+        )
         rhs = np.array([1.0, 0.0, 0.0], dtype=np.float64)
-        
+
         # Solve for window coefficients
         Acoef, Bcoef, Ccoef = np.linalg.solve(M, rhs)
 
         # Apply window function to all points
         window = (
-            Acoef * np.exp(-self.alpha * x * x) +
-            Bcoef * (np.exp(-self.alpha * (x - 2.0) ** 2) + 
-                    np.exp(-self.alpha * (x + 2.0) ** 2)) +
-            Ccoef
+            Acoef * np.exp(-self.alpha * x * x)
+            + Bcoef
+            * (
+                np.exp(-self.alpha * (x - 2.0) ** 2)
+                + np.exp(-self.alpha * (x + 2.0) ** 2)
+            )
+            + Ccoef
         )
 
         # Initial kernel: sinc core * window
         h = core * window
 
         # Apply optional passband-flattening corrections from paper
-        if (self.use_corrections and 
-            self._has_kappa_table(self.n) and 
-            (m >= self.n // 2 + 2)):
-            
+        if (
+            self.use_corrections
+            and self._has_kappa_table(self.n)
+            and (m >= self.n // 2 + 2)
+        ):
             # ν = 1 for n=6,10; ν = 2 for n=8
             nu = 1 if ((self.n // 2) % 2 == 1) else 2
-            
+
             # Get correction coefficients from paper's table
             coeffs = self._kappa_coeffs(self.n, m)
-            
+
             # Apply correction terms
             B = []
             for j, kappa in enumerate(coeffs):
@@ -121,12 +126,12 @@ class ModifiedSincFilter(_BaseFIRFilter):
         # Ensure perfect symmetry and normalize to sum=1
         h = 0.5 * (h + h[::-1])
         s = h.sum()
-        
+
         if not np.isfinite(s) or abs(s) < 1e-15:
             raise FloatingPointError(
                 "Kernel normalization failed; try different parameters."
             )
-        
+
         # Return DC-preserving kernel (sum = 1.0)
         h = h / s
         return h
