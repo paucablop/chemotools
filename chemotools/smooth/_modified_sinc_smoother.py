@@ -14,7 +14,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
     Modified-sinc (MS) smoother.
 
     Kernel on normalized x = i/(m+1) (so the first point *outside* the support is x=±1):
-        h(x) = A · w(x) · sinc((n/2) * x)  +  Σ κ_j^(n) · w(x) · x · sin((2j+ν)πx)
+        h(x) = A · w(x) · sinc(((n+4)/2) · x) + Σ κ_j^(n) · w(x) · x · sin((2j+ν)πx)
     - w(x) is a Gaussian-based window constructed so that w(0)=1, w(1)=0, and w'(1)=0,
       i.e., amplitude and slope vanish at the ends as described in the paper. :contentReference[oaicite:3]{index=3}
     - κ_j^(n) follow κ = a + b/(c - m)^3 (Table 1) for n ∈ {6,8,10}. :contentReference[oaicite:4]{index=4}
@@ -54,8 +54,8 @@ class ModifiedSincFilter(_BaseFIRFilter):
             np.ndarray: Symmetric kernel with sum=1.0 (DC preserving)
         """
         # Parameter validation
-        if self.n % 2 != 0 or self.n < 4:
-            raise ValueError("n must be an even integer ≥ 4.")
+        if self.n % 2 != 0 or self.n < 2:
+            raise ValueError("n must be an even integer ≥ 2.")
         if self.alpha <= 0:
             raise ValueError("alpha must be positive.")
 
@@ -65,29 +65,28 @@ class ModifiedSincFilter(_BaseFIRFilter):
         x = i / (m + 1) if m >= 0 else np.array([0.0])
 
         # Core sinc function (with zeros at specific points for even n)
-        core = np.sinc(0.5 * self.n * x)  # np.sinc(u) := sin(pi*u)/(pi*u)
+        core = np.sinc(0.5 * (self.n + 4) * x)  # np.sinc(u) := sin(pi*u)/(pi*u)
 
         # Create window function with properties: w(0)=1, w(1)=0, w'(1)=0
         # Window form: w(x) = A*exp(-α x^2) + B*(exp(-α(x-2)^2)+exp(-α(x+2)^2)) + C
-        E0 = np.exp(-self.alpha * 0.0)  # exp(0) = 1
-        E1 = np.exp(-self.alpha * 1.0**2)
-        Ep = np.exp(-self.alpha * (1.0 - 2.0) ** 2)
-        Em = Ep  # symmetric
+        E1 = np.exp(-self.alpha * 1.0)  # e^{-α}
+        Ep = np.exp(-self.alpha * 1.0)  # (x-2)^2 at x=1
+        Em = np.exp(-self.alpha * 9.0)  # (x+2)^2 at x=1
+        e4 = np.exp(-self.alpha * 4.0)  # (±2)^2 at x=0
 
-        # Set up linear system to solve for A, B, C coefficients
-        e4 = np.exp(-self.alpha * 4.0)
         M = np.array(
             [
-                [E0, 2.0 * e4, 1.0],  # w(0) = 1
+                [1.0, 2.0 * e4, 1.0],  # w(0) = 1
                 [E1, (Ep + Em), 1.0],  # w(1) = 0
                 [
-                    -2 * self.alpha * E1,  # w'(1) = 0
-                    2 * self.alpha * (1 * Ep - 3 * Em),
-                    0,
-                ],
+                    -2 * self.alpha * E1,
+                    2 * self.alpha * (Ep - 3 * Em),
+                    0.0,
+                ],  # w'(1) = 0
             ],
             dtype=np.float64,
         )
+
         rhs = np.array([1.0, 0.0, 0.0], dtype=np.float64)
 
         # Solve for window coefficients
@@ -95,7 +94,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
         # Apply window function to all points
         window = (
-            Acoef * np.exp(-self.alpha * x * x)
+            Acoef * np.exp(-self.alpha * x**2)
             + Bcoef
             * (
                 np.exp(-self.alpha * (x - 2.0) ** 2)
@@ -149,7 +148,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
     def _kappa_coeffs(n: int, m: int) -> np.ndarray:
         """
         Returns [κ_0] for n=6; [κ_0, κ_1] for n=8 or 10; using κ = a + b/(c - m)^3.
-        Coefficients (a,b,c) taken from Table 1 of the paper. :contentReference[oaicite:5]{index=5}
+        Coefficients (a,b,c) taken from Table 1 of the paper.
         """
         # (a, b, c) tuples in the order of j
         if n == 6:

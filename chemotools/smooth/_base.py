@@ -1,5 +1,5 @@
 # _base.py
-# Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
+# Authors: Niklas Zell <nik.zoe@web.de>, Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>, Pau Cabaneros
 # License: MIT
 
 from __future__ import annotations
