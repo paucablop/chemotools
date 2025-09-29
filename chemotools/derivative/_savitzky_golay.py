@@ -3,7 +3,7 @@ The :mod:`chemotools.derivative._savitzky_golay` module implements the Savitzky-
 transformer to calculate the Savitzky-Golay derivative of spectral data.
 """
 
-# Author: Pau Cababeros
+# Author: Pau Cabaneros
 # License: MIT
 
 from typing import Literal

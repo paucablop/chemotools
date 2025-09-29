@@ -3,7 +3,7 @@ The :mod:`chemotools.derivative._norris_william` module implements the Norris-Wi
 transformer to calculate the Norris-Williams derivative of spectral data.
 """
 
-# Author: Pau Cababeros
+# Author: Pau Cabaneros
 # License: MIT
 
 import numpy as np

@@ -3,7 +3,7 @@ The :mod:`chemotools.feature_selection._index_selector` module implements the In
 to select specific features from spectral data based on indices or wavenumbers.
 """
 
-# Author: Pau Cababeros
+# Author: Pau Cabaneros
 # License: MIT
 
 from typing import Optional, Union

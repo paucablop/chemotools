@@ -3,7 +3,7 @@ The :mod:`chemotools.feature_selection._sr_selector` module implements the Selec
 feature selector for PLS regression models.
 """
 
-# Author: Pau Cababeros
+# Author: Pau Cabaneros
 # License: MIT
 
 import numpy as np
