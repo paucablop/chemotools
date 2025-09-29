@@ -31,15 +31,15 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Examples
     --------
-    >> from chemotools.datasets import load_fermentation_train
-    >> from chemotools.smooth import MeanFilter
-    >> # Load sample data
-    >> X, _ = load_fermentation_train()
-    >> # Initialize MeanFilter
-    >> mf = MeanFilter()
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.smooth import MeanFilter
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize MeanFilter
+    >>> mf = MeanFilter()
     MeanFilter()
-    >> # Fit and transform the data
-    >> X_smoothed = mf.fit_transform(X)
+    >>> # Fit and transform the data
+    >>> X_smoothed = mf.fit_transform(X)
 
     """
 

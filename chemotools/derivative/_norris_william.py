@@ -80,7 +80,6 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         y : None
             Ignored to align with API.
 
-
         Returns
         -------
         self : NorrisWilliams
