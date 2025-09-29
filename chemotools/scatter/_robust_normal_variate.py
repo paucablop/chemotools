@@ -50,8 +50,8 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Initialize RobustNormalVariate
-    RobustNormalVariate()
     >>> rnv = RobustNormalVariate()
+    RobustNormalVariate()
     >>> # Fit and transform the data
     >>> X_scaled = rnv.fit_transform(X)
     """
