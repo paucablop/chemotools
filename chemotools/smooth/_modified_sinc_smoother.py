@@ -11,25 +11,60 @@ from ._base import _BaseFIRFilter
 
 class ModifiedSincFilter(_BaseFIRFilter):
     """
-    Modified-sinc (MS) smoother.
+    Modified Sinc smoothing (MS) for denoising while preserving peak positions based on the paper "Why and How Savitzky–Golay Filters Should Be Replaced."
 
-    Kernel on normalized x = i/(m+1) (so the first point *outside* the support is x=±1):
-        h(x) = A · w(x) · sinc(((n+4)/2) · x) + Σ κ_j^(n) · w(x) · x · sin((2j+ν)πx)
-    - w(x) is a Gaussian-based window constructed so that w(0)=1, w(1)=0, and w'(1)=0,
-      i.e., amplitude and slope vanish at the ends as described in the paper. :contentReference[oaicite:3]{index=3}
-    - κ_j^(n) follow κ = a + b/(c - m)^3 (Table 1) for n ∈ {6,8,10}. :contentReference[oaicite:4]{index=4}
-    - Final kernel is symmetrized and normalized (DC = 1).
+    The Modified Sinc smoother is a linear-phase FIR filter: the signal is
+    convolved with a fixed, symmetric kernel. The kernel is built from:
+      1) a sinc core with argument ((n + 4) / 2) * pi * x (Eq. 3, p. 187),
+      2) a special Gaussian-like window w(x) whose value and slope vanish at
+         the window ends (Eq. 4, p. 187), and
+      3) small optional correction terms that flatten the passband so low
+         frequencies are almost unattenuated (Eqs. 7–8 and Table 1, pp. 187–188).
 
     Parameters
     ----------
-    window_size : int, odd >= 3
-    n : int, even >= 4
-        Controls number of sinc “wiggles” in support (use 6, 8, or 10 for paper’s κ).
-    alpha : float > 0
-        Gaussian width parameter for the window construction.
+    window_size : int, default=21
+        Odd number of taps (2*m + 1). Larger values give stronger smoothing.
+
+    n : int, default=6
+        Even integer >= 2. Controls how many inner zeros the sinc has within
+        the window. The paper discusses n = 2, 4, 6, 8, 10 (Fig. 2).
+
+    alpha : float, default=4.0
+        Positive window width parameter. Larger alpha reduces side lobes more
+        aggressively (steeper roll-off).
+
     use_corrections : bool, default=True
-        Apply passband-flattening corrections for n ∈ {6,8,10} when valid.
-    mode, axis : inherited
+        If True and n in {6, 8, 10} and the window is large enough, add the
+        small passband-flattening terms from Eqs. 7–8 (coefficients from Table 1).
+
+    mode : {"mirror", "constant", "nearest", "wrap", "interp"}, default="interp"
+        Boundary strategy, passed to the base FIR class. "interp" performs
+        linear extrapolation (recommended in the paper).
+
+    axis : int, default=1
+        Axis along which to smooth for 2D inputs (rows x features). Use 1 to
+        smooth within each row.
+
+    Methods
+    -------
+    fit(X, y=None)
+        Inherited from the base class. Validates input and builds the kernel.
+
+    transform(X, y=None)
+        Inherited from the base class. Pads, convolves, and returns the smoothed data.
+
+    Examples
+    --------
+    >>> from chemotools.smooth import ModifiedSincFilter
+    >>> import numpy as np
+    >>> X = np.array([[0.0, 1.0, 2.0, 1.0, 0.0]], dtype=float)
+    >>> ms = ModifiedSincFilter(window_size= 9, n=6, alpha=4.0, mode="interp")
+    >>> X_smooth = ms.fit_transform(X)
+
+    References
+    ----------
+    Schmid, M.; Rath, D.; Diebold, U. "Why and How Savitzky–Golay Filters Should Be Replaced."
     """
 
     def __init__(
@@ -48,109 +83,91 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
     def _compute_kernel(self) -> np.ndarray:
         """
-        Compute the Modified Sinc kernel based on parameters.
+        Build the Modified Sinc kernel h[i] for i = -m ... m.
 
-        Returns:
-            np.ndarray: Symmetric kernel with sum=1.0 (DC preserving)
+        Implementation map to the paper:
+          1) Map index to x = i / (m + 1)  (Eq. 5).
+          2) Base sinc: np.sinc(0.5 * (n + 4) * x)  (Eq. 3).
+          3) Solve a 3x3 system for the window coefficients so that
+             w(0)=1, w(1)=0, w'(1)=0; then form w(x)  (Eq. 4).
+          4) h = sinc * w.
+          5) Optional corrections from Eqs. 7–8 (Table 1).
+          6) Symmetrize and normalize so sum(h)=1  (Eq. 6).
         """
-        # Parameter validation
+        
+        # ---- parameter checks ----
         if self.n % 2 != 0 or self.n < 2:
-            raise ValueError("n must be an even integer ≥ 2.")
+            raise ValueError("n must be an even integer >= 2.")
         if self.alpha <= 0:
             raise ValueError("alpha must be positive.")
 
-        # Calculate kernel points and normalize x to [-1, 1] range
+        # ---- 1) Eq. 5: index -> normalized coordinate in [-1, 1] ----
         m = (self.window_size - 1) // 2
         i = np.arange(-m, m + 1, dtype=np.float64)
         x = i / (m + 1) if m >= 0 else np.array([0.0])
 
-        # Core sinc function (with zeros at specific points for even n)
-        core = np.sinc(0.5 * (self.n + 4) * x)  # np.sinc(u) := sin(pi*u)/(pi*u)
+        # ---- 2) Eq. 3: modified sinc core (numpy's sinc uses sin(pi*u)/(pi*u)) ----
+        core = np.sinc(0.5 * (self.n + 4) * x)
 
-        # Create window function with properties: w(0)=1, w(1)=0, w'(1)=0
-        # Window form: w(x) = A*exp(-α x^2) + B*(exp(-α(x-2)^2)+exp(-α(x+2)^2)) + C
-        E1 = np.exp(-self.alpha * 1.0)  # e^{-α}
-        Ep = np.exp(-self.alpha * 1.0)  # (x-2)^2 at x=1
-        Em = np.exp(-self.alpha * 9.0)  # (x+2)^2 at x=1
-        e4 = np.exp(-self.alpha * 4.0)  # (±2)^2 at x=0
+        # ---- 3) Eq. 4: window with w(0)=1, w(1)=0, w'(1)=0 ----
+        # Precompute the exponentials appearing in those constraints.
+        E1 = np.exp(-self.alpha * 1.0)   # exp(-alpha * 1^2)   at x = 1 (central Gaussian)
+        Ep = np.exp(-self.alpha * 1.0)   # exp(-alpha * (1-2)^2) = exp(-alpha) for (x-2)
+        Em = np.exp(-self.alpha * 9.0)   # exp(-alpha * (1+2)^2) = exp(-9*alpha) for (x+2)
+        e4 = np.exp(-self.alpha * 4.0)   # exp(-alpha * (±2)^2) at x = 0
 
-        M = np.array(
-            [
-                [1.0, 2.0 * e4, 1.0],  # w(0) = 1
-                [E1, (Ep + Em), 1.0],  # w(1) = 0
-                [
-                    -2 * self.alpha * E1,
-                    2 * self.alpha * (Ep - 3 * Em),
-                    0.0,
-                ],  # w'(1) = 0
-            ],
-            dtype=np.float64,
-        )
-
+        # Linear system rows correspond to: w(0)=1, w(1)=0, w'(1)=0
+        M = np.array([
+            [1.0,              2.0 * e4,                 1.0],
+            [E1,               (Ep + Em),                1.0],
+            [-2*self.alpha*E1, 2*self.alpha*(Ep - 3*Em), 0.0],
+        ], dtype=np.float64)
         rhs = np.array([1.0, 0.0, 0.0], dtype=np.float64)
 
-        # Solve for window coefficients
         Acoef, Bcoef, Ccoef = np.linalg.solve(M, rhs)
 
-        # Apply window function to all points
+        # Window values across the support
         window = (
             Acoef * np.exp(-self.alpha * x**2)
-            + Bcoef
-            * (
-                np.exp(-self.alpha * (x - 2.0) ** 2)
-                + np.exp(-self.alpha * (x + 2.0) ** 2)
-            )
+            + Bcoef * (np.exp(-self.alpha * (x - 2.0) ** 2) + np.exp(-self.alpha * (x + 2.0) ** 2))
             + Ccoef
         )
 
-        # Initial kernel: sinc core * window
+        # ---- 4) base kernel = windowed sinc ----
         h = core * window
 
-        # Apply optional passband-flattening corrections from paper
-        if (
-            self.use_corrections
-            and self._has_kappa_table(self.n)
-            and (m >= self.n // 2 + 2)
-        ):
-            # ν = 1 for n=6,10; ν = 2 for n=8
+        # ---- 5) Eqs. 7–8 + Table 1: optional passband-flattening corrections ----
+        if self.use_corrections and self._has_kappa_table(self.n) and (m >= self.n // 2 + 2):
+            # nu = 1 for n/2 odd (n=6,10); nu = 2 for n=8 (Eq. 7)
             nu = 1 if ((self.n // 2) % 2 == 1) else 2
+            kappas = self._kappa_coeffs(self.n, m)  # kappa = a + b / (c - m)^3  (Eq. 8; Table 1)
+            corr = 0.0
+            # add the correction term according to Eq. 7
+            for j, kappa in enumerate(kappas):
+                corr += kappa * window * x * np.sin((2 * j + nu) * np.pi * x)
+            h = h + corr
 
-            # Get correction coefficients from paper's table
-            coeffs = self._kappa_coeffs(self.n, m)
-
-            # Apply correction terms
-            B = []
-            for j, kappa in enumerate(coeffs):
-                bj = window * x * np.sin((2 * j + nu) * np.pi * x)
-                B.append(kappa * bj)
-            if B:
-                h = h + np.sum(np.stack(B, axis=0), axis=0)
-
-        # Ensure perfect symmetry and normalize to sum=1
+        # ---- 6) Eq. 6: Enforce symmetry and DC = 1 ----
         h = 0.5 * (h + h[::-1])
         s = h.sum()
-
         if not np.isfinite(s) or abs(s) < 1e-15:
-            raise FloatingPointError(
-                "Kernel normalization failed; try different parameters."
-            )
-
-        # Return DC-preserving kernel (sum = 1.0)
+            raise FloatingPointError("Kernel normalization failed; try different parameters.")
         h = h / s
         return h
 
-    # ====== κ(a,b,c) table per paper’s Table 1 (eq. 8) ======
+    # ====== Table 1 (p. 188): kappa fit coefficients for Eq. 8 ======
     @staticmethod
     def _has_kappa_table(n: int) -> bool:
+        # The paper provides corrections for n = 6, 8, 10
         return n in (6, 8, 10)
 
     @staticmethod
     def _kappa_coeffs(n: int, m: int) -> np.ndarray:
         """
-        Returns [κ_0] for n=6; [κ_0, κ_1] for n=8 or 10; using κ = a + b/(c - m)^3.
-        Coefficients (a,b,c) taken from Table 1 of the paper.
+        Return [kappa_0] for n=6; [kappa_0, kappa_1] for n=8 or 10.
+        Formula: kappa_j^(n)(m) = a_j^(n) + b_j^(n) / (c_j^(n) - m)^3
+        (Eq. 8, p. 188; coefficients from Table 1).
         """
-        # (a, b, c) tuples in the order of j
         if n == 6:
             ABC = [(0.00172, 0.02437, 1.64375)]
         elif n == 8:
@@ -159,8 +176,4 @@ class ModifiedSincFilter(_BaseFIRFilter):
             ABC = [(0.00118, 0.04219, 2.74688), (0.00367, 0.12780, 2.77031)]
         else:
             return np.zeros(0, dtype=np.float64)
-
-        ks = []
-        for a, b, c in ABC:
-            ks.append(a + b / ((c - m) ** 3))
-        return np.asarray(ks, dtype=np.float64)
+        return np.asarray([a + b / ((c - m) ** 3) for a, b, c in ABC], dtype=np.float64)
