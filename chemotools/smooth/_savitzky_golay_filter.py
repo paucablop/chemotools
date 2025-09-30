@@ -6,40 +6,40 @@ from ._base import _BaseFIRFilter
 
 class SavitzkyGolayFilter(_BaseFIRFilter):
     """
-        A transformer that calculates the Savitzky-Golay filter of the input data.
+    A transformer that calculates the Savitzky-Golay filter of the input data.
 
-        Parameters
-        ----------
-        window_size : int, optional
-            The size of the window to use for the Savitzky-Golay filter. Must be odd. Default
-            is 3.
+    Parameters
+    ----------
+    window_size : int, optional
+        The size of the window to use for the Savitzky-Golay filter. Must be odd. Default
+        is 3.
 
-        polynomial_order : int, optional
-            The order of the polynomial to use for the Savitzky-Golay filter. Must be less
-            than window_size. Default is 1.
+    polynomial_order : int, optional
+        The order of the polynomial to use for the Savitzky-Golay filter. Must be less
+        than window_size. Default is 1.
 
-        mode : str, optional
-            The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
-            "reflect", "wrap", "mirror" or "interp". Default is "nearest".
+    mode : str, optional
+        The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
+        "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
-        Attributes
-        ----------
-        n_features_in_ : int
-            The number of features in the training data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
-        Examples
-        --------
-        >>> from chemotools.datasets import load_fermentation_train
-        >>> from chemotools.smooth import SavitzkyGolayFilter
-        >>> # Load sample data
-        >>> X, _ = load_fermentation_train()
-        >>> # Initialize SavitzkyGolayFilter
-        >>> sgf = SavitzkyGolayFilter()
-        SavitzkyGolayFilter()
-        >>> # Fit and transform the data
-        >>> X_smoothed = sgf.fit_transform(X)
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.smooth import SavitzkyGolayFilter
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize SavitzkyGolayFilter
+    >>> sgf = SavitzkyGolayFilter()
+    SavitzkyGolayFilter()
+    >>> # Fit and transform the data
+    >>> X_smoothed = sgf.fit_transform(X)
 
-        """
+    """
 
     def __init__(
         self,

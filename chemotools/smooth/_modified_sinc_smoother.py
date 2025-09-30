@@ -94,7 +94,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
           5) Optional corrections from Eqs. 7–8 (Table 1).
           6) Symmetrize and normalize so sum(h)=1  (Eq. 6).
         """
-        
+
         # ---- parameter checks ----
         if self.n % 2 != 0 or self.n < 2:
             raise ValueError("n must be an even integer >= 2.")
@@ -111,17 +111,24 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
         # ---- 3) Eq. 4: window with w(0)=1, w(1)=0, w'(1)=0 ----
         # Precompute the exponentials appearing in those constraints.
-        E1 = np.exp(-self.alpha * 1.0)   # exp(-alpha * 1^2)   at x = 1 (central Gaussian)
-        Ep = np.exp(-self.alpha * 1.0)   # exp(-alpha * (1-2)^2) = exp(-alpha) for (x-2)
-        Em = np.exp(-self.alpha * 9.0)   # exp(-alpha * (1+2)^2) = exp(-9*alpha) for (x+2)
-        e4 = np.exp(-self.alpha * 4.0)   # exp(-alpha * (±2)^2) at x = 0
+        E1 = np.exp(
+            -self.alpha * 1.0
+        )  # exp(-alpha * 1^2)   at x = 1 (central Gaussian)
+        Ep = np.exp(-self.alpha * 1.0)  # exp(-alpha * (1-2)^2) = exp(-alpha) for (x-2)
+        Em = np.exp(
+            -self.alpha * 9.0
+        )  # exp(-alpha * (1+2)^2) = exp(-9*alpha) for (x+2)
+        e4 = np.exp(-self.alpha * 4.0)  # exp(-alpha * (±2)^2) at x = 0
 
         # Linear system rows correspond to: w(0)=1, w(1)=0, w'(1)=0
-        M = np.array([
-            [1.0,              2.0 * e4,                 1.0],
-            [E1,               (Ep + Em),                1.0],
-            [-2*self.alpha*E1, 2*self.alpha*(Ep - 3*Em), 0.0],
-        ], dtype=np.float64)
+        M = np.array(
+            [
+                [1.0, 2.0 * e4, 1.0],
+                [E1, (Ep + Em), 1.0],
+                [-2 * self.alpha * E1, 2 * self.alpha * (Ep - 3 * Em), 0.0],
+            ],
+            dtype=np.float64,
+        )
         rhs = np.array([1.0, 0.0, 0.0], dtype=np.float64)
 
         Acoef, Bcoef, Ccoef = np.linalg.solve(M, rhs)
@@ -129,7 +136,11 @@ class ModifiedSincFilter(_BaseFIRFilter):
         # Window values across the support
         window = (
             Acoef * np.exp(-self.alpha * x**2)
-            + Bcoef * (np.exp(-self.alpha * (x - 2.0) ** 2) + np.exp(-self.alpha * (x + 2.0) ** 2))
+            + Bcoef
+            * (
+                np.exp(-self.alpha * (x - 2.0) ** 2)
+                + np.exp(-self.alpha * (x + 2.0) ** 2)
+            )
             + Ccoef
         )
 
@@ -137,10 +148,16 @@ class ModifiedSincFilter(_BaseFIRFilter):
         h = core * window
 
         # ---- 5) Eqs. 7–8 + Table 1: optional passband-flattening corrections ----
-        if self.use_corrections and self._has_kappa_table(self.n) and (m >= self.n // 2 + 2):
+        if (
+            self.use_corrections
+            and self._has_kappa_table(self.n)
+            and (m >= self.n // 2 + 2)
+        ):
             # nu = 1 for n/2 odd (n=6,10); nu = 2 for n=8 (Eq. 7)
             nu = 1 if ((self.n // 2) % 2 == 1) else 2
-            kappas = self._kappa_coeffs(self.n, m)  # kappa = a + b / (c - m)^3  (Eq. 8; Table 1)
+            kappas = self._kappa_coeffs(
+                self.n, m
+            )  # kappa = a + b / (c - m)^3  (Eq. 8; Table 1)
             corr = 0.0
             # add the correction term according to Eq. 7
             for j, kappa in enumerate(kappas):
@@ -151,7 +168,9 @@ class ModifiedSincFilter(_BaseFIRFilter):
         h = 0.5 * (h + h[::-1])
         s = h.sum()
         if not np.isfinite(s) or abs(s) < 1e-15:
-            raise FloatingPointError("Kernel normalization failed; try different parameters.")
+            raise FloatingPointError(
+                "Kernel normalization failed; try different parameters."
+            )
         h = h / s
         return h
 
