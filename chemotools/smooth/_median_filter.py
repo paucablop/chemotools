@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.smooth._median_filter` module implements the Median Filter (MD) transformation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal
 
 import numpy as np
@@ -8,24 +15,33 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    A transformer that calculates the median filter of the input data.
+    A smoothing transformer that calculates the median filter of the input data.
 
     Parameters
     ----------
-    window_size : int, optional
+    window_size : int, optional, default=3
         The size of the window to use for the median filter. Must be odd. Default is 3.
 
-    mode : str, optional
+    mode : str, optional, default="nearest"
         The mode to use for the median filter. Can be "nearest", "constant", "reflect",
         "wrap", "mirror" or "interp". Default is "nearest".
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the median filter.
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.smooth import MedianFilter
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize MedianFilter
+    >>> md = MedianFilter()
+    MedianFilter()
+    >>> # Fit and transform the data
+    >>> X_smoothed = md.fit_transform(X)
     """
 
     def __init__(
@@ -55,7 +71,7 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -78,11 +94,11 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

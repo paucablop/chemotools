@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.derivative._savitzky_golay` module implements the Savitzky-Golay
+transformer to calculate the Savitzky-Golay derivative of spectral data.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Literal
 
 import numpy as np
@@ -27,13 +35,29 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The mode to use for the derivative calculation. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the Savitzky-Golay derivative.
+    References
+    ----------
+    [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
+        "Review of the most common pre-processing techniques for near-infrared spectra,"
+        TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
+
+    Examples
+    --------
+    >>> from chemotools.derivative import SavitzkyGolay
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = SavitzkyGolay(window_size=3, polynomial_order=1)
+    SavitzkyGolay()
+    >>> transformer.fit(X)
+    >>> # Calculate Savitzky-Golay derivative
+    >>> X_corrected = transformer.transform(X)
     """
 
     def __init__(
@@ -58,7 +82,7 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -81,11 +105,11 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

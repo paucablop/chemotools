@@ -15,7 +15,7 @@ from scipy.stats import f as f_distribution
 
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .utils import calculate_residual_spectrum
+from ._utils import calculate_residual_spectrum
 
 
 class DModX(_ModelResidualsBase):
@@ -61,42 +61,30 @@ class DModX(_ModelResidualsBase):
     A0_ : int
         Adjustment factor for degrees of freedom based on mean centering
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the model to the training data. The fit method is used to calculate
-        the training residual variance and the critical value for outlier detection.
-
-    predict(X)
-        Predict outliers in the input data based on DModX statistics. Returns -1 for outliers and 1 for inliers.
-
-    predict_residuals(X, y=None, validate=True)
-        Calculate normalized DModX statistics for the input data.
-
-    _calculate_critical_value(X=None)
-        Calculate the critical value based on the F-distribution.
-
-    Examples
-    --------
-    >>> from sklearn.decomposition import PCA
-    >>> from chemotools.outliers import DModX
-    >>> X = np.random.rand(100, 10)
-    >>> pca = PCA(n_components=3).fit(X)
-    >>> # Initialize DModX with the fitted PCA model
-    >>> dmodx = DModX(model=pca, confidence=0.95, mean_centered=True)
-    >>> dmodx.fit(X)
-    DModX()
-    >>> # Predict outliers in the dataset
-    >>> outliers = dmodx.predict(X)
-    >>> # Calculate DModX residuals
-    >>> residuals = dmodx.predict_residuals(X)
-
     References
     ----------
     [1] Max Bylesjö, Mattias Rantalainen, Oliver Cloarec, Johan K. Nicholson,
         Elaine Holmes, Johan Trygg.
         "OPLS discriminant analysis: combining the strengths of PLS-DA and SIMCA
         classification." Journal of Chemometrics 20 (8-10), 341-351 (2006).
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.outliers import DModX
+    >>> from sklearn.decomposition import PCA
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the PCA model
+    >>> pca = PCA(n_components=3).fit(X)
+    >>> # Initialize DModX with the fitted PCA model
+    >>> dmodx = DModX(model=pca, confidence=0.95, mean_centered=True)
+    DModX(model=PCA(n_components=3), confidence=0.95, mean_centered=True)
+    >>> dmodx.fit(X)
+    >>> # Predict outliers in the dataset
+    >>> outliers = dmodx.predict(X)
+    >>> # Calculate DModX residuals
+    >>> residuals = dmodx.predict_residuals(X)
     """
 
     _parameter_constraints: dict = {
@@ -124,7 +112,7 @@ class DModX(_ModelResidualsBase):
             The input data used to fit the model.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -164,6 +152,9 @@ class DModX(_ModelResidualsBase):
         ----------
         X : np.ndarray of shape (n_samples, n_features)
             The input data to predict outliers for.
+
+        y : None
+            Ignored to align with API.
 
         Returns
         -------

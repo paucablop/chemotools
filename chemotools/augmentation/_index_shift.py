@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.augmentation._index_shift` module implements the IndexShift
+transformer to randomly shift spectral data along the index axis.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
@@ -40,11 +48,18 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     n_features_in_ : int
         The number of features in the input data.
 
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    _rng : numpy.random.Generator
-        Random number generator instance used for shifting.
+    Examples
+    --------
+    >>> from chemotools.augmentation import IndexShift
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = IndexShift(shift=2, padding_mode="constant",)
+    IndexShift()
+    >>> transformer.fit(X)
+    >>> # Generate shifted data
+    >>> X_shifted = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -111,7 +126,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data with the applied shifts.
         """
         # Check that the estimator is fitted

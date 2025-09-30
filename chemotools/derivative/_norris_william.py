@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.derivative._norris_william` module implements the Norris-Williams
+transformer to calculate the Norris-Williams derivative of spectral data.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from scipy.ndimage import convolve1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
@@ -23,13 +31,29 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The mode to use for the derivative calculation. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the Norris-Williams derivative.
+    References
+    ----------
+    [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
+        "Review of the most common pre-processing techniques for near-infrared spectra,"
+        TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
+
+    Examples
+    --------
+    >>> from chemotools.derivative import NorrisWilliams
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = NorrisWilliams(window_size=5, gap_size=3)
+    NorrisWilliams()
+    >>> transformer.fit(X)
+    >>> # Calculate Norris-Williams derivative
+    >>> X_corrected = transformer.transform(X)
     """
 
     def __init__(
@@ -54,7 +78,7 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -77,11 +101,11 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

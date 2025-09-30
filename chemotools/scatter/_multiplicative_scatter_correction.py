@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scatter._multiplicative_scatter_correction` module implements a Multiplicative Scatter Correction transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
@@ -18,23 +25,43 @@ class MultiplicativeScatterCorrection(
     reference : np.ndarray of shape (n_freatures), optional
         The reference spectrum to use for the correction. If None, the mean
         spectrum will be used. The default is None.
+
     use_mean : bool, optional
         Whether to use the mean spectrum as the reference. The default is True.
+
     use_median : bool, optional
         Whether to use the median spectrum as the reference. The default is False.
 
     Attributes
     ----------
-    reference_ : np.ndarray
-        The reference spectrum used for the correction.
     n_features_in_ : int
         The number of features in the training data.
+
+    reference_ : np.ndarray
+        The reference spectrum used for the correction.
 
     Raises
     ------
     ValueError
         If no reference is provided.
 
+    References
+    ----------
+    [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
+        "Review of the most common pre-processing techniques for near-infrared spectra,"
+        TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scatter import MultiplicativeScatterCorrection
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize MultiplicativeScatterCorrection
+    >>> msc = MultiplicativeScatterCorrection()
+    MultiplicativeScatterCorrection()
+    >>> # Fit and transform the data
+    >>> X_scaled = msc.fit_transform(X)
     """
 
     ALLOWED_METHODS = ["mean", "median"]
@@ -62,7 +89,7 @@ class MultiplicativeScatterCorrection(
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -123,11 +150,11 @@ class MultiplicativeScatterCorrection(
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

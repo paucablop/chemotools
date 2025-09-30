@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._subtract_reference` module implements
+a reference spectrum subtraction transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -15,25 +23,30 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The reference spectrum to subtract from the input data. If None, the original spectrum
         is returned.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the reference spectrum.
-
-    _subtract_reference(x)
-        Subtract the reference spectrum from a single spectrum.
+    reference_ : np.ndarray
+        The reference spectrum to subtract from the input data if the reference parameter is not None.
 
     Examples
     --------
     >>> from chemotools.baseline import SubtractReference
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4,  5]])
-    >>> reference = np.array([1, 1, 1, 1, 1])
-    >>> sr = SubtractReference(reference=reference)
-    >>> X_corrected = sr.fit_transform(X)
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Convert X to a numpy array
+    >>> X = np.array(X)
+    >>> # Instantiate the transformer with a reference spectrum
+    >>> reference = X[0]
+    >>> transformer = SubtractReference(reference=reference)
+    SubtractReference()
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
+
     """
 
     def __init__(
@@ -52,7 +65,7 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -80,11 +93,11 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

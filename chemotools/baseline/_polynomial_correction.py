@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._polynomial_correction` module implements
+a polynomial baseline correction transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -19,24 +27,27 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
         The indices of the points in the spectrum to fit the polynomial to. Defaults to None,
         which fits the polynomial to all points in the spectrum (equivalent to detrend).
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the polynomial baseline.
-
-    _baseline_correct_spectrum(x)
-        Subtract the polynomial baseline from a single spectrum.
+    indices_ : list
+        The indices of the points in the spectrum to fit the polynomial to.
+        If indices is None, this will be a list of all indices in the spectrum.
 
     Examples
     --------
     >>> from chemotools.baseline import PolynomialCorrection
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> pc = PolynomialCorrection(order=2, indices=[0, 2, 4])
-    >>> X_corrected = pc.fit_transform(X)
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = PolynomialCorrection(order=2, indices=[0, 100, 200, 300, 400, 500])
+    PolynomialCorrection()
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
     """
 
     def __init__(self, order: int = 1, indices: Optional[list] = None) -> None:
@@ -53,7 +64,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -71,7 +82,7 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 
         return self
 
-    def transform(self, X: np.ndarray, y: int = 0, copy: bool = True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the polynomial baseline.
 
@@ -80,15 +91,12 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
         X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
-        y : int or float, optional
-            Ignored.
-
-        copy : bool, optional
-            Whether to copy the input data before transforming. Defaults to True.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

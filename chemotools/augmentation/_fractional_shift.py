@@ -1,4 +1,13 @@
+"""
+The :mod:`chemotools.augmentation._fractional_shift` module implements the FractionalShift
+transformer to shift signals by a random fractional amount using cubic spline interpolation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
+
 import numpy as np
 from scipy.interpolate import CubicSpline
 from scipy import stats
@@ -26,6 +35,24 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     random_state : int, RandomState instance or None, default=None
         Controls randomness.
+
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of features in the training data.
+
+    Examples
+    --------
+    >>> from chemotools.augmentation import FractionalShift
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = FractionalShift(shift=2.0, padding_mode="linear")
+    FractionalShift()
+    >>> transformer.fit(X)
+    >>> # Generate shifted data
+    >>> X_shifted = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -51,14 +78,54 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         self.pad_value = pad_value
         self.random_state = random_state
 
-    def fit(self, X, y=None):
+    def fit(self, X: np.ndarray, y=None) -> "FractionalShift":
+        """
+        Fit the transformer to the input data.
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            Training data.
+
+        y : None
+            Ignored. Present for API consistency.
+
+        Returns
+        -------
+        self : FractionalShift
+            Fitted transformer.
+
+        Raises
+        ------
+        ValueError
+            If X is not a 2D array or contains non-finite values.
+        """
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
         self._rng = check_random_state(self.random_state)
         return self
 
-    def transform(self, X, y=None):
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """
+        Transform the input data by applying a random fractional shift to each signal.
+        Parameters
+        ----------
+        X : np.ndarray of shape (n_samples, n_features)
+            Input data to transform.
+
+        y : None
+            Ignored. Present for API consistency.
+        Returns
+        -------
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            Transformed data with applied shifts.
+
+        Raises
+        ------
+        ValueError
+            If X has different number of features than the training data,
+            or if an invalid padding mode is specified.
+        """
         check_is_fitted(self, "n_features_in_")
         X = validate_data(
             self,
@@ -71,7 +138,7 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         )
         return np.array([self._shift_signal(x) for x in X])
 
-    def _shift_signal(self, x):
+    def _shift_signal(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
         shift = self._rng.uniform(-self.shift, self.shift)
         indices = np.arange(n)
@@ -96,7 +163,6 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             shifted = self._apply_linear_padding(x, shifted, shifted_indices)
         return shifted
 
-    # --- helper methods ---
     def _apply_mirror_padding(self, x, shifted, shifted_indices):
         n = len(x)
         left_len = np.sum(shifted_indices < 0)

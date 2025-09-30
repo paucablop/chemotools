@@ -16,7 +16,7 @@ from sklearn.utils.validation import validate_data, check_is_fitted
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from ._base import _ModelResidualsBase, ModelTypes
-from .utils import calculate_residual_spectrum
+from ._utils import calculate_residual_spectrum
 
 
 class QResiduals(_ModelResidualsBase):
@@ -73,27 +73,26 @@ class QResiduals(_ModelResidualsBase):
     _calculate_critical_value(X)
         Calculate the critical value for outlier detection using the specified method.
 
-    Examples
-    --------
-    >>> from chemotools.decomposition import PCA
-    >>> from chemotools.outliers import QResiduals
-    >>> X = np.random.rand(100, 10)
-    >>> pca = PCA(n_components=3).fit(X)
-    >>> # Initialize QResiduals with the fitted PCA model
-    >>> q_residuals = QResiduals(pca, confidence=0.95, method="jackson-mudholkar")
-    >>> q_residuals.fit(X)
-    QResiduals()
-    >>> # Predict outliers in the dataset
-    >>> outliers = q_residuals.predict(X)
-    >>> # Calculate Q residuals
-    >>> residuals = q_residuals.predict_residuals(X)
-
-
     References
     ----------
     [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde (2001)
-    Generalized contribution plots in multivariate statistical process
-    monitoring  Chemometrics and Intelligent Laboratory Systems 51 95–114 (2000)
+        Generalized contribution plots in multivariate statistical process
+        monitoring  Chemometrics and Intelligent Laboratory Systems 51 95–114 (2000)
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.outliers import QResiduals
+    >>> from sklearn.decomposition import PCA
+    >>> X, _ = load_fermentation_train()
+    >>> pca = PCA(n_components=3).fit(X)
+    >>> # Initialize QResiduals with the fitted PCA model
+    >>> q_residuals = QResiduals(model=pca, confidence=0.95)
+    >>> q_residuals.fit(X)
+    >>> # Predict outliers in the dataset
+    >>> outliers = q_residuals.predict(X)
+    >>> # Calculate Q-residuals
+    >>> q_residuals_stats = q_residuals.predict_residuals(X)
     """
 
     _parameter_constraints: dict = {

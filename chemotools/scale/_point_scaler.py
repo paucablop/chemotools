@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.scale._point_scaler` module implements a Point Scaler transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -22,16 +29,23 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Attributes
     ----------
+    n_features_in_ : int
+        The number of features in the input data.
+
     point_index_ : int
         The index of the point to scale the data by. It is 0 if the wavenumbers are not provided.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by scaling by the value at a given Point.
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scale import PointScaler
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize PointScaler with point index
+    >>> scaler = PointScaler(point=10)
+    PointScaler(point=10, wavenumbers=None)
+    >>> # Fit and transform the data
+    >>> X_scaled = scaler.fit_transform(X)
     """
 
     def __init__(self, point: int = 0, wavenumbers: Optional[np.ndarray] = None):
@@ -48,7 +62,7 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -77,11 +91,11 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

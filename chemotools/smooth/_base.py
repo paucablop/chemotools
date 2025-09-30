@@ -44,12 +44,12 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
 
     def fit(self, X: np.ndarray, y=None) -> "_BaseWhittaker":
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
-        self.DtD_ab_ = self._precompute_DtD(X.shape[1])
+        self.DtD_ = self._precompute_DtD(X.shape[1])
         solver = whittaker_solver_dispatch(self.solver_type)
         return self._fit_core(X, y, solver=solver)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        check_is_fitted(self, ["DtD_ab_"])
+        check_is_fitted(self, ["DtD_"])
         X_ = validate_data(self, X, ensure_2d=True, copy=True, reset=False)
         solver = whittaker_solver_dispatch(self.solver_type)
         return self._transform_core(X_, y, solver=solver)
@@ -88,7 +88,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
     ) -> np.ndarray:
         """Solve (diag(w) + lam*D^T D) z = w*x."""
         try:
-            return solver(x, w, self.lam, self.DtD_ab_)
+            return solver(x, w, self.lam, self.DtD_)
         except Exception as e:
             logger.debug("Primary solver failed (%s); fallback to sparse LU.", e)
             DtD = compute_DtD_sparse(len(x))

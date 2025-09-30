@@ -26,16 +26,10 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         A small value added to the denominator to avoid numerical instability
         (division by zero). The default is 1e-10.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by calculating the standard normal variate.
-
-    _calculate_robust_normal_variate(x)
-        Calculate the robust normal variate for a single spectrum.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the training data.
 
     Raises
     ------
@@ -43,19 +37,23 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         If the standard deviation of the values below the specified percentile is zero,
         a warning and a small epsilon is added to the denominator to avoid NaNs.
 
-    Examples
-    --------
-    >>> from chemotools.scatter import RobustNormalVariate
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> rnv = RobustNormalVariate(percentile=25)
-    >>> X_transformed = rnv.fit_transform(X)
-
     References
     ----------
     [1] Q. Guo, W. Wu, D.L. Massart.
         "The robust normal variate transform for pattern
         recognition with near-infrared data." doi:10.1016/S0003-2670(98)00737-5
+
+    Examples
+    --------
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> from chemotools.scatter import RobustNormalVariate
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize RobustNormalVariate
+    >>> rnv = RobustNormalVariate()
+    RobustNormalVariate()
+    >>> # Fit and transform the data
+    >>> X_scaled = rnv.fit_transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -77,7 +75,7 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -100,11 +98,11 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
             The input data to transform.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted

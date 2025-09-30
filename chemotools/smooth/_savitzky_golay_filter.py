@@ -1,3 +1,10 @@
+"""
+The :mod:`chemotools.smooth._savitzky_golay_filter` module implements the Savitzky-Golay Filter (SGF) transformation.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal
 
 import numpy as np

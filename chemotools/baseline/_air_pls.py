@@ -48,31 +48,39 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
     max_iter_after_warmstart : int, default=20
         Maximum iterations allowed when warm-starting from previous weights.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the estimator to the input spectra.
+    Attributes
+    ----------
+    n_features_in_ : int
+        The number of features in the input data.
 
-    transform(X, y=None)
-        Remove baselines from the input spectra.
+    DtD_ : np.ndarray
+        The precomputed banded representation of D^T D for the second-order
+        difference operator.
+        - DtD_ is stored as a banded representation from scipy's solveh_banded if
+            solver_type is "banded".
+        - DtD_ is stored as a scipy.sparse CSC matrix if solver_type is "sparse".
 
-    _calculate_baseline(x, w, max_iter)
-        Internal method: compute the baseline for a single spectrum
-        using the AirPls exponential reweighting scheme.
-
-    Examples
-    --------
-    >>> from chemotools.baseline import AirPls
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> airpls = AirPls()
-    >>> X_corrected = airpls.fit_transform(X)
+    self.w_init_ : np.ndarray
+        The weights set for warm-starting.
 
     References
     ----------
     [1] Z.-M. Zhang, S. Chen, Y.-Z. Liang.
         "Baseline correction using adaptive iteratively reweighted penalized
         least squares." Analyst 135 (5), 1138–1146 (2010).
+
+    Examples
+    --------
+    >>> from chemotools.baseline import AirPls
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = AirPls(lam=1e4, nr_iterations=100)
+    AirPls()
+    >>> transformer.fit(X)
+    >>> # Remove baselines
+    >>> X_corrected = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -106,7 +114,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to fit the model to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -124,10 +132,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
             The input spectra to transform.
 
         y : None
-            Ignored.
-
-        copy : bool, default=True
-            If True, a copy of X is made before transforming.
+            Ignored to align with API.
 
         Returns
         -------

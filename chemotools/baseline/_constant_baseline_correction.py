@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._constant_baseline_correction` module implements
+a constant baseline correction transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -30,29 +38,17 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
     end_index_ : int
         The index of the end of the range. It is 1 if the wavenumbers are not provided.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the constant baseline value.
-
-    _find_index(target)
-        Find the index of the closest wavenumber to the target value.
-
     Examples
     --------
     >>> from chemotools.baseline import ConstantBaselineCorrection
-    >>> import numpy as np
-    >>> # Using indices
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> cbc = ConstantBaselineCorrection(start=0, end=1)
-    >>> X_corrected = cbc.fit_transform(X)
-    >>> # Using wavenumbers
-    >>> wavenumbers = np.array([100, 200, 300, 400, 500])
-    >>> cbc = ConstantBaselineCorrection(start=100, end=200, wavenumbers=wavenumbers)
-    >>> X_corrected = cbc.fit_transform(X)
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = ConstantBaselineCorrection(start=0, end=1)
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
     """
 
     def __init__(
@@ -75,7 +71,7 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -97,7 +93,7 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
         return self
 
-    def transform(self, X: np.ndarray, y=0, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the constant baseline value.
 
@@ -106,15 +102,12 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
         X : np.ndarray of shape (n_samples, n_features)
             The input data to transform.
 
-        y : int or None, optional
-            Ignored.
-
-        copy : bool, optional
-            Whether to copy the input data before transforming it.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed input data.
         """
         # Check that the estimator is fitted

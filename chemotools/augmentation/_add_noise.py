@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.augmentation._add_noise` module implements the AddNoise
+transformer to add random noise from various probability distributions to input data.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
@@ -18,11 +26,14 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     ----------
     distribution : {'gaussian', 'poisson', 'exponential'}, default='gaussian'
         The probability distribution to sample noise from.
+
     scale : float, default=0.0
         Scale parameter for the noise distribution:
         - For gaussian: standard deviation
         - For poisson: multiplication factor for sampled values
         - For exponential: scale parameter (1/λ)
+        Must be non-negative.
+
     random_state : int, optional
         Random seed for reproducibility.
 
@@ -30,6 +41,19 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     ----------
     n_features_in_ : int
         Number of features in the training data.
+
+    Examples
+    --------
+    >>> from chemotools.augmentation import AddNoise
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = AddNoise(distribution="gaussian", scale=0.1)
+    AddNoise()
+    >>> transformer.fit(X)
+    >>> # Generate noisy data
+    >>> X_noisy = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -53,8 +77,9 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Training data.
+
         y : None
             Ignored. Present for API consistency.
 
@@ -84,14 +109,14 @@ class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : np.ndarray of shape (n_samples, n_features)
             Input data to transform.
         y : None
             Ignored. Present for API consistency.
 
         Returns
         -------
-        X_noisy : ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             Transformed data with added noise.
 
         Raises

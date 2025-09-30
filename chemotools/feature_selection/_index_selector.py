@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.feature_selection._index_selector` module implements the IndexSelector
+to select specific features from spectral data based on indices or wavenumbers.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Optional, Union
 
 import numpy as np
@@ -11,6 +19,7 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:
+
     - by the indices of the wavenumbers to select,
     - by the wavenumbers to select, the wavenumbers must be provided to the transformer
         when it is initialised. If the wavenumbers are not provided, the indices will be
@@ -31,13 +40,28 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     features_index_ : int
         The index of the features to select.
 
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by cutting it to the specified range.
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.feature_selection import IndexSelector
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Get wavenumbers as numpy array
+    >>> wavenumbers = X.columns.values
+    array([ 428.,  429.,  431., ..., 1830., 1831., 1833.], shape=(1047,))
+    >>> # Define features to select
+    >>> range_1 = np.arange(428, 551, 1)
+    >>> range_2 = np.arange(875, 1001, 1)
+    >>> features = np.concatenate((range_1, range_2))
+    >>> # Instantiate the transformer
+    >>> selector = IndexSelector(features=features, wavenumbers=wavenumbers)
+    IndexSelector()
+    >>> selector.fit(X)
+    >>> # Transform the data
+    >>> X_selected = selector.transform(X)
+    >>> X_selected.shape
+    (21, 183)
     """
 
     def __init__(
@@ -58,7 +82,7 @@ class IndexSelector(SelectorMixin, BaseEstimator):
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------

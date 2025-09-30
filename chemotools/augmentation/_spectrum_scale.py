@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.augmentation._spectrum_scale` module implements the SpectrumScale
+transformer to scale spectral data by a random factor.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -20,21 +28,18 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     random_state : int, default=None
         The random state to use for the random number generator.
 
-    Attributes
-    ----------
-    n_features_in_ : int
-        The number of features in the input data.
-
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by scaling the spectrum.
+    Examples
+    --------
+    >>> from chemotools.augmentation import SpectrumScale
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = SpectrumScale(scale=0.1)
+    SpectrumScale()
+    >>> transformer.fit(X)
+    >>> # Generate scaled data
+    >>> X_scaled = transformer.transform(X)
     """
 
     _parameter_constraints: dict = {
@@ -68,12 +73,6 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        # Set the number of features
-        self.n_features_in_ = X.shape[1]
-
-        # Set the fitted attribute to True
-        self._is_fitted = True
-
         # Instantiate the random number generator
         self._rng = check_random_state(self.random_state)
 
@@ -93,11 +92,11 @@ class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "_is_fitted")
+        check_is_fitted(self, "n_features_in_")
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(

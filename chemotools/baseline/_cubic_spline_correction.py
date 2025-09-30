@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.baseline._cubic_spline_correction` module implements
+a cubic spline baseline correction transformer.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
 from typing import Optional
 
 import numpy as np
@@ -13,35 +21,30 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
 
     Parameters
     ----------
-    indices : list, optional
-        The indices of the features to use for the baseline correction.
+    indices : list, optional, default=None
+        The indices of the features to use for the baseline correction. If None,
+        the first and last indices will be used.
 
     Attributes
     ----------
     n_features_in_ : int
         The number of features in the input data.
 
-    _is_fitted : bool
-        Whether the transformer has been fitted to data.
-
-    Methods
-    -------
-    fit(X, y=None)
-        Fit the transformer to the input data.
-
-    transform(X, y=0, copy=True)
-        Transform the input data by subtracting the constant baseline value.
-
-    _spline_baseline_correct(x)
-        Internal method: compute the baseline for a single spectrum.
+    indices_ : list
+        The indices of the features used for the baseline correction.
 
     Examples
     --------
     >>> from chemotools.baseline import CubicSplineCorrection
-    >>> import numpy as np
-    >>> X = np.array([[1, 2, 3, 4, 5]])
-    >>> csc = CubicSplineCorrection(indices=[0, 4])
-    >>> X_corrected = csc.fit_transform(X)
+    >>> from chemotools.datasets import load_fermentation_train
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Instantiate the transformer
+    >>> transformer = CubicSplineCorrection(indices=[0, 100, 200, 300, 400, 500])
+    CubicSplineCorrection(indices=[0, 100, 200, 300, 400, 500])
+    >>> transformer.fit(X)
+    >>> # Generate baseline-corrected data
+    >>> X_corrected = transformer.transform(X)
     """
 
     def __init__(self, indices: Optional[list] = None) -> None:
@@ -57,7 +60,7 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
             The input data to fit the transformer to.
 
         y : None
-            Ignored.
+            Ignored to align with API.
 
         Returns
         -------
@@ -76,7 +79,7 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
 
         return self
 
-    def transform(self, X: np.ndarray, y=None, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
         Transform the input data by subtracting the baseline.
 
@@ -86,14 +89,11 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
             The input data to transform.
 
         y : None
-            Ignored.
-
-        copy : bool, optional
-            Whether to copy the input data or not.
+            Ignored to align with API.
 
         Returns
         -------
-        X_ : np.ndarray of shape (n_samples, n_features)
+        X_transformed : np.ndarray of shape (n_samples, n_features)
             The transformed data.
         """
         # Check that the estimator is fitted
