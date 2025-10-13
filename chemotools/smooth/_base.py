@@ -6,7 +6,6 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
 from typing import Callable, Literal, Optional
-from typing_extensions import Self
 
 import numpy as np
 
@@ -61,7 +60,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         y=None,
         nr_iterations: int = 1,
         solver: Callable = whittaker_smooth_banded,
-    ) -> "Self":
+    ) -> "_BaseWhittaker":
         """Subclasses can extend fitting logic here."""
         ...
 
@@ -84,9 +83,11 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         )
 
     def _solve_whittaker(
-        self, x: np.ndarray, w: np.ndarray, solver: Callable
+        self, x: np.ndarray, w: np.ndarray, solver: Optional[Callable]
     ) -> np.ndarray:
         """Solve (diag(w) + lam*D^T D) z = w*x."""
+        if solver is None:
+            solver = whittaker_solver_dispatch(self.solver_type)
         try:
             return solver(x, w, self.lam, self.DtD_)
         except Exception as e:
