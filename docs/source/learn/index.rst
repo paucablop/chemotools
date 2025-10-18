@@ -48,4 +48,4 @@ Learn
             :color: secondary
             :click-parent:
 
-            **Coffee classificatoin**
+            **Coffee classification**

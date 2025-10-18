@@ -44,7 +44,7 @@ BUTTON_TRANSLATIONS = {
             "translation": "发酵监测",
             "url": "pls_regression.html",
         },
-        "Coffee classificatoin": {  # Note: typo in original
+        "Coffee classification": {  # Note: typo in original
             "translation": "咖啡分类",
             "url": "pls_classification.html",
         },
@@ -115,7 +115,7 @@ BUTTON_TRANSLATIONS = {
             "translation": "Monitoreo de fermentación",
             "url": "pls_regression.html",
         },
-        "Coffee classificatoin": {  # Note: typo in original
+        "Coffee classification": {  # Note: typo in original
             "translation": "Clasificación de café",
             "url": "pls_classification.html",
         },
@@ -186,7 +186,7 @@ BUTTON_TRANSLATIONS = {
             "translation": "発酵モニタリング",
             "url": "pls_regression.html",
         },
-        "Coffee classificatoin": {  # Note: typo in original
+        "Coffee classification": {
             "translation": "コーヒーの分類",
             "url": "pls_classification.html",
         },

@@ -32,6 +32,6 @@ msgid "Fermentation monitoring"
 msgstr ""
 
 #: ../../source/learn/index.rst:46
-msgid "Coffee classificatoin"
+msgid "Coffee classification"
 msgstr ""
 
