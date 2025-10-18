@@ -1,0 +1,53 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/scale.rst:2
+msgid "Scaling Methods"
+msgstr "スケーリング手法"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`MinMaxScaler <chemotools.scale.MinMaxScaler>`"
+msgstr ":py:obj:`MinMaxScaler <chemotools.scale.MinMaxScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ""
+"A transformer that scales the input data by subtracting the minimum and "
+"dividing by the difference between the maximum and the minimum."
+msgstr "最小値を減算し、最大値と最小値の差で除算して入力データをスケーリングする変換器。"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`NormScaler <chemotools.scale.NormScaler>`"
+msgstr ":py:obj:`NormScaler <chemotools.scale.NormScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid "A transformer that scales the input data by the L-norm of the spectrum."
+msgstr "スペクトルのLノルムによって入力データをスケーリングする変換器。"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`PointScaler <chemotools.scale.PointScaler>`"
+msgstr ":py:obj:`PointScaler <chemotools.scale.PointScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ""
+"A transformer that scales the input data by the intensity value at a "
+"given point."
+msgstr "指定された点の強度値によって入力データをスケーリングする変換器。"
+

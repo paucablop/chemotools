@@ -1,0 +1,181 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/dataframes.rst:2
+msgid "Working with DataFrames"
+msgstr "Trabajando con DataFrames"
+
+#: ../../source/explore/dataframes.rst:4
+msgid ""
+"For the ``pandas.DataFrame`` and ``polars.DataFrame`` lovers. By default,"
+" all ``scikit-learn`` and ``chemotools`` transformers output "
+"``numpy.ndarray``. However, now it is possible to configure your "
+"``chemotools`` preprocessing methods to produce either a "
+"``pandas.DataFrame`` or a ``polars.DataFrame`` objects as output. This is"
+" possible after implementing the new ``set_output()`` API from ``scikit-"
+"learn`` (>= 1.2.2 for ``pandas`` and >= 1.4.0 for ``polars``) "
+"(`documentation <https://scikit-"
+"learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_). "
+"The same API implemented in other ``scikit-learn`` preprocessing methods "
+"like the ``StandardScaler()`` is now available for the ``chemotools`` "
+"transformers."
+msgstr ""
+"Para los amantes de ``pandas.DataFrame`` y ``polars.DataFrame``. Por defecto, "
+"todos los transformadores de ``scikit-learn`` y ``chemotools`` devuelven "
+"``numpy.ndarray``. Sin embargo, ahora es posible configurar tus métodos de "
+"preprocesamiento de ``chemotools`` para producir objetos ``pandas.DataFrame`` "
+"o ``polars.DataFrame`` como salida. Esto es posible después de implementar "
+"la nueva API ``set_output()`` de ``scikit-learn`` (>= 1.2.2 para ``pandas`` "
+"y >= 1.4.0 para ``polars``) (`documentación <https://scikit-"
+"learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_). "
+"La misma API implementada en otros métodos de preprocesamiento de ``scikit-learn`` "
+"como ``StandardScaler()`` ahora está disponible para los transformadores de ``chemotools``."
+
+#: ../../source/explore/dataframes.rst:7
+msgid ""
+"From version 0.1.3, the ``set_output()`` is available for all "
+"``chemotools`` functions!"
+msgstr ""
+"¡Desde la versión 0.1.3, ``set_output()`` está disponible para todas las "
+"funciones de ``chemotools``!"
+
+#: ../../source/explore/dataframes.rst:9
+msgid "Below there are two examples of how to use this new API:"
+msgstr "A continuación se presentan dos ejemplos de cómo usar esta nueva API:"
+
+#: ../../source/explore/dataframes.rst:12
+msgid ""
+"**Example 1: Using the set_output() API with a single preprocessing "
+"method**"
+msgstr ""
+"**Ejemplo 1: Usando la API set_output() con un único método de "
+"preprocesamiento**"
+
+#: ../../source/explore/dataframes.rst:15
+msgid "1. Load your spectral data as a ``pandas.DataFrame``"
+msgstr "1. Carga tus datos espectrales como un ``pandas.DataFrame``"
+
+#: ../../source/explore/dataframes.rst:17
+msgid ""
+"First load your spectral data. In this case, we assume a file called "
+"``spectra.csv`` where each row represents a spectrum and each column "
+"represents wavenumbers."
+msgstr ""
+"Primero carga tus datos espectrales. En este caso, asumimos un archivo llamado "
+"``spectra.csv`` donde cada fila representa un espectro y cada columna "
+"representa números de onda."
+
+#: ../../source/explore/dataframes.rst:27
+msgid ""
+"The ``spectra`` variable is a ``pandas.DataFrame`` object with the "
+"indices representing the sample names and the columns representing the "
+"wavenumbers."
+msgstr ""
+"La variable ``spectra`` es un objeto ``pandas.DataFrame`` con los "
+"índices representando los nombres de las muestras y las columnas representando los "
+"números de onda."
+
+#: ../../source/explore/dataframes.rst:30
+msgid ""
+"2. Create a ``chemotools`` preprocessing object and set the output to "
+"``pandas``"
+msgstr ""
+"2. Crea un objeto de preprocesamiento de ``chemotools`` y establece la salida a "
+"``pandas``"
+
+#: ../../source/explore/dataframes.rst:32
+msgid "Next, we create the ``AirPls`` object and set the output to ``pandas``."
+msgstr "A continuación, creamos el objeto ``AirPls`` y establecemos la salida a ``pandas``."
+
+#: ../../source/explore/dataframes.rst:39
+msgid "The ``set_output()`` method accepts the following arguments:"
+msgstr "El método ``set_output()`` acepta los siguientes argumentos:"
+
+#: ../../source/explore/dataframes.rst:41
+msgid ""
+"``transform``: The output format. Can be ``'pandas'`` or ``'default'`` "
+"(the default format will output a ``numpy.ndarray``)."
+msgstr ""
+"``transform``: El formato de salida. Puede ser ``'pandas'`` o ``'default'`` "
+"(el formato por defecto devolverá un ``numpy.ndarray``)."
+
+#: ../../source/explore/dataframes.rst:44
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``AirPLS().set_output(transform='polars')``)."
+msgstr ""
+"Si deseas establecer la salida a ``polars`` deberías usar "
+"``transform='polars'`` en el método ``set_output()`` "
+"(``AirPLS().set_output(transform='polars')``)."
+
+#: ../../source/explore/dataframes.rst:47
+msgid "3. Fit and transform the spectra"
+msgstr "3. Ajusta y transforma los espectros"
+
+#: ../../source/explore/dataframes.rst:54
+msgid ""
+"The output of the ``fit_transform()`` method is now a "
+"``pandas.DataFrame`` object."
+msgstr ""
+"La salida del método ``fit_transform()`` ahora es un objeto "
+"``pandas.DataFrame``."
+
+#: ../../source/explore/dataframes.rst:57
+msgid ""
+"Notice that by default the indices and the columns of the input data are "
+"not maintained to the output, and the ``spectra_airpls`` DataFrame has "
+"default indices and columns."
+msgstr ""
+"Observa que por defecto los índices y las columnas de los datos de entrada "
+"no se mantienen en la salida, y el DataFrame ``spectra_airpls`` tiene "
+"índices y columnas por defecto."
+
+#: ../../source/explore/dataframes.rst:60
+msgid "**Example 2: Using the set_output() API with a pipeline**"
+msgstr "**Ejemplo 2: Usando la API set_output() con un pipeline**"
+
+#: ../../source/explore/dataframes.rst:62
+msgid ""
+"Similarly, the ``set_output()`` API can be used with pipelines. The "
+"following code shows how to create a pipeline that performs:"
+msgstr ""
+"De manera similar, la API ``set_output()`` se puede usar con pipelines. El "
+"siguiente código muestra cómo crear un pipeline que realiza:"
+
+#: ../../source/explore/dataframes.rst:64
+msgid "Multiplicative scatter correction"
+msgstr "Corrección de dispersión multiplicativa"
+
+#: ../../source/explore/dataframes.rst:65
+msgid "Standard scaling"
+msgstr "Escalado estándar"
+
+#: ../../source/explore/dataframes.rst:84
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``pipeline.set_output(transform='polars')``)."
+msgstr ""
+"Si deseas establecer la salida a ``polars`` deberías usar "
+"``transform='polars'`` en el método ``set_output()`` "
+"(``pipeline.set_output(transform='polars')``)."
+

@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/augmentation.rst:2
+msgid "chemotools.augmentation"
+msgstr "chemotools.augmentation"
+
+#: ../../source/api/augmentation.rst:6
+msgid ""
+"Data augmentation methods for spectral analysis. These methods add "
+"controlled variation to your data to simulate different real-world "
+"scenarios and improve model robustness."
+msgstr ""
+"光谱分析的数据增强方法。这些方法为您的数据添加受控变化，以模拟不同的真实场景并提高模型的鲁棒性。"
+
+#: ../../source/api/augmentation.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/augmentation.rst:22
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/augmentation.rst:28
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/augmentation.rst:29
+msgid "Description"
+msgstr "描述"
+
+#: ../../source/api/augmentation.rst:30
+msgid ":doc:`AddNoise </methods/generated/chemotools.augmentation.AddNoise>`"
+msgstr ":doc:`AddNoise </methods/generated/chemotools.augmentation.AddNoise>`"
+
+#: ../../source/api/augmentation.rst:31
+msgid "Add random noise to spectra"
+msgstr "向光谱添加随机噪声"
+
+#: ../../source/api/augmentation.rst:32
+msgid ""
+":doc:`BaselineShift "
+"</methods/generated/chemotools.augmentation.BaselineShift>`"
+msgstr ""
+":doc:`BaselineShift "
+"</methods/generated/chemotools.augmentation.BaselineShift>`"
+
+#: ../../source/api/augmentation.rst:33
+msgid "Shift baseline by a constant value"
+msgstr "通过常数值偏移基线"
+
+#: ../../source/api/augmentation.rst:34
+msgid ""
+":doc:`FractionalShift "
+"</methods/generated/chemotools.augmentation.FractionalShift>`"
+msgstr ""
+":doc:`FractionalShift "
+"</methods/generated/chemotools.augmentation.FractionalShift>`"
+
+#: ../../source/api/augmentation.rst:35
+msgid "Apply fractional wavelength shifts"
+msgstr "应用分数波长偏移"
+
+#: ../../source/api/augmentation.rst:36
+msgid ""
+":doc:`GaussianBroadening "
+"</methods/generated/chemotools.augmentation.GaussianBroadening>`"
+msgstr ""
+":doc:`GaussianBroadening "
+"</methods/generated/chemotools.augmentation.GaussianBroadening>`"
+
+#: ../../source/api/augmentation.rst:37
+msgid "Broaden peaks with Gaussian kernel"
+msgstr "使用高斯核展宽峰"
+
+#: ../../source/api/augmentation.rst:38
+msgid ":doc:`IndexShift </methods/generated/chemotools.augmentation.IndexShift>`"
+msgstr ":doc:`IndexShift </methods/generated/chemotools.augmentation.IndexShift>`"
+
+#: ../../source/api/augmentation.rst:39
+msgid "Shift spectra by index positions"
+msgstr "按索引位置偏移光谱"
+
+#: ../../source/api/augmentation.rst:40
+msgid ""
+":doc:`SpectrumScale "
+"</methods/generated/chemotools.augmentation.SpectrumScale>`"
+msgstr ""
+":doc:`SpectrumScale "
+"</methods/generated/chemotools.augmentation.SpectrumScale>`"
+
+#: ../../source/api/augmentation.rst:41
+msgid "Scale spectrum intensity"
+msgstr "缩放光谱强度"
+
+#: ../../source/api/augmentation.rst:44
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/augmentation.rst:46
+msgid ""
+":doc:`Augmentation Methods Overview </methods/augmentation>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`数据增强方法概述 </methods/augmentation>` - 包含示例和可视化指南的完整文档"
+

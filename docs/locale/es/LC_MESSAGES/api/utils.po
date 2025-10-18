@@ -1,0 +1,65 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/utils.rst:2
+msgid "chemotools.utils"
+msgstr "chemotools.utils"
+
+#: ../../source/api/utils.rst:6
+msgid "Utility functions and helper methods used internally by chemotools."
+msgstr "Funciones de utilidad y métodos auxiliares usados internamente por chemotools."
+
+#: ../../source/api/utils.rst:8
+msgid "**Import from this module:**"
+msgstr "**Importar desde este módulo:**"
+
+#: ../../source/api/utils.rst:18
+msgid ""
+"This module contains internal utilities. Most users won't need to import "
+"directly from here."
+msgstr ""
+"Este módulo contiene utilidades internas. La mayoría de los usuarios no necesitarán "
+"importar directamente desde aquí."
+
+#: ../../source/api/utils.rst:20
+msgid ""
+"For linear algebra operations used in preprocessing, see the specific "
+"method classes in other modules."
+msgstr ""
+"Para operaciones de álgebra lineal usadas en preprocesamiento, consulte las clases "
+"de métodos específicos en otros módulos."
+
+#: ../../source/api/utils.rst:23
+msgid "Available Functions"
+msgstr "Funciones disponibles"
+
+#: ../../source/api/utils.rst:25
+msgid ""
+"This module provides linear algebra utilities and helper functions that "
+"support the core chemotools methods."
+msgstr ""
+"Este módulo proporciona utilidades de álgebra lineal y funciones auxiliares que "
+"soportan los métodos principales de chemotools."
+
+#: ../../source/api/utils.rst:27
+msgid "See the source code for implementation details."
+msgstr "Consulte el código fuente para detalles de implementación."
+

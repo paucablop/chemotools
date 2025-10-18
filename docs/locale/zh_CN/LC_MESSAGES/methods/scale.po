@@ -1,0 +1,53 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/scale.rst:2
+msgid "Scaling Methods"
+msgstr "缩放方法"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`MinMaxScaler <chemotools.scale.MinMaxScaler>`"
+msgstr ":py:obj:`MinMaxScaler <chemotools.scale.MinMaxScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ""
+"A transformer that scales the input data by subtracting the minimum and "
+"dividing by the difference between the maximum and the minimum."
+msgstr "通过减去最小值并除以最大值和最小值之间的差值来缩放输入数据的转换器。"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`NormScaler <chemotools.scale.NormScaler>`"
+msgstr ":py:obj:`NormScaler <chemotools.scale.NormScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid "A transformer that scales the input data by the L-norm of the spectrum."
+msgstr "通过光谱的 L-范数缩放输入数据的转换器。"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ":py:obj:`PointScaler <chemotools.scale.PointScaler>`"
+msgstr ":py:obj:`PointScaler <chemotools.scale.PointScaler>`"
+
+#: ../../source/methods/scale.rst:13:<autosummary>:1
+msgid ""
+"A transformer that scales the input data by the intensity value at a "
+"given point."
+msgstr "通过给定点的强度值缩放输入数据的转换器。"
+

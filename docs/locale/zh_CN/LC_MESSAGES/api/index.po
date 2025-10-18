@@ -1,0 +1,129 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/index.rst:8
+msgid "Augmentation"
+msgstr "数据增强"
+
+#: ../../source/api/index.rst:8
+msgid "Baseline"
+msgstr "基线"
+
+#: ../../source/api/index.rst:8
+msgid "Derivative"
+msgstr "导数"
+
+#: ../../source/api/index.rst:8
+msgid "Feature Selection"
+msgstr "特征选择"
+
+#: ../../source/api/index.rst:8
+msgid "Outliers"
+msgstr "异常值"
+
+#: ../../source/api/index.rst:8
+msgid "Scale"
+msgstr "缩放"
+
+#: ../../source/api/index.rst:8
+msgid "Scatter"
+msgstr "散射"
+
+#: ../../source/api/index.rst:8
+msgid "Smooth"
+msgstr "平滑"
+
+#: ../../source/api/index.rst:8
+msgid "Utilities"
+msgstr "实用工具"
+
+#: ../../source/api/index.rst:8
+msgid "Core Modules"
+msgstr "核心模块"
+
+#: ../../source/api/index.rst:2
+msgid "API Reference"
+msgstr "API参考"
+
+#: ../../source/api/index.rst:4
+msgid ""
+"The public Python API for ``chemotools``. This section provides a "
+"technical reference for all importable modules and classes."
+msgstr ""
+"``chemotools`` 的公共Python API。本节提供所有可导入模块和类的技术参考。"
+
+#: ../../source/api/index.rst:6
+msgid ""
+"For detailed documentation with examples and visual guides, see the "
+":doc:`Methods </methods/index>` section."
+msgstr ""
+"有关包含示例和可视化指南的详细文档，请参阅 :doc:`方法 </methods/index>` 部分。"
+
+#: ../../source/api/index.rst:23
+msgid "Quick Import Reference"
+msgstr "快速导入参考"
+
+#: ../../source/api/index.rst:25
+msgid "All classes can be imported directly from their respective modules:"
+msgstr "所有类都可以直接从其相应的模块导入："
+
+#~ msgid "Core namespaces"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The public Python API for "
+#~ "``chemotools``. Below we curate the key"
+#~ " submodules. This avoids deep recursive "
+#~ "explosion and keeps build warnings to"
+#~ " zero."
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.augmentation <chemotools.augmentation>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.baseline <chemotools.baseline>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.derivative <chemotools.derivative>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.feature_selection <chemotools.feature_selection>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.scale <chemotools.scale>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.scatter <chemotools.scatter>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.smooth <chemotools.smooth>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.utils <chemotools.utils>`\\"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The pages under ``generated/`` are "
+#~ "auto-created at build time; you "
+#~ "normally should not add them to "
+#~ "version control."
+#~ msgstr ""
+

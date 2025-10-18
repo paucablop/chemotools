@@ -1,0 +1,41 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/cite/index.rst:4
+msgid "Cite chemotools"
+msgstr "chemotools の引用"
+
+#: ../../source/cite/index.rst:10
+msgid ""
+"Chemotools has been peer-reviewed and published in the Journal of Open "
+"Source Software (JOSS). The paper is available at: "
+"https://doi.org/10.21105/joss.06802"
+msgstr ""
+"Chemotools は査読を経て Journal of Open Source Software (JOSS) に掲載されています。論文は以下で入手できます: "
+"https://doi.org/10.21105/joss.06802"
+
+#: ../../source/cite/index.rst:15
+msgid ""
+"If you use chemotools in your research or software and would like to cite"
+" it, please use the following BibTeX entry:"
+msgstr ""
+"研究やソフトウェアで chemotools を使用し、引用したい場合は、以下の BibTeX エントリをご利用ください:"
+

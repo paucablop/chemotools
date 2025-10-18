@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/index.rst:6
+msgid "Discover the environment"
+msgstr "環境を理解する"
+
+#: ../../source/explore/index.rst:26
+msgid "Get started with scikit-learn"
+msgstr "scikit-learnを始める"
+
+#: ../../source/explore/index.rst:37
+msgid "Working with spectra"
+msgstr "スペクトルデータの操作"
+
+#: ../../source/explore/index.rst:48
+msgid "Creating your pipelines"
+msgstr "パイプラインの作成"
+
+#: ../../source/explore/index.rst:59
+msgid "Optimize your processing"
+msgstr "処理の最適化"
+
+#: ../../source/explore/index.rst:70
+msgid "DataFrame lover?"
+msgstr "DataFrameが好き？"
+
+#: ../../source/explore/index.rst:82
+msgid "Persisting your models"
+msgstr "モデルの永続化"
+

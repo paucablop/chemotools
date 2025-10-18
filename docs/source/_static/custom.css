@@ -1,0 +1,31 @@
+/* Light theme */
+html[data-theme="light"] .banner {
+    content: url("./images/main/banner_light.png");
+}
+
+/* Dark theme */
+html[data-theme="dark"] .banner {
+    content: url("./images/main/banner_dark.png");
+}
+
+/* Common styles for both */
+.banner {
+    width: 100%;
+    height: auto;
+    background-color: transparent !important;
+}
+
+.no-background {
+    background-color: transparent !important;
+}
+
+/* Fix language switcher dropdown layout */
+.bd-navbar .dropdown {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.bd-navbar .dropdown .btn {
+  min-width: 100px;  /* reserve space so Chinese doesn’t break */
+    white-space: nowrap;
+}

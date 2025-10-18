@@ -1,0 +1,97 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/smooth.rst:2
+msgid "chemotools.smooth"
+msgstr "chemotools.smooth"
+
+#: ../../source/api/smooth.rst:6
+msgid "Smoothing methods to reduce noise while preserving spectral features."
+msgstr "Métodos de suavizado para reducir ruido mientras se preservan las características espectrales."
+
+#: ../../source/api/smooth.rst:8
+msgid "**Import from this module:**"
+msgstr "**Importar desde este módulo:**"
+
+#: ../../source/api/smooth.rst:20
+msgid "Available Classes"
+msgstr "Clases disponibles"
+
+#: ../../source/api/smooth.rst:26
+msgid "Class"
+msgstr "Clase"
+
+#: ../../source/api/smooth.rst:27
+msgid "Description"
+msgstr "Descripción"
+
+#: ../../source/api/smooth.rst:28
+msgid ":doc:`MeanFilter </methods/generated/chemotools.smooth.MeanFilter>`"
+msgstr ":doc:`MeanFilter </methods/generated/chemotools.smooth.MeanFilter>`"
+
+#: ../../source/api/smooth.rst:29
+msgid "Moving average smoothing"
+msgstr "Suavizado de media móvil"
+
+#: ../../source/api/smooth.rst:30
+msgid ":doc:`MedianFilter </methods/generated/chemotools.smooth.MedianFilter>`"
+msgstr ":doc:`MedianFilter </methods/generated/chemotools.smooth.MedianFilter>`"
+
+#: ../../source/api/smooth.rst:31
+msgid "Median filter for noise reduction"
+msgstr "Filtro de mediana para reducción de ruido"
+
+#: ../../source/api/smooth.rst:32
+msgid ""
+":doc:`SavitzkyGolayFilter "
+"</methods/generated/chemotools.smooth.SavitzkyGolayFilter>`"
+msgstr ""
+":doc:`SavitzkyGolayFilter "
+"</methods/generated/chemotools.smooth.SavitzkyGolayFilter>`"
+
+#: ../../source/api/smooth.rst:33
+msgid "Savitzky-Golay smoothing filter"
+msgstr "Filtro de suavizado de Savitzky-Golay"
+
+#: ../../source/api/smooth.rst:34
+msgid ""
+":doc:`WhittakerSmooth "
+"</methods/generated/chemotools.smooth.WhittakerSmooth>`"
+msgstr ""
+":doc:`WhittakerSmooth "
+"</methods/generated/chemotools.smooth.WhittakerSmooth>`"
+
+#: ../../source/api/smooth.rst:35
+msgid "Whittaker smoothing with penalized least squares"
+msgstr "Suavizado de Whittaker con mínimos cuadrados penalizados"
+
+#: ../../source/api/smooth.rst:38
+msgid "See Also"
+msgstr "Ver también"
+
+#: ../../source/api/smooth.rst:40
+msgid ""
+":doc:`Smoothing Methods Overview </methods/smooth>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`Resumen de métodos de suavizado </methods/smooth>` - Documentación "
+"completa con ejemplos y guías visuales"
+

@@ -140,3 +140,15 @@ dmypy.json
 # Task files
 *.task
 
+# Sphinx build output (any _build folder)
+docs/_build/
+**/_build/
+docs/build/*
+
+# Sphinx generated API/autosummary stubs
+_autosummary/
+generated/
+docs/source/api/generated/
+docs/source/generated/
+
+

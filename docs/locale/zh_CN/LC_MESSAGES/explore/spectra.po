@@ -1,0 +1,88 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/spectra.rst:4
+msgid "Working with spectra"
+msgstr "处理光谱数据"
+
+#: ../../source/explore/spectra.rst:6
+msgid ""
+"When working with spectroscopic data in ``chemotools`` and ``scikit-"
+"learn``, you often need to reshape single spectra to fit the expected "
+"data shapes. This guide explains how to reshape single spectra for "
+"preprocessing in ``scikit-learn`` and ``chemotools``."
+msgstr "在 ``chemotools`` 和 ``scikit-learn`` 中处理光谱数据时，通常需要重新调整单个光谱的形状以符合预期的数据格式。本指南说明如何为 ``scikit-learn`` 和 ``chemotools`` 中的预处理重新调整单个光谱的形状。"
+
+#: ../../source/explore/spectra.rst:9
+msgid "Understanding Data Shapes"
+msgstr "理解数据形状"
+
+#: ../../source/explore/spectra.rst:11
+msgid ""
+"``chemotools`` and ``scikit-learn`` preprocessing techniques expect 2D "
+"arrays (matrices) where:"
+msgstr "``chemotools`` 和 ``scikit-learn`` 的预处理技术期望使用二维数组（矩阵），其中："
+
+#: ../../source/explore/spectra.rst:13
+msgid "Each row represents a sample"
+msgstr "每一行代表一个样本"
+
+#: ../../source/explore/spectra.rst:14
+msgid "Each column represents a feature"
+msgstr "每一列代表一个特征"
+
+#: ../../source/explore/spectra.rst:16
+msgid ""
+"However, spectroscopic data often comes as single spectrum in 1D arrays "
+"(vectors). Here's an example of a single spectrum:"
+msgstr "然而，光谱数据通常以一维数组（向量）形式的单个光谱出现。以下是一个单个光谱的示例："
+
+#: ../../source/explore/spectra.rst:23
+msgid ""
+"To use ``chemotools`` and  ``scikit-learn`` with single spectra, you need"
+" to reshape the 1D array into a 2D array with one row."
+msgstr "要在单个光谱上使用 ``chemotools`` 和 ``scikit-learn``，您需要将一维数组重新调整为只有一行的二维数组。"
+
+#: ../../source/explore/spectra.rst:26
+msgid "Reshaping for Preprocessing"
+msgstr "为预处理重新调整形状"
+
+#: ../../source/explore/spectra.rst:28
+msgid "Here's how to reshape a 1D array into a 2D array with a single row:"
+msgstr "以下是如何将一维数组重新调整为只有一行的二维数组："
+
+#: ../../source/explore/spectra.rst:36
+msgid ""
+"The ``reshape(1, -1)`` method converts the 1D array ``spectra_1d`` into a"
+" 2D array with a single row. The result (``spectra_2d``) looks like this:"
+msgstr "``reshape(1, -1)`` 方法将一维数组 ``spectra_1d`` 转换为只有一行的二维数组。结果（``spectra_2d``）如下所示："
+
+#: ../../source/explore/spectra.rst:44
+msgid ""
+"The reshaped output is a 2D array with a single row - the format required"
+" by ``scikit-learn`` and ``chemotools`` preprocessing techniques."
+msgstr "重新调整后的输出是一个只有一行的二维数组——这是 ``scikit-learn`` 和 ``chemotools`` 预处理技术所需的格式。"
+
+#: ../../source/explore/spectra.rst:47
+msgid ""
+"Now, you can use the reshaped single spectrum with ``chemotools`` and "
+"``scikit-learn`` preprocessing techniques:"
+msgstr "现在，您可以将重新调整形状后的单个光谱与 ``chemotools`` 和 ``scikit-learn`` 预处理技术一起使用："

@@ -1,0 +1,35 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/preprocessing.rst:5
+msgid "API Modules"
+msgstr "Módulos de API"
+
+#: ../../source/methods/preprocessing.rst:2
+msgid "Preprocessing"
+msgstr "Preprocesamiento"
+
+#: ../../source/methods/preprocessing.rst:3
+msgid ""
+"Preprocess your data to remove noise and enhance the chemical information contained in the spectra. Common preprocessing techniques include baseline correction, smoothing, normalization, and derivative transformations. These steps help eliminate unwanted variations caused by instrumental drift or sample inconsistencies, allowing the model to focus on the true chemical signals that drive accurate predictions."
+msgstr ""
+"Preprocesa tus datos para eliminar ruido y mejorar la información química contenida en los espectros. Las técnicas comunes de preprocesamiento incluyen corrección de línea base, suavizado, normalización y transformaciones de derivadas. Estos pasos ayudan a eliminar variaciones no deseadas causadas por deriva instrumental o inconsistencias de muestras, permitiendo que el modelo se enfoque en las señales químicas verdaderas que impulsan predicciones precisas."
+

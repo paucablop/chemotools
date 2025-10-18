@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/baseline.rst:2
+msgid "Baseline Methods"
+msgstr "Métodos de línea base"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+msgstr ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline"
+" correction."
+msgstr ""
+"Corrección de línea base por Mínimos Cuadrados Penalizados Reponderados Iterativamente Adaptativos (AirPls)."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+msgstr ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Asymmetrically Reweighted Penalized Least Squares (ArPLS) baseline "
+"correction."
+msgstr ""
+"Corrección de línea base por Mínimos Cuadrados Penalizados Reponderados Asimétricamente (ArPLS)."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+msgstr ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "Asymmetric Least Squares (AsLs) baseline correction."
+msgstr "Corrección de línea base por Mínimos Cuadrados Asimétricos (AsLs)."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`ConstantBaselineCorrection "
+"<chemotools.baseline.ConstantBaselineCorrection>`"
+msgstr ""
+":py:obj:`ConstantBaselineCorrection "
+"<chemotools.baseline.ConstantBaselineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that corrects a baseline by subtracting a constant value."
+msgstr "Un transformador que corrige una línea base restando un valor constante."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`CubicSplineCorrection "
+"<chemotools.baseline.CubicSplineCorrection>`"
+msgstr ""
+":py:obj:`CubicSplineCorrection "
+"<chemotools.baseline.CubicSplineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a cubic spline "
+"through the points defined by the indices."
+msgstr ""
+"Un transformador que corrige una línea base restando una spline cúbica "
+"a través de los puntos definidos por los índices."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+msgstr ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a linear baseline "
+"through the initial and final points of the spectrum."
+msgstr ""
+"Un transformador que corrige una línea base restando una línea base lineal "
+"a través de los puntos inicial y final del espectro."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+msgstr ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that sets all negative values to zero or to abs."
+msgstr "Un transformador que establece todos los valores negativos a cero o a su valor absoluto."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+msgstr ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a polynomial baseline from the input data."
+msgstr "Un transformador que resta una línea base polinómica de los datos de entrada."
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+msgstr ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a reference spectrum from the input data."
+msgstr "Un transformador que resta un espectro de referencia de los datos de entrada."
+

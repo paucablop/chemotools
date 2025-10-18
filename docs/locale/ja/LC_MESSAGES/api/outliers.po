@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/outliers.rst:2
+msgid "chemotools.outliers"
+msgstr "chemotools.outliers"
+
+#: ../../source/api/outliers.rst:6
+msgid ""
+"Outlier detection methods to identify unusual samples and improve model "
+"diagnostics."
+msgstr ""
+"異常なサンプルを特定し、モデル診断を改善するための外れ値検出手法。"
+
+#: ../../source/api/outliers.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/outliers.rst:21
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/outliers.rst:27
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/outliers.rst:28
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/outliers.rst:29
+msgid ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+msgstr ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+
+#: ../../source/api/outliers.rst:30
+msgid "Distance to model in X-space"
+msgstr "X 空間におけるモデルからの距離"
+
+#: ../../source/api/outliers.rst:31
+msgid ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+msgstr ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+
+#: ../../source/api/outliers.rst:32
+msgid "Hotelling's T² statistic for multivariate outliers"
+msgstr "多変量外れ値のための Hotelling T² 統計量"
+
+#: ../../source/api/outliers.rst:33
+msgid ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+msgstr ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+
+#: ../../source/api/outliers.rst:34
+msgid "Leverage values for influential point detection"
+msgstr "影響力のある点の検出のためのレバレッジ値"
+
+#: ../../source/api/outliers.rst:35
+msgid ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+msgstr ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+
+#: ../../source/api/outliers.rst:36
+msgid "Q residuals (squared prediction error)"
+msgstr "Q 残差（二乗予測誤差）"
+
+#: ../../source/api/outliers.rst:37
+msgid ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+msgstr ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+
+#: ../../source/api/outliers.rst:38
+msgid "Studentized residuals for regression outliers"
+msgstr "回帰外れ値のためのスチューデント化残差"
+
+#: ../../source/api/outliers.rst:41
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/outliers.rst:43
+msgid ""
+":doc:`Outlier Detection Methods Overview </methods/outliers>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`外れ値検出手法の概要 </methods/outliers>` - 例とビジュアルガイドを含む完全なドキュメント"
+

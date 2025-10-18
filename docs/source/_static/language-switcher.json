@@ -1,0 +1,22 @@
+[
+    {
+        "version": "en",
+        "url": "/",
+        "name": "English"
+    },
+    {
+        "version": "es",
+        "url": "/es/",
+        "name": "Español"
+    },
+    {
+        "version": "zh_CN",
+        "url": "/zh_CN/",
+        "name": "中文"
+    },
+    {
+        "version": "ja",
+        "url": "/ja/",
+        "name": "日本語"
+    }
+]

@@ -1,0 +1,173 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/pipelines.rst:2
+msgid "Preprocessing pipelines"
+msgstr "Pipelines de preprocesamiento"
+
+#: ../../source/explore/pipelines.rst:4
+msgid ""
+"Pipelines are becoming increasingly popular in machine learning "
+"workflows. In essence, pipelines are a sequence of connected data "
+"processing steps, where the output of one step is the input of the next. "
+"They are very useful for:"
+msgstr ""
+"Los pipelines se están volviendo cada vez más populares en flujos de trabajo de aprendizaje automático. "
+"En esencia, los pipelines son una secuencia de pasos de procesamiento de datos conectados, "
+"donde la salida de un paso es la entrada del siguiente. "
+"Son muy útiles para:"
+
+#: ../../source/explore/pipelines.rst:6
+msgid "automating complex workflows,"
+msgstr "automatizar flujos de trabajo complejos,"
+
+#: ../../source/explore/pipelines.rst:7
+msgid "improving efficiency,"
+msgstr "mejorar la eficiencia,"
+
+#: ../../source/explore/pipelines.rst:8
+msgid "reducing errors in data processing and analysis and"
+msgstr "reducir errores en el procesamiento y análisis de datos y"
+
+#: ../../source/explore/pipelines.rst:9
+msgid "simplifying model persistence and deployment."
+msgstr "simplificar la persistencia y el despliegue de modelos."
+
+#: ../../source/explore/pipelines.rst:11
+msgid ""
+"All preprocessing techniques in ``chemotools`` are compatible with "
+"``scikit-learn`` and can be used in pipelines. As an example, we will "
+"study the case where we would like to apply the following preprocessing "
+"techniques to our spectra:"
+msgstr ""
+"Todas las técnicas de preprocesamiento en ``chemotools`` son compatibles con "
+"``scikit-learn`` y se pueden usar en pipelines. Como ejemplo, estudiaremos "
+"el caso donde queremos aplicar las siguientes técnicas de preprocesamiento "
+"a nuestros espectros:"
+
+#: ../../source/explore/pipelines.rst:13
+msgid "Range Cut"
+msgstr "Corte de rango"
+
+#: ../../source/explore/pipelines.rst:14
+msgid "Linear Correction"
+msgstr "Corrección lineal"
+
+#: ../../source/explore/pipelines.rst:15
+msgid "Savitzky-Golay derivate"
+msgstr "Derivada de Savitzky-Golay"
+
+#: ../../source/explore/pipelines.rst:16
+msgid "Mean Centering (Standard Scaler)"
+msgstr "Centrado de media (Standard Scaler)"
+
+#: ../../source/explore/pipelines.rst:17
+msgid "PLS regression"
+msgstr "Regresión PLS"
+
+#: ../../source/explore/pipelines.rst:20
+msgid "Traditional flow"
+msgstr "Flujo tradicional"
+
+#: ../../source/explore/pipelines.rst:22
+msgid ""
+"In a traditional flow, would apply each preprocessing technique "
+"individually to the spectra as shown in the image below:"
+msgstr ""
+"En un flujo tradicional, aplicaríamos cada técnica de preprocesamiento "
+"individualmente a los espectros como se muestra en la imagen a continuación:"
+
+#: ../../source/explore/pipelines.rst:24
+msgid "Traditional workflow"
+msgstr "Flujo de trabajo tradicional"
+
+#: ../../source/explore/pipelines.rst:29
+msgid "The code to perform this workflow would look like this:"
+msgstr "El código para realizar este flujo de trabajo se vería así:"
+
+#: ../../source/explore/pipelines.rst:77
+msgid ""
+"This is a tedious and error-prone workflow, especially when the number of"
+" preprocessing steps increases. In addition, persisting the model and "
+"deploying it to a production environment is not straightforward, as each "
+"preprocessing step needs to be persisted and deployed individually."
+msgstr ""
+"Este es un flujo de trabajo tedioso y propenso a errores, especialmente cuando el número de "
+"pasos de preprocesamiento aumenta. Además, persistir el modelo y "
+"desplegarlo en un entorno de producción no es sencillo, ya que cada "
+"paso de preprocesamiento necesita ser persistido y desplegado individualmente."
+
+#: ../../source/explore/pipelines.rst:80
+msgid "Pipeline flow"
+msgstr "Flujo de pipeline"
+
+#: ../../source/explore/pipelines.rst:81
+msgid ""
+"In a pipeline flow, we can combine all preprocessing steps into a single "
+"object. This simplifies the workflow and reduces the risk of errors. The "
+"figure below shows the same workflow as above, but using a pipeline:"
+msgstr ""
+"En un flujo de pipeline, podemos combinar todos los pasos de preprocesamiento en un único "
+"objeto. Esto simplifica el flujo de trabajo y reduce el riesgo de errores. La "
+"figura a continuación muestra el mismo flujo de trabajo que antes, pero usando un pipeline:"
+
+#: ../../source/explore/pipelines.rst:83
+msgid "Pipeline workflow"
+msgstr "Flujo de trabajo de pipeline"
+
+#: ../../source/explore/pipelines.rst:88
+msgid ""
+"An outline of the code to perform the pipeline is shown in the image "
+"below:"
+msgstr ""
+"Un esquema del código para realizar el pipeline se muestra en la imagen "
+"a continuación:"
+
+#: ../../source/explore/pipelines.rst:90
+msgid "Pipeline code"
+msgstr "Código del pipeline"
+
+#: ../../source/explore/pipelines.rst:95
+msgid "The code to perform the pipeline is shown below:"
+msgstr "El código para realizar el pipeline se muestra a continuación:"
+
+#: ../../source/explore/pipelines.rst:122
+msgid ""
+"It is now possible to visualize the pipeline and the different "
+"preprocessing steps that are applied to the spectra."
+msgstr ""
+"Ahora es posible visualizar el pipeline y los diferentes "
+"pasos de preprocesamiento que se aplican a los espectros."
+
+#: ../../source/explore/pipelines.rst:129
+msgid ""
+"Notice that in the traditional workflow, the different preprocessing "
+"objects had to be persisted individually. In the pipeline workflow, the "
+"entire pipeline can be persisted and deployed to a production "
+"environment. See the :ref:`persisting-your-models` section for more "
+"information."
+msgstr ""
+"Observe que en el flujo de trabajo tradicional, los diferentes objetos de preprocesamiento "
+"tenían que ser persistidos individualmente. En el flujo de trabajo de pipeline, todo el "
+"pipeline puede ser persistido y desplegado en un entorno de producción. "
+"Consulte la sección :ref:`persisting-your-models` para más "
+"información."
+

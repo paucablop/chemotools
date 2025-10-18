@@ -1,0 +1,192 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/user/what_is_chemotools.rst:2
+msgid "What is chemotools?"
+msgstr "chemotoolsとは？"
+
+#: ../../source/user/what_is_chemotools.rst:4
+msgid ""
+"``chemotools`` is an open-source Python package for spectral "
+"preprocessing and chemometric modelling. It integrates directly with the "
+"``scikit-learn`` ecosystem, enabling reproducible and scalable "
+"development of spectroscopic models."
+msgstr ""
+"``chemotools`` は、スペクトル前処理とケモメトリクスモデリングのための"
+"オープンソースのPythonパッケージです。``scikit-learn`` エコシステムと直接統合されており、"
+"再現可能でスケーラブルな分光モデルの開発を可能にします。"
+
+#: ../../source/user/what_is_chemotools.rst:6
+msgid "**Extensive toolkit:** transformers for diverse spectroscopic data."
+msgstr "豊富なツールキット：多様な分光データ用のトランスフォーマー。"
+
+#: ../../source/user/what_is_chemotools.rst:7
+msgid ""
+"**Composable and scalable:** pipelines that integrate directly and grow "
+"with your workflow."
+msgstr "組み合わせ可能でスケーラブル：直接統合され、ワークフローとともに成長するパイプライン。"
+
+#: ../../source/user/what_is_chemotools.rst:8
+msgid "**Reliable and transparent:** rigorously tested, peer-reviewed, and open."
+msgstr "信頼性と透明性：厳密にテストされ、査読を受けた、オープンなツール。"
+
+#: ../../source/user/what_is_chemotools.rst:12
+msgid ""
+"Build exactly what you need, integrate with the tools you trust, and "
+"scale without compromise."
+msgstr ""
+"必要なものを正確に構築し、信頼できるツールと統合し、妥協することなくスケールします。"
+
+#: ../../source/user/what_is_chemotools.rst:14
+msgid "Composable building blocks / lifecycle"
+msgstr "組み合わせ可能な構成要素 / ライフサイクル"
+
+#: ../../source/user/what_is_chemotools.rst:20
+msgid ""
+"**Curious about scikit-learn?** See the dedicated `scikit-learn overview "
+"<../explore/sklearn.html>`_."
+msgstr ""
+"``scikit-learn`` について詳しく知りたいですか？ 専用の `scikit-learn "
+"<../explore/sklearn.html>`_ 概要をご覧ください。"
+
+#: ../../source/user/what_is_chemotools.rst:23
+msgid "Extensive Toolkit"
+msgstr "豊富なツールキット"
+
+#: ../../source/user/what_is_chemotools.rst:24
+msgid ""
+"Spectroscopy is diverse — different **instruments**, **sample matrices**,"
+" and **analysis goals** demand different approaches. ``chemotools`` "
+"provides a **focused set of transformers** for spectroscopic data and "
+"makes it simple to assemble them into **preprocessing pipelines**. By "
+"connecting to the wider **Python ecosystem**, you can leverage **state-"
+"of-the-art machine learning** and **scientific libraries** to build "
+"**robust, end-to-end spectroscopic models**."
+msgstr ""
+"分光法は多様です。異なる機器、サンプルマトリックス、分析目標には、"
+"それぞれ異なるアプローチが必要です。``chemotools`` は、"
+"分光データ用の焦点を絞ったトランスフォーマーセットを提供し、"
+"それらを前処理パイプラインに簡単に組み立てることができます。"
+"より広範なPythonエコシステムと接続することで、"
+"最先端の機械学習と科学ライブラリを活用して、"
+"堅牢なエンドツーエンドの分光モデルを構築できます。"
+
+#: ../../source/user/what_is_chemotools.rst:26
+msgid "Ecosystem: chemotools with sklearn, numpy and friends"
+msgstr "エコシステム：chemotoolsとscikit-learn、numpy、その他のライブラリ"
+
+#: ../../source/user/what_is_chemotools.rst:33
+msgid ""
+"Connect your preprocessing with the ``scikit-learn`` ecosystem to unlock "
+"a wide toolstack for feature selection, model tuning, validation, and "
+"deployment."
+msgstr ""
+"前処理を ``scikit-learn`` エコシステムと接続することで、"
+"特徴選択、モデル調整、検証、デプロイメントのための"
+"幅広いツールスタックを利用できます。"
+
+#: ../../source/user/what_is_chemotools.rst:36
+msgid ""
+"**Want to explore the tools at your fingertips?** Visit the `explore "
+"overview <../explore/index.html>`_."
+msgstr ""
+"手元のツールを探索したいですか？ `探索の概要 "
+"<../explore/index.html>`_ をご覧ください。"
+
+#: ../../source/user/what_is_chemotools.rst:39
+msgid "Composable and Scalable"
+msgstr "組み合わせ可能でスケーラブル"
+
+#: ../../source/user/what_is_chemotools.rst:40
+msgid ""
+"``chemotools`` transforms preprocessing into a **modular, composable "
+"process**: each transformer follows the ``fit`` / ``transform`` API and "
+"integrates directly with ``scikit-learn`` pipelines. Preprocessing, "
+"feature selection, modelling, and validation can be chained directly — no"
+" adapters required."
+msgstr ""
+"``chemotools`` は、前処理をモジュール化された組み合わせ可能なプロセスに変換します。"
+"各トランスフォーマーは ``fit`` / ``transform`` APIに従い、"
+"``scikit-learn`` パイプラインと直接統合されます。"
+"前処理、特徴選択、モデリング、検証を直接チェーン化できます。"
+"アダプターは不要です。"
+
+#: ../../source/user/what_is_chemotools.rst:42
+msgid ""
+"This composability ensures **reproducibility** (pipelines are "
+"declarative), **robustness** (swap blocks without refactoring), and "
+"**scalability** (parallelization and deployment patterns leveraging "
+"already supported infrastructure by the ecosystem)."
+msgstr ""
+"この組み合わせ可能性により、再現性（パイプラインは宣言的）、"
+"堅牢性（リファクタリングせずにブロックを交換可能）、"
+"スケーラビリティ（エコシステムによって既にサポートされている"
+"インフラストラクチャを活用した並列化とデプロイメントパターン）が保証されます。"
+
+#: ../../source/user/what_is_chemotools.rst:45
+msgid "From exploration to deployment, ``chemotools`` grows with your workflow."
+msgstr "探索からデプロイメントまで、``chemotools`` はワークフローとともに成長します。"
+
+#: ../../source/user/what_is_chemotools.rst:48
+msgid "Quality & Transparency"
+msgstr "品質と透明性"
+
+#: ../../source/user/what_is_chemotools.rst:49
+msgid ""
+"``chemotools`` combines extensibility and scalability with open-source "
+"transparency, making validation and trust easier from the start."
+msgstr ""
+"``chemotools`` は、拡張性とスケーラビリティをオープンソースの透明性と組み合わせ、"
+"最初から検証と信頼を容易にします。"
+
+#: ../../source/user/what_is_chemotools.rst:51
+msgid ""
+"**Thorough testing** — covered by extensive `unit tests "
+"<https://app.codecov.io/github/paucablop/chemotools>`_ and continuous "
+"code coverage for reliability and robustness."
+msgstr ""
+"徹底的なテスト — 広範な `ユニットテスト "
+"<https://app.codecov.io/github/paucablop/chemotools>`_ と継続的な"
+"コードカバレッジにより、信頼性と堅牢性が保証されています。"
+
+#: ../../source/user/what_is_chemotools.rst:52
+msgid ""
+"**Transparency** — we provide a Software Bill of Materials (SBOM) in "
+"`CycloneDX <https://cyclonedx.org/>`_ format with every release, "
+"supporting validation and clearance in regulated environments."
+msgstr ""
+"透明性 — すべてのリリースで `CycloneDX <https://cyclonedx.org/>`_ 形式の"
+"ソフトウェア部品表（SBOM）を提供し、"
+"規制環境での検証と承認をサポートしています。"
+
+#: ../../source/user/what_is_chemotools.rst:53
+msgid ""
+"**Peer-reviewed** — published in the `Journal of Open Source Software "
+"(JOSS) <https://joss.theoj.org/papers/10.21105/joss.06802>`_ following "
+"independent peer review."
+msgstr ""
+"査読済み — 独立した査読を経て `Journal of Open Source Software "
+"(JOSS) <https://joss.theoj.org/papers/10.21105/joss.06802>`_ に掲載されています。"
+
+#: ../../source/user/what_is_chemotools.rst:56
+msgid "Quality, transparency, and trust — built in from the start."
+msgstr "品質、透明性、信頼性 — 最初から組み込まれています。"
+

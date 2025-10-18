@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/scatter.rst:2
+msgid "chemotools.scatter"
+msgstr "chemotools.scatter"
+
+#: ../../source/api/scatter.rst:6
+msgid ""
+"Scatter correction methods to remove multiplicative scatter effects and "
+"physical variations in spectral data."
+msgstr ""
+"散射校正方法，用于去除光谱数据中的乘性散射效应和物理变化。"
+
+#: ../../source/api/scatter.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/scatter.rst:20
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/scatter.rst:26
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/scatter.rst:27
+msgid "Description"
+msgstr "描述"
+
+#: ../../source/api/scatter.rst:28
+msgid ""
+":doc:`ExtendedMultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+msgstr ""
+":doc:`ExtendedMultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+
+#: ../../source/api/scatter.rst:29
+msgid "EMSC with polynomial baseline correction"
+msgstr "带多项式基线校正的EMSC"
+
+#: ../../source/api/scatter.rst:30
+msgid ""
+":doc:`MultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.MultiplicativeScatterCorrection>`"
+msgstr ""
+":doc:`MultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.MultiplicativeScatterCorrection>`"
+
+#: ../../source/api/scatter.rst:31
+msgid "Classic MSC algorithm"
+msgstr "经典MSC算法"
+
+#: ../../source/api/scatter.rst:32
+msgid ""
+":doc:`RobustNormalVariate "
+"</methods/generated/chemotools.scatter.RobustNormalVariate>`"
+msgstr ""
+":doc:`RobustNormalVariate "
+"</methods/generated/chemotools.scatter.RobustNormalVariate>`"
+
+#: ../../source/api/scatter.rst:33
+msgid "RNV using median and MAD for robustness"
+msgstr "使用中位数和MAD的RNV以提高鲁棒性"
+
+#: ../../source/api/scatter.rst:34
+msgid ""
+":doc:`StandardNormalVariate "
+"</methods/generated/chemotools.scatter.StandardNormalVariate>`"
+msgstr ""
+":doc:`StandardNormalVariate "
+"</methods/generated/chemotools.scatter.StandardNormalVariate>`"
+
+#: ../../source/api/scatter.rst:35
+msgid "SNV using mean and standard deviation"
+msgstr "使用均值和标准差的SNV"
+
+#: ../../source/api/scatter.rst:38
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/scatter.rst:40
+msgid ""
+":doc:`Scatter Correction Methods Overview </methods/scatter>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`散射校正方法概述 </methods/scatter>` - 包含示例和可视化指南的完整文档"
+

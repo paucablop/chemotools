@@ -1,0 +1,118 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:44+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/index.rst:7
+msgid "User Guide"
+msgstr "Guía de usuario"
+
+#: ../../source/index.rst:7
+msgid "Methods"
+msgstr "Métodos"
+
+#: ../../source/index.rst:7
+msgid "Explore"
+msgstr "Explorar"
+
+#: ../../source/index.rst:7
+msgid "Learn"
+msgstr "Aprender"
+
+#: ../../source/index.rst:7
+msgid "Cite"
+msgstr "Citar"
+
+#: ../../source/index.rst:7
+msgid "API"
+msgstr "API"
+
+#: ../../source/index.rst:20
+msgid "PyPI version"
+msgstr "Versión de PyPI"
+
+#: ../../source/index.rst:24
+msgid "Python versions"
+msgstr "Versiones de Python"
+
+#: ../../source/index.rst:28
+msgid "License"
+msgstr "Licencia"
+
+#: ../../source/index.rst:32
+msgid "Code coverage"
+msgstr "Cobertura de código"
+
+#: ../../source/index.rst:36
+msgid "Downloads"
+msgstr "Descargas"
+
+#: ../../source/index.rst:40
+msgid "DOI"
+msgstr "DOI"
+
+#: ../../source/index.rst:47
+msgid "Welcome to chemotools"
+msgstr "Bienvenido a chemotools"
+
+#: ../../source/index.rst:50
+msgid ""
+"``chemotools`` is a **Python package for spectral analysis**, designed to"
+" integrate natively with the widely adopted ``scikit-learn`` API and the "
+"broader **Python machine learning ecosystem**."
+msgstr ""
+"``chemotools`` es un **paquete de Python para análisis espectral**, diseñado para "
+"integrarse nativamente con la ampliamente adoptada API de ``scikit-learn`` y el "
+"**ecosistema de aprendizaje automático de Python** más amplio."
+
+#: ../../source/index.rst:52
+msgid ""
+"Developed after years of applying **spectroscopy** across industries, its"
+" mission is to empower **scientists and engineers** with the tools needed"
+" to build **production-ready chemometric models**. ``chemotools`` "
+"provides an **intuitive, flexible environment** that streamlines the "
+"**development and deployment** of models, making it easier to "
+"**standardize workflows** and **scale chemometric solutions**."
+msgstr ""
+"Desarrollado tras años de aplicar **espectroscopía** en diversas industrias, su "
+"misión es empoderar a **científicos e ingenieros** con las herramientas necesarias "
+"para construir **modelos quimiométricos listos para producción**. ``chemotools`` "
+"proporciona un **entorno intuitivo y flexible** que agiliza el "
+"**desarrollo y despliegue** de modelos, facilitando la "
+"**estandarización de flujos de trabajo** y el **escalado de soluciones quimiométricas**."
+
+#: ../../source/index.rst:54
+msgid "chemotools workflow"
+msgstr "Flujo de trabajo de chemotools"
+
+#: ../../source/index.rst:61
+msgid "Start exploring"
+msgstr "Comenzar a explorar"
+
+#: ../../source/index.rst:70
+msgid "Discover the environment"
+msgstr "Descubre el entorno"
+
+#: ../../source/index.rst:81
+msgid "Chemometrics tutorials"
+msgstr "Tutoriales de quimiometría"
+
+#: ../../source/index.rst:92
+msgid "Check out our Webinar"
+msgstr "Mira nuestro seminario web"
+

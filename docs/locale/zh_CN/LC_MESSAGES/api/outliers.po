@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/outliers.rst:2
+msgid "chemotools.outliers"
+msgstr "chemotools.outliers"
+
+#: ../../source/api/outliers.rst:6
+msgid ""
+"Outlier detection methods to identify unusual samples and improve model "
+"diagnostics."
+msgstr ""
+"异常值检测方法，用于识别异常样本并改进模型诊断。"
+
+#: ../../source/api/outliers.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/outliers.rst:21
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/outliers.rst:27
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/outliers.rst:28
+msgid "Description"
+msgstr "描述"
+
+#: ../../source/api/outliers.rst:29
+msgid ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+msgstr ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+
+#: ../../source/api/outliers.rst:30
+msgid "Distance to model in X-space"
+msgstr "X空间中到模型的距离"
+
+#: ../../source/api/outliers.rst:31
+msgid ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+msgstr ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+
+#: ../../source/api/outliers.rst:32
+msgid "Hotelling's T² statistic for multivariate outliers"
+msgstr "用于多元异常值的Hotelling T²统计量"
+
+#: ../../source/api/outliers.rst:33
+msgid ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+msgstr ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+
+#: ../../source/api/outliers.rst:34
+msgid "Leverage values for influential point detection"
+msgstr "用于影响点检测的杠杆值"
+
+#: ../../source/api/outliers.rst:35
+msgid ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+msgstr ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+
+#: ../../source/api/outliers.rst:36
+msgid "Q residuals (squared prediction error)"
+msgstr "Q残差（平方预测误差）"
+
+#: ../../source/api/outliers.rst:37
+msgid ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+msgstr ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+
+#: ../../source/api/outliers.rst:38
+msgid "Studentized residuals for regression outliers"
+msgstr "用于回归异常值的学生化残差"
+
+#: ../../source/api/outliers.rst:41
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/outliers.rst:43
+msgid ""
+":doc:`Outlier Detection Methods Overview </methods/outliers>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`异常值检测方法概述 </methods/outliers>` - 包含示例和可视化指南的完整文档"
+

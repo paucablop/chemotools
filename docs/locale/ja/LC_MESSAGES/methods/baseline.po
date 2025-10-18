@@ -1,0 +1,109 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/baseline.rst:2
+msgid "Baseline Methods"
+msgstr "ベースライン手法"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+msgstr ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline"
+" correction."
+msgstr "適応的反復再重み付けペナルティ付き最小二乗法(AirPls)ベースライン補正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+msgstr ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Asymmetrically Reweighted Penalized Least Squares (ArPLS) baseline "
+"correction."
+msgstr "非対称再重み付けペナルティ付き最小二乗法(ArPLS)ベースライン補正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+msgstr ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "Asymmetric Least Squares (AsLs) baseline correction."
+msgstr "非対称最小二乗法(AsLs)ベースライン補正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`ConstantBaselineCorrection "
+"<chemotools.baseline.ConstantBaselineCorrection>`"
+msgstr ":py:obj:`ConstantBaselineCorrection <chemotools.baseline.ConstantBaselineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that corrects a baseline by subtracting a constant value."
+msgstr "定数値を減算してベースラインを補正する変換器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`CubicSplineCorrection "
+"<chemotools.baseline.CubicSplineCorrection>`"
+msgstr ":py:obj:`CubicSplineCorrection <chemotools.baseline.CubicSplineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a cubic spline "
+"through the points defined by the indices."
+msgstr "インデックスで定義された点を通る3次スプラインを減算してベースラインを補正する変換器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+msgstr ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a linear baseline "
+"through the initial and final points of the spectrum."
+msgstr "スペクトルの最初と最後の点を通る線形ベースラインを減算してベースラインを補正する変換器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+msgstr ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that sets all negative values to zero or to abs."
+msgstr "すべての負の値をゼロまたは絶対値に設定する変換器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+msgstr ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a polynomial baseline from the input data."
+msgstr "入力データから多項式ベースラインを減算する変換器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+msgstr ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a reference spectrum from the input data."
+msgstr "入力データから参照スペクトルを減算する変換器。"
+

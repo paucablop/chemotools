@@ -1,0 +1,43 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/methods.rst:4
+msgid "Methods overview"
+msgstr "Descripción general de métodos"
+
+#: ../../source/methods/methods.rst:6
+msgid ""
+"This page is a placeholder for upcoming method categories such as "
+"Augmentation, Feature Selection, and Outliers."
+msgstr ""
+"Esta página es un marcador de posición para las próximas categorías de métodos como "
+"Aumento de datos, Selección de características y Valores atípicos."
+
+#: ../../source/methods/methods.rst:9
+msgid "Available pages"
+msgstr "Páginas disponibles"
+
+#~ msgid ""
+#~ "This page is a placeholder for "
+#~ "upcoming method categories such as "
+#~ "Augmentation, Feature Selection, and Metrics."
+#~ msgstr ""
+

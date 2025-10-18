@@ -1,0 +1,45 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/derivative.rst:2
+msgid "Derivative"
+msgstr "导数"
+
+#: ../../source/methods/derivative.rst:13:<autosummary>:1
+msgid ":py:obj:`NorrisWilliams <chemotools.derivative.NorrisWilliams>`"
+msgstr ":py:obj:`NorrisWilliams <chemotools.derivative.NorrisWilliams>`"
+
+#: ../../source/methods/derivative.rst:13:<autosummary>:1
+msgid ""
+"A transformer that calculates the Norris-Williams derivative of the input"
+" data."
+msgstr "计算输入数据的 Norris-Williams 导数的转换器。"
+
+#: ../../source/methods/derivative.rst:13:<autosummary>:1
+msgid ":py:obj:`SavitzkyGolay <chemotools.derivative.SavitzkyGolay>`"
+msgstr ":py:obj:`SavitzkyGolay <chemotools.derivative.SavitzkyGolay>`"
+
+#: ../../source/methods/derivative.rst:13:<autosummary>:1
+msgid ""
+"A transformer that calculates the Savitzky-Golay derivative of the input "
+"data."
+msgstr "计算输入数据的 Savitzky-Golay 导数的转换器。"
+

@@ -1,0 +1,16 @@
+{% set current_version = theme_switcher.version_match %}
+<div class="dropdown">
+    <button class="btn dropdown-toggle">
+        <i class="fas fa-globe"></i>
+        {{ theme_switcher.data[current_version].name }}
+    </button>
+    <ul class="dropdown-menu">
+        {% for slug, entry in theme_switcher.data.items() %}
+        <li>
+            <a class="dropdown-item" href="{{ entry.url }}">
+                {{ entry.name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>

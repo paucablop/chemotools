@@ -1,0 +1,61 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/smooth.rst:2
+msgid "Smoothing Methods"
+msgstr "Métodos de suavizado"
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid ":py:obj:`MeanFilter <chemotools.smooth.MeanFilter>`"
+msgstr ":py:obj:`MeanFilter <chemotools.smooth.MeanFilter>`"
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid "A transformer that calculates the mean filter of the input data."
+msgstr "Un transformador que calcula el filtro de media de los datos de entrada."
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid ":py:obj:`MedianFilter <chemotools.smooth.MedianFilter>`"
+msgstr ":py:obj:`MedianFilter <chemotools.smooth.MedianFilter>`"
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid ""
+"A smoothing transformer that calculates the median filter of the input "
+"data."
+msgstr ""
+"Un transformador de suavizado que calcula el filtro de mediana de los datos de "
+"entrada."
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid ":py:obj:`SavitzkyGolayFilter <chemotools.smooth.SavitzkyGolayFilter>`"
+msgstr ":py:obj:`SavitzkyGolayFilter <chemotools.smooth.SavitzkyGolayFilter>`"
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid "A transformer that calculates the Savitzky-Golay filter of the input data."
+msgstr "Un transformador que calcula el filtro de Savitzky-Golay de los datos de entrada."
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid ":py:obj:`WhittakerSmooth <chemotools.smooth.WhittakerSmooth>`"
+msgstr ":py:obj:`WhittakerSmooth <chemotools.smooth.WhittakerSmooth>`"
+
+#: ../../source/methods/smooth.rst:13:<autosummary>:1
+msgid "Whittaker smoothing for noise reduction and signal trend estimation."
+msgstr "Suavizado de Whittaker para reducción de ruido y estimación de tendencias de señal."
+

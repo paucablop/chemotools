@@ -1,0 +1,62 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/utils.rst:2
+msgid "chemotools.utils"
+msgstr "chemotools.utils"
+
+#: ../../source/api/utils.rst:6
+msgid "Utility functions and helper methods used internally by chemotools."
+msgstr "chemotools で内部的に使用されるユーティリティ関数とヘルパーメソッド。"
+
+#: ../../source/api/utils.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/utils.rst:18
+msgid ""
+"This module contains internal utilities. Most users won't need to import "
+"directly from here."
+msgstr ""
+"このモジュールには内部ユーティリティが含まれています。ほとんどのユーザーは、ここから直接インポートする必要はありません。"
+
+#: ../../source/api/utils.rst:20
+msgid ""
+"For linear algebra operations used in preprocessing, see the specific "
+"method classes in other modules."
+msgstr ""
+"前処理で使用される線形代数演算については、他のモジュールの特定のメソッドクラスを参照してください。"
+
+#: ../../source/api/utils.rst:23
+msgid "Available Functions"
+msgstr "利用可能な関数"
+
+#: ../../source/api/utils.rst:25
+msgid ""
+"This module provides linear algebra utilities and helper functions that "
+"support the core chemotools methods."
+msgstr ""
+"このモジュールは、chemotools のコアメソッドをサポートする線形代数ユーティリティとヘルパー関数を提供します。"
+
+#: ../../source/api/utils.rst:27
+msgid "See the source code for implementation details."
+msgstr "実装の詳細については、ソースコードを参照してください。"
+

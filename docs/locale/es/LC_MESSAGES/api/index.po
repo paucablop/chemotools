@@ -1,0 +1,131 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/index.rst:8
+msgid "Augmentation"
+msgstr "Aumento de datos"
+
+#: ../../source/api/index.rst:8
+msgid "Baseline"
+msgstr "Corrección de línea base"
+
+#: ../../source/api/index.rst:8
+msgid "Derivative"
+msgstr "Derivadas"
+
+#: ../../source/api/index.rst:8
+msgid "Feature Selection"
+msgstr "Selección de características"
+
+#: ../../source/api/index.rst:8
+msgid "Outliers"
+msgstr "Valores atípicos"
+
+#: ../../source/api/index.rst:8
+msgid "Scale"
+msgstr "Escalado"
+
+#: ../../source/api/index.rst:8
+msgid "Scatter"
+msgstr "Corrección de dispersión"
+
+#: ../../source/api/index.rst:8
+msgid "Smooth"
+msgstr "Suavizado"
+
+#: ../../source/api/index.rst:8
+msgid "Utilities"
+msgstr "Utilidades"
+
+#: ../../source/api/index.rst:8
+msgid "Core Modules"
+msgstr "Módulos principales"
+
+#: ../../source/api/index.rst:2
+msgid "API Reference"
+msgstr "Referencia de la API"
+
+#: ../../source/api/index.rst:4
+msgid ""
+"The public Python API for ``chemotools``. This section provides a "
+"technical reference for all importable modules and classes."
+msgstr ""
+"La API pública de Python para ``chemotools``. Esta sección proporciona una "
+"referencia técnica para todos los módulos y clases importables."
+
+#: ../../source/api/index.rst:6
+msgid ""
+"For detailed documentation with examples and visual guides, see the "
+":doc:`Methods </methods/index>` section."
+msgstr ""
+"Para documentación detallada con ejemplos y guías visuales, consulte la "
+"sección :doc:`Métodos </methods/index>`."
+
+#: ../../source/api/index.rst:23
+msgid "Quick Import Reference"
+msgstr "Referencia rápida de importación"
+
+#: ../../source/api/index.rst:25
+msgid "All classes can be imported directly from their respective modules:"
+msgstr "Todas las clases se pueden importar directamente desde sus respectivos módulos:"
+
+#~ msgid "Core namespaces"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The public Python API for "
+#~ "``chemotools``. Below we curate the key"
+#~ " submodules. This avoids deep recursive "
+#~ "explosion and keeps build warnings to"
+#~ " zero."
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.augmentation <chemotools.augmentation>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.baseline <chemotools.baseline>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.derivative <chemotools.derivative>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.feature_selection <chemotools.feature_selection>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.scale <chemotools.scale>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.scatter <chemotools.scatter>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.smooth <chemotools.smooth>`\\"
+#~ msgstr ""
+
+#~ msgid ":py:obj:`chemotools.utils <chemotools.utils>`\\"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The pages under ``generated/`` are "
+#~ "auto-created at build time; you "
+#~ "normally should not add them to "
+#~ "version control."
+#~ msgstr ""
+

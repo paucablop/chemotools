@@ -1,0 +1,107 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/scatter.rst:2
+msgid "chemotools.scatter"
+msgstr "chemotools.scatter"
+
+#: ../../source/api/scatter.rst:6
+msgid ""
+"Scatter correction methods to remove multiplicative scatter effects and "
+"physical variations in spectral data."
+msgstr ""
+"スペクトルデータから乗法散乱効果と物理的変動を除去するための散乱補正手法。"
+
+#: ../../source/api/scatter.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/scatter.rst:20
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/scatter.rst:26
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/scatter.rst:27
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/scatter.rst:28
+msgid ""
+":doc:`ExtendedMultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+msgstr ""
+":doc:`ExtendedMultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+
+#: ../../source/api/scatter.rst:29
+msgid "EMSC with polynomial baseline correction"
+msgstr "多項式ベースライン補正を伴う EMSC"
+
+#: ../../source/api/scatter.rst:30
+msgid ""
+":doc:`MultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.MultiplicativeScatterCorrection>`"
+msgstr ""
+":doc:`MultiplicativeScatterCorrection "
+"</methods/generated/chemotools.scatter.MultiplicativeScatterCorrection>`"
+
+#: ../../source/api/scatter.rst:31
+msgid "Classic MSC algorithm"
+msgstr "古典的な MSC アルゴリズム"
+
+#: ../../source/api/scatter.rst:32
+msgid ""
+":doc:`RobustNormalVariate "
+"</methods/generated/chemotools.scatter.RobustNormalVariate>`"
+msgstr ""
+":doc:`RobustNormalVariate "
+"</methods/generated/chemotools.scatter.RobustNormalVariate>`"
+
+#: ../../source/api/scatter.rst:33
+msgid "RNV using median and MAD for robustness"
+msgstr "ロバスト性のために中央値と MAD を使用する RNV"
+
+#: ../../source/api/scatter.rst:34
+msgid ""
+":doc:`StandardNormalVariate "
+"</methods/generated/chemotools.scatter.StandardNormalVariate>`"
+msgstr ""
+":doc:`StandardNormalVariate "
+"</methods/generated/chemotools.scatter.StandardNormalVariate>`"
+
+#: ../../source/api/scatter.rst:35
+msgid "SNV using mean and standard deviation"
+msgstr "平均と標準偏差を使用する SNV"
+
+#: ../../source/api/scatter.rst:38
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/scatter.rst:40
+msgid ""
+":doc:`Scatter Correction Methods Overview </methods/scatter>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`散乱補正手法の概要 </methods/scatter>` - 例とビジュアルガイドを含む完全なドキュメント"
+

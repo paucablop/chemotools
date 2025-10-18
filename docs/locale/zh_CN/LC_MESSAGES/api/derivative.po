@@ -1,0 +1,83 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/derivative.rst:2
+msgid "chemotools.derivative"
+msgstr "chemotools.derivative"
+
+#: ../../source/api/derivative.rst:6
+msgid ""
+"Derivative calculation methods for spectral analysis. Derivatives help "
+"remove baseline effects and enhance spectral features."
+msgstr ""
+"光谱分析的导数计算方法。导数有助于去除基线效应并增强光谱特征。"
+
+#: ../../source/api/derivative.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/derivative.rst:18
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/derivative.rst:24
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/derivative.rst:25
+msgid "Description"
+msgstr "描述"
+
+#: ../../source/api/derivative.rst:26
+msgid ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+msgstr ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+
+#: ../../source/api/derivative.rst:27
+msgid "Norris-Williams derivative with gap parameter"
+msgstr "带间隙参数的Norris-Williams导数"
+
+#: ../../source/api/derivative.rst:28
+msgid ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+msgstr ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+
+#: ../../source/api/derivative.rst:29
+msgid "Savitzky-Golay derivative filter"
+msgstr "Savitzky-Golay导数滤波器"
+
+#: ../../source/api/derivative.rst:32
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/derivative.rst:34
+msgid ""
+":doc:`Derivative Methods Overview </methods/derivative>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`导数方法概述 </methods/derivative>` - 包含示例和可视化指南的完整文档"
+

@@ -1,0 +1,895 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/learn/pls_regression.ipynb:9
+msgid "**Glucose monitoring with PLS**"
+msgstr "**Monitoreo de glucosa con PLS**"
+
+#: ../../source/learn/pls_regression.ipynb:20
+msgid ""
+"💡\\ **NOTE:** This document is a Jupyter notebook. You can download the "
+"source file and run it in your Jupyter environment!"
+msgstr ""
+"💡\\ **NOTA:** Este documento es un notebook de Jupyter. ¡Puedes descargar el "
+"archivo fuente y ejecutarlo en tu entorno Jupyter!"
+
+#: ../../source/learn/pls_regression.ipynb:32
+msgid "**Introduction**"
+msgstr "**Introducción**"
+
+#: ../../source/learn/pls_regression.ipynb:34
+msgid ""
+"This dataset provides information on lignocellulosic ethanol fermentation"
+" through spectroscopic data collected data using attenuated total "
+"reflectance, mid-infrared (ATR-MIR) spectroscopy, along with reference "
+"measurements using high-performance liquid chromatography (HPLC) for "
+"validation."
+msgstr ""
+"Este conjunto de datos proporciona información sobre fermentación de etanol lignocelulósico"
+" a través de datos espectroscópicos recopilados usando espectroscopía de reflectancia "
+"total atenuada infrarroja media (ATR-MIR), junto con mediciones de referencia "
+"usando cromatografía líquida de alto rendimiento (HPLC) para "
+"validación."
+
+#: ../../source/learn/pls_regression.ipynb:36
+msgid "The project contains two datasets:"
+msgstr "El proyecto contiene dos conjuntos de datos:"
+
+#: ../../source/learn/pls_regression.ipynb:38
+msgid ""
+"**Training Dataset:** Contains spectral data with corresponding HPLC "
+"measurements used to train the partial least squares (PLS) models."
+msgstr ""
+"**Conjunto de datos de entrenamiento:** Contiene datos espectrales con mediciones HPLC "
+"correspondientes usadas para entrenar los modelos de mínimos cuadrados parciales (PLS)."
+
+#: ../../source/learn/pls_regression.ipynb:39
+msgid ""
+"**Testing Dataset:** Includes a time series of spectra collected during "
+"fermentation, plus off-line HPLC measurements."
+msgstr ""
+"**Conjunto de datos de prueba:** Incluye una serie temporal de espectros recopilados durante "
+"la fermentación, más mediciones HPLC fuera de línea."
+
+#: ../../source/learn/pls_regression.ipynb:41
+msgid ""
+"For more information about these datasets and how they can be used to "
+"monitor fermentation, please see our article: \"Transforming Data to "
+"Information: A Parallel Hybrid Model for Real-Time State Estimation in "
+"Lignocellulosic Ethanol Fermentation.\" (Note that the data in the "
+"article differs from the data provided here.)"
+msgstr ""
+"Para más información sobre estos conjuntos de datos y cómo pueden usarse para "
+"monitorear la fermentación, consulta nuestro artículo: \"Transformando datos en "
+"información: Un modelo híbrido paralelo para estimación de estado en tiempo real en "
+"fermentación de etanol lignocelulósico\". (Nota que los datos en el "
+"artículo difieren de los datos proporcionados aquí.)"
+
+#: ../../source/learn/pls_regression.ipynb:53
+msgid "**Objective**"
+msgstr "**Objetivo**"
+
+#: ../../source/learn/pls_regression.ipynb:55
+msgid ""
+"In this exercise, you will build a PLS model to monitor glucose "
+"concentration in real-time using ATR-MIR spectroscopy. You'll train the "
+"model using a small training set of spiked spectra, then test its "
+"performance with spectra from an actual fermentation process."
+msgstr ""
+"En este ejercicio, construirás un modelo PLS para monitorear la concentración de glucosa "
+"en tiempo real usando espectroscopía ATR-MIR. Entrenarás el "
+"modelo usando un pequeño conjunto de entrenamiento de espectros enriquecidos, luego probarás su "
+"rendimiento con espectros de un proceso de fermentación real."
+
+#: ../../source/learn/pls_regression.ipynb:67
+msgid "**Before starting**"
+msgstr "**Antes de comenzar**"
+
+#: ../../source/learn/pls_regression.ipynb:69
+msgid ""
+"Before we start, you need to be sure to have the following dependencies "
+"installed:"
+msgstr ""
+"Antes de comenzar, debes asegurarte de tener las siguientes dependencias "
+"instaladas:"
+
+#: ../../source/learn/pls_regression.ipynb:79
+msgid "You can install them using"
+msgstr "Puedes instalarlas usando"
+
+#: ../../source/learn/pls_regression.ipynb:99
+msgid "**Loading the training data**"
+msgstr "**Cargando los datos de entrenamiento**"
+
+#: ../../source/learn/pls_regression.ipynb:101
+msgid ""
+"You can access the from the ``chemotools.datasets`` module with the "
+"``load_fermentation_train()`` function."
+msgstr ""
+"Puedes acceder desde el módulo ``chemotools.datasets`` con la "
+"función ``load_fermentation_train()``."
+
+#: ../../source/learn/pls_regression.ipynb:123
+msgid ""
+"The ``load_fermentation_train()`` function returns two "
+"``pandas.DataFrame``:"
+msgstr ""
+"La función ``load_fermentation_train()`` devuelve dos "
+"``pandas.DataFrame``:"
+
+#: ../../source/learn/pls_regression.ipynb:125
+msgid ""
+"``spectra``: This dataframe contains spectral data, with columns "
+"representing wavenumbers and rows representing samples."
+msgstr ""
+"``spectra``: Este dataframe contiene datos espectrales, con columnas "
+"que representan números de onda y filas que representan muestras."
+
+#: ../../source/learn/pls_regression.ipynb:127
+msgid ""
+"``hplc``: Here, you'll find reference HPLC measurements for the glucose "
+"concentration (in g/L) of each sample, stored in a single column labeled "
+"``glucose``."
+msgstr ""
+"``hplc``: Aquí encontrarás mediciones HPLC de referencia para la concentración de glucosa "
+"(en g/L) de cada muestra, almacenadas en una sola columna etiquetada como "
+"``glucose``."
+
+#: ../../source/learn/pls_regression.ipynb:131
+msgid ""
+"💡\\ **NOTE:** If you are interested in working with ``polars.DataFrame`` "
+"you can simply use ``load_fermentation_train(set_output=\"polars\")``. "
+"Note that if you choose to work with ``polars.DataFrame`` the wavenumbers"
+" are given in the column names as ``str`` and not as ``float``. This is "
+"because ``polars`` does not support column names with types other than "
+"``str``. To extract the wavenumbers as ``float`` from the "
+"``polars.DataFrame`` you can use the "
+"``df.columns.to_numpy(dtype=np.float64)`` method."
+msgstr ""
+"💡\\ **NOTA:** Si estás interesado en trabajar con ``polars.DataFrame`` "
+"simplemente puedes usar ``load_fermentation_train(set_output=\"polars\")``. "
+"Nota que si eliges trabajar con ``polars.DataFrame`` los números de onda"
+" se dan en los nombres de columna como ``str`` y no como ``float``. Esto se debe a "
+"que ``polars`` no soporta nombres de columna con tipos distintos de "
+"``str``. Para extraer los números de onda como ``float`` del "
+"``polars.DataFrame`` puedes usar el método "
+"``df.columns.to_numpy(dtype=np.float64)``."
+
+#: ../../source/learn/pls_regression.ipynb:144
+msgid "**Exploring the training data**"
+msgstr "**Explorando los datos de entrenamiento**"
+
+#: ../../source/learn/pls_regression.ipynb:146
+msgid ""
+"Before starting with data modeling, it's important to get familiar with "
+"your data. Let's start by answering some basic questions:"
+msgstr ""
+"Antes de comenzar con el modelado de datos, es importante familiarizarse con "
+"tus datos. Comencemos respondiendo algunas preguntas básicas:"
+
+#: ../../source/learn/pls_regression.ipynb:148
+msgid "*How many samples are there?*"
+msgstr "*¿Cuántas muestras hay?*"
+
+#: ../../source/learn/pls_regression.ipynb:149
+msgid "*and how many wavenumbers are available?*"
+msgstr "*¿y cuántos números de onda están disponibles?*"
+
+#: ../../source/learn/pls_regression.ipynb:197
+msgid "Now that we have the basics down, let's take a closer look at the data."
+msgstr "Ahora que tenemos lo básico, echemos un vistazo más de cerca a los datos."
+
+#: ../../source/learn/pls_regression.ipynb:199
+msgid ""
+"For the spectral data, you can use the ``pandas.DataFrame.head()`` method"
+" to examine the first 5 rows:"
+msgstr ""
+"Para los datos espectrales, puedes usar el método ``pandas.DataFrame.head()``"
+" para examinar las primeras 5 filas:"
+
+#: ../../source/learn/pls_regression.ipynb:483
+msgid ""
+"For brevity, we won't display the entire table here, but you'll notice "
+"that each column corresponds to a wavenumber, and each row represents a "
+"sample."
+msgstr ""
+"Por brevedad, no mostraremos la tabla completa aquí, pero notarás "
+"que cada columna corresponde a un número de onda, y cada fila representa una "
+"muestra."
+
+#: ../../source/learn/pls_regression.ipynb:485
+msgid ""
+"Turning to the HPLC data, the ``pandas.DataFrame.describe()`` method "
+"provides a summary of the glucose column:"
+msgstr ""
+"En cuanto a los datos HPLC, el método ``pandas.DataFrame.describe()`` "
+"proporciona un resumen de la columna de glucosa:"
+
+#: ../../source/learn/pls_regression.ipynb:621
+msgid ""
+"This summary offers insights into the distribution of the glucose "
+"concentration. With this practical knowledge, we are now ready to "
+"continue with our data modeling journey."
+msgstr ""
+"Este resumen ofrece información sobre la distribución de la concentración de glucosa "
+". Con este conocimiento práctico, ahora estamos listos para "
+"continuar con nuestro viaje de modelado de datos."
+
+#: ../../source/learn/pls_regression.ipynb:633
+msgid "**Visualizing the training data**"
+msgstr "**Visualizando los datos de entrenamiento**"
+
+#: ../../source/learn/pls_regression.ipynb:635
+msgid ""
+"To better understand our dataset, we will visualize the data. We will "
+"plot the spectra in the train dataset, with each spectrum color-coded to "
+"reflect its associated glucose concentration. This visual approach "
+"provides a didactic means to understand the dataset's characteristics, "
+"offering insights into chemical variations among the samples. To do so, "
+"we'll use the ``matplotlib.pyplot`` module. Remember to install it first "
+"using:"
+msgstr ""
+"Para entender mejor nuestro conjunto de datos, visualizaremos los datos. Graficaremos "
+"los espectros en el conjunto de datos de entrenamiento, con cada espectro codificado por color para "
+"reflejar su concentración de glucosa asociada. Este enfoque visual "
+"proporciona un medio didáctico para entender las características del conjunto de datos, "
+"ofreciendo información sobre variaciones químicas entre las muestras. Para hacerlo, "
+"usaremos el módulo ``matplotlib.pyplot``. Recuerda instalarlo primero "
+"usando:"
+
+#: ../../source/learn/pls_regression.ipynb:641
+msgid ""
+"Up until now, we have used ``pandas.DataFrame`` to represent the dataset."
+" ``pandas.DataFrame`` are great for storing and manipulating many large "
+"datasets. However, I often find more convenient to use ``numpy.ndarray`` "
+"to work with spectral data. Therefore, we will convert the "
+"``pandas.DataFrame`` to ``numpy.ndarray`` using the "
+"``pandas.DataFrame.to_numpy()`` method."
+msgstr ""
+"Hasta ahora, hemos usado ``pandas.DataFrame`` para representar el conjunto de datos."
+" Los ``pandas.DataFrame`` son excelentes para almacenar y manipular muchos conjuntos de datos grandes"
+". Sin embargo, a menudo encuentro más conveniente usar ``numpy.ndarray`` "
+"para trabajar con datos espectrales. Por lo tanto, convertiremos el "
+"``pandas.DataFrame`` a ``numpy.ndarray`` usando el "
+"método ``pandas.DataFrame.to_numpy()``."
+
+#: ../../source/learn/pls_regression.ipynb:643
+msgid ""
+"So our first step will be to transform our ``pandas.DataFrame`` to "
+"``numpy.ndarray``:"
+msgstr ""
+"Así que nuestro primer paso será transformar nuestro ``pandas.DataFrame`` a "
+"``numpy.ndarray``:"
+
+#: ../../source/learn/pls_regression.ipynb:672
+msgid ""
+"Before plotting our data, we'll create a dedicated plotting function that"
+" color-codes each spectrum according to its glucose concentration. This "
+"approach helps visualize the relationship between spectral patterns and "
+"glucose levels."
+msgstr ""
+"Antes de graficar nuestros datos, crearemos una función de graficación dedicada que"
+" codifique por color cada espectro según su concentración de glucosa. Este "
+"enfoque ayuda a visualizar la relación entre patrones espectrales y "
+"niveles de glucosa."
+
+#: ../../source/learn/pls_regression.ipynb:674
+msgid "The function will implement:"
+msgstr "La función implementará:"
+
+#: ../../source/learn/pls_regression.ipynb:676
+msgid ""
+"**Color normalization**: We'll use ``matplotlib.colors.Normalize`` to "
+"scale glucose concentration values to a 0-1 range, making them suitable "
+"for color mapping."
+msgstr ""
+"**Normalización de color**: Usaremos ``matplotlib.colors.Normalize`` para "
+"escalar valores de concentración de glucosa a un rango 0-1, haciéndolos adecuados "
+"para mapeo de color."
+
+#: ../../source/learn/pls_regression.ipynb:678
+msgid ""
+"**Color mapping**: The normalized values will be mapped to colors using a"
+" color map via ``matplotlib.cm.ScalarMappable``."
+msgstr ""
+"**Mapeo de color**: Los valores normalizados se mapearán a colores usando un"
+" mapa de colores vía ``matplotlib.cm.ScalarMappable``."
+
+#: ../../source/learn/pls_regression.ipynb:680
+msgid ""
+"**Colorbar**: We'll add a colorbar to indicate how colors correspond to "
+"glucose concentration values."
+msgstr ""
+"**Barra de color**: Agregaremos una barra de color para indicar cómo los colores corresponden a "
+"valores de concentración de glucosa."
+
+#: ../../source/learn/pls_regression.ipynb:682
+msgid ""
+"This visualization allows us to compare multiple spectra based on their "
+"associated glucose concentrations."
+msgstr ""
+"Esta visualización nos permite comparar múltiples espectros basados en sus "
+"concentraciones de glucosa asociadas."
+
+#: ../../source/learn/pls_regression.ipynb:759
+msgid "We can now use this function to plot the training dataset:"
+msgstr "Ahora podemos usar esta función para graficar el conjunto de datos de entrenamiento:"
+
+#: ../../source/learn/pls_regression.ipynb:787
+msgid ""
+"These spectra may look unclear because they cover a wide wavenumber range"
+" that includes areas with little chemical information. To get a better "
+"view, we should focus on the \"fingerprint\" region between 950 and 1550 "
+"cm-1, where the important chemical features appear. For now, we'll use "
+"the zoom_in=True parameter in our plot_spectra() function to focus on "
+"this region. Later, we'll learn how to properly trim the spectra using "
+"preprocessing functions."
+msgstr ""
+"Estos espectros pueden verse poco claros porque cubren un amplio rango de números de onda"
+" que incluye áreas con poca información química. Para obtener una mejor "
+"vista, debemos enfocarnos en la región \"huella digital\" entre 950 y 1550 "
+"cm-1, donde aparecen las características químicas importantes. Por ahora, usaremos "
+"el parámetro zoom_in=True en nuestra función plot_spectra() para enfocarnos en "
+"esta región. Más tarde, aprenderemos cómo recortar apropiadamente los espectros usando "
+"funciones de preprocesamiento."
+
+#: ../../source/learn/pls_regression.ipynb:817
+msgid "**Preprocessing the training data**"
+msgstr "**Preprocesando los datos de entrenamiento**"
+
+#: ../../source/learn/pls_regression.ipynb:819
+msgid ""
+"Now that you've explored the dataset, it's time to preprocess the "
+"spectral data. This step is essential for removing unwanted variations, "
+"such as baseline shifts and noise, which can negatively impact model "
+"performance. We'll use the ``chemotools`` and the ``scikit-learn`` "
+"modules to preprocess the spectral data."
+msgstr ""
+"Ahora que has explorado el conjunto de datos, es hora de preprocesar los "
+"datos espectrales. Este paso es esencial para eliminar variaciones no deseadas, "
+"como desplazamientos de línea base y ruido, que pueden impactar negativamente el rendimiento del modelo"
+". Usaremos los módulos ``chemotools`` y ``scikit-learn`` "
+"para preprocesar los datos espectrales."
+
+#: ../../source/learn/pls_regression.ipynb:821
+msgid "We will preprocess the spectra using the following steps:"
+msgstr "Preprocesaremos los espectros usando los siguientes pasos:"
+
+#: ../../source/learn/pls_regression.ipynb:823
+msgid ""
+"`Range Cut "
+"<https://paucablop.github.io/chemotools/docs/feature_selection.html"
+"#range-cut>`__: to remove the wavenumbers outside the range between 950 "
+"and 1550 cm-1."
+msgstr ""
+"`Corte de rango "
+"<https://paucablop.github.io/chemotools/docs/feature_selection.html"
+"#range-cut>`__: para eliminar los números de onda fuera del rango entre 950 "
+"y 1550 cm-1."
+
+#: ../../source/learn/pls_regression.ipynb:825
+msgid ""
+"`Linear Correction "
+"<https://paucablop.github.io/chemotools/docs/baseline.html#linear-"
+"baseline-correction>`__: to remove the linear baseline shift."
+msgstr ""
+"`Corrección lineal "
+"<https://paucablop.github.io/chemotools/docs/baseline.html#linear-"
+"baseline-correction>`__: para eliminar el desplazamiento de línea base lineal."
+
+#: ../../source/learn/pls_regression.ipynb:827
+msgid ""
+"`Savitzky-Golay "
+"<https://paucablop.github.io/chemotools/docs/derivative.html#savitzky-"
+"golay-derivative>`__: calculates the nth order derivative of the spectra "
+"using the Savitzky-Golay method. This is useful to remove additive and "
+"multiplicative scatter effects."
+msgstr ""
+"`Savitzky-Golay "
+"<https://paucablop.github.io/chemotools/docs/derivative.html#savitzky-"
+"golay-derivative>`__: calcula la derivada de n-ésimo orden de los espectros "
+"usando el método de Savitzky-Golay. Esto es útil para eliminar efectos de dispersión aditivos y "
+"multiplicativos."
+
+#: ../../source/learn/pls_regression.ipynb:829
+msgid ""
+"`Standard Scaler <https://scikit-"
+"learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html>`__:"
+" to scale the spectra to zero mean."
+msgstr ""
+"`Escalador estándar <https://scikit-"
+"learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html>`__:"
+" para escalar los espectros a media cero."
+
+#: ../../source/learn/pls_regression.ipynb:840
+msgid ""
+"We will chain the preprocessing steps using the ```make_pipeline()`` "
+"<https://scikit-"
+"learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html>`__"
+" function from ``scikit-learn``."
+msgstr ""
+"Encadenaremos los pasos de preprocesamiento usando la función ```make_pipeline()`` "
+"<https://scikit-"
+"learn.org/stable/modules/generated/sklearn.pipeline.make_pipeline.html>`__"
+" de ``scikit-learn``."
+
+#: ../../source/learn/pls_regression.ipynb:842
+msgid ""
+"💡 **NOTE:** *What is a pipeline?* A pipeline is a sequence of steps that "
+"are executed in a specific order. In our case, we will create a pipeline "
+"that will execute the preprocessing steps in the order described above. "
+"You can find more information on working with pipelines at our "
+"`documentation page <https://paucablop.github.io/chemotools/get-"
+"started/scikit_learn_integration.html#working-with-pipelines>`__."
+msgstr ""
+"💡 **NOTA:** *¿Qué es un pipeline?* Un pipeline es una secuencia de pasos que "
+"se ejecutan en un orden específico. En nuestro caso, crearemos un pipeline "
+"que ejecutará los pasos de preprocesamiento en el orden descrito arriba. "
+"Puedes encontrar más información sobre cómo trabajar con pipelines en nuestra "
+"`página de documentación <https://paucablop.github.io/chemotools/get-"
+"started/scikit_learn_integration.html#working-with-pipelines>`__."
+
+#: ../../source/learn/pls_regression.ipynb:875
+msgid "Now we can use the preprocessing pipeline to preprocess the spectra:"
+msgstr "Ahora podemos usar el pipeline de preprocesamiento para preprocesar los espectros:"
+
+#: ../../source/learn/pls_regression.ipynb:895
+msgid ""
+"And we can use the ``plot_spectra()`` function to plot the preprocessed "
+"spectra:"
+msgstr ""
+"Y podemos usar la función ``plot_spectra()`` para graficar los espectros "
+"preprocesados:"
+
+#: ../../source/learn/pls_regression.ipynb:928
+msgid ""
+"💡 **NOTE:** This is cool! See how we are integrating chemometrics with "
+"scikit-learn? ``RangeCut`` ``LinearCorrection`` and ``SavitizkyGolay`` "
+"are all preprocessing techniques implemented in ``chemotools`` while "
+"``StandardScaler`` and ``pipelines`` are functionalities provided by "
+"``scikit-learn`` This is the power of ``chemotools``— it is designed to "
+"work seamlessly with ``scikit-learn``"
+msgstr ""
+"💡 **NOTA:** ¡Esto es genial! ¿Ves cómo estamos integrando quimiometría con "
+"scikit-learn? ``RangeCut``, ``LinearCorrection`` y ``SavitizkyGolay`` "
+"son todas técnicas de preprocesamiento implementadas en ``chemotools`` mientras que "
+"``StandardScaler`` y ``pipelines`` son funcionalidades proporcionadas por "
+"``scikit-learn``. Este es el poder de ``chemotools``— está diseñado para "
+"trabajar sin problemas con ``scikit-learn``"
+
+#: ../../source/learn/pls_regression.ipynb:940
+msgid "**Training a PLS model**"
+msgstr "**Entrenando un modelo PLS**"
+
+#: ../../source/learn/pls_regression.ipynb:951
+msgid ""
+"Partial Least Squares (PLS) is a powerful regression technique commonly "
+"used in chemometrics. It works by finding a latent space representation "
+"that maximizes covariance with the target variable."
+msgstr ""
+"Los Mínimos Cuadrados Parciales (PLS) son una técnica de regresión poderosa comúnmente "
+"usada en quimiometría. Funciona encontrando una representación de espacio latente "
+"que maximiza la covarianza con la variable objetivo."
+
+#: ../../source/learn/pls_regression.ipynb:953
+msgid ""
+"A critical parameter in PLS modeling is the number of components "
+"(dimensions) in the latent space:"
+msgstr ""
+"Un parámetro crítico en el modelado PLS es el número de componentes "
+"(dimensiones) en el espacio latente:"
+
+#: ../../source/learn/pls_regression.ipynb:955
+msgid ""
+"Too many components leads to overfitting, where the model captures noise "
+"rather than signal"
+msgstr ""
+"Demasiados componentes lleva al sobreajuste, donde el modelo captura ruido "
+"en lugar de señal"
+
+#: ../../source/learn/pls_regression.ipynb:956
+msgid ""
+"Too few components results in underfitting, missing important patterns in"
+" the data"
+msgstr ""
+"Muy pocos componentes resulta en subajuste, perdiendo patrones importantes en"
+" los datos"
+
+#: ../../source/learn/pls_regression.ipynb:958
+msgid ""
+"When working with limited samples, cross-validation provides a reliable "
+"method for selecting the optimal number of components. This approach:"
+msgstr ""
+"Al trabajar con muestras limitadas, la validación cruzada proporciona un método confiable "
+"para seleccionar el número óptimo de componentes. Este enfoque:"
+
+#: ../../source/learn/pls_regression.ipynb:960
+msgid "Divides the data into training and validation sets"
+msgstr "Divide los datos en conjuntos de entrenamiento y validación"
+
+#: ../../source/learn/pls_regression.ipynb:961
+msgid ""
+"Trains the model on the training set and evaluates it on the validation "
+"set"
+msgstr ""
+"Entrena el modelo en el conjunto de entrenamiento y lo evalúa en el conjunto de validación"
+
+#: ../../source/learn/pls_regression.ipynb:962
+msgid "Repeats this process with different data splits"
+msgstr "Repite este proceso con diferentes divisiones de datos"
+
+#: ../../source/learn/pls_regression.ipynb:963
+msgid "Averages the results to estimate the model's generalization error"
+msgstr "Promedia los resultados para estimar el error de generalización del modelo"
+
+#: ../../source/learn/pls_regression.ipynb:965
+msgid ""
+"For our analysis, we'll use scikit-learn's ``GridSearchCV`` class to "
+"systematically test different component numbers through cross-validation."
+" This will identify the optimal complexity for our PLS model based on "
+"performance metrics across multiple data splits."
+msgstr ""
+"Para nuestro análisis, usaremos la clase ``GridSearchCV`` de scikit-learn para "
+"probar sistemáticamente diferentes números de componentes mediante validación cruzada."
+" Esto identificará la complejidad óptima para nuestro modelo PLS basándose en "
+"métricas de rendimiento a través de múltiples divisiones de datos."
+
+#: ../../source/learn/pls_regression.ipynb:1030
+msgid ""
+"Suggesting that the optimal number of components is 6, with a mean "
+"absolute error of 0.92 g/L. We can verify this by plotting the mean "
+"absolute error as a function of the number of components:"
+msgstr ""
+"Sugiriendo que el número óptimo de componentes es 6, con un error "
+"absoluto medio de 0.92 g/L. Podemos verificar esto graficando el error "
+"absoluto medio en función del número de componentes:"
+
+#: ../../source/learn/pls_regression.ipynb:1064
+msgid ""
+"Even though using the number of components that minimize the mean "
+"absolute error is a good starting point, it is not always the best. The "
+"model with 6 components does not increase the mean absolute error much "
+"compared to the model with 3 or even two components. However, the model "
+"with 6 components includes components associated with small eigenvalues, "
+"which are more uncertain. This means that models with 3 or 2 components "
+"might be more robust. Therefore, it is always a good idea to try "
+"different numbers of components and select the one that gives the best "
+"performance. However, for now we will train the model with 6 components:"
+msgstr ""
+"Aunque usar el número de componentes que minimiza el error "
+"absoluto medio es un buen punto de partida, no siempre es lo mejor. El "
+"modelo con 6 componentes no aumenta mucho el error absoluto medio "
+"comparado con el modelo con 3 o incluso dos componentes. Sin embargo, el modelo "
+"con 6 componentes incluye componentes asociados con valores propios pequeños, "
+"que son más inciertos. Esto significa que modelos con 3 o 2 componentes "
+"podrían ser más robustos. Por lo tanto, siempre es una buena idea probar "
+"diferentes números de componentes y seleccionar el que dé el mejor "
+"rendimiento. Sin embargo, por ahora entrenaremos el modelo con 6 componentes:"
+
+#: ../../source/learn/pls_regression.ipynb:1540
+msgid "Finally we can evaluate the performance of the model on the training set:"
+msgstr "Finalmente podemos evaluar el rendimiento del modelo en el conjunto de entrenamiento:"
+
+#: ../../source/learn/pls_regression.ipynb:1581
+msgid "**Applying the model**"
+msgstr "**Aplicando el modelo**"
+
+#: ../../source/learn/pls_regression.ipynb:1583
+msgid ""
+"Now that we have trained our model, we can apply it to the testing "
+"dataset. The testing dataset contains spectra recorded in real-time "
+"during the fermentation process. The test dataset contains two "
+"``pandas.DataFrame``:"
+msgstr ""
+"Ahora que hemos entrenado nuestro modelo, podemos aplicarlo al conjunto de datos de prueba "
+". El conjunto de datos de prueba contiene espectros registrados en tiempo real "
+"durante el proceso de fermentación. El conjunto de datos de prueba contiene dos "
+"``pandas.DataFrame``:"
+
+#: ../../source/learn/pls_regression.ipynb:1585
+msgid ""
+"``spectra``: This dataset contains spectral data, with columns "
+"representing wavenumbers and rows representing samples. These spectra "
+"were recorded in real-time during the fermentation process approximately "
+"every 1.5 minutes."
+msgstr ""
+"``spectra``: Este conjunto de datos contiene datos espectrales, con columnas "
+"que representan números de onda y filas que representan muestras. Estos espectros "
+"fueron registrados en tiempo real durante el proceso de fermentación aproximadamente "
+"cada 1.5 minutos."
+
+#: ../../source/learn/pls_regression.ipynb:1587
+msgid ""
+"``hplc``: This dataset contains HPLC measurements, specifically glucose "
+"concentrations (in g/L), stored in a single column labeled ``glucose``. "
+"These measurements were recorded off-line approximately every 60 minutes."
+msgstr ""
+"``hplc``: Este conjunto de datos contiene mediciones HPLC, específicamente concentraciones de glucosa "
+"(en g/L), almacenadas en una sola columna etiquetada como ``glucose``. "
+"Estas mediciones fueron registradas fuera de línea aproximadamente cada 60 minutos."
+
+#: ../../source/learn/pls_regression.ipynb:1589
+msgid ""
+"We will use the ``load_fermentation_test()`` function from the "
+"``chemotools.datasets`` module to load the testing dataset:"
+msgstr ""
+"Usaremos la función ``load_fermentation_test()`` del "
+"módulo ``chemotools.datasets`` para cargar el conjunto de datos de prueba:"
+
+#: ../../source/learn/pls_regression.ipynb:1611
+msgid ""
+"Then, we will preprocess the spectra using the same preprocessing "
+"pipeline that we used for the training dataset:"
+msgstr ""
+"Luego, preprocesaremos los espectros usando el mismo pipeline de preprocesamiento "
+"que usamos para el conjunto de datos de entrenamiento:"
+
+#: ../../source/learn/pls_regression.ipynb:1635
+msgid "Finally, we can use the PLS model to predict the glucose concentrations:"
+msgstr "Finalmente, podemos usar el modelo PLS para predecir las concentraciones de glucosa:"
+
+#: ../../source/learn/pls_regression.ipynb:1656
+msgid ""
+"We can use the predicted values to plot the spectra color-coded according"
+" to the predicted glucose concentrations:"
+msgstr ""
+"Podemos usar los valores predichos para graficar los espectros codificados por color según"
+" las concentraciones de glucosa predichas:"
+
+#: ../../source/learn/pls_regression.ipynb:1684
+msgid ""
+"Now we can compare the predicted glucose concentrations with the off-line"
+" HPLC measurements. We will plot the predictions and the off-line "
+"measurements over time. Each spectrum was taken every 1.25 minutes, while"
+" the off-line measurements were taken every 60 minutes."
+msgstr ""
+"Ahora podemos comparar las concentraciones de glucosa predichas con las mediciones"
+" HPLC fuera de línea. Graficaremos las predicciones y las mediciones fuera de línea "
+"a lo largo del tiempo. Cada espectro fue tomado cada 1.25 minutos, mientras"
+" que las mediciones fuera de línea fueron tomadas cada 60 minutos."
+
+#: ../../source/learn/pls_regression.ipynb:1727
+msgid "**Recap**"
+msgstr "**Resumen**"
+
+#: ../../source/learn/pls_regression.ipynb:1738
+msgid ""
+"In this tutorial, we explored how to apply machine learning to "
+"spectroscopic data analysis using the Fermentation dataset. Our goal was "
+"to build a regression model capable of predicting glucose concentrations "
+"during lignocellulosic ethanol fermentation. Here's a quick summary of "
+"what we covered:"
+msgstr ""
+"En este tutorial, exploramos cómo aplicar aprendizaje automático al "
+"análisis de datos espectroscópicos usando el conjunto de datos de Fermentación. Nuestro objetivo era "
+"construir un modelo de regresión capaz de predecir concentraciones de glucosa "
+"durante la fermentación de etanol lignocelulósico. Aquí hay un resumen rápido de "
+"lo que cubrimos:"
+
+#: ../../source/learn/pls_regression.ipynb:1740
+msgid ""
+"**Introduction**: We began by introducing the Fermentation dataset, which"
+" includes spectral data collected via attenuated total reflectance mid-"
+"infrared spectroscopy (ATR-MIR) and corresponding HPLC reference data. "
+"This dataset is especially valuable for studying real-time fermentation "
+"processes."
+msgstr ""
+"**Introducción**: Comenzamos introduciendo el conjunto de datos de Fermentación, que"
+" incluye datos espectrales recopilados vía espectroscopía infrarroja media de reflectancia total atenuada"
+" (ATR-MIR) y datos de referencia HPLC correspondientes. "
+"Este conjunto de datos es especialmente valioso para estudiar procesos de fermentación "
+"en tiempo real."
+
+#: ../../source/learn/pls_regression.ipynb:1742
+msgid ""
+"**Loading and Exploring the Data:** We loaded the training data, examined"
+" its structure, and took a closer look at both the spectral and HPLC "
+"measurements. Understanding the data at this stage is a critical "
+"foundation for any successful analysis."
+msgstr ""
+"**Cargando y explorando los datos:** Cargamos los datos de entrenamiento, examinamos"
+" su estructura y echamos un vistazo más de cerca a las mediciones espectrales y HPLC "
+". Entender los datos en esta etapa es una base crítica "
+"para cualquier análisis exitoso."
+
+#: ../../source/learn/pls_regression.ipynb:1744
+msgid ""
+"**Data Visualization:** Through visualization, we gained a clearer "
+"picture of the dataset. By plotting spectra color-coded by glucose "
+"concentration, we could observe how chemical variations appear across "
+"samples."
+msgstr ""
+"**Visualización de datos:** A través de la visualización, obtuvimos una imagen más clara "
+"del conjunto de datos. Al graficar espectros codificados por color según la concentración de glucosa "
+", pudimos observar cómo aparecen las variaciones químicas en "
+"las muestras."
+
+#: ../../source/learn/pls_regression.ipynb:1746
+msgid ""
+"**Data Preprocessing:** We prepared the spectral data for modeling by "
+"applying several preprocessing techniques—range cutting, linear "
+"correction, Savitzky-Golay derivatives, and standard scaling. These steps"
+" helped reduce noise and improve overall data quality."
+msgstr ""
+"**Preprocesamiento de datos:** Preparamos los datos espectrales para el modelado "
+"aplicando varias técnicas de preprocesamiento: corte de rango, corrección lineal "
+", derivadas de Savitzky-Golay y escalado estándar. Estos pasos"
+" ayudaron a reducir el ruido y mejorar la calidad general de los datos."
+
+#: ../../source/learn/pls_regression.ipynb:1748
+msgid ""
+"**Model Training:** Using the processed data, we trained a Partial Least "
+"Squares (PLS) regression model to predict glucose concentrations. Cross-"
+"validation helped us determine the optimal number of components and "
+"evaluate the model's performance."
+msgstr ""
+"**Entrenamiento del modelo:** Usando los datos procesados, entrenamos un modelo de regresión de Mínimos "
+"Cuadrados Parciales (PLS) para predecir concentraciones de glucosa. La validación "
+"cruzada nos ayudó a determinar el número óptimo de componentes y "
+"evaluar el rendimiento del modelo."
+
+#: ../../source/learn/pls_regression.ipynb:1750
+msgid ""
+"**Testing and Application:** Finally, we applied our trained model to the"
+" testing dataset to predict glucose concentrations in real-time. This "
+"demonstrated how the model can be used to track glucose levels during "
+"fermentation."
+msgstr ""
+"**Prueba y aplicación:** Finalmente, aplicamos nuestro modelo entrenado al"
+" conjunto de datos de prueba para predecir concentraciones de glucosa en tiempo real. Esto "
+"demostró cómo el modelo puede usarse para rastrear niveles de glucosa durante "
+"la fermentación."
+
+#: ../../source/learn/pls_regression.ipynb:1752
+msgid ""
+"This tutorial offers a practical introduction to using machine learning "
+"for spectroscopic data analysis. By following these steps, you can "
+"extract meaningful insights from complex spectral data and build "
+"predictive models that have real-world applications."
+msgstr ""
+"Este tutorial ofrece una introducción práctica al uso de aprendizaje automático "
+"para análisis de datos espectroscópicos. Siguiendo estos pasos, puedes "
+"extraer información significativa de datos espectrales complejos y construir "
+"modelos predictivos que tienen aplicaciones en el mundo real."
+
+#~ msgid ""
+#~ "``hplc``: Here, you’ll find reference "
+#~ "HPLC measurements for the glucose "
+#~ "concentration (in g/L) of each sample,"
+#~ " stored in a single column labeled"
+#~ " ``glucose``."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Before starting with data modeling, it’s"
+#~ " important to get familiar with your"
+#~ " data. Let's start by answering some"
+#~ " basic questions:"
+#~ msgstr ""
+
+#~ msgid "Now that we have the basics down, let’s take a closer look at the data."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "For brevity, we won’t display the "
+#~ "entire table here, but you’ll notice "
+#~ "that each column corresponds to a "
+#~ "wavenumber, and each row represents a"
+#~ " sample."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To better understand our dataset, we "
+#~ "will visualize the data. We will "
+#~ "plot the spectra in the train "
+#~ "dataset, with each spectrum color-coded"
+#~ " to reflect its associated glucose "
+#~ "concentration. This visual approach provides"
+#~ " a didactic means to understand the"
+#~ " dataset's characteristics, offering insights "
+#~ "into chemical variations among the "
+#~ "samples. To do so, we’ll use the"
+#~ " ``matplotlib.pyplot`` module. Remember to "
+#~ "install it first using:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In this tutorial, we embarked on a"
+#~ " journey into the realm of machine"
+#~ " learning for spectroscopic data analysis,"
+#~ " focusing on the Fermentation dataset. "
+#~ "We covered essential steps in building"
+#~ " a regression model to predict "
+#~ "glucose concentrations during lignocellulosic "
+#~ "ethanol fermentation. Here’s a brief "
+#~ "recap of what we accomplished:"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Introduction:** We introduced the "
+#~ "Fermentation dataset, which consists of "
+#~ "spectral data obtained through attenuated "
+#~ "total reflectance, mid-infrared spectroscopy"
+#~ " (ATR-MIR), and HPLC reference data."
+#~ " We highlighted the importance of "
+#~ "this dataset in understanding real-time"
+#~ " fermentation processes."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Loading and Exploring Data:** We "
+#~ "loaded the training dataset, explored "
+#~ "its dimensions, and gained insights into"
+#~ " both spectral and HPLC data. "
+#~ "Understanding your data is a crucial "
+#~ "first step in any data analysis "
+#~ "project."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Visualizing Data:** We used data "
+#~ "visualization to gain a deeper "
+#~ "understanding of the dataset. By "
+#~ "plotting the spectra color-coded by "
+#~ "glucose concentration, we visually examined"
+#~ " the chemical variations among samples."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Preprocessing Data:** We applied "
+#~ "preprocessing techniques, such as range "
+#~ "cutting, linear correction, Savitzky-Golay "
+#~ "derivative, and standard scaling, to "
+#~ "prepare the spectral data for modeling."
+#~ " This step removed unwanted variations "
+#~ "and enhanced the data’s quality."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Model Training:** We trained a Partial"
+#~ " Least Squares (PLS) regression model "
+#~ "to predict glucose concentrations. We "
+#~ "used cross-validation to find the "
+#~ "optimal number of components and "
+#~ "assessed model performance."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Application to Testing Data:** We "
+#~ "extended our model to predict glucose"
+#~ " concentrations in real-time by "
+#~ "applying it to the testing dataset. "
+#~ "This allowed us to monitor glucose "
+#~ "levels during fermentation."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This tutorial provides a solid "
+#~ "foundation for anyone interested in "
+#~ "using machine learning techniques for "
+#~ "spectroscopic data analysis. By following "
+#~ "these steps, you can gain valuable "
+#~ "insights from complex spectral data and"
+#~ " make predictions that can be applied"
+#~ " in real-world applications. Happy "
+#~ "analyzing!"
+#~ msgstr ""
+

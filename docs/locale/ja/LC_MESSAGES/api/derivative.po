@@ -1,0 +1,83 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/derivative.rst:2
+msgid "chemotools.derivative"
+msgstr "chemotools.derivative"
+
+#: ../../source/api/derivative.rst:6
+msgid ""
+"Derivative calculation methods for spectral analysis. Derivatives help "
+"remove baseline effects and enhance spectral features."
+msgstr ""
+"スペクトル分析のための微分計算手法。微分は、ベースライン効果を除去し、スペクトル特徴を強調するのに役立ちます。"
+
+#: ../../source/api/derivative.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/derivative.rst:18
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/derivative.rst:24
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/derivative.rst:25
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/derivative.rst:26
+msgid ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+msgstr ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+
+#: ../../source/api/derivative.rst:27
+msgid "Norris-Williams derivative with gap parameter"
+msgstr "ギャップパラメータを持つ Norris-Williams 微分"
+
+#: ../../source/api/derivative.rst:28
+msgid ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+msgstr ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+
+#: ../../source/api/derivative.rst:29
+msgid "Savitzky-Golay derivative filter"
+msgstr "Savitzky-Golay 微分フィルタ"
+
+#: ../../source/api/derivative.rst:32
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/derivative.rst:34
+msgid ""
+":doc:`Derivative Methods Overview </methods/derivative>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`微分手法の概要 </methods/derivative>` - 例とビジュアルガイドを含む完全なドキュメント"
+

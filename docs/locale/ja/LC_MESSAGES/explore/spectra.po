@@ -1,0 +1,95 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/spectra.rst:4
+msgid "Working with spectra"
+msgstr "スペクトルの操作"
+
+#: ../../source/explore/spectra.rst:6
+msgid ""
+"When working with spectroscopic data in ``chemotools`` and ``scikit-"
+"learn``, you often need to reshape single spectra to fit the expected "
+"data shapes. This guide explains how to reshape single spectra for "
+"preprocessing in ``scikit-learn`` and ``chemotools``."
+msgstr ""
+"``chemotools`` および ``scikit-learn`` で分光データを扱う場合、単一のスペクトルを期待されるデータ形状に合わせてリシェイプする必要が頻繁に生じます。このガイドでは、 ``scikit-learn`` および ``chemotools`` での前処理のために単一スペクトルをリシェイプする方法について説明します。"
+
+#: ../../source/explore/spectra.rst:9
+msgid "Understanding Data Shapes"
+msgstr "データ形状の理解"
+
+#: ../../source/explore/spectra.rst:11
+msgid ""
+"``chemotools`` and ``scikit-learn`` preprocessing techniques expect 2D "
+"arrays (matrices) where:"
+msgstr ""
+"``chemotools`` および ``scikit-learn`` の前処理技術は、以下のような2次元配列（行列）を想定しています："
+
+#: ../../source/explore/spectra.rst:13
+msgid "Each row represents a sample"
+msgstr "各行が1つのサンプルを表します"
+
+#: ../../source/explore/spectra.rst:14
+msgid "Each column represents a feature"
+msgstr "各列が1つの特徴量を表します"
+
+#: ../../source/explore/spectra.rst:16
+msgid ""
+"However, spectroscopic data often comes as single spectrum in 1D arrays "
+"(vectors). Here's an example of a single spectrum:"
+msgstr ""
+"しかしながら、分光データはしばしば1次元配列（ベクトル）としての単一スペクトルとして提供されます。以下に単一スペクトルの例を示します："
+
+#: ../../source/explore/spectra.rst:23
+msgid ""
+"To use ``chemotools`` and  ``scikit-learn`` with single spectra, you need"
+" to reshape the 1D array into a 2D array with one row."
+msgstr ""
+"単一のスペクトルで ``chemotools`` および ``scikit-learn`` を使用するには、1次元配列を1行の2次元配列にリシェイプする必要があります。"
+
+#: ../../source/explore/spectra.rst:26
+msgid "Reshaping for Preprocessing"
+msgstr "前処理のためのリシェイプ"
+
+#: ../../source/explore/spectra.rst:28
+msgid "Here's how to reshape a 1D array into a 2D array with a single row:"
+msgstr "1次元配列を単一行の2次元配列にリシェイプする方法は以下の通りです："
+
+#: ../../source/explore/spectra.rst:36
+msgid ""
+"The ``reshape(1, -1)`` method converts the 1D array ``spectra_1d`` into a"
+" 2D array with a single row. The result (``spectra_2d``) looks like this:"
+msgstr ""
+"``reshape(1, -1)`` メソッドは、1次元配列 ``spectra_1d`` を単一行の2次元配列に変換します。結果 ( ``spectra_2d`` ) は以下のようになります："
+
+#: ../../source/explore/spectra.rst:44
+msgid ""
+"The reshaped output is a 2D array with a single row - the format required"
+" by ``scikit-learn`` and ``chemotools`` preprocessing techniques."
+msgstr ""
+"リシェイプされた出力は単一行の2次元配列であり、これは ``scikit-learn`` および ``chemotools`` の前処理技術で要求される形式です。"
+
+#: ../../source/explore/spectra.rst:47
+msgid ""
+"Now, you can use the reshaped single spectrum with ``chemotools`` and "
+"``scikit-learn`` preprocessing techniques:"
+msgstr ""
+"これで、リシェイプされた単一スペクトルを ``chemotools`` および ``scikit-learn`` の前処理技術で使用できるようになります："

@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/feature_selection.rst:2
+msgid "chemotools.feature_selection"
+msgstr "chemotools.feature_selection"
+
+#: ../../source/api/feature_selection.rst:6
+msgid ""
+"Feature selection methods to identify the most chemically relevant "
+"wavelengths or variables for your models."
+msgstr ""
+"特征选择方法，用于识别模型中最具化学相关性的波长或变量。"
+
+#: ../../source/api/feature_selection.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/feature_selection.rst:20
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/feature_selection.rst:26
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/feature_selection.rst:27
+msgid "Description"
+msgstr "描述"
+
+#: ../../source/api/feature_selection.rst:28
+msgid ""
+":doc:`IndexSelector "
+"</methods/generated/chemotools.feature_selection.IndexSelector>`"
+msgstr ""
+":doc:`IndexSelector "
+"</methods/generated/chemotools.feature_selection.IndexSelector>`"
+
+#: ../../source/api/feature_selection.rst:29
+msgid "Select features by specific indices"
+msgstr "按特定索引选择特征"
+
+#: ../../source/api/feature_selection.rst:30
+msgid ":doc:`RangeCut </methods/generated/chemotools.feature_selection.RangeCut>`"
+msgstr ":doc:`RangeCut </methods/generated/chemotools.feature_selection.RangeCut>`"
+
+#: ../../source/api/feature_selection.rst:31
+msgid "Select features within a specified range"
+msgstr "选择指定范围内的特征"
+
+#: ../../source/api/feature_selection.rst:32
+msgid ""
+":doc:`SRSelector "
+"</methods/generated/chemotools.feature_selection.SRSelector>`"
+msgstr ""
+":doc:`SRSelector "
+"</methods/generated/chemotools.feature_selection.SRSelector>`"
+
+#: ../../source/api/feature_selection.rst:33
+msgid "Selectivity ratio based feature selection"
+msgstr "基于选择性比率的特征选择"
+
+#: ../../source/api/feature_selection.rst:34
+msgid ""
+":doc:`VIPSelector "
+"</methods/generated/chemotools.feature_selection.VIPSelector>`"
+msgstr ""
+":doc:`VIPSelector "
+"</methods/generated/chemotools.feature_selection.VIPSelector>`"
+
+#: ../../source/api/feature_selection.rst:35
+msgid "Variable importance in projection (VIP) selector"
+msgstr "投影变量重要性(VIP)选择器"
+
+#: ../../source/api/feature_selection.rst:38
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/feature_selection.rst:40
+msgid ""
+":doc:`Feature Selection Methods Overview </methods/feature_selection>` - "
+"Complete documentation with examples and visual guides"
+msgstr ""
+":doc:`特征选择方法概述 </methods/feature_selection>` - 包含示例和可视化指南的完整文档"
+

@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/cite/index.rst:4
+msgid "Cite chemotools"
+msgstr "引用 chemotools"
+
+#: ../../source/cite/index.rst:10
+msgid ""
+"Chemotools has been peer-reviewed and published in the Journal of Open "
+"Source Software (JOSS). The paper is available at: "
+"https://doi.org/10.21105/joss.06802"
+msgstr ""
+"Chemotools 已经过同行评审并发表在 Journal of Open Source Software (JOSS) 期刊上。论文可在以下网址获取："
+" https://doi.org/10.21105/joss.06802"
+
+#: ../../source/cite/index.rst:15
+msgid ""
+"If you use chemotools in your research or software and would like to cite"
+" it, please use the following BibTeX entry:"
+msgstr "如果您在研究或软件中使用 chemotools 并希望引用它，请使用以下 BibTeX 条目："

@@ -1,0 +1,87 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/index.rst:8
+msgid "Augmentation"
+msgstr "データ拡張"
+
+#: ../../source/api/index.rst:8
+msgid "Baseline"
+msgstr "ベースライン補正"
+
+#: ../../source/api/index.rst:8
+msgid "Derivative"
+msgstr "微分"
+
+#: ../../source/api/index.rst:8
+msgid "Feature Selection"
+msgstr "特徴選択"
+
+#: ../../source/api/index.rst:8
+msgid "Outliers"
+msgstr "外れ値検出"
+
+#: ../../source/api/index.rst:8
+msgid "Scale"
+msgstr "スケーリング"
+
+#: ../../source/api/index.rst:8
+msgid "Scatter"
+msgstr "散乱補正"
+
+#: ../../source/api/index.rst:8
+msgid "Smooth"
+msgstr "平滑化"
+
+#: ../../source/api/index.rst:8
+msgid "Utilities"
+msgstr "ユーティリティ"
+
+#: ../../source/api/index.rst:8
+msgid "Core Modules"
+msgstr "コアモジュール"
+
+#: ../../source/api/index.rst:2
+msgid "API Reference"
+msgstr "API リファレンス"
+
+#: ../../source/api/index.rst:4
+msgid ""
+"The public Python API for ``chemotools``. This section provides a "
+"technical reference for all importable modules and classes."
+msgstr ""
+" ``chemotools`` のパブリック Python API。このセクションでは、すべてのインポート可能なモジュールとクラスの技術的なリファレンスを提供します。"
+
+#: ../../source/api/index.rst:6
+msgid ""
+"For detailed documentation with examples and visual guides, see the "
+":doc:`Methods </methods/index>` section."
+msgstr ""
+"例やビジュアルガイドを含む詳細なドキュメントについては、 :doc:`Methods </methods/index>` セクションを参照してください。"
+
+#: ../../source/api/index.rst:23
+msgid "Quick Import Reference"
+msgstr "クイックインポートリファレンス"
+
+#: ../../source/api/index.rst:25
+msgid "All classes can be imported directly from their respective modules:"
+msgstr "すべてのクラスは、それぞれのモジュールから直接インポートできます:"
+

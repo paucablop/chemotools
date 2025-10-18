@@ -1,0 +1,105 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/outliers.rst:2
+msgid "chemotools.outliers"
+msgstr "chemotools.outliers"
+
+#: ../../source/api/outliers.rst:6
+msgid ""
+"Outlier detection methods to identify unusual samples and improve model "
+"diagnostics."
+msgstr ""
+"Métodos de detección de valores atípicos para identificar muestras inusuales "
+"y mejorar el diagnóstico del modelo."
+
+#: ../../source/api/outliers.rst:8
+msgid "**Import from this module:**"
+msgstr "**Importar desde este módulo:**"
+
+#: ../../source/api/outliers.rst:21
+msgid "Available Classes"
+msgstr "Clases disponibles"
+
+#: ../../source/api/outliers.rst:27
+msgid "Class"
+msgstr "Clase"
+
+#: ../../source/api/outliers.rst:28
+msgid "Description"
+msgstr "Descripción"
+
+#: ../../source/api/outliers.rst:29
+msgid ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+msgstr ":doc:`DModX </methods/generated/chemotools.outliers.DModX>`"
+
+#: ../../source/api/outliers.rst:30
+msgid "Distance to model in X-space"
+msgstr "Distancia al modelo en el espacio X"
+
+#: ../../source/api/outliers.rst:31
+msgid ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+msgstr ":doc:`HotellingT2 </methods/generated/chemotools.outliers.HotellingT2>`"
+
+#: ../../source/api/outliers.rst:32
+msgid "Hotelling's T² statistic for multivariate outliers"
+msgstr "Estadístico T² de Hotelling para valores atípicos multivariantes"
+
+#: ../../source/api/outliers.rst:33
+msgid ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+msgstr ":doc:`Leverage </methods/generated/chemotools.outliers.Leverage>`"
+
+#: ../../source/api/outliers.rst:34
+msgid "Leverage values for influential point detection"
+msgstr "Valores de apalancamiento para detección de puntos influyentes"
+
+#: ../../source/api/outliers.rst:35
+msgid ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+msgstr ":doc:`QResiduals </methods/generated/chemotools.outliers.QResiduals>`"
+
+#: ../../source/api/outliers.rst:36
+msgid "Q residuals (squared prediction error)"
+msgstr "Residuos Q (error de predicción cuadrado)"
+
+#: ../../source/api/outliers.rst:37
+msgid ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+msgstr ""
+":doc:`StudentizedResiduals "
+"</methods/generated/chemotools.outliers.StudentizedResiduals>`"
+
+#: ../../source/api/outliers.rst:38
+msgid "Studentized residuals for regression outliers"
+msgstr "Residuos estudentizados para valores atípicos de regresión"
+
+#: ../../source/api/outliers.rst:41
+msgid "See Also"
+msgstr "Ver también"
+
+#: ../../source/api/outliers.rst:43
+msgid ""
+":doc:`Outlier Detection Methods Overview </methods/outliers>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`Resumen de métodos de detección de valores atípicos </methods/outliers>` - "
+"Documentación completa con ejemplos y guías visuales"
+

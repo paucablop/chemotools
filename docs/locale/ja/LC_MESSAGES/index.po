@@ -1,0 +1,116 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/index.rst:7
+msgid "User Guide"
+msgstr "ユーザーガイド"
+
+#: ../../source/index.rst:7
+msgid "Methods"
+msgstr "手法"
+
+#: ../../source/index.rst:7
+msgid "Explore"
+msgstr "探索"
+
+#: ../../source/index.rst:7
+msgid "Learn"
+msgstr "学習"
+
+#: ../../source/index.rst:7
+msgid "Cite"
+msgstr "引用"
+
+#: ../../source/index.rst:7
+msgid "API"
+msgstr "API"
+
+#: ../../source/index.rst:20
+msgid "PyPI version"
+msgstr "PyPIバージョン"
+
+#: ../../source/index.rst:24
+msgid "Python versions"
+msgstr "Pythonバージョン"
+
+#: ../../source/index.rst:28
+msgid "License"
+msgstr "ライセンス"
+
+#: ../../source/index.rst:32
+msgid "Code coverage"
+msgstr "コードカバレッジ"
+
+#: ../../source/index.rst:36
+msgid "Downloads"
+msgstr "ダウンロード数"
+
+#: ../../source/index.rst:40
+msgid "DOI"
+msgstr "DOI"
+
+#: ../../source/index.rst:47
+msgid "Welcome to chemotools"
+msgstr "chemotoolsへようこそ"
+
+#: ../../source/index.rst:50
+msgid ""
+"``chemotools`` is a **Python package for spectral analysis**, designed to"
+" integrate natively with the widely adopted ``scikit-learn`` API and the "
+"broader **Python machine learning ecosystem**."
+msgstr ""
+"``chemotools`` はスペクトル解析のためのPythonパッケージであり、広く採用されている ``scikit-learn`` APIおよび"
+"より広範なPython機械学習エコシステムとネイティブに統合するように設計されています。"
+
+#: ../../source/index.rst:52
+msgid ""
+"Developed after years of applying **spectroscopy** across industries, its"
+" mission is to empower **scientists and engineers** with the tools needed"
+" to build **production-ready chemometric models**. ``chemotools`` "
+"provides an **intuitive, flexible environment** that streamlines the "
+"**development and deployment** of models, making it easier to "
+"**standardize workflows** and **scale chemometric solutions**."
+msgstr ""
+"さまざまな業界で長年にわたり分光法を適用してきた経験から開発されたこのツールは、"
+"科学者やエンジニアが本番環境対応のケモメトリクスモデルを構築するために必要なツールを提供することを使命としています。"
+"``chemotools`` は、モデルの開発とデプロイメントを効率化する直感的で柔軟な環境を提供し、"
+"ワークフローの標準化とケモメトリクスソリューションのスケール化を容易にします。"
+
+#: ../../source/index.rst:54
+msgid "chemotools workflow"
+msgstr "chemotoolsワークフロー"
+
+#: ../../source/index.rst:61
+msgid "Start exploring"
+msgstr "探索を始める"
+
+#: ../../source/index.rst:70
+msgid "Discover the environment"
+msgstr "環境を探索"
+
+#: ../../source/index.rst:81
+msgid "Chemometrics tutorials"
+msgstr "ケモメトリクスのチュートリアル"
+
+#: ../../source/index.rst:92
+msgid "Check out our Webinar"
+msgstr "ウェビナーをチェック"
+

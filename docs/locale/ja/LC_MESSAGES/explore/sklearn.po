@@ -1,0 +1,304 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/sklearn.rst:4
+msgid "Why Scikit-Learn?"
+msgstr "Scikit-Learnを選ぶ理由"
+
+#: ../../source/explore/sklearn.rst:6
+msgid ""
+"Scikit-Learn brings modern machine learning tools to chemometrics—making "
+"workflows more flexible, scalable, and easy to prototype and validate."
+msgstr ""
+"Scikit-Learnは、現代の機械学習ツールをケモメトリクスにもたらし、ワークフローをより柔軟でスケーラブルにし、プロトタイピングと検証を容易にします。"
+
+#: ../../source/explore/sklearn.rst:8
+msgid ""
+"**Flexibility**: Works with various chemometric models and preprocessing "
+"methods."
+msgstr ""
+"柔軟性：様々なケモメトリクスモデルおよび前処理手法と連携します。"
+
+#: ../../source/explore/sklearn.rst:9
+msgid ""
+"**Integration**: Can be combined with domain-specific tools for spectral "
+"analysis, multivariate statistics, and experimental design."
+msgstr ""
+"統合性：スペクトル分析、多変量統計、実験計画法のためのドメイン固有のツールと組み合わせることができます。"
+
+#: ../../source/explore/sklearn.rst:10
+msgid ""
+"**Scalability**: Can handle small laboratory datasets as well as large-"
+"scale industrial data."
+msgstr ""
+"スケーラビリティ：小規模な実験室データセットから大規模な産業データまで扱うことができます。"
+
+#: ../../source/explore/sklearn.rst:11
+msgid ""
+"**Easy Experimentation**: Rapid prototyping with different algorithms and"
+" preprocessing techniques."
+msgstr ""
+"容易な実験：様々なアルゴリズムと前処理技術による迅速なプロトタイピングが可能です。"
+
+#: ../../source/explore/sklearn.rst:15
+msgid "What is Scikit-Learn?"
+msgstr "Scikit-Learnとは"
+
+#: ../../source/explore/sklearn.rst:17
+msgid ""
+"`Scikit-learn <https://scikit-learn.org/>`_ (``sklearn``) is an open-"
+"source machine-learning library built on top of **NumPy**, **SciPy**. It "
+"offers a unified API for various machine-learning techniques, including:"
+msgstr ""
+"`Scikit-learn <https://scikit-learn.org/>`_ ( ``sklearn`` ) は、 **NumPy** , **SciPy** 上に構築されたオープンソースの機械学習ライブラリです。以下のような様々な機械学習技術に対して統一されたAPIを提供します："
+
+#: ../../source/explore/sklearn.rst:19
+msgid "**Supervised learning**: Regression, classification, and ensemble methods"
+msgstr ""
+"教師あり学習：回帰、分類、アンサンブル手法"
+
+#: ../../source/explore/sklearn.rst:20
+msgid "**Unsupervised learning**: Clustering and dimensionality reduction"
+msgstr ""
+"教師なし学習：クラスタリングと次元削減"
+
+#: ../../source/explore/sklearn.rst:21
+msgid "**Data preprocessing**: Feature scaling, encoding, and transformation"
+msgstr ""
+"データ前処理：特徴量スケーリング、エンコーディング、変換"
+
+#: ../../source/explore/sklearn.rst:22
+msgid "**Model evaluation**: Cross-validation, metrics, and hyperparameter tuning"
+msgstr ""
+"モデル評価：交差検証、評価指標、ハイパーパラメータチューニング"
+
+#: ../../source/explore/sklearn.rst:24
+msgid ""
+"``scikit-learn`` is widely used in research and industry due to its "
+"simplicity, efficiency, and extensive documentation."
+msgstr ""
+"``scikit-learn`` は、そのシンプルさ、効率性、そして充実したドキュメントにより、研究および産業界で広く使用されています。"
+
+#: ../../source/explore/sklearn.rst:27
+msgid "A Broad Toolbox of Models and Methods"
+msgstr "幅広いモデルと手法のツールボックス"
+
+#: ../../source/explore/sklearn.rst:29
+msgid ""
+"One of the biggest strengths of ``scikit-learn`` is its vast selection of"
+" models and tools. Some key categories include:"
+msgstr ""
+"``scikit-learn`` の最大の強みの1つは、その豊富なモデルとツールの選択肢です。主なカテゴリには以下が含まれます："
+
+#: ../../source/explore/sklearn.rst:32
+msgid "Regression"
+msgstr "回帰"
+
+#: ../../source/explore/sklearn.rst:34
+msgid ""
+"**Linear Regression** (``LinearRegression``): A simple yet effective "
+"model for continuous target variables."
+msgstr ""
+"線形回帰 ( ``LinearRegression`` ) ：連続的な目的変数に対するシンプルかつ効果的なモデル。"
+
+#: ../../source/explore/sklearn.rst:35
+msgid ""
+"**Partial Least Squares** (``PLSRegression``): A powerful method often "
+"used in chemometrics."
+msgstr ""
+"部分最小二乗回帰 ( ``PLSRegression`` ) ：ケモメトリクスで頻繁に使用される強力な手法。"
+
+#: ../../source/explore/sklearn.rst:36
+msgid ""
+"**Support Vector Regression** (``SVR``): Effective for nonlinear "
+"relationships."
+msgstr ""
+"サポートベクター回帰 ( ``SVR`` ) ：非線形関係に対して効果的です。"
+
+#: ../../source/explore/sklearn.rst:39
+msgid "Classification"
+msgstr "分類"
+
+#: ../../source/explore/sklearn.rst:41
+msgid ""
+"**Logistic Regression** (``LogisticRegression``): For binary and multi-"
+"class classification."
+msgstr ""
+"ロジスティック回帰 ( ``LogisticRegression`` ) ：二値および多クラス分類用。"
+
+#: ../../source/explore/sklearn.rst:42
+msgid ""
+"**Random Forest** (``RandomForestClassifier``): A robust ensemble method "
+"for better accuracy."
+msgstr ""
+"ランダムフォレスト ( ``RandomForestClassifier`` ) ：より高い精度を得るための堅牢なアンサンブル手法。"
+
+#: ../../source/explore/sklearn.rst:43
+msgid ""
+"**Support Vector Machines** (``SVC``): Effective for complex decision "
+"boundaries."
+msgstr ""
+"サポートベクターマシン ( ``SVC`` ) ：複雑な決定境界に対して効果的です。"
+
+#: ../../source/explore/sklearn.rst:46
+msgid "Dimensionality Reduction"
+msgstr "次元削減"
+
+#: ../../source/explore/sklearn.rst:48
+msgid ""
+"**Principal Component Analysis** (``PCA``): Extracts the most important "
+"features in your dataset."
+msgstr ""
+"主成分分析 ( ``PCA`` ) ：データセット内の最も重要な特徴量を抽出します。"
+
+#: ../../source/explore/sklearn.rst:49
+msgid ""
+"**Non Negative Matrix Factorization** (``NMF``): Useful for signal "
+"decomposition."
+msgstr ""
+"非負値行列因子分解 ( ``NMF`` ) ：信号分解に有用です。"
+
+#: ../../source/explore/sklearn.rst:50
+msgid "**t-SNE** (``TSNE``): Helps visualize complex high-dimensional data."
+msgstr ""
+"t-SNE ( ``TSNE`` ) ：複雑な高次元データの可視化を支援します。"
+
+#: ../../source/explore/sklearn.rst:53
+msgid "Preprocessing Tools"
+msgstr "前処理ツール"
+
+#: ../../source/explore/sklearn.rst:55
+msgid ""
+"**Feature Scaling** (``StandardScaler``, ``MinMaxScaler``): Essential for"
+" models that rely on distance metrics."
+msgstr ""
+"特徴量スケーリング ( ``StandardScaler`` , ``MinMaxScaler`` ) ：距離指標に依存するモデルにとって必須です。"
+
+#: ../../source/explore/sklearn.rst:56
+msgid ""
+"**Encoding Categorical Data** (``OneHotEncoder``, ``LabelEncoder``): "
+"Transforms categorical variables into numerical format."
+msgstr ""
+"カテゴリカルデータのエンコーディング ( ``OneHotEncoder`` , ``LabelEncoder`` ) ：カテゴリカル変数を数値形式に変換します。"
+
+#: ../../source/explore/sklearn.rst:57
+msgid ""
+"**Feature Selection** (``SelectKBest``, ``RFE``): Helps choose the most "
+"relevant variables."
+msgstr ""
+"特徴量選択 ( ``SelectKBest`` , ``RFE`` ) ：最も関連性の高い変数を選択するのに役立ちます。"
+
+#: ../../source/explore/sklearn.rst:61
+msgid "The scikit-learn workflow"
+msgstr "scikit-learnのワークフロー"
+
+#: ../../source/explore/sklearn.rst:63
+msgid ""
+"Scikit-learn follows an intuitive three-step process outlined in the "
+"figure below:"
+msgstr ""
+"Scikit-learnは、以下の図に示す直感的な3ステップのプロセスに従います："
+
+#: ../../source/explore/sklearn.rst:65
+msgid "scikit-learn workflow"
+msgstr "scikit-learnワークフロー"
+
+#: ../../source/explore/sklearn.rst:71
+msgid "**Define**: Configure the model/preprocessing parameters."
+msgstr ""
+"定義：モデル/前処理のパラメータを設定します。"
+
+#: ../../source/explore/sklearn.rst:72
+msgid "**Fit**: The model learns patterns from training data using ``fit()``"
+msgstr ""
+"学習：モデルが ``fit()`` を使用して訓練データからパターンを学習します。"
+
+#: ../../source/explore/sklearn.rst:73
+msgid "**Apply**: The fitted model processes new data using either:"
+msgstr ""
+"適用：学習済みモデルが以下のいずれかを使用して新しいデータを処理します："
+
+#: ../../source/explore/sklearn.rst:75
+msgid "``transform()`` for preprocessing steps and unsupervised learning"
+msgstr ""
+"前処理ステップと教師なし学習には ``transform()``"
+
+#: ../../source/explore/sklearn.rst:76
+msgid ""
+"``predict()`` for supervised learning models (classification and "
+"regression)"
+msgstr ""
+"教師あり学習モデル（分類と回帰）には ``predict()``"
+
+#: ../../source/explore/sklearn.rst:78
+msgid ""
+"Let's see two examples, one for a preprocessing and one for a regerssion "
+"model. First, import the required modules:"
+msgstr ""
+"前処理と回帰モデルの2つの例を見てみましょう。まず、必要なモジュールをインポートします："
+
+#: ../../source/explore/sklearn.rst:85
+msgid "Preprocessing with ``StandardScaler``:"
+msgstr "``StandardScaler`` による前処理："
+
+#: ../../source/explore/sklearn.rst:101
+msgid "Building a ``PLSRegression`` model:"
+msgstr "``PLSRegression`` モデルの構築："
+
+#: ../../source/explore/sklearn.rst:116
+msgid "Extended Ecosystem"
+msgstr "拡張エコシステム"
+
+#: ../../source/explore/sklearn.rst:118
+msgid ""
+"In addition to the ``scikit-learn`` main packages, the ecosystem includes"
+" a broad range of complementary open-source libraries that extend its "
+"functionality:"
+msgstr ""
+"``scikit-learn`` の主要パッケージに加えて、その機能を拡張する幅広い補完的なオープンソースライブラリがエコシステムに含まれています："
+
+#: ../../source/explore/sklearn.rst:120
+msgid ""
+"`skore <https://docs.skore.probabl.ai/>`_: Streamline and structure model"
+" development and interpretation."
+msgstr ""
+"`skore <https://docs.skore.probabl.ai/>`_ ：モデルの開発と解釈を効率化し構造化します。"
+
+#: ../../source/explore/sklearn.rst:121
+msgid ""
+"`astartes <https://jacksonburns.github.io/astartes/README.html>`_: "
+"Algorithmic techniques for splitting data into training and test sets."
+msgstr ""
+"`astartes <https://jacksonburns.github.io/astartes/README.html>`_ ：データを訓練セットとテストセットに分割するためのアルゴリズム技術。"
+
+#: ../../source/explore/sklearn.rst:122
+msgid ""
+"`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_: Techniques "
+"for handling imbalanced datasets."
+msgstr ""
+"`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_ ：不均衡データセットを扱うための技術。"
+
+#: ../../source/explore/sklearn.rst:123
+msgid ""
+"`skops <https://skops.readthedocs.io/en/stable/>`_: Tools for serializing"
+" and sharing machine learning models."
+msgstr ""
+"`skops <https://skops.readthedocs.io/en/stable/>`_ ：機械学習モデルをシリアライズおよび共有するためのツール。"

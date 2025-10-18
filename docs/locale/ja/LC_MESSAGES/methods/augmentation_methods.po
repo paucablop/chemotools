@@ -1,0 +1,79 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/augmentation_methods.rst:2
+msgid "Augmentation Methods"
+msgstr "拡張手法"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`AddNoise <chemotools.augmentation.AddNoise>`"
+msgstr ":py:obj:`AddNoise <chemotools.augmentation.AddNoise>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid "Add noise to input data from various probability distributions."
+msgstr "さまざまな確率分布から入力データにノイズを追加します。"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`BaselineShift <chemotools.augmentation.BaselineShift>`"
+msgstr ":py:obj:`BaselineShift <chemotools.augmentation.BaselineShift>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid "Adds a constant baseline to the data."
+msgstr "データに定数ベースラインを追加します。"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`FractionalShift <chemotools.augmentation.FractionalShift>`"
+msgstr ":py:obj:`FractionalShift <chemotools.augmentation.FractionalShift>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ""
+"Shift signals by a random fractional amount using cubic spline "
+"interpolation."
+msgstr "3次スプライン補間を使用してランダムな小数量だけ信号をシフトします。"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`GaussianBroadening <chemotools.augmentation.GaussianBroadening>`"
+msgstr ":py:obj:`GaussianBroadening <chemotools.augmentation.GaussianBroadening>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid "Transform spectral data by broadening peaks using Gaussian convolution."
+msgstr "ガウシアン畳み込みを使用してピークを広げることでスペクトルデータを変換します。"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`IndexShift <chemotools.augmentation.IndexShift>`"
+msgstr ":py:obj:`IndexShift <chemotools.augmentation.IndexShift>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ""
+"Shift the spectrum a given number of indices between -shift and +shift "
+"drawn from a discrete uniform distribution."
+msgstr "離散一様分布から抽出された-shiftと+shiftの間の指定されたインデックス数だけスペクトルをシフトします。"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ":py:obj:`SpectrumScale <chemotools.augmentation.SpectrumScale>`"
+msgstr ":py:obj:`SpectrumScale <chemotools.augmentation.SpectrumScale>`"
+
+#: ../../source/methods/augmentation_methods.rst:17:<autosummary>:1
+msgid ""
+"Scales the data by a value drawn from the uniform distribution centered "
+"around 1.0."
+msgstr "1.0を中心とした一様分布から抽出された値でデータをスケーリングします。"
+

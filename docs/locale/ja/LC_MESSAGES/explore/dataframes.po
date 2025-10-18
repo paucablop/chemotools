@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/dataframes.rst:2
+msgid "Working with DataFrames"
+msgstr "DataFrame の操作"
+
+#: ../../source/explore/dataframes.rst:4
+msgid ""
+"For the ``pandas.DataFrame`` and ``polars.DataFrame`` lovers. By default,"
+" all ``scikit-learn`` and ``chemotools`` transformers output "
+"``numpy.ndarray``. However, now it is possible to configure your "
+"``chemotools`` preprocessing methods to produce either a "
+"``pandas.DataFrame`` or a ``polars.DataFrame`` objects as output. This is"
+" possible after implementing the new ``set_output()`` API from ``scikit-"
+"learn`` (>= 1.2.2 for ``pandas`` and >= 1.4.0 for ``polars``) "
+"(`documentation <https://scikit-"
+"learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_). "
+"The same API implemented in other ``scikit-learn`` preprocessing methods "
+"like the ``StandardScaler()`` is now available for the ``chemotools`` "
+"transformers."
+msgstr ""
+"``pandas.DataFrame`` と ``polars.DataFrame`` をお使いの方へ。デフォルトでは、すべての ``scikit-learn`` および ``chemotools`` "
+"変換器は ``numpy.ndarray`` を出力します。しかし、現在では ``chemotools`` の前処理メソッドを設定して、 ``pandas.DataFrame`` "
+"または ``polars.DataFrame`` オブジェクトを出力として生成することが可能です。これは ``scikit-learn`` の新しい ``set_output()`` "
+"API の実装により可能になりました（ ``pandas`` の場合 >= 1.2.2、 ``polars`` の場合 >= 1.4.0）"
+"（`ドキュメント <https://scikit-"
+"learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_）。 ``StandardScaler()`` など、他の ``scikit-learn`` "
+"前処理メソッドに実装されているものと同じ API が、 ``chemotools`` 変換器でも利用可能になりました。"
+
+#: ../../source/explore/dataframes.rst:7
+msgid ""
+"From version 0.1.3, the ``set_output()`` is available for all "
+"``chemotools`` functions!"
+msgstr ""
+"バージョン 0.1.3 以降、すべての ``chemotools`` 関数で ``set_output()`` が利用可能です！"
+
+#: ../../source/explore/dataframes.rst:9
+msgid "Below there are two examples of how to use this new API:"
+msgstr "以下に、この新しい API の使用方法を示す 2 つの例を紹介します:"
+
+#: ../../source/explore/dataframes.rst:12
+msgid ""
+"**Example 1: Using the set_output() API with a single preprocessing "
+"method**"
+msgstr ""
+"例 1: 単一の前処理メソッドでの set_output() API の使用"
+
+#: ../../source/explore/dataframes.rst:15
+msgid "1. Load your spectral data as a ``pandas.DataFrame``"
+msgstr "1. スペクトルデータを ``pandas.DataFrame`` として読み込む"
+
+#: ../../source/explore/dataframes.rst:17
+msgid ""
+"First load your spectral data. In this case, we assume a file called "
+"``spectra.csv`` where each row represents a spectrum and each column "
+"represents wavenumbers."
+msgstr ""
+"まず、スペクトルデータを読み込みます。ここでは、各行がスペクトルを表し、各列が波数を表す ``spectra.csv`` "
+"というファイルを想定します。"
+
+#: ../../source/explore/dataframes.rst:27
+msgid ""
+"The ``spectra`` variable is a ``pandas.DataFrame`` object with the "
+"indices representing the sample names and the columns representing the "
+"wavenumbers."
+msgstr ""
+"``spectra`` 変数は ``pandas.DataFrame`` オブジェクトで、インデックスはサンプル名を表し、列は波数を表します。"
+
+#: ../../source/explore/dataframes.rst:30
+msgid ""
+"2. Create a ``chemotools`` preprocessing object and set the output to "
+"``pandas``"
+msgstr ""
+"2. ``chemotools`` 前処理オブジェクトを作成し、出力を ``pandas`` に設定する"
+
+#: ../../source/explore/dataframes.rst:32
+msgid "Next, we create the ``AirPls`` object and set the output to ``pandas``."
+msgstr "次に、 ``AirPls`` オブジェクトを作成し、出力を ``pandas`` に設定します。"
+
+#: ../../source/explore/dataframes.rst:39
+msgid "The ``set_output()`` method accepts the following arguments:"
+msgstr "``set_output()`` メソッドは以下の引数を受け付けます:"
+
+#: ../../source/explore/dataframes.rst:41
+msgid ""
+"``transform``: The output format. Can be ``'pandas'`` or ``'default'`` "
+"(the default format will output a ``numpy.ndarray``)."
+msgstr ""
+"``transform`` : 出力フォーマット。 ``'pandas'`` または ``'default'`` を指定できます"
+"（デフォルトフォーマットは ``numpy.ndarray`` を出力します）。"
+
+#: ../../source/explore/dataframes.rst:44
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``AirPLS().set_output(transform='polars')``)."
+msgstr ""
+"出力を ``polars`` に設定したい場合は、 ``set_output()`` メソッドで ``transform='polars'`` を使用します"
+"（ ``AirPLS().set_output(transform='polars')`` ）。"
+
+#: ../../source/explore/dataframes.rst:47
+msgid "3. Fit and transform the spectra"
+msgstr "3. スペクトルをフィットして変換する"
+
+#: ../../source/explore/dataframes.rst:54
+msgid ""
+"The output of the ``fit_transform()`` method is now a "
+"``pandas.DataFrame`` object."
+msgstr ""
+"``fit_transform()`` メソッドの出力は、 ``pandas.DataFrame`` オブジェクトになります。"
+
+#: ../../source/explore/dataframes.rst:57
+msgid ""
+"Notice that by default the indices and the columns of the input data are "
+"not maintained to the output, and the ``spectra_airpls`` DataFrame has "
+"default indices and columns."
+msgstr ""
+"デフォルトでは、入力データのインデックスと列は出力に維持されず、 ``spectra_airpls`` "
+"DataFrame はデフォルトのインデックスと列を持つことに注意してください。"
+
+#: ../../source/explore/dataframes.rst:60
+msgid "**Example 2: Using the set_output() API with a pipeline**"
+msgstr "例 2: パイプラインでの set_output() API の使用"
+
+#: ../../source/explore/dataframes.rst:62
+msgid ""
+"Similarly, the ``set_output()`` API can be used with pipelines. The "
+"following code shows how to create a pipeline that performs:"
+msgstr ""
+"同様に、 ``set_output()`` API はパイプラインでも使用できます。以下のコードは、次の処理を実行するパイプラインの作成方法を示しています:"
+
+#: ../../source/explore/dataframes.rst:64
+msgid "Multiplicative scatter correction"
+msgstr "乗法散乱補正"
+
+#: ../../source/explore/dataframes.rst:65
+msgid "Standard scaling"
+msgstr "標準スケーリング"
+
+#: ../../source/explore/dataframes.rst:84
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``pipeline.set_output(transform='polars')``)."
+msgstr ""
+"出力を ``polars`` に設定したい場合は、 ``set_output()`` メソッドで ``transform='polars'`` を使用します"
+"（ ``pipeline.set_output(transform='polars')`` ）。"
+

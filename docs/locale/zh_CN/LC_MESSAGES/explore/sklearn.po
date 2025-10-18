@@ -1,0 +1,268 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/sklearn.rst:4
+msgid "Why Scikit-Learn?"
+msgstr "为什么选择 Scikit-Learn？"
+
+#: ../../source/explore/sklearn.rst:6
+msgid ""
+"Scikit-Learn brings modern machine learning tools to chemometrics—making "
+"workflows more flexible, scalable, and easy to prototype and validate."
+msgstr "Scikit-Learn 将现代机器学习工具引入化学计量学——使工作流程更加灵活、可扩展，并且易于原型设计和验证。"
+
+#: ../../source/explore/sklearn.rst:8
+msgid ""
+"**Flexibility**: Works with various chemometric models and preprocessing "
+"methods."
+msgstr "灵活性：可与各种化学计量学模型和预处理方法配合使用。"
+
+#: ../../source/explore/sklearn.rst:9
+msgid ""
+"**Integration**: Can be combined with domain-specific tools for spectral "
+"analysis, multivariate statistics, and experimental design."
+msgstr "集成性：可与特定领域工具结合，用于光谱分析、多元统计和实验设计。"
+
+#: ../../source/explore/sklearn.rst:10
+msgid ""
+"**Scalability**: Can handle small laboratory datasets as well as large-"
+"scale industrial data."
+msgstr "可扩展性：既能处理小型实验室数据集，也能处理大规模的工业数据。"
+
+#: ../../source/explore/sklearn.rst:11
+msgid ""
+"**Easy Experimentation**: Rapid prototyping with different algorithms and"
+" preprocessing techniques."
+msgstr "易于实验：使用不同算法和预处理技术进行快速原型设计。"
+
+#: ../../source/explore/sklearn.rst:15
+msgid "What is Scikit-Learn?"
+msgstr "什么是 Scikit-Learn？"
+
+#: ../../source/explore/sklearn.rst:17
+msgid ""
+"`Scikit-learn <https://scikit-learn.org/>`_ (``sklearn``) is an open-"
+"source machine-learning library built on top of **NumPy**, **SciPy**. It "
+"offers a unified API for various machine-learning techniques, including:"
+msgstr "`Scikit-learn <https://scikit-learn.org/>`_ (``sklearn``) 是一个基于 **NumPy**、**SciPy** 构建的开源机器学习库。它为各种机器学习技术提供统一的 API，包括："
+
+#: ../../source/explore/sklearn.rst:19
+msgid "**Supervised learning**: Regression, classification, and ensemble methods"
+msgstr "监督学习：回归、分类和集成方法"
+
+#: ../../source/explore/sklearn.rst:20
+msgid "**Unsupervised learning**: Clustering and dimensionality reduction"
+msgstr "无监督学习：聚类和降维"
+
+#: ../../source/explore/sklearn.rst:21
+msgid "**Data preprocessing**: Feature scaling, encoding, and transformation"
+msgstr "数据预处理：特征缩放、编码和转换"
+
+#: ../../source/explore/sklearn.rst:22
+msgid "**Model evaluation**: Cross-validation, metrics, and hyperparameter tuning"
+msgstr "模型评估：交叉验证、指标和超参数调优"
+
+#: ../../source/explore/sklearn.rst:24
+msgid ""
+"``scikit-learn`` is widely used in research and industry due to its "
+"simplicity, efficiency, and extensive documentation."
+msgstr "``scikit-learn`` 因其简单性、高效性和丰富的文档而在研究和工业领域得到广泛应用。"
+
+#: ../../source/explore/sklearn.rst:27
+msgid "A Broad Toolbox of Models and Methods"
+msgstr "广泛的模型和方法工具箱"
+
+#: ../../source/explore/sklearn.rst:29
+msgid ""
+"One of the biggest strengths of ``scikit-learn`` is its vast selection of"
+" models and tools. Some key categories include:"
+msgstr "``scikit-learn`` 的最大优势之一是其丰富的模型和工具选择。一些关键类别包括："
+
+#: ../../source/explore/sklearn.rst:32
+msgid "Regression"
+msgstr "回归"
+
+#: ../../source/explore/sklearn.rst:34
+msgid ""
+"**Linear Regression** (``LinearRegression``): A simple yet effective "
+"model for continuous target variables."
+msgstr "线性回归 (``LinearRegression``)：一个简单但有效的连续目标变量模型。"
+
+#: ../../source/explore/sklearn.rst:35
+msgid ""
+"**Partial Least Squares** (``PLSRegression``): A powerful method often "
+"used in chemometrics."
+msgstr "偏最小二乘法 (``PLSRegression``)：化学计量学中常用的强大方法。"
+
+#: ../../source/explore/sklearn.rst:36
+msgid ""
+"**Support Vector Regression** (``SVR``): Effective for nonlinear "
+"relationships."
+msgstr "支持向量回归 (``SVR``)：对非线性关系有效。"
+
+#: ../../source/explore/sklearn.rst:39
+msgid "Classification"
+msgstr "分类"
+
+#: ../../source/explore/sklearn.rst:41
+msgid ""
+"**Logistic Regression** (``LogisticRegression``): For binary and multi-"
+"class classification."
+msgstr "逻辑回归 (``LogisticRegression``)：用于二元和多类分类。"
+
+#: ../../source/explore/sklearn.rst:42
+msgid ""
+"**Random Forest** (``RandomForestClassifier``): A robust ensemble method "
+"for better accuracy."
+msgstr "随机森林 (``RandomForestClassifier``)：一种稳健的集成方法，可提高准确性。"
+
+#: ../../source/explore/sklearn.rst:43
+msgid ""
+"**Support Vector Machines** (``SVC``): Effective for complex decision "
+"boundaries."
+msgstr "支持向量机 (``SVC``)：对复杂决策边界有效。"
+
+#: ../../source/explore/sklearn.rst:46
+msgid "Dimensionality Reduction"
+msgstr "降维"
+
+#: ../../source/explore/sklearn.rst:48
+msgid ""
+"**Principal Component Analysis** (``PCA``): Extracts the most important "
+"features in your dataset."
+msgstr "主成分分析 (``PCA``)：提取数据集中最重要的特征。"
+
+#: ../../source/explore/sklearn.rst:49
+msgid ""
+"**Non Negative Matrix Factorization** (``NMF``): Useful for signal "
+"decomposition."
+msgstr "非负矩阵分解 (``NMF``)：对信号分解有用。"
+
+#: ../../source/explore/sklearn.rst:50
+msgid "**t-SNE** (``TSNE``): Helps visualize complex high-dimensional data."
+msgstr "t-SNE (``TSNE``)：有助于可视化复杂的高维数据。"
+
+#: ../../source/explore/sklearn.rst:53
+msgid "Preprocessing Tools"
+msgstr "预处理工具"
+
+#: ../../source/explore/sklearn.rst:55
+msgid ""
+"**Feature Scaling** (``StandardScaler``, ``MinMaxScaler``): Essential for"
+" models that rely on distance metrics."
+msgstr "特征缩放 (``StandardScaler``, ``MinMaxScaler``)：对于依赖距离度量的模型至关重要。"
+
+#: ../../source/explore/sklearn.rst:56
+msgid ""
+"**Encoding Categorical Data** (``OneHotEncoder``, ``LabelEncoder``): "
+"Transforms categorical variables into numerical format."
+msgstr "分类数据编码 (``OneHotEncoder``, ``LabelEncoder``)：将分类变量转换为数值格式。"
+
+#: ../../source/explore/sklearn.rst:57
+msgid ""
+"**Feature Selection** (``SelectKBest``, ``RFE``): Helps choose the most "
+"relevant variables."
+msgstr "特征选择 (``SelectKBest``, ``RFE``)：帮助选择最相关的变量。"
+
+#: ../../source/explore/sklearn.rst:61
+msgid "The scikit-learn workflow"
+msgstr "Scikit-learn 工作流程"
+
+#: ../../source/explore/sklearn.rst:63
+msgid ""
+"Scikit-learn follows an intuitive three-step process outlined in the "
+"figure below:"
+msgstr "Scikit-learn 遵循以下图中概述的直观三步流程："
+
+#: ../../source/explore/sklearn.rst:65
+msgid "scikit-learn workflow"
+msgstr "scikit-learn 工作流程"
+
+#: ../../source/explore/sklearn.rst:71
+msgid "**Define**: Configure the model/preprocessing parameters."
+msgstr "定义：配置模型/预处理参数。"
+
+#: ../../source/explore/sklearn.rst:72
+msgid "**Fit**: The model learns patterns from training data using ``fit()``"
+msgstr "拟合：模型使用 ``fit()`` 从训练数据中学习模式。"
+
+#: ../../source/explore/sklearn.rst:73
+msgid "**Apply**: The fitted model processes new data using either:"
+msgstr "应用：拟合的模型使用以下任一方法处理新数据："
+
+#: ../../source/explore/sklearn.rst:75
+msgid "``transform()`` for preprocessing steps and unsupervised learning"
+msgstr "``transform()`` 用于预处理步骤和无监督学习"
+
+#: ../../source/explore/sklearn.rst:76
+msgid ""
+"``predict()`` for supervised learning models (classification and "
+"regression)"
+msgstr "``predict()`` 用于监督学习模型（分类和回归）"
+
+#: ../../source/explore/sklearn.rst:78
+msgid ""
+"Let's see two examples, one for a preprocessing and one for a regerssion "
+"model. First, import the required modules:"
+msgstr "让我们看两个例子，一个是预处理，一个是回归模型。首先，导入所需的模块："
+
+#: ../../source/explore/sklearn.rst:85
+msgid "Preprocessing with ``StandardScaler``:"
+msgstr "使用 ``StandardScaler`` 进行预处理："
+
+#: ../../source/explore/sklearn.rst:101
+msgid "Building a ``PLSRegression`` model:"
+msgstr "构建 ``PLSRegression`` 模型："
+
+#: ../../source/explore/sklearn.rst:116
+msgid "Extended Ecosystem"
+msgstr "扩展生态系统"
+
+#: ../../source/explore/sklearn.rst:118
+msgid ""
+"In addition to the ``scikit-learn`` main packages, the ecosystem includes"
+" a broad range of complementary open-source libraries that extend its "
+"functionality:"
+msgstr "除了 ``scikit-learn`` 主包之外，该生态系统还包括一系列扩展其功能的互补开源库："
+
+#: ../../source/explore/sklearn.rst:120
+msgid ""
+"`skore <https://docs.skore.probabl.ai/>`_: Streamline and structure model"
+" development and interpretation."
+msgstr "`skore <https://docs.skore.probabl.ai/>`_：简化和结构化模型开发与解释。"
+
+#: ../../source/explore/sklearn.rst:121
+msgid ""
+"`astartes <https://jacksonburns.github.io/astartes/README.html>`_: "
+"Algorithmic techniques for splitting data into training and test sets."
+msgstr "`astartes <https://jacksonburns.github.io/astartes/README.html>`_：将数据拆分为训练集和测试集的算法技术。"
+
+#: ../../source/explore/sklearn.rst:122
+msgid ""
+"`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_: Techniques "
+"for handling imbalanced datasets."
+msgstr "`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_：处理不平衡数据集的技术。"
+
+#: ../../source/explore/sklearn.rst:123
+msgid ""
+"`skops <https://skops.readthedocs.io/en/stable/>`_: Tools for serializing"
+" and sharing machine learning models."
+msgstr "`skops <https://skops.readthedocs.io/en/stable/>`_：用于序列化和共享机器学习模型的工具。"

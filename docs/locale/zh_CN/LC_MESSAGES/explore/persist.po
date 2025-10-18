@@ -1,0 +1,85 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/persist.rst:4
+msgid "Persisting your models"
+msgstr "持久化您的模型"
+
+#: ../../source/explore/persist.rst:6
+msgid ""
+"Previously, we saw how to use ``chemotools`` in combination with "
+"``scikit-learn`` to preprocess your data and make predictions. However, "
+"in a real-world scenario, we would like to persist our trained (fitted) "
+"pipelines to deploy it to a production environment. In this section, we "
+"will show two ways to persist our models:"
+msgstr "之前，我们了解了如何结合使用 ``chemotools`` 和 ``scikit-learn`` 来预处理数据并进行预测。然而，在实际场景中，我们希望持久化我们训练好的（已拟合的）管道，以便将其部署到生产环境中。在本节中，我们将展示两种持久化模型的方法："
+
+#: ../../source/explore/persist.rst:8
+msgid "Using ``pickle``"
+msgstr "使用 ``pickle``"
+
+#: ../../source/explore/persist.rst:9
+msgid "Using ``joblib``"
+msgstr "使用 ``joblib``"
+
+#: ../../source/explore/persist.rst:11
+msgid "An overview of the workflow is shown in the image below:"
+msgstr "工作流程的概述如下图所示："
+
+#: ../../source/explore/persist.rst:13
+msgid "Persist your models"
+msgstr "持久化您的模型"
+
+#: ../../source/explore/persist.rst:18
+msgid "For this section, we will use the following fit pipeline as an example:"
+msgstr "在本节中，我们将使用以下已拟合的管道作为示例："
+
+#: ../../source/explore/persist.rst:42
+msgid "Using pickle"
+msgstr "使用 pickle"
+
+#: ../../source/explore/persist.rst:44
+msgid ""
+"``pickle`` is a Python module that implements a binary protocol for "
+"serializing and de-serializing a Python object structure. It is a "
+"standard module that comes with the Python installation. The following "
+"code shows how to persist a ``scikit-learn`` model using ``pickle``:"
+msgstr "``pickle`` 是一个 Python 模块，它实现了用于序列化和反序列化 Python 对象结构的二进制协议。它是 Python 安装自带的标准模块。以下代码展示了如何使用 ``pickle`` 持久化 ``scikit-learn`` 模型："
+
+#: ../../source/explore/persist.rst:47
+msgid ""
+"Notice that the ``pickle`` module is not secure against erroneous or "
+"maliciously constructed data. Never unpickle data received from an "
+"untrusted or unauthenticated source."
+msgstr "请注意，``pickle`` 模块不能防止错误或恶意构造的数据。切勿对从未经信任或未经身份验证的来源接收的数据进行反序列化。"
+
+#: ../../source/explore/persist.rst:64
+msgid "Using joblib"
+msgstr "使用 joblib"
+
+#: ../../source/explore/persist.rst:66
+msgid ""
+"``joblib`` is a Python module that provides utilities for saving and "
+"loading Python objects that make use of NumPy data structures, "
+"efficiently. It is not part of the standard Python installation, but it "
+"can be installed using ``pip``. The following code shows how to persist a"
+" ``scikit-learn`` model using ``joblib``:"
+msgstr "``joblib`` 是一个 Python 模块，它提供了用于高效保存和加载利用 NumPy 数据结构的 Python 对象的实用程序。它不是标准 Python 安装的一部分，但可以使用 ``pip`` 安装。以下代码展示了如何使用 ``joblib`` 持久化 ``scikit-learn`` 模型："

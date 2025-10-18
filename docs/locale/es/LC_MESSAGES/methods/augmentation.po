@@ -1,0 +1,35 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/augmentation.rst:5
+msgid "API Modules"
+msgstr "Módulos de API"
+
+#: ../../source/methods/augmentation.rst:2
+msgid "Augmentation"
+msgstr "Aumento de datos"
+
+#: ../../source/methods/augmentation.rst:3
+msgid ""
+"Simulate real-world variations in your spectral data to enhance model robustness. This can include introducing controlled noise, baseline shifts, or small wavelength misalignments to mimic real measurement conditions. By doing so, your model learns to handle variability in experimental setups, instrument performance, and sample preparation—leading to more reliable predictions when applied to unseen data."
+msgstr ""
+"Simula variaciones del mundo real en tus datos espectrales para mejorar la robustez del modelo. Esto puede incluir la introducción de ruido controlado, desplazamientos de línea base o pequeños desalineamientos de longitud de onda para imitar condiciones de medición reales. Al hacerlo, tu modelo aprende a manejar la variabilidad en configuraciones experimentales, rendimiento de instrumentos y preparación de muestras, lo que conduce a predicciones más confiables cuando se aplica a datos no vistos."
+

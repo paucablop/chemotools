@@ -1,0 +1,189 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/learn/datasets.rst:2
+msgid "**Explore our datasets**"
+msgstr "**Explora nuestros conjuntos de datos**"
+
+#: ../../source/learn/datasets.rst:4
+msgid ""
+"Welcome to the world of data exploration! Our ``chemotools`` package "
+"provides useful datasets that help you test the package and learn. You "
+"can find these datasets in the ``chemotools.datasets`` module and access "
+"them using simple loading functions. Here's what we offer:"
+msgstr ""
+"¡Bienvenido al mundo de la exploración de datos! Nuestro paquete ``chemotools`` "
+"proporciona conjuntos de datos útiles que te ayudan a probar el paquete y aprender. Puedes "
+"encontrar estos conjuntos de datos en el módulo ``chemotools.datasets`` y acceder a "
+"ellos usando funciones de carga simples. Esto es lo que ofrecemos:"
+
+#: ../../source/learn/datasets.rst:9
+msgid "The Fermentation Dataset 🧪"
+msgstr "El conjunto de datos de fermentación 🧪"
+
+#: ../../source/learn/datasets.rst:11
+msgid ""
+"This dataset contains spectra collected during a yeast fermentation "
+"process using attenuated total reflectance Fourier transform infrared "
+"spectroscopy (ATR-FTIR). The dataset includes both a training set and a "
+"test set."
+msgstr ""
+"Este conjunto de datos contiene espectros recopilados durante un proceso de fermentación de levadura "
+"usando espectroscopía infrarroja por transformada de Fourier de reflectancia total atenuada "
+"(ATR-FTIR). El conjunto de datos incluye tanto un conjunto de entrenamiento como un conjunto de "
+"prueba."
+
+#: ../../source/learn/datasets.rst:15
+msgid ""
+"For more information about the Fermentation Dataset, see these "
+"publications:"
+msgstr ""
+"Para más información sobre el conjunto de datos de fermentación, consulta estas "
+"publicaciones:"
+
+#: ../../source/learn/datasets.rst:17
+msgid ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. "
+"`Transforming data to information: A parallel hybrid model for real-time "
+"state estimation in lignocellulosic ethanol fermentation "
+"<https://doi.org/10.1002/bit.27586>`_."
+msgstr ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. "
+"`Transformando datos en información: Un modelo híbrido paralelo para la estimación de "
+"estado en tiempo real en fermentación de etanol lignocelulósico "
+"<https://doi.org/10.1002/bit.27586>`_."
+
+#: ../../source/learn/datasets.rst:19
+msgid ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. `Towards"
+" a digital twin: a hybrid data-driven and mechanistic digital shadow to "
+"forecast the evolution of lignocellulosic fermentation "
+"<https://doi.org/10.1002/bbb.2108>`_."
+msgstr ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. `Hacia "
+"un gemelo digital: una sombra digital híbrida basada en datos y mecanicista para "
+"pronosticar la evolución de la fermentación lignocelulósica "
+"<https://doi.org/10.1002/bbb.2108>`_."
+
+#: ../../source/learn/datasets.rst:21
+msgid ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. "
+"`Promoting the co-utilisation of glucose and xylose in lignocellulosic "
+"ethanol fermentations using a data-driven feed-back controller "
+"<https://doi.org/10.1186/s13068-020-01829-2>`_."
+msgstr ""
+"Cabaneros Lopez, P., Abeykoon Udugama, I., Thomsen, S.T., et al. "
+"`Promoviendo la co-utilización de glucosa y xilosa en fermentaciones de etanol lignocelulósico "
+"usando un controlador de retroalimentación basado en datos "
+"<https://doi.org/10.1186/s13068-020-01829-2>`_."
+
+#: ../../source/learn/datasets.rst:25
+msgid "The Train Set"
+msgstr "El conjunto de entrenamiento"
+
+#: ../../source/learn/datasets.rst:27
+msgid ""
+"The train set contains 21 synthetic spectra with reference glucose "
+"concentrations, measured by high-performance liquid chromatography "
+"(HPLC). You can load the train set as a ``pandas.DataFrame`` or as a "
+"``polars.DataFrame``:"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:31 ../../source/learn/datasets.rst:62
+#: ../../source/learn/datasets.rst:90
+msgid "**Load as pandas.DataFrame**:"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:39 ../../source/learn/datasets.rst:70
+#: ../../source/learn/datasets.rst:98
+msgid "**Load as polars.DataFrame**:"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:48
+msgid "Polars is supported in ``chemotools``>=0.1.5"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:51
+msgid ""
+"To learn how to build a PLS model using the Fermentation Dataset, see our"
+" `Training Guide <https://chemotools.org/learn/pls_regression.html>`__."
+msgstr ""
+
+#: ../../source/learn/datasets.rst:54
+msgid "The Test Set"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:56
+msgid ""
+"The test set contains over 1000 spectra collected during a fermentation "
+"process. These spectra were captured every 1.25 minutes over several "
+"hours. It also includes 35 reference glucose concentrations measured "
+"hourly during the fermentation."
+msgstr ""
+
+#: ../../source/learn/datasets.rst:60
+msgid "Load the test set using:"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:79
+msgid ""
+"The wavenumbers are stored as column names in both the "
+"``pandas.DataFrame`` and the ``polars.DataFrame``. In a "
+"``pandas.DataFrame`` the column names can be of type ``float``, but in a "
+"``polars.DataFrame`` the column names must be of type ``str``."
+msgstr ""
+
+#: ../../source/learn/datasets.rst:84
+msgid "The Coffee Dataset ☕"
+msgstr ""
+
+#: ../../source/learn/datasets.rst:86
+msgid ""
+"The Coffee Dataset contains spectra collected from various coffee samples"
+" from different countries. These spectra were collected using attenuated "
+"total reflectance Fourier transform infrared spectroscopy (ATR-FTIR)."
+msgstr ""
+
+#: ../../source/learn/datasets.rst:107
+msgid ""
+"To learn how to build a PLS-DA classification model using the Coffee "
+"Dataset, see our `Training Guide "
+"<https://chemotools.org/learn/pls_classification.html>`__."
+msgstr ""
+
+#: ../../source/learn/datasets.rst:110
+msgid "We hope you enjoy exploring these datasets! 🚀"
+msgstr ""
+
+#~ msgid ""
+#~ "To learn how to build a PLS "
+#~ "model using the Fermentation Dataset, "
+#~ "see our `Training Guide "
+#~ "<https://chemotools.org/_learn/pls_regression.html>`__."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "To learn how to build a PLS-"
+#~ "DA classification model using the Coffee"
+#~ " Dataset, see our `Training Guide "
+#~ "<https://chemotools.org/_learn/pls_classification.html>`__."
+#~ msgstr ""
+

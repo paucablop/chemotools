@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/persist.rst:4
+msgid "Persisting your models"
+msgstr "Persistiendo tus modelos"
+
+#: ../../source/explore/persist.rst:6
+msgid ""
+"Previously, we saw how to use ``chemotools`` in combination with "
+"``scikit-learn`` to preprocess your data and make predictions. However, "
+"in a real-world scenario, we would like to persist our trained (fitted) "
+"pipelines to deploy it to a production environment. In this section, we "
+"will show two ways to persist our models:"
+msgstr ""
+"Anteriormente, vimos cómo usar ``chemotools`` en combinación con "
+"``scikit-learn`` para preprocesar tus datos y hacer predicciones. Sin embargo, "
+"en un escenario del mundo real, nos gustaría persistir nuestros pipelines entrenados (ajustados) "
+"para desplegarlos en un entorno de producción. En esta sección, "
+"mostraremos dos formas de persistir nuestros modelos:"
+
+#: ../../source/explore/persist.rst:8
+msgid "Using ``pickle``"
+msgstr "Usando ``pickle``"
+
+#: ../../source/explore/persist.rst:9
+msgid "Using ``joblib``"
+msgstr "Usando ``joblib``"
+
+#: ../../source/explore/persist.rst:11
+msgid "An overview of the workflow is shown in the image below:"
+msgstr "Una vista general del flujo de trabajo se muestra en la imagen de abajo:"
+
+#: ../../source/explore/persist.rst:13
+msgid "Persist your models"
+msgstr "Persiste tus modelos"
+
+#: ../../source/explore/persist.rst:18
+msgid "For this section, we will use the following fit pipeline as an example:"
+msgstr "Para esta sección, usaremos el siguiente pipeline ajustado como ejemplo:"
+
+#: ../../source/explore/persist.rst:42
+msgid "Using pickle"
+msgstr "Usando pickle"
+
+#: ../../source/explore/persist.rst:44
+msgid ""
+"``pickle`` is a Python module that implements a binary protocol for "
+"serializing and de-serializing a Python object structure. It is a "
+"standard module that comes with the Python installation. The following "
+"code shows how to persist a ``scikit-learn`` model using ``pickle``:"
+msgstr ""
+"``pickle`` es un módulo de Python que implementa un protocolo binario para "
+"serializar y deserializar una estructura de objetos de Python. Es un "
+"módulo estándar que viene con la instalación de Python. El siguiente "
+"código muestra cómo persistir un modelo de ``scikit-learn`` usando ``pickle``:"
+
+#: ../../source/explore/persist.rst:47
+msgid ""
+"Notice that the ``pickle`` module is not secure against erroneous or "
+"maliciously constructed data. Never unpickle data received from an "
+"untrusted or unauthenticated source."
+msgstr ""
+"Observa que el módulo ``pickle`` no es seguro contra datos erróneos o "
+"construidos maliciosamente. Nunca deserialices datos recibidos de una "
+"fuente no confiable o no autenticada."
+
+#: ../../source/explore/persist.rst:64
+msgid "Using joblib"
+msgstr "Usando joblib"
+
+#: ../../source/explore/persist.rst:66
+msgid ""
+"``joblib`` is a Python module that provides utilities for saving and "
+"loading Python objects that make use of NumPy data structures, "
+"efficiently. It is not part of the standard Python installation, but it "
+"can be installed using ``pip``. The following code shows how to persist a"
+" ``scikit-learn`` model using ``joblib``:"
+msgstr ""
+"``joblib`` es un módulo de Python que proporciona utilidades para guardar y "
+"cargar objetos de Python que hacen uso de estructuras de datos de NumPy, "
+"eficientemente. No es parte de la instalación estándar de Python, pero "
+"puede instalarse usando ``pip``. El siguiente código muestra cómo persistir un "
+"modelo de ``scikit-learn`` usando ``joblib``:"
+

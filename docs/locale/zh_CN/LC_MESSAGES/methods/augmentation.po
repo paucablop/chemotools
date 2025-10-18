@@ -1,0 +1,33 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/augmentation.rst:5
+msgid "API Modules"
+msgstr "API 模块"
+
+#: ../../source/methods/augmentation.rst:2
+msgid "Augmentation"
+msgstr "数据增强"
+
+#: ../../source/methods/augmentation.rst:3
+msgid ""
+"Simulate real-world variations in your spectral data to enhance model robustness. This can include introducing controlled noise, baseline shifts, or small wavelength misalignments to mimic real measurement conditions. By doing so, your model learns to handle variability in experimental setups, instrument performance, and sample preparation—leading to more reliable predictions when applied to unseen data."
+msgstr "模拟光谱数据中的真实世界变异，以增强模型的鲁棒性。这可以包括引入受控噪声、基线漂移或小的波长偏移，以模拟真实测量条件。通过这样做，您的模型将学会处理实验设置、仪器性能和样品制备中的变异性——从而在应用于未见数据时获得更可靠的预测。"

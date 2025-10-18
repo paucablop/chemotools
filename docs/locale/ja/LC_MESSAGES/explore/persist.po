@@ -1,0 +1,96 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/persist.rst:4
+msgid "Persisting your models"
+msgstr "モデルを永続化する"
+
+#: ../../source/explore/persist.rst:6
+msgid ""
+"Previously, we saw how to use ``chemotools`` in combination with "
+"``scikit-learn`` to preprocess your data and make predictions. However, "
+"in a real-world scenario, we would like to persist our trained (fitted) "
+"pipelines to deploy it to a production environment. In this section, we "
+"will show two ways to persist our models:"
+msgstr ""
+"以前、 ``chemotools`` を ``scikit-learn`` と組み合わせて使用し、データを前処理して予測を行う方法を見ました。"
+"しかし、実際のシナリオでは、訓練済み（フィット済み）のパイプラインを永続化して、本番環境にデプロイしたいと考えます。"
+"このセクションでは、モデルを永続化する2つの方法を紹介します:"
+
+#: ../../source/explore/persist.rst:8
+msgid "Using ``pickle``"
+msgstr "``pickle`` を使用する"
+
+#: ../../source/explore/persist.rst:9
+msgid "Using ``joblib``"
+msgstr "``joblib`` を使用する"
+
+#: ../../source/explore/persist.rst:11
+msgid "An overview of the workflow is shown in the image below:"
+msgstr "ワークフローの概要を以下の画像に示します:"
+
+#: ../../source/explore/persist.rst:13
+msgid "Persist your models"
+msgstr "モデルの永続化"
+
+#: ../../source/explore/persist.rst:18
+msgid "For this section, we will use the following fit pipeline as an example:"
+msgstr "このセクションでは、以下のフィット済みパイプラインを例として使用します:"
+
+#: ../../source/explore/persist.rst:42
+msgid "Using pickle"
+msgstr "pickle を使用する"
+
+#: ../../source/explore/persist.rst:44
+msgid ""
+"``pickle`` is a Python module that implements a binary protocol for "
+"serializing and de-serializing a Python object structure. It is a "
+"standard module that comes with the Python installation. The following "
+"code shows how to persist a ``scikit-learn`` model using ``pickle``:"
+msgstr ""
+"``pickle`` は、Python オブジェクト構造をシリアル化およびデシリアル化するためのバイナリプロトコルを実装する Python モジュールです。"
+"Python インストールに付属する標準モジュールです。以下のコードは、 ``pickle`` を使用して ``scikit-learn`` モデルを永続化する方法を示しています:"
+
+#: ../../source/explore/persist.rst:47
+msgid ""
+"Notice that the ``pickle`` module is not secure against erroneous or "
+"maliciously constructed data. Never unpickle data received from an "
+"untrusted or unauthenticated source."
+msgstr ""
+"``pickle`` モジュールは、誤ったデータや悪意を持って構築されたデータに対して安全ではありません。"
+"信頼できない、または認証されていないソースから受け取ったデータを決してアンピクルしないでください。"
+
+#: ../../source/explore/persist.rst:64
+msgid "Using joblib"
+msgstr "joblib を使用する"
+
+#: ../../source/explore/persist.rst:66
+msgid ""
+"``joblib`` is a Python module that provides utilities for saving and "
+"loading Python objects that make use of NumPy data structures, "
+"efficiently. It is not part of the standard Python installation, but it "
+"can be installed using ``pip``. The following code shows how to persist a"
+" ``scikit-learn`` model using ``joblib``:"
+msgstr ""
+"``joblib`` は、NumPy データ構造を使用する Python オブジェクトを効率的に保存および読み込むためのユーティリティを提供する Python モジュールです。"
+"標準の Python インストールには含まれていませんが、 ``pip`` を使用してインストールできます。"
+"以下のコードは、 ``joblib`` を使用して ``scikit-learn`` モデルを永続化する方法を示しています:"
+

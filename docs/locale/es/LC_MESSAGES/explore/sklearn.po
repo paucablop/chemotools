@@ -1,0 +1,324 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/sklearn.rst:4
+msgid "Why Scikit-Learn?"
+msgstr "¿Por qué Scikit-Learn?"
+
+#: ../../source/explore/sklearn.rst:6
+msgid ""
+"Scikit-Learn brings modern machine learning tools to chemometrics—making "
+"workflows more flexible, scalable, and easy to prototype and validate."
+msgstr ""
+"Scikit-Learn trae herramientas modernas de aprendizaje automático a la quimiometría, haciendo que "
+"los flujos de trabajo sean más flexibles, escalables y fáciles de prototipar y validar."
+
+#: ../../source/explore/sklearn.rst:8
+msgid ""
+"**Flexibility**: Works with various chemometric models and preprocessing "
+"methods."
+msgstr ""
+"**Flexibilidad**: Funciona con varios modelos quimiométricos y métodos de "
+"preprocesamiento."
+
+#: ../../source/explore/sklearn.rst:9
+msgid ""
+"**Integration**: Can be combined with domain-specific tools for spectral "
+"analysis, multivariate statistics, and experimental design."
+msgstr ""
+"**Integración**: Se puede combinar con herramientas específicas del dominio para análisis "
+"espectral, estadística multivariante y diseño experimental."
+
+#: ../../source/explore/sklearn.rst:10
+msgid ""
+"**Scalability**: Can handle small laboratory datasets as well as large-"
+"scale industrial data."
+msgstr ""
+"**Escalabilidad**: Puede manejar pequeños conjuntos de datos de laboratorio así como "
+"datos industriales a gran escala."
+
+#: ../../source/explore/sklearn.rst:11
+msgid ""
+"**Easy Experimentation**: Rapid prototyping with different algorithms and"
+" preprocessing techniques."
+msgstr ""
+"**Experimentación fácil**: Prototipado rápido con diferentes algoritmos y "
+"técnicas de preprocesamiento."
+
+#: ../../source/explore/sklearn.rst:15
+msgid "What is Scikit-Learn?"
+msgstr "¿Qué es Scikit-Learn?"
+
+#: ../../source/explore/sklearn.rst:17
+msgid ""
+"`Scikit-learn <https://scikit-learn.org/>`_ (``sklearn``) is an open-"
+"source machine-learning library built on top of **NumPy**, **SciPy**. It "
+"offers a unified API for various machine-learning techniques, including:"
+msgstr ""
+"`Scikit-learn <https://scikit-learn.org/>`_ (``sklearn``) es una biblioteca de aprendizaje automático de código "
+"abierto construida sobre **NumPy** y **SciPy**. Ofrece una API unificada para varias técnicas de aprendizaje automático, incluyendo:"
+
+#: ../../source/explore/sklearn.rst:19
+msgid "**Supervised learning**: Regression, classification, and ensemble methods"
+msgstr "**Aprendizaje supervisado**: Regresión, clasificación y métodos de conjunto"
+
+#: ../../source/explore/sklearn.rst:20
+msgid "**Unsupervised learning**: Clustering and dimensionality reduction"
+msgstr "**Aprendizaje no supervisado**: Agrupamiento y reducción de dimensionalidad"
+
+#: ../../source/explore/sklearn.rst:21
+msgid "**Data preprocessing**: Feature scaling, encoding, and transformation"
+msgstr "**Preprocesamiento de datos**: Escalado de características, codificación y transformación"
+
+#: ../../source/explore/sklearn.rst:22
+msgid "**Model evaluation**: Cross-validation, metrics, and hyperparameter tuning"
+msgstr "**Evaluación de modelos**: Validación cruzada, métricas y ajuste de hiperparámetros"
+
+#: ../../source/explore/sklearn.rst:24
+msgid ""
+"``scikit-learn`` is widely used in research and industry due to its "
+"simplicity, efficiency, and extensive documentation."
+msgstr ""
+"``scikit-learn`` es ampliamente utilizado en investigación e industria debido a su "
+"simplicidad, eficiencia y extensa documentación."
+
+#: ../../source/explore/sklearn.rst:27
+msgid "A Broad Toolbox of Models and Methods"
+msgstr "Una Amplia Caja de Herramientas de Modelos y Métodos"
+
+#: ../../source/explore/sklearn.rst:29
+msgid ""
+"One of the biggest strengths of ``scikit-learn`` is its vast selection of"
+" models and tools. Some key categories include:"
+msgstr ""
+"Una de las mayores fortalezas de ``scikit-learn`` es su amplia selección de "
+"modelos y herramientas. Algunas categorías clave incluyen:"
+
+#: ../../source/explore/sklearn.rst:32
+msgid "Regression"
+msgstr "Regresión"
+
+#: ../../source/explore/sklearn.rst:34
+msgid ""
+"**Linear Regression** (``LinearRegression``): A simple yet effective "
+"model for continuous target variables."
+msgstr ""
+"**Regresión Lineal** (``LinearRegression``): Un modelo simple pero efectivo "
+"para variables objetivo continuas."
+
+#: ../../source/explore/sklearn.rst:35
+msgid ""
+"**Partial Least Squares** (``PLSRegression``): A powerful method often "
+"used in chemometrics."
+msgstr ""
+"**Mínimos Cuadrados Parciales** (``PLSRegression``): Un método poderoso "
+"frecuentemente usado en quimiometría."
+
+#: ../../source/explore/sklearn.rst:36
+msgid ""
+"**Support Vector Regression** (``SVR``): Effective for nonlinear "
+"relationships."
+msgstr ""
+"**Regresión de Vectores de Soporte** (``SVR``): Efectivo para "
+"relaciones no lineales."
+
+#: ../../source/explore/sklearn.rst:39
+msgid "Classification"
+msgstr "Clasificación"
+
+#: ../../source/explore/sklearn.rst:41
+msgid ""
+"**Logistic Regression** (``LogisticRegression``): For binary and multi-"
+"class classification."
+msgstr ""
+"**Regresión Logística** (``LogisticRegression``): Para clasificación binaria "
+"y multiclase."
+
+#: ../../source/explore/sklearn.rst:42
+msgid ""
+"**Random Forest** (``RandomForestClassifier``): A robust ensemble method "
+"for better accuracy."
+msgstr ""
+"**Bosque Aleatorio** (``RandomForestClassifier``): Un método de conjunto robusto "
+"para mejor precisión."
+
+#: ../../source/explore/sklearn.rst:43
+msgid ""
+"**Support Vector Machines** (``SVC``): Effective for complex decision "
+"boundaries."
+msgstr ""
+"**Máquinas de Vectores de Soporte** (``SVC``): Efectivo para fronteras de "
+"decisión complejas."
+
+#: ../../source/explore/sklearn.rst:46
+msgid "Dimensionality Reduction"
+msgstr "Reducción de Dimensionalidad"
+
+#: ../../source/explore/sklearn.rst:48
+msgid ""
+"**Principal Component Analysis** (``PCA``): Extracts the most important "
+"features in your dataset."
+msgstr ""
+"**Análisis de Componentes Principales** (``PCA``): Extrae las características "
+"más importantes de tu conjunto de datos."
+
+#: ../../source/explore/sklearn.rst:49
+msgid ""
+"**Non Negative Matrix Factorization** (``NMF``): Useful for signal "
+"decomposition."
+msgstr ""
+"**Factorización de Matrices No Negativas** (``NMF``): Útil para "
+"descomposición de señales."
+
+#: ../../source/explore/sklearn.rst:50
+msgid "**t-SNE** (``TSNE``): Helps visualize complex high-dimensional data."
+msgstr "**t-SNE** (``TSNE``): Ayuda a visualizar datos complejos de alta dimensionalidad."
+
+#: ../../source/explore/sklearn.rst:53
+msgid "Preprocessing Tools"
+msgstr "Herramientas de Preprocesamiento"
+
+#: ../../source/explore/sklearn.rst:55
+msgid ""
+"**Feature Scaling** (``StandardScaler``, ``MinMaxScaler``): Essential for"
+" models that rely on distance metrics."
+msgstr ""
+"**Escalado de Características** (``StandardScaler``, ``MinMaxScaler``): Esencial para "
+"modelos que dependen de métricas de distancia."
+
+#: ../../source/explore/sklearn.rst:56
+msgid ""
+"**Encoding Categorical Data** (``OneHotEncoder``, ``LabelEncoder``): "
+"Transforms categorical variables into numerical format."
+msgstr ""
+"**Codificación de Datos Categóricos** (``OneHotEncoder``, ``LabelEncoder``): "
+"Transforma variables categóricas a formato numérico."
+
+#: ../../source/explore/sklearn.rst:57
+msgid ""
+"**Feature Selection** (``SelectKBest``, ``RFE``): Helps choose the most "
+"relevant variables."
+msgstr ""
+"**Selección de Características** (``SelectKBest``, ``RFE``): Ayuda a elegir las "
+"variables más relevantes."
+
+#: ../../source/explore/sklearn.rst:61
+msgid "The scikit-learn workflow"
+msgstr "El flujo de trabajo de scikit-learn"
+
+#: ../../source/explore/sklearn.rst:63
+msgid ""
+"Scikit-learn follows an intuitive three-step process outlined in the "
+"figure below:"
+msgstr ""
+"Scikit-learn sigue un proceso intuitivo de tres pasos descrito en la "
+"figura a continuación:"
+
+#: ../../source/explore/sklearn.rst:65
+msgid "scikit-learn workflow"
+msgstr "Flujo de trabajo de scikit-learn"
+
+#: ../../source/explore/sklearn.rst:71
+msgid "**Define**: Configure the model/preprocessing parameters."
+msgstr "**Definir**: Configurar los parámetros del modelo/preprocesamiento."
+
+#: ../../source/explore/sklearn.rst:72
+msgid "**Fit**: The model learns patterns from training data using ``fit()``"
+msgstr "**Ajustar**: El modelo aprende patrones de los datos de entrenamiento usando ``fit()``"
+
+#: ../../source/explore/sklearn.rst:73
+msgid "**Apply**: The fitted model processes new data using either:"
+msgstr "**Aplicar**: El modelo ajustado procesa nuevos datos usando:"
+
+#: ../../source/explore/sklearn.rst:75
+msgid "``transform()`` for preprocessing steps and unsupervised learning"
+msgstr "``transform()`` para pasos de preprocesamiento y aprendizaje no supervisado"
+
+#: ../../source/explore/sklearn.rst:76
+msgid ""
+"``predict()`` for supervised learning models (classification and "
+"regression)"
+msgstr ""
+"``predict()`` para modelos de aprendizaje supervisado (clasificación y "
+"regresión)"
+
+#: ../../source/explore/sklearn.rst:78
+msgid ""
+"Let's see two examples, one for a preprocessing and one for a regerssion "
+"model. First, import the required modules:"
+msgstr ""
+"Veamos dos ejemplos, uno para preprocesamiento y otro para un modelo de regresión. "
+"Primero, importa los módulos requeridos:"
+
+#: ../../source/explore/sklearn.rst:85
+msgid "Preprocessing with ``StandardScaler``:"
+msgstr "Preprocesamiento con ``StandardScaler``:"
+
+#: ../../source/explore/sklearn.rst:101
+msgid "Building a ``PLSRegression`` model:"
+msgstr "Construyendo un modelo de ``PLSRegression``:"
+
+#: ../../source/explore/sklearn.rst:116
+msgid "Extended Ecosystem"
+msgstr "Ecosistema Extendido"
+
+#: ../../source/explore/sklearn.rst:118
+msgid ""
+"In addition to the ``scikit-learn`` main packages, the ecosystem includes"
+" a broad range of complementary open-source libraries that extend its "
+"functionality:"
+msgstr ""
+"Además de los paquetes principales de ``scikit-learn``, el ecosistema incluye "
+"una amplia gama de bibliotecas complementarias de código abierto que extienden su "
+"funcionalidad:"
+
+#: ../../source/explore/sklearn.rst:120
+msgid ""
+"`skore <https://docs.skore.probabl.ai/>`_: Streamline and structure model"
+" development and interpretation."
+msgstr ""
+"`skore <https://docs.skore.probabl.ai/>`_: Optimiza y estructura el "
+"desarrollo e interpretación de modelos."
+
+#: ../../source/explore/sklearn.rst:121
+msgid ""
+"`astartes <https://jacksonburns.github.io/astartes/README.html>`_: "
+"Algorithmic techniques for splitting data into training and test sets."
+msgstr ""
+"`astartes <https://jacksonburns.github.io/astartes/README.html>`_: "
+"Técnicas algorítmicas para dividir datos en conjuntos de entrenamiento y prueba."
+
+#: ../../source/explore/sklearn.rst:122
+msgid ""
+"`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_: Techniques "
+"for handling imbalanced datasets."
+msgstr ""
+"`Imbalanced-learn <https://imbalanced-learn.org/stable/>`_: Técnicas "
+"para manejar conjuntos de datos desbalanceados."
+
+#: ../../source/explore/sklearn.rst:123
+msgid ""
+"`skops <https://skops.readthedocs.io/en/stable/>`_: Tools for serializing"
+" and sharing machine learning models."
+msgstr ""
+"`skops <https://skops.readthedocs.io/en/stable/>`_: Herramientas para serializar "
+"y compartir modelos de aprendizaje automático."
+

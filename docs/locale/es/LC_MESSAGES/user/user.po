@@ -1,0 +1,157 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/user/user.rst:2
+msgid "Quick start"
+msgstr "Inicio rápido"
+
+#: ../../source/user/user.rst:4
+msgid "Check the `installation guide <../user/install.html>`_ to get started."
+msgstr "Consulta la `guía de instalación <../user/install.html>`_ para comenzar."
+
+#: ../../source/user/user.rst:7
+msgid ""
+"**New in chemometrics?** Learn through our step-by-step `tutorials page "
+"<../learn/index.html>`_."
+msgstr ""
+"**¿Nuevo en quimiometría?** Aprende con nuestra `página de tutoriales "
+"<../learn/index.html>`_ paso a paso."
+
+#: ../../source/user/user.rst:10
+msgid ""
+"**Want to explore the tools at your fingertips?** Visit the `explore "
+"overview <../explore/index.html>`_."
+msgstr ""
+"**¿Quieres explorar las herramientas a tu alcance?** Visita la `descripción general de exploración "
+"<../explore/index.html>`_."
+
+#: ../../source/user/user.rst:13
+msgid "Load data"
+msgstr "Cargar datos"
+
+#: ../../source/user/user.rst:15
+msgid ""
+"This loads a training set of mid infrared spectra (``X_train``) and "
+"associated reference values (``y_train``) from a fermentation process."
+msgstr ""
+"Esto carga un conjunto de entrenamiento de espectros infrarrojos medios (``X_train``) y "
+"valores de referencia asociados (``y_train``) de un proceso de fermentación."
+
+#: ../../source/user/user.rst:24
+msgid ""
+"**Looking for available datasets?** See the `datasets catalog "
+"<../learn/datasets.html>`_."
+msgstr ""
+"**¿Buscas conjuntos de datos disponibles?** Consulta el `catálogo de conjuntos de datos "
+"<../learn/datasets.html>`_."
+
+#: ../../source/user/user.rst:27
+msgid "Preprocess spectra"
+msgstr "Preprocesar espectros"
+
+#: ../../source/user/user.rst:29
+msgid ""
+"Load, define and apply preprocessing steps to the training data. Here we "
+"use a Savitzky-Golay filter to compute the first derivative of the sample"
+" spectra."
+msgstr ""
+"Carga, define y aplica pasos de preprocesamiento a los datos de entrenamiento. Aquí "
+"usamos un filtro de Savitzky-Golay para calcular la primera derivada de los "
+"espectros de muestra."
+
+#: ../../source/user/user.rst:42
+msgid ""
+"**Want to know more about preprocessing methods?** Read the `methods "
+"index <../methods/index.html>`_."
+msgstr ""
+"**¿Quieres saber más sobre métodos de preprocesamiento?** Lee el `índice de métodos "
+"<../methods/index.html>`_."
+
+#: ../../source/user/user.rst:45
+msgid "Build a pipeline"
+msgstr "Construir un pipeline"
+
+#: ../../source/user/user.rst:47
+msgid "Combine preprocessing and modelling steps in a single pipeline."
+msgstr "Combina pasos de preprocesamiento y modelado en un solo pipeline."
+
+#: ../../source/user/user.rst:68
+msgid ""
+"**Want to know more about pipelines?** Open the `pipelines article "
+"<../explore/pipelines.html>`_."
+msgstr ""
+"**¿Quieres saber más sobre pipelines?** Abre el `artículo de pipelines "
+"<../explore/pipelines.html>`_."
+
+#: ../../source/user/user.rst:71
+msgid ""
+"**Curious about model optimization?** Read the `optimization guide "
+"<../explore/optimize.html>`_."
+msgstr ""
+"**¿Curioso sobre la optimización de modelos?** Lee la `guía de optimización "
+"<../explore/optimize.html>`_."
+
+#: ../../source/user/user.rst:73
+msgid ""
+"**Congratulations!** You have just built your first chemotools workflow "
+"in Python 🎯"
+msgstr ""
+"**¡Felicidades!** Acabas de construir tu primer flujo de trabajo de chemotools "
+"en Python 🎯"
+
+#~ msgid "Check the `installation guide <../_user/install.html>`_ to get started."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**New in chemometrics?** Learn through "
+#~ "our step-by-step `tutorials page "
+#~ "<../_learn/index.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Want to explore the tools at "
+#~ "your fingertips?** Visit the `explore "
+#~ "overview <../_explore/index.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Looking for available datasets?** See "
+#~ "the `datasets catalog <../_learn/datasets.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Want to know more about preprocessing"
+#~ " methods?** Read the `methods index "
+#~ "<../_methods/index.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Want to know more about pipelines?**"
+#~ " Open the `pipelines article "
+#~ "<../_explore/pipelines.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Curious about model optimization?** Read "
+#~ "the `optimization guide "
+#~ "<../_explore/optimize.html>`_."
+#~ msgstr ""
+

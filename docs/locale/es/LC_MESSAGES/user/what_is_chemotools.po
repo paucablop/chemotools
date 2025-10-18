@@ -1,0 +1,209 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/user/what_is_chemotools.rst:2
+msgid "What is chemotools?"
+msgstr "¿Qué es chemotools?"
+
+#: ../../source/user/what_is_chemotools.rst:4
+msgid ""
+"``chemotools`` is an open-source Python package for spectral "
+"preprocessing and chemometric modelling. It integrates directly with the "
+"``scikit-learn`` ecosystem, enabling reproducible and scalable "
+"development of spectroscopic models."
+msgstr ""
+"``chemotools`` es un paquete de Python de código abierto para preprocesamiento "
+"espectral y modelado quimiométrico. Se integra directamente con el "
+"ecosistema de ``scikit-learn``, permitiendo el desarrollo reproducible y escalable "
+"de modelos espectroscópicos."
+
+#: ../../source/user/what_is_chemotools.rst:6
+msgid "**Extensive toolkit:** transformers for diverse spectroscopic data."
+msgstr "**Kit de herramientas extenso:** transformadores para datos espectroscópicos diversos."
+
+#: ../../source/user/what_is_chemotools.rst:7
+msgid ""
+"**Composable and scalable:** pipelines that integrate directly and grow "
+"with your workflow."
+msgstr ""
+"**Componible y escalable:** pipelines que se integran directamente y crecen "
+"con tu flujo de trabajo."
+
+#: ../../source/user/what_is_chemotools.rst:8
+msgid "**Reliable and transparent:** rigorously tested, peer-reviewed, and open."
+msgstr "**Confiable y transparente:** rigurosamente probado, revisado por pares y abierto."
+
+#: ../../source/user/what_is_chemotools.rst:12
+msgid ""
+"Build exactly what you need, integrate with the tools you trust, and "
+"scale without compromise."
+msgstr ""
+"Construye exactamente lo que necesitas, integra con las herramientas en las que confías y "
+"escala sin compromisos."
+
+#: ../../source/user/what_is_chemotools.rst:14
+msgid "Composable building blocks / lifecycle"
+msgstr "Bloques de construcción componibles / ciclo de vida"
+
+#: ../../source/user/what_is_chemotools.rst:20
+msgid ""
+"**Curious about scikit-learn?** See the dedicated `scikit-learn overview "
+"<../explore/sklearn.html>`_."
+msgstr ""
+"**¿Curioso sobre scikit-learn?** Consulta la `descripción general de scikit-learn "
+"<../explore/sklearn.html>`_."
+
+#: ../../source/user/what_is_chemotools.rst:23
+msgid "Extensive Toolkit"
+msgstr "Kit de herramientas extenso"
+
+#: ../../source/user/what_is_chemotools.rst:24
+msgid ""
+"Spectroscopy is diverse — different **instruments**, **sample matrices**,"
+" and **analysis goals** demand different approaches. ``chemotools`` "
+"provides a **focused set of transformers** for spectroscopic data and "
+"makes it simple to assemble them into **preprocessing pipelines**. By "
+"connecting to the wider **Python ecosystem**, you can leverage **state-"
+"of-the-art machine learning** and **scientific libraries** to build "
+"**robust, end-to-end spectroscopic models**."
+msgstr ""
+"La espectroscopía es diversa — diferentes **instrumentos**, **matrices de muestras** "
+"y **objetivos de análisis** exigen diferentes enfoques. ``chemotools`` "
+"proporciona un **conjunto enfocado de transformadores** para datos espectroscópicos y "
+"hace simple ensamblarlos en **pipelines de preprocesamiento**. Al "
+"conectar con el **ecosistema de Python** más amplio, puedes aprovechar **aprendizaje "
+"automático de última generación** y **bibliotecas científicas** para construir "
+"**modelos espectroscópicos robustos de extremo a extremo**."
+
+#: ../../source/user/what_is_chemotools.rst:26
+msgid "Ecosystem: chemotools with sklearn, numpy and friends"
+msgstr "Ecosistema: chemotools con sklearn, numpy y amigos"
+
+#: ../../source/user/what_is_chemotools.rst:33
+msgid ""
+"Connect your preprocessing with the ``scikit-learn`` ecosystem to unlock "
+"a wide toolstack for feature selection, model tuning, validation, and "
+"deployment."
+msgstr ""
+"Conecta tu preprocesamiento con el ecosistema de ``scikit-learn`` para desbloquear "
+"un amplio conjunto de herramientas para selección de características, ajuste de modelos, validación y "
+"despliegue."
+
+#: ../../source/user/what_is_chemotools.rst:36
+msgid ""
+"**Want to explore the tools at your fingertips?** Visit the `explore "
+"overview <../explore/index.html>`_."
+msgstr ""
+"**¿Quieres explorar las herramientas a tu alcance?** Visita la `descripción general de exploración "
+"<../explore/index.html>`_."
+
+#: ../../source/user/what_is_chemotools.rst:39
+msgid "Composable and Scalable"
+msgstr "Componible y escalable"
+
+#: ../../source/user/what_is_chemotools.rst:40
+msgid ""
+"``chemotools`` transforms preprocessing into a **modular, composable "
+"process**: each transformer follows the ``fit`` / ``transform`` API and "
+"integrates directly with ``scikit-learn`` pipelines. Preprocessing, "
+"feature selection, modelling, and validation can be chained directly — no"
+" adapters required."
+msgstr ""
+"``chemotools`` transforma el preprocesamiento en un **proceso modular y componible**: "
+"cada transformador sigue la API ``fit`` / ``transform`` y "
+"se integra directamente con pipelines de ``scikit-learn``. El preprocesamiento, "
+"selección de características, modelado y validación se pueden encadenar directamente — sin "
+"adaptadores requeridos."
+
+#: ../../source/user/what_is_chemotools.rst:42
+msgid ""
+"This composability ensures **reproducibility** (pipelines are "
+"declarative), **robustness** (swap blocks without refactoring), and "
+"**scalability** (parallelization and deployment patterns leveraging "
+"already supported infrastructure by the ecosystem)."
+msgstr ""
+"Esta componibilidad asegura **reproducibilidad** (los pipelines son "
+"declarativos), **robustez** (intercambia bloques sin refactorizar) y "
+"**escalabilidad** (patrones de paralelización y despliegue aprovechando "
+"infraestructura ya soportada por el ecosistema)."
+
+#: ../../source/user/what_is_chemotools.rst:45
+msgid "From exploration to deployment, ``chemotools`` grows with your workflow."
+msgstr "Desde la exploración hasta el despliegue, ``chemotools`` crece con tu flujo de trabajo."
+
+#: ../../source/user/what_is_chemotools.rst:48
+msgid "Quality & Transparency"
+msgstr "Calidad y transparencia"
+
+#: ../../source/user/what_is_chemotools.rst:49
+msgid ""
+"``chemotools`` combines extensibility and scalability with open-source "
+"transparency, making validation and trust easier from the start."
+msgstr ""
+"``chemotools`` combina extensibilidad y escalabilidad con transparencia de código abierto, "
+"haciendo que la validación y la confianza sean más fáciles desde el principio."
+
+#: ../../source/user/what_is_chemotools.rst:51
+msgid ""
+"**Thorough testing** — covered by extensive `unit tests "
+"<https://app.codecov.io/github/paucablop/chemotools>`_ and continuous "
+"code coverage for reliability and robustness."
+msgstr ""
+"**Pruebas exhaustivas** — cubierto por extensas `pruebas unitarias "
+"<https://app.codecov.io/github/paucablop/chemotools>`_ y cobertura continua "
+"de código para confiabilidad y robustez."
+
+#: ../../source/user/what_is_chemotools.rst:52
+msgid ""
+"**Transparency** — we provide a Software Bill of Materials (SBOM) in "
+"`CycloneDX <https://cyclonedx.org/>`_ format with every release, "
+"supporting validation and clearance in regulated environments."
+msgstr ""
+"**Transparencia** — proporcionamos una Lista de Materiales de Software (SBOM) en "
+"formato `CycloneDX <https://cyclonedx.org/>`_ con cada lanzamiento, "
+"soportando validación y aprobación en entornos regulados."
+
+#: ../../source/user/what_is_chemotools.rst:53
+msgid ""
+"**Peer-reviewed** — published in the `Journal of Open Source Software "
+"(JOSS) <https://joss.theoj.org/papers/10.21105/joss.06802>`_ following "
+"independent peer review."
+msgstr ""
+"**Revisado por pares** — publicado en el `Journal of Open Source Software "
+"(JOSS) <https://joss.theoj.org/papers/10.21105/joss.06802>`_ después de "
+"revisión independiente por pares."
+
+#: ../../source/user/what_is_chemotools.rst:56
+msgid "Quality, transparency, and trust — built in from the start."
+msgstr "Calidad, transparencia y confianza — incorporadas desde el principio."
+
+#~ msgid ""
+#~ "**Curious about scikit-learn?** See the"
+#~ " dedicated `scikit-learn overview "
+#~ "<../_explore/sklearn.html>`_."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "**Want to explore the tools at "
+#~ "your fingertips?** Visit the `explore "
+#~ "overview <../_explore/index.html>`_."
+#~ msgstr ""
+

@@ -1,0 +1,43 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/augmentation.rst:5
+msgid "API Modules"
+msgstr "API モジュール"
+
+#: ../../source/methods/augmentation.rst:2
+msgid "Augmentation"
+msgstr "データ拡張"
+
+#: ../../source/methods/augmentation.rst:3
+msgid ""
+"Simulate real-world variations in your spectral data to enhance model "
+"robustness. This can include introducing controlled noise, baseline "
+"shifts, or small wavelength misalignments to mimic real measurement "
+"conditions. By doing so, your model learns to handle variability in "
+"experimental setups, instrument performance, and sample "
+"preparation—leading to more reliable predictions when applied to unseen "
+"data."
+msgstr ""
+"モデルの堅牢性を高めるために、スペクトルデータに実世界の変動をシミュレートします。これには、実際の測定条件を模倣するために、制御されたノイズ、ベースラインシフト、"
+"または小さな波長のずれを導入することが含まれます。これにより、モデルは実験セットアップ、機器性能、サンプル調製のばらつきを処理する方法を学習し、"
+"未知のデータに適用した際により信頼性の高い予測につながります。"
+

@@ -1,0 +1,85 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/derivative.rst:2
+msgid "chemotools.derivative"
+msgstr "chemotools.derivative"
+
+#: ../../source/api/derivative.rst:6
+msgid ""
+"Derivative calculation methods for spectral analysis. Derivatives help "
+"remove baseline effects and enhance spectral features."
+msgstr ""
+"Métodos de cálculo de derivadas para análisis espectral. Las derivadas ayudan "
+"a eliminar efectos de línea base y realzar características espectrales."
+
+#: ../../source/api/derivative.rst:8
+msgid "**Import from this module:**"
+msgstr "**Importar desde este módulo:**"
+
+#: ../../source/api/derivative.rst:18
+msgid "Available Classes"
+msgstr "Clases disponibles"
+
+#: ../../source/api/derivative.rst:24
+msgid "Class"
+msgstr "Clase"
+
+#: ../../source/api/derivative.rst:25
+msgid "Description"
+msgstr "Descripción"
+
+#: ../../source/api/derivative.rst:26
+msgid ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+msgstr ""
+":doc:`NorrisWilliams "
+"</methods/generated/chemotools.derivative.NorrisWilliams>`"
+
+#: ../../source/api/derivative.rst:27
+msgid "Norris-Williams derivative with gap parameter"
+msgstr "Derivada de Norris-Williams con parámetro de intervalo"
+
+#: ../../source/api/derivative.rst:28
+msgid ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+msgstr ""
+":doc:`SavitzkyGolay "
+"</methods/generated/chemotools.derivative.SavitzkyGolay>`"
+
+#: ../../source/api/derivative.rst:29
+msgid "Savitzky-Golay derivative filter"
+msgstr "Filtro de derivada de Savitzky-Golay"
+
+#: ../../source/api/derivative.rst:32
+msgid "See Also"
+msgstr "Ver también"
+
+#: ../../source/api/derivative.rst:34
+msgid ""
+":doc:`Derivative Methods Overview </methods/derivative>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`Resumen de métodos de derivadas </methods/derivative>` - Documentación "
+"completa con ejemplos y guías visuales"
+

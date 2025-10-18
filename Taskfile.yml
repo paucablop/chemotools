@@ -181,7 +181,7 @@ tasks:
       - echo "Japanese docs available at http://localhost:8004"
       - cd {{.SPHINX_BUILD}}/html/ja && python3 -m http.server 8004
 
-  clean:
+  docs:clean:
     desc: Remove build artifacts and generated API stubs
     cmds:
       - rm -rf {{.SPHINX_BUILD}} {{.API_OUT}}

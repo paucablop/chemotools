@@ -1,0 +1,62 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/utils.rst:2
+msgid "chemotools.utils"
+msgstr "chemotools.utils"
+
+#: ../../source/api/utils.rst:6
+msgid "Utility functions and helper methods used internally by chemotools."
+msgstr "chemotools内部使用的实用函数和辅助方法。"
+
+#: ../../source/api/utils.rst:8
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/utils.rst:18
+msgid ""
+"This module contains internal utilities. Most users won't need to import "
+"directly from here."
+msgstr ""
+"此模块包含内部实用程序。大多数用户不需要直接从此处导入。"
+
+#: ../../source/api/utils.rst:20
+msgid ""
+"For linear algebra operations used in preprocessing, see the specific "
+"method classes in other modules."
+msgstr ""
+"有关预处理中使用的线性代数运算，请参阅其他模块中的特定方法类。"
+
+#: ../../source/api/utils.rst:23
+msgid "Available Functions"
+msgstr "可用函数"
+
+#: ../../source/api/utils.rst:25
+msgid ""
+"This module provides linear algebra utilities and helper functions that "
+"support the core chemotools methods."
+msgstr ""
+"此模块提供支持核心chemotools方法的线性代数实用程序和辅助函数。"
+
+#: ../../source/api/utils.rst:27
+msgid "See the source code for implementation details."
+msgstr "有关实现详细信息，请参阅源代码。"
+

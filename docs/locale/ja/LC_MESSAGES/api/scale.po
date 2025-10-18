@@ -1,0 +1,83 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/scale.rst:2
+msgid "chemotools.scale"
+msgstr "chemotools.scale"
+
+#: ../../source/api/scale.rst:6
+msgid ""
+"Scaling methods to normalize spectral intensity and improve model "
+"performance."
+msgstr ""
+"スペクトル強度を正規化し、モデル性能を向上させるためのスケーリング手法。"
+
+#: ../../source/api/scale.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/scale.rst:19
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/scale.rst:25
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/scale.rst:26
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/scale.rst:27
+msgid ":doc:`MinMaxScaler </methods/generated/chemotools.scale.MinMaxScaler>`"
+msgstr ":doc:`MinMaxScaler </methods/generated/chemotools.scale.MinMaxScaler>`"
+
+#: ../../source/api/scale.rst:28
+msgid "Scale features to a given range (min-max normalization)"
+msgstr "特徴を指定された範囲にスケーリング（最小最大正規化）"
+
+#: ../../source/api/scale.rst:29
+msgid ":doc:`NormScaler </methods/generated/chemotools.scale.NormScaler>`"
+msgstr ":doc:`NormScaler </methods/generated/chemotools.scale.NormScaler>`"
+
+#: ../../source/api/scale.rst:30
+msgid "Scale by vector norm (L1, L2, or max)"
+msgstr "ベクトルノルムでスケーリング（L1、L2、または最大値）"
+
+#: ../../source/api/scale.rst:31
+msgid ":doc:`PointScaler </methods/generated/chemotools.scale.PointScaler>`"
+msgstr ":doc:`PointScaler </methods/generated/chemotools.scale.PointScaler>`"
+
+#: ../../source/api/scale.rst:32
+msgid "Scale relative to a specific point in the spectrum"
+msgstr "スペクトル内の特定の点を基準にスケーリング"
+
+#: ../../source/api/scale.rst:35
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/scale.rst:37
+msgid ""
+":doc:`Scale Methods Overview </methods/scale>` - Complete documentation "
+"with examples and visual guides"
+msgstr ""
+":doc:`スケーリング手法の概要 </methods/scale>` - 例とビジュアルガイドを含む完全なドキュメント"
+

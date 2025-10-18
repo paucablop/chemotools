@@ -1,0 +1,170 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 18:36+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/user/what_is_chemotools.rst:2
+msgid "What is chemotools?"
+msgstr "什么是 chemotools？"
+
+#: ../../source/user/what_is_chemotools.rst:4
+msgid ""
+"``chemotools`` is an open-source Python package for spectral "
+"preprocessing and chemometric modelling. It integrates directly with the "
+"``scikit-learn`` ecosystem, enabling reproducible and scalable "
+"development of spectroscopic models."
+msgstr ""
+"``chemotools`` 是一个用于光谱预处理和化学计量学建模的开源 Python 包。它直接与 ``scikit-learn`` "
+"生态系统集成，支持可重现且可扩展的光谱模型开发。"
+
+#: ../../source/user/what_is_chemotools.rst:6
+msgid "**Extensive toolkit:** transformers for diverse spectroscopic data."
+msgstr "丰富的工具集： 适用于各类光谱数据的转换器。"
+
+#: ../../source/user/what_is_chemotools.rst:7
+msgid ""
+"**Composable and scalable:** pipelines that integrate directly and grow "
+"with your workflow."
+msgstr "可组合且可扩展：可直接集成并能随您工作流程发展的管道。"
+
+#: ../../source/user/what_is_chemotools.rst:8
+msgid "**Reliable and transparent:** rigorously tested, peer-reviewed, and open."
+msgstr "可靠且透明： 经过严格测试、同行评审并且开源。"
+
+#: ../../source/user/what_is_chemotools.rst:12
+msgid ""
+"Build exactly what you need, integrate with the tools you trust, and "
+"scale without compromise."
+msgstr "构建您所需，集成您所信，扩展无妥协。"
+
+#: ../../source/user/what_is_chemotools.rst:14
+msgid "Composable building blocks / lifecycle"
+msgstr "可组合的构建模块 / 生命周期"
+
+#: ../../source/user/what_is_chemotools.rst:20
+#, fuzzy
+msgid ""
+"**Curious about scikit-learn?** See the dedicated `scikit-learn overview "
+"<../explore/sklearn.html>`_."
+msgstr "对 scikit-learn 感到好奇？请参阅专门的 `scikit-learn <../_explore/sklearn.html>`_ 概述。"
+
+#: ../../source/user/what_is_chemotools.rst:23
+msgid "Extensive Toolkit"
+msgstr "丰富的工具集"
+
+#: ../../source/user/what_is_chemotools.rst:24
+msgid ""
+"Spectroscopy is diverse — different **instruments**, **sample matrices**,"
+" and **analysis goals** demand different approaches. ``chemotools`` "
+"provides a **focused set of transformers** for spectroscopic data and "
+"makes it simple to assemble them into **preprocessing pipelines**. By "
+"connecting to the wider **Python ecosystem**, you can leverage **state-"
+"of-the-art machine learning** and **scientific libraries** to build "
+"**robust, end-to-end spectroscopic models**."
+msgstr ""
+"光谱学是多样化的——不同的仪器、样品基质和分析目标需要不同的方法。``chemotools`` "
+"为光谱数据提供了一套专注的转换器，并使将它们组装成预处理管道变得简单。通过连接到更广泛的 Python "
+"生态系统，您可以利用先进的机器学习和科学库来构建稳健的端到端光谱模型。"
+
+#: ../../source/user/what_is_chemotools.rst:26
+msgid "Ecosystem: chemotools with sklearn, numpy and friends"
+msgstr "生态系统：chemotools 与 sklearn、numpy 及其伙伴们"
+
+#: ../../source/user/what_is_chemotools.rst:33
+msgid ""
+"Connect your preprocessing with the ``scikit-learn`` ecosystem to unlock "
+"a wide toolstack for feature selection, model tuning, validation, and "
+"deployment."
+msgstr "将您的预处理与 ``scikit-learn`` 生态系统连接起来，以解锁用于特征选择、模型调优、验证和部署的广泛工具栈。"
+
+#: ../../source/user/what_is_chemotools.rst:36
+#, fuzzy
+msgid ""
+"**Want to explore the tools at your fingertips?** Visit the `explore "
+"overview <../explore/index.html>`_."
+msgstr "想要探索触手可及的工具？ 请访问 `探索概览 <../_explore/index.html>`_。"
+
+#: ../../source/user/what_is_chemotools.rst:39
+msgid "Composable and Scalable"
+msgstr "可组合与可扩展"
+
+#: ../../source/user/what_is_chemotools.rst:40
+msgid ""
+"``chemotools`` transforms preprocessing into a **modular, composable "
+"process**: each transformer follows the ``fit`` / ``transform`` API and "
+"integrates directly with ``scikit-learn`` pipelines. Preprocessing, "
+"feature selection, modelling, and validation can be chained directly — no"
+" adapters required."
+msgstr ""
+"``chemotools`` 将预处理转变为模块化、可组合的过程：每个转换器都遵循 ``fit`` / ``transform`` "
+"API，并直接与 ``scikit-learn`` 管道集成。预处理、特征选择、建模和验证可以直接链接——无需适配器。"
+
+#: ../../source/user/what_is_chemotools.rst:42
+msgid ""
+"This composability ensures **reproducibility** (pipelines are "
+"declarative), **robustness** (swap blocks without refactoring), and "
+"**scalability** (parallelization and deployment patterns leveraging "
+"already supported infrastructure by the ecosystem)."
+msgstr "这种可组合性确保了可重现性（管道是声明式的）、稳健性（无需重构即可交换模块）和可扩展性（利用生态系统已支持的基础设施进行并行化和部署）。"
+
+#: ../../source/user/what_is_chemotools.rst:45
+msgid "From exploration to deployment, ``chemotools`` grows with your workflow."
+msgstr "从探索到部署，``chemotools`` 与您的工作流程共同成长。"
+
+#: ../../source/user/what_is_chemotools.rst:48
+msgid "Quality & Transparency"
+msgstr "质量与透明度"
+
+#: ../../source/user/what_is_chemotools.rst:49
+msgid ""
+"``chemotools`` combines extensibility and scalability with open-source "
+"transparency, making validation and trust easier from the start."
+msgstr "``chemotools`` 将可扩展性和可伸缩性与开源透明度相结合，使得验证和信任从一开始就更加容易。"
+
+#: ../../source/user/what_is_chemotools.rst:51
+msgid ""
+"**Thorough testing** — covered by extensive `unit tests "
+"<https://app.codecov.io/github/paucablop/chemotools>`_ and continuous "
+"code coverage for reliability and robustness."
+msgstr ""
+"全面测试 — 通过广泛的 `单元测试 <https://app.codecov.io/github/paucablop/chemotools>`_"
+" 和持续的代码覆盖率来确保可靠性和稳健性。"
+
+#: ../../source/user/what_is_chemotools.rst:52
+msgid ""
+"**Transparency** — we provide a Software Bill of Materials (SBOM) in "
+"`CycloneDX <https://cyclonedx.org/>`_ format with every release, "
+"supporting validation and clearance in regulated environments."
+msgstr ""
+"透明度 — 我们在每个版本中都提供 `CycloneDX <https://cyclonedx.org/>`_ 格式的软件物料清单 "
+"(SBOM)，以支持在受监管环境中的验证和审核。"
+
+#: ../../source/user/what_is_chemotools.rst:53
+msgid ""
+"**Peer-reviewed** — published in the `Journal of Open Source Software "
+"(JOSS) <https://joss.theoj.org/papers/10.21105/joss.06802>`_ following "
+"independent peer review."
+msgstr ""
+"同行评审 — 经过独立同行评审后，发表于 `Journal of Open Source Software (JOSS) "
+"<https://joss.theoj.org/papers/10.21105/joss.06802>`_。"
+
+#: ../../source/user/what_is_chemotools.rst:56
+msgid "Quality, transparency, and trust — built in from the start."
+msgstr "质量、透明度和信任——从一开始就内置其中。"
+

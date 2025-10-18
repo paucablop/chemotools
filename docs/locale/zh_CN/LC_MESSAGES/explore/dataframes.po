@@ -1,0 +1,143 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/dataframes.rst:2
+msgid "Working with DataFrames"
+msgstr "处理 DataFrame"
+
+#: ../../source/explore/dataframes.rst:4
+msgid ""
+"For the ``pandas.DataFrame`` and ``polars.DataFrame`` lovers. By default,"
+" all ``scikit-learn`` and ``chemotools`` transformers output "
+"``numpy.ndarray``. However, now it is possible to configure your "
+"``chemotools`` preprocessing methods to produce either a "
+"``pandas.DataFrame`` or a ``polars.DataFrame`` objects as output. This is"
+" possible after implementing the new ``set_output()`` API from ``scikit-"
+"learn`` (>= 1.2.2 for ``pandas`` and >= 1.4.0 for ``polars``) "
+"(`documentation <https://scikit-"
+"learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_). "
+"The same API implemented in other ``scikit-learn`` preprocessing methods "
+"like the ``StandardScaler()`` is now available for the ``chemotools`` "
+"transformers."
+msgstr "献给 ``pandas.DataFrame`` 和 ``polars.DataFrame`` 爱好者。默认情况下，所有 ``scikit-learn`` 和 ``chemotools`` 转换器都输出 ``numpy.ndarray``。然而，现在可以配置您的 ``chemotools`` 预处理方法以生成 ``pandas.DataFrame`` 或 ``polars.DataFrame`` 对象作为输出。这是在实现了来自 ``scikit-learn`` 的新 ``set_output()`` API（对于 ``pandas`` 需要 >= 1.2.2，对于 ``polars`` 需要 >= 1.4.0）（`文档 <https://scikit-learn.org/stable/auto_examples/miscellaneous/plot_set_output.html>`_）之后实现的。现在，在其他 ``scikit-learn`` 预处理方法（如 ``StandardScaler()``）中实现的相同 API 也可用于 ``chemotools`` 转换器。"
+
+#: ../../source/explore/dataframes.rst:7
+msgid ""
+"From version 0.1.3, the ``set_output()`` is available for all "
+"``chemotools`` functions!"
+msgstr "从版本 0.1.3 开始，``set_output()`` 可用于所有 ``chemotools`` 函数！"
+
+#: ../../source/explore/dataframes.rst:9
+msgid "Below there are two examples of how to use this new API:"
+msgstr "以下是两个如何使用此新 API 的示例："
+
+#: ../../source/explore/dataframes.rst:12
+msgid ""
+"**Example 1: Using the set_output() API with a single preprocessing "
+"method**"
+msgstr "示例 1：在单个预处理方法中使用 set_output() API"
+
+#: ../../source/explore/dataframes.rst:15
+msgid "1. Load your spectral data as a ``pandas.DataFrame``"
+msgstr "1. 将光谱数据加载为 ``pandas.DataFrame``"
+
+#: ../../source/explore/dataframes.rst:17
+msgid ""
+"First load your spectral data. In this case, we assume a file called "
+"``spectra.csv`` where each row represents a spectrum and each column "
+"represents wavenumbers."
+msgstr "首先加载您的光谱数据。在这种情况下，我们假设有一个名为 ``spectra.csv`` 的文件，其中每一行代表一个光谱，每一列代表波数。"
+
+#: ../../source/explore/dataframes.rst:27
+msgid ""
+"The ``spectra`` variable is a ``pandas.DataFrame`` object with the "
+"indices representing the sample names and the columns representing the "
+"wavenumbers."
+msgstr "``spectra`` 变量是一个 ``pandas.DataFrame`` 对象，其索引代表样本名称，列代表波数。"
+
+#: ../../source/explore/dataframes.rst:30
+msgid ""
+"2. Create a ``chemotools`` preprocessing object and set the output to "
+"``pandas``"
+msgstr "2. 创建一个 ``chemotools`` 预处理对象并将输出设置为 ``pandas``"
+
+#: ../../source/explore/dataframes.rst:32
+msgid "Next, we create the ``AirPls`` object and set the output to ``pandas``."
+msgstr "接下来，我们创建 ``AirPls`` 对象并将输出设置为 ``pandas``。"
+
+#: ../../source/explore/dataframes.rst:39
+msgid "The ``set_output()`` method accepts the following arguments:"
+msgstr "``set_output()`` 方法接受以下参数："
+
+#: ../../source/explore/dataframes.rst:41
+msgid ""
+"``transform``: The output format. Can be ``'pandas'`` or ``'default'`` "
+"(the default format will output a ``numpy.ndarray``)."
+msgstr "``transform``：输出格式。可以是 ``'pandas'`` 或 ``'default'``（默认格式将输出 ``numpy.ndarray``）。"
+
+#: ../../source/explore/dataframes.rst:44
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``AirPLS().set_output(transform='polars')``)."
+msgstr "如果您想将输出设置为 ``polars``，您可以在 ``set_output()`` 方法中使用 ``transform='polars'``（``AirPLS().set_output(transform='polars')``）。"
+
+#: ../../source/explore/dataframes.rst:47
+msgid "3. Fit and transform the spectra"
+msgstr "3. 拟合并转换光谱"
+
+#: ../../source/explore/dataframes.rst:54
+msgid ""
+"The output of the ``fit_transform()`` method is now a "
+"``pandas.DataFrame`` object."
+msgstr "``fit_transform()`` 方法的输出现在是一个 ``pandas.DataFrame`` 对象。"
+
+#: ../../source/explore/dataframes.rst:57
+msgid ""
+"Notice that by default the indices and the columns of the input data are "
+"not maintained to the output, and the ``spectra_airpls`` DataFrame has "
+"default indices and columns."
+msgstr "请注意，默认情况下输入数据的索引和列不会保留到输出中，``spectra_airpls`` DataFrame 具有默认的索引和列。"
+
+#: ../../source/explore/dataframes.rst:60
+msgid "**Example 2: Using the set_output() API with a pipeline**"
+msgstr "示例 2：在管道中使用 set_output() API"
+
+#: ../../source/explore/dataframes.rst:62
+msgid ""
+"Similarly, the ``set_output()`` API can be used with pipelines. The "
+"following code shows how to create a pipeline that performs:"
+msgstr "类似地，``set_output()`` API 也可用于管道。以下代码显示了如何创建一个执行以下操作的管道："
+
+#: ../../source/explore/dataframes.rst:64
+msgid "Multiplicative scatter correction"
+msgstr "乘性散射校正"
+
+#: ../../source/explore/dataframes.rst:65
+msgid "Standard scaling"
+msgstr "标准缩放"
+
+#: ../../source/explore/dataframes.rst:84
+msgid ""
+"If you wanted to set the output to ``polars`` you would use "
+"``transform='polars'`` in the ``set_output()`` method "
+"(``pipeline.set_output(transform='polars')``)."
+msgstr "如果您想将输出设置为 ``polars``，您可以在 ``set_output()`` 方法中使用 ``transform='polars'``（``pipeline.set_output(transform='polars')``）。"

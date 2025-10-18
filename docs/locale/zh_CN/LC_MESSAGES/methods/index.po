@@ -1,0 +1,64 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/index.rst:7
+msgid "Methods"
+msgstr "方法"
+
+#: ../../source/methods/index.rst:22
+msgid ""
+"Add random variation in your data to simulate different real-world "
+"scenarios."
+msgstr "在数据中添加随机变异，以模拟不同的现实场景。"
+
+#: ../../source/methods/index.rst:24
+msgid "Augmentation"
+msgstr ""
+
+#: ../../source/methods/index.rst:36
+msgid ""
+"Preprocess your data to remove remove noise and highlight the chemical "
+"information."
+msgstr "预处理数据以去除噪声并突出化学信息。"
+
+#: ../../source/methods/index.rst:38
+msgid "Preprocessing"
+msgstr ""
+
+#: ../../source/methods/index.rst:50
+msgid ""
+"Select the most chemically relevant features to improve the performance "
+"of your model."
+msgstr "选择最具化学相关性的特征，以提高模型的性能。"
+
+#: ../../source/methods/index.rst:52
+msgid "Feature selection"
+msgstr ""
+
+#: ../../source/methods/index.rst:64
+msgid ""
+"Detect outliers from your data to improve diagnostics and reliability of "
+"the results."
+msgstr "检测数据异常值，以优化分析结果。"
+
+#: ../../source/methods/index.rst:66
+msgid "Outliers"
+msgstr ""

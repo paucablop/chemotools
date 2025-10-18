@@ -1,0 +1,73 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/outliers_methods.rst:2
+msgid "Outliers Methods"
+msgstr "Métodos de valores atípicos"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ":py:obj:`DModX <chemotools.outliers.DModX>`"
+msgstr ":py:obj:`DModX <chemotools.outliers.DModX>`"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid "Calculate Distance to Model (DModX) statistics."
+msgstr "Calcula estadísticas de Distancia al Modelo (DModX)."
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ":py:obj:`HotellingT2 <chemotools.outliers.HotellingT2>`"
+msgstr ":py:obj:`HotellingT2 <chemotools.outliers.HotellingT2>`"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid "Calculate Hotelling's T-squared statistics for PCA or PLS like models."
+msgstr "Calcula estadísticas T-cuadrado de Hotelling para modelos tipo PCA o PLS."
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ":py:obj:`QResiduals <chemotools.outliers.QResiduals>`"
+msgstr ":py:obj:`QResiduals <chemotools.outliers.QResiduals>`"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ""
+"Calculate Q residuals (Squared Prediction Error - SPE) for PCA or PLS "
+"models."
+msgstr ""
+"Calcula residuos Q (Error de Predicción Cuadrado - SPE) para modelos PCA o "
+"PLS."
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ":py:obj:`Leverage <chemotools.outliers.Leverage>`"
+msgstr ":py:obj:`Leverage <chemotools.outliers.Leverage>`"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ""
+"Calculate the leverage of the training samples on  the latent space of a "
+"PLS model."
+msgstr ""
+"Calcula el apalancamiento de las muestras de entrenamiento en el espacio latente de un "
+"modelo PLS."
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid ":py:obj:`StudentizedResiduals <chemotools.outliers.StudentizedResiduals>`"
+msgstr ":py:obj:`StudentizedResiduals <chemotools.outliers.StudentizedResiduals>`"
+
+#: ../../source/methods/outliers_methods.rst:16:<autosummary>:1
+msgid "Calculate the Studentized Residuals on a _PLS model preditions."
+msgstr "Calcula los Residuos Estudentizados en las predicciones de un modelo PLS."
+

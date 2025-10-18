@@ -1,0 +1,77 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/scatter.rst:2
+msgid "Scattering Methods"
+msgstr "Métodos de dispersión"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+":py:obj:`ExtendedMultiplicativeScatterCorrection "
+"<chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+msgstr ""
+":py:obj:`ExtendedMultiplicativeScatterCorrection "
+"<chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"Extended multiplicative scatter correction (EMSC) is a preprocessing "
+"technique for removing non linear scatter effects from spectra."
+msgstr ""
+"La corrección de dispersión multiplicativa extendida (EMSC) es una técnica de preprocesamiento "
+"para eliminar efectos de dispersión no lineal de los espectros."
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+":py:obj:`MultiplicativeScatterCorrection "
+"<chemotools.scatter.MultiplicativeScatterCorrection>`"
+msgstr ""
+":py:obj:`MultiplicativeScatterCorrection "
+"<chemotools.scatter.MultiplicativeScatterCorrection>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"Multiplicative scatter correction (MSC) is a preprocessing technique for "
+"removing scatter effects from spectra."
+msgstr ""
+"La corrección de dispersión multiplicativa (MSC) es una técnica de preprocesamiento "
+"para eliminar efectos de dispersión de los espectros."
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ":py:obj:`RobustNormalVariate <chemotools.scatter.RobustNormalVariate>`"
+msgstr ":py:obj:`RobustNormalVariate <chemotools.scatter.RobustNormalVariate>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid "A transformer that calculates the robust normal variate of the input data."
+msgstr "Un transformador que calcula la variante normal robusta de los datos de entrada."
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ":py:obj:`StandardNormalVariate <chemotools.scatter.StandardNormalVariate>`"
+msgstr ":py:obj:`StandardNormalVariate <chemotools.scatter.StandardNormalVariate>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"A transformer that calculates the standard normal variate of the input "
+"data."
+msgstr ""
+"Un transformador que calcula la variante normal estándar de los datos de "
+"entrada."
+

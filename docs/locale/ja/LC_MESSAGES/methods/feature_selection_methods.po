@@ -1,0 +1,65 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/feature_selection_methods.rst:2
+msgid "Feature Selection Methods"
+msgstr "特徴量選択手法"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`IndexSelector <chemotools.feature_selection.IndexSelector>`"
+msgstr ":py:obj:`IndexSelector <chemotools.feature_selection.IndexSelector>`"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ""
+"A transformer that Selects the spectral data to a specified array of "
+"features."
+msgstr "スペクトルデータを指定された特徴量の配列に選択する変換器。"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`RangeCut <chemotools.feature_selection.RangeCut>`"
+msgstr ":py:obj:`RangeCut <chemotools.feature_selection.RangeCut>`"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid "Select a contiguous spectral region by index or by wavenumber."
+msgstr "インデックスまたは波数で連続したスペクトル領域を選択します。"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`SRSelector <chemotools.feature_selection.SRSelector>`"
+msgstr ":py:obj:`SRSelector <chemotools.feature_selection.SRSelector>`"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ""
+"This selector is used to select features that contribute significantly to"
+" the latent variables in a PLS regression model using the Selectivity "
+"Ratio (SR) method."
+msgstr "このセレクタは、選択比(SR)法を使用してPLS回帰モデルの潜在変数に大きく寄与する特徴量を選択するために使用されます。"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`VIPSelector <chemotools.feature_selection.VIPSelector>`"
+msgstr ":py:obj:`VIPSelector <chemotools.feature_selection.VIPSelector>`"
+
+#: ../../source/methods/feature_selection_methods.rst:15:<autosummary>:1
+msgid ""
+"This selector is used to select features that contribute significantly to"
+" the latent variables in a PLS regression model using the Variables "
+"Importance in Projection (VIP) method."
+msgstr "このセレクタは、投影変数重要度(VIP)法を使用してPLS回帰モデルの潜在変数に大きく寄与する特徴量を選択するために使用されます。"
+

@@ -1,0 +1,105 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/spectra.rst:4
+msgid "Working with spectra"
+msgstr "Trabajando con espectros"
+
+#: ../../source/explore/spectra.rst:6
+msgid ""
+"When working with spectroscopic data in ``chemotools`` and ``scikit-"
+"learn``, you often need to reshape single spectra to fit the expected "
+"data shapes. This guide explains how to reshape single spectra for "
+"preprocessing in ``scikit-learn`` and ``chemotools``."
+msgstr ""
+"Al trabajar con datos espectroscópicos en ``chemotools`` y ``scikit-"
+"learn``, a menudo necesitas remodelar espectros individuales para que se ajusten a las "
+"formas de datos esperadas. Esta guía explica cómo remodelar espectros individuales para "
+"preprocesamiento en ``scikit-learn`` y ``chemotools``."
+
+#: ../../source/explore/spectra.rst:9
+msgid "Understanding Data Shapes"
+msgstr "Comprendiendo las Formas de Datos"
+
+#: ../../source/explore/spectra.rst:11
+msgid ""
+"``chemotools`` and ``scikit-learn`` preprocessing techniques expect 2D "
+"arrays (matrices) where:"
+msgstr ""
+"Las técnicas de preprocesamiento de ``chemotools`` y ``scikit-learn`` esperan arreglos 2D "
+"(matrices) donde:"
+
+#: ../../source/explore/spectra.rst:13
+msgid "Each row represents a sample"
+msgstr "Cada fila representa una muestra"
+
+#: ../../source/explore/spectra.rst:14
+msgid "Each column represents a feature"
+msgstr "Cada columna representa una característica"
+
+#: ../../source/explore/spectra.rst:16
+msgid ""
+"However, spectroscopic data often comes as single spectrum in 1D arrays "
+"(vectors). Here's an example of a single spectrum:"
+msgstr ""
+"Sin embargo, los datos espectroscópicos a menudo vienen como un espectro individual en arreglos 1D "
+"(vectores). Aquí hay un ejemplo de un espectro individual:"
+
+#: ../../source/explore/spectra.rst:23
+msgid ""
+"To use ``chemotools`` and  ``scikit-learn`` with single spectra, you need"
+" to reshape the 1D array into a 2D array with one row."
+msgstr ""
+"Para usar ``chemotools`` y ``scikit-learn`` con espectros individuales, necesitas "
+"remodelar el arreglo 1D en un arreglo 2D con una fila."
+
+#: ../../source/explore/spectra.rst:26
+msgid "Reshaping for Preprocessing"
+msgstr "Remodelando para Preprocesamiento"
+
+#: ../../source/explore/spectra.rst:28
+msgid "Here's how to reshape a 1D array into a 2D array with a single row:"
+msgstr "Aquí se muestra cómo remodelar un arreglo 1D en un arreglo 2D con una sola fila:"
+
+#: ../../source/explore/spectra.rst:36
+msgid ""
+"The ``reshape(1, -1)`` method converts the 1D array ``spectra_1d`` into a"
+" 2D array with a single row. The result (``spectra_2d``) looks like this:"
+msgstr ""
+"El método ``reshape(1, -1)`` convierte el arreglo 1D ``spectra_1d`` en un "
+"arreglo 2D con una sola fila. El resultado (``spectra_2d``) se ve así:"
+
+#: ../../source/explore/spectra.rst:44
+msgid ""
+"The reshaped output is a 2D array with a single row - the format required"
+" by ``scikit-learn`` and ``chemotools`` preprocessing techniques."
+msgstr ""
+"La salida remodelada es un arreglo 2D con una sola fila - el formato requerido "
+"por las técnicas de preprocesamiento de ``scikit-learn`` y ``chemotools``."
+
+#: ../../source/explore/spectra.rst:47
+msgid ""
+"Now, you can use the reshaped single spectrum with ``chemotools`` and "
+"``scikit-learn`` preprocessing techniques:"
+msgstr ""
+"Ahora, puedes usar el espectro individual remodelado con las técnicas de preprocesamiento de ``chemotools`` y "
+"``scikit-learn``:"
+

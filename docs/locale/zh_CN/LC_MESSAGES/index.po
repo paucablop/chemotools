@@ -1,0 +1,117 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:44+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/index.rst:7
+msgid "User Guide"
+msgstr "用户指南"
+
+#: ../../source/index.rst:7
+msgid "Methods"
+msgstr "方法"
+
+#: ../../source/index.rst:7
+msgid "Explore"
+msgstr "探索"
+
+#: ../../source/index.rst:7
+msgid "Learn"
+msgstr "学习"
+
+#: ../../source/index.rst:7
+msgid "Cite"
+msgstr "引用"
+
+#: ../../source/index.rst:7
+msgid "API"
+msgstr "API"
+
+#: ../../source/index.rst:20
+msgid "PyPI version"
+msgstr "PyPI 版本"
+
+#: ../../source/index.rst:24
+msgid "Python versions"
+msgstr "Python 版本"
+
+#: ../../source/index.rst:28
+msgid "License"
+msgstr "许可证"
+
+#: ../../source/index.rst:32
+msgid "Code coverage"
+msgstr "代码覆盖率"
+
+#: ../../source/index.rst:36
+msgid "Downloads"
+msgstr "下载量"
+
+#: ../../source/index.rst:40
+msgid "DOI"
+msgstr "DOI"
+
+#: ../../source/index.rst:47
+msgid "Welcome to chemotools"
+msgstr "欢迎使用 chemotools"
+
+#: ../../source/index.rst:50
+msgid ""
+"``chemotools`` is a **Python package for spectral analysis**, designed to"
+" integrate natively with the widely adopted ``scikit-learn`` API and the "
+"broader **Python machine learning ecosystem**."
+msgstr ""
+"``chemotools`` 是一个用于光谱分析的 Python 软件包，旨在与广泛采用的 ``scikit-learn`` API 及更广泛的 Python 机器学习生态系统原生集成。"
+
+#: ../../source/index.rst:52
+msgid ""
+"Developed after years of applying **spectroscopy** across industries, its"
+" mission is to empower **scientists and engineers** with the tools needed"
+" to build **production-ready chemometric models**. ``chemotools`` "
+"provides an **intuitive, flexible environment** that streamlines the "
+"**development and deployment** of models, making it easier to "
+"**standardize workflows** and **scale chemometric solutions**."
+msgstr ""
+"基于多年在各行业应用光谱技术的经验开发而成，其使命是为科学家和工程师提供构建生产就绪的化学计量模型所需的工具。``chemotools`` "
+"提供了一个直观、灵活的环境，能够简化模型的开发与部署过程，使标准化工作流程和扩展化学计量解决方案变得更加容易。"
+
+#: ../../source/index.rst:54
+msgid "chemotools workflow"
+msgstr "chemotools 工作流程"
+
+#: ../../source/index.rst:61
+msgid "Start exploring"
+msgstr "开始探索"
+
+#: ../../source/index.rst:70
+# NOTE: Button text translation is handled by post-processing script (fix_translated_buttons.py)
+# to work around sphinx-design's i18n limitation. Keep this for reference.
+msgid "Discover the environment"
+msgstr ""
+
+#: ../../source/index.rst:81
+# NOTE: Button text translation is handled by post-processing script (fix_translated_buttons.py)
+# to work around sphinx-design's i18n limitation. Keep this for reference.
+msgid "Chemometrics tutorials"
+msgstr ""
+
+#: ../../source/index.rst:92
+# NOTE: Button text translation is handled by post-processing script (fix_translated_buttons.py)
+# to work around sphinx-design's i18n limitation. Keep this for reference.
+msgid "Check out our Webinar"
+msgstr ""

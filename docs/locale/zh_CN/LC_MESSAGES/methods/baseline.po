@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/baseline.rst:2
+msgid "Baseline Methods"
+msgstr "基线校正方法"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+msgstr ":py:obj:`AirPls <chemotools.baseline.AirPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline"
+" correction."
+msgstr "自适应迭代重加权惩罚最小二乘（AirPls）基线校正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+msgstr ":py:obj:`ArPls <chemotools.baseline.ArPls>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"Asymmetrically Reweighted Penalized Least Squares (ArPLS) baseline "
+"correction."
+msgstr "非对称重加权惩罚最小二乘（ArPLS）基线校正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+msgstr ":py:obj:`AsLs <chemotools.baseline.AsLs>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "Asymmetric Least Squares (AsLs) baseline correction."
+msgstr "非对称最小二乘（AsLs）基线校正。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`ConstantBaselineCorrection "
+"<chemotools.baseline.ConstantBaselineCorrection>`"
+msgstr ""
+":py:obj:`ConstantBaselineCorrection "
+"<chemotools.baseline.ConstantBaselineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that corrects a baseline by subtracting a constant value."
+msgstr "通过减去常数值来校正基线的转换器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`CubicSplineCorrection "
+"<chemotools.baseline.CubicSplineCorrection>`"
+msgstr ""
+":py:obj:`CubicSplineCorrection "
+"<chemotools.baseline.CubicSplineCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a cubic spline "
+"through the points defined by the indices."
+msgstr "通过减去由索引定义的点的三次样条来校正基线的转换器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+msgstr ":py:obj:`LinearCorrection <chemotools.baseline.LinearCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ""
+"A transformer that corrects a baseline by subtracting a linear baseline "
+"through the initial and final points of the spectrum."
+msgstr "通过减去穿过光谱初始点和最终点的线性基线来校正基线的转换器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+msgstr ":py:obj:`NonNegative <chemotools.baseline.NonNegative>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that sets all negative values to zero or to abs."
+msgstr "将所有负值设置为零或绝对值的转换器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+msgstr ":py:obj:`PolynomialCorrection <chemotools.baseline.PolynomialCorrection>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a polynomial baseline from the input data."
+msgstr "从输入数据中减去多项式基线的转换器。"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+msgstr ":py:obj:`SubtractReference <chemotools.baseline.SubtractReference>`"
+
+#: ../../source/methods/baseline.rst:20:<autosummary>:1
+msgid "A transformer that subtracts a reference spectrum from the input data."
+msgstr "从输入数据中减去参考光谱的转换器。"
+

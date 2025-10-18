@@ -1,0 +1,152 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/explore/pipelines.rst:2
+msgid "Preprocessing pipelines"
+msgstr "前処理パイプライン"
+
+#: ../../source/explore/pipelines.rst:4
+msgid ""
+"Pipelines are becoming increasingly popular in machine learning "
+"workflows. In essence, pipelines are a sequence of connected data "
+"processing steps, where the output of one step is the input of the next. "
+"They are very useful for:"
+msgstr ""
+"パイプラインは機械学習ワークフローでますます人気が高まっています。本質的に、パイプラインは接続されたデータ処理ステップのシーケンスであり、あるステップの出力が次のステップの入力となります。これらは以下の点で非常に有用です："
+
+#: ../../source/explore/pipelines.rst:6
+msgid "automating complex workflows,"
+msgstr "複雑なワークフローの自動化、"
+
+#: ../../source/explore/pipelines.rst:7
+msgid "improving efficiency,"
+msgstr "効率の向上、"
+
+#: ../../source/explore/pipelines.rst:8
+msgid "reducing errors in data processing and analysis and"
+msgstr "データ処理と分析におけるエラーの削減、そして"
+
+#: ../../source/explore/pipelines.rst:9
+msgid "simplifying model persistence and deployment."
+msgstr "モデルの永続化とデプロイの簡素化。"
+
+#: ../../source/explore/pipelines.rst:11
+msgid ""
+"All preprocessing techniques in ``chemotools`` are compatible with "
+"``scikit-learn`` and can be used in pipelines. As an example, we will "
+"study the case where we would like to apply the following preprocessing "
+"techniques to our spectra:"
+msgstr ""
+"``chemotools`` のすべての前処理技術は ``scikit-learn`` と互換性があり、パイプラインで使用できます。例として、スペクトルに以下の前処理技術を適用したい場合を検討します："
+
+#: ../../source/explore/pipelines.rst:13
+msgid "Range Cut"
+msgstr "範囲カット"
+
+#: ../../source/explore/pipelines.rst:14
+msgid "Linear Correction"
+msgstr "線形補正"
+
+#: ../../source/explore/pipelines.rst:15
+msgid "Savitzky-Golay derivate"
+msgstr "Savitzky-Golay微分"
+
+#: ../../source/explore/pipelines.rst:16
+msgid "Mean Centering (Standard Scaler)"
+msgstr "平均センタリング（標準スケーラー）"
+
+#: ../../source/explore/pipelines.rst:17
+msgid "PLS regression"
+msgstr "PLS回帰"
+
+#: ../../source/explore/pipelines.rst:20
+msgid "Traditional flow"
+msgstr "従来のフロー"
+
+#: ../../source/explore/pipelines.rst:22
+msgid ""
+"In a traditional flow, would apply each preprocessing technique "
+"individually to the spectra as shown in the image below:"
+msgstr ""
+"従来のフローでは、以下の図に示すように、各前処理技術をスペクトルに個別に適用します："
+
+#: ../../source/explore/pipelines.rst:24
+msgid "Traditional workflow"
+msgstr "従来のワークフロー"
+
+#: ../../source/explore/pipelines.rst:29
+msgid "The code to perform this workflow would look like this:"
+msgstr "このワークフローを実行するコードは以下のようになります："
+
+#: ../../source/explore/pipelines.rst:77
+msgid ""
+"This is a tedious and error-prone workflow, especially when the number of"
+" preprocessing steps increases. In addition, persisting the model and "
+"deploying it to a production environment is not straightforward, as each "
+"preprocessing step needs to be persisted and deployed individually."
+msgstr ""
+"これは退屈でエラーが発生しやすいワークフローであり、特に前処理ステップの数が増加すると顕著です。さらに、各前処理ステップを個別に永続化およびデプロイする必要があるため、モデルの永続化と本番環境へのデプロイは簡単ではありません。"
+
+#: ../../source/explore/pipelines.rst:80
+msgid "Pipeline flow"
+msgstr "パイプラインフロー"
+
+#: ../../source/explore/pipelines.rst:81
+msgid ""
+"In a pipeline flow, we can combine all preprocessing steps into a single "
+"object. This simplifies the workflow and reduces the risk of errors. The "
+"figure below shows the same workflow as above, but using a pipeline:"
+msgstr ""
+"パイプラインフローでは、すべての前処理ステップを単一のオブジェクトに結合できます。これによりワークフローが簡素化され、エラーのリスクが低減されます。以下の図は、同じワークフローをパイプラインを使用して示しています："
+
+#: ../../source/explore/pipelines.rst:83
+msgid "Pipeline workflow"
+msgstr "パイプラインワークフロー"
+
+#: ../../source/explore/pipelines.rst:88
+msgid ""
+"An outline of the code to perform the pipeline is shown in the image "
+"below:"
+msgstr "パイプラインを実行するコードの概要を以下の図に示します："
+
+#: ../../source/explore/pipelines.rst:90
+msgid "Pipeline code"
+msgstr "パイプラインコード"
+
+#: ../../source/explore/pipelines.rst:95
+msgid "The code to perform the pipeline is shown below:"
+msgstr "パイプラインを実行するコードを以下に示します："
+
+#: ../../source/explore/pipelines.rst:122
+msgid ""
+"It is now possible to visualize the pipeline and the different "
+"preprocessing steps that are applied to the spectra."
+msgstr "パイプラインとスペクトルに適用される様々な前処理ステップを可視化できるようになりました。"
+
+#: ../../source/explore/pipelines.rst:129
+msgid ""
+"Notice that in the traditional workflow, the different preprocessing "
+"objects had to be persisted individually. In the pipeline workflow, the "
+"entire pipeline can be persisted and deployed to a production "
+"environment. See the :ref:`persisting-your-models` section for more "
+"information."
+msgstr ""
+"従来のワークフローでは、異なる前処理オブジェクトを個別に永続化する必要があったことに注意してください。パイプラインワークフローでは、パイプライン全体を永続化し、本番環境にデプロイできます。詳細については :ref:`persisting-your-models` セクションを参照してください。"

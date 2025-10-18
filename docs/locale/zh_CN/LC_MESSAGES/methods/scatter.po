@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-03 02:35+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/methods/scatter.rst:2
+msgid "Scattering Methods"
+msgstr "散射校正方法"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+":py:obj:`ExtendedMultiplicativeScatterCorrection "
+"<chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+msgstr ""
+":py:obj:`ExtendedMultiplicativeScatterCorrection "
+"<chemotools.scatter.ExtendedMultiplicativeScatterCorrection>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"Extended multiplicative scatter correction (EMSC) is a preprocessing "
+"technique for removing non linear scatter effects from spectra."
+msgstr "扩展乘性散射校正（EMSC）是一种用于去除光谱中非线性散射效应的预处理技术。"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+":py:obj:`MultiplicativeScatterCorrection "
+"<chemotools.scatter.MultiplicativeScatterCorrection>`"
+msgstr ""
+":py:obj:`MultiplicativeScatterCorrection "
+"<chemotools.scatter.MultiplicativeScatterCorrection>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"Multiplicative scatter correction (MSC) is a preprocessing technique for "
+"removing scatter effects from spectra."
+msgstr "乘性散射校正（MSC）是一种用于去除光谱中散射效应的预处理技术。"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ":py:obj:`RobustNormalVariate <chemotools.scatter.RobustNormalVariate>`"
+msgstr ":py:obj:`RobustNormalVariate <chemotools.scatter.RobustNormalVariate>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid "A transformer that calculates the robust normal variate of the input data."
+msgstr "计算输入数据的稳健标准正态变换的转换器。"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ":py:obj:`StandardNormalVariate <chemotools.scatter.StandardNormalVariate>`"
+msgstr ":py:obj:`StandardNormalVariate <chemotools.scatter.StandardNormalVariate>`"
+
+#: ../../source/methods/scatter.rst:14:<autosummary>:1
+msgid ""
+"A transformer that calculates the standard normal variate of the input "
+"data."
+msgstr "计算输入数据的标准正态变换的转换器。"
+

@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/api/feature_selection.rst:2
+msgid "chemotools.feature_selection"
+msgstr "chemotools.feature_selection"
+
+#: ../../source/api/feature_selection.rst:6
+msgid ""
+"Feature selection methods to identify the most chemically relevant "
+"wavelengths or variables for your models."
+msgstr ""
+"モデルにとって化学的に最も関連性の高い波長や変数を特定するための特徴選択手法。"
+
+#: ../../source/api/feature_selection.rst:8
+msgid "**Import from this module:**"
+msgstr "このモジュールからのインポート:"
+
+#: ../../source/api/feature_selection.rst:20
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/feature_selection.rst:26
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/feature_selection.rst:27
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/feature_selection.rst:28
+msgid ""
+":doc:`IndexSelector "
+"</methods/generated/chemotools.feature_selection.IndexSelector>`"
+msgstr ""
+":doc:`IndexSelector "
+"</methods/generated/chemotools.feature_selection.IndexSelector>`"
+
+#: ../../source/api/feature_selection.rst:29
+msgid "Select features by specific indices"
+msgstr "特定のインデックスで特徴を選択"
+
+#: ../../source/api/feature_selection.rst:30
+msgid ":doc:`RangeCut </methods/generated/chemotools.feature_selection.RangeCut>`"
+msgstr ":doc:`RangeCut </methods/generated/chemotools.feature_selection.RangeCut>`"
+
+#: ../../source/api/feature_selection.rst:31
+msgid "Select features within a specified range"
+msgstr "指定された範囲内の特徴を選択"
+
+#: ../../source/api/feature_selection.rst:32
+msgid ""
+":doc:`SRSelector "
+"</methods/generated/chemotools.feature_selection.SRSelector>`"
+msgstr ""
+":doc:`SRSelector "
+"</methods/generated/chemotools.feature_selection.SRSelector>`"
+
+#: ../../source/api/feature_selection.rst:33
+msgid "Selectivity ratio based feature selection"
+msgstr "選択比に基づく特徴選択"
+
+#: ../../source/api/feature_selection.rst:34
+msgid ""
+":doc:`VIPSelector "
+"</methods/generated/chemotools.feature_selection.VIPSelector>`"
+msgstr ""
+":doc:`VIPSelector "
+"</methods/generated/chemotools.feature_selection.VIPSelector>`"
+
+#: ../../source/api/feature_selection.rst:35
+msgid "Variable importance in projection (VIP) selector"
+msgstr "射影における変数重要度（VIP）セレクタ"
+
+#: ../../source/api/feature_selection.rst:38
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/feature_selection.rst:40
+msgid ""
+":doc:`Feature Selection Methods Overview </methods/feature_selection>` - "
+"Complete documentation with examples and visual guides"
+msgstr ""
+":doc:`特徴選択手法の概要 </methods/feature_selection>` - 例とビジュアルガイドを含む完全なドキュメント"
+
