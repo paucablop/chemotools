@@ -1,9 +1,20 @@
 name: Deploy Sphinx documentation to Pages
 
 on:
+  # TEMPORARY: Deploy from current branch for testing
   push:
-    branches: [main]
+    branches: 
+      - main
+      - 195-improve-documentation-page-generating-it-automatically  # Testing branch
+  
+  # Deploy when a new release is published
+  release:
+    types: [published]
+  
+  # Build check on PRs (no deployment)
   pull_request:
+  
+  # Allow manual trigger
   workflow_dispatch:
 
 permissions:
@@ -46,11 +57,21 @@ jobs:
         run: |
           task docs:html-all
 
+      # Only upload and deploy if NOT a pull request
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs/_build/html
 
       - name: Deploy to GitHub Pages
+        if: github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@v4
+      
+      # On PR: just verify the build worked
+      - name: PR Check - Documentation built successfully
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "✅ Documentation builds successfully!"
+          echo "📝 Docs will be deployed when this PR is merged to main"
