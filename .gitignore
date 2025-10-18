@@ -128,8 +128,10 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-# Notebooks
+# Notebooks (ignore all by default)
 *.ipynb
+# But keep documentation/tutorial notebooks
+!docs/**/*.ipynb
 
 # Pyre type checker
 .pyre/
