@@ -26,20 +26,20 @@ class ExtendedMultiplicativeScatterCorrection(
 
     Parameters
     ----------
-    reference : np.ndarray, optional
+    reference : np.ndarray, optional, default=None
         The reference spectrum to use for the correction. If None, the mean
         spectrum will be used. The default is None.
 
-    use_mean : bool, optional
+    use_mean : bool, optional, default=True
         Whether to use the mean spectrum as the reference. The default is True.
 
-    use_median : bool, optional
+    use_median : bool, optional, default=False
         Whether to use the median spectrum as the reference. The default is False.
 
-    order : int, optional
+    order : int, optional, default=2
         The order of the polynomial to fit to the spectrum. The default is 2.
 
-    weights : np.ndarray, optional
+    weights : np.ndarray, optional, default=None
         The weights to use for the weighted EMSC. If None, the standard EMSC
         will be used. The default is None.
 
@@ -105,7 +105,7 @@ class ExtendedMultiplicativeScatterCorrection(
 
         Returns
         -------
-        self : MultiplicativeScatterCorrection
+        self : ExtendedMultiplicativeScatterCorrection
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values

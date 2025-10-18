@@ -18,11 +18,11 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
 
     Parameters
     ----------
-    percentile : float, optional
+    percentile : float, optional, default=25
         The percentile to use for the robust normal variate. The value should be
         between 0 and 100. The default is 25.
 
-    epsilon : float, optional
+    epsilon : float, optional, default=1e-10
         A small value added to the denominator to avoid numerical instability
         (division by zero). The default is 1e-10.
 
@@ -50,8 +50,8 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Initialize RobustNormalVariate
-    >>> rnv = RobustNormalVariate()
     RobustNormalVariate()
+    >>> rnv = RobustNormalVariate()
     >>> # Fit and transform the data
     >>> X_scaled = rnv.fit_transform(X)
     """
@@ -70,7 +70,7 @@ class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         Fit the transformer to the input data.
 
         Parameters
-        ---------->
+        ----------
         X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 

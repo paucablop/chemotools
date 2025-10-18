@@ -15,7 +15,6 @@ ModelTypes = Union[_PLS, Pipeline]
 class _PLSFeatureSelectorBase(ABC, BaseEstimator, SelectorMixin):
     """Feature selection base class for _PLS-like models.
 
-
     Parameters
     ----------
     model : Union[_PLS, Pipeline]

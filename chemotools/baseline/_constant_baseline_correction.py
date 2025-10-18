@@ -21,14 +21,14 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
 
     Parameters
     ----------
-    wavenumbers : np.ndarray, optional
-        The wavenumbers corresponding to each feature in the input data.
-
-    start : int, optional
+    start : int, optional, default=0
         The index of the first feature to use for the baseline correction.
 
-    end : int, optional
+    end : int, optional, default=1
         The index of the last feature to use for the baseline correction.
+
+    wavenumbers : np.ndarray, optional, default=None
+        The wavenumbers corresponding to each feature in the input data.
 
     Attributes
     ----------

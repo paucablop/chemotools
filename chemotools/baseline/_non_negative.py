@@ -59,7 +59,7 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        self : ConstantBaselineCorrection
+        self : NonNegative
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values
@@ -70,7 +70,7 @@ class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by subtracting the constant baseline value.
+        Transform the input data to non-negative values.
 
         Parameters
         ----------

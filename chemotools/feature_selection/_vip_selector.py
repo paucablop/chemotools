@@ -20,10 +20,10 @@ class VIPSelector(_PLSFeatureSelectorBase):
 
     Parameters
     ----------
-    model: Union[_PLS, Pipeline]
+    model : Union[_PLS, Pipeline]
         The PLS regression model or a pipeline with a PLS regression model as last step.
 
-    threshold: float, default=1.0
+    threshold : float, default=1.0
         The threshold for feature selection. Features with importance
         above this threshold will be selected.
 

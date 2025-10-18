@@ -19,15 +19,15 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
 
     Parameters
     ----------
-    window_size : int, optional
+    window_size : int, optional, default=3
         The size of the window to use for the Savitzky-Golay filter. Must be odd. Default
         is 3.
 
-    polynomial_order : int, optional
+    polynomial_order : int, optional, default=1
         The order of the polynomial to use for the Savitzky-Golay filter. Must be less
         than window_size. Default is 1.
 
-    mode : str, optional
+    mode : str, optional, default="nearest"
         The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 
@@ -47,7 +47,6 @@ class SavitzkyGolayFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     SavitzkyGolayFilter()
     >>> # Fit and transform the data
     >>> X_smoothed = sgf.fit_transform(X)
-
     """
 
     def __init__(

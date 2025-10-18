@@ -18,16 +18,16 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    window_size : int, optional
+    window_size : int, optional, default=5
         The size of the window to use for the derivative calculation. Must be odd. Default is 5.
 
-    gap_size : int, optional
+    gap_size : int, optional, default=3
         The size of the gap to use for the derivative calculation. Must be odd. Default is 3.
 
-    derivative_order : int, optional
+    derivative_order : int, optional, default=1
         The order of the derivative to calculate. Can be 1 or 2. Default is 1.
 
-    mode : str, optional
+    mode : str, optional, default="nearest"
         The mode to use for the derivative calculation. Can be "nearest", "constant",
         "reflect", "wrap", "mirror" or "interp". Default is "nearest".
 

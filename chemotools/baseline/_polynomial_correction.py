@@ -20,10 +20,10 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 
     Parameters
     ----------
-    order : int, optional
+    order : int, optional, default=1
         The order of the polynomial to fit to the baseline. Defaults to 1.
 
-    indices : list, optional
+    indices : list, optional, default=None
         The indices of the points in the spectrum to fit the polynomial to. Defaults to None,
         which fits the polynomial to all points in the spectrum (equivalent to detrend).
 

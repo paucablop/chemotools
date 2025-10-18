@@ -49,7 +49,7 @@ class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         Returns
         -------
-        self : ConstantBaselineCorrection
+        self : LinearCorrection
             The fitted transformer.
         """
         # Check that X is a 2D array and has only finite values

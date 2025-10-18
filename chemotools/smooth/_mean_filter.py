@@ -40,7 +40,6 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     MeanFilter()
     >>> # Fit and transform the data
     >>> X_smoothed = mf.fit_transform(X)
-
     """
 
     def __init__(self, window_size: int = 3, mode="nearest") -> None:

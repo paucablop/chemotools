@@ -1,3 +1,9 @@
+"""
+The :mod:`chemotools.feature_selection._range_cut` module implements the RangeCut
+to select specific features from spectral data based on start and end indices or
+wavenumbers.
+"""
+
 from typing import Optional
 
 import numpy as np
@@ -7,55 +13,46 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class RangeCut(SelectorMixin, BaseEstimator):
-    """
-    A selector that cuts the input data to a specified range. The range is specified:
-    - by the indices of the start and end of the range,
-    - by the wavenumbers of the start and end of the range. In this case, the wavenumbers
-        must be provided to the transformer when it is initialised. If the wavenumbers
-        are not provided, the indices will be used instead. The wavenumbers must be
-        provided in ascending order.
+    """Select a contiguous spectral region by index or by wavenumber.
+
+    The range can be specified in two ways:
+
+    * By integer indices (``start`` and ``end``)
+    * By wavenumber values (``start`` and ``end`` interpreted against the
+        provided ``wavenumbers`` array)
+
+    If ``wavenumbers`` is supplied, the closest indices to the given start / end
+    wavenumber values are located. Otherwise numeric ``start`` / ``end`` are
+    treated directly as indices. Wavenumbers must be in ascending order.
 
     Parameters
     ----------
-    start : int, optional
-        The index or wavenumber of the start of the range. Default is 0.
-
-    end : int, optional
-        The index or wavenumber of the end of the range. Default is -1.
-
+    start : int, default=0
+        Index or wavenumber of the start of the range.
+    end : int, default=-1
+        Index or wavenumber of the end of the range.
     wavenumbers : array-like, optional
-        The wavenumbers of the input data. If not provided, the indices will be used
-        instead. Default is None. If provided, the wavenumbers must be provided in
-        ascending order.
+        Wavenumbers corresponding to columns. Must be ascending if provided.
 
     Attributes
     ----------
     start_index_ : int
-        The index of the start of the range. It is 0 if the wavenumbers are not provided.
-
+        Resolved start index.
     end_index_ : int
-        The index of the end of the range. It is -1 if the wavenumbers are not provided.
-
-    wavenuumbers_ : array-like
-        The cut wavenumbers of the input data.
+        Resolved end index.
+    wavenumbers_ : array-like or None
+        Selected wavenumbers (if provided), else ``None``.
 
     Examples
     --------
     >>> from chemotools.feature_selection import RangeCut
     >>> from chemotools.datasets import load_fermentation_train
-    >>> # Load sample data
     >>> X, _ = load_fermentation_train()
-    >>> # Get wavenumbers as numpy array
     >>> wavenumbers = X.columns.values
-    >>> # Define the range to cut
-    >>> start = 1000
-    >>> end = 2000
-    >>> # Instantiate the transformer
-    >>> range_cut = RangeCut(start=start, end=end, wavenumbers=wavenumbers)
+    >>> rc = RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
+    >>> rc.fit(X)
     RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
-    >>> range_cut.fit(X)
-    >>> # Transform the data
-    >>> X_cut = range_cut.transform(X)
+    >>> X_cut = rc.transform(X)
     >>> X_cut.shape
     (21, 616)
     """

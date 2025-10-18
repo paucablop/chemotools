@@ -27,10 +27,10 @@ class IndexSelector(SelectorMixin, BaseEstimator):
 
     Parameters
     ----------
-    features : narray-like, optional
+    features : narray-like, optional, default=None
         The index of the features to select. Default is None.
 
-    wavenumbers : array-like, optional
+    wavenumbers : array-like, optional, default=None
         The wavenumbers of the input data. If not provided, the indices will be used
         instead. Default is None. If provided, the wavenumbers must be provided in
         ascending order.

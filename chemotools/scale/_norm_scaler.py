@@ -16,7 +16,7 @@ class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    l_norm : int, optional
+    l_norm : int, optional, default=2
         The L-norm to use. Default is 2.
 
     Attributes

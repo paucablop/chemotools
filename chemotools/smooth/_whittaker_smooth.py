@@ -38,7 +38,7 @@ class WhittakerSmooth(_BaseWhittaker):
         Regularization parameter controlling smoothness of the fitted signal.
         Larger values yield smoother trends.
 
-    weights : ndarray of shape (n_features,), optional
+    weights : ndarray of shape (n_features,), optional, default=None
         Non-negative weights applied to each observation. If None,
         all observations are weighted equally.
 

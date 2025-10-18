@@ -41,7 +41,7 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
     >>> transformer = CubicSplineCorrection(indices=[0, 100, 200, 300, 400, 500])
-    CubicSplineCorrection(indices=[0, 100, 200, 300, 400, 500])
+    CubicSplineCorrection(indices)
     >>> transformer.fit(X)
     >>> # Generate baseline-corrected data
     >>> X_corrected = transformer.transform(X)

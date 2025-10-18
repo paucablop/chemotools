@@ -19,10 +19,10 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    point : int,
+    point : int, optional, default=0
         The point to scale the data by. It can be an index or a wavenumber.
 
-    wavenumber : array-like, optional
+    wavenumber : array-like, optional, default=None
         The wavenumbers of the input data. If not provided, the indices will be used
         instead. Default is None. If provided, the wavenumbers must be provided in
         ascending order.
