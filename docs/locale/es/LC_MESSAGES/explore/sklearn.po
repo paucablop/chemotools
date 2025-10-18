@@ -262,7 +262,7 @@ msgstr ""
 
 #: ../../source/explore/sklearn.rst:78
 msgid ""
-"Let's see two examples, one for a preprocessing and one for a regerssion "
+"Let's see two examples, one for a preprocessing and one for a regression "
 "model. First, import the required modules:"
 msgstr ""
 "Veamos dos ejemplos, uno para preprocesamiento y otro para un modelo de regresión. "

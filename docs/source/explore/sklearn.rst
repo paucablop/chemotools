@@ -75,7 +75,7 @@ Scikit-learn follows an intuitive three-step process outlined in the figure belo
 - ``transform()`` for preprocessing steps and unsupervised learning
 - ``predict()`` for supervised learning models (classification and regression)
 
-Let's see two examples, one for a preprocessing and one for a regerssion model. First, import the required modules:
+Let's see two examples, one for a preprocessing and one for a regression model. First, import the required modules:
 
 .. code-block:: python
 

@@ -36,7 +36,7 @@ When contributing, please keep in mind:
    - Open an issue first so we can discuss scope.  
    - Create a new branch for your contribution.  
    - Make your changes, including tests and documentation updates if needed. 
-   - Branches should be shor-lived with a well defined scope, follwoing a [truck-based development](https://trunkbaseddevelopment.com/) philosophy.
+   - Branches should be shor-lived with a well defined scope, following a [truck-based development](https://trunkbaseddevelopment.com/) philosophy.
 
 3. **Check your work**  
    Use the [Taskfile](./Taskfile.yml) for a quick workflow:  

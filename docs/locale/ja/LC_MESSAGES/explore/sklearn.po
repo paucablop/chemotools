@@ -250,7 +250,7 @@ msgstr ""
 
 #: ../../source/explore/sklearn.rst:78
 msgid ""
-"Let's see two examples, one for a preprocessing and one for a regerssion "
+"Let's see two examples, one for a preprocessing and one for a regression "
 "model. First, import the required modules:"
 msgstr ""
 "前処理と回帰モデルの2つの例を見てみましょう。まず、必要なモジュールをインポートします："

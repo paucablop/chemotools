@@ -40,7 +40,7 @@ The code to perform this workflow would look like this:
     # Define the Range Cut
     range_cut = RangeCut(start=950, end=1550, wavenumbers=wavenumbers)
 
-    # Fit and apply Ranve Cut
+    # Fit and apply Range Cut
     spectra_cut = range_cut.fit_transform(spectra)
 
     # Linear Correction
@@ -57,7 +57,7 @@ The code to perform this workflow would look like this:
     # Fit and apply Savitzky-Golay
     spectra_derivate = savitzky_golay.fit_transform(spectra_corrected)
 
-    # Mean Cetering (Standard Scaler)
+    # Mean Centering (Standard Scaler)
     # Define the Standard Scaler
     standard_scaler = StandardScaler(with_mean=True, with_std=False)
 

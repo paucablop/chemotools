@@ -109,7 +109,7 @@ msgstr "パイプラインは以下のコードを使用して作成できます
 
 #: ../../source/explore/optimize.rst:67
 msgid ""
-"All hyperparameter optmization methods, following the three follwoing "
+"All hyperparameter optimization methods, following the three following "
 "steps:"
 msgstr ""
 "すべてのハイパーパラメータ最適化手法は、次の3つのステップに従います:"
@@ -225,7 +225,7 @@ msgstr ""
 
 #: ../../source/explore/optimize.rst:147
 msgid ""
-"🚀 Laveraging the multiple cores will speed up the process of "
+"🚀 Leveraging the multiple cores will speed up the process of "
 "hyperparameter optimization, especially when the dataset is large. You "
 "can further speed the process by caching the intermediate results using "
 "the ``memory`` parameter in the pipeline, as shown in the video above!"

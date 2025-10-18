@@ -220,7 +220,7 @@ msgstr "``predict()`` 用于监督学习模型（分类和回归）"
 
 #: ../../source/explore/sklearn.rst:78
 msgid ""
-"Let's see two examples, one for a preprocessing and one for a regerssion "
+"Let's see two examples, one for a preprocessing and one for a regression "
 "model. First, import the required modules:"
 msgstr "让我们看两个例子，一个是预处理，一个是回归模型。首先，导入所需的模块："
 

@@ -64,7 +64,7 @@ The pipeline can be created using the code shown below:
         PLSRegression(n_components=2, scale=False)
     )
 
-All hyperparameter optmization methods, following the three follwoing steps:
+All hyperparameter optimization methods, following the three following steps:
     - They all explore the hyperparameter space to find an optimal set of hyperparameters.
     - They all use cross-validation to evaluate the performance of each set of hyperparameters.
 
@@ -144,7 +144,7 @@ There are a few important parameters to note in the ``GridSearchCV`` function:
     - ``n_jobs`` specifies the number of jobs to run in parallel. In this case, we are using all available cores by setting ``n_jobs=-1``.
 
 .. note::
-    🚀 Laveraging the multiple cores will speed up the process of hyperparameter optimization, especially when the dataset is large. You can further speed the process by caching the intermediate results using the ``memory`` parameter in the pipeline, 
+    🚀 Leveraging the multiple cores will speed up the process of hyperparameter optimization, especially when the dataset is large. You can further speed the process by caching the intermediate results using the ``memory`` parameter in the pipeline, 
     as shown in the video above!
 
 **RandomizedSearchCV**

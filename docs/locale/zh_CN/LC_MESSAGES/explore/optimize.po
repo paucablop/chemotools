@@ -103,7 +103,7 @@ msgstr "可以使用如下所示的代码创建管道："
 
 #: ../../source/explore/optimize.rst:67
 msgid ""
-"All hyperparameter optmization methods, following the three follwoing "
+"All hyperparameter optimization methods, following the three following "
 "steps:"
 msgstr "所有超参数优化方法都遵循以下三个步骤："
 
@@ -208,7 +208,7 @@ msgstr "``n_jobs`` 指定并行运行的作业数。在这种情况下，我们�
 
 #: ../../source/explore/optimize.rst:147
 msgid ""
-"🚀 Laveraging the multiple cores will speed up the process of "
+"🚀 Leveraging the multiple cores will speed up the process of "
 "hyperparameter optimization, especially when the dataset is large. You "
 "can further speed the process by caching the intermediate results using "
 "the ``memory`` parameter in the pipeline, as shown in the video above!"
