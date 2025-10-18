@@ -1,0 +1,56 @@
+name: Deploy Sphinx documentation to Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+      
+      - name: Install uv
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+
+      - name: Install Task (taskfile.dev)
+        uses: arduino/setup-task@v2
+
+      - name: Sync dependencies (all groups)
+        run: uv sync --all-groups
+
+      - name: Build documentation
+        run: |
+          task docs:html-all
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs/_build/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
