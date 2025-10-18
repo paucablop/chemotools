@@ -3,6 +3,9 @@ version: '3'
 
 vars:
   UV: uv
+  SPHINX_SOURCE: docs/source
+  SPHINX_BUILD: docs/_build
+  API_OUT: docs/source/api/generated
 
 tasks:
   # 🛠️ Environment
@@ -98,3 +101,87 @@ tasks:
       - task: install
       - task: install-hooks
       - task: check
+
+  # 📚 Documentation
+  docs:html:
+    desc: Build English HTML documentation
+    cmds:
+      - uv run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -j auto
+
+  docs:html-es:
+    desc: Build Spanish HTML documentation with button translation fix
+    cmds:
+      - uv run sphinx-build -b html -D language=es -D html_theme_options.switcher.version_match=es {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/es -j auto
+      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/es es
+
+  docs:html-zh:
+    desc: Build Chinese HTML documentation with button translation fix
+    cmds:
+      - uv run sphinx-build -b html -D language=zh_CN -D html_theme_options.switcher.version_match=zh_CN {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/zh_CN -j auto
+      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/zh_CN zh_CN
+
+  docs:html-ja:
+    desc: Build Japanese HTML documentation with button translation fix
+    cmds:
+      - uv run sphinx-build -b html -D language=ja -D html_theme_options.switcher.version_match=ja {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/ja -j auto
+      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/ja ja
+
+  docs:html-all:
+    desc: Build all language variants (en, es, zh_CN, ja)
+    cmds:
+      - task: docs:html
+      - task: docs:html-es
+      - task: docs:html-zh
+      - task: docs:html-ja
+
+  docs:gettext:
+    desc: Extract gettext catalogs
+    cmds:
+      - uv run sphinx-build -b gettext {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/gettext -j auto
+
+  docs:update-translations:
+    desc: Update .po files for es, zh_CN, and ja
+    deps: [docs:gettext]
+    cmds:
+      - uv run sphinx-intl update -p {{.SPHINX_BUILD}}/gettext -d docs/locale -l es -l zh_CN -l ja
+
+  docs:check:
+    desc: Build English docs treating warnings as errors (CI quality gate)
+    cmds:
+      - uv run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -W -j auto
+
+  serve:
+    desc: Live-reload English docs on port 8003 (avoiding port conflicts)
+    cmds:
+      - uv run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore "{{.SPHINX_BUILD}}/*" --ignore "{{.API_OUT}}/*" --port 8003
+
+  serve:en:
+    desc: Live-reload English docs on port 8003 (avoiding port conflicts)
+    cmds:
+      - uv run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore "{{.SPHINX_BUILD}}/*" --ignore "{{.API_OUT}}/*" --port 8003
+
+  serve:zh:
+    desc: Serve Chinese docs locally
+    cmds:
+      - task: docs:html-zh
+      - echo "Chinese docs available at http://localhost:8001"
+      - cd {{.SPHINX_BUILD}}/html/zh_CN && python3 -m http.server 8001
+
+  serve:es:
+    desc: Serve Spanish docs locally  
+    cmds:
+      - task: docs:html-es
+      - echo "Spanish docs available at http://localhost:8002"
+      - cd {{.SPHINX_BUILD}}/html/es && python3 -m http.server 8002
+
+  serve:ja:
+    desc: Serve Japanese docs locally
+    cmds:
+      - task: docs:html-ja
+      - echo "Japanese docs available at http://localhost:8004"
+      - cd {{.SPHINX_BUILD}}/html/ja && python3 -m http.server 8004
+
+  clean:
+    desc: Remove build artifacts and generated API stubs
+    cmds:
+      - rm -rf {{.SPHINX_BUILD}} {{.API_OUT}}
