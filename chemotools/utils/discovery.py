@@ -21,7 +21,7 @@ from sklearn.base import (
 )
 from sklearn.utils._testing import ignore_warnings
 
-_MODULE_TO_IGNORE = {"tests", "utils"}
+_MODULE_TO_IGNORE = {"tests", "utils", "datasets"}
 
 
 def all_estimators(type_filter=None):
@@ -71,10 +71,7 @@ def all_estimators(type_filter=None):
             module_parts = module_name.split(".")
             # Skip ignored modules and any submodules of datasets
 
-            if (
-                any(part in _MODULE_TO_IGNORE for part in module_parts)
-                or "._" in module_name
-            ):
+            if any(part in _MODULE_TO_IGNORE for part in module_parts):
                 continue
 
             module = import_module(module_name)
