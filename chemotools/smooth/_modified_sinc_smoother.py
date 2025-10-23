@@ -54,6 +54,11 @@ class ModifiedSincFilter(_BaseFIRFilter):
     transform(X, y=None)
         Inherited from the base class. Pads, convolves, and returns the smoothed data.
 
+    References
+    ----------
+    [1] Schmid, M.; Rath, D.; Diebold, U. "Why and How Savitzky–Golay Filters Should Be Replaced."
+    ACS measurement science Au 2022, 2 (2), 185-196.
+
     Examples
     --------
     >>> from chemotools.smooth import ModifiedSincFilter
@@ -61,10 +66,6 @@ class ModifiedSincFilter(_BaseFIRFilter):
     >>> X = np.array([[0.0, 1.0, 2.0, 1.0, 0.0]], dtype=float)
     >>> ms = ModifiedSincFilter(window_size= 9, n=6, alpha=4.0, mode="interp")
     >>> X_smooth = ms.fit_transform(X)
-
-    References
-    ----------
-    Schmid, M.; Rath, D.; Diebold, U. "Why and How Savitzky–Golay Filters Should Be Replaced."
     """
 
     def __init__(
@@ -89,9 +90,9 @@ class ModifiedSincFilter(_BaseFIRFilter):
           1) Map index to x = i / (m + 1)  (Eq. 5).
           2) Base sinc: np.sinc(0.5 * (n + 4) * x)  (Eq. 3).
           3) Solve a 3x3 system for the window coefficients so that
-             w(0)=1, w(1)=0, w'(1)=0; then form w(x)  (Eq. 4).
+             w(0)=1, w(1)=0, w'(1)=0; then we form w(x)  (Eq. 4).
           4) h = sinc * w.
-          5) Optional corrections from Eqs. 7–8 (Table 1).
+          5) Optional corrections from based on Eqs. 7–8 (Table 1).
           6) Symmetrize and normalize so sum(h)=1  (Eq. 6).
         """
 
@@ -106,7 +107,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
         i = np.arange(-m, m + 1, dtype=np.float64)
         x = i / (m + 1) if m >= 0 else np.array([0.0])
 
-        # ---- 2) Eq. 3: modified sinc core (numpy's sinc uses sin(pi*u)/(pi*u)) ----
+        # ---- 2) Eq. 3: modified sinc core (note that numpy's sinc uses sin(pi*u)/(pi*u)) ----
         core = np.sinc(0.5 * (self.n + 4) * x)
 
         # ---- 3) Eq. 4: window with w(0)=1, w(1)=0, w'(1)=0 ----
@@ -129,11 +130,12 @@ class ModifiedSincFilter(_BaseFIRFilter):
             ],
             dtype=np.float64,
         )
+        # solve the system using linear algebra.
         rhs = np.array([1.0, 0.0, 0.0], dtype=np.float64)
 
         Acoef, Bcoef, Ccoef = np.linalg.solve(M, rhs)
 
-        # Window values across the support
+        # Window values calculated
         window = (
             Acoef * np.exp(-self.alpha * x**2)
             + Bcoef
@@ -164,14 +166,14 @@ class ModifiedSincFilter(_BaseFIRFilter):
                 corr += kappa * window * x * np.sin((2 * j + nu) * np.pi * x)
             h = h + corr
 
-        # ---- 6) Eq. 6: Enforce symmetry and DC = 1 ----
-        h = 0.5 * (h + h[::-1])
+        # ---- 6) Eq. 6: Enforce symmetry and Direct Current = 1 ----
+        h = 0.5 * (h + h[::-1])  # make it symmetric
         s = h.sum()
         if not np.isfinite(s) or abs(s) < 1e-15:
             raise FloatingPointError(
                 "Kernel normalization failed; try different parameters."
             )
-        h = h / s
+        h = h / s  # Normalize so sum = 1
         return h
 
     # ====== Table 1 (p. 188): kappa fit coefficients for Eq. 8 ======

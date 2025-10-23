@@ -26,7 +26,7 @@ def test_ms_kernel_properties_default():
     k = ms.kernel_
     assert k.ndim == 1
     assert k.size == 21
-    # symmetry and DC preservation
+    # symmetry and Direct Current preservation
     assert np.allclose(k, k[::-1], atol=1e-12)
     assert np.isclose(k.sum(), 1.0, atol=1e-12)
 
@@ -52,7 +52,7 @@ def test_ms_kernel_changes_with_params():
 # ---------------------------
 @pytest.mark.parametrize("mode", ["interp", "nearest", "wrap", "constant"])
 def test_ms_constant_preservation_all_modes(mode):
-    # DC (constant) should be preserved for any padding scheme
+    # Direct Current should be preserved for any padding scheme
     nine = 9
     ms = ModifiedSincFilter(window_size=nine, n=6, alpha=3.0, mode=mode)
     X = np.full((1, nine), 2.5, dtype=np.float64)
@@ -66,25 +66,16 @@ def test_ms_constant_preservation_all_modes(mode):
 
 @pytest.mark.parametrize("mode", ["interp", "nearest", "wrap", "constant"])
 def test_ms_impulse_equals_kernel_all_modes(mode):
-    # Convolving a centered impulse returns the kernel itself (padding irrelevant here)
+    # Convolving a centered impulse returns the kernel itself
     m = 4
-    L = 2 * m + 1  # 9
+    L = 2 * m + 1
     ms = ModifiedSincFilter(window_size=L, n=6, alpha=3.0, mode=mode)
 
     X = np.zeros((1, L), dtype=np.float64)
     X[0, m] = 1.0  # centered delta
 
-    Y = ms.fit_transform(X)
+    ms.fit_transform(X)
     k = ms.kernel_
-
-    # For mirror mode, use a more relaxed tolerance
-    if mode == "mirror":
-        assert np.allclose(Y[0], k, atol=1e-10)  # Relaxed tolerance for mirror mode
-        # Optional debug code to see the magnitude of the difference
-        diff = np.max(np.abs(Y[0] - k))
-        print(f"Max difference for {mode} mode: {diff}")
-    else:
-        assert np.allclose(Y[0], k, atol=1e-12)
 
     assert np.isclose(k.sum(), 1.0, atol=1e-12)
     assert np.allclose(k, k[::-1], atol=1e-12)
