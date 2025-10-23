@@ -71,13 +71,13 @@ def all_estimators(type_filter=None):
             module_parts = module_name.split(".")
             # Skip ignored modules and any submodules of datasets
 
-            if any(part in _MODULE_TO_IGNORE for part in module_parts):
+            if (
+                any(part in _MODULE_TO_IGNORE for part in module_parts)
+                or "._" in module_name
+            ):
                 continue
-            try:
-                module = import_module(module_name)
-            except Exception:
-                continue  # skip modules that fail to import
-
+            
+            module = import_module(module_name)
             classes = inspect.getmembers(module, inspect.isclass)
             # Only classes defined in this module
             classes = [
