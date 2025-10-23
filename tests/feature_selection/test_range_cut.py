@@ -1,9 +1,27 @@
+import pytest
+from chemotools.utils._optional_dependencies import check_optional_dependency
 import numpy as np
-import pandas as pd
-import polars as pl
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.feature_selection import RangeCut
+
+
+@pytest.fixture(scope="module")
+def pd():
+    """Fixture for optional pandas dependency."""
+    try:
+        return check_optional_dependency("pandas", "tests (pandas-dependent)")
+    except ImportError:
+        pytest.skip("pandas is not installed, skipping pandas-dependent tests")
+
+
+@pytest.fixture(scope="module")
+def pl():
+    """Fixture for optional polars dependency."""
+    try:
+        return check_optional_dependency("polars", "tests (polars-dependent)")
+    except ImportError:
+        pytest.skip("polars is not installed, skipping polars-dependent tests")
 
 
 # Test compliance with scikit-learn
@@ -53,7 +71,7 @@ def test_range_cut_by_wavenumber_with_list():
     assert range_cut.wavenumbers_ == [2, 3, 4, 5, 6, 7]
 
 
-def test_range_cut_by_wavenumber_with_pandas_dataframe():
+def test_range_cut_by_wavenumber_with_pandas_dataframe(pd):
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pd.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))
@@ -68,7 +86,7 @@ def test_range_cut_by_wavenumber_with_pandas_dataframe():
     assert isinstance(spectrum_corrected, pd.DataFrame)
 
 
-def test_range_cut_by_wavenumber_with_polars_dataframe():
+def test_range_cut_by_wavenumber_with_polars_dataframe(pl):
     # Arrange
     wavenumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     spectrum = pl.DataFrame(np.array([[10, 12, 14, 16, 14, 12, 10, 12, 14, 16]]))

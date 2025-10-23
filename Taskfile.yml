@@ -65,7 +65,7 @@ tasks:
   test:
     desc: Run tests with pytest
     cmds:
-      - "{{.UV}} run pytest tests/"
+      - "{{.UV}} run pytest -rs tests/"
 
   coverage:
     desc: Run tests with coverage report

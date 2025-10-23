@@ -1,8 +1,6 @@
 import os
 
-
-import pandas as pd
-import polars as pl
+from chemotools.utils._optional_dependencies import check_optional_dependency
 
 PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,12 +27,14 @@ def load_fermentation_train(set_output="pandas"):
     A parallel hybrid model for real-time state estimation in lignocellulose ethanol fermentations.
     """
     if set_output == "pandas":
+        pd = check_optional_dependency("pandas", "load_fermentation_train")
         train_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/train_spectra.csv")
         train_spectra.columns = train_spectra.columns.astype(float)
         train_hplc = pd.read_csv(PACKAGE_DIRECTORY + "/data/train_hplc.csv")
         return train_spectra, train_hplc
 
     if set_output == "polars":
+        pl = check_optional_dependency("polars", "load_fermentation_train")
         train_spectra = pl.read_csv(PACKAGE_DIRECTORY + "/data/train_spectra.csv")
         train_hplc = pl.read_csv(PACKAGE_DIRECTORY + "/data/train_hplc.csv")
         return train_spectra, train_hplc
@@ -67,6 +67,7 @@ def load_fermentation_test(set_output="pandas"):
     A parallel hybrid model for real-time state estimation in lignocellulose ethanol fermentations.
     """
     if set_output == "pandas":
+        pd = check_optional_dependency("pandas", "load_fermentation_test")
         fermentation_spectra = pd.read_csv(
             PACKAGE_DIRECTORY + "/data/fermentation_spectra.csv"
         )
@@ -77,6 +78,7 @@ def load_fermentation_test(set_output="pandas"):
         return fermentation_spectra, fermentation_hplc
 
     if set_output == "polars":
+        pl = check_optional_dependency("polars", "load_fermentation_test")
         fermentation_spectra = pl.read_csv(
             PACKAGE_DIRECTORY + "/data/fermentation_spectra.csv"
         )
@@ -107,11 +109,13 @@ def load_coffee(set_output="pandas"):
     coffee_labels: pd.DataFrame A pandas DataFrame containing the corresponding labels.
     """
     if set_output == "pandas":
+        pd = check_optional_dependency("pandas", "load_coffee")
         coffee_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels
 
     if set_output == "polars":
+        pl = check_optional_dependency("polars", "load_coffee")
         coffee_spectra = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels

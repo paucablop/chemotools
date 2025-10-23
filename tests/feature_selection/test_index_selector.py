@@ -1,8 +1,18 @@
+import pytest
+from chemotools.utils._optional_dependencies import check_optional_dependency
 import numpy as np
-import pandas as pd
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.feature_selection import IndexSelector
+
+
+@pytest.fixture(scope="module")
+def pd():
+    """Fixture for optional pandas dependency."""
+    try:
+        return check_optional_dependency("pandas", "tests (pandas-dependent)")
+    except ImportError:
+        pytest.skip("pandas is not installed, skipping pandas-dependent tests")
 
 
 # Test compliance with scikit-learn
@@ -55,7 +65,7 @@ def test_index_selector_with_wavenumbers():
     assert np.allclose(spectrum_corrected[0], expected, atol=1e-8)
 
 
-def test_index_selector_with_wavenumbers_and_dataframe():
+def test_index_selector_with_wavenumbers_and_dataframe(pd):
     # Arrange
     wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
     spectrum = pd.DataFrame(

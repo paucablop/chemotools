@@ -17,8 +17,6 @@ readme = "README.md"
 license = "MIT"
 dependencies = [
     "numpy>=2.0.0,<3",
-    "pandas>=2.0.0,<3",
-    "polars>=1.17.0,<2",
     "pyarrow>=18,<21",
     "scikit-learn>=1.4.0,<2",
 ]

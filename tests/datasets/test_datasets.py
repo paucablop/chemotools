@@ -1,6 +1,5 @@
-import pandas as pd
-import polars as pl
 import pytest
+from chemotools.utils._optional_dependencies import check_optional_dependency
 
 from chemotools.datasets import (
     load_coffee,
@@ -9,7 +8,25 @@ from chemotools.datasets import (
 )
 
 
-def test_load_coffee_pandas():
+@pytest.fixture(scope="module")
+def pd():
+    """Fixture for optional pandas dependency."""
+    try:
+        return check_optional_dependency("pandas", "tests (pandas-dependent)")
+    except ImportError:
+        pytest.skip("pandas is not installed, skipping pandas-dependent tests")
+
+
+@pytest.fixture(scope="module")
+def pl():
+    """Fixture for optional polars dependency."""
+    try:
+        return check_optional_dependency("polars", "tests (polars-dependent)")
+    except ImportError:
+        pytest.skip("polars is not installed, skipping polars-dependent tests")
+
+
+def test_load_coffee_pandas(pd):
     # Arrange & Act
     coffee_spectra, coffee_labels = load_coffee()
 
@@ -20,7 +37,7 @@ def test_load_coffee_pandas():
     assert isinstance(coffee_labels, pd.DataFrame)
 
 
-def test_load_coffee_polars():
+def test_load_coffee_polars(pl):
     # Arrange & Act
     coffee_spectra, coffee_labels = load_coffee(set_output="polars")
 
@@ -37,7 +54,7 @@ def test_load_coffee_exception():
         coffee_spectra, coffee_labels = load_coffee(set_output="plars")
 
 
-def test_load_fermentation_test_pandas():
+def test_load_fermentation_test_pandas(pd):
     # Arrange & Act
     test_spectra, test_hplc = load_fermentation_test()
 
@@ -48,7 +65,7 @@ def test_load_fermentation_test_pandas():
     assert isinstance(test_hplc, pd.DataFrame)
 
 
-def test_load_fermentation_test_polars():
+def test_load_fermentation_test_polars(pl):
     # Arrange & Act
     test_spectra, test_hplc = load_fermentation_test(set_output="polars")
 
@@ -65,7 +82,7 @@ def test_load_fermentation_test_exception():
         test_spectra, test_hplc = load_fermentation_test(set_output="plars")
 
 
-def test_load_fermentation_train_pandas():
+def test_load_fermentation_train_pandas(pd):
     # Arrange & Act
     train_spectra, train_hplc = load_fermentation_train()
 
@@ -76,7 +93,7 @@ def test_load_fermentation_train_pandas():
     assert isinstance(train_hplc, pd.DataFrame)
 
 
-def test_load_fermentation_train_polars():
+def test_load_fermentation_train_polars(pl):
     # Arrange & Act
     train_spectra, train_hplc = load_fermentation_train(set_output="polars")
 
