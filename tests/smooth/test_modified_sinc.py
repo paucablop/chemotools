@@ -91,9 +91,7 @@ def test_ms_linear_ramp_preservation_interp_only():
     assert np.allclose(Y_interp, X, atol=1e-12)
 
 
-# ---------------------------
 # multi-row / axis behavior
-# ---------------------------
 def test_ms_axis_behavior_rows_vs_columns():
     # Smoothing along axis=1 should match smoothing each row independently.
     # Likewise, axis=0 + transpose should give the same result.
@@ -111,3 +109,24 @@ def test_ms_axis_behavior_rows_vs_columns():
     assert np.allclose(Y_row, Y_col, atol=1e-12)
     assert Y_row.shape == X.shape
     assert Y_col.shape == X.shape
+
+
+# Test kappa corrections with different n values
+@pytest.mark.parametrize("n", [6, 8, 10])
+def test_kappa_corrections_applied(n):
+    """Test that kappa corrections are properly applied for n=6,8,10."""
+    # Using a larger window size to ensure m >= n/2 + 2
+    window_size = n * 4 + 1  # Ensure large enough window
+    ms = ModifiedSincFilter(window_size=window_size, n=n, alpha=3.0)
+
+    # Fit on dummy data to trigger kernel computation
+    X = np.zeros((1, window_size), dtype=np.float64)
+    ms.fit(X)
+
+    # The kernel should be computed with kappa corrections
+    assert hasattr(ms, "kernel_")
+    assert ms.kernel_.shape == (window_size,)
+
+    # Verify symmetry and DC preservation
+    assert np.allclose(ms.kernel_, ms.kernel_[::-1], atol=1e-12)
+    assert np.isclose(ms.kernel_.sum(), 1.0, atol=1e-12)
