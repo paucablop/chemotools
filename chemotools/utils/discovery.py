@@ -23,6 +23,7 @@ from sklearn.utils._testing import ignore_warnings
 
 _MODULE_TO_IGNORE = {"tests", "utils"}
 
+
 def all_estimators(type_filter=None):
     """Get a list of all estimators from `chemotools`.
 
@@ -53,6 +54,7 @@ def all_estimators(type_filter=None):
     >>> type(estimators)
     <class 'list'>
     """
+
     def is_abstract(c):
         return bool(getattr(c, "__abstractmethods__", False))
 
@@ -69,13 +71,11 @@ def all_estimators(type_filter=None):
             module_parts = module_name.split(".")
             # Skip ignored modules and any submodules of datasets
 
-            if (
-                any(part in _MODULE_TO_IGNORE for part in module_parts)
-            ):
+            if any(part in _MODULE_TO_IGNORE for part in module_parts):
                 continue
             try:
                 module = import_module(module_name)
-            except Exception as e:
+            except Exception:
                 continue  # skip modules that fail to import
 
             classes = inspect.getmembers(module, inspect.isclass)
@@ -83,8 +83,7 @@ def all_estimators(type_filter=None):
             classes = [
                 (name, cls)
                 for name, cls in classes
-                if not name.startswith("_")
-                and cls.__module__ == module.__name__
+                if not name.startswith("_") and cls.__module__ == module.__name__
             ]
             all_classes.extend(classes)
 
@@ -93,7 +92,9 @@ def all_estimators(type_filter=None):
     estimators = [
         (name, cls)
         for name, cls in all_classes
-        if issubclass(cls, BaseEstimator) and name != "BaseEstimator" and not is_abstract(cls)
+        if issubclass(cls, BaseEstimator)
+        and name != "BaseEstimator"
+        and not is_abstract(cls)
     ]
 
     if type_filter is not None:
@@ -215,4 +216,3 @@ def all_functions():
     # itemgetter is used to ensure the sort does not extend to the 2nd item of
     # the tuple
     return sorted(set(all_functions), key=itemgetter(0))
-    
