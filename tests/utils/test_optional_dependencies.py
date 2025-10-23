@@ -6,6 +6,7 @@ def test_check_optional_dependency_existing_module():
     """Test that an existing dependency is successfully imported."""
     module = check_optional_dependency("math", "test_function")
     import math
+
     assert module is math
 
 
@@ -28,6 +29,7 @@ def test_check_optional_dependency_real_optional(monkeypatch):
     Test that if __import__ fails for a real optional package (e.g. pandas),
     the raised ImportError includes the correct package name and caller.
     """
+
     # Monkeypatch __import__ to simulate ImportError
     def fake_import(name, *args, **kwargs):
         if name == "pandas":
