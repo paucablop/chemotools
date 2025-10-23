@@ -124,7 +124,7 @@ class _BaseFIRFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         self.axis = axis
 
     # sklearn API
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "Self":
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "_BaseFIRFilter":
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
