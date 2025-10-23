@@ -1,5 +1,4 @@
 import pytest
-from unittest.mock import patch, MagicMock
 from chemotools.utils.discovery import all_estimators, all_displays, all_functions
 
 

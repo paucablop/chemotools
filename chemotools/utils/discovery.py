@@ -76,7 +76,7 @@ def all_estimators(type_filter=None):
                 or "._" in module_name
             ):
                 continue
-            
+
             module = import_module(module_name)
             classes = inspect.getmembers(module, inspect.isclass)
             # Only classes defined in this module
