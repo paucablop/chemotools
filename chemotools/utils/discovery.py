@@ -202,11 +202,7 @@ def all_functions():
 
             module = import_module(module_name)
             functions = inspect.getmembers(module, _is_checked_function)
-            functions = [
-                (func.__name__, func)
-                for name, func in functions
-                if not name.startswith("_")
-            ]
+            functions = [(func.__name__, func) for name, func in functions]
             all_functions.extend(functions)
 
     # drop duplicates, sort for reproducibility
