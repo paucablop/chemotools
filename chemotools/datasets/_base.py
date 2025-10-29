@@ -39,7 +39,7 @@ def load_fermentation_train(set_output="pandas"):
         train_hplc = pl.read_csv(PACKAGE_DIRECTORY + "/data/train_hplc.csv")
         return train_spectra, train_hplc
 
-    else:  # pragma: no cover
+    else:
         raise ValueError(
             "Invalid value for set_output. Please use 'pandas' or 'polars'."
         )
@@ -87,7 +87,7 @@ def load_fermentation_test(set_output="pandas"):
         )
         return fermentation_spectra, fermentation_hplc
 
-    else:  # pragma: no cover
+    else:
         raise ValueError(
             "Invalid value for set_output. Please use 'pandas' or 'polars'."
         )
@@ -120,7 +120,7 @@ def load_coffee(set_output="pandas"):
         coffee_labels = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels
 
-    else:  # pragma: no cover
+    else:
         raise ValueError(
             "Invalid value for set_output. Please use 'pandas' or 'polars'."
         )
