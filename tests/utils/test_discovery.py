@@ -14,7 +14,7 @@ def test_all_estimators_returns_list_of_tuples():
 
 
 @pytest.mark.parametrize(
-    "type_filter", ["classifier", "regressor", "transformer", "cluster"]
+    "type_filter", ["classifier", "regressor", "transformer", "cluster", "selector", "outlier"]
 )
 def test_all_estimators_type_filter(type_filter):
     result = all_estimators(type_filter)

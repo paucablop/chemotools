@@ -18,7 +18,9 @@ from sklearn.base import (
     ClusterMixin,
     RegressorMixin,
     TransformerMixin,
+    OutlierMixin,
 )
+from sklearn.feature_selection import SelectorMixin
 from sklearn.utils._testing import ignore_warnings
 
 _MODULE_TO_IGNORE = {"tests", "utils", "datasets"}
@@ -33,12 +35,12 @@ def all_estimators(type_filter=None):
 
     Parameters
     ----------
-    type_filter : {"classifier", "regressor", "cluster", "transformer"} \
+    type_filter : {"classifier", "regressor", "cluster", "transformer", "selector", "outlier"} \
             or list of such str, default=None
         Which kind of estimators should be returned. If None, no filter is
         applied and all estimators are returned.  Possible values are
-        'classifier', 'regressor', 'cluster' and 'transformer' to get
-        estimators only of these specific types, or a list of these to
+        'classifier', 'regressor', 'cluster', 'transformer', 'selector', and 'outlier'
+        to get estimators only of these specific types, or a list of these to
         get the estimators that fit at least one of the types.
 
     Returns
@@ -105,6 +107,8 @@ def all_estimators(type_filter=None):
             "regressor": RegressorMixin,
             "transformer": TransformerMixin,
             "cluster": ClusterMixin,
+            "selector": SelectorMixin,
+            "outlier": OutlierMixin,
         }
         for name, mixin in filters.items():
             if name in type_filter:
@@ -115,7 +119,7 @@ def all_estimators(type_filter=None):
         if type_filter:
             raise ValueError(
                 "Parameter type_filter must be 'classifier', "
-                "'regressor', 'transformer', 'cluster' or "
+                "'regressor', 'transformer', 'cluster', 'selector', 'outlier' or "
                 "None, got"
                 f" {repr(type_filter)}."
             )
