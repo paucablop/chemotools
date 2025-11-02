@@ -1,6 +1,9 @@
+"""
+The :mod:chemotools.smooth._modified_sinc_smoother module implements the Modified Sinc Filter (SGF) transformation.
+"""
+
 # Authors: Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>
 # License: MIT
-
 
 from __future__ import annotations
 from typing import Literal

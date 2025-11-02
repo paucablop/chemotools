@@ -162,8 +162,11 @@ class _BaseFIRFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         out = X_sw.reshape(*X_sw.shape)
         return np.moveaxis(out, -1, ax)
 
-    # --- hooks for subclasses ---
+    @abstractmethod
     def _compute_kernel(self) -> np.ndarray:
+        """
+        Subclasses must implement this method to compute the convolution kernel.
+        """
         raise NotImplementedError
 
     # --- shared convolution/padding ---
