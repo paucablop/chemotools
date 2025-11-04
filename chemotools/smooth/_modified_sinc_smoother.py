@@ -1,5 +1,5 @@
 """
-The :mod:chemotools.smooth._modified_sinc_smoother module implements the Modified Sinc Filter (SGF) transformation.
+The :mod:chemotools.smooth._modified_sinc_smoother module implements the Modified Sinc Filter (MSF) transformation.
 """
 
 # Authors: Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>
