@@ -60,7 +60,7 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         "padding_mode": [
             StrOptions({"zeros", "constant", "extend", "mirror", "linear"})
         ],
-        "pad_value": [Interval(Real, 0, None, closed="both")],
+        "pad_value": [Real],
         "random_state": [None, int, np.random.RandomState],
     }
 

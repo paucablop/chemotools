@@ -5,12 +5,12 @@ wavenumbers.
 """
 
 from typing import Optional
-from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, Integral
 
 
 class RangeCut(SelectorMixin, BaseEstimator):
@@ -59,7 +59,7 @@ class RangeCut(SelectorMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "start": [Integral],
+        "start": Interval(Integral, 0, None, closed="left"),
         "end": [Integral],
         "wavenumbers": ["array-like", None],
     }

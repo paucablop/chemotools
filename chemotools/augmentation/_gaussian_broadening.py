@@ -60,7 +60,7 @@ class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     _parameter_constraints: dict = {
         "sigma": [Interval(Real, 0, None, closed="both")],
         "mode": StrOptions({"reflect", "constant", "nearest", "mirror", "wrap"}),
-        "pad_value": [Interval(Real, 0, None, closed="both")],
+        "pad_value": [Real],
         "random_state": [None, int, np.random.RandomState],
         "truncate": [Interval(Real, 0, None, closed="both")],
     }
