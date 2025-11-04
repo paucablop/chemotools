@@ -198,5 +198,6 @@ class _BaseFIRFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         if mode == "wrap":
             return np.pad(x, (m, m), mode="wrap")
         if mode == "constant":
-            return np.pad(x, (m, m), mode="constant", constant_values=(x[0], x[-1]))
+            # Match scipy's behavior: pad with zeros (cval=0.0 by default)
+            return np.pad(x, (m, m), mode="constant", constant_values=0.0)
         raise ValueError(f"Unknown mode='{mode}'")
