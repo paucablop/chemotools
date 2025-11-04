@@ -12,6 +12,7 @@ Smoothing methods to reduce noise while preserving spectral features.
    from chemotools.smooth import (
        MeanFilter,
        MedianFilter,
+       ModifiedSincFilter,
        SavitzkyGolayFilter,
        WhittakerSmooth,
    )
@@ -29,6 +30,8 @@ Available Classes
      - Moving average smoothing
    * - :doc:`MedianFilter </methods/generated/chemotools.smooth.MedianFilter>`
      - Median filter for noise reduction
+   * - :doc:`ModifiedSincFilter </methods/generated/chemotools.smooth.ModifiedSincFilter>`
+     - Modified Sinc smoothing filter
    * - :doc:`SavitzkyGolayFilter </methods/generated/chemotools.smooth.SavitzkyGolayFilter>`
      - Savitzky-Golay smoothing filter
    * - :doc:`WhittakerSmooth </methods/generated/chemotools.smooth.WhittakerSmooth>`

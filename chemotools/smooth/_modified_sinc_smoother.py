@@ -19,11 +19,11 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
     The Modified Sinc smoother is a linear-phase FIR filter: the signal is
     convolved with a fixed, symmetric kernel. The kernel is built from:
-      1) a sinc core with argument ((n + 4) / 2) * pi * x (Eq. 3, p. 187),
-      2) a special Gaussian-like window w(x) whose value and slope vanish at
-         the window ends (Eq. 4, p. 187), and
-      3) small optional correction terms that flatten the passband so low
-         frequencies are almost unattenuated (Eqs. 7–8 and Table 1, pp. 187–188).
+        1) a sinc core with argument ((n + 4) / 2) * pi * x (Eq. 3, p. 187),
+        2) a special Gaussian-like window w(x) whose value and slope vanish at
+            the window ends (Eq. 4, p. 187), and
+        3) small optional correction terms that flatten the passband so low
+            frequencies are almost unattenuated (Eqs. 7–8 and Table 1, pp. 187–188).
 
     Parameters
     ----------
