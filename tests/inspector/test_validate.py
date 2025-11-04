@@ -263,9 +263,7 @@ class TestValidateDatasetsConsistency:
         X_test = np.random.rand(50, 10)
 
         # Act & Assert
-        with pytest.raises(
-            ValueError, match="y_test required when X_test is provided"
-        ):
+        with pytest.raises(ValueError, match="y_test required when X_test is provided"):
             _validate_datasets_consistency(
                 X_train=X_train,
                 y_train=y_train,
