@@ -6,8 +6,10 @@ The :mod:`chemotools.smooth._savitzky_golay_filter` module implements the Savitz
 # License: MIT
 
 from typing import Literal, Optional
+from numbers import Integral
 
 import numpy as np
+from sklearn.utils._param_validation import Interval, StrOptions
 from ._base import _BaseFIRFilter
 
 
@@ -47,6 +49,13 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
     >>> X_smoothed = sgf.fit_transform(X)
 
     """
+
+    _parameter_constraints: dict = {
+        "window_size": [Interval(Integral, 1, None, closed="left")],
+        "polynomial_order": [Interval(Integral, 0, None, closed="left")],
+        "mode": [StrOptions({"mirror", "constant", "nearest", "wrap", "interp"})],
+        "axis": [Interval(Integral, 0, None, closed="left")],
+    }
 
     def __init__(
         self,

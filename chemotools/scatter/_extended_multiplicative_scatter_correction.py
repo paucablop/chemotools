@@ -6,10 +6,12 @@ The :mod:`chemotools.scatter._extended_multiplicative_scatter_correction` module
 # License: MIT
 
 from typing import Literal, Optional
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, StrOptions
 
 
 class ExtendedMultiplicativeScatterCorrection(
@@ -75,6 +77,13 @@ class ExtendedMultiplicativeScatterCorrection(
     """
 
     ALLOWED_METHODS = ["mean", "median"]
+
+    _parameter_constraints: dict = {
+        "method": [StrOptions({"mean", "median"})],
+        "order": [Interval(Integral, 0, None, closed="left")],
+        "reference": ["array-like", None],
+        "weights": ["array-like", None],
+    }
 
     # TODO: Check method is valid in instantiation. Right now it is check on fit because it breaks the scikitlearn check_estimator()
 

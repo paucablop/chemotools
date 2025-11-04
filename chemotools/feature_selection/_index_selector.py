@@ -7,7 +7,6 @@ to select specific features from spectral data based on indices or wavenumbers.
 # License: MIT
 
 from typing import Optional, Union
-
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
@@ -63,6 +62,11 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     >>> X_selected.shape
     (21, 183)
     """
+
+    _parameter_constraints: dict = {
+        "features": ["array-like", None],
+        "wavenumbers": ["array-like", None],
+    }
 
     def __init__(
         self,

@@ -19,7 +19,7 @@ def test_ms_kernel_properties_default():
     ms = ModifiedSincFilter(window_size=21, n=6, alpha=3.0, mode="interp")
     # fit on any numeric 2D data to set up internal attributes
     X = np.zeros((1, 21), dtype=np.float64)
-    
+
     # Act
     ms.fit(X)
     k = ms.kernel_
@@ -37,11 +37,11 @@ def test_ms_kernel_changes_with_params():
     X = np.zeros((1, 21))
     ms1 = ModifiedSincFilter(window_size=21, n=6, alpha=2.0, mode="interp")
     ms2 = ModifiedSincFilter(window_size=21, n=6, alpha=4.0, mode="interp")
-    
+
     # Act
     ms1.fit(X)
     ms2.fit(X)
-    
+
     # Assert
     # different alpha should yield a different kernel (not identical vector)
     assert not np.allclose(ms1.kernel_, ms2.kernel_, atol=1e-12)
@@ -99,7 +99,7 @@ def test_ms_linear_ramp_preservation_interp_only():
 
     # Act
     Y_interp = ms_interp.fit_transform(X)
-    
+
     # Assert
     # With linear extrapolation, a linear ramp should be preserved at the edges
     assert np.allclose(Y_interp, X, atol=1e-12)

@@ -7,7 +7,9 @@ The :mod:chemotools.smooth._modified_sinc_smoother module implements the Modifie
 
 from __future__ import annotations
 from typing import Literal
+from numbers import Integral
 import numpy as np
+from sklearn.utils._param_validation import Interval, StrOptions, Real
 
 from ._base import _BaseFIRFilter
 
@@ -70,6 +72,15 @@ class ModifiedSincFilter(_BaseFIRFilter):
     >>> ms = ModifiedSincFilter(window_size= 9, n=6, alpha=4.0, mode="interp")
     >>> X_smooth = ms.fit_transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "window_size": [Interval(Integral, 1, None, closed="left")],
+        "n": [Interval(Integral, 2, None, closed="left")],
+        "alpha": [Interval(Real, 0, None, closed="neither")],
+        "use_corrections": ["boolean"],
+        "mode": [StrOptions({"mirror", "constant", "nearest", "wrap", "interp"})],
+        "axis": [Interval(Integral, 0, None, closed="left")],
+    }
 
     def __init__(
         self,

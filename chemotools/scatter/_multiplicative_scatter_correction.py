@@ -10,6 +10,7 @@ from typing import Literal, Optional
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import StrOptions
 
 
 class MultiplicativeScatterCorrection(
@@ -67,6 +68,11 @@ class MultiplicativeScatterCorrection(
 
     ALLOWED_METHODS = ["mean", "median"]
 
+    _parameter_constraints: dict = {
+        "method": [StrOptions({"mean", "median"})],
+        "reference": ["array-like", None],
+        "weights": ["array-like", None],
+    }
     # TODO: Check method is valid in instantiation. Right now it is check on fit because it breaks the scikitlearn check_estimator()
 
     def __init__(

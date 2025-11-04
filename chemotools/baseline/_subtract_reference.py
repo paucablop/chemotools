@@ -48,6 +48,10 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> X_corrected = transformer.transform(X)
     """
 
+    _parameter_constraints: dict = {
+        "reference": ["array-like", None],
+    }
+
     def __init__(
         self,
         reference: Optional[np.ndarray] = None,

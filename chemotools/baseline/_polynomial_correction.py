@@ -7,10 +7,12 @@ a polynomial baseline correction transformer.
 # License: MIT
 
 from typing import Optional
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval
 
 
 class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -49,6 +51,11 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
     >>> # Generate baseline-corrected data
     >>> X_corrected = transformer.transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "order": [Interval(Integral, 0, None, closed="left")],
+        "indices": ["array-like", None],
+    }
 
     def __init__(self, order: int = 1, indices: Optional[list] = None) -> None:
         self.order = order

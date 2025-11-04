@@ -67,7 +67,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         "padding_mode": [
             StrOptions({"zeros", "constant", "wrap", "extend", "mirror", "linear"})
         ],
-        "pad_value": [Real],
+        "pad_value": [Interval(Real, 0, None, closed="both")],
         "random_state": [None, int, np.random.RandomState],
     }
 

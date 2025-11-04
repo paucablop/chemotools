@@ -6,10 +6,12 @@ transformer to calculate the Norris-Williams derivative of spectral data.
 # Author: Pau Cabaneros
 # License: MIT
 
+from numbers import Integral
 import numpy as np
 from scipy.ndimage import convolve1d
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, StrOptions
 
 
 class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -55,6 +57,15 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> # Calculate Norris-Williams derivative
     >>> X_corrected = transformer.transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "window_size": [Interval(Integral, 3, None, closed="left")],
+        "gap_size": [Interval(Integral, 1, None, closed="left")],
+        "derivative_order": [Interval(Integral, 1, 2, closed="both")],
+        "mode": [
+            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
+        ],
+    }
 
     def __init__(
         self,

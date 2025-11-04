@@ -6,10 +6,12 @@ The :mod:`chemotools.scale._point_scaler` module implements a Point Scaler trans
 # License: MIT
 
 from typing import Optional
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval
 
 
 class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -47,6 +49,11 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> # Fit and transform the data
     >>> X_scaled = scaler.fit_transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "point": [Interval(Integral, 0, None, closed="left")],
+        "wavenumbers": ["array-like", None],
+    }
 
     def __init__(self, point: int = 0, wavenumbers: Optional[np.ndarray] = None):
         self.point = point

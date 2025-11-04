@@ -7,6 +7,7 @@ The :mod:`chemotools.smooth._whittaker_smooth` module implements the Whittaker s
 
 from typing import Callable, Literal
 import numpy as np
+from sklearn.utils._param_validation import Interval, StrOptions, Real
 
 from chemotools.utils._linear_algebra import (
     whittaker_smooth_banded,
@@ -68,6 +69,12 @@ class WhittakerSmooth(_BaseWhittaker):
     >>> # Fit and transform the data
     >>> X_smoothed = ws.fit_transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "lam": [Interval(Real, 0, None, closed="neither")],
+        "weights": ["array-like", None],
+        "solver_type": [StrOptions({"banded", "sparse"})],
+    }
 
     def __init__(
         self,

@@ -6,11 +6,13 @@ The :mod:`chemotools.smooth._median_filter` module implements the Median Filter 
 # License: MIT
 
 from typing import Literal
+from numbers import Integral
 
 import numpy as np
 from scipy.ndimage import median_filter
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval, StrOptions
 
 
 class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -43,6 +45,13 @@ class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> # Fit and transform the data
     >>> X_smoothed = md.fit_transform(X)
     """
+
+    _parameter_constraints: dict = {
+        "window_size": [Interval(Integral, 3, None, closed="left")],
+        "mode": [
+            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
+        ],
+    }
 
     def __init__(
         self,

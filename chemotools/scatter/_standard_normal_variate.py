@@ -45,6 +45,8 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     >>> X_scaled = snv.fit_transform(X)
     """
 
+    _parameter_constraints: dict = {}
+
     def fit(self, X: np.ndarray, y=None) -> "StandardNormalVariate":
         """
         Fit the transformer to the input data.

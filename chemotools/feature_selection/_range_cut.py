@@ -5,6 +5,7 @@ wavenumbers.
 """
 
 from typing import Optional
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator
@@ -56,6 +57,12 @@ class RangeCut(SelectorMixin, BaseEstimator):
     >>> X_cut.shape
     (21, 616)
     """
+
+    _parameter_constraints: dict = {
+        "start": [Integral],
+        "end": [Integral],
+        "wavenumbers": ["array-like", None],
+    }
 
     def __init__(
         self,

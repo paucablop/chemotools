@@ -47,6 +47,10 @@ class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     >>> X_corrected = transformer.transform(X)
     """
 
+    _parameter_constraints: dict = {
+        "indices": ["array-like", None],
+    }
+
     def __init__(self, indices: Optional[list] = None) -> None:
         self.indices = indices
 

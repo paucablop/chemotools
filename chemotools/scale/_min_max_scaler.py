@@ -40,6 +40,10 @@ class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> X_scaled = scaler.fit_transform(X)
     """
 
+    _parameter_constraints: dict = {
+        "use_min": ["boolean"],
+    }
+
     def __init__(self, use_min: bool = True):
         self.use_min = use_min
 

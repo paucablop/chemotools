@@ -8,8 +8,10 @@ Projection (VIP) feature selector for PLS regression models.
 
 import numpy as np
 from sklearn.utils.validation import validate_data
+from sklearn.pipeline import Pipeline
+from sklearn.utils._param_validation import Interval, Real
 
-from ._base import _PLSFeatureSelectorBase
+from ._base import _PLSFeatureSelectorBase, ModelTypes
 
 
 class VIPSelector(_PLSFeatureSelectorBase):
@@ -61,6 +63,11 @@ class VIPSelector(_PLSFeatureSelectorBase):
     >>> X_selected.shape
     (21, 527)
     """
+
+    _parameter_constraints: dict = {
+        "model": [Pipeline, ModelTypes],
+        "threshold": [Interval(Real, 0, None, closed="both")],
+    }
 
     def __init__(
         self,
