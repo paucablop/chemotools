@@ -16,6 +16,7 @@ classifiers = [
 readme = "README.md"
 license = "MIT"
 dependencies = [
+    "matplotlib>=3.10.7",
     "numpy>=2.0.0,<3",
     "pyarrow>=18,<21",
     "scikit-learn>=1.4.0,<2",
