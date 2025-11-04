@@ -90,6 +90,12 @@ def invalid_model():
 
 
 @pytest.fixture
+def fitted_invalid_model(dummy_data_loader):
+    X, y = dummy_data_loader
+    return SVR().fit(X, y)
+
+
+@pytest.fixture
 def pipeline_with_invalid_model():
     return make_pipeline(StandardScaler(), SVR())
 
