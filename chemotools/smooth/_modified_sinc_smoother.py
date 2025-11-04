@@ -66,11 +66,15 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
     Examples
     --------
+    >>> from chemotools.datasets import load_fermentation_train
     >>> from chemotools.smooth import ModifiedSincFilter
-    >>> import numpy as np
-    >>> X = np.array([[0.0, 1.0, 2.0, 1.0, 0.0]], dtype=float)
-    >>> ms = ModifiedSincFilter(window_size= 9, n=6, alpha=4.0, mode="interp")
-    >>> X_smooth = ms.fit_transform(X)
+    >>> # Load sample data
+    >>> X, _ = load_fermentation_train()
+    >>> # Initialize ModifiedSincFilter
+    >>> msf = ModifiedSincFilter()
+    ModifiedSincFilter()
+    >>> # Fit and transform the data
+    >>> X_smoothed = msf.fit_transform(X)
     """
 
     _parameter_constraints: dict = {
