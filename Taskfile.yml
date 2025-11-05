@@ -23,11 +23,9 @@ tasks:
   install:release:
       desc: Install only runtime/build dependencies (no lock file)
       cmds:
-        - "{{.UV}} pip install --no-cache ."  
+        - "{{.UV}} pip install --system --no-cache ."  
       sources:
         - pyproject.toml
-      generates:
-        - .venv
 
   update:
     desc: Update all project dependencies
