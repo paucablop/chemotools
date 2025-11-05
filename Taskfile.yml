@@ -23,7 +23,7 @@ tasks:
   install:release:
       desc: Install only runtime/build dependencies (no lock file)
       cmds:
-        - "{{.UV}} pip install --system --no-cache ."  
+        - "{{.UV}} pip install --system --no-cache ."
       sources:
         - pyproject.toml
 
