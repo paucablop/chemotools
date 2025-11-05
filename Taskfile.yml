@@ -27,6 +27,7 @@ tasks:
       sources:
         - pyproject.toml
 
+
   update:
     desc: Update all project dependencies
     cmds:
