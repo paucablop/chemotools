@@ -110,7 +110,7 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.random.randn(100)
         y = np.random.randn(100)
-        
+
         # Act - should not raise any errors
         add_confidence_ellipse(ax, x, y)
 
@@ -123,7 +123,7 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.random.randn(100)
         y = np.random.randn(100)
-        
+
         # Act
         add_confidence_ellipse(ax, x, y, confidence=0.90)
 
@@ -136,7 +136,7 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.random.randn(100)
         y = np.random.randn(100)
-        
+
         # Act - use n_std parameter (should override confidence)
         add_confidence_ellipse(ax, x, y, n_std=2)
 
@@ -149,14 +149,10 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.random.randn(100)
         y = np.random.randn(100)
-        
+
         # Act
         add_confidence_ellipse(
-            ax, x, y,
-            edgecolor='red',
-            linewidth=2,
-            linestyle='--',
-            alpha=0.5
+            ax, x, y, edgecolor="red", linewidth=2, linestyle="--", alpha=0.5
         )
 
         # Assert
@@ -168,7 +164,7 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.random.randn(100)
         y = np.random.randn(50)  # Different length
-        
+
         # Act & Assert
         with pytest.raises(ValueError, match="x and y must have the same length"):
             add_confidence_ellipse(ax, x, y)
@@ -180,7 +176,7 @@ class TestAddConfidenceEllipse:
         fig, ax = plt.subplots()
         x = np.array([1, 2])  # Only 2 points
         y = np.array([1, 2])
-        
+
         # Act & Assert
         with pytest.raises(ValueError, match="Need at least 3 points"):
             add_confidence_ellipse(ax, x, y)
@@ -197,7 +193,7 @@ class TestAnnotatePoints:
         x = np.array([1, 2, 3])
         y = np.array([1, 2, 3])
         labels = ["A", "B", "C"]
-        
+
         # Act
         annotate_points(ax, x, y, labels)
 
@@ -211,14 +207,17 @@ class TestAnnotatePoints:
         x = np.array([1, 2, 3])
         y = np.array([1, 2, 3])
         labels = ["A", "B", "C"]
-        
+
         # Act
         annotate_points(
-            ax, x, y, labels,
+            ax,
+            x,
+            y,
+            labels,
             fontsize=10,
-            color='red',
+            color="red",
             xytext=(5, 5),
-            textcoords='offset points'
+            textcoords="offset points",
         )
 
         # Assert
@@ -332,7 +331,7 @@ class TestGetDefaultColormap:
 
         # Assert
         assert cmap == "Set2"
-        
+
         # Act
         cmap = get_default_colormap(is_categorical=False, colormap="plasma")
 
@@ -348,10 +347,10 @@ class TestAddColorbar:
         # Arrange
         fig, ax = plt.subplots()
         color_by = np.linspace(0, 1, 10)
-        
+
         # Act
         add_colorbar(ax, color_by, "viridis")
-        
+
         # Assert - check that colorbar was added (figure should have 2 axes now)
         assert len(fig.axes) == 2
         plt.close(fig)
@@ -361,10 +360,10 @@ class TestAddColorbar:
         # Arrange
         fig, ax = plt.subplots()
         color_by = np.linspace(0, 1, 10)
-        
+
         # Act
         add_colorbar(ax, color_by, "plasma", label="Concentration (mg/L)")
-        
+
         # Assert - check colorbar label
         cbar_ax = fig.axes[1]
         assert cbar_ax.get_ylabel() == "Concentration (mg/L)"

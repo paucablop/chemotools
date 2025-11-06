@@ -839,6 +839,7 @@ class TestScoresPlotRenderAxisLimits:
 
         # Create a mock axes object with get_figure() returning None
         from unittest.mock import Mock
+
         ax = Mock(spec=Axes)
         ax.get_figure.return_value = None
 
@@ -855,12 +856,12 @@ class TestScoresPlotConfidenceEllipseEdgeCases:
         # Arrange
         scores = {"train": np.random.randn(50, 5)}
         color_by = np.linspace(0, 1, 50)
-        
+
         plot = ScoresPlot(
             scores,
             color_by_dict={"train": color_by},
             colormap="viridis",
-            confidence_ellipse=True
+            confidence_ellipse=True,
         )
 
         # Act
@@ -875,11 +876,9 @@ class TestScoresPlotConfidenceEllipseEdgeCases:
         # Arrange
         scores = {"train": np.random.randn(50, 5)}
         classes = np.array(["A"] * 25 + ["B"] * 25)
-        
+
         plot = ScoresPlot(
-            scores,
-            color_by_dict={"train": classes},
-            confidence_ellipse=True
+            scores, color_by_dict={"train": classes}, confidence_ellipse=True
         )
 
         # Act
@@ -893,11 +892,8 @@ class TestScoresPlotConfidenceEllipseEdgeCases:
         """Test confidence ellipse without color_by_dict."""
         # Arrange
         scores = {"train": np.random.randn(50, 5)}
-        
-        plot = ScoresPlot(
-            scores,
-            confidence_ellipse=True
-        )
+
+        plot = ScoresPlot(scores, confidence_ellipse=True)
 
         # Act
         fig = plot.show()
@@ -912,13 +908,13 @@ class TestScoresPlotConfidenceEllipseEdgeCases:
         scores = {
             "train": np.random.randn(50, 5),
             "test": np.random.randn(30, 5),
-            "val": np.random.randn(20, 5)
+            "val": np.random.randn(20, 5),
         }
-        
+
         # Only train and test get ellipses
         plot = ScoresPlot(
             scores,
-            confidence_ellipse=["train", "test"]  # val should not get ellipse
+            confidence_ellipse=["train", "test"],  # val should not get ellipse
         )
 
         # Act

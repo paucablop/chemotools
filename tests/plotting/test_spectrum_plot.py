@@ -600,6 +600,7 @@ class TestSpectrumPlotAxisLimits:
 
         # Create a mock axes object with get_figure() returning None
         from unittest.mock import Mock
+
         ax = Mock(spec=Axes)
         ax.get_figure.return_value = None
 
@@ -657,13 +658,13 @@ class TestSpectrumPlotAxisLimits:
         # Assert
         ax = fig.axes[0]
         ylim = ax.get_ylim()
-        
+
         # Get data in the x-range to verify margin was added
         mask = (x >= 1000) & (x <= 1500)
         y_in_range = y[:, mask]
         data_min = np.min(y_in_range)
         data_max = np.max(y_in_range)
-        
+
         # Y-limits should be wider than the data range (due to margin)
         assert ylim[0] < data_min
         assert ylim[1] > data_max
