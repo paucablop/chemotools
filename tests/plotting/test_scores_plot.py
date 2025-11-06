@@ -786,3 +786,144 @@ def test_different_sample_sizes(n_samples):
     # Assert
     assert isinstance(fig, Figure)
     plt.close(fig)
+
+
+class TestScoresPlotRenderAxisLimits:
+    """Test render() method with axis limits."""
+
+    def test_render_with_xlim(self):
+        """Test render() with xlim parameter."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        plot = ScoresPlot(scores)
+
+        # Act
+        fig, ax = plot.render(xlim=(-2, 2))
+
+        # Assert
+        assert ax.get_xlim() == (-2, 2)
+        plt.close(fig)
+
+    def test_render_with_ylim(self):
+        """Test render() with ylim parameter."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        plot = ScoresPlot(scores)
+
+        # Act
+        fig, ax = plot.render(ylim=(-3, 3))
+
+        # Assert
+        assert ax.get_ylim() == (-3, 3)
+        plt.close(fig)
+
+    def test_render_with_both_limits(self):
+        """Test render() with both xlim and ylim."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        plot = ScoresPlot(scores)
+
+        # Act
+        fig, ax = plot.render(xlim=(-2, 2), ylim=(-3, 3))
+
+        # Assert
+        assert ax.get_xlim() == (-2, 2)
+        assert ax.get_ylim() == (-3, 3)
+        plt.close(fig)
+
+    def test_render_axes_without_figure_raises_error(self):
+        """Test that render() raises error if axes has no figure."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        plot = ScoresPlot(scores)
+
+        # Create a mock axes object with get_figure() returning None
+        from unittest.mock import Mock
+        ax = Mock(spec=Axes)
+        ax.get_figure.return_value = None
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Axes object has no associated figure"):
+            plot.render(ax=ax)
+
+
+class TestScoresPlotConfidenceEllipseEdgeCases:
+    """Test confidence ellipse with edge cases."""
+
+    def test_ellipse_with_continuous_coloring(self):
+        """Test confidence ellipse color with continuous coloring."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        color_by = np.linspace(0, 1, 50)
+        
+        plot = ScoresPlot(
+            scores,
+            color_by_dict={"train": color_by},
+            colormap="viridis",
+            confidence_ellipse=True
+        )
+
+        # Act
+        fig = plot.show()
+
+        # Assert - should use gray color for ellipse with continuous coloring
+        assert isinstance(fig, Figure)
+        plt.close(fig)
+
+    def test_ellipse_with_categorical_coloring(self):
+        """Test confidence ellipse color with categorical coloring."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        classes = np.array(["A"] * 25 + ["B"] * 25)
+        
+        plot = ScoresPlot(
+            scores,
+            color_by_dict={"train": classes},
+            confidence_ellipse=True
+        )
+
+        # Act
+        fig = plot.show()
+
+        # Assert - should use dataset color for ellipse with categorical
+        assert isinstance(fig, Figure)
+        plt.close(fig)
+
+    def test_ellipse_without_color_by(self):
+        """Test confidence ellipse without color_by_dict."""
+        # Arrange
+        scores = {"train": np.random.randn(50, 5)}
+        
+        plot = ScoresPlot(
+            scores,
+            confidence_ellipse=True
+        )
+
+        # Act
+        fig = plot.show()
+
+        # Assert - should use dataset color
+        assert isinstance(fig, Figure)
+        plt.close(fig)
+
+    def test_multiple_datasets_with_selective_ellipses(self):
+        """Test ellipses for specific datasets only."""
+        # Arrange
+        scores = {
+            "train": np.random.randn(50, 5),
+            "test": np.random.randn(30, 5),
+            "val": np.random.randn(20, 5)
+        }
+        
+        # Only train and test get ellipses
+        plot = ScoresPlot(
+            scores,
+            confidence_ellipse=["train", "test"]  # val should not get ellipse
+        )
+
+        # Act
+        fig = plot.show()
+
+        # Assert
+        assert isinstance(fig, Figure)
+        plt.close(fig)

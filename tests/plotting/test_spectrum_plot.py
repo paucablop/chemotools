@@ -535,3 +535,136 @@ def test_different_numbers_of_spectra(n_spectra):
     # Assert
     assert isinstance(fig, Figure)
     plt.close(fig)
+
+
+class TestSpectrumPlotAxisLimits:
+    """Test axis limits and auto-scaling functionality."""
+
+    def test_xlim_with_auto_yscaling(self):
+        """Test xlim parameter with automatic y-axis scaling."""
+        # Arrange
+        x = np.linspace(400, 2500, 210)
+        y = np.random.randn(3, 210)
+        plot = SpectrumPlot(x, y)
+
+        # Act - xlim without ylim should auto-scale y-axis
+        fig = plot.show(xlim=(1000, 1500))
+
+        # Assert
+        ax = fig.axes[0]
+        assert ax.get_xlim() == (1000, 1500)
+        # Y-axis should be auto-scaled to the data in x-range
+        ylim = ax.get_ylim()
+        assert ylim[0] < ylim[1]  # Valid range
+        plt.close(fig)
+
+    def test_xlim_with_explicit_ylim(self):
+        """Test xlim with explicit ylim (no auto-scaling)."""
+        # Arrange
+        x = np.linspace(400, 2500, 100)
+        y = np.random.randn(3, 100)
+        plot = SpectrumPlot(x, y)
+
+        # Act - both xlim and ylim specified
+        fig = plot.show(xlim=(1000, 1500), ylim=(-2, 2))
+
+        # Assert
+        ax = fig.axes[0]
+        assert ax.get_xlim() == (1000, 1500)
+        assert ax.get_ylim() == (-2, 2)
+        plt.close(fig)
+
+    def test_render_xlim_with_auto_yscaling(self):
+        """Test render() with xlim parameter and automatic y-axis scaling."""
+        # Arrange
+        x = np.linspace(400, 2500, 210)
+        y = np.random.randn(5, 210)
+        plot = SpectrumPlot(x, y)
+
+        # Act
+        fig, ax = plot.render(xlim=(800, 1200))
+
+        # Assert
+        assert ax.get_xlim() == (800, 1200)
+        # Y-axis should be auto-scaled
+        ylim = ax.get_ylim()
+        assert ylim[0] < ylim[1]
+        plt.close(fig)
+
+    def test_render_axes_without_figure_raises_error(self):
+        """Test that render() raises error if axes has no figure."""
+        # Arrange
+        x = np.linspace(400, 2500, 100)
+        y = np.random.randn(3, 100)
+        plot = SpectrumPlot(x, y)
+
+        # Create a mock axes object with get_figure() returning None
+        from unittest.mock import Mock
+        ax = Mock(spec=Axes)
+        ax.get_figure.return_value = None
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Axes object has no associated figure"):
+            plot.render(ax=ax)
+
+    def test_calculate_ylim_no_data_in_range(self):
+        """Test _calculate_ylim_for_xlim when no data in x-range."""
+        # Arrange
+        x = np.linspace(400, 2500, 100)
+        y = np.random.randn(3, 100)
+        plot = SpectrumPlot(x, y)
+
+        # Act - xlim outside data range
+        fig = plot.show(xlim=(3000, 4000))
+
+        # Assert
+        ax = fig.axes[0]
+        # Should return default limits (0, 1) when no data in range
+        ylim = ax.get_ylim()
+        assert ylim == (0, 1)
+        plt.close(fig)
+
+    def test_calculate_ylim_all_same_values(self):
+        """Test _calculate_ylim_for_xlim when all y-values are the same."""
+        # Arrange
+        x = np.linspace(400, 2500, 100)
+        # Create spectra with constant values
+        y = np.ones((3, 100)) * 5.0
+        plot = SpectrumPlot(x, y)
+
+        # Act
+        fig = plot.show(xlim=(1000, 1500))
+
+        # Assert
+        ax = fig.axes[0]
+        ylim = ax.get_ylim()
+        # Should add small margin around the constant value
+        assert ylim[0] < 5.0  # Should be below 5
+        assert ylim[1] > 5.0  # Should be above 5
+        assert abs(ylim[1] - ylim[0]) > 0  # Non-zero range
+        plt.close(fig)
+
+    def test_calculate_ylim_with_custom_margin(self):
+        """Test _calculate_ylim_for_xlim includes margin."""
+        # Arrange
+        x = np.linspace(400, 2500, 100)
+        y = np.random.randn(3, 100)
+        plot = SpectrumPlot(x, y)
+
+        # Act
+        fig = plot.show(xlim=(1000, 1500))
+
+        # Assert
+        ax = fig.axes[0]
+        ylim = ax.get_ylim()
+        
+        # Get data in the x-range to verify margin was added
+        mask = (x >= 1000) & (x <= 1500)
+        y_in_range = y[:, mask]
+        data_min = np.min(y_in_range)
+        data_max = np.max(y_in_range)
+        
+        # Y-limits should be wider than the data range (due to margin)
+        assert ylim[0] < data_min
+        assert ylim[1] > data_max
+        plt.close(fig)
