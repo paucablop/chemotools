@@ -33,7 +33,7 @@ tasks:
         - rm -rf .venv-release
         - "{{.UV}} venv .venv-release --seed"
         - .venv-release/bin/pip install --no-cache-dir dist/*.whl
-        - echo "✅ Release venv created at .venv-release"
+        - echo "Release venv created at .venv-release"
         - .venv-release/bin/pip list
       sources:
         - dist/*.whl
