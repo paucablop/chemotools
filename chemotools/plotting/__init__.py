@@ -8,7 +8,12 @@ from chemotools.plotting._utilities import (
     annotate_points,
 )
 from chemotools.plotting._spectrum import SpectrumPlot
+from chemotools.plotting._scores import ScoresPlot
 from chemotools.plotting._styles import DATASET_COLORS
+from chemotools.plotting._inspector_plots import (
+    LoadingsPlot,
+    ExplainedVariancePlot,
+)
 
 __all__ = [
     # Protocols
@@ -23,4 +28,7 @@ __all__ = [
     "annotate_points",
     # Constants
     "DATASET_COLORS",
+    "ScoresPlot",
+    "LoadingsPlot",
+    "ExplainedVariancePlot",
 ]
