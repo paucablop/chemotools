@@ -27,6 +27,19 @@ tasks:
       sources:
         - pyproject.toml
 
+  install:release:sbom:
+      desc: Create a clean venv with the built package for SBOM generation
+      cmds:
+        - rm -rf .venv-release
+        - "{{.UV}} venv .venv-release --seed"
+        - .venv-release/bin/pip install --no-cache-dir dist/*.whl
+        - echo "✅ Release venv created at .venv-release"
+        - .venv-release/bin/pip list
+      sources:
+        - dist/*.whl
+      generates:
+        - .venv-release
+
 
   update:
     desc: Update all project dependencies

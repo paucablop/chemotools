@@ -43,22 +43,31 @@ jobs:
       - name: Build package
         run: task build
 
-      # 3. Publish to PyPI
+      # 3. Create clean venv with package for SBOM
+      - name: Create release environment
+        run: task install:release:sbom
+
+      # 4. Publish to PyPI
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
 
-      # 4. Generate SBOM from runtime environment
+      # 5. Generate SBOM from runtime environment
       - name: Generate SBOM
         run: |
-          CYCLONEDX_VERSION=$(uv tool run --from cyclonedx-bom cyclonedx-bom --version | head -n1)
+          uv tool install cyclonedx-bom
+          
+          CYCLONEDX_VERSION=$(uv tool run cyclonedx-py --version | head -n1)
           echo "Generating SBOM using $CYCLONEDX_VERSION"
-          uv tool run --from cyclonedx-bom cyclonedx-bom environment \
+          
+          # Use the globally installed tool to scan the clean venv
+          uv tool run cyclonedx-py environment \
             --output-format=json \
-            --output-file=chemotools-${{ github.event.release.tag_name }}-sbom.json
+            --output-file=chemotools-${{ github.event.release.tag_name }}-sbom.json \
+            .venv-release
           echo "cyclonedx-bom-version=$CYCLONEDX_VERSION" >> $GITHUB_OUTPUT
         id: sbom
 
-      # 5. Upload SBOM as release asset
+      # 6. Upload SBOM as release asset
       - name: Upload SBOM to release
         uses: softprops/action-gh-release@v1
         with:

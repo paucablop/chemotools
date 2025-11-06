@@ -23,7 +23,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "cyclonedx-bom>=7.1.0",
     "pytest>=8.3.0",
     "pytest-cov>=6.3.0",
     "ruff>=0.10.0",
