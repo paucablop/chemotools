@@ -11,7 +11,13 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import setup_figure, get_colors_from_labels
+from chemotools.plotting._utilities import (
+    setup_figure,
+    get_colors_from_labels,
+    detect_categorical,
+    get_default_colormap,
+    add_colorbar,
+)
 
 
 class SpectrumPlot:
@@ -122,64 +128,13 @@ class SpectrumPlot:
             # User explicitly specified the type
             self.is_categorical = categorical
         elif color_by is not None:
-            # Automatic detection with improved logic
-            self.is_categorical = self._detect_categorical(color_by)
+            # Automatic detection using utility function
+            self.is_categorical = detect_categorical(color_by)
         else:
             self.is_categorical = False
 
         # Set colormap with colorblind-friendly defaults
-        if colormap is None:
-            self.colormap = "tab10" if self.is_categorical else "viridis"
-        else:
-            self.colormap = colormap
-
-    def _detect_categorical(self, color_by: np.ndarray) -> bool:
-        """Detect if color_by array should be treated as categorical.
-
-        Parameters
-        ----------
-        color_by : np.ndarray
-            The color reference array to analyze.
-
-        Returns
-        -------
-        bool
-            True if the array should be treated as categorical.
-
-        Notes
-        -----
-        Detection logic:
-        1. String types (U, S, O) → categorical
-        2. Boolean type → categorical
-        3. Integer type with ≤ 10 unique values → categorical
-        4. Float type with ≤ 5 unique values AND all values repeat → categorical
-        5. Otherwise → continuous
-        """
-        # String or object types are categorical
-        if color_by.dtype.kind in ["U", "S", "O"]:
-            return True
-
-        # Boolean is categorical
-        if color_by.dtype.kind == "b":
-            return True
-
-        unique_values = np.unique(color_by)
-        n_unique = len(unique_values)
-
-        # Integer types with reasonable number of unique values
-        if color_by.dtype.kind in ["i", "u"]:  # signed or unsigned int
-            return n_unique <= 10
-
-        # Float types: only categorical if very few unique values AND repeated
-        if color_by.dtype.kind == "f":
-            if n_unique <= 5:
-                # Check if values repeat (each value appears more than once)
-                # This distinguishes [1.0, 2.0, 3.0, 4.0] from [1.0, 1.0, 2.0, 2.0]
-                counts = np.bincount(np.searchsorted(unique_values, color_by))
-                has_repeats = bool(np.any(counts > 1))
-                return has_repeats
-
-        return False
+        self.colormap = get_default_colormap(self.is_categorical, colormap)
 
     def show(
         self,
@@ -272,14 +227,7 @@ class SpectrumPlot:
             ax.legend()
         else:
             # Add colorbar for continuous data
-            from matplotlib import cm
-            import matplotlib.colors as mcolors
-
-            norm = mcolors.Normalize(vmin=self.color_by.min(), vmax=self.color_by.max())
-            sm = cm.ScalarMappable(cmap=self.colormap, norm=norm)
-            sm.set_array([])
-            cbar = plt.colorbar(sm, ax=ax)
-            cbar.set_label(self.colorbar_label, fontsize=10)
+            add_colorbar(ax, self.color_by, self.colormap, self.colorbar_label)
 
         plt.tight_layout()
         return fig

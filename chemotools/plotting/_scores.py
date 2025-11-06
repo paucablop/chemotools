@@ -6,7 +6,15 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import setup_figure
+from chemotools.plotting._utilities import (
+    setup_figure,
+    get_colors_from_labels,
+    detect_categorical,
+    get_default_colormap,
+    add_colorbar,
+    annotate_points,
+    add_confidence_ellipse,
+)
 from chemotools.plotting._styles import DATASET_COLORS
 
 
@@ -164,16 +172,13 @@ class ScoresPlot:
                 # User explicitly specified
                 is_cat = categorical
             else:
-                # Auto-detect using same logic as SpectrumPlot
-                is_cat = self._detect_categorical(color_by)
+                # Auto-detect using utility function
+                is_cat = detect_categorical(color_by)
 
             self.is_categorical_dict[dataset_name] = is_cat
 
-            # Set colormap
-            if colormap is None:
-                self.colormap_dict[dataset_name] = "tab10" if is_cat else "viridis"
-            else:
-                self.colormap_dict[dataset_name] = colormap
+            # Set colormap using utility function
+            self.colormap_dict[dataset_name] = get_default_colormap(is_cat, colormap)
 
         # Handle confidence_ellipse parameter
         self.confidence_ellipse: Optional[float]
@@ -194,35 +199,6 @@ class ScoresPlot:
 
         # Validate components at initialization
         self._validate_components()
-
-    def _detect_categorical(self, color_by: np.ndarray) -> bool:
-        """Detect if color_by array should be treated as categorical.
-
-        Uses the same logic as SpectrumPlot for consistency.
-        """
-        # String or object types are categorical
-        if color_by.dtype.kind in ["U", "S", "O"]:
-            return True
-
-        # Boolean is categorical
-        if color_by.dtype.kind == "b":
-            return True
-
-        unique_values = np.unique(color_by)
-        n_unique = len(unique_values)
-
-        # Integer types with reasonable number of unique values
-        if color_by.dtype.kind in ["i", "u"]:  # signed or unsigned int
-            return n_unique <= 10
-
-        # Float types: only categorical if very few unique values AND repeated
-        if color_by.dtype.kind == "f":
-            if n_unique <= 5:
-                counts = np.bincount(np.searchsorted(unique_values, color_by))
-                has_repeats = bool(np.any(counts > 1))
-                return has_repeats
-
-        return False
 
     def _validate_components(self) -> None:
         """Validate that component indices are valid for all datasets.
@@ -350,19 +326,15 @@ class ScoresPlot:
 
         if has_continuous:
             # Add colorbar for continuous data
-            from matplotlib import cm
-            import matplotlib.colors as mcolors
-
             # Get the first continuous dataset for colorbar
             for dataset_name, color_by in self.color_by_dict.items():
                 if not self.is_categorical_dict.get(dataset_name, True):
-                    norm = mcolors.Normalize(vmin=color_by.min(), vmax=color_by.max())
-                    sm = cm.ScalarMappable(
-                        cmap=self.colormap_dict[dataset_name], norm=norm
+                    add_colorbar(
+                        ax,
+                        color_by,
+                        self.colormap_dict[dataset_name],
+                        self.colorbar_label,
                     )
-                    sm.set_array([])
-                    cbar = plt.colorbar(sm, ax=ax)
-                    cbar.set_label(self.colorbar_label, fontsize=10)
                     break  # Only one colorbar
 
         # Always show legend (for datasets or categories)
@@ -453,8 +425,6 @@ class ScoresPlot:
                 )
             elif self.is_categorical_dict.get(dataset_name, True):
                 # Categorical coloring
-                from chemotools.plotting._utilities import get_colors_from_labels
-
                 colors = get_colors_from_labels(
                     color_by, self.colormap_dict[dataset_name]
                 )
@@ -503,8 +473,6 @@ class ScoresPlot:
 
             # Add point annotations if provided
             if annotations is not None:
-                from chemotools.plotting._utilities import annotate_points
-
                 annotate_points(
                     ax,
                     scores[:, comp1],
@@ -520,8 +488,6 @@ class ScoresPlot:
                 self.confidence_ellipse is not None
                 and dataset_name in self.ellipse_datasets
             ):
-                from chemotools.plotting._utilities import add_confidence_ellipse
-
                 # Determine ellipse color - use dataset color or first continuous color
                 if color_by is None:
                     ellipse_color = self.dataset_colors.get(dataset_name, None)

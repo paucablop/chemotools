@@ -159,3 +159,134 @@ def annotate_points(
     """Annotate points on a plot."""
     for xi, yi, label in zip(x, y, labels):
         ax.annotate(label, (xi, yi), **kwargs)
+
+
+def detect_categorical(color_by: np.ndarray) -> bool:
+    """Detect if color_by array should be treated as categorical.
+
+    Parameters
+    ----------
+    color_by : np.ndarray
+        The color reference array to analyze.
+
+    Returns
+    -------
+    bool
+        True if the array should be treated as categorical.
+
+    Notes
+    -----
+    Detection logic:
+    1. String types (U, S, O) → categorical
+    2. Boolean type → categorical
+    3. Integer type with ≤ 10 unique values → categorical
+    4. Float type with ≤ 5 unique values AND all values repeat → categorical
+    5. Otherwise → continuous
+
+    Examples
+    --------
+    >>> classes = np.array(['A', 'B', 'A', 'C'])
+    >>> detect_categorical(classes)
+    True
+
+    >>> concentrations = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
+    >>> detect_categorical(concentrations)
+    False
+
+    >>> levels = np.array([1, 1, 2, 2, 3, 3])
+    >>> detect_categorical(levels)
+    True
+    """
+    # String or object types are categorical
+    if color_by.dtype.kind in ["U", "S", "O"]:
+        return True
+
+    # Boolean is categorical
+    if color_by.dtype.kind == "b":
+        return True
+
+    unique_values = np.unique(color_by)
+    n_unique = len(unique_values)
+
+    # Integer types with reasonable number of unique values
+    if color_by.dtype.kind in ["i", "u"]:  # signed or unsigned int
+        return n_unique <= 10
+
+    # Float types: only categorical if very few unique values AND repeated
+    if color_by.dtype.kind == "f":
+        if n_unique <= 5:
+            counts = np.bincount(np.searchsorted(unique_values, color_by))
+            has_repeats = bool(np.any(counts > 1))
+            return has_repeats
+
+    return False
+
+
+def get_default_colormap(is_categorical: bool, colormap: Optional[str] = None) -> str:
+    """Get appropriate colormap for categorical or continuous data.
+
+    Parameters
+    ----------
+    is_categorical : bool
+        Whether the data is categorical or continuous.
+    colormap : str, optional
+        User-specified colormap. If provided, this is returned as-is.
+
+    Returns
+    -------
+    str
+        The colormap name to use.
+
+    Notes
+    -----
+    Defaults are colorblind-friendly:
+    - "tab10" for categorical data
+    - "viridis" for continuous data
+
+    Examples
+    --------
+    >>> get_default_colormap(is_categorical=True)
+    'tab10'
+
+    >>> get_default_colormap(is_categorical=False)
+    'viridis'
+
+    >>> get_default_colormap(is_categorical=True, colormap='Set2')
+    'Set2'
+    """
+    if colormap is not None:
+        return colormap
+    return "tab10" if is_categorical else "viridis"
+
+
+def add_colorbar(
+    ax: Axes,
+    color_by: np.ndarray,
+    colormap: str,
+    label: str = "Reference Value",
+) -> None:
+    """Add a colorbar to the axes for continuous coloring.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes to add the colorbar to.
+    color_by : np.ndarray
+        The continuous values used for coloring.
+    colormap : str
+        Name of the colormap to use.
+    label : str, optional
+        Label for the colorbar (default: "Reference Value").
+
+    Examples
+    --------
+    >>> add_colorbar(ax, concentrations, 'viridis', 'Concentration (mg/L)')
+    """
+    from matplotlib import cm
+    import matplotlib.colors as mcolors
+
+    norm = mcolors.Normalize(vmin=color_by.min(), vmax=color_by.max())
+    sm = cm.ScalarMappable(cmap=colormap, norm=norm)
+    sm.set_array([])
+    cbar = plt.colorbar(sm, ax=ax)
+    cbar.set_label(label, fontsize=10)
