@@ -112,6 +112,45 @@ class PLSRegression(_SklearnPLSRegression):
     chemotools.plotting.ExplainedVariancePlot : Visualization for explained variance
     """
 
+    def __init__(
+        self,
+        n_components: int = 2,
+        *,
+        scale: bool = True,
+        max_iter: int = 500,
+        tol: float = 1e-06,
+        copy: bool = True,
+    ):
+        """Initialize PLS Regression model.
+
+        Parameters
+        ----------
+        n_components : int, default=2
+            Number of components to keep.
+        scale : bool, default=True
+            Whether to scale X and Y.
+        max_iter : int, default=500
+            Maximum number of iterations of the power method.
+        tol : float, default=1e-06
+            Tolerance used as convergence criteria.
+        copy : bool, default=True
+            Whether to copy X and Y in fit before applying centering.
+
+        Attributes (set after fitting)
+        -------------------------------
+        explained_x_variance_ratio_ : ndarray
+            Explained variance ratio in X-space for each component.
+        explained_y_variance_ratio_ : ndarray
+            Explained variance ratio in Y-space for each component.
+        """
+        super().__init__(
+            n_components=n_components,
+            scale=scale,
+            max_iter=max_iter,
+            tol=tol,
+            copy=copy,
+        )
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> "PLSRegression":
         """Fit model to data and compute explained variance ratios.
 
