@@ -65,13 +65,6 @@ class PLSRegression(_SklearnPLSRegression):
     >>>
     >>> # Variance ratios are automatically available!
     >>> print(f"LV1 explains {pls.explained_y_variance_ratio_[0]*100:.1f}% of Y variance")
-    >>>
-    >>> # Use directly with plotting
-    >>> plot_x = ExplainedVariancePlot(pls.explained_x_variance_ratio_)
-    >>> plot_x.show(title='PLS Variance in X-space')
-    >>>
-    >>> plot_y = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
-    >>> plot_y.show(title='PLS Variance in Y-space')
 
     Notes
     -----
