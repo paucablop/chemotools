@@ -33,8 +33,7 @@ class PLSRegression(_SklearnPLSRegression):
 
     This process is repeated for each component, using the corresponding t and c vectors.
     Note: Unlike PCA, deflation in PLS is asymmetric—Y is deflated using t-scores derived from X.
-        
-        
+
     Parameters
     ----------
     n_components : int, default=2
@@ -69,31 +68,50 @@ class PLSRegression(_SklearnPLSRegression):
     .. [1] sklearn.cross_decomposition.PLSRegression
         https://scikit-learn.org/stable/modules/generated/sklearn.cross_decomposition.PLSRegression.html
 
-    .. [2] Wegelin, J. A. (2000). 
+    .. [2] Wegelin, J. A. (2000).
         A Survey of Partial Least Squares (PLS) Methods, with Emphasis on the Two-Block Case. Technical Report No. 371, Department of Statistics, University of Washington, Seattle, WA
 
-    .. [3] Abdi, H. (2003). 
+    .. [3] Abdi, H. (2003).
         Partial Least Squares (PLS) Regression. In Lewis-Beck M., Bryman A., Futing T. (Eds.), Encyclopedia of Social Sciences Research Methods. Thousand Oaks (CA): Sage.
 
     Examples
     --------
-    **Example 1: Basic usage with automatic variance calculation**
+    **Basic usage with automatic variance calculation**
 
     >>> from chemotools.models import PLSRegression
-    >>> from chemotools.plotting import ExplainedVariancePlot
+    >>> import numpy as np
     >>>
+    >>> # Generate sample data
+    >>> X = np.random.randn(100, 50)
+    >>> y = X[:, 0] + 2*X[:, 1] + np.random.randn(100)*0.1
+    >>>
+    >>> # Fit model
     >>> pls = PLSRegression(n_components=5)
-    >>> pls.fit(X_train, y_train)
+    >>> pls.fit(X, y)
     >>>
     >>> # Variance ratios are automatically available!
     >>> print(f"LV1 explains {pls.explained_y_variance_ratio_[0]*100:.1f}% of Y variance")
+    >>> print(f"Total Y variance: {pls.explained_y_variance_ratio_.sum()*100:.1f}%")
+    >>>
+    >>> # Use with plotting
+    >>> from chemotools.plotting import ExplainedVariancePlot
+    >>> plot = ExplainedVariancePlot(pls)
+    >>> plot.show()
 
     Notes
     -----
-    - **X-space variance** is calculated using sequential deflation method
-    - **Y-space variance** is calculated using sequential deflation method
-    - For each component, variance is calculated before deflating the matrices
-    - This is the standard approach in PLS regression for explained variance
+    **Variance Calculation:**
+
+    - **X-space variance** is calculated using sequential deflation and will sum to ~1.0 (100%)
+    - **Y-space variance** is calculated using sequential deflation but may not sum to 1.0
+      due to asymmetric deflation (Y deflated with X-scores). The sum depends on X-Y correlation.
+    - For each component, variance explained = variance reduction after deflation
+    - This follows the standard PLS variance decomposition methodology (Wegelin, 2000)
+
+    **Scaling:**
+
+    - When ``scale=True``, data is standardized before variance calculation
+    - The variance ratios reflect the scaled space, not the original data space
     - Both calculations are performed automatically during the initial fit
 
     See Also
@@ -118,20 +136,13 @@ class PLSRegression(_SklearnPLSRegression):
         n_components : int, default=2
             Number of components to keep.
         scale : bool, default=True
-            Whether to scale X and Y.
+            Whether to scale X and Y to unit variance.
         max_iter : int, default=500
             Maximum number of iterations of the power method.
         tol : float, default=1e-06
             Tolerance used as convergence criteria.
         copy : bool, default=True
             Whether to copy X and Y in fit before applying centering.
-
-        Attributes (set after fitting)
-        -------------------------------
-        explained_x_variance_ratio_ : ndarray
-            Explained variance ratio in X-space for each component.
-        explained_y_variance_ratio_ : ndarray
-            Explained variance ratio in Y-space for each component.
         """
         super().__init__(
             n_components=n_components,
@@ -144,17 +155,21 @@ class PLSRegression(_SklearnPLSRegression):
     def fit(self, X: np.ndarray, y: np.ndarray) -> "PLSRegression":
         """Fit model to data and compute explained variance ratios.
 
+        This method extends sklearn's fit() by automatically calculating
+        explained variance ratios after fitting.
+
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training vectors.
+            Training vectors. Accepts numpy arrays, pandas DataFrames.
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors.
+            Target vectors. Accepts 1D (univariate) or 2D (multivariate) targets.
 
         Returns
         -------
-        self : object
-            Fitted estimator.
+        self : PLSRegression
+            Fitted estimator with populated variance attributes:
+            ``explained_x_variance_ratio_`` and ``explained_y_variance_ratio_``.
         """
         # Call parent fit method
         super().fit(X, y)
@@ -165,6 +180,24 @@ class PLSRegression(_SklearnPLSRegression):
         return self
 
     def transform(self, X: np.ndarray, y: np.ndarray | None = None, copy: bool = True):
+        """Apply dimensionality reduction to X.
+
+        Projects X onto the latent components found during fitting.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Samples to transform.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets), optional
+            Target vectors. Only used to transform Y when provided.
+        copy : bool, default=True
+            Whether to copy X and Y, or perform in-place normalization.
+
+        Returns
+        -------
+        X_scores : ndarray of shape (n_samples, n_components)
+            X transformed into the latent space (X-scores).
+        """
         return super().transform(X, y=y, copy=copy)
 
     def _calculate_explained_variance(self, X, y):
@@ -195,6 +228,9 @@ class PLSRegression(_SklearnPLSRegression):
         self, X: np.ndarray, y: np.ndarray
     ) -> tuple[np.ndarray, np.ndarray]:
         """Calculate explained variance ratios using sequential deflation.
+
+        This implements the variance decomposition for PLS regression following
+        the deflation methodology described in Wegelin (2000).
 
         This method calculates how much variance each component explains by
         sequentially deflating the X and Y matrices. This is the standard

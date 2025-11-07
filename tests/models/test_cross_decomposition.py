@@ -228,9 +228,9 @@ class TestPLSRegressionVarianceCalculation:
     def test_y_variance_high_with_strong_correlation(self):
         """Test Y variance calculation against known literature example.
 
-        Abdi, H. (2003). Partial Least Squares (PLS) Regression. 
-        In Lewis-Beck M., Bryman A., Futing T. (Eds.), 
-        Encyclopedia of Social Sciences Research Methods. 
+        Abdi, H. (2003). Partial Least Squares (PLS) Regression.
+        In Lewis-Beck M., Bryman A., Futing T. (Eds.),
+        Encyclopedia of Social Sciences Research Methods.
         Thousand Oaks (CA): Sage.
         """
         # Arrange - Known example from literature
