@@ -365,7 +365,7 @@ class PCAInspector:
 
     def inspect(
         self,
-        dataset: str = "train",
+        dataset: Union[str, Sequence[str]] = "train",
         components_scores: Union[Tuple[int, int], Sequence[Tuple[int, int]]] = (
             (0, 1),
             (1, 2),
@@ -392,8 +392,9 @@ class PCAInspector:
 
         Parameters
         ----------
-        dataset : str, default='train'
-            Which dataset to visualize
+        dataset : Union[str, Sequence[str]], default='train'
+            Dataset(s) to inspect. Can be a single dataset name ("train", "test", or "val")
+            or a sequence of dataset names (e.g., ["train", "test"]).
         components_scores : int, tuple of two ints, or sequence, default=((0, 1), (1, 2))
             Component(s) for scores plots. Can be:
             - Single int: Creates one 1D plot (e.g., 0 for PC1 vs sample index/y-value)
@@ -420,8 +421,11 @@ class PCAInspector:
         -------
         figures : dict
             Dictionary containing all created figures with keys:
-            'scores_1', 'scores_2', ..., 'loadings', 'variance', and optionally
-            'raw_spectra', 'preprocessed_spectra'
+            - Single dataset: 'scores_1', 'scores_2', ..., 'loadings', 'variance', and optionally
+              'raw_spectra', 'preprocessed_spectra'
+            - Multiple datasets: 'scores_1', 'scores_2', ..., 'loadings', 'variance',
+              and optionally 'raw_spectra', 'preprocessed_spectra'. All scores and spectra plots
+              show all datasets together on the same figure, colored by dataset.
             Number of 'scores_N' entries depends on components_scores parameter
 
         Examples
@@ -429,6 +433,13 @@ class PCAInspector:
         >>> inspector = PCAInspector(pca, X_train, y_train)
         >>> # Default: 2 scores plots + loadings + variance + spectra (if preprocessing exists)
         >>> figs = inspector.inspect()
+        >>> # Multiple datasets for comparison
+        >>> inspector.X_test = X_test
+        >>> inspector.y_test = y_test
+        >>> figs = inspector.inspect(dataset=["train", "test"])
+        >>> # Access individual figures
+        >>> figs["scores_1_train"].savefig("scores_1_train.png")
+        >>> figs["scores_1_test"].savefig("scores_1_test.png")
         >>> # Without spectra plots
         >>> figs = inspector.inspect(include_spectra=False)
         >>> # Single 2D scores plot (PC1 vs PC2)
@@ -447,16 +458,68 @@ class PCAInspector:
 
         figures = {}
 
-        # Get data
-        scores = self.get_scores(dataset)
-        loadings = self.get_loadings()
-        _, y = self._get_raw_data(dataset)
-        explained_var = self.get_explained_variance_ratio()
+        # Normalize dataset to always be a list
+        datasets = [dataset] if isinstance(dataset, str) else list(dataset)
 
-        # Prepare color_by_dict
-        color_by_dict = None
-        if color_by_y and y is not None:
-            color_by_dict = {dataset: y}
+        # Determine if we need to add dataset suffixes to figure names
+        use_suffix = len(datasets) > 1
+
+        # Variance plot is shared across all datasets (only created once)
+        fig_variance, ax_variance = plt.subplots(figsize=variance_figsize)
+        variance_plot = ExplainedVariancePlot(
+            explained_variance_ratio=self.get_explained_variance_ratio(),
+            threshold=variance_threshold,
+        )
+        variance_plot.render(ax=ax_variance)
+
+        # Apply decorations
+        ax_variance.set_title(
+            "Explained Variance by Component", fontsize=12, fontweight="bold"
+        )
+        ax_variance.legend(loc="upper right")
+        ax_variance.grid(alpha=0.3)
+        plt.tight_layout()
+        figures["variance"] = fig_variance
+
+        # Loadings plot is shared across all datasets (only created once)
+        fig_loadings, ax_loadings = plt.subplots(figsize=loadings_figsize)
+
+        # Convert to list if it's a sequence for type compatibility
+        loadings_comps = (
+            loadings_components
+            if isinstance(loadings_components, int)
+            else list(loadings_components)
+        )
+
+        # Determine xlabel based on wavenumbers
+        xlabel = (
+            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
+        )
+
+        # Get preprocessed wavenumbers since loadings are on preprocessed features
+        preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
+
+        loadings = self.get_loadings()
+        loadings_plot = LoadingsPlot(
+            loadings=loadings,
+            feature_names=preprocessed_wavenumbers,
+            components=loadings_comps,
+        )
+        loadings_plot.render(ax=ax_loadings, linewidth=2, alpha=0.7)
+
+        # Apply decorations
+        ax_loadings.set_xlabel(xlabel, fontsize=10)
+        ax_loadings.set_ylabel("Loading", fontsize=10)
+
+        if isinstance(loadings_components, int):
+            title = f"PC{loadings_components + 1} Loadings"
+        else:
+            comp_str = ", ".join([f"PC{c + 1}" for c in loadings_components])
+            title = f"Loadings: {comp_str}"
+        ax_loadings.set_title(title, fontsize=12, fontweight="bold")
+        ax_loadings.grid(alpha=0.3)
+        plt.tight_layout()
+        figures["loadings"] = fig_loadings
 
         # Normalize components_scores to always be a sequence
         if isinstance(components_scores, int):
@@ -474,118 +537,247 @@ class PCAInspector:
             components_list = list(components_scores)
 
         # Create scores plots
-        for i, component_spec in enumerate(components_list, start=1):
-            fig, ax = plt.subplots(figsize=scores_figsize)
+        # When multiple datasets, combine them on the same plot with different colors
+        if use_suffix:
+            # Multiple datasets: combine on same plot
+            dataset_colors = {
+                "train": "#1f77b4",  # blue
+                "test": "#ff7f0e",  # orange
+                "val": "#2ca02c",  # green
+            }
+            dataset_markers = {
+                "train": "o",
+                "test": "s",
+                "val": "^",
+            }
 
-            if isinstance(component_spec, int):
-                # 1D plot: Single component vs sample index or y-value
-                pc_scores = scores[:, component_spec]
-                var_pct = explained_var[component_spec] * 100
+            for i, component_spec in enumerate(components_list, start=1):
+                fig, ax = plt.subplots(figsize=scores_figsize)
+                explained_var = self.get_explained_variance_ratio()
 
-                if color_by_y and y is not None:
-                    # Plot PC score vs y-value
-                    scatter = ax.scatter(
-                        y, pc_scores, c=y, cmap="viridis", alpha=0.7, s=50
+                if isinstance(component_spec, int):
+                    # 1D plot: Single component vs sample index or y-value
+                    var_pct = explained_var[component_spec] * 100
+
+                    for ds in datasets:
+                        scores = self.get_scores(ds)
+                        _, y = self._get_raw_data(ds)
+                        pc_scores = scores[:, component_spec]
+                        color = dataset_colors.get(ds, "#7f7f7f")
+                        marker = dataset_markers.get(ds, "o")
+
+                        if color_by_y and y is not None:
+                            # Plot PC score vs y-value
+                            ax.scatter(
+                                y,
+                                pc_scores,
+                                c=color,
+                                marker=marker,
+                                alpha=0.7,
+                                s=50,
+                                label=ds.capitalize(),
+                            )
+                            xlabel_text = "y-value"
+                        else:
+                            # Plot PC score vs sample index
+                            ax.scatter(
+                                range(len(pc_scores)),
+                                pc_scores,
+                                c=color,
+                                marker=marker,
+                                alpha=0.7,
+                                s=50,
+                                label=ds.capitalize(),
+                            )
+                            xlabel_text = "Sample Index"
+
+                    # Apply decorations
+                    ax.set_xlabel(xlabel_text, fontsize=10)
+                    ax.set_ylabel(
+                        f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
                     )
-                    plt.colorbar(scatter, ax=ax, label="y-value")
-                    xlabel_text = "y-value"
+                    ax.set_title(
+                        f"Scores: PC{component_spec + 1}",
+                        fontsize=12,
+                        fontweight="bold",
+                    )
+                    ax.grid(alpha=0.3)
+                    ax.legend(loc="best")
                 else:
-                    # Plot PC score vs sample index
-                    ax.scatter(range(len(pc_scores)), pc_scores, alpha=0.7, s=50)
-                    xlabel_text = "Sample Index"
+                    # 2D plot: Component pair scatter plot
+                    components_pair = component_spec
+                    var_x = explained_var[components_pair[0]] * 100
+                    var_y = explained_var[components_pair[1]] * 100
 
-                # Apply decorations
-                ax.set_xlabel(xlabel_text, fontsize=10)
-                ax.set_ylabel(f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10)
-                ax.set_title(
-                    f"Scores: PC{component_spec + 1} ({dataset.capitalize()})",
-                    fontsize=12,
-                    fontweight="bold",
-                )
-                ax.grid(alpha=0.3)
-            else:
-                # 2D plot: Component pair scatter plot
-                components_pair = component_spec
-                var_x = explained_var[components_pair[0]] * 100
-                var_y = explained_var[components_pair[1]] * 100
+                    # Collect all dataset scores and colors
+                    scores_dict = {}
+                    color_by_dict = {}
 
-                scores_plot = ScoresPlot(
-                    scores_dict={dataset: scores},
-                    components=components_pair,
-                    color_by_dict=color_by_dict,
-                    colormap="viridis",
-                    confidence_ellipse=True if dataset == "train" else None,
-                )
-                scores_plot.render(ax=ax)
+                    for ds in datasets:
+                        scores = self.get_scores(ds)
+                        _, y = self._get_raw_data(ds)
+                        scores_dict[ds] = scores
 
-                # Apply decorations with variance percentages
-                ax.set_xlabel(f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10)
-                ax.set_ylabel(f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10)
-                ax.set_title(
-                    f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1} ({dataset.capitalize()})",
-                    fontsize=12,
-                    fontweight="bold",
-                )
-                ax.grid(alpha=0.3)
+                        # For multi-dataset, we'll use dataset names as colors
+                        # Create a color array based on dataset
+                        if color_by_y and y is not None:
+                            color_by_dict[ds] = y
 
-            plt.tight_layout()
-            figures[f"scores_{i}"] = fig
+                    # Create a custom plot with dataset-based coloring
+                    for ds in datasets:
+                        scores = scores_dict[ds]
+                        color = dataset_colors.get(ds, "#7f7f7f")
+                        marker = dataset_markers.get(ds, "o")
 
-        # Loadings plot
-        fig3, ax3 = plt.subplots(figsize=loadings_figsize)
-        
-        # Convert to list if it's a sequence for type compatibility
-        loadings_comps = (
-            loadings_components
-            if isinstance(loadings_components, int)
-            else list(loadings_components)
-        )
-        
-        # Determine xlabel based on wavenumbers
-        xlabel = (
-            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
-        )
-        
-        loadings_plot = LoadingsPlot(
-            loadings=loadings,
-            feature_names=self.wavenumbers,
-            components=loadings_comps,
-        )
-        loadings_plot.render(ax=ax3, linewidth=2, alpha=0.7)
+                        ax.scatter(
+                            scores[:, components_pair[0]],
+                            scores[:, components_pair[1]],
+                            c=color,
+                            marker=marker,
+                            alpha=0.7,
+                            s=50,
+                            label=ds.capitalize(),
+                            edgecolors="white",
+                            linewidth=0.5,
+                        )
 
-        # Apply decorations
-        ax3.set_xlabel(xlabel, fontsize=10)
-        ax3.set_ylabel("Loading", fontsize=10)
-        
-        if isinstance(loadings_components, int):
-            title = f"PC{loadings_components + 1} Loadings"
+                        # Add confidence ellipse only for train
+                        if ds == "train":
+                            from matplotlib.patches import Ellipse
+                            import numpy as np
+
+                            x = scores[:, components_pair[0]]
+                            y = scores[:, components_pair[1]]
+
+                            # Calculate mean and covariance
+                            mean_x, mean_y = np.mean(x), np.mean(y)
+                            cov = np.cov(x, y)
+
+                            # Calculate eigenvalues and eigenvectors
+                            eigenvalues, eigenvectors = np.linalg.eigh(cov)
+
+                            # Sort by eigenvalue
+                            order = eigenvalues.argsort()[::-1]
+                            eigenvalues = eigenvalues[order]
+                            eigenvectors = eigenvectors[:, order]
+
+                            # Calculate angle and dimensions for 95% confidence
+                            angle = np.degrees(np.arctan2(*eigenvectors[:, 0][::-1]))
+                            width, height = (
+                                2 * 2.447 * np.sqrt(eigenvalues)
+                            )  # 95% confidence
+
+                            ellipse = Ellipse(
+                                xy=(mean_x, mean_y),
+                                width=width,
+                                height=height,
+                                angle=angle,
+                                facecolor="none",
+                                edgecolor=color,
+                                linewidth=2,
+                                linestyle="--",
+                                alpha=0.5,
+                            )
+                            ax.add_patch(ellipse)
+
+                    # Apply decorations with variance percentages
+                    ax.set_xlabel(
+                        f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+                    )
+                    ax.set_ylabel(
+                        f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+                    )
+                    ax.set_title(
+                        f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1}",
+                        fontsize=12,
+                        fontweight="bold",
+                    )
+                    ax.grid(alpha=0.3)
+                    ax.legend(loc="best")
+
+                plt.tight_layout()
+                figures[f"scores_{i}"] = fig
         else:
-            comp_str = ", ".join([f"PC{c + 1}" for c in loadings_components])
-            title = f"Loadings: {comp_str}"
-        ax3.set_title(title, fontsize=12, fontweight="bold")
-        ax3.grid(alpha=0.3)
-        plt.tight_layout()
-        figures["loadings"] = fig3
+            # Single dataset: use original logic
+            ds = datasets[0]
+            scores = self.get_scores(ds)
+            _, y = self._get_raw_data(ds)
+            explained_var = self.get_explained_variance_ratio()
 
-        # Explained variance plot
-        fig4, ax4 = plt.subplots(figsize=variance_figsize)
-        variance_plot = ExplainedVariancePlot(
-            explained_variance_ratio=self.get_explained_variance_ratio(),
-            threshold=variance_threshold,
-        )
-        variance_plot.render(ax=ax4)
-        
-        # Apply decorations
-        ax4.set_title("Explained Variance by Component", fontsize=12, fontweight="bold")
-        ax4.legend(loc="upper right")
-        ax4.grid(alpha=0.3)
-        plt.tight_layout()
-        figures["variance"] = fig4
+            # Prepare color_by_dict
+            color_by_dict = None
+            if color_by_y and y is not None:
+                color_by_dict = {ds: y}
+
+            # Create scores plots
+            for i, component_spec in enumerate(components_list, start=1):
+                fig, ax = plt.subplots(figsize=scores_figsize)
+
+                if isinstance(component_spec, int):
+                    # 1D plot: Single component vs sample index or y-value
+                    pc_scores = scores[:, component_spec]
+                    var_pct = explained_var[component_spec] * 100
+
+                    if color_by_y and y is not None:
+                        # Plot PC score vs y-value
+                        scatter = ax.scatter(
+                            y, pc_scores, c=y, cmap="viridis", alpha=0.7, s=50
+                        )
+                        plt.colorbar(scatter, ax=ax, label="y-value")
+                        xlabel_text = "y-value"
+                    else:
+                        # Plot PC score vs sample index
+                        ax.scatter(range(len(pc_scores)), pc_scores, alpha=0.7, s=50)
+                        xlabel_text = "Sample Index"
+
+                    # Apply decorations
+                    ax.set_xlabel(xlabel_text, fontsize=10)
+                    ax.set_ylabel(
+                        f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
+                    )
+                    ax.set_title(
+                        f"Scores: PC{component_spec + 1} ({ds.capitalize()})",
+                        fontsize=12,
+                        fontweight="bold",
+                    )
+                    ax.grid(alpha=0.3)
+                else:
+                    # 2D plot: Component pair scatter plot
+                    components_pair = component_spec
+                    var_x = explained_var[components_pair[0]] * 100
+                    var_y = explained_var[components_pair[1]] * 100
+
+                    scores_plot = ScoresPlot(
+                        scores_dict={ds: scores},
+                        components=components_pair,
+                        color_by_dict=color_by_dict,
+                        colormap="viridis",
+                        confidence_ellipse=True if ds == "train" else None,
+                    )
+                    scores_plot.render(ax=ax)
+
+                    # Apply decorations with variance percentages
+                    ax.set_xlabel(
+                        f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+                    )
+                    ax.set_ylabel(
+                        f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+                    )
+                    ax.set_title(
+                        f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1} ({ds.capitalize()})",
+                        fontsize=12,
+                        fontweight="bold",
+                    )
+                    ax.grid(alpha=0.3)
+
+                plt.tight_layout()
+                figures[f"scores_{i}"] = fig
 
         # Optionally add spectra plots if preprocessing exists
+        # Note: We call inspect_spectra once with all datasets to plot them together
         if include_spectra and self.transformer is not None:
             spectra_figs = self.inspect_spectra(
-                dataset=dataset,
+                dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,
                 figsize=spectra_figsize,
             )
@@ -595,7 +787,7 @@ class PCAInspector:
 
     def inspect_spectra(
         self,
-        dataset: str = "train",
+        dataset: Union[str, Sequence[str]] = "train",
         color_by_y: bool = True,
         xlim: Optional[Tuple[float, float]] = None,
         figsize: Tuple[float, float] = (12, 5),
@@ -604,14 +796,18 @@ class PCAInspector:
 
         Only available if model is a Pipeline with preprocessing steps.
         Creates two separate figure windows: one for raw spectra and one
-        for preprocessed spectra.
+        for preprocessed spectra. When multiple datasets are provided,
+        all spectra are plotted on the same figure with colors indicating
+        the dataset.
 
         Parameters
         ----------
-        dataset : str, default='train'
-            Which dataset to visualize
+        dataset : Union[str, Sequence[str]], default='train'
+            Dataset(s) to visualize. Can be a single dataset name or a sequence
+            of dataset names (e.g., ["train", "test"]).
         color_by_y : bool, default=True
-            Whether to color by y values (if available)
+            Whether to color by y values (if available). Only used for single dataset.
+            Ignored when multiple datasets are provided (colors by dataset instead).
         xlim : tuple of float, optional
             X-axis limits for zooming into spectral regions
         figsize : tuple of float, default=(12, 5)
@@ -631,11 +827,13 @@ class PCAInspector:
         Examples
         --------
         >>> inspector = PCAInspector(pipeline, X_train, y_train)
+        >>> # Single dataset
         >>> figs = inspector.inspect_spectra()  # Creates 2 separate plots
         >>> figs = inspector.inspect_spectra(xlim=(1000, 1800))  # Zoom in
-        >>> # Save individual plots
-        >>> figs['raw_spectra'].savefig('raw_spectra.png')
-        >>> figs['preprocessed_spectra'].savefig('preprocessed_spectra.png')
+        >>> # Multiple datasets comparison
+        >>> inspector.X_test = X_test
+        >>> figs = inspector.inspect_spectra(dataset=["train", "test"])
+        >>> figs['raw_spectra'].savefig('raw_spectra_comparison.png')
         """
         if self.transformer is None:
             raise ValueError(
@@ -645,49 +843,192 @@ class PCAInspector:
 
         figures = {}
 
-        # Get data
-        X_raw, y = self._get_raw_data(dataset)
-        X_preprocessed = self._get_preprocessed_data(dataset)
+        # Normalize dataset to always be a list
+        datasets = [dataset] if isinstance(dataset, str) else list(dataset)
 
-        color_values = None
-        if color_by_y and y is not None:
-            color_values = y
+        # Determine if multiple datasets (color by dataset) or single (color by y)
+        is_multi_dataset = len(datasets) > 1
 
         # Determine xlabel based on wavenumbers
         xlabel = (
             "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
         )
-        
-        # Figure 1: Raw spectra - use .show() for complete figure
-        plot_raw = SpectrumPlot(
-            x=self.wavenumbers,
-            y=X_raw,
-            color_by=color_values,
-            colormap="viridis",
-            xlabel=xlabel,
-            ylabel="Intensity",
-        )
-        fig1 = plot_raw.show(
-            figsize=figsize,
-            title=f"Raw Spectra ({dataset.capitalize()})",
-            xlim=xlim,
-        )
-        figures["raw_spectra"] = fig1
 
-        # Figure 2: Preprocessed spectra - use .show() for complete figure
-        plot_preprocessed = SpectrumPlot(
-            x=self.wavenumbers,
-            y=X_preprocessed,
-            color_by=color_values,
-            colormap="viridis",
-            xlabel=xlabel,
-            ylabel="Intensity",
-        )
-        fig2 = plot_preprocessed.show(
-            figsize=figsize,
-            title=f"Preprocessed Spectra ({dataset.capitalize()})",
-            xlim=xlim,
-        )
-        figures["preprocessed_spectra"] = fig2
+        if is_multi_dataset:
+            # Multiple datasets: plot all on same figure, color by dataset
+            # Define colors for different datasets
+            dataset_colors = {
+                "train": "#1f77b4",  # blue
+                "test": "#ff7f0e",  # orange
+                "val": "#2ca02c",  # green
+            }
+
+            # Collect all data
+            raw_data = {}
+            preprocessed_data = {}
+            for ds in datasets:
+                X_raw, _ = self._get_raw_data(ds)
+                X_preprocessed = self._get_preprocessed_data(ds)
+                raw_data[ds] = X_raw
+                preprocessed_data[ds] = X_preprocessed
+
+            # Create raw spectra plot with all datasets
+            import matplotlib.pyplot as plt
+
+            fig1, ax1 = plt.subplots(figsize=figsize)
+
+            for ds in datasets:
+                color = dataset_colors.get(ds, "#7f7f7f")  # default gray if unknown
+                for i in range(raw_data[ds].shape[0]):
+                    ax1.plot(
+                        self.wavenumbers
+                        if self.wavenumbers is not None
+                        else range(raw_data[ds].shape[1]),
+                        raw_data[ds][i, :],
+                        color=color,
+                        alpha=0.6,
+                        linewidth=1,
+                        label=ds.capitalize()
+                        if i == 0
+                        else None,  # Label only first line
+                    )
+
+            ax1.set_xlabel(xlabel, fontsize=10)
+            ax1.set_ylabel("Intensity", fontsize=10)
+            ax1.set_title("Raw Spectra Comparison", fontsize=12, fontweight="bold")
+            ax1.grid(alpha=0.3)
+            if xlim:
+                ax1.set_xlim(xlim)
+            ax1.legend(loc="best")
+            plt.tight_layout()
+            figures["raw_spectra"] = fig1
+
+            # Get wavenumbers for preprocessed data (may be subset if feature selection)
+            preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
+
+            # Create preprocessed spectra plot with all datasets
+            fig2, ax2 = plt.subplots(figsize=figsize)
+
+            for ds in datasets:
+                color = dataset_colors.get(ds, "#7f7f7f")
+                for i in range(preprocessed_data[ds].shape[0]):
+                    ax2.plot(
+                        preprocessed_wavenumbers,
+                        preprocessed_data[ds][i, :],
+                        color=color,
+                        alpha=0.6,
+                        linewidth=1,
+                        label=ds.capitalize() if i == 0 else None,
+                    )
+
+            ax2.set_xlabel(xlabel, fontsize=10)
+            ax2.set_ylabel("Intensity", fontsize=10)
+            ax2.set_title(
+                "Preprocessed Spectra Comparison", fontsize=12, fontweight="bold"
+            )
+            ax2.grid(alpha=0.3)
+            if xlim:
+                ax2.set_xlim(xlim)
+            ax2.legend(loc="best")
+            plt.tight_layout()
+            figures["preprocessed_spectra"] = fig2
+
+        else:
+            # Single dataset: use existing logic with color_by_y option
+            ds = datasets[0]
+            X_raw, y = self._get_raw_data(ds)
+            X_preprocessed = self._get_preprocessed_data(ds)
+
+            color_values = None
+            if color_by_y and y is not None:
+                color_values = y
+
+            # Figure 1: Raw spectra - use .show() for complete figure
+            plot_raw = SpectrumPlot(
+                x=self.wavenumbers,
+                y=X_raw,
+                color_by=color_values,
+                colormap="viridis",
+                xlabel=xlabel,
+                ylabel="Intensity",
+            )
+            fig1 = plot_raw.show(
+                figsize=figsize,
+                title=f"Raw Spectra ({ds.capitalize()})",
+                xlim=xlim,
+            )
+            figures["raw_spectra"] = fig1
+
+            # Figure 2: Preprocessed spectra - use .show() for complete figure
+            # Get wavenumbers for preprocessed data (may be subset if feature selection)
+            preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
+
+            plot_preprocessed = SpectrumPlot(
+                x=preprocessed_wavenumbers,
+                y=X_preprocessed,
+                color_by=color_values,
+                colormap="viridis",
+                xlabel=xlabel,
+                ylabel="Intensity",
+            )
+            fig2 = plot_preprocessed.show(
+                figsize=figsize,
+                title=f"Preprocessed Spectra ({ds.capitalize()})",
+                xlim=xlim,
+            )
+            figures["preprocessed_spectra"] = fig2
 
         return figures
+
+    def _get_feature_mask(self) -> Optional[np.ndarray]:
+        """Get the feature selection mask from preprocessing pipeline.
+
+        Detects feature selectors by checking if they are instances of
+        sklearn's SelectorMixin, which is the standard way feature selectors
+        are identified in scikit-learn.
+
+        Returns
+        -------
+        mask : np.ndarray or None
+            Boolean array indicating which features are selected, or None if no
+            feature selector is present in the pipeline.
+        """
+        from sklearn.feature_selection._base import SelectorMixin
+
+        if self.transformer is None:
+            return None
+
+        # Check if transformer is a Pipeline
+        if isinstance(self.transformer, Pipeline):
+            # Look through pipeline steps for a feature selector (SelectorMixin)
+            for _, step in self.transformer.steps:
+                if isinstance(step, SelectorMixin):
+                    # SelectorMixin provides get_support() method
+                    return step.get_support()
+        else:
+            # Single transformer
+            if isinstance(self.transformer, SelectorMixin):
+                return self.transformer.get_support()
+
+        return None
+
+    def _get_preprocessed_wavenumbers(self) -> np.ndarray:
+        """Get wavenumbers after feature selection.
+
+        Returns
+        -------
+        wavenumbers : np.ndarray
+            Wavenumbers/feature indices after feature selection. If no feature
+            selector is present, returns the original wavenumbers.
+        """
+        feature_mask = self._get_feature_mask()
+
+        if feature_mask is not None and self._wavenumbers is not None:
+            # Apply feature mask to wavenumbers
+            return self._wavenumbers[feature_mask]
+        elif self._wavenumbers is not None:
+            return self._wavenumbers
+        else:
+            # If no wavenumbers provided, use feature indices
+            X_preprocessed = self._get_preprocessed_data("train")
+            return np.arange(X_preprocessed.shape[1])
