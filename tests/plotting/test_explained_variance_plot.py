@@ -1,4 +1,4 @@
-"""Tests for ExplainedVariancePlot class and calculate_pls_variance_ratio function."""
+"""Tests for ExplainedVariancePlot class."""
 
 import pytest
 import numpy as np
@@ -6,11 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import (
-    ExplainedVariancePlot,
-    is_displayable,
-    calculate_pls_variance_ratio,
-)
+from chemotools.plotting import ExplainedVariancePlot, is_displayable
 
 
 class TestExplainedVariancePlotBasics:
@@ -344,164 +340,8 @@ class TestExplainedVariancePlotRendering:
         plt.close(fig)
 
 
-class TestCalculatePLSVarianceRatio:
-    """Test calculate_pls_variance_ratio helper function."""
-
-    def test_x_space_variance_calculation(self):
-        """Test variance calculation for X-space."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        y = np.random.randn(50)
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, space="X")
-
-        # Assert
-        assert len(var_ratios) == 5
-        assert var_ratios.sum() <= 1.0  # Total variance should be <= 100%
-        assert np.all(var_ratios >= 0)  # All ratios should be non-negative
-
-    def test_y_space_variance_calculation(self):
-        """Test variance calculation for Y-space."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        # Create y with actual relationship to X for meaningful variance
-        y = X[:, 0] + 0.5 * X[:, 1] + np.random.randn(50) * 0.1
-        # Use fewer components to avoid overfitting
-        pls = PLSRegression(n_components=3)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, y, space="Y")
-
-        # Assert
-        assert len(var_ratios) == 3
-        assert isinstance(var_ratios, np.ndarray)
-        # Note: variance ratios can be negative if model overfits (R² < 0)
-
-    def test_y_space_requires_y_data(self):
-        """Test that Y-space calculation requires y parameter."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        y = np.random.randn(50)
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="y data is required when space='Y'"):
-            calculate_pls_variance_ratio(pls, X, space="Y")
-
-    def test_invalid_space_raises_error(self):
-        """Test that invalid space parameter raises ValueError."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        y = np.random.randn(50)
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="space must be 'X' or 'Y'"):
-            calculate_pls_variance_ratio(pls, X, y, space="Z")
-
-    def test_case_insensitive_space_parameter(self):
-        """Test that space parameter is case-insensitive."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        y = np.random.randn(50)
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios_lower = calculate_pls_variance_ratio(pls, X, space="x")
-        var_ratios_upper = calculate_pls_variance_ratio(pls, X, space="X")
-
-        # Assert
-        np.testing.assert_array_almost_equal(var_ratios_lower, var_ratios_upper)
-
-    def test_works_with_pandas_dataframe(self):
-        """Test that function works with pandas DataFrame/Series input."""
-        # Arrange
-        pytest.importorskip("pandas")
-        import pandas as pd
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = pd.DataFrame(np.random.randn(50, 100))
-        y = pd.Series(np.random.randn(50))
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, y, space="Y")
-
-        # Assert
-        assert len(var_ratios) == 5
-        assert isinstance(var_ratios, np.ndarray)
-
-    def test_scale_parameter_preserved(self):
-        """Test that PLS scale parameter is preserved in Y-space calculation."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(50, 100)
-        # Create y with actual relationship to X
-        y = X[:, 0] + 0.5 * X[:, 1] + np.random.randn(50) * 0.1
-
-        # Test with scale=False and fewer components
-        pls = PLSRegression(n_components=3, scale=False)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, y, space="Y")
-
-        # Assert
-        assert len(var_ratios) == 3
-        assert isinstance(var_ratios, np.ndarray)
-        # Function should complete without errors, regardless of variance values
-
-    def test_decreasing_variance_ratios(self):
-        """Test that first component captures most X-space variance."""
-        # Arrange
-        from sklearn.cross_decomposition import PLSRegression
-
-        np.random.seed(42)
-        X = np.random.randn(100, 200)
-        y = (
-            X[:, 0] + 0.5 * X[:, 1] + np.random.randn(100) * 0.1
-        )  # Strong linear relationship
-        # Use fewer components relative to sample size
-        pls = PLSRegression(n_components=5)
-        pls.fit(X, y)
-
-        # Act
-        var_ratios_x = calculate_pls_variance_ratio(pls, X, space="X")
-
-        # Assert
-        # First component should explain most X-space variance
-        assert var_ratios_x[0] > var_ratios_x[1]
-        # Y-space variance with many features can be unpredictable, so skip that test
-
-
 class TestExplainedVariancePlotIntegration:
-    """Test integration of ExplainedVariancePlot with PLS models."""
+    """Test integration of ExplainedVariancePlot with decomposition models."""
 
     def test_pca_integration(self):
         """Test ExplainedVariancePlot with PCA model."""
@@ -524,7 +364,7 @@ class TestExplainedVariancePlotIntegration:
     def test_pls_x_space_integration(self):
         """Test ExplainedVariancePlot with PLS X-space variance."""
         # Arrange
-        from sklearn.cross_decomposition import PLSRegression
+        from chemotools.models import PLSRegression
 
         np.random.seed(42)
         X = np.random.randn(50, 100)
@@ -533,18 +373,19 @@ class TestExplainedVariancePlotIntegration:
         pls.fit(X, y)
 
         # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, space="X")
-        plot = ExplainedVariancePlot(var_ratios)
+        plot = ExplainedVariancePlot(pls.explained_x_variance_ratio_)
         fig = plot.show(title="PLS Explained Variance in X")
 
         # Assert
         assert isinstance(fig, Figure)
+        assert hasattr(pls, "explained_x_variance_ratio_")
+        assert len(pls.explained_x_variance_ratio_) == 5
         plt.close(fig)
 
     def test_pls_y_space_integration(self):
         """Test ExplainedVariancePlot with PLS Y-space variance."""
         # Arrange
-        from sklearn.cross_decomposition import PLSRegression
+        from chemotools.models import PLSRegression
 
         np.random.seed(42)
         X = np.random.randn(50, 100)
@@ -553,18 +394,19 @@ class TestExplainedVariancePlotIntegration:
         pls.fit(X, y)
 
         # Act
-        var_ratios = calculate_pls_variance_ratio(pls, X, y, space="Y")
-        plot = ExplainedVariancePlot(var_ratios)
+        plot = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
         fig = plot.show(title="PLS Explained Variance in Y")
 
         # Assert
         assert isinstance(fig, Figure)
+        assert hasattr(pls, "explained_y_variance_ratio_")
+        assert len(pls.explained_y_variance_ratio_) == 5
         plt.close(fig)
 
     def test_side_by_side_comparison(self):
         """Test creating side-by-side X and Y variance plots."""
         # Arrange
-        from sklearn.cross_decomposition import PLSRegression
+        from chemotools.models import PLSRegression
 
         np.random.seed(42)
         X = np.random.randn(50, 100)
@@ -573,11 +415,8 @@ class TestExplainedVariancePlotIntegration:
         pls.fit(X, y)
 
         # Act
-        var_ratios_x = calculate_pls_variance_ratio(pls, X, space="X")
-        var_ratios_y = calculate_pls_variance_ratio(pls, X, y, space="Y")
-
-        plot_x = ExplainedVariancePlot(var_ratios_x)
-        plot_y = ExplainedVariancePlot(var_ratios_y)
+        plot_x = ExplainedVariancePlot(pls.explained_x_variance_ratio_)
+        plot_y = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
 
         fig, axes = plt.subplots(1, 2, figsize=(12, 5))
         plot_x.render(ax=axes[0])
