@@ -15,6 +15,7 @@ from chemotools.plotting import (
     LoadingsPlot,
     ExplainedVariancePlot,
 )
+from chemotools.plotting._utilities import annotate_points, add_confidence_ellipse
 from ._validate import _validate_and_extract_model, _validate_datasets_consistency
 
 
@@ -179,7 +180,7 @@ class PCAInspector:
         if self._X_val is not None:
             samples["val"] = self._X_val.shape[0]
         return samples
-
+    
     @property
     def wavenumbers(self) -> np.ndarray:
         """Return the feature names/indices."""
@@ -373,6 +374,7 @@ class PCAInspector:
         loadings_components: Union[int, Sequence[int]] = [0, 1, 2],
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
+        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         include_spectra: bool = True,
         scores_figsize: Tuple[float, float] = (6, 6),
         loadings_figsize: Tuple[float, float] = (10, 5),
@@ -406,6 +408,13 @@ class PCAInspector:
             Threshold line for explained variance plot
         color_by_y : bool, default=True
             Whether to color scores by y values (if available)
+        annotate_by : str or dict, optional
+            Annotations for score plot points. Can be:
+            - 'sample_index': Annotate with sample indices (0, 1, 2, ...)
+            - 'y': Annotate with y values (only for single dataset)
+            - dict: Dictionary mapping dataset names to annotation arrays
+              e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
+            If None (default), no annotations are added.
         include_spectra : bool, default=True
             Whether to include raw and preprocessed spectra plots (only if preprocessing exists)
         scores_figsize : tuple of float, default=(6, 6)
@@ -643,42 +652,46 @@ class PCAInspector:
 
                         # Add confidence ellipse only for train
                         if ds == "train":
-                            from matplotlib.patches import Ellipse
-                            import numpy as np
-
                             x = scores[:, components_pair[0]]
                             y = scores[:, components_pair[1]]
-
-                            # Calculate mean and covariance
-                            mean_x, mean_y = np.mean(x), np.mean(y)
-                            cov = np.cov(x, y)
-
-                            # Calculate eigenvalues and eigenvectors
-                            eigenvalues, eigenvectors = np.linalg.eigh(cov)
-
-                            # Sort by eigenvalue
-                            order = eigenvalues.argsort()[::-1]
-                            eigenvalues = eigenvalues[order]
-                            eigenvectors = eigenvectors[:, order]
-
-                            # Calculate angle and dimensions for 95% confidence
-                            angle = np.degrees(np.arctan2(*eigenvectors[:, 0][::-1]))
-                            width, height = (
-                                2 * 2.447 * np.sqrt(eigenvalues)
-                            )  # 95% confidence
-
-                            ellipse = Ellipse(
-                                xy=(mean_x, mean_y),
-                                width=width,
-                                height=height,
-                                angle=angle,
-                                facecolor="none",
+                            add_confidence_ellipse(
+                                ax,
+                                x,
+                                y,
+                                confidence=0.95,
                                 edgecolor=color,
                                 linewidth=2,
                                 linestyle="--",
                                 alpha=0.5,
                             )
-                            ax.add_patch(ellipse)
+                        
+                        # Add annotations if requested
+                        if annotate_by is not None:
+                            # Get labels for this dataset
+                            if isinstance(annotate_by, str):
+                                if annotate_by == 'sample_index':
+                                    labels = np.arange(scores.shape[0])
+                                elif annotate_by == 'y':
+                                    _, y_data = self._get_raw_data(ds)
+                                    labels = y_data if y_data is not None else None
+                                else:
+                                    labels = None
+                            elif isinstance(annotate_by, dict) and ds in annotate_by:
+                                labels = np.asarray(annotate_by[ds])
+                            else:
+                                labels = None
+                            
+                            if labels is not None:
+                                annotate_points(
+                                    ax,
+                                    scores[:, components_pair[0]],
+                                    scores[:, components_pair[1]],
+                                    labels,
+                                    fontsize=8,
+                                    alpha=0.7,
+                                    xytext=(3, 3),
+                                    textcoords='offset points'
+                                )
 
                     # Apply decorations with variance percentages
                     ax.set_xlabel(
@@ -755,6 +768,33 @@ class PCAInspector:
                         confidence_ellipse=True if ds == "train" else None,
                     )
                     scores_plot.render(ax=ax)
+
+                    # Add annotations if requested
+                    if annotate_by is not None:
+                        # Get labels for this dataset
+                        if isinstance(annotate_by, str):
+                            if annotate_by == 'sample_index':
+                                labels = np.arange(scores.shape[0])
+                            elif annotate_by == 'y':
+                                labels = y if y is not None else None
+                            else:
+                                labels = None
+                        elif isinstance(annotate_by, dict) and ds in annotate_by:
+                            labels = np.asarray(annotate_by[ds])
+                        else:
+                            labels = None
+                        
+                        if labels is not None:
+                            annotate_points(
+                                ax,
+                                scores[:, components_pair[0]],
+                                scores[:, components_pair[1]],
+                                labels,
+                                fontsize=8,
+                                alpha=0.7,
+                                xytext=(3, 3),
+                                textcoords='offset points'
+                            )
 
                     # Apply decorations with variance percentages
                     ax.set_xlabel(
@@ -1032,3 +1072,4 @@ class PCAInspector:
             # If no wavenumbers provided, use feature indices
             X_preprocessed = self._get_preprocessed_data("train")
             return np.arange(X_preprocessed.shape[1])
+
