@@ -22,8 +22,19 @@ class PLSRegression(_SklearnPLSRegression):
     - `explained_x_variance_ratio_`: Variance explained in X-space (predictors)
     - `explained_y_variance_ratio_`: Variance explained in Y-space (response)
 
-    These can be used directly with `ExplainedVariancePlot` for model diagnostics.
+    Following the PLSRegression implemented in scikit-learn [1] and [2], this
+    extension uses the x_scores_ (t) to asymmetrically deflate the Y matrix.
 
+    In PLS, the latent score vector t (from X) is used to model Y via its loading vector c:
+        Y_hat = t @ c.T
+
+    Deflation removes the part of Y explained by the current component:
+        Y_new = Y - Y_hat
+
+    This process is repeated for each component, using the corresponding t and c vectors.
+    Note: Unlike PCA, deflation in PLS is asymmetric—Y is deflated using t-scores derived from X.
+        
+        
     Parameters
     ----------
     n_components : int, default=2
@@ -53,6 +64,17 @@ class PLSRegression(_SklearnPLSRegression):
     x_weights_, y_weights_, x_loadings_, y_loadings_, x_scores_, y_scores_,
     x_rotations_, y_rotations_, coef_, intercept_, n_features_in_, feature_names_in_
 
+    References
+    ----------
+    .. [1] sklearn.cross_decomposition.PLSRegression
+        https://scikit-learn.org/stable/modules/generated/sklearn.cross_decomposition.PLSRegression.html
+
+    .. [2] Wegelin, J. A. (2000). 
+        A Survey of Partial Least Squares (PLS) Methods, with Emphasis on the Two-Block Case. Technical Report No. 371, Department of Statistics, University of Washington, Seattle, WA
+
+    .. [3] Abdi, H. (2003). 
+        Partial Least Squares (PLS) Regression. In Lewis-Beck M., Bryman A., Futing T. (Eds.), Encyclopedia of Social Sciences Research Methods. Thousand Oaks (CA): Sage.
+
     Examples
     --------
     **Example 1: Basic usage with automatic variance calculation**
@@ -68,9 +90,10 @@ class PLSRegression(_SklearnPLSRegression):
 
     Notes
     -----
-    - **X-space variance** is calculated using score variances (fast, no refitting)
-    - **Y-space variance** is calculated using score variances (same as X-space)
-    - Both calculations use the fitted model's score variances directly
+    - **X-space variance** is calculated using sequential deflation method
+    - **Y-space variance** is calculated using sequential deflation method
+    - For each component, variance is calculated before deflating the matrices
+    - This is the standard approach in PLS regression for explained variance
     - Both calculations are performed automatically during the initial fit
 
     See Also
@@ -163,63 +186,94 @@ class PLSRegression(_SklearnPLSRegression):
         y_array = np.asarray(y)
         y_2d = y_array.reshape(-1, 1) if y_array.ndim == 1 else y_array
 
-        # Calculate X-space variance (using score variances - fast method)
-        self.explained_x_variance_ratio_ = self._calculate_x_variance()
+        # Calculate X-space and Y-space variance using deflation method
+        self.explained_x_variance_ratio_, self.explained_y_variance_ratio_ = (
+            self._calculate_variance_deflation(X_array, y_2d)
+        )
 
-        # Calculate Y-space variance (using score variances - same method as X)
-        self.explained_y_variance_ratio_ = self._calculate_y_variance(X_array, y_2d)
+    def _calculate_variance_deflation(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Calculate explained variance ratios using sequential deflation.
 
-    def _calculate_x_variance(self) -> np.ndarray:
-        """Calculate explained variance ratio for X-space.
-
-        Uses the score variance method which is fast and doesn't require refitting.
-
-        Returns
-        -------
-        ndarray of shape (n_components,)
-            Explained variance ratio for each component in X-space.
-        """
-        # Score variances
-        score_variances = np.var(self.x_scores_, axis=0)
-
-        # Total variance in X (using the data the model was trained on)
-        # We need to calculate this from the scores and loadings
-        # Total variance = sum of all score variances
-        total_variance = np.sum(score_variances)
-
-        # Explained variance ratio
-        var_individual = score_variances / total_variance
-
-        return var_individual
-
-    def _calculate_y_variance(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Calculate explained variance ratio for Y-space.
-
-        Uses the score variance method (same as X-space) which is fast and
-        doesn't require refitting or reconstruction.
+        This method calculates how much variance each component explains by
+        sequentially deflating the X and Y matrices. This is the standard
+        approach in PLS and provides accurate component-wise variance.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features)
-            Training vectors (not used, kept for API consistency).
-        y : ndarray of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors (not used, kept for API consistency).
+            Training vectors.
+        y : ndarray of shape (n_samples, n_targets)
+            Target vectors (2D).
 
         Returns
         -------
-        ndarray of shape (n_components,)
-            Explained variance ratio for each component in Y-space.
+        tuple[ndarray, ndarray]
+            - X variance ratios of shape (n_components,)
+            - Y variance ratios of shape (n_components,)
         """
-        # Score variances for Y-space
-        score_variances = np.var(self.y_scores_, axis=0)
+        # Ensure data is numeric (handle object dtype from sklearn tests)
+        X = np.asarray(X, dtype=float)
+        y = np.asarray(y, dtype=float)
 
-        # Total variance = sum of all score variances
-        total_variance = np.sum(score_variances)
+        # Center X and Y (PLS already centers data, but we need the original centered versions)
+        X_centered = X - X.mean(axis=0)
+        y_centered = y - y.mean(axis=0)
 
-        # Explained variance ratio
-        var_individual = score_variances / total_variance
+        # Check for scaling
+        if self.scale:
+            X_std = X.std(axis=0, ddof=1)
+            y_std = y.std(axis=0, ddof=1)
+            # Avoid division by zero
+            X_std[X_std == 0] = 1.0
+            y_std[y_std == 0] = 1.0
+            X_centered /= X_std
+            y_centered /= y_std
 
-        return var_individual
+        # Total variance in centered data
+        X_total_var = np.var(X_centered, axis=0).sum()
+        y_total_var = np.var(y_centered, axis=0).sum()
+
+        # Initialize matrices for deflation
+        X_current = X_centered.copy()
+        y_current = y_centered.copy()
+
+        X_var_ratios = []
+        y_var_ratios = []
+
+        # For each component, calculate variance explained then deflate
+        for a in range(self.n_components):
+            # Get scores and loadings for component a
+            t_a = self.x_scores_[:, a].reshape(-1, 1)  # (n_samples, 1)
+            p_a = self.x_loadings_[:, a].reshape(-1, 1)  # (n_features_X, 1)
+            c_a = self.y_loadings_[:, a].reshape(-1, 1)  # (n_features_y, 1)
+
+            # Reconstruct X and y using current component
+            X_hat = t_a @ p_a.T
+            y_hat = t_a @ c_a.T
+
+            # Variance of current residual before deflation
+            X_var_before = np.var(X_current, axis=0).sum()
+            y_var_before = np.var(y_current, axis=0).sum()
+
+            # Deflate X and y
+            X_current = X_current - X_hat
+            y_current = y_current - y_hat
+
+            # Variance of residual after deflation
+            X_var_after = np.var(X_current, axis=0).sum()
+            y_var_after = np.var(y_current, axis=0).sum()
+
+            # Variance explained = reduction in variance
+            X_var_explained = X_var_before - X_var_after
+            y_var_explained = y_var_before - y_var_after
+
+            # Store as ratio of total variance
+            X_var_ratios.append(X_var_explained / X_total_var)
+            y_var_ratios.append(y_var_explained / y_total_var)
+
+        return np.array(X_var_ratios), np.array(y_var_ratios)
 
     def __repr__(self):
         """Enhanced repr showing variance info if fitted."""
