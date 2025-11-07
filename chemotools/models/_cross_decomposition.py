@@ -73,31 +73,6 @@ class PLSRegression(_SklearnPLSRegression):
     >>> plot_y = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
     >>> plot_y.show(title='PLS Variance in Y-space')
 
-    **Example 2: Side-by-side comparison**
-
-    >>> import matplotlib.pyplot as plt
-    >>> fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    >>>
-    >>> ExplainedVariancePlot(pls.explained_x_variance_ratio_).render(ax=axes[0])
-    >>> axes[0].set_title('X-space (Predictors)')
-    >>>
-    >>> ExplainedVariancePlot(pls.explained_y_variance_ratio_).render(ax=axes[1])
-    >>> axes[1].set_title('Y-space (Response)')
-
-    **Example 3: Just like PCA!**
-
-    >>> from sklearn.decomposition import PCA
-    >>>
-    >>> # PCA workflow
-    >>> pca = PCA(n_components=5)
-    >>> pca.fit(X)
-    >>> plot = ExplainedVariancePlot(pca.explained_variance_ratio_)
-    >>>
-    >>> # PLS workflow - now just as easy!
-    >>> pls = PLSRegression(n_components=5)
-    >>> pls.fit(X, y)
-    >>> plot = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
-
     Notes
     -----
     - **X-space variance** is calculated using score variances (fast, no refitting)
