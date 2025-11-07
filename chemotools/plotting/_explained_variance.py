@@ -18,7 +18,7 @@ class ExplainedVariancePlot:
 
     **Works with:**
     - PCA: Use `pca.explained_variance_ratio_` directly
-    - PLS: Calculate variance explained in X-space or Y-space (see examples)
+    - PLS: Use `chemotools.models.PLSRegression` for automatic variance calculation
     - Any method: Just provide an array of variance ratios per component
 
     Parameters
@@ -27,7 +27,8 @@ class ExplainedVariancePlot:
         Array of explained variance ratios for each component.
         Should be 1D array with values between 0 and 1.
         For PCA, use `model.explained_variance_ratio_` directly.
-        For PLS, calculate manually for X-space or Y-space.
+        For PLS, use `chemotools.models.PLSRegression` which provides
+        `explained_x_variance_ratio_` and `explained_y_variance_ratio_`.
     xlabel : str, optional
         Label for x-axis. Default is "Component".
     ylabel : str, optional
@@ -51,25 +52,33 @@ class ExplainedVariancePlot:
     >>> plot = ExplainedVariancePlot(pca.explained_variance_ratio_)
     >>> plot.show(title="PCA Explained Variance")
 
-    **Example 2: PLS - X-space variance**
+    **Example 2: PLS - Now just as simple!**
 
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.models import PLSRegression
+    >>> from chemotools.plotting import ExplainedVariancePlot
+    >>>
     >>> pls = PLSRegression(n_components=5)
     >>> pls.fit(X, y)
     >>>
-    >>> # Calculate variance explained in X
-    >>> X_centered = X - X.mean(axis=0)
-    >>> total_var = np.sum(X_centered**2)
-    >>> var_ratios = []
-    >>> for i in range(pls.n_components):
-    ...     X_recon = pls.x_scores_[:, :i+1] @ pls.x_loadings_[:, :i+1].T
-    ...     var_ratios.append(np.sum(X_recon**2) / total_var)
-    >>> var_individual = np.diff([0] + var_ratios)
+    >>> # Variance ratios automatically available!
+    >>> plot_x = ExplainedVariancePlot(pls.explained_x_variance_ratio_)
+    >>> plot_x.show(title="PLS Explained Variance in X-space")
     >>>
-    >>> plot = ExplainedVariancePlot(var_individual)
-    >>> plot.show(title="PLS Explained Variance in X")
+    >>> plot_y = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
+    >>> plot_y.show(title="PLS Explained Variance in Y-space")
 
-    **Example 3: Custom threshold**
+    **Example 3: Side-by-side PLS comparison**
+
+    >>> import matplotlib.pyplot as plt
+    >>> fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    >>>
+    >>> ExplainedVariancePlot(pls.explained_x_variance_ratio_).render(ax=axes[0])
+    >>> axes[0].set_title('X-space (Predictors)')
+    >>>
+    >>> ExplainedVariancePlot(pls.explained_y_variance_ratio_).render(ax=axes[1])
+    >>> axes[1].set_title('Y-space (Response)')
+
+    **Example 4: Custom threshold**
 
     >>> plot = ExplainedVariancePlot(
     ...     pca.explained_variance_ratio_,
@@ -77,7 +86,7 @@ class ExplainedVariancePlot:
     ... )
     >>> plot.show()
 
-    **Example 4: No threshold line**
+    **Example 5: No threshold line**
 
     >>> plot = ExplainedVariancePlot(
     ...     pca.explained_variance_ratio_,
@@ -279,100 +288,3 @@ class ExplainedVariancePlot:
 
         # Grid for better readability
         ax.grid(alpha=0.3, axis="y")
-
-
-def calculate_pls_variance_ratio(
-    pls_model, X: np.ndarray, y: Optional[np.ndarray] = None, space: str = "X"
-) -> np.ndarray:
-    """Calculate explained variance ratio for PLS models.
-
-    Helper function to compute explained variance ratios for PLS regression,
-    which can then be used with ExplainedVariancePlot.
-
-    Parameters
-    ----------
-    pls_model : PLSRegression
-        Fitted PLS model from sklearn.
-    X : np.ndarray
-        Original X data used to fit the model.
-    y : np.ndarray, optional
-        Original y data used to fit the model. Required if space='Y'.
-    space : str, optional
-        Which space to calculate variance for: 'X' (predictors) or 'Y' (response).
-        Default is 'X'.
-
-    Returns
-    -------
-    np.ndarray
-        Array of explained variance ratios (individual per component).
-
-    Examples
-    --------
-    >>> from sklearn.cross_decomposition import PLSRegression
-    >>> from chemotools.plotting import ExplainedVariancePlot, calculate_pls_variance_ratio
-    >>>
-    >>> pls = PLSRegression(n_components=5)
-    >>> pls.fit(X_train, y_train)
-    >>>
-    >>> # Get variance ratios for X-space
-    >>> var_ratios_x = calculate_pls_variance_ratio(pls, X_train, space='X')
-    >>> plot_x = ExplainedVariancePlot(var_ratios_x)
-    >>> plot_x.show(title='PLS Explained Variance in X')
-    >>>
-    >>> # Get variance ratios for Y-space
-    >>> var_ratios_y = calculate_pls_variance_ratio(pls, X_train, y_train, space='Y')
-    >>> plot_y = ExplainedVariancePlot(var_ratios_y)
-    >>> plot_y.show(title='PLS Explained Variance in Y')
-    """
-    space = space.upper()
-    if space not in ("X", "Y"):
-        raise ValueError(f"space must be 'X' or 'Y', got '{space}'")
-
-    if space == "Y" and y is None:
-        raise ValueError("y data is required when space='Y'")
-
-    # Import PLSRegression for refitting with different n_components (Y-space only)
-    from sklearn.cross_decomposition import PLSRegression
-
-    if space == "X":
-        # Calculate variance explained in X-space using score variances
-        # This measures how much variance the latent variables capture
-        X_array = np.asarray(X)  # Convert to numpy array if DataFrame
-        score_variances = np.var(pls_model.x_scores_, axis=0)
-
-        # Total variance in X
-        total_variance = np.var(X_array, axis=0).sum()
-
-        # Explained variance ratio for each component
-        var_individual = score_variances / total_variance
-
-    else:
-        # Calculate variance explained in Y-space using R² from predictions
-        # For PLS, Y variance is fundamentally about prediction quality
-        # We need to refit models with different n_components to get cumulative R²
-        y_array = np.asarray(y)  # Convert to numpy array if Series/DataFrame
-        y_2d = y_array.reshape(-1, 1) if y_array.ndim == 1 else y_array
-        y_centered = y_2d - y_2d.mean(axis=0)
-        total_variance = np.sum(y_centered**2)
-
-        # Get model parameters to maintain consistency with original model
-        scale = getattr(pls_model, "scale", True)
-
-        # Calculate cumulative R² for each number of components
-        var_ratios = []
-        for i in range(1, pls_model.n_components + 1):
-            # Fit PLS with i components using same parameters as original
-            pls_temp = PLSRegression(n_components=i, scale=scale)
-            pls_temp.fit(X, y)
-            y_pred = pls_temp.predict(X)
-
-            # Calculate R² (cumulative explained variance)
-            ss_res = np.sum((y_2d - y_pred) ** 2)
-            r2 = 1.0 - (ss_res / total_variance)
-            var_ratios.append(float(r2))
-
-        # Convert cumulative to individual variance per component
-        var_cumulative = np.array([0.0] + var_ratios)
-        var_individual = np.diff(var_cumulative)
-
-    return var_individual
