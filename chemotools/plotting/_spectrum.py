@@ -17,6 +17,7 @@ from chemotools.plotting._utilities import (
     detect_categorical,
     get_default_colormap,
     add_colorbar,
+    calculate_ylim_for_xlim,
 )
 
 
@@ -217,7 +218,7 @@ class SpectrumPlot:
 
             # Auto-scale y-axis to data within xlim if ylim not provided
             if ylim is None:
-                ylim = self._calculate_ylim_for_xlim(xlim)
+                ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
 
         if ylim is not None:
             ax.set_ylim(ylim)
@@ -276,7 +277,7 @@ class SpectrumPlot:
 
             # Auto-scale y-axis to data within xlim if ylim not provided
             if ylim is None:
-                ylim = self._calculate_ylim_for_xlim(xlim)
+                ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
 
         if ylim is not None:
             ax.set_ylim(ylim)
@@ -349,48 +350,3 @@ class SpectrumPlot:
                     linewidth=linewidth,
                     **kwargs,
                 )
-
-    def _calculate_ylim_for_xlim(
-        self, xlim: tuple[float, float], margin: float = 0.05
-    ) -> tuple[float, float]:
-        """Calculate appropriate y-axis limits for the given x-axis range.
-
-        Parameters
-        ----------
-        xlim : tuple[float, float]
-            The x-axis limits (xmin, xmax).
-        margin : float, optional
-            Fraction of the data range to add as margin (default: 0.05 = 5%).
-
-        Returns
-        -------
-        tuple[float, float]
-            The calculated y-axis limits (ymin, ymax).
-        """
-        xmin, xmax = xlim
-
-        # Find indices within the x-range
-        mask = (self.x >= xmin) & (self.x <= xmax)
-
-        if not np.any(mask):
-            # No data in range, return default limits
-            return (0, 1)
-
-        # Get y-values within the x-range
-        y_in_range = self.y[:, mask]
-
-        # Calculate min and max
-        ymin = np.min(y_in_range)
-        ymax = np.max(y_in_range)
-
-        # Add margin
-        y_range = ymax - ymin
-        if y_range > 0:
-            ymin -= margin * y_range
-            ymax += margin * y_range
-        else:
-            # If all values are the same, add small margin
-            ymin -= 0.1
-            ymax += 0.1
-
-        return (ymin, ymax)
