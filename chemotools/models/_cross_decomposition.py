@@ -69,9 +69,8 @@ class PLSRegression(_SklearnPLSRegression):
     Notes
     -----
     - **X-space variance** is calculated using score variances (fast, no refitting)
-    - **Y-space variance** is calculated using R² from predictions with 1..n components
-    - Y-space calculation uses the fitted model's scores and loadings directly,
-      no refitting required - just matrix multiplication!
+    - **Y-space variance** is calculated using score variances (same as X-space)
+    - Both calculations use the fitted model's score variances directly
     - Both calculations are performed automatically during the initial fit
 
     See Also
@@ -167,7 +166,7 @@ class PLSRegression(_SklearnPLSRegression):
         # Calculate X-space variance (using score variances - fast method)
         self.explained_x_variance_ratio_ = self._calculate_x_variance()
 
-        # Calculate Y-space variance (using R² method - accurate for prediction quality)
+        # Calculate Y-space variance (using score variances - same method as X)
         self.explained_y_variance_ratio_ = self._calculate_y_variance(X_array, y_2d)
 
     def _calculate_x_variance(self) -> np.ndarray:
@@ -196,44 +195,29 @@ class PLSRegression(_SklearnPLSRegression):
     def _calculate_y_variance(self, X: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Calculate explained variance ratio for Y-space.
 
-        Uses the R² method which accurately reflects prediction quality.
-        Uses the already-fitted model's scores and loadings to reconstruct
-        predictions with different numbers of components (no refitting needed).
+        Uses the score variance method (same as X-space) which is fast and
+        doesn't require refitting or reconstruction.
 
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features)
-            Training vectors.
+            Training vectors (not used, kept for API consistency).
         y : ndarray of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors.
+            Target vectors (not used, kept for API consistency).
 
         Returns
         -------
         ndarray of shape (n_components,)
             Explained variance ratio for each component in Y-space.
         """
-        # Ensure y is 2D
-        y_2d = y.reshape(-1, 1) if y.ndim == 1 else y
+        # Score variances for Y-space
+        score_variances = np.var(self.y_scores_, axis=0)
 
-        # Center y
-        y_centered = y_2d - y_2d.mean(axis=0)
-        total_variance = float(np.sum(y_centered**2))
+        # Total variance = sum of all score variances
+        total_variance = np.sum(score_variances)
 
-        # Calculate cumulative R² for each number of components
-        # Using the already fitted model's x_scores_ and y_loadings_
-        var_ratios = []
-        for i in range(1, self.n_components + 1):
-            # Reconstruct Y using first i components: Y_pred = X_scores @ Y_loadings.T
-            y_pred = self.x_scores_[:, :i] @ self.y_loadings_[:, :i].T + self._y_mean
-
-            # Calculate R² (cumulative explained variance)
-            ss_res = np.sum((y_2d - y_pred) ** 2)
-            r2 = 1.0 - (ss_res / total_variance)
-            var_ratios.append(float(r2))
-
-        # Convert cumulative to individual variance per component
-        var_cumulative = np.array([0.0] + var_ratios)
-        var_individual = np.diff(var_cumulative)
+        # Explained variance ratio
+        var_individual = score_variances / total_variance
 
         return var_individual
 

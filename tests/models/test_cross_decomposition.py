@@ -225,6 +225,26 @@ class TestPLSRegressionVarianceCalculation:
             err_msg="X-space variance should sum to ~1.0",
         )
 
+    def test_y_variance_sums_to_one(self):
+        """Test that Y-space variance ratios sum to ~1.0 (100%)."""
+        # Arrange
+        np.random.seed(42)
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100)
+
+        # Act
+        pls = PLSRegression(n_components=5)
+        pls.fit(X, y)
+
+        # Assert
+        # Y-space variance should sum to approximately 1.0
+        np.testing.assert_almost_equal(
+            pls.explained_y_variance_ratio_.sum(),
+            1.0,
+            decimal=5,
+            err_msg="Y-space variance should sum to ~1.0",
+        )
+
     def test_x_variance_all_positive(self):
         """Test that X-space variance ratios are all positive."""
         # Arrange
@@ -239,6 +259,22 @@ class TestPLSRegressionVarianceCalculation:
         # Assert
         assert np.all(pls.explained_x_variance_ratio_ >= 0), (
             "X-space variance should be non-negative"
+        )
+
+    def test_y_variance_all_positive(self):
+        """Test that Y-space variance ratios are all positive."""
+        # Arrange
+        np.random.seed(42)
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100)
+
+        # Act
+        pls = PLSRegression(n_components=5)
+        pls.fit(X, y)
+
+        # Assert
+        assert np.all(pls.explained_y_variance_ratio_ >= 0), (
+            "Y-space variance should be non-negative"
         )
 
     def test_y_variance_is_float_array(self):
