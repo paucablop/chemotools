@@ -6,14 +6,13 @@ from chemotools.plotting._utilities import (
     get_colors_from_labels,
     add_confidence_ellipse,
     annotate_points,
+    calculate_ylim_for_xlim,
 )
 from chemotools.plotting._spectrum import SpectrumPlot
 from chemotools.plotting._scores import ScoresPlot
+from chemotools.plotting._loadings import LoadingsPlot
 from chemotools.plotting._styles import DATASET_COLORS
-from chemotools.plotting._inspector_plots import (
-    LoadingsPlot,
-    ExplainedVariancePlot,
-)
+from chemotools.plotting._inspector_plots import ExplainedVariancePlot
 
 __all__ = [
     # Protocols
@@ -21,14 +20,15 @@ __all__ = [
     "is_displayable",
     # Plot classes
     "SpectrumPlot",
+    "ScoresPlot",
+    "LoadingsPlot",
+    "ExplainedVariancePlot",
     # Utilities
     "setup_figure",
     "get_colors_from_labels",
     "add_confidence_ellipse",
     "annotate_points",
+    "calculate_ylim_for_xlim",
     # Constants
     "DATASET_COLORS",
-    "ScoresPlot",
-    "LoadingsPlot",
-    "ExplainedVariancePlot",
 ]

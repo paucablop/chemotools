@@ -290,3 +290,100 @@ def add_colorbar(
     sm.set_array([])
     cbar = plt.colorbar(sm, ax=ax)
     cbar.set_label(label, fontsize=10)
+
+
+def calculate_ylim_for_xlim(
+    x: np.ndarray,
+    y: np.ndarray,
+    xlim: tuple[float, float],
+    margin: float = 0.05,
+) -> tuple[float, float]:
+    """Calculate appropriate y-axis limits for the given x-axis range.
+
+    This utility function automatically scales the y-axis to fit the data
+    within a specified x-axis range, useful for zooming into spectral regions
+    or feature ranges while maintaining optimal y-axis scaling.
+
+    Parameters
+    ----------
+    x : np.ndarray
+        X-axis data (e.g., wavelengths, wavenumbers, feature indices).
+        Shape: (n_points,)
+    y : np.ndarray
+        Y-axis data (e.g., spectra, loadings). Can be 1D or 2D.
+        - If 1D with shape (n_points,): single spectrum/loading
+        - If 2D: can have either layout:
+          * (n_spectra, n_points): x maps to columns (axis 1)
+          * (n_points, n_components): x maps to rows (axis 0)
+        Function automatically detects which layout based on x length.
+    xlim : tuple[float, float]
+        The x-axis limits (xmin, xmax) to calculate y-limits for.
+    margin : float, optional
+        Fraction of the data range to add as margin (default: 0.05 = 5%).
+        This prevents data from touching the plot edges.
+
+    Returns
+    -------
+    tuple[float, float]
+        The calculated y-axis limits (ymin, ymax) with margin applied.
+        Returns (0, 1) if no data points are found within xlim.
+
+    Examples
+    --------
+    Auto-scale y-axis when zooming into a spectral region:
+
+    >>> xlim = (2800, 3000)  # Focus on C-H stretch region
+    >>> ylim = calculate_ylim_for_xlim(wavenumbers, spectra, xlim)
+    >>> ax.set_xlim(xlim)
+    >>> ax.set_ylim(ylim)
+
+    With custom margin:
+
+    >>> ylim = calculate_ylim_for_xlim(x, y, xlim=(100, 200), margin=0.1)
+
+    Works with 2D data (multiple spectra/loadings):
+
+    >>> # y can have shape (n_spectra, n_points) or (n_points, n_components)
+    >>> ylim = calculate_ylim_for_xlim(wavelengths, all_spectra, xlim)
+    """
+    xmin, xmax = xlim
+    # Find indices within the x-range
+    mask = (x >= xmin) & (x <= xmax)
+
+    if not np.any(mask):
+        # No data in range, return default limits
+        return (0, 1)
+
+    # Handle both 1D and 2D y data
+    if y.ndim == 1:
+        y_in_range = y[mask]
+    else:
+        # For 2D data, determine if x corresponds to rows or columns
+        # If x length matches axis 1 (columns), filter columns (SpectrumPlot style)
+        # If x length matches axis 0 (rows), filter rows (LoadingsPlot style)
+        if len(x) == y.shape[1]:
+            # x maps to columns: y has shape (n_spectra, n_points)
+            y_in_range = y[:, mask]
+        elif len(x) == y.shape[0]:
+            # x maps to rows: y has shape (n_points, n_components)
+            y_in_range = y[mask, :]
+        else:
+            raise ValueError(
+                f"x length ({len(x)}) must match either dimension of y {y.shape}"
+            )
+
+    # Calculate min and max
+    ymin = np.min(y_in_range)
+    ymax = np.max(y_in_range)
+
+    # Add margin
+    y_range = ymax - ymin
+    if y_range > 0:
+        ymin -= margin * y_range
+        ymax += margin * y_range
+    else:
+        # If all values are the same, add small margin
+        ymin -= 0.1
+        ymax += 0.1
+
+    return (ymin, ymax)
