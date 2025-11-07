@@ -8,7 +8,6 @@ from sklearn.utils.estimator_checks import check_estimator
 from chemotools.models import PLSRegression
 
 
-
 # Test compliance with scikit-learn
 def test_compliance_pls_regression():
     # Arrange
@@ -41,8 +40,10 @@ class TestPLSRegressionCompatibility:
 
         # Assert - predictions should be identical
         np.testing.assert_array_almost_equal(
-            sklearn_pred, chemotools_pred, decimal=10,
-            err_msg="Predictions should match sklearn exactly"
+            sklearn_pred,
+            chemotools_pred,
+            decimal=10,
+            err_msg="Predictions should match sklearn exactly",
         )
 
     def test_same_transform_as_sklearn(self):
@@ -64,8 +65,10 @@ class TestPLSRegressionCompatibility:
 
         # Assert
         np.testing.assert_array_almost_equal(
-            sklearn_scores, chemotools_scores, decimal=10,
-            err_msg="Transform scores should match sklearn exactly"
+            sklearn_scores,
+            chemotools_scores,
+            decimal=10,
+            err_msg="Transform scores should match sklearn exactly",
         )
 
     def test_same_attributes_as_sklearn(self):
@@ -83,17 +86,27 @@ class TestPLSRegressionCompatibility:
 
         # Assert - check all important sklearn attributes match
         sklearn_attributes = [
-            'x_weights_', 'y_weights_', 'x_loadings_', 'y_loadings_',
-            'x_scores_', 'y_scores_', 'x_rotations_', 'y_rotations_',
-            'coef_', 'intercept_', 'n_features_in_'
+            "x_weights_",
+            "y_weights_",
+            "x_loadings_",
+            "y_loadings_",
+            "x_scores_",
+            "y_scores_",
+            "x_rotations_",
+            "y_rotations_",
+            "coef_",
+            "intercept_",
+            "n_features_in_",
         ]
 
         for attr in sklearn_attributes:
             sklearn_val = getattr(sklearn_pls, attr)
             chemotools_val = getattr(chemotools_pls, attr)
             np.testing.assert_array_almost_equal(
-                sklearn_val, chemotools_val, decimal=10,
-                err_msg=f"Attribute {attr} should match sklearn exactly"
+                sklearn_val,
+                chemotools_val,
+                decimal=10,
+                err_msg=f"Attribute {attr} should match sklearn exactly",
             )
 
     def test_same_score_as_sklearn(self):
@@ -115,8 +128,10 @@ class TestPLSRegressionCompatibility:
 
         # Assert
         np.testing.assert_almost_equal(
-            sklearn_r2, chemotools_r2, decimal=10,
-            err_msg="R² score should match sklearn exactly"
+            sklearn_r2,
+            chemotools_r2,
+            decimal=10,
+            err_msg="R² score should match sklearn exactly",
         )
 
     def test_works_with_scale_true(self):
@@ -138,8 +153,10 @@ class TestPLSRegressionCompatibility:
 
         # Assert
         np.testing.assert_array_almost_equal(
-            sklearn_pred, chemotools_pred, decimal=10,
-            err_msg="Predictions with scale=True should match sklearn"
+            sklearn_pred,
+            chemotools_pred,
+            decimal=10,
+            err_msg="Predictions with scale=True should match sklearn",
         )
 
     def test_works_with_multivariate_y(self):
@@ -161,8 +178,10 @@ class TestPLSRegressionCompatibility:
 
         # Assert
         np.testing.assert_array_almost_equal(
-            sklearn_pred, chemotools_pred, decimal=10,
-            err_msg="Multivariate predictions should match sklearn"
+            sklearn_pred,
+            chemotools_pred,
+            decimal=10,
+            err_msg="Multivariate predictions should match sklearn",
         )
 
 
@@ -181,8 +200,8 @@ class TestPLSRegressionVarianceCalculation:
         pls.fit(X, y)
 
         # Assert
-        assert hasattr(pls, 'explained_x_variance_ratio_')
-        assert hasattr(pls, 'explained_y_variance_ratio_')
+        assert hasattr(pls, "explained_x_variance_ratio_")
+        assert hasattr(pls, "explained_y_variance_ratio_")
         assert len(pls.explained_x_variance_ratio_) == 5
         assert len(pls.explained_y_variance_ratio_) == 5
 
@@ -200,8 +219,10 @@ class TestPLSRegressionVarianceCalculation:
         # Assert
         # X-space variance should sum to approximately 1.0
         np.testing.assert_almost_equal(
-            pls.explained_x_variance_ratio_.sum(), 1.0, decimal=5,
-            err_msg="X-space variance should sum to ~1.0"
+            pls.explained_x_variance_ratio_.sum(),
+            1.0,
+            decimal=5,
+            err_msg="X-space variance should sum to ~1.0",
         )
 
     def test_x_variance_all_positive(self):
@@ -216,8 +237,9 @@ class TestPLSRegressionVarianceCalculation:
         pls.fit(X, y)
 
         # Assert
-        assert np.all(pls.explained_x_variance_ratio_ >= 0), \
+        assert np.all(pls.explained_x_variance_ratio_ >= 0), (
             "X-space variance should be non-negative"
+        )
 
     def test_y_variance_is_float_array(self):
         """Test that Y-space variance is a proper numpy array."""
@@ -249,8 +271,8 @@ class TestPLSRegressionVarianceCalculation:
         pls.fit(X, y)
 
         # Assert
-        assert hasattr(pls, 'explained_x_variance_ratio_')
-        assert hasattr(pls, 'explained_y_variance_ratio_')
+        assert hasattr(pls, "explained_x_variance_ratio_")
+        assert hasattr(pls, "explained_y_variance_ratio_")
         assert len(pls.explained_x_variance_ratio_) == 5
         assert len(pls.explained_y_variance_ratio_) == 5
 
@@ -296,12 +318,16 @@ class TestPLSRegressionVarianceCalculation:
 
         # Assert
         np.testing.assert_array_almost_equal(
-            sklearn_pred, chemotools_pred, decimal=10,
-            err_msg="Predictions should match sklearn"
+            sklearn_pred,
+            chemotools_pred,
+            decimal=10,
+            err_msg="Predictions should match sklearn",
         )
         np.testing.assert_array_almost_equal(
-            chemotools_pred, chemotools_pred_after, decimal=10,
-            err_msg="Variance calculation shouldn't change predictions"
+            chemotools_pred,
+            chemotools_pred_after,
+            decimal=10,
+            err_msg="Variance calculation shouldn't change predictions",
         )
 
 
@@ -320,8 +346,8 @@ class TestPLSRegressionEdgeCases:
         pls.fit(X, y)
 
         # Assert
-        assert hasattr(pls, 'explained_x_variance_ratio_')
-        assert hasattr(pls, 'explained_y_variance_ratio_')
+        assert hasattr(pls, "explained_x_variance_ratio_")
+        assert hasattr(pls, "explained_y_variance_ratio_")
 
     def test_repr_shows_variance_info(self):
         """Test that __repr__ shows variance information after fitting."""
@@ -336,8 +362,8 @@ class TestPLSRegressionEdgeCases:
         repr_str = repr(pls)
 
         # Assert
-        assert 'X-space variance explained' in repr_str
-        assert 'Y-space variance explained' in repr_str
+        assert "X-space variance explained" in repr_str
+        assert "Y-space variance explained" in repr_str
 
     def test_repr_before_fitting(self):
         """Test that __repr__ works before fitting (no variance info)."""
@@ -348,5 +374,5 @@ class TestPLSRegressionEdgeCases:
         repr_str = repr(pls)
 
         # Assert
-        assert 'n_components=5' in repr_str
-        assert 'X-space variance' not in repr_str  # Not fitted yet
+        assert "n_components=5" in repr_str
+        assert "X-space variance" not in repr_str  # Not fitted yet
