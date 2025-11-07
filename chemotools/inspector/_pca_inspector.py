@@ -487,19 +487,22 @@ class PCAInspector:
                     scatter = ax.scatter(
                         y, pc_scores, c=y, cmap="viridis", alpha=0.7, s=50
                     )
-                    ax.set_xlabel("y-value", fontsize=10)
                     plt.colorbar(scatter, ax=ax, label="y-value")
+                    xlabel_text = "y-value"
                 else:
                     # Plot PC score vs sample index
                     ax.scatter(range(len(pc_scores)), pc_scores, alpha=0.7, s=50)
-                    ax.set_xlabel("Sample Index", fontsize=10)
+                    xlabel_text = "Sample Index"
 
+                # Apply decorations
+                ax.set_xlabel(xlabel_text, fontsize=10)
                 ax.set_ylabel(f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10)
                 ax.set_title(
                     f"Scores: PC{component_spec + 1} ({dataset.capitalize()})",
                     fontsize=12,
                     fontweight="bold",
                 )
+                ax.grid(alpha=0.3)
             else:
                 # 2D plot: Component pair scatter plot
                 components_pair = component_spec
@@ -515,7 +518,7 @@ class PCAInspector:
                 )
                 scores_plot.render(ax=ax)
 
-                # Set axis labels with variance percentages
+                # Apply decorations with variance percentages
                 ax.set_xlabel(f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10)
                 ax.set_ylabel(f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10)
                 ax.set_title(
@@ -523,19 +526,26 @@ class PCAInspector:
                     fontsize=12,
                     fontweight="bold",
                 )
+                ax.grid(alpha=0.3)
 
-            ax.grid(alpha=0.3)
             plt.tight_layout()
             figures[f"scores_{i}"] = fig
 
-        # Figure 3: Loadings plot
+        # Loadings plot
         fig3, ax3 = plt.subplots(figsize=loadings_figsize)
+        
         # Convert to list if it's a sequence for type compatibility
         loadings_comps = (
             loadings_components
             if isinstance(loadings_components, int)
             else list(loadings_components)
         )
+        
+        # Determine xlabel based on wavenumbers
+        xlabel = (
+            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
+        )
+        
         loadings_plot = LoadingsPlot(
             loadings=loadings,
             feature_names=self.wavenumbers,
@@ -543,13 +553,10 @@ class PCAInspector:
         )
         loadings_plot.render(ax=ax3, linewidth=2, alpha=0.7)
 
-        # Set axis labels
-        xlabel = (
-            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
-        )
+        # Apply decorations
         ax3.set_xlabel(xlabel, fontsize=10)
         ax3.set_ylabel("Loading", fontsize=10)
-
+        
         if isinstance(loadings_components, int):
             title = f"PC{loadings_components + 1} Loadings"
         else:
@@ -560,13 +567,15 @@ class PCAInspector:
         plt.tight_layout()
         figures["loadings"] = fig3
 
-        # Figure 4: Explained variance
+        # Explained variance plot
         fig4, ax4 = plt.subplots(figsize=variance_figsize)
         variance_plot = ExplainedVariancePlot(
             explained_variance_ratio=self.get_explained_variance_ratio(),
             threshold=variance_threshold,
         )
         variance_plot.render(ax=ax4)
+        
+        # Apply decorations
         ax4.set_title("Explained Variance by Component", fontsize=12, fontweight="bold")
         ax4.legend(loc="upper right")
         ax4.grid(alpha=0.3)
@@ -634,8 +643,6 @@ class PCAInspector:
                 "Model must be a Pipeline with preprocessing steps."
             )
 
-        import matplotlib.pyplot as plt
-
         figures = {}
 
         # Get data
@@ -646,37 +653,41 @@ class PCAInspector:
         if color_by_y and y is not None:
             color_values = y
 
-        # Figure 1: Raw spectra
-        fig1, ax1 = plt.subplots(figsize=figsize)
+        # Determine xlabel based on wavenumbers
+        xlabel = (
+            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
+        )
+        
+        # Figure 1: Raw spectra - use .show() for complete figure
         plot_raw = SpectrumPlot(
-            x=self.wavenumbers, y=X_raw, color_by=color_values, colormap="viridis"
+            x=self.wavenumbers,
+            y=X_raw,
+            color_by=color_values,
+            colormap="viridis",
+            xlabel=xlabel,
+            ylabel="Intensity",
         )
-        plot_raw.render(ax=ax1, xlim=xlim)
-        ax1.set_title(
-            f"Raw Spectra ({dataset.capitalize()})",
-            fontsize=12,
-            fontweight="bold",
+        fig1 = plot_raw.show(
+            figsize=figsize,
+            title=f"Raw Spectra ({dataset.capitalize()})",
+            xlim=xlim,
         )
-        ax1.grid(alpha=0.3)
-        plt.tight_layout()
         figures["raw_spectra"] = fig1
 
-        # Figure 2: Preprocessed spectra
-        fig2, ax2 = plt.subplots(figsize=figsize)
+        # Figure 2: Preprocessed spectra - use .show() for complete figure
         plot_preprocessed = SpectrumPlot(
             x=self.wavenumbers,
             y=X_preprocessed,
             color_by=color_values,
             colormap="viridis",
+            xlabel=xlabel,
+            ylabel="Intensity",
         )
-        plot_preprocessed.render(ax=ax2, xlim=xlim)
-        ax2.set_title(
-            f"Preprocessed Spectra ({dataset.capitalize()})",
-            fontsize=12,
-            fontweight="bold",
+        fig2 = plot_preprocessed.show(
+            figsize=figsize,
+            title=f"Preprocessed Spectra ({dataset.capitalize()})",
+            xlim=xlim,
         )
-        ax2.grid(alpha=0.3)
-        plt.tight_layout()
         figures["preprocessed_spectra"] = fig2
 
         return figures
