@@ -393,6 +393,9 @@ class DistancesPlot:
         s = kwargs.pop("s", 50)
 
         # Extract data for plotting
+        x: np.ndarray
+        y: np.ndarray
+
         if self.x_axis is None:
             # Plot vs sample index
             x = np.arange(len(self.distances))
