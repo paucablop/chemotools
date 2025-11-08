@@ -14,6 +14,9 @@ from chemotools.plotting._loadings import LoadingsPlot
 from chemotools.plotting._distances import DistancesPlot
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._explained_variance import ExplainedVariancePlot
+from chemotools.plotting._y_residuals import YResidualsPlot
+from chemotools.plotting._qq_plot import QQPlot
+from chemotools.plotting._residual_distribution import ResidualDistributionPlot
 
 __all__ = [
     # Protocols
@@ -25,6 +28,9 @@ __all__ = [
     "LoadingsPlot",
     "DistancesPlot",
     "ExplainedVariancePlot",
+    "YResidualsPlot",
+    "QQPlot",
+    "ResidualDistributionPlot",
     # Utilities
     "setup_figure",
     "get_colors_from_labels",
