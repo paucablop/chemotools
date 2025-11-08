@@ -389,7 +389,8 @@ class TestPCAInspectorSummary:
         inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
 
         # Act & Assert - should not raise
-        inspector.summary()
+        result = inspector.summary()
+        assert isinstance(result, dict)
 
     def test_summary_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
         """Test summary with preprocessing pipeline."""
@@ -398,7 +399,10 @@ class TestPCAInspectorSummary:
         inspector = PCAInspector(model=fitted_pipeline_pca, X_train=X, y_train=y)
 
         # Act & Assert - should not raise
-        inspector.summary()
+        result = inspector.summary()
+        assert isinstance(result, dict)
+        assert "preprocessing_steps" in result
+        assert len(result["preprocessing_steps"]) > 0
 
     def test_summary_with_multiple_datasets(self, fitted_pca, dummy_data_loader):
         """Test summary with multiple datasets."""
@@ -417,24 +421,43 @@ class TestPCAInspectorSummary:
         )
 
         # Act & Assert - should not raise
-        inspector.summary()
+        result = inspector.summary()
+        assert isinstance(result, dict)
+        assert "nr_samples" in result
+        assert len(result["nr_samples"]) == 3  # train, test, val
 
-    def test_summary_output_format(self, fitted_pca, dummy_data_loader, capsys):
-        """Test that summary produces expected output format."""
+    def test_summary_output_format(self, fitted_pca, dummy_data_loader):
+        """Test that summary returns dictionary with expected keys."""
         # Arrange
         X, _ = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X)
 
         # Act
-        inspector.summary()
-        captured = capsys.readouterr()
+        result = inspector.summary()
 
         # Assert - check for key content
-        assert "PCA Model Summary" in captured.out
-        assert "Model Information" in captured.out
-        assert "Data Dimensions" in captured.out
-        assert "Explained Variance" in captured.out
-        assert "Components for Variance Thresholds" in captured.out
+        assert isinstance(result, dict)
+        assert "model_type" in result
+        assert "has_preprocessing" in result
+        assert "nr_features" in result
+        assert "nr_components" in result
+        assert "nr_samples" in result
+        assert "explained_variance_ratio" in result
+        assert "cumulative_variance" in result
+        assert "pc_variances" in result
+        assert "total_variance" in result
+        assert "variance_thresholds" in result
+        assert "preprocessing_steps" in result
+
+        # Check variance thresholds structure
+        assert "90%" in result["variance_thresholds"]
+        assert "95%" in result["variance_thresholds"]
+        assert "99%" in result["variance_thresholds"]
+
+        # Check each threshold has required keys
+        for threshold in ["90%", "95%", "99%"]:
+            assert "n_components" in result["variance_thresholds"][threshold]
+            assert "actual_variance" in result["variance_thresholds"][threshold]
 
 
 class TestPCAInspectorInspect:

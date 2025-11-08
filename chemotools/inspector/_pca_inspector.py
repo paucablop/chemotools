@@ -417,18 +417,36 @@ class PCAInspector:
         """
         return self.estimator.explained_variance_ratio_
 
-    def summary(self) -> None:
-        """Display a formatted summary table of the PCA model.
+    def summary(self) -> Dict[str, Union[str, int, float, Dict, np.ndarray]]:
+        """Get a summary dictionary of the PCA model.
 
-        Prints a formatted summary directly to the console.
+        Returns
+        -------
+        summary : dict
+            Dictionary containing model information with keys:
+            - 'model_type': Name of the PCA estimator class
+            - 'has_preprocessing': Whether preprocessing pipeline exists
+            - 'nr_features': Number of features in original data
+            - 'nr_components': Number of principal components
+            - 'nr_samples': Dictionary with sample counts per dataset
+            - 'explained_variance_ratio': Array of variance ratios per component
+            - 'cumulative_variance': Array of cumulative variance
+            - 'pc_variances': Dictionary with variance explained by PC1, PC2, PC3
+            - 'total_variance': Total variance explained by all components
+            - 'variance_thresholds': Dictionary with components needed for 90%, 95%, 99% variance
+            - 'preprocessing_steps': List of preprocessing step names (if available)
 
         Examples
         --------
         >>> inspector = PCAInspector(pca, X_train, y_train)
-        >>> inspector.summary()
+        >>> summary = inspector.summary()
+        >>> print(f"Model type: {summary['model_type']}")
+        >>> print(f"PC1 explains: {summary['pc_variances']['PC1']:.2f}%")
+        >>> print(f"Components for 95% variance: {summary['variance_thresholds']['95%']}")
         """
         # Calculate cumulative variance
-        cumsum = np.cumsum(self.get_explained_variance_ratio())
+        explained_var = self.get_explained_variance_ratio()
+        cumsum = np.cumsum(explained_var)
 
         # Find components for common variance thresholds
         n_90 = (
@@ -447,72 +465,53 @@ class PCAInspector:
             else self.nr_components
         )
 
-        # Build summary string
-        summary_lines = [
-            "=" * 70,
-            "PCA Model Summary".center(70),
-            "=" * 70,
-            "",
-            "Model Information:",
-            "-" * 70,
-            f"  Model Type          : {type(self.estimator).__name__}",
-            f"  Has Preprocessing   : {'Yes' if self.transformer is not None else 'No'}",
-            "",
-            "Data Dimensions:",
-            "-" * 70,
-            f"  Number of Features  : {self.nr_features}",
-            f"  Number of Components: {self.nr_components}",
-        ]
+        # Build PC variances dictionary
+        pc_variances = {
+            "PC1": explained_var[0] * 100,
+        }
+        if self.nr_components > 1:
+            pc_variances["PC2"] = explained_var[1] * 100
+        if self.nr_components > 2:
+            pc_variances["PC3"] = explained_var[2] * 100
 
-        # Add sample counts
-        for dataset, count in self.nr_samples.items():
-            summary_lines.append(f"  Samples ({dataset:5s})    : {count}")
+        # Build summary dictionary
+        summary_dict = {
+            "model_type": type(self.estimator).__name__,
+            "has_preprocessing": self.transformer is not None,
+            "nr_features": self.nr_features,
+            "nr_components": self.nr_components,
+            "nr_samples": self.nr_samples.copy(),
+            "explained_variance_ratio": explained_var,
+            "cumulative_variance": cumsum,
+            "pc_variances": pc_variances,
+            "total_variance": cumsum[-1] * 100,
+            "variance_thresholds": {
+                "90%": {
+                    "n_components": n_90,
+                    "actual_variance": cumsum[n_90 - 1] * 100,
+                },
+                "95%": {
+                    "n_components": n_95,
+                    "actual_variance": cumsum[n_95 - 1] * 100,
+                },
+                "99%": {
+                    "n_components": n_99,
+                    "actual_variance": cumsum[n_99 - 1] * 100,
+                },
+            },
+        }
 
-        # Add variance information
-        summary_lines.extend(
-            [
-                "",
-                "Explained Variance:",
-                "-" * 70,
-                f"  PC1 explains        : {self.get_explained_variance_ratio()[0] * 100:6.2f}%",
-                f"  PC2 explains        : {self.get_explained_variance_ratio()[1] * 100:6.2f}%"
-                if self.nr_components > 1
-                else "",
-                f"  PC3 explains        : {self.get_explained_variance_ratio()[2] * 100:6.2f}%"
-                if self.nr_components > 2
-                else "",
-                "",
-                f"  Total (all {self.nr_components} PCs)   : {cumsum[-1] * 100:6.2f}%",
-                "",
-                "Components for Variance Thresholds:",
-                "-" * 70,
-                f"  90% variance        : {n_90} component(s) (actual: {cumsum[n_90 - 1] * 100:.2f}%)",
-                f"  95% variance        : {n_95} component(s) (actual: {cumsum[n_95 - 1] * 100:.2f}%)",
-                f"  99% variance        : {n_99} component(s) (actual: {cumsum[n_99 - 1] * 100:.2f}%)",
-            ]
-        )
-
-        # Add preprocessing info if available
+        # Add preprocessing steps if available
         if self.transformer is not None:
-            summary_lines.extend(
-                [
-                    "",
-                    "Preprocessing Pipeline:",
-                    "-" * 70,
-                ]
-            )
-            for i, (name, transform) in enumerate(self.transformer.steps, 1):
-                summary_lines.append(f"  {i}. {name:20s}: {type(transform).__name__}")
-
-        summary_lines.extend(
-            [
-                "",
-                "=" * 70,
+            preprocessing_steps = [
+                {"step": i, "name": name, "type": type(transform).__name__}
+                for i, (name, transform) in enumerate(self.transformer.steps, 1)
             ]
-        )
+            summary_dict["preprocessing_steps"] = preprocessing_steps
+        else:
+            summary_dict["preprocessing_steps"] = []
 
-        # Filter out empty strings and print
-        print("\n".join([line for line in summary_lines if line is not None]))
+        return summary_dict
 
     def inspect(
         self,
