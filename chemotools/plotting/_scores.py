@@ -374,11 +374,13 @@ class ScoresPlot:
                 )
         else:
             # Continuous coloring
-            from matplotlib import cm
+            import matplotlib as mpl
             import matplotlib.colors as mcolors
 
             norm = mcolors.Normalize(vmin=self.color_by.min(), vmax=self.color_by.max())
-            cmap = cm.get_cmap(self.colormap)
+            # Ensure we have a valid colormap (should not be None here, but be defensive)
+            colormap_name = self.colormap if self.colormap is not None else "viridis"
+            cmap = mpl.colormaps.get_cmap(colormap_name)
 
             ax.scatter(
                 x,

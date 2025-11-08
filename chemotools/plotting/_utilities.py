@@ -31,7 +31,7 @@ def get_colors_from_labels(
 ) -> np.ndarray:
     """Convert labels to colors using a colormap."""
     unique_labels = np.unique(labels)
-    cmap = plt.get_cmap(colormap)
+    cmap = plt.colormaps.get_cmap(colormap)
     label_to_color = {
         label: cmap(i / len(unique_labels)) for i, label in enumerate(unique_labels)
     }
