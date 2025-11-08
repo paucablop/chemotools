@@ -256,9 +256,12 @@ class ResidualDistributionPlot:
         if ax is None:
             fig, ax = plt.subplots(figsize=(10, 6))
         else:
-            fig = ax.get_figure()
-            if fig is None:
+            _fig = ax.get_figure()
+            if _fig is None:
                 raise ValueError("Provided axes must be attached to a figure")
+            # Type narrowing for mypy
+            assert isinstance(_fig, Figure)
+            fig = _fig
 
         # Render the plot
         self._render_plot(ax, **kwargs)

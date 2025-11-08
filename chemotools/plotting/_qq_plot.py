@@ -139,10 +139,13 @@ class QQPlot:
         """Calculate theoretical and sample quantiles for Q-Q plot."""
         # Use scipy.stats.probplot to get the Q-Q plot data
         # probplot returns ((theoretical_quantiles, ordered_values), (slope, intercept, r))
-        (self.theoretical_quantiles, self.sample_quantiles), (
-            self.slope,
-            self.intercept,
-            self.r_value,
+        (
+            (self.theoretical_quantiles, self.sample_quantiles),
+            (
+                self.slope,
+                self.intercept,
+                self.r_value,
+            ),
         ) = stats.probplot(self.residuals_1d, dist="norm")
 
     def show(
@@ -249,9 +252,12 @@ class QQPlot:
         if ax is None:
             fig, ax = plt.subplots(figsize=(8, 8))
         else:
-            fig = ax.get_figure()
-            if fig is None:
+            _fig = ax.get_figure()
+            if _fig is None:
                 raise ValueError("Provided axes must be attached to a figure")
+            # Type narrowing for mypy
+            assert isinstance(_fig, Figure)
+            fig = _fig
 
         # Render the plot
         self._render_plot(ax, **kwargs)
@@ -291,7 +297,9 @@ class QQPlot:
         # Add reference line (diagonal)
         if self.add_reference_line:
             # Calculate the line based on the fit
-            line_x = np.array([self.theoretical_quantiles.min(), self.theoretical_quantiles.max()])
+            line_x = np.array(
+                [self.theoretical_quantiles.min(), self.theoretical_quantiles.max()]
+            )
             line_y = self.slope * line_x + self.intercept
 
             ax.plot(
@@ -312,13 +320,21 @@ class QQPlot:
 
             # Calculate confidence bands using standard error
             n = len(self.residuals_1d)
-            se = np.std(self.residuals_1d) * np.sqrt((1 / n) + (self.theoretical_quantiles ** 2) / np.sum(self.theoretical_quantiles ** 2))
+            se = np.std(self.residuals_1d) * np.sqrt(
+                (1 / n)
+                + (self.theoretical_quantiles**2)
+                / np.sum(self.theoretical_quantiles**2)
+            )
 
             # Critical value for the confidence level
             z_crit = stats.norm.ppf((1 + confidence_level) / 2)
 
-            upper_band = self.slope * self.theoretical_quantiles + self.intercept + z_crit * se
-            lower_band = self.slope * self.theoretical_quantiles + self.intercept - z_crit * se
+            upper_band = (
+                self.slope * self.theoretical_quantiles + self.intercept + z_crit * se
+            )
+            lower_band = (
+                self.slope * self.theoretical_quantiles + self.intercept - z_crit * se
+            )
 
             ax.fill_between(
                 self.theoretical_quantiles,
@@ -326,7 +342,7 @@ class QQPlot:
                 upper_band,
                 color="red",
                 alpha=0.2,
-                label=f"{confidence_level*100:.0f}% Confidence Band",
+                label=f"{confidence_level * 100:.0f}% Confidence Band",
             )
 
         # Add annotations if provided

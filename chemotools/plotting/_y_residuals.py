@@ -279,9 +279,12 @@ class YResidualsPlot:
         if ax is None:
             fig, ax = plt.subplots(figsize=(10, 6))
         else:
-            fig = ax.get_figure()
-            if fig is None:
+            _fig = ax.get_figure()
+            if _fig is None:
                 raise ValueError("Provided axes must be attached to a figure")
+            # Type narrowing for mypy
+            assert isinstance(_fig, Figure)
+            fig = _fig
 
         # Render the plot
         self._render_plot(ax, **kwargs)
@@ -303,6 +306,7 @@ class YResidualsPlot:
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Internal method to render the plot on given axes."""
         # Determine colors for points
+        colors: np.ndarray | str
         if self.color_by is not None:
             if self.is_categorical:
                 colors = get_colors_from_labels(self.color_by, colormap=self.colormap)
@@ -326,7 +330,11 @@ class YResidualsPlot:
         if isinstance(colors, np.ndarray) and not self.is_categorical:
             # Continuous coloring
             ax.scatter(
-                self.x_axis, self.residuals_1d, c=colors, cmap=self.colormap, **scatter_kwargs
+                self.x_axis,
+                self.residuals_1d,
+                c=colors,
+                cmap=self.colormap,
+                **scatter_kwargs,
             )
             # Add colorbar
             if ax.get_figure() is not None:

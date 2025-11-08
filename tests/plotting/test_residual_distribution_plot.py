@@ -162,9 +162,7 @@ class TestResidualDistributionPlotMultivariate:
         residuals = np.random.randn(100)
 
         # Act
-        plot = ResidualDistributionPlot(
-            residuals, target_index=5
-        )  # Should be ignored
+        plot = ResidualDistributionPlot(residuals, target_index=5)  # Should be ignored
 
         # Assert
         assert plot.residuals_1d.shape == (100,)
@@ -481,10 +479,8 @@ class TestResidualDistributionPlotIntegration:
         # Act
         fig, axes = plt.subplots(1, 3, figsize=(15, 5))
         for i in range(3):
-            ResidualDistributionPlot(residuals, target_index=i, bins=20).render(
-                axes[i]
-            )
-            axes[i].set_title(f"Target {i+1}")
+            ResidualDistributionPlot(residuals, target_index=i, bins=20).render(axes[i])
+            axes[i].set_title(f"Target {i + 1}")
 
         # Assert
         assert isinstance(fig, Figure)

@@ -417,12 +417,8 @@ class TestYResidualsPlotIntegration:
         residuals = y_true - y_pred
 
         # Act
-        plot = YResidualsPlot(
-            residuals, x_values=y_pred, add_confidence_band=2.0
-        )
-        fig = plot.show(
-            title="Residuals vs Predicted", xlabel="Predicted Values"
-        )
+        plot = YResidualsPlot(residuals, x_values=y_pred, add_confidence_band=2.0)
+        fig = plot.show(title="Residuals vs Predicted", xlabel="Predicted Values")
 
         # Assert
         assert isinstance(fig, Figure)
@@ -451,9 +447,7 @@ class TestYResidualsPlotIntegration:
         # Arrange
         residuals = np.random.randn(100)
         outlier_indices = [5, 23, 47]
-        annotations = [
-            f"S{i}" if i in outlier_indices else "" for i in range(100)
-        ]
+        annotations = [f"S{i}" if i in outlier_indices else "" for i in range(100)]
 
         # Act
         plot = YResidualsPlot(residuals, annotations=annotations)

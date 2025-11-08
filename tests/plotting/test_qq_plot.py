@@ -380,7 +380,7 @@ class TestQQPlotStatistics:
         plot = QQPlot(residuals)
 
         # Assert - R² should be very close to 1 for normal data
-        assert plot.r_value ** 2 > 0.98
+        assert plot.r_value**2 > 0.98
 
     def test_skewed_residuals_have_poorer_fit(self):
         """Test that skewed residuals have lower R²."""
@@ -393,7 +393,7 @@ class TestQQPlotStatistics:
 
         # Assert - R² should be noticeably lower for skewed data
         # (though still might be high for exponential)
-        assert 0 < plot.r_value ** 2 < 1
+        assert 0 < plot.r_value**2 < 1
 
 
 class TestQQPlotIntegration:
@@ -422,7 +422,7 @@ class TestQQPlotIntegration:
         fig, axes = plt.subplots(1, 3, figsize=(15, 5))
         for i in range(3):
             QQPlot(residuals, target_index=i).render(axes[i])
-            axes[i].set_title(f"Target {i+1}")
+            axes[i].set_title(f"Target {i + 1}")
 
         # Assert
         assert isinstance(fig, Figure)
@@ -436,9 +436,7 @@ class TestQQPlotIntegration:
         residuals[5] = 5.0
         residuals[23] = -4.5
         outlier_indices = [5, 23]
-        annotations = [
-            f"S{i}" if i in outlier_indices else "" for i in range(100)
-        ]
+        annotations = [f"S{i}" if i in outlier_indices else "" for i in range(100)]
 
         # Act
         plot = QQPlot(residuals, annotations=annotations)
