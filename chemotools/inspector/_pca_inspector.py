@@ -16,6 +16,7 @@ from chemotools.plotting import (
     ExplainedVariancePlot,
 )
 from chemotools.plotting._utilities import annotate_points, add_confidence_ellipse
+from chemotools.plotting._styles import DATASET_COLORS
 from ._validate import _validate_and_extract_model, _validate_datasets_consistency
 
 
@@ -180,7 +181,7 @@ class PCAInspector:
         if self._X_val is not None:
             samples["val"] = self._X_val.shape[0]
         return samples
-    
+
     @property
     def wavenumbers(self) -> np.ndarray:
         """Return the feature names/indices."""
@@ -375,6 +376,7 @@ class PCAInspector:
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        confidence_ellipse: Union[bool, float, Sequence[str]] = True,
         include_spectra: bool = True,
         scores_figsize: Tuple[float, float] = (6, 6),
         loadings_figsize: Tuple[float, float] = (10, 5),
@@ -415,6 +417,13 @@ class PCAInspector:
             - dict: Dictionary mapping dataset names to annotation arrays
               e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
             If None (default), no annotations are added.
+        confidence_ellipse : bool, float, or sequence of str, default=True
+            Controls confidence ellipses on scores plots:
+            - True: adds 95% ellipse for 'train' dataset only
+            - False or None: no ellipses
+            - float (0.90, 0.95, 0.99): confidence level for 'train' only
+            - sequence of dataset names: ellipses for those datasets at 95%
+              e.g., ['train'], ['train', 'test'], ['train', 'test', 'val']
         include_spectra : bool, default=True
             Whether to include raw and preprocessed spectra plots (only if preprocessing exists)
         scores_figsize : tuple of float, default=(6, 6)
@@ -549,16 +558,31 @@ class PCAInspector:
         # When multiple datasets, combine them on the same plot with different colors
         if use_suffix:
             # Multiple datasets: combine on same plot
-            dataset_colors = {
-                "train": "#1f77b4",  # blue
-                "test": "#ff7f0e",  # orange
-                "val": "#2ca02c",  # green
-            }
+            # Use consistent dataset markers across the codebase
             dataset_markers = {
                 "train": "o",
                 "test": "s",
                 "val": "^",
             }
+
+            # Parse confidence_ellipse parameter
+            if confidence_ellipse is True:
+                ellipse_confidence = 0.95
+                ellipse_datasets = ["train"]
+            elif confidence_ellipse is False or confidence_ellipse is None:
+                ellipse_confidence = None
+                ellipse_datasets = []
+            elif isinstance(confidence_ellipse, (list, tuple)):
+                ellipse_confidence = 0.95
+                ellipse_datasets = list(confidence_ellipse)
+            elif isinstance(confidence_ellipse, (int, float)):
+                # Must be numeric value at this point
+                ellipse_confidence = float(confidence_ellipse)
+                ellipse_datasets = ["train"]
+            else:
+                # Shouldn't reach here based on type hints, but handle gracefully
+                ellipse_confidence = 0.95
+                ellipse_datasets = ["train"]
 
             for i, component_spec in enumerate(components_list, start=1):
                 fig, ax = plt.subplots(figsize=scores_figsize)
@@ -572,7 +596,7 @@ class PCAInspector:
                         scores = self.get_scores(ds)
                         _, y = self._get_raw_data(ds)
                         pc_scores = scores[:, component_spec]
-                        color = dataset_colors.get(ds, "#7f7f7f")
+                        color = DATASET_COLORS.get(ds, "#7f7f7f")
                         marker = dataset_markers.get(ds, "o")
 
                         if color_by_y and y is not None:
@@ -635,7 +659,7 @@ class PCAInspector:
                     # Create a custom plot with dataset-based coloring
                     for ds in datasets:
                         scores = scores_dict[ds]
-                        color = dataset_colors.get(ds, "#7f7f7f")
+                        color = DATASET_COLORS.get(ds, "#7f7f7f")
                         marker = dataset_markers.get(ds, "o")
 
                         ax.scatter(
@@ -650,28 +674,29 @@ class PCAInspector:
                             linewidth=0.5,
                         )
 
-                        # Add confidence ellipse only for train
-                        if ds == "train":
+                        # Add confidence ellipse if requested for this dataset
+                        if ellipse_confidence is not None and ds in ellipse_datasets:
                             x = scores[:, components_pair[0]]
                             y = scores[:, components_pair[1]]
                             add_confidence_ellipse(
                                 ax,
                                 x,
                                 y,
-                                confidence=0.95,
+                                confidence=ellipse_confidence,
                                 edgecolor=color,
                                 linewidth=2,
                                 linestyle="--",
                                 alpha=0.5,
                             )
-                        
+
                         # Add annotations if requested
                         if annotate_by is not None:
                             # Get labels for this dataset
+                            labels: np.ndarray | None
                             if isinstance(annotate_by, str):
-                                if annotate_by == 'sample_index':
+                                if annotate_by == "sample_index":
                                     labels = np.arange(scores.shape[0])
-                                elif annotate_by == 'y':
+                                elif annotate_by == "y":
                                     _, y_data = self._get_raw_data(ds)
                                     labels = y_data if y_data is not None else None
                                 else:
@@ -680,7 +705,7 @@ class PCAInspector:
                                 labels = np.asarray(annotate_by[ds])
                             else:
                                 labels = None
-                            
+
                             if labels is not None:
                                 annotate_points(
                                     ax,
@@ -690,7 +715,7 @@ class PCAInspector:
                                     fontsize=8,
                                     alpha=0.7,
                                     xytext=(3, 3),
-                                    textcoords='offset points'
+                                    textcoords="offset points",
                                 )
 
                     # Apply decorations with variance percentages
@@ -716,6 +741,22 @@ class PCAInspector:
             scores = self.get_scores(ds)
             _, y = self._get_raw_data(ds)
             explained_var = self.get_explained_variance_ratio()
+
+            # Parse confidence_ellipse parameter for single dataset
+            ellipse_param: bool | float | None
+            if confidence_ellipse is True:
+                ellipse_param = True  # Use ScoresPlot default (95%, train only)
+            elif confidence_ellipse is False or confidence_ellipse is None:
+                ellipse_param = None
+            elif isinstance(confidence_ellipse, (list, tuple)):
+                # Check if current dataset should have ellipse
+                ellipse_param = 0.95 if ds in confidence_ellipse else None
+            elif isinstance(confidence_ellipse, (int, float)):
+                # Numeric value - use it for train dataset only
+                ellipse_param = float(confidence_ellipse) if ds == "train" else None
+            else:
+                # Shouldn't reach here based on type hints
+                ellipse_param = None
 
             # Prepare color_by_dict
             color_by_dict = None
@@ -765,7 +806,7 @@ class PCAInspector:
                         components=components_pair,
                         color_by_dict=color_by_dict,
                         colormap="viridis",
-                        confidence_ellipse=True if ds == "train" else None,
+                        confidence_ellipse=ellipse_param,
                     )
                     scores_plot.render(ax=ax)
 
@@ -773,9 +814,9 @@ class PCAInspector:
                     if annotate_by is not None:
                         # Get labels for this dataset
                         if isinstance(annotate_by, str):
-                            if annotate_by == 'sample_index':
+                            if annotate_by == "sample_index":
                                 labels = np.arange(scores.shape[0])
-                            elif annotate_by == 'y':
+                            elif annotate_by == "y":
                                 labels = y if y is not None else None
                             else:
                                 labels = None
@@ -783,7 +824,7 @@ class PCAInspector:
                             labels = np.asarray(annotate_by[ds])
                         else:
                             labels = None
-                        
+
                         if labels is not None:
                             annotate_points(
                                 ax,
@@ -793,7 +834,7 @@ class PCAInspector:
                                 fontsize=8,
                                 alpha=0.7,
                                 xytext=(3, 3),
-                                textcoords='offset points'
+                                textcoords="offset points",
                             )
 
                     # Apply decorations with variance percentages
@@ -896,13 +937,6 @@ class PCAInspector:
 
         if is_multi_dataset:
             # Multiple datasets: plot all on same figure, color by dataset
-            # Define colors for different datasets
-            dataset_colors = {
-                "train": "#1f77b4",  # blue
-                "test": "#ff7f0e",  # orange
-                "val": "#2ca02c",  # green
-            }
-
             # Collect all data
             raw_data = {}
             preprocessed_data = {}
@@ -918,7 +952,7 @@ class PCAInspector:
             fig1, ax1 = plt.subplots(figsize=figsize)
 
             for ds in datasets:
-                color = dataset_colors.get(ds, "#7f7f7f")  # default gray if unknown
+                color = DATASET_COLORS.get(ds, "#7f7f7f")  # default gray if unknown
                 for i in range(raw_data[ds].shape[0]):
                     ax1.plot(
                         self.wavenumbers
@@ -950,7 +984,7 @@ class PCAInspector:
             fig2, ax2 = plt.subplots(figsize=figsize)
 
             for ds in datasets:
-                color = dataset_colors.get(ds, "#7f7f7f")
+                color = DATASET_COLORS.get(ds, "#7f7f7f")
                 for i in range(preprocessed_data[ds].shape[0]):
                     ax2.plot(
                         preprocessed_wavenumbers,
@@ -1072,4 +1106,3 @@ class PCAInspector:
             # If no wavenumbers provided, use feature indices
             X_preprocessed = self._get_preprocessed_data("train")
             return np.arange(X_preprocessed.shape[1])
-
