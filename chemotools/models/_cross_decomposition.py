@@ -175,7 +175,10 @@ class PLSRegression(_SklearnPLSRegression):
         super().fit(X, y)
 
         # Calculate explained variance ratios automatically
-        self._calculate_explained_variance(X, y)
+        (
+            self.explained_x_variance_ratio_,
+            self.explained_y_variance_ratio_,
+        ) = self._calculate_explained_variance_deflation(X, y)
 
         return self
 
@@ -200,32 +203,8 @@ class PLSRegression(_SklearnPLSRegression):
         """
         return super().transform(X, y=y, copy=copy)
 
-    def _calculate_explained_variance(self, X, y):
-        """Calculate explained variance ratios for X and Y spaces.
-
-        This is called automatically after fitting and populates:
-        - explained_x_variance_ratio_
-        - explained_y_variance_ratio_
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training vectors.
-        y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors.
-        """
-        # Convert to arrays if needed (handles pandas DataFrame/Series)
-        X_array = np.asarray(X)
-        y_array = np.asarray(y)
-        y_2d = y_array.reshape(-1, 1) if y_array.ndim == 1 else y_array
-
-        # Calculate X-space and Y-space variance using deflation method
-        self.explained_x_variance_ratio_, self.explained_y_variance_ratio_ = (
-            self._calculate_variance_deflation(X_array, y_2d)
-        )
-
-    def _calculate_variance_deflation(
-        self, X: np.ndarray, y: np.ndarray
+    def _calculate_explained_variance_deflation(
+        self, X, y
     ) -> tuple[np.ndarray, np.ndarray]:
         """Calculate explained variance ratios using sequential deflation.
 
@@ -238,10 +217,10 @@ class PLSRegression(_SklearnPLSRegression):
 
         Parameters
         ----------
-        X : ndarray of shape (n_samples, n_features)
-            Training vectors.
-        y : ndarray of shape (n_samples, n_targets)
-            Target vectors (2D).
+        X : array-like of shape (n_samples, n_features)
+            Training vectors. Accepts numpy arrays, pandas DataFrames.
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Target vectors. Accepts 1D (univariate) or 2D (multivariate) targets.
 
         Returns
         -------
@@ -249,9 +228,10 @@ class PLSRegression(_SklearnPLSRegression):
             - X variance ratios of shape (n_components,)
             - Y variance ratios of shape (n_components,)
         """
-        # Ensure data is numeric (handle object dtype from sklearn tests)
+        # Convert to arrays and ensure y is 2D (handles pandas DataFrame/Series)
         X = np.asarray(X, dtype=float)
-        y = np.asarray(y, dtype=float)
+        y_array = np.asarray(y, dtype=float)
+        y = np.atleast_2d(y_array).T if y_array.ndim == 1 else y_array
 
         # Center X and Y (PLS already centers data, but we need the original centered versions)
         X_centered = X - X.mean(axis=0)
@@ -259,13 +239,9 @@ class PLSRegression(_SklearnPLSRegression):
 
         # Check for scaling
         if self.scale:
-            X_std = X.std(axis=0, ddof=1)
-            y_std = y.std(axis=0, ddof=1)
-            # Avoid division by zero
-            X_std[X_std == 0] = 1.0
-            y_std[y_std == 0] = 1.0
-            X_centered /= X_std
-            y_centered /= y_std
+            # Scale to unit variance, avoiding division by zero
+            X_centered /= np.maximum(X.std(axis=0, ddof=1), 1.0)
+            y_centered /= np.maximum(y.std(axis=0, ddof=1), 1.0)
 
         # Total variance in centered data
         X_total_var = np.var(X_centered, axis=0).sum()
@@ -280,34 +256,30 @@ class PLSRegression(_SklearnPLSRegression):
 
         # For each component, calculate variance explained then deflate
         for a in range(self.n_components):
-            # Get scores and loadings for component a
-            t_a = self.x_scores_[:, a].reshape(-1, 1)  # (n_samples, 1)
-            p_a = self.x_loadings_[:, a].reshape(-1, 1)  # (n_features_X, 1)
-            c_a = self.y_loadings_[:, a].reshape(-1, 1)  # (n_features_y, 1)
+            # Get scores and loadings for component a (using slicing to keep 2D)
+            t_a = self.x_scores_[:, a : a + 1]  # (n_samples, 1)
+            p_a = self.x_loadings_[:, a : a + 1]  # (n_features_X, 1)
+            q_a = self.y_loadings_[:, a : a + 1]  # (n_features_y, 1)
 
             # Reconstruct X and y using current component
             X_hat = t_a @ p_a.T
-            y_hat = t_a @ c_a.T
+            y_hat = t_a @ q_a.T
 
             # Variance of current residual before deflation
             X_var_before = np.var(X_current, axis=0).sum()
             y_var_before = np.var(y_current, axis=0).sum()
 
             # Deflate X and y
-            X_current = X_current - X_hat
-            y_current = y_current - y_hat
+            X_current -= X_hat
+            y_current -= y_hat
 
             # Variance of residual after deflation
             X_var_after = np.var(X_current, axis=0).sum()
             y_var_after = np.var(y_current, axis=0).sum()
 
-            # Variance explained = reduction in variance
-            X_var_explained = X_var_before - X_var_after
-            y_var_explained = y_var_before - y_var_after
-
-            # Store as ratio of total variance
-            X_var_ratios.append(X_var_explained / X_total_var)
-            y_var_ratios.append(y_var_explained / y_total_var)
+            # Store variance explained as ratio of total variance
+            X_var_ratios.append((X_var_before - X_var_after) / X_total_var)
+            y_var_ratios.append((y_var_before - y_var_after) / y_total_var)
 
         return np.array(X_var_ratios), np.array(y_var_ratios)
 
