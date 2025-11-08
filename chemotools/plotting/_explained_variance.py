@@ -29,10 +29,6 @@ class ExplainedVariancePlot:
         For PCA, use `model.explained_variance_ratio_` directly.
         For PLS, use `chemotools.models.PLSRegression` which provides
         `explained_x_variance_ratio_` and `explained_y_variance_ratio_`.
-    xlabel : str, optional
-        Label for x-axis. Default is "Component".
-    ylabel : str, optional
-        Label for y-axis. Default is "Explained Variance Ratio".
     threshold : float or None, optional
         If provided, draws a horizontal dashed line at this variance level.
         Common values are 0.90, 0.95, 0.99. Default is 0.95.
@@ -78,28 +74,16 @@ class ExplainedVariancePlot:
     >>> ExplainedVariancePlot(pls.explained_y_variance_ratio_).render(ax=axes[1])
     >>> axes[1].set_title('Y-space (Response)')
 
-    **Example 4: Custom threshold**
+    **Example 4: Custom threshold and labels**
 
-    >>> plot = ExplainedVariancePlot(
-    ...     pca.explained_variance_ratio_,
-    ...     threshold=0.90
-    ... )
-    >>> plot.show()
-
-    **Example 5: No threshold line**
-
-    >>> plot = ExplainedVariancePlot(
-    ...     pca.explained_variance_ratio_,
-    ...     threshold=None
-    ... )
-    >>> plot.show()
+    >>> plot = ExplainedVariancePlot(pca.explained_variance_ratio_, threshold=0.90)
+    >>> plot.show(xlabel="PC Number", ylabel="Variance Explained")
     """
 
     def __init__(
         self,
         explained_variance_ratio: np.ndarray,
-        xlabel: str = "Component",
-        ylabel: str = "Explained Variance Ratio",
+        *,
         threshold: Optional[float] = 0.95,
     ):
         # Validate input
@@ -120,14 +104,15 @@ class ExplainedVariancePlot:
 
         self.explained_variance_ratio = explained_variance_ratio
         self.cumulative_variance = np.cumsum(explained_variance_ratio)
-        self.xlabel = xlabel
-        self.ylabel = ylabel
         self.threshold = threshold
 
     def show(
         self,
+        *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
+        xlabel: str = "Component",
+        ylabel: str = "Explained Variance Ratio",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -140,6 +125,10 @@ class ExplainedVariancePlot:
             Figure size (width, height) in inches.
         title : str, optional
             Plot title.
+        xlabel : str, optional
+            Label for x-axis. Default is "Component".
+        ylabel : str, optional
+            Label for y-axis. Default is "Explained Variance Ratio".
         xlim : tuple[float, float], optional
             X-axis limits (min, max).
         ylim : tuple[float, float], optional
@@ -162,13 +151,13 @@ class ExplainedVariancePlot:
         fig, ax = setup_figure(
             figsize=figsize or (10, 6),
             title=title,
-            xlabel=self.xlabel,
-            ylabel=self.ylabel,
+            xlabel=xlabel,
+            ylabel=ylabel,
             subplot_kw=subplot_kw,
             gridspec_kw=gridspec_kw,
         )
 
-        self.render(ax=ax, xlim=xlim, ylim=ylim, **kwargs)
+        self.render(ax=ax, xlabel=xlabel, ylabel=ylabel, xlim=xlim, ylim=ylim, **kwargs)
         ax.legend()
         plt.tight_layout()
         return fig
@@ -176,6 +165,9 @@ class ExplainedVariancePlot:
     def render(
         self,
         ax: Optional[Axes] = None,
+        *,
+        xlabel: str = "Component",
+        ylabel: str = "Explained Variance Ratio",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -186,6 +178,10 @@ class ExplainedVariancePlot:
         ----------
         ax : Axes, optional
             Matplotlib axes to render on. If None, current axes are used.
+        xlabel : str, optional
+            Label for x-axis. Default is "Component".
+        ylabel : str, optional
+            Label for y-axis. Default is "Explained Variance Ratio".
         xlim : tuple[float, float], optional
             X-axis limits (min, max).
         ylim : tuple[float, float], optional
@@ -203,17 +199,15 @@ class ExplainedVariancePlot:
 
         self._render_plot(ax, **kwargs)
 
+        # Set labels
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+
         # Apply axis limits if provided
         if xlim is not None:
             ax.set_xlim(xlim)
         if ylim is not None:
             ax.set_ylim(ylim)
-
-        # Set labels if not already set
-        if not ax.get_xlabel():
-            ax.set_xlabel(self.xlabel)
-        if not ax.get_ylabel():
-            ax.set_ylabel(self.ylabel)
 
         return ax
 

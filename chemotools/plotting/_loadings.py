@@ -28,10 +28,6 @@ class LoadingsPlot:
         - Single int (default 0): plots one component
         - List of ints: plots multiple components overlaid with legend
         Uses 0-based indexing.
-    xlabel : str, optional
-        X-axis label. Default is "Feature".
-    ylabel : str, optional
-        Y-axis label. Default is "Loading".
 
     Raises
     ------
@@ -53,21 +49,25 @@ class LoadingsPlot:
     ...     loadings,
     ...     feature_names=wavelengths,
     ...     components=[0, 1, 2],  # Plot PC1, PC2, PC3 together
+    ... )
+    >>> fig = plot.show(
+    ...     title="First 3 Principal Components",
     ...     xlabel='Wavenumber (cm⁻¹)',
     ...     ylabel='Loading Coefficient'
     ... )
-    >>> fig = plot.show(title="First 3 Principal Components")
 
     With custom axis labels:
 
     >>> plot = LoadingsPlot(
     ...     loadings,
     ...     feature_names=wavenumbers,
-    ...     components=0,
+    ...     components=0
+    ... )
+    >>> fig = plot.show(
+    ...     title="PLS LV1 Loadings",
     ...     xlabel="Wavenumber (cm⁻¹)",
     ...     ylabel="Loading Coefficient"
     ... )
-    >>> fig = plot.show(title="PLS LV1 Loadings")
 
     Zoom into a spectral region:
 
@@ -95,10 +95,9 @@ class LoadingsPlot:
     def __init__(
         self,
         loadings: np.ndarray,
+        *,
         feature_names: Optional[np.ndarray | list] = None,
         components: int | list[int] = 0,
-        xlabel: str = "Feature",
-        ylabel: str = "Loading",
     ):
         # Validate loadings shape
         if loadings.ndim != 2:
@@ -109,8 +108,6 @@ class LoadingsPlot:
 
         self.loadings = loadings
         self.n_features, self.n_components = loadings.shape
-        self.xlabel = xlabel
-        self.ylabel = ylabel
 
         # Handle components parameter - convert to list
         if isinstance(components, int):
@@ -140,8 +137,11 @@ class LoadingsPlot:
 
     def show(
         self,
+        *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
+        xlabel: str = "Feature",
+        ylabel: str = "Loading",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -154,6 +154,10 @@ class LoadingsPlot:
             Figure size as (width, height) in inches. Default is (12, 4).
         title : str, optional
             Title for the plot. If None, auto-generates title based on components.
+        xlabel : str, optional
+            X-axis label. Default is "Feature".
+        ylabel : str, optional
+            Y-axis label. Default is "Loading".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax). Useful for zooming into specific
             feature regions (e.g., spectral bands).
@@ -191,10 +195,12 @@ class LoadingsPlot:
 
         >>> plot.show(title="C-H Stretch Region", xlim=(2800, 3000))
 
-        Custom styling:
+        Custom labels and styling:
 
         >>> plot.show(
         ...     title="Custom Styled Loadings",
+        ...     xlabel="Wavenumber (cm⁻¹)",
+        ...     ylabel="Loading Coefficient",
         ...     linewidth=2.5,
         ...     alpha=0.7
         ... )
@@ -216,8 +222,8 @@ class LoadingsPlot:
         fig, ax = setup_figure(
             figsize=figsize or (12, 4),
             title=title,
-            xlabel=self.xlabel,
-            ylabel=self.ylabel,
+            xlabel=xlabel,
+            ylabel=ylabel,
             **figure_kwargs,
         )
 
@@ -250,6 +256,9 @@ class LoadingsPlot:
     def render(
         self,
         ax: Optional[Axes] = None,
+        *,
+        xlabel: str = "Feature",
+        ylabel: str = "Loading",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -260,6 +269,10 @@ class LoadingsPlot:
         ----------
         ax : Axes, optional
             Matplotlib axes to plot on. If None, creates new figure and axes.
+        xlabel : str, optional
+            X-axis label. Default is "Feature".
+        ylabel : str, optional
+            Y-axis label. Default is "Loading".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax).
         ylim : tuple[float, float], optional
@@ -296,6 +309,10 @@ class LoadingsPlot:
             fig = cast(Figure, figure)
 
         self._render_plot(ax, **kwargs)
+
+        # Set axis labels
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         # Add zero reference line
         ax.axhline(y=0, color="k", linestyle="-", linewidth=0.5, alpha=0.3)

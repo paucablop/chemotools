@@ -59,8 +59,8 @@ class TestSpectrumPlotBasics:
         y = np.random.randn(3, 100)
 
         # Act
-        plot = SpectrumPlot(x, y, xlabel="Wavenumber (cm⁻¹)", ylabel="Intensity (a.u.)")
-        fig = plot.show()
+        plot = SpectrumPlot(x, y)
+        fig = plot.show(xlabel="Wavenumber (cm⁻¹)", ylabel="Intensity (a.u.)")
 
         # Assert
         assert isinstance(fig, Figure)

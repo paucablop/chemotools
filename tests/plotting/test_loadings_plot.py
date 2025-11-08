@@ -101,13 +101,11 @@ class TestLoadingsPlotBasics:
         loadings = np.random.randn(100, 5)
 
         # Act
-        plot = LoadingsPlot(
-            loadings,
-            components=0,
+        plot = LoadingsPlot(loadings, components=0)
+        fig = plot.show(
             xlabel="Wavenumber (cm⁻¹)",
             ylabel="Loading Coefficient",
         )
-        fig = plot.show()
 
         # Assert
         ax = fig.axes[0]
@@ -658,10 +656,12 @@ class TestLoadingsPlotIntegration:
             loadings,
             feature_names=wavenumbers,
             components=0,
+        )
+        fig = plot.show(
+            title="PC1 Loadings",
             xlabel="Wavenumber (cm⁻¹)",
             ylabel="Loading Coefficient",
         )
-        fig = plot.show(title="PC1 Loadings")
 
         # Assert
         assert isinstance(fig, Figure)
@@ -684,10 +684,14 @@ class TestLoadingsPlotIntegration:
             loadings,
             feature_names=wavelengths,
             components=[0, 1, 2],
+        )
+        fig = plot.show(
+            title="PLS X-Loadings",
             xlabel="Wavelength (nm)",
             ylabel="PLS Loading",
+            linewidth=2,
+            alpha=0.7,
         )
-        fig = plot.show(title="PLS X-Loadings", linewidth=2, alpha=0.7)
 
         # Assert
         assert isinstance(fig, Figure)
@@ -708,10 +712,12 @@ class TestLoadingsPlotIntegration:
                 loadings,
                 feature_names=wavenumbers,
                 components=i,
+            )
+            plot.render(
+                ax=ax,
                 xlabel="Wavenumber (cm⁻¹)",
                 ylabel="Loading",
             )
-            plot.render(ax=ax)
             ax.set_title(f"PC{i + 1} Loadings")
             ax.grid(alpha=0.3)
 

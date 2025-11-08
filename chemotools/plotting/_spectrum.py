@@ -35,10 +35,6 @@ class SpectrumPlot:
         Y-axis data (e.g., spectra intensities). Can be 1D or 2D.
     labels : list[str], optional
         Labels for each spectrum (used for legend).
-    xlabel : str, optional
-        X-axis label. Default is "Wavelength (nm)".
-    ylabel : str, optional
-        Y-axis label. Default is "Absorbance".
     color_by : np.ndarray, optional
         Reference vector for coloring spectra. Can be:
         - Categorical (class labels): uses discrete colormap
@@ -63,7 +59,7 @@ class SpectrumPlot:
     >>> x = np.linspace(400, 2500, 100)
     >>> y = np.random.randn(5, 100)
     >>> plotter = SpectrumPlot(x, y)
-    >>> fig = plotter.show(title="NIR Spectra")
+    >>> fig = plotter.show(title="NIR Spectra", xlabel="Wavelength (nm)", ylabel="Absorbance")
 
     With categorical coloring:
 
@@ -93,8 +89,12 @@ class SpectrumPlot:
 
     With custom axis labels:
 
-    >>> plotter = SpectrumPlot(x, y, xlabel="Wavenumber (cm⁻¹)", ylabel="Intensity")
-    >>> fig = plotter.show(title="Raman Spectra")
+    >>> plotter = SpectrumPlot(x, y)
+    >>> fig = plotter.show(
+    ...     title="Raman Spectra",
+    ...     xlabel="Wavenumber (cm⁻¹)",
+    ...     ylabel="Intensity"
+    ... )
 
     Creating subplots:
 
@@ -108,9 +108,8 @@ class SpectrumPlot:
         self,
         x: np.ndarray,
         y: np.ndarray,
+        *,
         labels: Optional[list[str]] = None,
-        xlabel: str = "Wavelength (nm)",
-        ylabel: str = "Absorbance",
         color_by: Optional[np.ndarray] = None,
         colormap: Optional[str] = None,
         categorical: Optional[bool] = None,
@@ -119,8 +118,6 @@ class SpectrumPlot:
         self.x = x
         self.y = y if y.ndim == 2 else y.reshape(1, -1)
         self.labels = labels or [f"Spectrum {i}" for i in range(len(self.y))]
-        self.xlabel = xlabel
-        self.ylabel = ylabel
         self.color_by = color_by
         self.colorbar_label = colorbar_label
 
@@ -139,8 +136,11 @@ class SpectrumPlot:
 
     def show(
         self,
+        *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
+        xlabel: str = "Wavelength (nm)",
+        ylabel: str = "Absorbance",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -153,6 +153,10 @@ class SpectrumPlot:
             Figure size as (width, height) in inches. Default is (10, 3).
         title : str, optional
             Title for the plot.
+        xlabel : str, optional
+            X-axis label. Default is "Wavelength (nm)".
+        ylabel : str, optional
+            Y-axis label. Default is "Absorbance".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax). Useful for zooming into spectral regions.
             When xlim is set without ylim, the y-axis automatically scales to fit
@@ -187,8 +191,12 @@ class SpectrumPlot:
         --------
         Zoom into a spectral region (y-axis auto-scales):
 
-        >>> plot = SpectrumPlot(wavenumbers, spectra, xlabel="Wavenumber (cm⁻¹)")
-        >>> plot.show(title="C-H Stretch Region", xlim=(2800, 3000))
+        >>> plot = SpectrumPlot(wavenumbers, spectra)
+        >>> plot.show(
+        ...     title="C-H Stretch Region",
+        ...     xlabel="Wavenumber (cm⁻¹)",
+        ...     xlim=(2800, 3000)
+        ... )
 
         Manual control over both axes:
 
@@ -204,8 +212,8 @@ class SpectrumPlot:
         fig, ax = setup_figure(
             figsize=figsize or (10, 3),
             title=title,
-            xlabel=self.xlabel,
-            ylabel=self.ylabel,
+            xlabel=xlabel,
+            ylabel=ylabel,
             **figure_kwargs,
         )
 
@@ -236,6 +244,9 @@ class SpectrumPlot:
     def render(
         self,
         ax: Optional[Axes] = None,
+        *,
+        xlabel: str = "Wavelength (nm)",
+        ylabel: str = "Absorbance",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -246,6 +257,10 @@ class SpectrumPlot:
         ----------
         ax : Axes, optional
             Matplotlib axes to plot on. If None, creates new figure and axes.
+        xlabel : str, optional
+            X-axis label. Default is "Wavelength (nm)".
+        ylabel : str, optional
+            Y-axis label. Default is "Absorbance".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax). When set without ylim, the y-axis
             automatically scales to fit the data within the x-range.
@@ -270,6 +285,10 @@ class SpectrumPlot:
             fig = cast(Figure, figure)
 
         self._render_plot(ax, **kwargs)
+
+        # Set axis labels
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         # Apply axis limits
         if xlim is not None:

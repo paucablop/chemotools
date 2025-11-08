@@ -93,10 +93,13 @@ class TestExplainedVariancePlotBasics:
 
         # Act
         plot = ExplainedVariancePlot(variance_ratios)
+        fig = plot.show()
 
         # Assert
-        assert plot.xlabel == "Component"
-        assert plot.ylabel == "Explained Variance Ratio"
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Component"
+        assert ax.get_ylabel() == "Explained Variance Ratio"
+        plt.close(fig)
 
     def test_custom_axis_labels(self):
         """Test custom axis labels."""
@@ -104,15 +107,17 @@ class TestExplainedVariancePlotBasics:
         variance_ratios = np.array([0.45, 0.25, 0.15, 0.10, 0.05])
 
         # Act
-        plot = ExplainedVariancePlot(
-            variance_ratios,
+        plot = ExplainedVariancePlot(variance_ratios)
+        fig = plot.show(
             xlabel="Principal Component",
             ylabel="Variance Explained (%)",
         )
 
         # Assert
-        assert plot.xlabel == "Principal Component"
-        assert plot.ylabel == "Variance Explained (%)"
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Principal Component"
+        assert ax.get_ylabel() == "Variance Explained (%)"
+        plt.close(fig)
 
     def test_show_with_title(self):
         """Test show() with custom title."""

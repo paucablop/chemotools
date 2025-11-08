@@ -1009,12 +1009,12 @@ class PCAInspector:
                 y=X_raw,
                 color_by=color_values,
                 colormap="viridis",
-                xlabel=xlabel,
-                ylabel="Intensity",
             )
             fig1 = plot_raw.show(
                 figsize=figsize,
                 title=f"Raw Spectra ({ds.capitalize()})",
+                xlabel=xlabel,
+                ylabel="Intensity",
                 xlim=xlim,
             )
             figures["raw_spectra"] = fig1
@@ -1028,12 +1028,12 @@ class PCAInspector:
                 y=X_preprocessed,
                 color_by=color_values,
                 colormap="viridis",
-                xlabel=xlabel,
-                ylabel="Intensity",
             )
             fig2 = plot_preprocessed.show(
                 figsize=figsize,
                 title=f"Preprocessed Spectra ({ds.capitalize()})",
+                xlabel=xlabel,
+                ylabel="Intensity",
                 xlim=xlim,
             )
             figures["preprocessed_spectra"] = fig2
