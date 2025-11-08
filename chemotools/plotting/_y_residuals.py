@@ -151,7 +151,7 @@ class YResidualsPlot:
 
         # Set up x-axis values
         if self.x_values is None:
-            self.x_axis = np.arange(len(self.residuals_1d))
+            self.x_axis = np.asarray(np.arange(len(self.residuals_1d)))
             self.x_label = "Sample Index"
         else:
             if len(self.x_values) != len(self.residuals_1d):
