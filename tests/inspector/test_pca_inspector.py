@@ -14,7 +14,12 @@ class TestPCAInspectorInitialization:
     """Test PCAInspector initialization."""
 
     def test_init_with_fitted_pca_only_train(self, fitted_pca, dummy_data_loader):
-        """Test initialization with only training data."""
+        """Test initi        # Assert
+        assert len(figures) == 4  # 1 scores + loadings + variance + distances
+        assert "scores_1" in figures
+        assert "loadings" in figures
+        assert "variance" in figures
+        assert "distances" in figurestion with only training data."""
         # Arrange
         X, y = dummy_data_loader
 
@@ -443,7 +448,7 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert
@@ -463,15 +468,16 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert
-        # Single scores plot + loadings + variance
-        assert len(figures) == 3
+        # Single scores plot + loadings + variance + distances
+        assert len(figures) == 4
         assert "scores_1" in figures
         assert "loadings" in figures
         assert "variance" in figures
+        assert "distances" in figures
 
     def test_inspect_single_2d_scores_plot(self, fitted_pca, dummy_data_loader):
         """Test inspect with single 2D scores plot."""
@@ -481,14 +487,15 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert
-        assert len(figures) == 3  # 1 scores + loadings + variance
+        assert len(figures) == 4  # 1 scores + loadings + variance + distances
         assert "scores_1" in figures
         assert "loadings" in figures
         assert "variance" in figures
+        assert "distances" in figures
 
     def test_inspect_single_1d_scores_plot(self, fitted_pca, dummy_data_loader):
         """Test inspect with single 1D scores plot."""
@@ -497,13 +504,12 @@ class TestPCAInspectorInspect:
         inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
 
         # Act
-        figures = inspector.inspect(
-            components_scores=0, loadings_components=[0, 1], include_spectra=False
-        )
+        figures = inspector.inspect(components_scores=0, loadings_components=[0, 1])
 
         # Assert
-        assert len(figures) == 3  # 1 scores + loadings + variance
+        assert len(figures) == 4  # 1 scores + loadings + variance + distances
         assert "scores_1" in figures
+        assert "distances" in figures
 
     def test_inspect_multiple_mixed_scores_plots(self, fitted_pca, dummy_data_loader):
         """Test inspect with mixed 1D and 2D scores plots."""
@@ -515,12 +521,16 @@ class TestPCAInspectorInspect:
         figures = inspector.inspect(
             components_scores=[(0, 1), 0, 1],
             loadings_components=[0, 1],
-            include_spectra=False,
         )
 
         # Assert
-        assert len(figures) == 5  # 3 scores + loadings + variance
+        assert len(figures) == 6  # 3 scores + loadings + variance + distances
         assert "scores_1" in figures
+        assert "scores_2" in figures
+        assert "scores_3" in figures
+        assert "loadings" in figures
+        assert "variance" in figures
+        assert "distances" in figures
         assert "scores_2" in figures
         assert "scores_3" in figures
 
@@ -531,9 +541,7 @@ class TestPCAInspectorInspect:
         inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
 
         # Act
-        figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=0, include_spectra=False
-        )
+        figures = inspector.inspect(components_scores=(0, 1), loadings_components=0)
 
         # Assert
         assert "loadings" in figures
@@ -549,11 +557,11 @@ class TestPCAInspectorInspect:
             components_scores=(0, 1),
             loadings_components=[0, 1],
             color_by_y=False,
-            include_spectra=False,
         )
 
         # Assert
-        assert len(figures) == 3
+        assert len(figures) == 4
+        assert "distances" in figures
 
     def test_inspect_without_y_values(self, fitted_pca, dummy_data_loader):
         """Test inspect works without y values."""
@@ -563,11 +571,12 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert
-        assert len(figures) == 3
+        assert len(figures) == 4
+        assert "distances" in figures
 
     def test_inspect_custom_figsize(self, fitted_pca, dummy_data_loader):
         """Test inspect with custom figure sizes."""
@@ -582,7 +591,6 @@ class TestPCAInspectorInspect:
             scores_figsize=(8, 8),
             loadings_figsize=(12, 6),
             variance_figsize=(12, 6),
-            include_spectra=False,
         )
 
         # Assert
@@ -599,7 +607,7 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=True
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert
@@ -614,7 +622,7 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=True
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert - no spectra plots should be created without preprocessing
@@ -640,11 +648,11 @@ class TestPCAInspectorInspect:
             dataset="test",
             components_scores=(0, 1),
             loadings_components=[0, 1],
-            include_spectra=False,
         )
 
         # Assert
-        assert len(figures) == 3
+        assert len(figures) == 4
+        assert "distances" in figures
 
     def test_inspect_closes_figures_properly(self, fitted_pca, dummy_data_loader):
         """Test that figures can be properly closed after creation."""
@@ -654,7 +662,7 @@ class TestPCAInspectorInspect:
 
         # Act
         figures = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
         for fig in figures.values():
             plt.close(fig)
@@ -924,10 +932,10 @@ class TestPCAInspectorIntegration:
 
         # Act - call inspect multiple times
         figures1 = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
         figures2 = inspector.inspect(
-            components_scores=(0, 1), loadings_components=[0, 1], include_spectra=False
+            components_scores=(0, 1), loadings_components=[0, 1]
         )
 
         # Assert - should create new figures each time

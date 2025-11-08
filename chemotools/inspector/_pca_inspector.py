@@ -9,15 +9,18 @@ from sklearn.pipeline import Pipeline
 if TYPE_CHECKING:
     import matplotlib.figure
 
+from chemotools.outliers import HotellingT2, QResiduals
+
 from chemotools.plotting import (
-    SpectrumPlot,
-    ScoresPlot,
-    LoadingsPlot,
+    DistancesPlot,
     ExplainedVariancePlot,
+    LoadingsPlot,
+    ScoresPlot,
+    SpectrumPlot,
 )
 from chemotools.plotting._utilities import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS
-from ._validate import _validate_and_extract_model, _validate_datasets_consistency
+from ._validate import _validate_model, _validate_datasets_consistency
 
 
 class PCAInspector:
@@ -54,6 +57,8 @@ class PCAInspector:
 
     Attributes
     ----------
+    model : _BasePCA or Pipeline
+        The original model passed to the inspector
     estimator : _BasePCA
         The PCA estimator
     transformer : Pipeline or None
@@ -113,8 +118,8 @@ class PCAInspector:
         y_val: Optional[np.ndarray] = None,
         wavenumbers: Optional[Sequence] = None,
     ):
-        # Validate and extract model
-        self._estimator, self._transformer = _validate_and_extract_model(model)
+        # Validate and store the model
+        self._model = _validate_model(model)
 
         # Convert to numpy arrays
         self._X_train = np.asarray(X_train)
@@ -153,14 +158,23 @@ class PCAInspector:
         self._preprocessed_cache: Dict[str, np.ndarray] = {}
 
     @property
+    def model(self) -> Union[_BasePCA, Pipeline]:
+        """Return the original model (PCA or Pipeline)."""
+        return self._model
+
+    @property
     def estimator(self) -> _BasePCA:
         """Return the PCA estimator."""
-        return self._estimator
+        if isinstance(self._model, Pipeline):
+            return self._model[-1]
+        return self._model
 
     @property
     def transformer(self) -> Optional[Pipeline]:
         """Return the preprocessing pipeline (if available)."""
-        return self._transformer
+        if isinstance(self._model, Pipeline) and len(self._model) > 1:
+            return Pipeline(self._model.steps[:-1])
+        return None
 
     @property
     def nr_components(self) -> int:
@@ -267,6 +281,38 @@ class PCAInspector:
             Explained variance ratio
         """
         return self.estimator.explained_variance_ratio_
+
+    def get_hotelling_residuals(self, X: np.ndarray) -> np.ndarray:
+        """Get Hotelling's T-squared residuals for the specified dataset.
+
+        Parameters
+        ----------
+        dataset : {'train', 'test', 'val'}, default='train'
+            Which dataset to get residuals for
+
+        Returns
+        -------
+        residuals : ndarray of shape (n_samples,)
+            Hotelling's T-squared residuals
+        """
+        residuals = HotellingT2(self._model).fit_predict_residuals(X)
+        return residuals
+
+    def get_q_residuals(self, X: np.ndarray) -> np.ndarray:
+        """Get Q residuals for the specified dataset.
+
+        Parameters
+        ----------
+        dataset : {'train', 'test', 'val'}, default='train'
+            Which dataset to get residuals for
+
+        Returns
+        -------
+        residuals : ndarray of shape (n_samples,)
+            Q residuals
+        """
+        residuals = QResiduals(self._model).fit_predict_residuals(X)
+        return residuals
 
     def summary(self) -> None:
         """Display a formatted summary table of the PCA model.
@@ -376,12 +422,11 @@ class PCAInspector:
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
-        confidence_ellipse: Union[bool, float, Sequence[str]] = True,
-        include_spectra: bool = True,
         scores_figsize: Tuple[float, float] = (6, 6),
         loadings_figsize: Tuple[float, float] = (10, 5),
         variance_figsize: Tuple[float, float] = (10, 5),
         spectra_figsize: Tuple[float, float] = (12, 5),
+        distances_figsize: Tuple[float, float] = (8, 6),
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create multiple independent PCA diagnostic plots.
 
@@ -417,15 +462,6 @@ class PCAInspector:
             - dict: Dictionary mapping dataset names to annotation arrays
               e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
             If None (default), no annotations are added.
-        confidence_ellipse : bool, float, or sequence of str, default=True
-            Controls confidence ellipses on scores plots:
-            - True: adds 95% ellipse for 'train' dataset only
-            - False or None: no ellipses
-            - float (0.90, 0.95, 0.99): confidence level for 'train' only
-            - sequence of dataset names: ellipses for those datasets at 95%
-              e.g., ['train'], ['train', 'test'], ['train', 'test', 'val']
-        include_spectra : bool, default=True
-            Whether to include raw and preprocessed spectra plots (only if preprocessing exists)
         scores_figsize : tuple of float, default=(6, 6)
             Figure size for each scores plot (width, height) in inches
         loadings_figsize : tuple of float, default=(10, 5)
@@ -434,17 +470,22 @@ class PCAInspector:
             Figure size for variance plot (width, height) in inches
         spectra_figsize : tuple of float, default=(12, 5)
             Figure size for spectra plots (width, height) in inches
+        distances_figsize : tuple of float, default=(8, 6)
+            Figure size for distances plot (width, height) in inches
 
         Returns
         -------
         figures : dict
             Dictionary containing all created figures with keys:
-            - Single dataset: 'scores_1', 'scores_2', ..., 'loadings', 'variance', and optionally
-              'raw_spectra', 'preprocessed_spectra'
-            - Multiple datasets: 'scores_1', 'scores_2', ..., 'loadings', 'variance',
-              and optionally 'raw_spectra', 'preprocessed_spectra'. All scores and spectra plots
-              show all datasets together on the same figure, colored by dataset.
-            Number of 'scores_N' entries depends on components_scores parameter
+            - 'scores_1', 'scores_2', ...: One or more scores plots (with 95% confidence ellipses)
+            - 'loadings': Loadings plot
+            - 'variance': Explained variance plot
+            - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
+            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+
+            For multiple datasets, scores, distances, and spectra plots show all datasets together
+            on the same figure, colored by dataset. Number of 'scores_N' entries depends on
+            components_scores parameter
 
         Examples
         --------
@@ -458,8 +499,6 @@ class PCAInspector:
         >>> # Access individual figures
         >>> figs["scores_1_train"].savefig("scores_1_train.png")
         >>> figs["scores_1_test"].savefig("scores_1_test.png")
-        >>> # Without spectra plots
-        >>> figs = inspector.inspect(include_spectra=False)
         >>> # Single 2D scores plot (PC1 vs PC2)
         >>> figs = inspector.inspect(components_scores=(0, 1))
         >>> # Single 1D scores plot (PC1 vs sample index or y)
@@ -565,24 +604,9 @@ class PCAInspector:
                 "val": "^",
             }
 
-            # Parse confidence_ellipse parameter
-            if confidence_ellipse is True:
-                ellipse_confidence = 0.95
-                ellipse_datasets = ["train"]
-            elif confidence_ellipse is False or confidence_ellipse is None:
-                ellipse_confidence = None
-                ellipse_datasets = []
-            elif isinstance(confidence_ellipse, (list, tuple)):
-                ellipse_confidence = 0.95
-                ellipse_datasets = list(confidence_ellipse)
-            elif isinstance(confidence_ellipse, (int, float)):
-                # Must be numeric value at this point
-                ellipse_confidence = float(confidence_ellipse)
-                ellipse_datasets = ["train"]
-            else:
-                # Shouldn't reach here based on type hints, but handle gracefully
-                ellipse_confidence = 0.95
-                ellipse_datasets = ["train"]
+            # Always show confidence ellipse at 95% for all datasets
+            ellipse_confidence = 0.95
+            ellipse_datasets = datasets
 
             for i, component_spec in enumerate(components_list, start=1):
                 fig, ax = plt.subplots(figsize=scores_figsize)
@@ -728,21 +752,8 @@ class PCAInspector:
             _, y = self._get_raw_data(ds)
             explained_var = self.get_explained_variance_ratio()
 
-            # Parse confidence_ellipse parameter for single dataset
-            single_ellipse_param: bool | float | None
-            if confidence_ellipse is True:
-                single_ellipse_param = True  # Use ScoresPlot default (95%)
-            elif confidence_ellipse is False or confidence_ellipse is None:
-                single_ellipse_param = None
-            elif isinstance(confidence_ellipse, (list, tuple)):
-                # Check if current dataset should have ellipse
-                single_ellipse_param = 0.95 if ds in confidence_ellipse else None
-            elif isinstance(confidence_ellipse, (int, float)):
-                # Numeric value - use it directly
-                single_ellipse_param = float(confidence_ellipse)
-            else:
-                # Shouldn't reach here based on type hints
-                single_ellipse_param = None
+            # Always show confidence ellipse at 95%
+            single_ellipse_param: bool | float = 0.95
 
             # Prepare color_by parameter
             color_by = y if (color_by_y and y is not None) else None
@@ -840,9 +851,105 @@ class PCAInspector:
                 plt.tight_layout()
                 figures[f"scores_{i}"] = fig
 
-        # Optionally add spectra plots if preprocessing exists
+        # Add distances plot (Hotelling's T² vs Q residuals)
+        fig_distances, ax_distances = plt.subplots(figsize=distances_figsize)
+
+        if use_suffix:
+            # Multiple datasets: compose on same plot
+            for ds in datasets:
+                X, y = self._get_raw_data(ds)
+
+                # Calculate residuals
+                hotelling = HotellingT2(self._model, confidence=0.95)
+                hotelling.fit(X)
+                t2 = hotelling.predict_residuals(X)
+
+                q_res_model = QResiduals(self._model, confidence=0.95)
+                q_res_model.fit(X)
+                q = q_res_model.predict_residuals(X)
+
+                # Combine into 2D array
+                distances = np.column_stack([t2, q])
+
+                color = DATASET_COLORS.get(ds, "#7f7f7f")
+                marker = dataset_markers.get(ds, "o")
+
+                # Determine color_by parameter
+                color_by = y if (color_by_y and y is not None) else None
+
+                # Create and render DistancesPlot
+                dist_plot = DistancesPlot(
+                    distances=distances,
+                    distances_selection=(0, 1),
+                    color_by=color_by,
+                    label=ds.capitalize(),
+                    color=color if color_by is None else None,
+                    colormap="viridis" if color_by is not None else None,
+                    confidence_lines=(
+                        hotelling.critical_value_,
+                        q_res_model.critical_value_,
+                    ),
+                )
+                dist_plot.render(ax_distances)
+
+            # Apply decorations
+            ax_distances.set_xlabel("Hotelling's T²", fontsize=10)
+            ax_distances.set_ylabel("Q Residuals", fontsize=10)
+            ax_distances.set_title(
+                "Diagnostic Distances Plot", fontsize=12, fontweight="bold"
+            )
+            ax_distances.grid(alpha=0.3)
+            ax_distances.legend(loc="best")
+        else:
+            # Single dataset
+            ds = datasets[0]
+            X, y = self._get_raw_data(ds)
+
+            # Calculate residuals
+            hotelling = HotellingT2(self._model, confidence=0.95)
+            hotelling.fit(X)
+            t2 = hotelling.predict_residuals(X)
+
+            q_res_model = QResiduals(self._model, confidence=0.95)
+            q_res_model.fit(X)
+            q = q_res_model.predict_residuals(X)
+
+            # Combine into 2D array
+            distances = np.column_stack([t2, q])
+
+            # Determine color_by parameter
+            color_by = y if (color_by_y and y is not None) else None
+
+            # Create and render DistancesPlot
+            dist_plot = DistancesPlot(
+                distances=distances,
+                distances_selection=(0, 1),
+                color_by=color_by,
+                label=ds.capitalize(),
+                colormap="viridis" if color_by is not None else None,
+                confidence_lines=(
+                    hotelling.critical_value_,
+                    q_res_model.critical_value_,
+                ),
+            )
+            dist_plot.render(ax_distances)
+
+            # Apply decorations
+            ax_distances.set_xlabel("Hotelling's T²", fontsize=10)
+            ax_distances.set_ylabel("Q Residuals", fontsize=10)
+            ax_distances.set_title(
+                f"Diagnostic Distances Plot ({ds.capitalize()})",
+                fontsize=12,
+                fontweight="bold",
+            )
+            ax_distances.grid(alpha=0.3)
+
+        plt.tight_layout()
+        figures["distances"] = fig_distances
+
+        # Add spectra plots if preprocessing exists
         # Note: We call inspect_spectra once with all datasets to plot them together
-        if include_spectra and self.transformer is not None:
+        if self.transformer is not None:
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,

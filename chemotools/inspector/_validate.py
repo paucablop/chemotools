@@ -8,6 +8,45 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
 
+def _validate_model(
+    model: Union[_BasePCA, _PLS, Pipeline],
+) -> Union[_BasePCA, _PLS, Pipeline]:
+    """Validate model without extracting components.
+
+    Parameters
+    ----------
+    model : Union[_BasePCA, _PLS, Pipeline]
+        The model to validate
+
+    Returns
+    -------
+    model : Union[_BasePCA, _PLS, Pipeline]
+        The validated model (same as input)
+
+    Raises
+    ------
+    TypeError
+        If model is not a valid type
+    ValueError
+        If model is not fitted
+    """
+    check_is_fitted(model)
+
+    # Determine the estimator
+    if isinstance(model, Pipeline):
+        estimator = model[-1]
+    else:
+        estimator = model
+
+    if not isinstance(estimator, (_BasePCA, _PLS)):
+        raise TypeError(
+            f"Model must be _BasePCA, _PLS, or Pipeline ending with one. "
+            f"Got {type(estimator)}"
+        )
+
+    return model
+
+
 def _validate_and_extract_model(
     model: Union[_BasePCA, _PLS, Pipeline],
 ) -> Tuple[Union[_BasePCA, _PLS], Optional[Pipeline]]:
