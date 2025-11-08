@@ -11,16 +11,26 @@ if TYPE_CHECKING:
 
 from chemotools.outliers import HotellingT2, QResiduals
 
-from chemotools.plotting import (
-    DistancesPlot,
-    ExplainedVariancePlot,
-    LoadingsPlot,
-    ScoresPlot,
-    SpectrumPlot,
-)
-from chemotools.plotting._utilities import annotate_points
-from chemotools.plotting._styles import DATASET_COLORS
 from ._validate import _validate_model, _validate_datasets_consistency
+from ._inspector_utils import (
+    normalize_datasets,
+    normalize_components,
+    get_xlabel_for_features,
+)
+from ._plot_core import (
+    create_variance_plot,
+    create_loadings_plot,
+    create_scores_plot_single_dataset,
+    create_scores_plot_multi_dataset,
+)
+from ._plot_diagnostics import (
+    create_distances_plot_single_dataset,
+    create_distances_plot_multi_dataset,
+)
+from ._plot_spectra import (
+    create_spectra_plots_single_dataset,
+    create_spectra_plots_multi_dataset,
+)
 
 
 class PCAInspector:
@@ -613,441 +623,106 @@ class PCAInspector:
         >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
         >>> figs['loadings'].savefig('loadings.png')
         """
-        import matplotlib.pyplot as plt
-
         figures = {}
 
-        # Normalize dataset to always be a list
-        datasets = [dataset] if isinstance(dataset, str) else list(dataset)
-
-        # Determine if we need to add dataset suffixes to figure names
+        # Normalize inputs
+        datasets = normalize_datasets(dataset)
+        components_list = normalize_components(components_scores)
         use_suffix = len(datasets) > 1
 
-        # Variance plot is shared across all datasets (only created once)
-        fig_variance, ax_variance = plt.subplots(figsize=variance_figsize)
-        variance_plot = ExplainedVariancePlot(
+        # Create variance plot (shared across all datasets)
+        figures["variance"] = create_variance_plot(
             explained_variance_ratio=self.get_explained_variance_ratio(),
-            threshold=variance_threshold,
-        )
-        variance_plot.render(ax=ax_variance)
-
-        # Apply decorations
-        ax_variance.set_title(
-            "Explained Variance by Component", fontsize=12, fontweight="bold"
-        )
-        ax_variance.legend(loc="upper right")
-        ax_variance.grid(alpha=0.3)
-        plt.tight_layout()
-        figures["variance"] = fig_variance
-
-        # Loadings plot is shared across all datasets (only created once)
-        fig_loadings, ax_loadings = plt.subplots(figsize=loadings_figsize)
-
-        # Convert to list if it's a sequence for type compatibility
-        loadings_comps = (
-            loadings_components
-            if isinstance(loadings_components, int)
-            else list(loadings_components)
+            variance_threshold=variance_threshold,
+            figsize=variance_figsize,
         )
 
-        # Determine xlabel based on wavenumbers
-        xlabel = (
-            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
-        )
-
-        # Get preprocessed wavenumbers since loadings are on preprocessed features
+        # Create loadings plot (shared across all datasets)
+        xlabel = get_xlabel_for_features(self._wavenumbers is not None)
         preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
-
-        loadings = self.get_loadings()
-        loadings_plot = LoadingsPlot(
-            loadings=loadings,
+        figures["loadings"] = create_loadings_plot(
+            loadings=self.get_loadings(),
             feature_names=preprocessed_wavenumbers,
-            components=loadings_comps,
+            loadings_components=loadings_components,
+            xlabel=xlabel,
+            figsize=loadings_figsize,
         )
-        loadings_plot.render(ax=ax_loadings, linewidth=2, alpha=0.7)
-
-        # Apply decorations
-        ax_loadings.set_xlabel(xlabel, fontsize=10)
-        ax_loadings.set_ylabel("Loading", fontsize=10)
-
-        if isinstance(loadings_components, int):
-            title = f"PC{loadings_components + 1} Loadings"
-        else:
-            comp_str = ", ".join([f"PC{c + 1}" for c in loadings_components])
-            title = f"Loadings: {comp_str}"
-        ax_loadings.set_title(title, fontsize=12, fontweight="bold")
-        ax_loadings.grid(alpha=0.3)
-        plt.tight_layout()
-        figures["loadings"] = fig_loadings
-
-        # Normalize components_scores to always be a sequence
-        if isinstance(components_scores, int):
-            # Single component like 0 (for PC1 vs index/y)
-            components_list = [components_scores]
-        elif (
-            isinstance(components_scores, tuple)
-            and len(components_scores) == 2
-            and isinstance(components_scores[0], int)
-        ):
-            # Single pair like (0, 1)
-            components_list = [components_scores]
-        else:
-            # Sequence of components/pairs like ((0, 1), (1, 2)) or [0, 1, (0, 1)]
-            components_list = list(components_scores)
 
         # Create scores plots
-        # When multiple datasets, combine them on the same plot with different colors
         if use_suffix:
             # Multiple datasets: combine on same plot
-            # Use consistent dataset markers across the codebase
-            dataset_markers = {
-                "train": "o",
-                "test": "s",
-                "val": "^",
-            }
+            explained_var = self.get_explained_variance_ratio()
 
-            # Always show confidence ellipse at 95% for all datasets
-            ellipse_confidence = 0.95
-            ellipse_datasets = datasets
+            # Prepare datasets data
+            datasets_data = {}
+            for ds in datasets:
+                datasets_data[ds] = {
+                    "scores": self.get_scores(ds),
+                    "y": self._get_raw_data(ds)[1],
+                }
 
             for i, component_spec in enumerate(components_list, start=1):
-                fig, ax = plt.subplots(figsize=scores_figsize)
-                explained_var = self.get_explained_variance_ratio()
-
-                if isinstance(component_spec, int):
-                    # 1D plot: Single component vs sample index or y-value
-                    var_pct = explained_var[component_spec] * 100
-
-                    for ds in datasets:
-                        scores = self.get_scores(ds)
-                        _, y = self._get_raw_data(ds)
-                        pc_scores = scores[:, component_spec]
-                        color = DATASET_COLORS.get(ds, "#7f7f7f")
-                        marker = dataset_markers.get(ds, "o")
-
-                        if color_by_y and y is not None:
-                            # Plot PC score vs y-value
-                            ax.scatter(
-                                y,
-                                pc_scores,
-                                c=color,
-                                marker=marker,
-                                alpha=0.7,
-                                s=50,
-                                label=ds.capitalize(),
-                            )
-                            xlabel_text = "y-value"
-                        else:
-                            # Plot PC score vs sample index
-                            ax.scatter(
-                                range(len(pc_scores)),
-                                pc_scores,
-                                c=color,
-                                marker=marker,
-                                alpha=0.7,
-                                s=50,
-                                label=ds.capitalize(),
-                            )
-                            xlabel_text = "Sample Index"
-
-                    # Apply decorations
-                    ax.set_xlabel(xlabel_text, fontsize=10)
-                    ax.set_ylabel(
-                        f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
-                    )
-                    ax.set_title(
-                        f"Scores: PC{component_spec + 1}",
-                        fontsize=12,
-                        fontweight="bold",
-                    )
-                    ax.grid(alpha=0.3)
-                    ax.legend(loc="best")
-                else:
-                    # 2D plot: Component pair scatter plot using composable ScoresPlot
-                    components_pair = component_spec
-                    var_x = explained_var[components_pair[0]] * 100
-                    var_y = explained_var[components_pair[1]] * 100
-
-                    # Determine which datasets should have ellipses
-                    ellipse_datasets_set = (
-                        set(ellipse_datasets)
-                        if ellipse_confidence is not None
-                        else set()
-                    )
-
-                    # Compose multiple datasets on same axes
-                    for ds in datasets:
-                        scores = self.get_scores(ds)
-                        _, y = self._get_raw_data(ds)
-                        color = DATASET_COLORS.get(ds, "#7f7f7f")
-
-                        # Determine if this dataset should have ellipse
-                        should_add_ellipse = ds in ellipse_datasets_set
-                        ellipse_param = (
-                            ellipse_confidence if should_add_ellipse else None
-                        )
-
-                        # Determine color_by parameter
-                        color_by = y if (color_by_y and y is not None) else None
-
-                        # Create and render ScoresPlot for this dataset
-                        plot = ScoresPlot(
-                            scores=scores,
-                            components=components_pair,
-                            color_by=color_by,
-                            label=ds.capitalize(),
-                            color=color if color_by is None else None,
-                            colormap="viridis" if color_by is not None else None,
-                            confidence_ellipse=ellipse_param,
-                        )
-                        plot.render(ax)
-
-                        # Add annotations if requested
-                        if annotate_by is not None:
-                            # Get labels for this dataset
-                            labels: np.ndarray | None
-                            if isinstance(annotate_by, str):
-                                if annotate_by == "sample_index":
-                                    labels = np.arange(scores.shape[0])
-                                elif annotate_by == "y":
-                                    labels = y if y is not None else None
-                                else:
-                                    labels = None
-                            elif isinstance(annotate_by, dict) and ds in annotate_by:
-                                labels = np.asarray(annotate_by[ds])
-                            else:
-                                labels = None
-
-                            if labels is not None:
-                                annotate_points(
-                                    ax,
-                                    scores[:, components_pair[0]],
-                                    scores[:, components_pair[1]],
-                                    labels,
-                                    fontsize=8,
-                                    alpha=0.7,
-                                    xytext=(3, 3),
-                                    textcoords="offset points",
-                                )
-
-                    # Apply decorations with variance percentages
-                    ax.set_xlabel(
-                        f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
-                    )
-                    ax.set_ylabel(
-                        f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
-                    )
-                    ax.set_title(
-                        f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1}",
-                        fontsize=12,
-                        fontweight="bold",
-                    )
-                    ax.grid(alpha=0.3)
-                    ax.legend(loc="best")
-
-                plt.tight_layout()
+                fig = create_scores_plot_multi_dataset(
+                    component_spec=component_spec,
+                    datasets_data=datasets_data,
+                    explained_var=explained_var,
+                    color_by_y=color_by_y,
+                    annotate_by=annotate_by,
+                    figsize=scores_figsize,
+                )
                 figures[f"scores_{i}"] = fig
         else:
-            # Single dataset: use original logic
+            # Single dataset
             ds = datasets[0]
             scores = self.get_scores(ds)
             _, y = self._get_raw_data(ds)
             explained_var = self.get_explained_variance_ratio()
 
-            # Always show confidence ellipse at 95%
-            single_ellipse_param: bool | float = 0.95
-
-            # Prepare color_by parameter
-            color_by = y if (color_by_y and y is not None) else None
-
-            # Create scores plots
+            # Create scores plots for single dataset
             for i, component_spec in enumerate(components_list, start=1):
-                fig, ax = plt.subplots(figsize=scores_figsize)
-
-                if isinstance(component_spec, int):
-                    # 1D plot: Single component vs sample index or y-value
-                    pc_scores = scores[:, component_spec]
-                    var_pct = explained_var[component_spec] * 100
-
-                    if color_by_y and y is not None:
-                        # Plot PC score vs y-value
-                        scatter = ax.scatter(
-                            y, pc_scores, c=y, cmap="viridis", alpha=0.7, s=50
-                        )
-                        plt.colorbar(scatter, ax=ax, label="y-value")
-                        xlabel_text = "y-value"
-                    else:
-                        # Plot PC score vs sample index
-                        ax.scatter(range(len(pc_scores)), pc_scores, alpha=0.7, s=50)
-                        xlabel_text = "Sample Index"
-
-                    # Apply decorations
-                    ax.set_xlabel(xlabel_text, fontsize=10)
-                    ax.set_ylabel(
-                        f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
-                    )
-                    ax.set_title(
-                        f"Scores: PC{component_spec + 1} ({ds.capitalize()})",
-                        fontsize=12,
-                        fontweight="bold",
-                    )
-                    ax.grid(alpha=0.3)
-                else:
-                    # 2D plot: Component pair scatter plot using composable ScoresPlot
-                    components_pair = component_spec
-                    var_x = explained_var[components_pair[0]] * 100
-                    var_y = explained_var[components_pair[1]] * 100
-
-                    # Create and render ScoresPlot
-                    scores_plot = ScoresPlot(
-                        scores=scores,
-                        components=components_pair,
-                        color_by=color_by,
-                        label=ds.capitalize(),
-                        colormap="viridis" if color_by is not None else None,
-                        confidence_ellipse=single_ellipse_param,
-                    )
-                    scores_plot.render(ax=ax)
-
-                    # Add annotations if requested
-                    if annotate_by is not None:
-                        # Get labels for this dataset
-                        if isinstance(annotate_by, str):
-                            if annotate_by == "sample_index":
-                                labels = np.arange(scores.shape[0])
-                            elif annotate_by == "y":
-                                labels = y if y is not None else None
-                            else:
-                                labels = None
-                        elif isinstance(annotate_by, dict) and ds in annotate_by:
-                            labels = np.asarray(annotate_by[ds])
-                        else:
-                            labels = None
-
-                        if labels is not None:
-                            annotate_points(
-                                ax,
-                                scores[:, components_pair[0]],
-                                scores[:, components_pair[1]],
-                                labels,
-                                fontsize=8,
-                                alpha=0.7,
-                                xytext=(3, 3),
-                                textcoords="offset points",
-                            )
-
-                    # Apply decorations with variance percentages
-                    ax.set_xlabel(
-                        f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
-                    )
-                    ax.set_ylabel(
-                        f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
-                    )
-                    ax.set_title(
-                        f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1} ({ds.capitalize()})",
-                        fontsize=12,
-                        fontweight="bold",
-                    )
-                    ax.grid(alpha=0.3)
-
-                plt.tight_layout()
+                fig = create_scores_plot_single_dataset(
+                    component_spec=component_spec,
+                    scores=scores,
+                    y=y,
+                    explained_var=explained_var,
+                    dataset_name=ds,
+                    color_by_y=color_by_y,
+                    annotate_by=annotate_by,
+                    figsize=scores_figsize,
+                )
                 figures[f"scores_{i}"] = fig
 
-        # Add distances plot (Hotelling's T² vs Q residuals)
-        fig_distances, ax_distances = plt.subplots(figsize=distances_figsize)
-
+        # Create distances plot
         if use_suffix:
             # Multiple datasets: compose on same plot
+            datasets_data = {}
             for ds in datasets:
                 X, y = self._get_raw_data(ds)
+                datasets_data[ds] = {"X": X, "y": y}
 
-                # Calculate residuals
-                hotelling = HotellingT2(self._model, confidence=self._confidence)
-                hotelling.fit(X)
-                t2 = hotelling.predict_residuals(X)
-
-                q_res_model = QResiduals(self._model, confidence=self._confidence)
-                q_res_model.fit(X)
-                q = q_res_model.predict_residuals(X)
-
-                # Combine into 2D array
-                distances = np.column_stack([t2, q])
-
-                color = DATASET_COLORS.get(ds, "#7f7f7f")
-                marker = dataset_markers.get(ds, "o")
-
-                # Determine color_by parameter
-                color_by = y if (color_by_y and y is not None) else None
-
-                # Create and render DistancesPlot
-                dist_plot = DistancesPlot(
-                    distances=distances,
-                    distances_selection=(0, 1),
-                    color_by=color_by,
-                    label=ds.capitalize(),
-                    color=color if color_by is None else None,
-                    colormap="viridis" if color_by is not None else None,
-                    confidence_lines=(
-                        hotelling.critical_value_,
-                        q_res_model.critical_value_,
-                    ),
-                )
-                dist_plot.render(ax_distances)
-
-            # Apply decorations
-            ax_distances.set_xlabel("Hotelling's T²", fontsize=10)
-            ax_distances.set_ylabel("Q Residuals", fontsize=10)
-            ax_distances.set_title(
-                "Diagnostic Distances Plot", fontsize=12, fontweight="bold"
+            fig_distances = create_distances_plot_multi_dataset(
+                datasets_data=datasets_data,
+                model=self._model,
+                confidence=self._confidence,
+                color_by_y=color_by_y,
+                figsize=distances_figsize,
             )
-            ax_distances.grid(alpha=0.3)
-            ax_distances.legend(loc="best")
+            figures["distances"] = fig_distances
         else:
             # Single dataset
             ds = datasets[0]
             X, y = self._get_raw_data(ds)
 
-            # Calculate residuals
-            hotelling = HotellingT2(self._model, confidence=self._confidence)
-            hotelling.fit(X)
-            t2 = hotelling.predict_residuals(X)
-
-            q_res_model = QResiduals(self._model, confidence=self._confidence)
-            q_res_model.fit(X)
-            q = q_res_model.predict_residuals(X)
-
-            # Combine into 2D array
-            distances = np.column_stack([t2, q])
-
-            # Determine color_by parameter
-            color_by = y if (color_by_y and y is not None) else None
-
-            # Create and render DistancesPlot
-            dist_plot = DistancesPlot(
-                distances=distances,
-                distances_selection=(0, 1),
-                color_by=color_by,
-                label=ds.capitalize(),
-                colormap="viridis" if color_by is not None else None,
-                confidence_lines=(
-                    hotelling.critical_value_,
-                    q_res_model.critical_value_,
-                ),
+            fig_distances = create_distances_plot_single_dataset(
+                X=X,
+                y=y,
+                model=self._model,
+                confidence=self._confidence,
+                dataset_name=ds,
+                color_by_y=color_by_y,
+                figsize=distances_figsize,
             )
-            dist_plot.render(ax_distances)
-
-            # Apply decorations
-            ax_distances.set_xlabel("Hotelling's T²", fontsize=10)
-            ax_distances.set_ylabel("Q Residuals", fontsize=10)
-            ax_distances.set_title(
-                f"Diagnostic Distances Plot ({ds.capitalize()})",
-                fontsize=12,
-                fontweight="bold",
-            )
-            ax_distances.grid(alpha=0.3)
-
-        plt.tight_layout()
-        figures["distances"] = fig_distances
+            figures["distances"] = fig_distances
 
         # Add spectra plots if preprocessing exists
         # Note: We call inspect_spectra once with all datasets to plot them together
@@ -1120,19 +795,17 @@ class PCAInspector:
         figures = {}
 
         # Normalize dataset to always be a list
-        datasets = [dataset] if isinstance(dataset, str) else list(dataset)
-
-        # Determine if multiple datasets (color by dataset) or single (color by y)
+        datasets = normalize_datasets(dataset)
         is_multi_dataset = len(datasets) > 1
 
         # Determine xlabel based on wavenumbers
-        xlabel = (
-            "Wavenumber (cm⁻¹)" if self._wavenumbers is not None else "Feature Index"
-        )
+        xlabel = get_xlabel_for_features(self._wavenumbers is not None)
+
+        # Get preprocessed wavenumbers (may be subset if feature selection)
+        preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
 
         if is_multi_dataset:
             # Multiple datasets: plot all on same figure, color by dataset
-            # Collect all data
             raw_data = {}
             preprocessed_data = {}
             for ds in datasets:
@@ -1141,110 +814,32 @@ class PCAInspector:
                 raw_data[ds] = X_raw
                 preprocessed_data[ds] = X_preprocessed
 
-            # Create raw spectra plot with all datasets
-            import matplotlib.pyplot as plt
-
-            fig1, ax1 = plt.subplots(figsize=figsize)
-
-            for ds in datasets:
-                color = DATASET_COLORS.get(ds, "#7f7f7f")  # default gray if unknown
-                for i in range(raw_data[ds].shape[0]):
-                    ax1.plot(
-                        self.wavenumbers
-                        if self.wavenumbers is not None
-                        else range(raw_data[ds].shape[1]),
-                        raw_data[ds][i, :],
-                        color=color,
-                        alpha=0.6,
-                        linewidth=1,
-                        label=ds.capitalize()
-                        if i == 0
-                        else None,  # Label only first line
-                    )
-
-            ax1.set_xlabel(xlabel, fontsize=10)
-            ax1.set_ylabel("Intensity", fontsize=10)
-            ax1.set_title("Raw Spectra Comparison", fontsize=12, fontweight="bold")
-            ax1.grid(alpha=0.3)
-            if xlim:
-                ax1.set_xlim(xlim)
-            ax1.legend(loc="best")
-            plt.tight_layout()
-            figures["raw_spectra"] = fig1
-
-            # Get wavenumbers for preprocessed data (may be subset if feature selection)
-            preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
-
-            # Create preprocessed spectra plot with all datasets
-            fig2, ax2 = plt.subplots(figsize=figsize)
-
-            for ds in datasets:
-                color = DATASET_COLORS.get(ds, "#7f7f7f")
-                for i in range(preprocessed_data[ds].shape[0]):
-                    ax2.plot(
-                        preprocessed_wavenumbers,
-                        preprocessed_data[ds][i, :],
-                        color=color,
-                        alpha=0.6,
-                        linewidth=1,
-                        label=ds.capitalize() if i == 0 else None,
-                    )
-
-            ax2.set_xlabel(xlabel, fontsize=10)
-            ax2.set_ylabel("Intensity", fontsize=10)
-            ax2.set_title(
-                "Preprocessed Spectra Comparison", fontsize=12, fontweight="bold"
+            figures = create_spectra_plots_multi_dataset(
+                raw_data=raw_data,
+                preprocessed_data=preprocessed_data,
+                wavenumbers=self.wavenumbers,
+                preprocessed_wavenumbers=preprocessed_wavenumbers,
+                xlabel=xlabel,
+                xlim=xlim,
+                figsize=figsize,
             )
-            ax2.grid(alpha=0.3)
-            if xlim:
-                ax2.set_xlim(xlim)
-            ax2.legend(loc="best")
-            plt.tight_layout()
-            figures["preprocessed_spectra"] = fig2
-
         else:
-            # Single dataset: use existing logic with color_by_y option
+            # Single dataset
             ds = datasets[0]
             X_raw, y = self._get_raw_data(ds)
             X_preprocessed = self._get_preprocessed_data(ds)
 
-            color_values = None
-            if color_by_y and y is not None:
-                color_values = y
-
-            # Figure 1: Raw spectra - use .show() for complete figure
-            plot_raw = SpectrumPlot(
-                x=self.wavenumbers,
-                y=X_raw,
-                color_by=color_values,
-                colormap="viridis",
-            )
-            fig1 = plot_raw.show(
-                figsize=figsize,
-                title=f"Raw Spectra ({ds.capitalize()})",
+            figures = create_spectra_plots_single_dataset(
+                X_raw=X_raw,
+                X_preprocessed=X_preprocessed,
+                y=y,
+                wavenumbers=self.wavenumbers,
+                preprocessed_wavenumbers=preprocessed_wavenumbers,
+                dataset_name=ds,
+                color_by_y=color_by_y,
                 xlabel=xlabel,
-                ylabel="Intensity",
                 xlim=xlim,
-            )
-            figures["raw_spectra"] = fig1
-
-            # Figure 2: Preprocessed spectra - use .show() for complete figure
-            # Get wavenumbers for preprocessed data (may be subset if feature selection)
-            preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
-
-            plot_preprocessed = SpectrumPlot(
-                x=preprocessed_wavenumbers,
-                y=X_preprocessed,
-                color_by=color_values,
-                colormap="viridis",
-            )
-            fig2 = plot_preprocessed.show(
                 figsize=figsize,
-                title=f"Preprocessed Spectra ({ds.capitalize()})",
-                xlabel=xlabel,
-                ylabel="Intensity",
-                xlim=xlim,
             )
-            figures["preprocessed_spectra"] = fig2
 
         return figures

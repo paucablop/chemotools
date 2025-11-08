@@ -12,7 +12,7 @@ from chemotools.plotting._spectrum import SpectrumPlot
 from chemotools.plotting._scores import ScoresPlot
 from chemotools.plotting._loadings import LoadingsPlot
 from chemotools.plotting._distances import DistancesPlot
-from chemotools.plotting._styles import DATASET_COLORS
+from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._explained_variance import ExplainedVariancePlot
 
 __all__ = [
@@ -33,4 +33,5 @@ __all__ = [
     "calculate_ylim_for_xlim",
     # Constants
     "DATASET_COLORS",
+    "DATASET_MARKERS",
 ]

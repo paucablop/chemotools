@@ -4,3 +4,10 @@ DATASET_COLORS = {
     "test": "#E69F00",
     "val": "#009E73",
 }
+
+# Default marker styles for datasets
+DATASET_MARKERS = {
+    "train": "o",
+    "test": "s",
+    "val": "^",
+}
