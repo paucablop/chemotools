@@ -54,6 +54,9 @@ class PCAInspector:
     wavenumbers : array-like of shape (n_features,), optional
         Feature names (e.g., wavenumbers for spectroscopy)
         If None, uses feature indices
+    confidence : float, default=0.95
+        Confidence level for outlier detection limits (Hotelling's T² and Q residuals).
+        Must be between 0 and 1. Used to calculate critical values for diagnostic plots.
 
     Attributes
     ----------
@@ -71,6 +74,12 @@ class PCAInspector:
         Number of samples in each dataset
     wavenumbers : ndarray
         Feature names/indices
+    confidence : float
+        Confidence level for outlier detection
+    hotelling_t2_limit : float
+        Critical value for Hotelling's T² statistic (computed on training data)
+    q_residuals_limit : float
+        Critical value for Q residuals statistic (computed on training data)
 
     Examples
     --------
@@ -117,6 +126,7 @@ class PCAInspector:
         X_val: Optional[np.ndarray] = None,
         y_val: Optional[np.ndarray] = None,
         wavenumbers: Optional[Sequence] = None,
+        confidence: float = 0.95,
     ):
         # Validate and store the model
         self._model = _validate_model(model)
@@ -153,9 +163,20 @@ class PCAInspector:
         else:
             self._wavenumbers = np.arange(self.nr_features)
 
+        # Set confidence level for outlier detection
+        if not 0 < confidence < 1:
+            raise ValueError(f"confidence must be between 0 and 1, got {confidence}")
+        self._confidence = confidence
+
         # Cache for computed values
         self._scores_cache: Dict[str, np.ndarray] = {}
         self._preprocessed_cache: Dict[str, np.ndarray] = {}
+        self._hotelling_t2_limit: Optional[float] = None
+        self._q_residuals_limit: Optional[float] = None
+
+    # ==================================================================================
+    # Properties
+    # ==================================================================================
 
     @property
     def model(self) -> Union[_BasePCA, Pipeline]:
@@ -201,6 +222,63 @@ class PCAInspector:
         """Return the feature names/indices."""
         return self._wavenumbers
 
+    @property
+    def confidence(self) -> float:
+        """Return the confidence level for outlier detection."""
+        return self._confidence
+
+    @property
+    def hotelling_t2_limit(self) -> float:
+        """Return the Hotelling's T² critical value at the specified confidence level.
+
+        Calculated using the training data. The limit is cached after first calculation.
+
+        Returns
+        -------
+        limit : float
+            Critical value for Hotelling's T² statistic
+
+        Examples
+        --------
+        >>> inspector = PCAInspector(pca, X_train, confidence=0.95)
+        >>> t2_limit = inspector.hotelling_t2_limit
+        >>> # Check if samples are outliers
+        >>> t2_values = inspector.get_scores('test')  # Use custom method if needed
+        """
+        if self._hotelling_t2_limit is None:
+            hotelling = HotellingT2(self._model, confidence=self._confidence)
+            hotelling.fit(self._X_train)
+            self._hotelling_t2_limit = hotelling.critical_value_
+        return self._hotelling_t2_limit
+
+    @property
+    def q_residuals_limit(self) -> float:
+        """Return the Q residuals critical value at the specified confidence level.
+
+        Calculated using the training data. The limit is cached after first calculation.
+
+        Returns
+        -------
+        limit : float
+            Critical value for Q residuals statistic
+
+        Examples
+        --------
+        >>> inspector = PCAInspector(pca, X_train, confidence=0.99)
+        >>> q_limit = inspector.q_residuals_limit
+        >>> # Check if samples are outliers
+        >>> q_values = inspector.get_scores('test')  # Use custom method if needed
+        """
+        if self._q_residuals_limit is None:
+            q_detector = QResiduals(self._model, confidence=self._confidence)
+            q_detector.fit(self._X_train)
+            self._q_residuals_limit = q_detector.critical_value_
+        return self._q_residuals_limit
+
+    # ==================================================================================
+    # Private Methods
+    # ==================================================================================
+
     def _get_raw_data(self, dataset: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """Get raw X and y data for specified dataset."""
         if dataset == "train":
@@ -228,6 +306,63 @@ class PCAInspector:
                 X_preprocessed = X
             self._preprocessed_cache[dataset] = X_preprocessed
         return self._preprocessed_cache[dataset]
+
+    def _get_feature_mask(self) -> Optional[np.ndarray]:
+        """Get the feature selection mask from preprocessing pipeline.
+
+        Detects feature selectors by checking if they are instances of
+        sklearn's SelectorMixin, which is the standard way feature selectors
+        are identified in scikit-learn.
+
+        Returns
+        -------
+        mask : np.ndarray or None
+            Boolean array indicating which features are selected, or None if no
+            feature selector is present in the pipeline.
+        """
+        from sklearn.feature_selection._base import SelectorMixin
+
+        if self.transformer is None:
+            return None
+
+        # Check if transformer is a Pipeline
+        if isinstance(self.transformer, Pipeline):
+            # Look through pipeline steps for a feature selector (SelectorMixin)
+            for _, step in self.transformer.steps:
+                if isinstance(step, SelectorMixin):
+                    # SelectorMixin provides get_support() method
+                    return step.get_support()
+        else:
+            # Single transformer
+            if isinstance(self.transformer, SelectorMixin):
+                return self.transformer.get_support()
+
+        return None
+
+    def _get_preprocessed_wavenumbers(self) -> np.ndarray:
+        """Get wavenumbers after feature selection.
+
+        Returns
+        -------
+        wavenumbers : np.ndarray
+            Wavenumbers/feature indices after feature selection. If no feature
+            selector is present, returns the original wavenumbers.
+        """
+        feature_mask = self._get_feature_mask()
+
+        if feature_mask is not None and self._wavenumbers is not None:
+            # Apply feature mask to wavenumbers
+            return self._wavenumbers[feature_mask]
+        elif self._wavenumbers is not None:
+            return self._wavenumbers
+        else:
+            # If no wavenumbers provided, use feature indices
+            X_preprocessed = self._get_preprocessed_data("train")
+            return np.arange(X_preprocessed.shape[1])
+
+    # ==================================================================================
+    # Public Methods
+    # ==================================================================================
 
     def get_scores(self, dataset: str = "train") -> np.ndarray:
         """Get PCA scores for specified dataset.
@@ -281,38 +416,6 @@ class PCAInspector:
             Explained variance ratio
         """
         return self.estimator.explained_variance_ratio_
-
-    def get_hotelling_residuals(self, X: np.ndarray) -> np.ndarray:
-        """Get Hotelling's T-squared residuals for the specified dataset.
-
-        Parameters
-        ----------
-        dataset : {'train', 'test', 'val'}, default='train'
-            Which dataset to get residuals for
-
-        Returns
-        -------
-        residuals : ndarray of shape (n_samples,)
-            Hotelling's T-squared residuals
-        """
-        residuals = HotellingT2(self._model).fit_predict_residuals(X)
-        return residuals
-
-    def get_q_residuals(self, X: np.ndarray) -> np.ndarray:
-        """Get Q residuals for the specified dataset.
-
-        Parameters
-        ----------
-        dataset : {'train', 'test', 'val'}, default='train'
-            Which dataset to get residuals for
-
-        Returns
-        -------
-        residuals : ndarray of shape (n_samples,)
-            Q residuals
-        """
-        residuals = QResiduals(self._model).fit_predict_residuals(X)
-        return residuals
 
     def summary(self) -> None:
         """Display a formatted summary table of the PCA model.
@@ -860,11 +963,11 @@ class PCAInspector:
                 X, y = self._get_raw_data(ds)
 
                 # Calculate residuals
-                hotelling = HotellingT2(self._model, confidence=0.95)
+                hotelling = HotellingT2(self._model, confidence=self._confidence)
                 hotelling.fit(X)
                 t2 = hotelling.predict_residuals(X)
 
-                q_res_model = QResiduals(self._model, confidence=0.95)
+                q_res_model = QResiduals(self._model, confidence=self._confidence)
                 q_res_model.fit(X)
                 q = q_res_model.predict_residuals(X)
 
@@ -906,11 +1009,11 @@ class PCAInspector:
             X, y = self._get_raw_data(ds)
 
             # Calculate residuals
-            hotelling = HotellingT2(self._model, confidence=0.95)
+            hotelling = HotellingT2(self._model, confidence=self._confidence)
             hotelling.fit(X)
             t2 = hotelling.predict_residuals(X)
 
-            q_res_model = QResiduals(self._model, confidence=0.95)
+            q_res_model = QResiduals(self._model, confidence=self._confidence)
             q_res_model.fit(X)
             q = q_res_model.predict_residuals(X)
 
@@ -1146,56 +1249,3 @@ class PCAInspector:
             figures["preprocessed_spectra"] = fig2
 
         return figures
-
-    def _get_feature_mask(self) -> Optional[np.ndarray]:
-        """Get the feature selection mask from preprocessing pipeline.
-
-        Detects feature selectors by checking if they are instances of
-        sklearn's SelectorMixin, which is the standard way feature selectors
-        are identified in scikit-learn.
-
-        Returns
-        -------
-        mask : np.ndarray or None
-            Boolean array indicating which features are selected, or None if no
-            feature selector is present in the pipeline.
-        """
-        from sklearn.feature_selection._base import SelectorMixin
-
-        if self.transformer is None:
-            return None
-
-        # Check if transformer is a Pipeline
-        if isinstance(self.transformer, Pipeline):
-            # Look through pipeline steps for a feature selector (SelectorMixin)
-            for _, step in self.transformer.steps:
-                if isinstance(step, SelectorMixin):
-                    # SelectorMixin provides get_support() method
-                    return step.get_support()
-        else:
-            # Single transformer
-            if isinstance(self.transformer, SelectorMixin):
-                return self.transformer.get_support()
-
-        return None
-
-    def _get_preprocessed_wavenumbers(self) -> np.ndarray:
-        """Get wavenumbers after feature selection.
-
-        Returns
-        -------
-        wavenumbers : np.ndarray
-            Wavenumbers/feature indices after feature selection. If no feature
-            selector is present, returns the original wavenumbers.
-        """
-        feature_mask = self._get_feature_mask()
-
-        if feature_mask is not None and self._wavenumbers is not None:
-            # Apply feature mask to wavenumbers
-            return self._wavenumbers[feature_mask]
-        elif self._wavenumbers is not None:
-            return self._wavenumbers
-        else:
-            # If no wavenumbers provided, use feature indices
-            X_preprocessed = self._get_preprocessed_data("train")
-            return np.arange(X_preprocessed.shape[1])
