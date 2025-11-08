@@ -15,7 +15,7 @@ from chemotools.plotting import (
     LoadingsPlot,
     ExplainedVariancePlot,
 )
-from chemotools.plotting._utilities import annotate_points, add_confidence_ellipse
+from chemotools.plotting._utilities import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS
 from ._validate import _validate_and_extract_model, _validate_datasets_consistency
 
@@ -637,57 +637,44 @@ class PCAInspector:
                     ax.grid(alpha=0.3)
                     ax.legend(loc="best")
                 else:
-                    # 2D plot: Component pair scatter plot
+                    # 2D plot: Component pair scatter plot using composable ScoresPlot
                     components_pair = component_spec
                     var_x = explained_var[components_pair[0]] * 100
                     var_y = explained_var[components_pair[1]] * 100
 
-                    # Collect all dataset scores and colors
-                    scores_dict = {}
-                    color_by_dict = {}
+                    # Determine which datasets should have ellipses
+                    ellipse_datasets_set = (
+                        set(ellipse_datasets)
+                        if ellipse_confidence is not None
+                        else set()
+                    )
 
+                    # Compose multiple datasets on same axes
                     for ds in datasets:
                         scores = self.get_scores(ds)
                         _, y = self._get_raw_data(ds)
-                        scores_dict[ds] = scores
-
-                        # For multi-dataset, we'll use dataset names as colors
-                        # Create a color array based on dataset
-                        if color_by_y and y is not None:
-                            color_by_dict[ds] = y
-
-                    # Create a custom plot with dataset-based coloring
-                    for ds in datasets:
-                        scores = scores_dict[ds]
                         color = DATASET_COLORS.get(ds, "#7f7f7f")
-                        marker = dataset_markers.get(ds, "o")
 
-                        ax.scatter(
-                            scores[:, components_pair[0]],
-                            scores[:, components_pair[1]],
-                            c=color,
-                            marker=marker,
-                            alpha=0.7,
-                            s=50,
-                            label=ds.capitalize(),
-                            edgecolors="white",
-                            linewidth=0.5,
+                        # Determine if this dataset should have ellipse
+                        should_add_ellipse = ds in ellipse_datasets_set
+                        ellipse_param = (
+                            ellipse_confidence if should_add_ellipse else None
                         )
 
-                        # Add confidence ellipse if requested for this dataset
-                        if ellipse_confidence is not None and ds in ellipse_datasets:
-                            x = scores[:, components_pair[0]]
-                            y = scores[:, components_pair[1]]
-                            add_confidence_ellipse(
-                                ax,
-                                x,
-                                y,
-                                confidence=ellipse_confidence,
-                                edgecolor=color,
-                                linewidth=2,
-                                linestyle="--",
-                                alpha=0.5,
-                            )
+                        # Determine color_by parameter
+                        color_by = y if (color_by_y and y is not None) else None
+
+                        # Create and render ScoresPlot for this dataset
+                        plot = ScoresPlot(
+                            scores=scores,
+                            components=components_pair,
+                            color_by=color_by,
+                            label=ds.capitalize(),
+                            color=color if color_by is None else None,
+                            colormap="viridis" if color_by is not None else None,
+                            confidence_ellipse=ellipse_param,
+                        )
+                        plot.render(ax)
 
                         # Add annotations if requested
                         if annotate_by is not None:
@@ -697,8 +684,7 @@ class PCAInspector:
                                 if annotate_by == "sample_index":
                                     labels = np.arange(scores.shape[0])
                                 elif annotate_by == "y":
-                                    _, y_data = self._get_raw_data(ds)
-                                    labels = y_data if y_data is not None else None
+                                    labels = y if y is not None else None
                                 else:
                                     labels = None
                             elif isinstance(annotate_by, dict) and ds in annotate_by:
@@ -743,25 +729,23 @@ class PCAInspector:
             explained_var = self.get_explained_variance_ratio()
 
             # Parse confidence_ellipse parameter for single dataset
-            ellipse_param: bool | float | None
+            single_ellipse_param: bool | float | None
             if confidence_ellipse is True:
-                ellipse_param = True  # Use ScoresPlot default (95%, train only)
+                single_ellipse_param = True  # Use ScoresPlot default (95%)
             elif confidence_ellipse is False or confidence_ellipse is None:
-                ellipse_param = None
+                single_ellipse_param = None
             elif isinstance(confidence_ellipse, (list, tuple)):
                 # Check if current dataset should have ellipse
-                ellipse_param = 0.95 if ds in confidence_ellipse else None
+                single_ellipse_param = 0.95 if ds in confidence_ellipse else None
             elif isinstance(confidence_ellipse, (int, float)):
-                # Numeric value - use it for train dataset only
-                ellipse_param = float(confidence_ellipse) if ds == "train" else None
+                # Numeric value - use it directly
+                single_ellipse_param = float(confidence_ellipse)
             else:
                 # Shouldn't reach here based on type hints
-                ellipse_param = None
+                single_ellipse_param = None
 
-            # Prepare color_by_dict
-            color_by_dict = None
-            if color_by_y and y is not None:
-                color_by_dict = {ds: y}
+            # Prepare color_by parameter
+            color_by = y if (color_by_y and y is not None) else None
 
             # Create scores plots
             for i, component_spec in enumerate(components_list, start=1):
@@ -796,17 +780,19 @@ class PCAInspector:
                     )
                     ax.grid(alpha=0.3)
                 else:
-                    # 2D plot: Component pair scatter plot
+                    # 2D plot: Component pair scatter plot using composable ScoresPlot
                     components_pair = component_spec
                     var_x = explained_var[components_pair[0]] * 100
                     var_y = explained_var[components_pair[1]] * 100
 
+                    # Create and render ScoresPlot
                     scores_plot = ScoresPlot(
-                        scores_dict={ds: scores},
+                        scores=scores,
                         components=components_pair,
-                        color_by_dict=color_by_dict,
-                        colormap="viridis",
-                        confidence_ellipse=ellipse_param,
+                        color_by=color_by,
+                        label=ds.capitalize(),
+                        colormap="viridis" if color_by is not None else None,
+                        confidence_ellipse=single_ellipse_param,
                     )
                     scores_plot.render(ax=ax)
 

@@ -387,3 +387,73 @@ def calculate_ylim_for_xlim(
         ymax += 0.1
 
     return (ymin, ymax)
+
+
+def add_confidence_lines(
+    ax: Axes,
+    x_threshold: Optional[float] = None,
+    y_threshold: Optional[float] = None,
+    color: str = "red",
+    linestyle: str = "--",
+    linewidth: float = 2,
+    alpha: float = 0.7,
+    label_x: Optional[str] = None,
+    label_y: Optional[str] = None,
+) -> None:
+    """Add vertical and/or horizontal confidence/threshold lines to a plot.
+
+    Useful for showing control limits, confidence regions, or threshold values
+    in diagnostic plots (e.g., Q residuals, Hotelling's T²).
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes to draw the lines on.
+    x_threshold : float, optional
+        X-coordinate for vertical line. If None, no vertical line is drawn.
+    y_threshold : float, optional
+        Y-coordinate for horizontal line. If None, no horizontal line is drawn.
+    color : str, optional
+        Color of the threshold lines (default: "red").
+    linestyle : str, optional
+        Line style (default: "--" for dashed).
+    linewidth : float, optional
+        Width of the lines (default: 2).
+    alpha : float, optional
+        Transparency of the lines (default: 0.7).
+    label_x : str, optional
+        Label for the vertical line (appears in legend).
+    label_y : str, optional
+        Label for the horizontal line (appears in legend).
+
+    Examples
+    --------
+    >>> fig, ax = plt.subplots()
+    >>> ax.scatter(x, y)
+    >>> add_confidence_lines(
+    ...     ax,
+    ...     x_threshold=12.5,
+    ...     y_threshold=5.2,
+    ...     label_x="T² limit (95%)",
+    ...     label_y="Q limit (95%)"
+    ... )
+    """
+    if x_threshold is not None:
+        ax.axvline(
+            x=x_threshold,
+            color=color,
+            linestyle=linestyle,
+            linewidth=linewidth,
+            alpha=alpha,
+            label=label_x,
+        )
+
+    if y_threshold is not None:
+        ax.axhline(
+            y=y_threshold,
+            color=color,
+            linestyle=linestyle,
+            linewidth=linewidth,
+            alpha=alpha,
+            label=label_y,
+        )
