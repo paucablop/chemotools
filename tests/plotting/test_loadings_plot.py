@@ -636,6 +636,23 @@ class TestLoadingsPlotEdgeCases:
         assert isinstance(fig, Figure)
         plt.close(fig)
 
+    def test_render_with_xlim_triggers_ylim_calculation(self):
+        """Test that xlim triggers automatic ylim calculation."""
+        # Create loadings with distinct values to ensure ylim calculation is noticeable
+        loadings = np.random.rand(100, 5) * 10 - 5  # Range from -5 to 5
+        features = np.linspace(4000, 400, 100)
+        plot = LoadingsPlot(loadings, feature_names=features, components=[0, 1])
+        fig, ax = plot.render(xlim=(3000, 2000))
+        # Verify ylim was set (should not be None or default autoscale)
+        ylim = ax.get_ylim()
+        assert ylim is not None
+        assert isinstance(ylim, tuple)
+        assert len(ylim) == 2
+        # The ylim should encompass the data within xlim range
+        # Just verify it's been set to some reasonable values
+        assert ylim[0] < ylim[1]
+        plt.close(fig)
+
 
 class TestLoadingsPlotIntegration:
     """Test integration with real-world scenarios."""

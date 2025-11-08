@@ -569,3 +569,64 @@ class TestScoresPlotConfidenceEllipse:
         # Should have 2 ellipses (patches)
         assert len(ax.patches) >= 2
         plt.close(fig)
+
+
+class TestScoresPlotEdgeCases:
+    """Test edge cases and error conditions for ScoresPlot."""
+
+    def test_invalid_component_negative(self):
+        """Test with negative component index."""
+        scores = np.random.rand(50, 5)
+        with pytest.raises(ValueError, match="Component index -1 is invalid"):
+            ScoresPlot(scores, components=(-1, 1))
+
+    def test_invalid_component_too_high(self):
+        """Test with component index out of range."""
+        scores = np.random.rand(50, 5)
+        with pytest.raises(ValueError, match="Component index 10 is invalid"):
+            ScoresPlot(scores, components=(0, 10))
+
+    def test_same_components(self):
+        """Test with same component for both axes."""
+        scores = np.random.rand(50, 5)
+        with pytest.raises(ValueError, match="Component indices must be different"):
+            ScoresPlot(scores, components=(1, 1))
+
+    def test_render_with_xlim_ylim(self):
+        """Test render with custom xlim and ylim."""
+        scores = np.random.rand(50, 5)
+        plot = ScoresPlot(scores, components=(0, 1))
+        fig, ax = plot.render(xlim=(-2, 2), ylim=(-3, 3))
+        assert ax.get_xlim() == (-2, 2)
+        assert ax.get_ylim() == (-3, 3)
+        plt.close(fig)
+
+    def test_render_with_continuous_colorby(self):
+        """Test render with continuous color_by to trigger add_colorbar."""
+        scores = np.random.rand(50, 5)
+        color_by = np.random.rand(50)  # Continuous values
+        plot = ScoresPlot(scores, components=(0, 1), color_by=color_by)
+        fig, ax = plot.render()
+        plt.close(fig)
+
+    def test_render_with_existing_axes_no_labels(self):
+        """Test render with existing axes that have no labels."""
+        scores = np.random.rand(50, 5)
+        plot = ScoresPlot(scores, components=(0, 1))
+        fig, ax = plt.subplots()
+        # Axes has no labels, so defaults should be set
+        result_fig, result_ax = plot.render(ax=ax)
+        assert result_ax.get_xlabel() == "PC1"
+        assert result_ax.get_ylabel() == "PC2"
+        plt.close(fig)
+
+    def test_categorical_with_many_unique_values(self):
+        """Test categorical detection with many unique values."""
+        scores = np.random.rand(100, 5)
+        # Integer with > 10 unique values should be continuous
+        color_by = np.arange(100)
+        plot = ScoresPlot(scores, components=(0, 1), color_by=color_by)
+        # Should not be categorical
+        assert not plot.is_categorical
+        fig, ax = plot.render()
+        plt.close(fig)

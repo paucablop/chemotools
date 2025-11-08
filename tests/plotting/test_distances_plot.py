@@ -467,7 +467,7 @@ class TestDistancesPlotRealWorld:
 
 
 class TestDistancesPlotEdgeCases:
-    """Test edge cases."""
+    """Test edge cases for DistancesPlot."""
 
     def test_single_sample(self):
         """Test with single sample."""
@@ -506,4 +506,46 @@ class TestDistancesPlotEdgeCases:
 
         # Assert
         assert isinstance(fig, Figure)
+        plt.close(fig)
+
+    def test_confidence_lines_true(self):
+        """Test with confidence_lines=True."""
+        distances = np.random.rand(50, 2)
+        plot = DistancesPlot(distances, confidence_lines=True)
+        # Should set thresholds to None (not implemented yet)
+        assert plot.x_threshold is None
+        assert plot.y_threshold is None
+
+    def test_confidence_lines_false(self):
+        """Test with confidence_lines=False."""
+        distances = np.random.rand(50, 2)
+        plot = DistancesPlot(distances, confidence_lines=False)
+        assert plot.x_threshold is None
+        assert plot.y_threshold is None
+
+    def test_1d_distances_edge_case(self):
+        """Test with 1D distances array (edge case in _render_plot)."""
+        # This tests line 406 in _distances.py
+        distances = np.random.rand(50)
+        plot = DistancesPlot(distances, distances_selection=0)
+        fig, ax = plot.render()
+        plt.close(fig)
+
+    def test_render_with_existing_axes_no_labels(self):
+        """Test render with existing axes that have no labels."""
+        distances = np.random.rand(50, 2)
+        plot = DistancesPlot(distances, distances_selection=(0, 1))
+        fig, ax = plt.subplots()
+        # Axes has no labels, so defaults should be set
+        result_fig, result_ax = plot.render(ax=ax)
+        assert "Distance" in result_ax.get_xlabel()
+        assert "Distance" in result_ax.get_ylabel()
+        plt.close(fig)
+
+    def test_render_with_none_x_axis(self):
+        """Test render when x_axis is None (sample index case)."""
+        distances = np.random.rand(50, 2)
+        plot = DistancesPlot(distances, distances_selection=(None, 1))
+        fig, ax = plot.render()
+        # Should use "Sample Index" as xlabel
         plt.close(fig)

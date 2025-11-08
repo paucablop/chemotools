@@ -380,3 +380,27 @@ class TestAddColorbar:
             add_colorbar(ax, color_by, cmap)
             assert len(fig.axes) == 2
             plt.close(fig)
+
+
+class TestCalculateYlimForXlim:
+    """Tests for calculate_ylim_for_xlim utility function."""
+
+    def test_with_2d_data_x_matches_axis_0(self):
+        """Test with 2D data where x matches axis 0 (rows)."""
+        from chemotools.plotting._utilities import calculate_ylim_for_xlim
+
+        x = np.linspace(0, 10, 100)
+        y = np.random.rand(100, 5)  # x matches rows
+        ylim = calculate_ylim_for_xlim(x, y, xlim=(3, 7))
+        assert isinstance(ylim, tuple)
+        assert len(ylim) == 2
+        assert ylim[0] < ylim[1]
+
+    def test_raises_on_mismatched_dimensions(self):
+        """Test that it raises error when x doesn't match y dimensions."""
+        from chemotools.plotting._utilities import calculate_ylim_for_xlim
+
+        x = np.linspace(0, 10, 100)
+        y = np.random.rand(50, 60)  # Neither dimension matches x
+        with pytest.raises(ValueError, match="x length .* must match either dimension"):
+            calculate_ylim_for_xlim(x, y, xlim=(3, 7))
