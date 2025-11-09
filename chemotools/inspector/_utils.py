@@ -99,6 +99,35 @@ def normalize_components(components_input: ComponentsInput) -> List[ComponentSpe
 # ==============================================================================
 
 
+def select_primary_target(y: Optional[np.ndarray]) -> Optional[np.ndarray]:
+    """Return a 1D target vector, falling back to the first column when needed.
+
+    Parameters
+    ----------
+    y : Optional[np.ndarray]
+        Target array that may be 1D or 2D.
+
+    Returns
+    -------
+    Optional[np.ndarray]
+        A flattened 1D view using the first column when ``y`` is 2D, or ``None``
+        when no targets are provided.
+    """
+
+    if y is None:
+        return None
+
+    y_arr = np.asarray(y)
+
+    if y_arr.ndim == 0:
+        return y_arr.reshape(1)
+
+    if y_arr.ndim > 1:
+        y_arr = y_arr[:, 0]
+
+    return y_arr.ravel()
+
+
 def get_xlabel_for_features(wavenumbers_provided: bool) -> str:
     """Get appropriate xlabel for feature plots.
 
@@ -163,10 +192,10 @@ def prepare_annotations(
         if annotate_by == "sample_index":
             return np.arange(scores.shape[0])
         elif annotate_by == "y":
-            return y if y is not None else None
+            return select_primary_target(y)
         else:
             return None
     elif isinstance(annotate_by, dict) and dataset_name in annotate_by:
-        return np.asarray(annotate_by[dataset_name])
+        return select_primary_target(np.asarray(annotate_by[dataset_name]))
     else:
         return None

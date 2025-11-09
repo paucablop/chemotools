@@ -24,6 +24,8 @@ from chemotools.plotting import (
 )
 from chemotools.plotting._styles import DATASET_COLORS
 
+from ._utils import select_primary_target
+
 
 def create_predicted_vs_actual_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
@@ -57,13 +59,16 @@ def create_predicted_vs_actual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        color_reference = (
+            select_primary_target(y) if (color_by_y and y is not None) else None
+        )
 
         fig, ax = plt.subplots(figsize=figsize)
 
         pred_actual_plot = PredictedVsActualPlot(
             y_true=y_true,
             y_pred=y_pred,
-            color_by=y if color_by_y else None,
+            color_by=color_reference,
         )
         pred_actual_plot.render(ax=ax)
 
@@ -137,6 +142,9 @@ def create_y_residual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        color_reference = (
+            select_primary_target(y) if (color_by_y and y is not None) else None
+        )
         residuals = y_true - y_pred
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -144,7 +152,7 @@ def create_y_residual_plot(
         residuals_plot = YResidualsPlot(
             residuals=residuals,
             x_values=y_pred,
-            color_by=y if color_by_y else None,
+            color_by=color_reference,
             add_confidence_band=2.0,
         )
         residuals_plot.render(ax=ax)
@@ -170,12 +178,15 @@ def create_y_residual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        color_reference = (
+            select_primary_target(y) if (color_by_y and y is not None) else None
+        )
         residuals = y_true - y_pred
 
         residuals_plot = YResidualsPlot(
             residuals=residuals,
             x_values=y_pred,
-            color_by=y if color_by_y else None,
+            color_by=color_reference,
             add_confidence_band=2.0,
         )
         residuals_plot.render(ax=ax)
@@ -379,7 +390,7 @@ def create_regression_distances_plot(
         distances_plot = DistancesPlot(
             y=studentized,
             x=leverages,
-            color_by=y if color_by_y else None,
+            color_by=select_primary_target(y) if color_by_y else None,
             confidence_lines=(leverage_limit, student_limit),
         )
         distances_plot.render(ax=ax)

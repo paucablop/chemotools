@@ -17,6 +17,8 @@ from chemotools.plotting import DistancesPlot
 from chemotools.plotting._styles import DATASET_COLORS
 from chemotools.outliers import HotellingT2, QResiduals
 
+from ._utils import select_primary_target
+
 
 def create_model_distances_plot(
     datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
@@ -79,7 +81,9 @@ def create_model_distances_plot(
         q_res_model.fit(X)
         q = q_res_model.predict_residuals(X)
 
-        color_by = y if (color_by_y and y is not None) else None
+        color_by = (
+            select_primary_target(y) if (color_by_y and y is not None) else None
+        )
         dataset_color = (
             DATASET_COLORS.get(ds_name, "#7f7f7f")
             if color_by is None and multi_dataset
@@ -103,7 +107,7 @@ def create_model_distances_plot(
             color_by=color_by,
             label=ds_name.capitalize(),
             color=dataset_color,
-            colormap="viridis" if color_by is not None else None,
+            colormap=None,
             confidence_lines=confidence_lines,
         )
         dist_plot.render(ax)

@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 from chemotools.plotting import SpectrumPlot
 from chemotools.plotting._styles import DATASET_COLORS
 
+from ._utils import select_primary_target
+
 
 def create_spectra_plots_single_dataset(
     X_raw: np.ndarray,
@@ -79,7 +81,7 @@ def create_spectra_plots_single_dataset(
 
     color_values = None
     if color_by_y and y is not None:
-        color_values = y
+        color_values = select_primary_target(y)
 
     # Figure 1: Raw spectra
     plot_raw = SpectrumPlot(

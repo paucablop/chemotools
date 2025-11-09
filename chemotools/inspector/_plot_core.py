@@ -14,12 +14,19 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 from chemotools.plotting import ExplainedVariancePlot, LoadingsPlot, ScoresPlot
-from chemotools.plotting._utils import annotate_points
+from chemotools.plotting._utils import (
+    add_colorbar,
+    annotate_points,
+    detect_categorical,
+    get_colors_from_labels,
+    get_default_colormap,
+)
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 
 from ._utils import (
     ComponentSpec,
     prepare_annotations,
+    select_primary_target,
 )
 
 
@@ -195,15 +202,52 @@ def create_scores_plot_single_dataset(
     """
     fig, ax = plt.subplots(figsize=figsize)
 
+    color_reference = select_primary_target(y) if color_by_y else None
+
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         pc_scores = scores[:, component_spec]
         var_pct = explained_var[component_spec] * 100
 
-        if color_by_y and y is not None:
-            # Plot PC score vs y-value
-            scatter = ax.scatter(y, pc_scores, c=y, cmap="viridis", alpha=0.7, s=50)
-            plt.colorbar(scatter, ax=ax, label="y-value")
+        if color_reference is not None:
+            x_values = color_reference
+
+            if x_values.shape[0] != pc_scores.shape[0]:
+                raise ValueError(
+                    "Length of target values must match number of samples. "
+                    f"Got {x_values.shape[0]} vs {pc_scores.shape[0]}."
+                )
+
+            color_array = np.asarray(x_values)
+            is_categorical = detect_categorical(color_array)
+
+            if is_categorical:
+                colormap = get_default_colormap(True, None)
+                colors = get_colors_from_labels(color_array, colormap)
+                unique_values = np.unique(color_array)
+                for value in unique_values:
+                    mask = color_array == value
+                    ax.scatter(
+                        x_values[mask],
+                        pc_scores[mask],
+                        color=colors[mask][0],
+                        alpha=0.7,
+                        s=50,
+                        label=f"{dataset_name.capitalize()} - {value}",
+                    )
+                ax.legend(loc="best")
+            else:
+                colormap = get_default_colormap(False, None)
+                ax.scatter(
+                    x_values,
+                    pc_scores,
+                    c=color_array,
+                    cmap=colormap,
+                    alpha=0.7,
+                    s=50,
+                )
+                add_colorbar(ax, color_array, colormap, label="y-value")
+
             xlabel_text = "y-value"
         else:
             # Plot PC score vs sample index
@@ -228,7 +272,7 @@ def create_scores_plot_single_dataset(
         var_y = explained_var[components_pair[1]] * 100
 
         # Determine color_by parameter
-        color_by = y if (color_by_y and y is not None) else None
+        color_by = color_reference if color_reference is not None else None
 
         # Create and render ScoresPlot
         scores_plot = ScoresPlot(
@@ -236,7 +280,7 @@ def create_scores_plot_single_dataset(
             components=components_pair,
             color_by=color_by,
             label=dataset_name.capitalize(),
-            colormap="viridis" if color_by is not None else None,
+            colormap=None,
             confidence_ellipse=0.95,  # Always show 95% confidence ellipse
         )
         scores_plot.render(ax=ax)
@@ -329,6 +373,8 @@ def create_scores_plot_multi_dataset(
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         var_pct = explained_var[component_spec] * 100
+        ylabel_text = f"{component_label}{component_spec + 1} ({var_pct:.1f}%)"
+        xlabel_text = "Sample Index"
 
         for ds_name, data in datasets_data.items():
             scores = data["scores"]
@@ -338,39 +384,39 @@ def create_scores_plot_multi_dataset(
             assert scores is not None, f"Scores data is required for dataset {ds_name}"
 
             pc_scores = scores[:, component_spec]
-            color = DATASET_COLORS.get(ds_name, "#7f7f7f")
             marker = DATASET_MARKERS.get(ds_name, "o")
 
-            if color_by_y and y is not None:
-                # Plot PC score vs y-value
-                ax.scatter(
-                    y,
-                    pc_scores,
-                    c=color,
-                    marker=marker,
-                    alpha=0.7,
-                    s=50,
-                    label=ds_name.capitalize(),
-                )
+            y_values = select_primary_target(y) if y is not None else None
+
+            if color_by_y and y_values is not None:
+                x_values = y_values
+                xlabel_for_dataset = "y-value"
                 xlabel_text = "y-value"
             else:
-                # Plot PC score vs sample index
-                ax.scatter(
-                    range(len(pc_scores)),
-                    pc_scores,
-                    c=color,
-                    marker=marker,
-                    alpha=0.7,
-                    s=50,
-                    label=ds_name.capitalize(),
-                )
-                xlabel_text = "Sample Index"
+                x_values = np.arange(pc_scores.shape[0])
+                xlabel_for_dataset = "Sample Index"
+
+            scores_for_plot = np.column_stack([x_values, pc_scores])
+
+            plot = ScoresPlot(
+                scores=scores_for_plot,
+                components=(0, 1),
+                color_by=None,
+                label=ds_name.capitalize(),
+                color=DATASET_COLORS.get(ds_name, "#7f7f7f"),
+                confidence_ellipse=None,
+            )
+            plot.render(
+                ax=ax,
+                xlabel=xlabel_for_dataset,
+                ylabel=ylabel_text,
+                marker=marker,
+                s=50,
+            )
 
         # Apply decorations
         ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(
-            f"{component_label}{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
-        )
+        ax.set_ylabel(ylabel_text, fontsize=10)
         ax.set_title(
             f"Scores: {component_label}{component_spec + 1}",
             fontsize=12,
@@ -395,7 +441,10 @@ def create_scores_plot_multi_dataset(
             color = DATASET_COLORS.get(ds_name, "#7f7f7f")
 
             # Determine color_by parameter
-            color_by = y if (color_by_y and y is not None) else None
+            color_reference = (
+                select_primary_target(y) if (color_by_y and y is not None) else None
+            )
+            color_by = color_reference
 
             # Create and render ScoresPlot for this dataset
             plot = ScoresPlot(
@@ -404,7 +453,7 @@ def create_scores_plot_multi_dataset(
                 color_by=color_by,
                 label=ds_name.capitalize(),
                 color=color if color_by is None else None,
-                colormap="viridis" if color_by is not None else None,
+                colormap=None,
                 confidence_ellipse=0.95,  # Always show 95% confidence ellipse
             )
             plot.render(ax)
