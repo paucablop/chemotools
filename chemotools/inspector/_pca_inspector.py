@@ -17,14 +17,14 @@ from ._utils import (
     normalize_components,
     get_xlabel_for_features,
 )
-from ._plot_core import (
+from ._plot_utils_latent_space import (
+    create_model_distances_plot,
     create_variance_plot,
     create_loadings_plot,
     create_scores_plot_single_dataset,
     create_scores_plot_multi_dataset,
 )
-from ._plot_diagnostics import create_model_distances_plot
-from ._plot_spectra import (
+from ._plot_utils_spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )
