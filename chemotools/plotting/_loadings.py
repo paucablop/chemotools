@@ -1,12 +1,18 @@
 """Loadings plot for visualizing model feature weights."""
 
-from typing import Optional, Any, cast
+from typing import Optional, Any
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import setup_figure, calculate_ylim_for_xlim
+from chemotools.plotting._utils import (
+    setup_figure,
+    calculate_ylim_for_xlim,
+    split_figure_plot_kwargs,
+    ensure_axes,
+    apply_limits,
+)
 
 
 class LoadingsPlot:
@@ -206,9 +212,7 @@ class LoadingsPlot:
         ... )
         """
         # Separate kwargs for setup_figure vs plot
-        figure_kwargs_keys = {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
-        figure_kwargs = {k: v for k, v in kwargs.items() if k in figure_kwargs_keys}
-        plot_kwargs = {k: v for k, v in kwargs.items() if k not in figure_kwargs_keys}
+        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
         # Auto-generate title if not provided
         if title is None:
@@ -238,17 +242,13 @@ class LoadingsPlot:
             ax.legend()
 
         # Apply axis limits with auto-scaling
-        if xlim is not None:
-            ax.set_xlim(xlim)
+        ylim_to_apply = ylim
+        if xlim is not None and ylim is None:
+            # Collect all y-data for components being plotted
+            y_data = self.loadings[:, self.components]
+            ylim_to_apply = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
 
-            # Auto-scale y-axis to data within xlim if ylim not provided
-            if ylim is None:
-                # Collect all y-data for components being plotted
-                y_data = self.loadings[:, self.components]
-                ylim = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim_to_apply)
 
         plt.tight_layout()
         return fig
@@ -300,13 +300,7 @@ class LoadingsPlot:
         >>> plot1.render(ax=axes[0])
         >>> plot2.render(ax=axes[1])
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(12, 4))
-        else:
-            figure = ax.get_figure()
-            if figure is None:
-                raise ValueError("Axes object has no associated figure")
-            fig = cast(Figure, figure)
+        fig, ax = ensure_axes(ax, figsize=(12, 4))
 
         self._render_plot(ax, **kwargs)
 
@@ -322,17 +316,13 @@ class LoadingsPlot:
             ax.legend()
 
         # Apply axis limits with auto-scaling
-        if xlim is not None:
-            ax.set_xlim(xlim)
+        ylim_to_apply = ylim
+        if xlim is not None and ylim is None:
+            # Collect all y-data for components being plotted
+            y_data = self.loadings[:, self.components]
+            ylim_to_apply = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
 
-            # Auto-scale y-axis to data within xlim if ylim not provided
-            if ylim is None:
-                # Collect all y-data for components being plotted
-                y_data = self.loadings[:, self.components]
-                ylim = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim_to_apply)
 
         return fig, ax
 

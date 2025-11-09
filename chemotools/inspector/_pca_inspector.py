@@ -1,7 +1,7 @@
 """PCA Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
-from typing import Optional, Union, Sequence, Tuple, Dict, TYPE_CHECKING
+from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
 import numpy as np
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 from chemotools.outliers import HotellingT2, QResiduals
 
-from ._validate import _validate_model, _validate_datasets_consistency
-from ._inspector_utils import (
+from ._base import _BaseInspector
+from ._utils import (
     normalize_datasets,
     normalize_components,
     get_xlabel_for_features,
@@ -23,17 +23,14 @@ from ._plot_core import (
     create_scores_plot_single_dataset,
     create_scores_plot_multi_dataset,
 )
-from ._plot_diagnostics import (
-    create_distances_plot_single_dataset,
-    create_distances_plot_multi_dataset,
-)
+from ._plot_diagnostics import create_model_distances_plot
 from ._plot_spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )
 
 
-class PCAInspector:
+class PCAInspector(_BaseInspector):
     """Inspector for PCA model diagnostics and visualization.
 
     This class provides a unified interface for inspecting PCA models by creating
@@ -138,49 +135,28 @@ class PCAInspector:
         wavenumbers: Optional[Sequence] = None,
         confidence: float = 0.95,
     ):
-        # Validate and store the model
-        self._model = _validate_model(model)
-
-        # Convert to numpy arrays
-        self._X_train = np.asarray(X_train)
-        self._y_train = np.asarray(y_train) if y_train is not None else None
-
-        self._X_test = np.asarray(X_test) if X_test is not None else None
-        self._y_test = np.asarray(y_test) if y_test is not None else None
-
-        self._X_val = np.asarray(X_val) if X_val is not None else None
-        self._y_val = np.asarray(y_val) if y_val is not None else None
-
-        # Validate datasets consistency
-        _validate_datasets_consistency(
-            self._X_train,
-            self._y_train,
-            self._X_test,
-            self._y_test,
-            self._X_val,
-            self._y_val,
-            supervised=False,  # PCA is unsupervised
+        super().__init__(
+            model=model,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            y_test=y_test,
+            X_val=X_val,
+            y_val=y_val,
+            supervised=False,
+            feature_names=wavenumbers,
         )
 
-        # Set wavenumbers
-        if wavenumbers is not None:
-            self._wavenumbers = np.asarray(wavenumbers)
-            if len(self._wavenumbers) != self.nr_features:
-                raise ValueError(
-                    f"wavenumbers length ({len(self._wavenumbers)}) must match "
-                    f"number of features ({self.nr_features})"
-                )
-        else:
-            self._wavenumbers = np.arange(self.nr_features)
-
-        # Set confidence level for outlier detection
         if not 0 < confidence < 1:
             raise ValueError(f"confidence must be between 0 and 1, got {confidence}")
         self._confidence = confidence
 
-        # Cache for computed values
+        if self.feature_names is not None:
+            self._wavenumbers = np.array(self.feature_names, copy=True)
+        else:
+            self._wavenumbers = np.arange(self.n_features_in_)
+
         self._scores_cache: Dict[str, np.ndarray] = {}
-        self._preprocessed_cache: Dict[str, np.ndarray] = {}
         self._hotelling_t2_limit: Optional[float] = None
         self._q_residuals_limit: Optional[float] = None
 
@@ -196,36 +172,27 @@ class PCAInspector:
     @property
     def estimator(self) -> _BasePCA:
         """Return the PCA estimator."""
-        if isinstance(self._model, Pipeline):
-            return self._model[-1]
-        return self._model
+        return self.estimator_
 
     @property
     def transformer(self) -> Optional[Pipeline]:
         """Return the preprocessing pipeline (if available)."""
-        if isinstance(self._model, Pipeline) and len(self._model) > 1:
-            return Pipeline(self._model.steps[:-1])
-        return None
+        return super().transformer
 
     @property
     def nr_components(self) -> int:
         """Return the number of principal components."""
-        return self.estimator.components_.shape[0]
+        return self.n_components_
 
     @property
     def nr_features(self) -> int:
         """Return the number of features in original data."""
-        return self._X_train.shape[1]
+        return self.n_features_in_
 
     @property
     def nr_samples(self) -> Dict[str, int]:
         """Return the number of samples in each dataset."""
-        samples = {"train": self._X_train.shape[0]}
-        if self._X_test is not None:
-            samples["test"] = self._X_test.shape[0]
-        if self._X_val is not None:
-            samples["val"] = self._X_val.shape[0]
-        return samples
+        return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
 
     @property
     def wavenumbers(self) -> np.ndarray:
@@ -256,8 +223,9 @@ class PCAInspector:
         >>> t2_values = inspector.get_scores('test')  # Use custom method if needed
         """
         if self._hotelling_t2_limit is None:
-            hotelling = HotellingT2(self._model, confidence=self._confidence)
-            hotelling.fit(self._X_train)
+            hotelling = HotellingT2(self.model, confidence=self._confidence)
+            X_train, _ = self._get_raw_data("train")
+            hotelling.fit(X_train)
             self._hotelling_t2_limit = hotelling.critical_value_
         return self._hotelling_t2_limit
 
@@ -280,74 +248,15 @@ class PCAInspector:
         >>> q_values = inspector.get_scores('test')  # Use custom method if needed
         """
         if self._q_residuals_limit is None:
-            q_detector = QResiduals(self._model, confidence=self._confidence)
-            q_detector.fit(self._X_train)
+            q_detector = QResiduals(self.model, confidence=self._confidence)
+            X_train, _ = self._get_raw_data("train")
+            q_detector.fit(X_train)
             self._q_residuals_limit = q_detector.critical_value_
         return self._q_residuals_limit
 
     # ==================================================================================
     # Private Methods
     # ==================================================================================
-
-    def _get_raw_data(self, dataset: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        """Get raw X and y data for specified dataset."""
-        if dataset == "train":
-            return self._X_train, self._y_train
-        elif dataset == "test":
-            if self._X_test is None:
-                raise ValueError("Test data not provided")
-            return self._X_test, self._y_test
-        elif dataset == "val":
-            if self._X_val is None:
-                raise ValueError("Validation data not provided")
-            return self._X_val, self._y_val
-        else:
-            raise ValueError(
-                f"Invalid dataset: {dataset}. Use 'train', 'test', or 'val'"
-            )
-
-    def _get_preprocessed_data(self, dataset: str) -> np.ndarray:
-        """Get preprocessed X data for specified dataset."""
-        if dataset not in self._preprocessed_cache:
-            X, _ = self._get_raw_data(dataset)
-            if self.transformer is not None:
-                X_preprocessed = self.transformer.transform(X)
-            else:
-                X_preprocessed = X
-            self._preprocessed_cache[dataset] = X_preprocessed
-        return self._preprocessed_cache[dataset]
-
-    def _get_feature_mask(self) -> Optional[np.ndarray]:
-        """Get the feature selection mask from preprocessing pipeline.
-
-        Detects feature selectors by checking if they are instances of
-        sklearn's SelectorMixin, which is the standard way feature selectors
-        are identified in scikit-learn.
-
-        Returns
-        -------
-        mask : np.ndarray or None
-            Boolean array indicating which features are selected, or None if no
-            feature selector is present in the pipeline.
-        """
-        from sklearn.feature_selection._base import SelectorMixin
-
-        if self.transformer is None:
-            return None
-
-        # Check if transformer is a Pipeline
-        if isinstance(self.transformer, Pipeline):
-            # Look through pipeline steps for a feature selector (SelectorMixin)
-            for _, step in self.transformer.steps:
-                if isinstance(step, SelectorMixin):
-                    # SelectorMixin provides get_support() method
-                    return step.get_support()
-        else:
-            # Single transformer
-            if isinstance(self.transformer, SelectorMixin):
-                return self.transformer.get_support()
-
-        return None
 
     def _get_preprocessed_wavenumbers(self) -> np.ndarray:
         """Get wavenumbers after feature selection.
@@ -358,17 +267,7 @@ class PCAInspector:
             Wavenumbers/feature indices after feature selection. If no feature
             selector is present, returns the original wavenumbers.
         """
-        feature_mask = self._get_feature_mask()
-
-        if feature_mask is not None and self._wavenumbers is not None:
-            # Apply feature mask to wavenumbers
-            return self._wavenumbers[feature_mask]
-        elif self._wavenumbers is not None:
-            return self._wavenumbers
-        else:
-            # If no wavenumbers provided, use feature indices
-            X_preprocessed = self._get_preprocessed_data("train")
-            return np.arange(X_preprocessed.shape[1])
+        return self._get_preprocessed_feature_names()
 
     # ==================================================================================
     # Public Methods
@@ -638,7 +537,7 @@ class PCAInspector:
         )
 
         # Create loadings plot (shared across all datasets)
-        xlabel = get_xlabel_for_features(self._wavenumbers is not None)
+        xlabel = get_xlabel_for_features(self.feature_names is not None)
         preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
         figures["loadings"] = create_loadings_plot(
             loadings=self.get_loadings(),
@@ -693,36 +592,19 @@ class PCAInspector:
                 figures[f"scores_{i}"] = fig
 
         # Create distances plot
-        if use_suffix:
-            # Multiple datasets: compose on same plot
-            datasets_data = {}
-            for ds in datasets:
-                X, y = self._get_raw_data(ds)
-                datasets_data[ds] = {"X": X, "y": y}
-
-            fig_distances = create_distances_plot_multi_dataset(
-                datasets_data=datasets_data,
-                model=self._model,
-                confidence=self._confidence,
-                color_by_y=color_by_y,
-                figsize=distances_figsize,
-            )
-            figures["distances"] = fig_distances
-        else:
-            # Single dataset
-            ds = datasets[0]
+        datasets_data = {}
+        for ds in datasets:
             X, y = self._get_raw_data(ds)
+            datasets_data[ds] = {"X": X, "y": y}
 
-            fig_distances = create_distances_plot_single_dataset(
-                X=X,
-                y=y,
-                model=self._model,
-                confidence=self._confidence,
-                dataset_name=ds,
-                color_by_y=color_by_y,
-                figsize=distances_figsize,
-            )
-            figures["distances"] = fig_distances
+        fig_distances = create_model_distances_plot(
+            datasets_data=datasets_data,
+            model=self.model,
+            confidence=self._confidence,
+            color_by_y=color_by_y,
+            figsize=distances_figsize,
+        )
+        figures["distances"] = fig_distances
 
         # Add spectra plots if preprocessing exists
         # Note: We call inspect_spectra once with all datasets to plot them together
@@ -799,7 +681,7 @@ class PCAInspector:
         is_multi_dataset = len(datasets) > 1
 
         # Determine xlabel based on wavenumbers
-        xlabel = get_xlabel_for_features(self._wavenumbers is not None)
+        xlabel = get_xlabel_for_features(self.feature_names is not None)
 
         # Get preprocessed wavenumbers (may be subset if feature selection)
         preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()

@@ -1,10 +1,85 @@
 """Core plotting utilities for chemotools visualizations."""
 
-from typing import Optional, Union
+from typing import Optional, Union, Iterable, cast
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+
+# Keys that should be forwarded to ``plt.subplots`` via ``setup_figure``.
+FIGURE_SETUP_KEYS: frozenset[str] = frozenset(
+    {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
+)
+
+
+def split_figure_plot_kwargs(
+    kwargs: dict[str, object],
+    figure_keys: Iterable[str] = FIGURE_SETUP_KEYS,
+) -> tuple[dict[str, object], dict[str, object]]:
+    """Split keyword arguments between figure creation and plotting.
+
+    Parameters
+    ----------
+    kwargs : dict[str, Any]
+        Keyword arguments passed to the plotting entrypoint.
+    figure_keys : Iterable[str], optional
+        Keys that should be forwarded to ``plt.subplots``.
+
+    Returns
+    -------
+    tuple[dict[str, Any], dict[str, Any]]
+        A tuple containing the figure kwargs and plot kwargs respectively.
+    """
+
+    figure_key_set = set(figure_keys)
+    figure_kwargs = {k: v for k, v in kwargs.items() if k in figure_key_set}
+    plot_kwargs = {k: v for k, v in kwargs.items() if k not in figure_key_set}
+    return figure_kwargs, plot_kwargs
+
+
+def ensure_axes(
+    ax: Optional[Axes] = None,
+    *,
+    figsize: tuple[float, float] = (8.0, 6.0),
+) -> tuple[Figure, Axes]:
+    """Return a valid figure/axes pair, creating one when needed."""
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+        return fig, ax
+
+    figure = cast(Figure, ax.get_figure())
+    if figure is None:
+        raise ValueError("Axes object has no associated figure")
+    return figure, ax
+
+
+def apply_limits(
+    ax: Axes,
+    *,
+    xlim: Optional[tuple[float, float]] = None,
+    ylim: Optional[tuple[float, float]] = None,
+) -> None:
+    """Apply optional axis limits in a single, reusable helper."""
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+
+def set_default_axis_labels(
+    ax: Axes,
+    *,
+    xlabel: Optional[str] = None,
+    ylabel: Optional[str] = None,
+) -> None:
+    """Set axis labels only when the axes do not already define them."""
+
+    if xlabel and not ax.get_xlabel():
+        ax.set_xlabel(xlabel)
+    if ylabel and not ax.get_ylabel():
+        ax.set_ylabel(ylabel)
 
 
 def setup_figure(

@@ -1,12 +1,12 @@
 """Distances plot for visualizing diagnostic measures and outlier detection."""
 
-from typing import Optional, Any, cast
+from typing import Optional, Any
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import (
+from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
     detect_categorical,
@@ -14,6 +14,9 @@ from chemotools.plotting._utilities import (
     add_colorbar,
     annotate_points,
     add_confidence_lines,
+    ensure_axes,
+    apply_limits,
+    set_default_axis_labels,
 )
 
 
@@ -26,18 +29,11 @@ class DistancesPlot:
 
     Parameters
     ----------
-    distances : np.ndarray
-        Distance array with shape (n_samples,) for single distance or
-        (n_samples, n_distances) for multiple distances.
-    distances_selection : tuple[int | None, int] or int, optional
-        Which distances to plot on x and y axes.
-        - For 1D arrays: single int (always 0, can be omitted)
-        - For 2D+ arrays: tuple (x_index, y_index) to select which distances to plot
-        - Use None as first element to plot against sample index: (None, y_index)
-        Default is (0, 1) for 2D+ arrays, or (None, 0) for 1D arrays.
-        Examples: (0, 1) plots distance 0 vs distance 1
-                  (None, 0) plots sample index vs distance 0
-                  (1, 2) plots distance 1 vs distance 2
+    x : np.ndarray, optional
+        Explicit x-axis values. Must match the length of ``y``. When omitted,
+        the sample index (0, 1, ..., n_samples-1) is used.
+    y : np.ndarray, optional
+        Y-axis values to plot. Accepts 1D arrays only.
     color_by : np.ndarray, optional
         Values for coloring samples. Can be either:
         - Continuous (numeric): shows colorbar
@@ -75,17 +71,17 @@ class DistancesPlot:
 
     >>> fig, ax = plt.subplots()
     >>> DistancesPlot(
-    ...     train_distances,
-    ...     distances_selection=(0, 1),
+    ...     y=train_q,
+    ...     x=train_t2,
     ...     label="Train",
     ...     color="blue",
-    ...     confidence_lines=(12.5, 5.2)
+    ...     confidence_lines=(12.5, 5.2),
     ... ).render(ax)
     >>> DistancesPlot(
-    ...     test_distances,
-    ...     distances_selection=(0, 1),
+    ...     y=test_q,
+    ...     x=test_t2,
     ...     label="Test",
-    ...     color="red"
+    ...     color="red",
     ... ).render(ax)
     >>> ax.set_xlabel("Hotelling's T²")
     >>> ax.set_ylabel("Q Residuals")
@@ -94,12 +90,11 @@ class DistancesPlot:
 
     **With categorical coloring:**
 
-    >>> distances = np.column_stack([t2, q_residuals])
     >>> plot = DistancesPlot(
-    ...     distances,
-    ...     distances_selection=(0, 1),
+    ...     y=q_residuals,
+    ...     x=t2_values,
     ...     color_by=classes,
-    ...     confidence_lines=(12.5, 5.2)
+    ...     confidence_lines=(12.5, 5.2),
     ... )
     >>> fig = plot.show(title="Outliers by Class")
 
@@ -108,18 +103,31 @@ class DistancesPlot:
     >>> outliers = [5, 23, 47]
     >>> annotations = [f"S{i}" if i in outliers else "" for i in range(len(q_residuals))]
     >>> plot = DistancesPlot(
-    ...     q_residuals,
+    ...     y=q_residuals,
     ...     annotations=annotations,
-    ...     confidence_lines=(None, 5.2)
+    ...     confidence_lines=(None, 5.2),
     ... )
     >>> fig = plot.show(title="Annotated Outliers")
+
+    **Explicit x/y arrays:**
+
+    >>> plot = DistancesPlot(
+    ...     y=q_residuals,
+    ...     x=t2_values,
+    ...     confidence_lines=(9.35, 12.0),
+    ... )
+    >>> fig = plot.show(
+    ...     title="T² vs Q",
+    ...     xlabel="Hotelling's T²",
+    ...     ylabel="Q Residuals",
+    ... )
     """
 
     def __init__(
         self,
-        distances: np.ndarray,
+        y: np.ndarray,
         *,
-        distances_selection: tuple[int | None, int] | int | None = None,
+        x: Optional[np.ndarray] = None,
         color_by: Optional[np.ndarray] = None,
         annotations: Optional[list[str]] = None,
         label: str = "Data",
@@ -127,11 +135,13 @@ class DistancesPlot:
         colormap: Optional[str] = None,
         confidence_lines: Optional[bool | tuple[float | None, float | None]] = None,
     ):
-        self.distances = distances
+        self._x: np.ndarray
+        self._y: np.ndarray
         self.color_by = color_by
         self.annotations = annotations
         self.label = label
         self.color = color
+        self.colormap: Optional[str]
 
         # Process confidence lines parameter
         if confidence_lines is True:
@@ -144,86 +154,63 @@ class DistancesPlot:
             self.x_threshold = None
             self.y_threshold = None
 
-        # Validate inputs
-        self._validate_distances()
-
-        # Determine dimensionality
-        n_distances = self.distances.shape[1] if self.distances.ndim == 2 else 1
-
-        # Parse distances_selection parameter
-        self.distances_selection: tuple[int | None, int]
-        if distances_selection is None:
-            # Smart defaults
-            if self.distances.ndim == 1:
-                # 1D: plot distance vs sample index
-                self.distances_selection = (None, 0)
-            else:
-                # 2D+: plot first vs second distance
-                self.distances_selection = (0, 1)
-        elif isinstance(distances_selection, int):
-            # Single int: treat as y-axis, x is sample index
-            self.distances_selection = (None, distances_selection)
-        else:
-            # Tuple provided
-            self.distances_selection = distances_selection
-
-        # Extract x_axis and y_axis
-        self.x_axis, self.y_axis = self.distances_selection
-
-        # Validate axes indices
-        self._validate_axes(n_distances)
+        self._default_xlabel: str
+        self._default_ylabel: str
+        self._init_from_xy(x, y)
 
         # Determine if coloring is categorical or continuous
-        if color_by is not None:
-            self.is_categorical = detect_categorical(color_by)
-            self.colormap: Optional[str] = get_default_colormap(
-                self.is_categorical, colormap
-            )
+        if self.color_by is not None:
+            self.color_by = np.asarray(self.color_by)
+            self.is_categorical = detect_categorical(self.color_by)
+            self.colormap = get_default_colormap(self.is_categorical, colormap)
         else:
             self.is_categorical = False
             self.colormap = colormap
 
-    def _validate_distances(self) -> None:
-        """Validate that distances array has correct shape."""
-        if self.distances.ndim not in (1, 2):
+        self._validate_color_and_annotations()
+
+    def _init_from_xy(
+        self,
+        x: Optional[np.ndarray],
+        y: np.ndarray,
+    ) -> None:
+        """Initialize internal state from explicit x/y arrays."""
+
+        y_arr = np.asarray(y)
+        if y_arr.ndim != 1:
+            raise ValueError("Explicit 'y' must be a 1D array.")
+
+        if x is None:
+            self._x = np.arange(y_arr.shape[0])
+            auto_xlabel = "Sample Index"
+        else:
+            x_arr = np.asarray(x)
+            if x_arr.ndim != 1:
+                raise ValueError("Explicit 'x' must be a 1D array.")
+            if x_arr.shape[0] != y_arr.shape[0]:
+                raise ValueError("'x' and 'y' must have the same length.")
+            self._x = x_arr
+            auto_xlabel = "X"
+
+        self._y = y_arr
+
+        auto_ylabel = "Distance"
+
+        self._default_xlabel = auto_xlabel
+        self._default_ylabel = auto_ylabel
+
+    def _validate_color_and_annotations(self) -> None:
+        """Ensure optional color and annotation arrays align with the data length."""
+
+        n_points = self._y.shape[0]
+
+        if self.color_by is not None and len(self.color_by) != n_points:
+            raise ValueError("color_by must have the same length as the plotted data.")
+
+        if self.annotations is not None and len(self.annotations) != n_points:
             raise ValueError(
-                f"Distances must be 1D or 2D array, got shape {self.distances.shape}"
+                "annotations must have the same length as the plotted data."
             )
-
-    def _validate_axes(self, n_distances: int) -> None:
-        """Validate that axis indices are valid for the number of distances.
-
-        Parameters
-        ----------
-        n_distances : int
-            Number of distance measures available.
-
-        Raises
-        ------
-        ValueError
-            If axis indices are invalid for the number of distances.
-        """
-        # Validate y_axis
-        if self.y_axis < 0 or self.y_axis >= n_distances:
-            raise ValueError(
-                f"y_axis index {self.y_axis} is invalid. "
-                f"Valid range: 0-{n_distances - 1} (have {n_distances} distance(s))"
-            )
-
-        # Validate x_axis (can be None for sample index)
-        if self.x_axis is not None:
-            if self.x_axis < 0 or self.x_axis >= n_distances:
-                raise ValueError(
-                    f"x_axis index {self.x_axis} is invalid. "
-                    f"Valid range: 0-{n_distances - 1} (have {n_distances} distance(s))"
-                )
-
-            # Prevent plotting same distance on both axes
-            if self.x_axis == self.y_axis:
-                raise ValueError(
-                    f"x_axis and y_axis cannot be the same (both are {self.x_axis}). "
-                    f"Please select different distances to plot."
-                )
 
     def show(
         self,
@@ -245,9 +232,11 @@ class DistancesPlot:
         title : str, optional
             Title for the plot.
         xlabel : str, optional
-            Custom x-axis label. If None, auto-generates based on x_axis.
+            Custom x-axis label. If None, uses the auto-detected default label
+            (e.g., ``"Sample Index"`` or ``"X"``).
         ylabel : str, optional
-            Custom y-axis label. If None, auto-generates based on y_axis.
+            Custom y-axis label. If None, uses the auto-detected default label
+            (e.g., ``"Distance"``).
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax).
         ylim : tuple[float, float], optional
@@ -267,18 +256,8 @@ class DistancesPlot:
         >>> plot.show(title="Outliers", xlabel="Hotelling T²", ylabel="Q Residuals")
         """
         # Determine axis labels
-        if xlabel is None:
-            if self.x_axis is None:
-                xlabel_text = "Sample Index"
-            else:
-                xlabel_text = f"Distance {self.x_axis + 1}"
-        else:
-            xlabel_text = xlabel
-
-        if ylabel is None:
-            ylabel_text = f"Distance {self.y_axis + 1}"
-        else:
-            ylabel_text = ylabel
+        xlabel_text = xlabel if xlabel is not None else self._default_xlabel
+        ylabel_text = ylabel if ylabel is not None else self._default_ylabel
 
         # Create figure
         fig, ax = setup_figure(
@@ -291,10 +270,7 @@ class DistancesPlot:
         self._render_plot(ax, **kwargs)
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         # Add colorbar for continuous data
         if self.color_by is not None and not self.is_categorical:
@@ -326,9 +302,11 @@ class DistancesPlot:
         ax : Axes, optional
             Matplotlib axes to plot on. If None, creates new figure and axes.
         xlabel : str, optional
-            Custom x-axis label. If None, uses existing label or auto-generates.
+            Custom x-axis label. If None, uses existing label or the default label
+            configured at initialization.
         ylabel : str, optional
-            Custom y-axis label. If None, uses existing label or auto-generates.
+            Custom y-axis label. If None, uses existing label or the default label
+            configured at initialization.
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax).
         ylim : tuple[float, float], optional
@@ -355,35 +333,23 @@ class DistancesPlot:
         >>> ax.legend()
         >>> plt.show()
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(8, 8))
-        else:
-            figure = ax.get_figure()
-            if figure is None:
-                raise ValueError("Axes object has no associated figure")
-            fig = cast(Figure, figure)
+        fig, ax = ensure_axes(ax, figsize=(8, 8))
 
         self._render_plot(ax, **kwargs)
 
         # Set axis labels if provided
         if xlabel is not None:
             ax.set_xlabel(xlabel)
-        elif not ax.get_xlabel():  # Only set default if no label exists
-            if self.x_axis is None:
-                ax.set_xlabel("Sample Index")
-            else:
-                ax.set_xlabel(f"Distance {self.x_axis + 1}")
+        else:
+            set_default_axis_labels(ax, xlabel=self._default_xlabel)
 
         if ylabel is not None:
             ax.set_ylabel(ylabel)
-        elif not ax.get_ylabel():  # Only set default if no label exists
-            ax.set_ylabel(f"Distance {self.y_axis + 1}")
+        else:
+            set_default_axis_labels(ax, ylabel=self._default_ylabel)
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return fig, ax
 
@@ -393,25 +359,8 @@ class DistancesPlot:
         s = kwargs.pop("s", 50)
 
         # Extract data for plotting
-        x: np.ndarray
-        y: np.ndarray
-
-        if self.x_axis is None:
-            # Plot vs sample index
-            x = np.arange(len(self.distances))
-        else:
-            # Plot distance vs distance
-            if self.distances.ndim == 1:
-                # Should not happen due to validation, but handle gracefully
-                x = np.arange(len(self.distances))
-            else:
-                x = self.distances[:, self.x_axis]
-
-        # Extract y data
-        if self.distances.ndim == 1:
-            y = self.distances
-        else:
-            y = self.distances[:, self.y_axis]
+        x = self._x
+        y = self._y
 
         if self.color_by is None:
             # Simple scatter with single color

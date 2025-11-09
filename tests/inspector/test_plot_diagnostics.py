@@ -5,10 +5,7 @@ import pytest
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
-from chemotools.inspector._plot_diagnostics import (
-    create_distances_plot_single_dataset,
-    create_distances_plot_multi_dataset,
-)
+from chemotools.inspector._plot_diagnostics import create_model_distances_plot
 
 
 @pytest.fixture
@@ -31,59 +28,60 @@ def sample_data():
     }
 
 
-class TestCreateDistancesPlotSingleDataset:
-    """Tests for create_distances_plot_single_dataset function."""
+class TestCreateModelDistancesPlot:
+    """Tests for the unified create_model_distances_plot function."""
 
-    def test_basic_distances_plot(self, pca_model, sample_data):
-        """Test basic distances plot creation."""
-        fig = create_distances_plot_single_dataset(
-            X=sample_data["X"],
-            y=sample_data["y"],
+    def test_single_dataset_with_targets(self, pca_model, sample_data):
+        """Single dataset renders successfully and adds colour mapping."""
+        datasets = {"train": {"X": sample_data["X"], "y": sample_data["y"]}}
+
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.95,
-            dataset_name="train",
             color_by_y=True,
             figsize=(8, 6),
         )
+
         assert fig is not None
         assert len(fig.axes) == 1
         plt.close(fig)
 
-    def test_without_y(self, pca_model, sample_data):
-        """Test distances plot without y data."""
-        fig = create_distances_plot_single_dataset(
-            X=sample_data["X"],
-            y=None,
+    def test_single_dataset_without_targets(self, pca_model, sample_data):
+        """Single dataset works when targets are missing or skipped."""
+        datasets = {"train": {"X": sample_data["X"], "y": None}}
+
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.95,
-            dataset_name="train",
             color_by_y=False,
             figsize=(8, 6),
         )
+
         assert fig is not None
         plt.close(fig)
 
-    def test_different_confidence(self, pca_model, sample_data):
-        """Test with different confidence level."""
-        fig = create_distances_plot_single_dataset(
-            X=sample_data["X"],
-            y=sample_data["y"],
+    def test_single_dataset_draws_confidence_lines(self, pca_model, sample_data):
+        """Training-only plots include both confidence limits."""
+        datasets = {"train": {"X": sample_data["X"], "y": None}}
+
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.99,
-            dataset_name="test",
             color_by_y=False,
             figsize=(8, 6),
         )
-        assert fig is not None
+
+        ax = fig.axes[0]
+        dashed_lines = [line for line in ax.lines if line.get_linestyle() == "--"]
+        assert len(dashed_lines) == 2
         plt.close(fig)
 
-
-class TestCreateDistancesPlotMultiDataset:
-    """Tests for create_distances_plot_multi_dataset function."""
-
-    def test_multi_dataset_distances(self, pca_model):
-        """Test multi-dataset distances plot."""
-        datasets_data = {
+    def test_multiple_datasets(self, pca_model):
+        """Multiple datasets are composed on the same axes."""
+        datasets = {
             "train": {
                 "X": np.random.rand(50, 50),
                 "y": np.random.randint(0, 3, 50),
@@ -94,55 +92,77 @@ class TestCreateDistancesPlotMultiDataset:
             },
         }
 
-        fig = create_distances_plot_multi_dataset(
-            datasets_data=datasets_data,
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.95,
             color_by_y=False,
             figsize=(8, 6),
         )
+
         assert fig is not None
         assert len(fig.axes) == 1
         plt.close(fig)
 
-    def test_with_none_y(self, pca_model):
-        """Test multi-dataset plot with None y values."""
-        datasets_data = {
-            "train": {
-                "X": np.random.rand(50, 50),
-                "y": None,
-            },
-            "test": {
-                "X": np.random.rand(30, 50),
-                "y": None,
-            },
+    def test_multiple_datasets_only_train_has_confidence_lines(self, pca_model):
+        """Confidence limits are drawn only for the training dataset."""
+        datasets = {
+            "train": {"X": np.random.rand(40, 50), "y": None},
+            "test": {"X": np.random.rand(35, 50), "y": None},
+            "val": {"X": np.random.rand(30, 50), "y": None},
         }
 
-        fig = create_distances_plot_multi_dataset(
-            datasets_data=datasets_data,
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.95,
             color_by_y=False,
             figsize=(8, 6),
         )
-        assert fig is not None
+
+        ax = fig.axes[0]
+        dashed_lines = [line for line in ax.lines if line.get_linestyle() == "--"]
+        assert len(dashed_lines) == 2
         plt.close(fig)
 
-    def test_single_dataset_multi(self, pca_model):
-        """Test multi-dataset function with single dataset."""
-        datasets_data = {
-            "train": {
-                "X": np.random.rand(50, 50),
-                "y": np.random.randint(0, 3, 50),
-            },
+    def test_multiple_datasets_without_targets(self, pca_model):
+        """Datasets lacking targets fall back to dataset colours."""
+        datasets = {
+            "train": {"X": np.random.rand(40, 50), "y": None},
+            "val": {"X": np.random.rand(35, 50), "y": None},
         }
 
-        fig = create_distances_plot_multi_dataset(
-            datasets_data=datasets_data,
+        fig = create_model_distances_plot(
+            datasets_data=datasets,
             model=pca_model,
             confidence=0.95,
             color_by_y=True,
             figsize=(8, 6),
         )
+
         assert fig is not None
         plt.close(fig)
+
+    def test_raises_with_missing_x(self, pca_model):
+        """Missing X arrays raise an informative error."""
+        datasets = {"train": {"X": None, "y": np.array([1, 2, 3])}}
+
+        with pytest.raises(ValueError, match="X data is required"):
+            create_model_distances_plot(
+                datasets_data=datasets,
+                model=pca_model,
+                confidence=0.95,
+                color_by_y=False,
+                figsize=(8, 6),
+            )
+
+    def test_raises_with_no_datasets(self, pca_model):
+        """Empty dataset mapping is rejected."""
+        with pytest.raises(ValueError, match="must contain at least one dataset"):
+            create_model_distances_plot(
+                datasets_data={},
+                model=pca_model,
+                confidence=0.95,
+                color_by_y=False,
+                figsize=(8, 6),
+            )

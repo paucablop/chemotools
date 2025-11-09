@@ -1,0 +1,348 @@
+"""Tests for regression plot creation functions."""
+
+import numpy as np
+import pytest
+import matplotlib.pyplot as plt
+from sklearn.cross_decomposition import PLSRegression
+
+from chemotools.inspector._plot_regression import (
+    create_predicted_vs_actual_plot,
+    create_y_residual_plot,
+    create_qq_plot,
+    create_residual_distribution_plot,
+    create_regression_distances_plot,
+)
+from chemotools.outliers import Leverage, StudentizedResiduals
+
+
+@pytest.fixture
+def sample_regression_data():
+    """Create sample regression data for testing."""
+    np.random.seed(42)
+    n_samples = 50
+    n_features = 20
+
+    X = np.random.rand(n_samples, n_features)
+    y_true = np.random.rand(n_samples)
+    y_pred = y_true + np.random.normal(0, 0.1, n_samples)  # Add some noise
+
+    return {
+        "X": X,
+        "y_true": y_true,
+        "y_pred": y_pred,
+        "y": y_true,
+    }
+
+
+@pytest.fixture
+def sample_detectors(sample_regression_data):
+    """Create sample outlier detectors."""
+    X = sample_regression_data["X"]
+    y_true = sample_regression_data["y_true"]
+
+    # Fit a simple PLS model
+    model = PLSRegression(n_components=3)
+    model.fit(X, y_true)
+
+    # Create and fit detectors - both need the fitted model
+    leverage_detector = Leverage(model, confidence=0.95)
+    leverage_detector.fit(X)
+
+    student_detector = StudentizedResiduals(model, confidence=0.95)
+    student_detector.fit(X, y_true)
+
+    return leverage_detector, student_detector
+
+
+class TestCreatePredictedVsActualPlot:
+    """Tests for create_predicted_vs_actual_plot function."""
+
+    def test_single_dataset(self, sample_regression_data):
+        """Test predicted vs actual plot for single dataset."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+                "y": sample_regression_data["y"],
+            }
+        }
+
+        fig = create_predicted_vs_actual_plot(
+            datasets_data=datasets_data,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_multi_dataset(self, sample_regression_data):
+        """Test predicted vs actual plot for multiple datasets."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+                "y": sample_regression_data["y"],
+            },
+            "test": {
+                "y_true": sample_regression_data["y_true"][:30],
+                "y_pred": sample_regression_data["y_pred"][:30],
+                "y": sample_regression_data["y"][:30],
+            },
+        }
+
+        fig = create_predicted_vs_actual_plot(
+            datasets_data=datasets_data,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_color_by_y(self, sample_regression_data):
+        """Test predicted vs actual plot with y-coloring."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+                "y": sample_regression_data["y"],
+            }
+        }
+
+        fig = create_predicted_vs_actual_plot(
+            datasets_data=datasets_data,
+            color_by_y=True,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        plt.close(fig)
+
+
+class TestCreateYResidualPlot:
+    """Tests for create_y_residual_plot function."""
+
+    def test_single_dataset(self, sample_regression_data):
+        """Test residual plot for single dataset."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+                "y": sample_regression_data["y"],
+            }
+        }
+
+        fig = create_y_residual_plot(
+            datasets_data=datasets_data,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_multi_dataset(self, sample_regression_data):
+        """Test residual plot for multiple datasets (side-by-side)."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+                "y": sample_regression_data["y"],
+            },
+            "test": {
+                "y_true": sample_regression_data["y_true"][:30],
+                "y_pred": sample_regression_data["y_pred"][:30],
+                "y": sample_regression_data["y"][:30],
+            },
+        }
+
+        fig = create_y_residual_plot(
+            datasets_data=datasets_data,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 2  # Side-by-side subplots
+        plt.close(fig)
+
+
+class TestCreateQQPlot:
+    """Tests for create_qq_plot function."""
+
+    def test_single_dataset(self, sample_regression_data):
+        """Test Q-Q plot for single dataset."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            }
+        }
+
+        fig = create_qq_plot(
+            datasets_data=datasets_data,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_multi_dataset(self, sample_regression_data):
+        """Test Q-Q plot for multiple datasets."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            },
+            "test": {
+                "y_true": sample_regression_data["y_true"][:30],
+                "y_pred": sample_regression_data["y_pred"][:30],
+            },
+        }
+
+        fig = create_qq_plot(
+            datasets_data=datasets_data,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 2  # Side-by-side subplots
+        plt.close(fig)
+
+
+class TestCreateResidualDistributionPlot:
+    """Tests for create_residual_distribution_plot function."""
+
+    def test_single_dataset(self, sample_regression_data):
+        """Test residual distribution plot for single dataset."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            }
+        }
+
+        fig = create_residual_distribution_plot(
+            datasets_data=datasets_data,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_multi_dataset(self, sample_regression_data):
+        """Test residual distribution plot for multiple datasets."""
+        datasets_data = {
+            "train": {
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            },
+            "test": {
+                "y_true": sample_regression_data["y_true"][:30],
+                "y_pred": sample_regression_data["y_pred"][:30],
+            },
+        }
+
+        fig = create_residual_distribution_plot(
+            datasets_data=datasets_data,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 2  # Side-by-side subplots
+        plt.close(fig)
+
+
+class TestCreateRegressionDistancesPlot:
+    """Tests for create_regression_distances_plot function."""
+
+    def test_single_dataset(self, sample_regression_data, sample_detectors):
+        """Test regression distances plot for single dataset."""
+        leverage_detector, student_detector = sample_detectors
+
+        datasets_data = {
+            "train": {
+                "X": sample_regression_data["X"],
+                "y": sample_regression_data["y"],
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            }
+        }
+
+        fig = create_regression_distances_plot(
+            datasets_data=datasets_data,
+            leverage_detector=leverage_detector,
+            student_detector=student_detector,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1
+        plt.close(fig)
+
+    def test_multi_dataset(self, sample_regression_data, sample_detectors):
+        """Test regression distances plot for multiple datasets."""
+        leverage_detector, student_detector = sample_detectors
+
+        datasets_data = {
+            "train": {
+                "X": sample_regression_data["X"],
+                "y": sample_regression_data["y"],
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            },
+            "test": {
+                "X": sample_regression_data["X"][:30],
+                "y": sample_regression_data["y"][:30],
+                "y_true": sample_regression_data["y_true"][:30],
+                "y_pred": sample_regression_data["y_pred"][:30],
+            },
+        }
+
+        fig = create_regression_distances_plot(
+            datasets_data=datasets_data,
+            leverage_detector=leverage_detector,
+            student_detector=student_detector,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        assert len(fig.axes) == 1  # Overlaid on same axes
+        plt.close(fig)
+
+    def test_uses_distances_plot_class(self, sample_regression_data, sample_detectors):
+        """Test that the function uses DistancesPlot class."""
+        leverage_detector, student_detector = sample_detectors
+
+        datasets_data = {
+            "train": {
+                "X": sample_regression_data["X"],
+                "y": sample_regression_data["y"],
+                "y_true": sample_regression_data["y_true"],
+                "y_pred": sample_regression_data["y_pred"],
+            }
+        }
+
+        # This should not raise any errors
+        fig = create_regression_distances_plot(
+            datasets_data=datasets_data,
+            leverage_detector=leverage_detector,
+            student_detector=student_detector,
+            color_by_y=False,
+            figsize=(6, 6),
+        )
+
+        assert fig is not None
+        # Check that confidence lines are present
+        ax = fig.axes[0]
+        # Should have vertical and horizontal lines for confidence limits
+        assert len(ax.lines) > 0
+        plt.close(fig)

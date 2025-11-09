@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from chemotools.inspector._inspector_utils import (
+from chemotools.inspector._utils import (
     normalize_datasets,
     normalize_components,
     get_xlabel_for_features,

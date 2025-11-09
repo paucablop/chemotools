@@ -5,19 +5,22 @@ The :mod:`chemotools.plotting._spectrum` module implements the SpectrumPlot clas
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Optional, Any, cast
+from typing import Optional, Any
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import (
+from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
     detect_categorical,
     get_default_colormap,
     add_colorbar,
     calculate_ylim_for_xlim,
+    split_figure_plot_kwargs,
+    ensure_axes,
+    apply_limits,
 )
 
 
@@ -204,9 +207,7 @@ class SpectrumPlot:
         """
         # Separate kwargs for setup_figure vs plot
         # These are kwargs that should go to plt.subplots() via setup_figure
-        figure_kwargs_keys = {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
-        figure_kwargs = {k: v for k, v in kwargs.items() if k in figure_kwargs_keys}
-        plot_kwargs = {k: v for k, v in kwargs.items() if k not in figure_kwargs_keys}
+        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
         # Use setup_figure utility for consistent styling
         fig, ax = setup_figure(
@@ -228,8 +229,7 @@ class SpectrumPlot:
             if ylim is None:
                 ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
 
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, ylim=ylim)
 
         # Add legend or colorbar
         if self.color_by is None or self.is_categorical:
@@ -276,13 +276,7 @@ class SpectrumPlot:
         ax : Axes
             The matplotlib Axes object with the rendered plot.
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(10, 6))
-        else:
-            figure = ax.get_figure()
-            if figure is None:
-                raise ValueError("Axes object has no associated figure")
-            fig = cast(Figure, figure)
+        fig, ax = ensure_axes(ax, figsize=(10, 6))
 
         self._render_plot(ax, **kwargs)
 
@@ -298,8 +292,7 @@ class SpectrumPlot:
             if ylim is None:
                 ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
 
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, ylim=ylim)
 
         return fig, ax
 

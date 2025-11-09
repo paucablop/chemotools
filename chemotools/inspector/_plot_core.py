@@ -14,10 +14,10 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 from chemotools.plotting import ExplainedVariancePlot, LoadingsPlot, ScoresPlot
-from chemotools.plotting._utilities import annotate_points
+from chemotools.plotting._utils import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 
-from ._inspector_utils import (
+from ._utils import (
     ComponentSpec,
     prepare_annotations,
 )
@@ -75,6 +75,8 @@ def create_loadings_plot(
     loadings_components: Union[int, Sequence[int]],
     xlabel: str,
     figsize: Tuple[float, float],
+    *,
+    component_label: str = "PC",
 ) -> Figure:
     """Create loadings plot.
 
@@ -93,6 +95,9 @@ def create_loadings_plot(
         Label for x-axis (e.g., "Wavenumber (cm⁻¹)" or "Feature Index")
     figsize : Tuple[float, float]
         Figure size (width, height) in inches
+
+    component_label : str, optional
+        Prefix for component naming in titles (default "PC").
 
     Returns
     -------
@@ -126,9 +131,9 @@ def create_loadings_plot(
     ax.set_ylabel("Loading", fontsize=10)
 
     if isinstance(loadings_components, int):
-        title = f"PC{loadings_components + 1} Loadings"
+        title = f"{component_label}{loadings_components + 1} Loadings"
     else:
-        comp_str = ", ".join([f"PC{c + 1}" for c in loadings_components])
+        comp_str = ", ".join([f"{component_label}{c + 1}" for c in loadings_components])
         title = f"Loadings: {comp_str}"
     ax.set_title(title, fontsize=12, fontweight="bold")
     ax.grid(alpha=0.3)
@@ -146,6 +151,8 @@ def create_scores_plot_single_dataset(
     color_by_y: bool,
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
+    *,
+    component_label: str = "PC",
 ) -> Figure:
     """Create scores plot for a single dataset.
 
@@ -169,6 +176,9 @@ def create_scores_plot_single_dataset(
         Annotation specification ('sample_index', 'y', or dict)
     figsize : Tuple[float, float]
         Figure size (width, height) in inches
+
+    component_label : str, optional
+        Prefix used in axis labels and titles (default "PC").
 
     Returns
     -------
@@ -202,9 +212,11 @@ def create_scores_plot_single_dataset(
 
         # Apply decorations
         ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10)
+        ax.set_ylabel(
+            f"{component_label}{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
+        )
         ax.set_title(
-            f"Scores: PC{component_spec + 1} ({dataset_name.capitalize()})",
+            f"Scores: {component_label}{component_spec + 1} ({dataset_name.capitalize()})",
             fontsize=12,
             fontweight="bold",
         )
@@ -244,10 +256,14 @@ def create_scores_plot_single_dataset(
             )
 
         # Apply decorations with variance percentages
-        ax.set_xlabel(f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10)
-        ax.set_ylabel(f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10)
+        ax.set_xlabel(
+            f"{component_label}{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+        )
+        ax.set_ylabel(
+            f"{component_label}{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+        )
         ax.set_title(
-            f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1} ({dataset_name.capitalize()})",
+            f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1} ({dataset_name.capitalize()})",
             fontsize=12,
             fontweight="bold",
         )
@@ -264,6 +280,8 @@ def create_scores_plot_multi_dataset(
     color_by_y: bool,
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
+    *,
+    component_label: str = "PC",
 ) -> Figure:
     """Create scores plot with multiple datasets on same axes.
 
@@ -284,6 +302,9 @@ def create_scores_plot_multi_dataset(
         Annotation specification
     figsize : Tuple[float, float]
         Figure size (width, height) in inches
+
+    component_label : str, optional
+        Prefix used in axis labels and titles (default "PC").
 
     Returns
     -------
@@ -347,8 +368,14 @@ def create_scores_plot_multi_dataset(
 
         # Apply decorations
         ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(f"PC{component_spec + 1} ({var_pct:.1f}%)", fontsize=10)
-        ax.set_title(f"Scores: PC{component_spec + 1}", fontsize=12, fontweight="bold")
+        ax.set_ylabel(
+            f"{component_label}{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
+        )
+        ax.set_title(
+            f"Scores: {component_label}{component_spec + 1}",
+            fontsize=12,
+            fontweight="bold",
+        )
         ax.grid(alpha=0.3)
         ax.legend(loc="best")
     else:
@@ -397,10 +424,14 @@ def create_scores_plot_multi_dataset(
                 )
 
         # Apply decorations with variance percentages
-        ax.set_xlabel(f"PC{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10)
-        ax.set_ylabel(f"PC{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10)
+        ax.set_xlabel(
+            f"{component_label}{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+        )
+        ax.set_ylabel(
+            f"{component_label}{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+        )
         ax.set_title(
-            f"Scores: PC{components_pair[0] + 1} vs PC{components_pair[1] + 1}",
+            f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1}",
             fontsize=12,
             fontweight="bold",
         )

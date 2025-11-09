@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import (
+from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
     add_confidence_ellipse,
@@ -387,7 +387,7 @@ class TestCalculateYlimForXlim:
 
     def test_with_2d_data_x_matches_axis_0(self):
         """Test with 2D data where x matches axis 0 (rows)."""
-        from chemotools.plotting._utilities import calculate_ylim_for_xlim
+        from chemotools.plotting._utils import calculate_ylim_for_xlim
 
         x = np.linspace(0, 10, 100)
         y = np.random.rand(100, 5)  # x matches rows
@@ -398,7 +398,7 @@ class TestCalculateYlimForXlim:
 
     def test_raises_on_mismatched_dimensions(self):
         """Test that it raises error when x doesn't match y dimensions."""
-        from chemotools.plotting._utilities import calculate_ylim_for_xlim
+        from chemotools.plotting._utils import calculate_ylim_for_xlim
 
         x = np.linspace(0, 10, 100)
         y = np.random.rand(50, 60)  # Neither dimension matches x

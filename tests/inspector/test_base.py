@@ -17,7 +17,7 @@ class ConcreteInspector(_BaseInspector):
         fig, ax = plt.subplots()
         for dataset in datasets:
             if dataset in self.datasets_:
-                scores = self._get_scores(self.datasets_[dataset]["X"], dataset)
+                scores = self._get_scores(dataset)
                 ax.scatter(scores[:, components[0]], scores[:, components[1]])
         return fig
 
@@ -140,7 +140,8 @@ class TestBaseInspectorInitialization:
         )
 
         # Assert
-        assert inspector.feature_names == feature_names
+        assert inspector.feature_names is not None
+        assert np.array_equal(inspector.feature_names, np.asarray(feature_names))
 
     def test_init_with_sample_labels(self, fitted_pca, dummy_data_loader):
         """Test initialization with sample labels."""

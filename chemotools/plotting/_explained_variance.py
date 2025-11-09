@@ -6,7 +6,12 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import setup_figure
+from chemotools.plotting._utils import (
+    setup_figure,
+    split_figure_plot_kwargs,
+    ensure_axes,
+    apply_limits,
+)
 
 
 class ExplainedVariancePlot:
@@ -144,8 +149,7 @@ class ExplainedVariancePlot:
             The matplotlib Figure object.
         """
         # Extract figure setup kwargs
-        subplot_kw = kwargs.pop("subplot_kw", None)
-        gridspec_kw = kwargs.pop("gridspec_kw", None)
+        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
         # Use setup_figure utility for consistent styling
         fig, ax = setup_figure(
@@ -153,11 +157,17 @@ class ExplainedVariancePlot:
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
-            subplot_kw=subplot_kw,
-            gridspec_kw=gridspec_kw,
+            **figure_kwargs,
         )
 
-        self.render(ax=ax, xlabel=xlabel, ylabel=ylabel, xlim=xlim, ylim=ylim, **kwargs)
+        self.render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **plot_kwargs,
+        )
         ax.legend()
         plt.tight_layout()
         return fig
@@ -194,8 +204,7 @@ class ExplainedVariancePlot:
         Axes
             The matplotlib Axes object.
         """
-        if ax is None:
-            ax = plt.gca()
+        _fig, ax = ensure_axes(ax, figsize=(10, 6))
 
         self._render_plot(ax, **kwargs)
 
@@ -204,10 +213,7 @@ class ExplainedVariancePlot:
         ax.set_ylabel(ylabel)
 
         # Apply axis limits if provided
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return ax
 

@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from sklearn.exceptions import NotFittedError
 
-from chemotools.inspector._validate import (
+from chemotools.inspector._validation import (
     _validate_and_extract_model,
     _validate_datasets_consistency,
 )

@@ -1,12 +1,12 @@
 """Scores plot for visualizing model projections and latent space."""
 
-from typing import Optional, Any, cast
+from typing import Optional, Any
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting._utilities import (
+from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
     detect_categorical,
@@ -14,6 +14,9 @@ from chemotools.plotting._utilities import (
     add_colorbar,
     annotate_points,
     add_confidence_ellipse,
+    ensure_axes,
+    apply_limits,
+    set_default_axis_labels,
 )
 
 
@@ -239,10 +242,7 @@ class ScoresPlot:
         self._render_plot(ax, **kwargs)
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         # Add colorbar for continuous data
         if self.color_by is not None and not self.is_categorical:
@@ -303,34 +303,25 @@ class ScoresPlot:
         >>> ax.legend()
         >>> plt.show()
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(8, 8))
-        else:
-            figure = ax.get_figure()
-            if figure is None:
-                raise ValueError("Axes object has no associated figure")
-            fig = cast(Figure, figure)
+        fig, ax = ensure_axes(ax, figsize=(8, 8))
 
         self._render_plot(ax, **kwargs)
 
         # Set axis labels if provided
         if xlabel is not None:
             ax.set_xlabel(xlabel)
-        elif not ax.get_xlabel():  # Only set default if no label exists
+        else:
             comp1, _ = self.components
-            ax.set_xlabel(f"PC{comp1 + 1}")
+            set_default_axis_labels(ax, xlabel=f"PC{comp1 + 1}")
 
         if ylabel is not None:
             ax.set_ylabel(ylabel)
-        elif not ax.get_ylabel():  # Only set default if no label exists
+        else:
             _, comp2 = self.components
-            ax.set_ylabel(f"PC{comp2 + 1}")
+            set_default_axis_labels(ax, ylabel=f"PC{comp2 + 1}")
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return fig, ax
 

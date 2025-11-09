@@ -7,7 +7,13 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy import stats
 
-from chemotools.plotting._utilities import setup_figure
+from chemotools.plotting._utils import (
+    setup_figure,
+    split_figure_plot_kwargs,
+    ensure_axes,
+    apply_limits,
+    set_default_axis_labels,
+)
 
 
 class ResidualDistributionPlot:
@@ -188,9 +194,7 @@ class ResidualDistributionPlot:
             The matplotlib Figure object containing the plot.
         """
         # Separate kwargs for setup_figure vs plot
-        figure_kwargs_keys = {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
-        figure_kwargs = {k: v for k, v in kwargs.items() if k in figure_kwargs_keys}
-        plot_kwargs = {k: v for k, v in kwargs.items() if k not in figure_kwargs_keys}
+        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
         # Auto-generate labels if not provided
         if xlabel is None:
@@ -216,10 +220,7 @@ class ResidualDistributionPlot:
         self._render_plot(ax, **plot_kwargs)
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         # Add grid
         ax.grid(alpha=0.3, linestyle="--", axis="y")
@@ -253,30 +254,20 @@ class ResidualDistributionPlot:
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(10, 6))
-        else:
-            _fig = ax.get_figure()
-            if _fig is None:
-                raise ValueError("Provided axes must be attached to a figure")
-            # Type narrowing for mypy
-            assert isinstance(_fig, Figure)
-            fig = _fig
+        fig, ax = ensure_axes(ax, figsize=(10, 6))
 
         # Render the plot
         self._render_plot(ax, **kwargs)
 
         # Set default labels if axes don't have them
-        if not ax.get_xlabel():
-            ax.set_xlabel("Residuals")
-        if not ax.get_ylabel():
-            ax.set_ylabel("Density" if self.density else "Count")
+        set_default_axis_labels(
+            ax,
+            xlabel="Residuals",
+            ylabel="Density" if self.density else "Count",
+        )
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return fig, ax
 

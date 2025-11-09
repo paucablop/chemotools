@@ -1,7 +1,7 @@
 """Plotting utilities and display protocols for chemotools visualizations."""
 
 from chemotools.plotting._display import Display, is_displayable
-from chemotools.plotting._utilities import (
+from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
     add_confidence_ellipse,
@@ -17,6 +17,7 @@ from chemotools.plotting._explained_variance import ExplainedVariancePlot
 from chemotools.plotting._y_residuals import YResidualsPlot
 from chemotools.plotting._qq_plot import QQPlot
 from chemotools.plotting._residual_distribution import ResidualDistributionPlot
+from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot
 
 __all__ = [
     # Protocols
@@ -31,6 +32,7 @@ __all__ = [
     "YResidualsPlot",
     "QQPlot",
     "ResidualDistributionPlot",
+    "PredictedVsActualPlot",
     # Utilities
     "setup_figure",
     "get_colors_from_labels",

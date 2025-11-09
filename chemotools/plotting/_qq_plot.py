@@ -7,7 +7,14 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy import stats
 
-from chemotools.plotting._utilities import setup_figure, annotate_points
+from chemotools.plotting._utils import (
+    setup_figure,
+    annotate_points,
+    split_figure_plot_kwargs,
+    ensure_axes,
+    apply_limits,
+    set_default_axis_labels,
+)
 
 
 class QQPlot:
@@ -184,9 +191,7 @@ class QQPlot:
             The matplotlib Figure object containing the plot.
         """
         # Separate kwargs for setup_figure vs plot
-        figure_kwargs_keys = {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
-        figure_kwargs = {k: v for k, v in kwargs.items() if k in figure_kwargs_keys}
-        plot_kwargs = {k: v for k, v in kwargs.items() if k not in figure_kwargs_keys}
+        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
         # Auto-generate labels if not provided
         if xlabel is None:
@@ -212,10 +217,7 @@ class QQPlot:
         self._render_plot(ax, **plot_kwargs)
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         # Add grid
         ax.grid(alpha=0.3, linestyle="--")
@@ -249,30 +251,20 @@ class QQPlot:
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=(8, 8))
-        else:
-            _fig = ax.get_figure()
-            if _fig is None:
-                raise ValueError("Provided axes must be attached to a figure")
-            # Type narrowing for mypy
-            assert isinstance(_fig, Figure)
-            fig = _fig
+        fig, ax = ensure_axes(ax, figsize=(10, 6))
 
         # Render the plot
         self._render_plot(ax, **kwargs)
 
         # Set default labels if axes don't have them
-        if not ax.get_xlabel():
-            ax.set_xlabel("Theoretical Quantiles")
-        if not ax.get_ylabel():
-            ax.set_ylabel("Sample Quantiles")
+        set_default_axis_labels(
+            ax,
+            xlabel="Theoretical Quantiles",
+            ylabel="Sample Quantiles",
+        )
 
         # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return fig, ax
 
@@ -351,5 +343,10 @@ class QQPlot:
                 ax, self.theoretical_quantiles, self.sample_quantiles, self.annotations
             )
 
-        # Make it square for easier visual assessment
+        # Enforce equal scaling so the reference line is visually meaningful
         ax.set_aspect("equal", adjustable="box")
+
+        # When available make the axes box square to avoid tiny drawing areas
+        set_box_aspect = getattr(ax, "set_box_aspect", None)
+        if callable(set_box_aspect):
+            set_box_aspect(1)
