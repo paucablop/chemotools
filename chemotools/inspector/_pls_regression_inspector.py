@@ -5,26 +5,19 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING, Un
 import numpy as np
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
-from sklearn.metrics import mean_squared_error, r2_score
 
 if TYPE_CHECKING:
     import matplotlib.figure
 
-from chemotools.outliers import HotellingT2, QResiduals, Leverage, StudentizedResiduals
+from chemotools.outliers import HotellingT2, QResiduals
 
 from ._base import _BaseInspector
+from .mixins import LatentVariableMixin, RegressionMixin
 from ._utils import (
     normalize_datasets,
-    normalize_components,
     get_xlabel_for_features,
 )
-from ._plot_utils_latent_space import (
-    create_model_distances_plot,
-    create_variance_plot,
-    create_loadings_plot,
-    create_scores_plot_single_dataset,
-    create_scores_plot_multi_dataset,
-)
+from . import _plot_utils_latent_space as _latent_plots
 from ._plot_utils_spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
@@ -43,7 +36,7 @@ SummaryValue = Union[
 ]
 
 
-class PLSRegressionInspector(_BaseInspector):
+class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspector):
     """Inspector for PLS Regression model diagnostics and visualization.
 
     This class provides a unified interface for inspecting PLS regression models by
@@ -151,6 +144,8 @@ class PLSRegressionInspector(_BaseInspector):
     >>> coeffs = inspector.get_regression_coefficients()
     """
 
+    component_label = "LV"
+
     def __init__(
         self,
         model: Union[_PLS, Pipeline],
@@ -186,19 +181,8 @@ class PLSRegressionInspector(_BaseInspector):
 
         self._x_scores_cache: Dict[str, np.ndarray] = {}
         self._y_scores_cache: Dict[str, np.ndarray] = {}
-        self._predictions_cache: Dict[str, np.ndarray] = {}
         self._hotelling_t2_limit: Optional[float] = None
         self._q_residuals_limit: Optional[float] = None
-        self._leverage_detector: Optional[Leverage] = None
-        self._studentized_detector: Optional[StudentizedResiduals] = None
-
-        self._RMSE_train = self._calculate_rmse("train")
-        self._RMSE_test = self._calculate_rmse("test") if X_test is not None else None
-        self._RMSE_val = self._calculate_rmse("val") if X_val is not None else None
-
-        self._R2_train = self._calculate_r2("train")
-        self._R2_test = self._calculate_r2("test") if X_test is not None else None
-        self._R2_val = self._calculate_r2("val") if X_val is not None else None
 
     # ==================================================================================
     # Properties
@@ -245,36 +229,6 @@ class PLSRegressionInspector(_BaseInspector):
         return self._confidence
 
     @property
-    def RMSE_train(self) -> float:
-        """Return RMSE on training data."""
-        return self._RMSE_train
-
-    @property
-    def RMSE_test(self) -> Optional[float]:
-        """Return RMSE on test data (if available)."""
-        return self._RMSE_test
-
-    @property
-    def RMSE_val(self) -> Optional[float]:
-        """Return RMSE on validation data (if available)."""
-        return self._RMSE_val
-
-    @property
-    def R2_train(self) -> float:
-        """Return R² score on training data."""
-        return self._R2_train
-
-    @property
-    def R2_test(self) -> Optional[float]:
-        """Return R² score on test data (if available)."""
-        return self._R2_test
-
-    @property
-    def R2_val(self) -> Optional[float]:
-        """Return R² score on validation data (if available)."""
-        return self._R2_val
-
-    @property
     def hotelling_t2_limit(self) -> float:
         """Return the Hotelling's T² critical value at the specified confidence level."""
         if self._hotelling_t2_limit is None:
@@ -294,32 +248,6 @@ class PLSRegressionInspector(_BaseInspector):
             self._q_residuals_limit = q_detector.critical_value_
         return self._q_residuals_limit
 
-    @property
-    def leverage_detector(self) -> Leverage:
-        """Return the fitted Leverage detector.
-
-        The detector is fitted on training data and cached for reuse.
-        """
-        if self._leverage_detector is None:
-            self._leverage_detector = Leverage(self.model, confidence=self._confidence)
-            X_train, y_train = self._get_raw_data("train")
-            self._leverage_detector.fit(X_train, y_train)
-        return self._leverage_detector
-
-    @property
-    def studentized_detector(self) -> StudentizedResiduals:
-        """Return the fitted StudentizedResiduals detector.
-
-        The detector is fitted on training data and cached for reuse.
-        """
-        if self._studentized_detector is None:
-            self._studentized_detector = StudentizedResiduals(
-                self.model, confidence=self._confidence
-            )
-            X_train, y_train = self._get_raw_data("train")
-            self._studentized_detector.fit(X_train, y_train)
-        return self._studentized_detector
-
     # ==================================================================================
     # Private Methods
     # ==================================================================================
@@ -335,28 +263,6 @@ class PLSRegressionInspector(_BaseInspector):
         """Get preprocessed X data for specified dataset."""
         return super()._get_preprocessed_data(dataset)
 
-    def _get_predictions(self, dataset: str) -> np.ndarray:
-        """Get predictions for specified dataset."""
-        if dataset not in self._predictions_cache:
-            X, _ = self._get_raw_data(dataset)
-            y_pred = self.model.predict(X)
-            if y_pred.ndim > 1:
-                y_pred = y_pred.ravel()
-            self._predictions_cache[dataset] = y_pred
-        return self._predictions_cache[dataset]
-
-    def _calculate_rmse(self, dataset: str) -> float:
-        """Calculate RMSE for specified dataset."""
-        _, y_true = self._get_raw_data(dataset)
-        y_pred = self._get_predictions(dataset)
-        return float(np.sqrt(mean_squared_error(y_true, y_pred)))
-
-    def _calculate_r2(self, dataset: str) -> float:
-        """Calculate R² score for specified dataset."""
-        _, y_true = self._get_raw_data(dataset)
-        y_pred = self._get_predictions(dataset)
-        return float(r2_score(y_true, y_pred))
-
     def _get_preprocessed_wavenumbers(self) -> np.ndarray:
         """Get wavenumbers after feature selection."""
         return self._get_preprocessed_feature_names()
@@ -364,6 +270,18 @@ class PLSRegressionInspector(_BaseInspector):
     # ==================================================================================
     # Public Methods
     # ==================================================================================
+
+    # ------------------------------------------------------------------
+    # LatentVariableMixin hooks
+    # ------------------------------------------------------------------
+    def get_latent_scores(self, dataset: str) -> np.ndarray:
+        return self.get_x_scores(dataset)
+
+    def get_latent_explained_variance(self) -> Optional[np.ndarray]:
+        return self.get_explained_x_variance_ratio()
+
+    def get_latent_loadings(self) -> np.ndarray:
+        return self.get_x_loadings()
 
     def get_x_scores(self, dataset: str = "train") -> np.ndarray:
         """Get PLS X-scores for specified dataset.
@@ -631,175 +549,102 @@ class PLSRegressionInspector(_BaseInspector):
         """
         figures = {}
 
-        # Normalize inputs
         datasets = normalize_datasets(dataset)
-        components_list = normalize_components(components_scores)
         use_suffix = len(datasets) > 1
 
-        # Get xlabel
         xlabel = get_xlabel_for_features(self._wavenumbers is not None)
         preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
 
-        # ============================================================================
-        # Variance plots (X and Y spaces)
-        # ============================================================================
         x_var = self.get_explained_x_variance_ratio()
         if x_var is not None:
-            figures["variance_x"] = create_variance_plot(
-                explained_variance_ratio=x_var,
+            variance_x_fig = self.create_latent_variance_figure(
                 variance_threshold=variance_threshold,
                 figsize=variance_figsize,
             )
-            figures["variance_x"].axes[0].set_title(
-                "Explained Variance in X-space", fontsize=12, fontweight="bold"
-            )
+            if variance_x_fig is not None:
+                variance_x_fig.axes[0].set_title(
+                    "Explained Variance in X-space",
+                    fontsize=12,
+                    fontweight="bold",
+                )
+                figures["variance_x"] = variance_x_fig
 
         y_var = self.get_explained_y_variance_ratio()
         if y_var is not None:
-            figures["variance_y"] = create_variance_plot(
+            variance_y_fig = _latent_plots.create_variance_plot(
                 explained_variance_ratio=y_var,
                 variance_threshold=variance_threshold,
                 figsize=variance_figsize,
             )
-            figures["variance_y"].axes[0].set_title(
+            variance_y_fig.axes[0].set_title(
                 "Explained Variance in Y-space", fontsize=12, fontweight="bold"
             )
+            figures["variance_y"] = variance_y_fig
 
-        # ============================================================================
-        # Loadings plots
-        # ============================================================================
-        # X-loadings
-        figures["loadings_x"] = create_loadings_plot(
-            loadings=self.get_x_loadings(),
-            feature_names=preprocessed_wavenumbers,
+        loadings_x_fig = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
             figsize=loadings_figsize,
-            component_label="LV",
         )
-        figures["loadings_x"].axes[0].set_title(
-            "X-Loadings", fontsize=12, fontweight="bold"
-        )
+        loadings_x_fig.axes[0].set_title("X-Loadings", fontsize=12, fontweight="bold")
+        figures["loadings_x"] = loadings_x_fig
 
-        # X-weights
-        figures["loadings_weights"] = create_loadings_plot(
+        figures["loadings_weights"] = _latent_plots.create_loadings_plot(
             loadings=self.get_x_weights(),
             feature_names=preprocessed_wavenumbers,
             loadings_components=loadings_components,
             xlabel=xlabel,
             figsize=loadings_figsize,
-            component_label="LV",
+            component_label=self.component_label,
         )
         figures["loadings_weights"].axes[0].set_title(
             "X-Weights", fontsize=12, fontweight="bold"
         )
 
-        # X-rotations
-        figures["loadings_rotations"] = create_loadings_plot(
+        figures["loadings_rotations"] = _latent_plots.create_loadings_plot(
             loadings=self.get_x_rotations(),
             feature_names=preprocessed_wavenumbers,
             loadings_components=loadings_components,
             xlabel=xlabel,
             figsize=loadings_figsize,
-            component_label="LV",
+            component_label=self.component_label,
         )
         figures["loadings_rotations"].axes[0].set_title(
             "X-Rotations", fontsize=12, fontweight="bold"
         )
 
-        # Regression coefficients
         coef = self.get_regression_coefficients()
-        # Create a loadings-style plot for coefficients (single "component")
-        figures["regression_coefficients"] = create_loadings_plot(
-            loadings=coef.reshape(-1, 1),  # Shape as (n_features, 1)
+        coef_fig = _latent_plots.create_loadings_plot(
+            loadings=coef.reshape(-1, 1),
             feature_names=preprocessed_wavenumbers,
-            loadings_components=[0],  # Only one "component"
+            loadings_components=[0],
             xlabel=xlabel,
             figsize=loadings_figsize,
-            component_label="LV",
+            component_label=self.component_label,
         )
-        figures["regression_coefficients"].axes[0].set_title(
+        coef_fig.axes[0].set_title(
             "Regression Coefficients", fontsize=12, fontweight="bold"
         )
-        # Update legend to show "Coefficients" instead of "LV 1"
-        ax = figures["regression_coefficients"].axes[0]
-        handles, _ = ax.get_legend_handles_labels()
+        coef_ax = coef_fig.axes[0]
+        handles, _ = coef_ax.get_legend_handles_labels()
         if handles:
-            ax.legend(handles, ["Coefficients"], loc="best")
+            coef_ax.legend(handles, ["Coefficients"], loc="best")
+        figures["regression_coefficients"] = coef_fig
 
-        # ============================================================================
-        # Scores plots (X-scores)
-        # ============================================================================
-        if use_suffix:
-            # Multiple datasets
-            scores_datasets: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
-            for ds in datasets:
-                _, y_values = self._get_raw_data(ds)
-                scores_datasets[ds] = {
-                    "scores": self.get_x_scores(ds),
-                    "y": y_values,
-                }
+        scores_figures = self.create_latent_scores_figures(
+            dataset=dataset,
+            components=components_scores,
+            color_by_y=color_by_y,
+            annotate_by=annotate_by,
+            figsize=scores_figsize,
+        )
+        figures.update(scores_figures)
 
-            # Get explained variance for axis labels
-            explained_var = (
-                x_var
-                if x_var is not None
-                else np.zeros(self.nr_components, dtype=float)
-            )
-
-            for i, component_spec in enumerate(components_list, start=1):
-                fig = create_scores_plot_multi_dataset(
-                    component_spec=component_spec,
-                    datasets_data=scores_datasets,
-                    explained_var=explained_var,
-                    color_by_y=color_by_y,
-                    annotate_by=annotate_by,
-                    figsize=scores_figsize,
-                    component_label="LV",
-                )
-                figures[f"scores_{i}"] = fig
-        else:
-            # Single dataset
-            ds = datasets[0]
-            scores = self.get_x_scores(ds)
-            _, y = self._get_raw_data(ds)
-            explained_var = (
-                x_var
-                if x_var is not None
-                else np.zeros(self.nr_components, dtype=float)
-            )
-
-            for i, component_spec in enumerate(components_list, start=1):
-                fig = create_scores_plot_single_dataset(
-                    component_spec=component_spec,
-                    scores=scores,
-                    y=y,
-                    explained_var=explained_var,
-                    dataset_name=ds,
-                    color_by_y=color_by_y,
-                    annotate_by=annotate_by,
-                    figsize=scores_figsize,
-                    component_label="LV",
-                )
-                figures[f"scores_{i}"] = fig
-
-        # ============================================================================
-        # Distance plots
-        # ============================================================================
-        # Hotelling T² vs Q residuals
-        distance_datasets: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
-        for ds in datasets:
-            X, y = self._get_raw_data(ds)
-            distance_datasets[ds] = {"X": X, "y": y}
-
-        fig_distances = create_model_distances_plot(
-            datasets_data=distance_datasets,
-            model=self._model,
-            confidence=self._confidence,
+        figures["distances_hotelling_q"] = self.create_latent_distance_figure(
+            dataset=dataset,
             color_by_y=color_by_y,
             figsize=distances_figsize,
         )
-        figures["distances_hotelling_q"] = fig_distances
 
         # Leverage vs Studentized residuals
         if use_suffix:

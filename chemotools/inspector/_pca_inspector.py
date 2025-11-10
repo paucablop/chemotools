@@ -12,17 +12,10 @@ if TYPE_CHECKING:
 from chemotools.outliers import HotellingT2, QResiduals
 
 from ._base import _BaseInspector
+from .mixins import LatentVariableMixin
 from ._utils import (
     normalize_datasets,
-    normalize_components,
     get_xlabel_for_features,
-)
-from ._plot_utils_latent_space import (
-    create_model_distances_plot,
-    create_variance_plot,
-    create_loadings_plot,
-    create_scores_plot_single_dataset,
-    create_scores_plot_multi_dataset,
 )
 from ._plot_utils_spectra import (
     create_spectra_plots_single_dataset,
@@ -30,7 +23,7 @@ from ._plot_utils_spectra import (
 )
 
 
-class PCAInspector(_BaseInspector):
+class PCAInspector(LatentVariableMixin, _BaseInspector):
     """Inspector for PCA model diagnostics and visualization.
 
     This class provides a unified interface for inspecting PCA models by creating
@@ -98,7 +91,6 @@ class PCAInspector(_BaseInspector):
     >>>
     >>> # Load data
     >>> X, y = load_fermentation_train()
-    >>>
     >>> # Create and fit pipeline
     >>> pipeline = make_pipeline(
     ...     StandardScaler(),
@@ -122,6 +114,8 @@ class PCAInspector(_BaseInspector):
     >>> scores = inspector.get_scores('train')
     >>> loadings = inspector.get_loadings([0, 1, 2])
     """
+
+    component_label = "PC"
 
     def __init__(
         self,
@@ -272,6 +266,18 @@ class PCAInspector(_BaseInspector):
     # ==================================================================================
     # Public Methods
     # ==================================================================================
+
+    # ------------------------------------------------------------------
+    # LatentVariableMixin hooks
+    # ------------------------------------------------------------------
+    def get_latent_scores(self, dataset: str) -> np.ndarray:
+        return self.get_scores(dataset)
+
+    def get_latent_explained_variance(self) -> Optional[np.ndarray]:
+        return self.get_explained_variance_ratio()
+
+    def get_latent_loadings(self) -> np.ndarray:
+        return self.get_loadings()
 
     def get_scores(self, dataset: str = "train") -> np.ndarray:
         """Get PCA scores for specified dataset.
@@ -524,87 +530,37 @@ class PCAInspector(_BaseInspector):
         """
         figures = {}
 
-        # Normalize inputs
         datasets = normalize_datasets(dataset)
-        components_list = normalize_components(components_scores)
         use_suffix = len(datasets) > 1
 
-        # Create variance plot (shared across all datasets)
-        figures["variance"] = create_variance_plot(
-            explained_variance_ratio=self.get_explained_variance_ratio(),
+        variance_fig = self.create_latent_variance_figure(
             variance_threshold=variance_threshold,
             figsize=variance_figsize,
         )
+        if variance_fig is not None:
+            figures["variance"] = variance_fig
 
-        # Create loadings plot (shared across all datasets)
         xlabel = get_xlabel_for_features(self.feature_names is not None)
-        preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
-        figures["loadings"] = create_loadings_plot(
-            loadings=self.get_loadings(),
-            feature_names=preprocessed_wavenumbers,
+        figures["loadings"] = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
             figsize=loadings_figsize,
         )
 
-        # Create scores plots
-        if use_suffix:
-            # Multiple datasets: combine on same plot
-            explained_var = self.get_explained_variance_ratio()
+        scores_figures = self.create_latent_scores_figures(
+            dataset=dataset,
+            components=components_scores,
+            color_by_y=color_by_y,
+            annotate_by=annotate_by,
+            figsize=scores_figsize,
+        )
+        figures.update(scores_figures)
 
-            # Prepare datasets data
-            datasets_data = {}
-            for ds in datasets:
-                datasets_data[ds] = {
-                    "scores": self.get_scores(ds),
-                    "y": self._get_raw_data(ds)[1],
-                }
-
-            for i, component_spec in enumerate(components_list, start=1):
-                fig = create_scores_plot_multi_dataset(
-                    component_spec=component_spec,
-                    datasets_data=datasets_data,
-                    explained_var=explained_var,
-                    color_by_y=color_by_y,
-                    annotate_by=annotate_by,
-                    figsize=scores_figsize,
-                )
-                figures[f"scores_{i}"] = fig
-        else:
-            # Single dataset
-            ds = datasets[0]
-            scores = self.get_scores(ds)
-            _, y = self._get_raw_data(ds)
-            explained_var = self.get_explained_variance_ratio()
-
-            # Create scores plots for single dataset
-            for i, component_spec in enumerate(components_list, start=1):
-                fig = create_scores_plot_single_dataset(
-                    component_spec=component_spec,
-                    scores=scores,
-                    y=y,
-                    explained_var=explained_var,
-                    dataset_name=ds,
-                    color_by_y=color_by_y,
-                    annotate_by=annotate_by,
-                    figsize=scores_figsize,
-                )
-                figures[f"scores_{i}"] = fig
-
-        # Create distances plot
-        datasets_data = {}
-        for ds in datasets:
-            X, y = self._get_raw_data(ds)
-            datasets_data[ds] = {"X": X, "y": y}
-
-        fig_distances = create_model_distances_plot(
-            datasets_data=datasets_data,
-            model=self.model,
-            confidence=self._confidence,
+        figures["distances"] = self.create_latent_distance_figure(
+            dataset=dataset,
             color_by_y=color_by_y,
             figsize=distances_figsize,
         )
-        figures["distances"] = fig_distances
 
         # Add spectra plots if preprocessing exists
         # Note: We call inspect_spectra once with all datasets to plot them together
