@@ -166,6 +166,7 @@ def create_scores_plot_single_dataset(
     figsize: Tuple[float, float],
     *,
     component_label: str = "PC",
+    dataset_color: Optional[str] = None,
 ) -> Figure:
     """Create scores plot for a single dataset.
 
@@ -192,6 +193,9 @@ def create_scores_plot_single_dataset(
 
     component_label : str, optional
         Prefix used in axis labels and titles (default "PC").
+    dataset_color : Optional[str], optional
+        Fixed colour for the dataset when ``color_by_y`` is False. When
+        provided, this colour is applied to the rendered points.
 
     Returns
     -------
@@ -257,7 +261,13 @@ def create_scores_plot_single_dataset(
             xlabel_text = "y-value"
         else:
             # Plot PC score vs sample index
-            ax.scatter(range(len(pc_scores)), pc_scores, alpha=0.7, s=50)
+            ax.scatter(
+                range(len(pc_scores)),
+                pc_scores,
+                alpha=0.7,
+                s=50,
+                color=dataset_color,
+            )
             xlabel_text = "Sample Index"
 
         # Apply decorations
@@ -286,6 +296,7 @@ def create_scores_plot_single_dataset(
             components=components_pair,
             color_by=color_by,
             label=dataset_name.capitalize(),
+            color=dataset_color if color_by is None else None,
             colormap=None,
             confidence_ellipse=0.95,  # Always show 95% confidence ellipse
         )
@@ -503,6 +514,10 @@ def create_model_distances_plot(
     confidence: float,
     color_by_y: bool,
     figsize: Tuple[float, float],
+    *,
+    hotelling_detector: Optional[HotellingT2] = None,
+    q_residuals_detector: Optional[QResiduals] = None,
+    training_dataset: str = "train",
 ) -> Figure:
     """Create model diagnostic distances plot across one or more datasets.
 
@@ -528,6 +543,20 @@ def create_model_distances_plot(
     figsize : Tuple[float, float]
         Figure size (width, height) in inches.
 
+    Other Parameters
+    ----------------
+    hotelling_detector : Optional[HotellingT2], default=None
+        Pre-fitted Hotelling's T² detector. When provided, ``datasets_data`` is
+        evaluated using this detector without refitting. When omitted, the
+        function fits a fresh detector on the training dataset (see below).
+    q_residuals_detector : Optional[QResiduals], default=None
+        Pre-fitted Q residuals detector. Behaviour mirrors
+        ``hotelling_detector``.
+    training_dataset : str, default="train"
+        Name of the dataset used to train the detectors when they are not
+        supplied. If the named dataset is absent, the first dataset in
+        ``datasets_data`` is used as a fallback.
+
     Returns
     -------
     Figure
@@ -541,6 +570,33 @@ def create_model_distances_plot(
     dataset_items = list(datasets_data.items())
     multi_dataset = len(dataset_items) > 1
 
+    training_dataset_lower = training_dataset.lower()
+
+    if hotelling_detector is None or q_residuals_detector is None:
+        if not dataset_items:
+            raise ValueError("datasets_data must contain at least one dataset")
+
+        if training_dataset in datasets_data:
+            train_entry = datasets_data[training_dataset]
+        else:
+            # Fallback to first dataset while preserving its name for limit drawing
+            first_name, first_entry = dataset_items[0]
+            training_dataset_lower = first_name.lower()
+            train_entry = first_entry
+
+        train_X = train_entry.get("X")
+
+        if train_X is None:
+            raise ValueError(
+                "X data is required for detector fitting when detectors are not supplied"
+            )
+
+        hotelling_detector = HotellingT2(model, confidence=confidence)
+        hotelling_detector.fit(train_X)
+
+        q_residuals_detector = QResiduals(model, confidence=confidence)
+        q_residuals_detector.fit(train_X)
+
     for ds_name, data in dataset_items:
         X = data.get("X")
         y = data.get("y")
@@ -548,15 +604,8 @@ def create_model_distances_plot(
         if X is None:
             raise ValueError(f"X data is required for dataset '{ds_name}'")
 
-        # Calculate Hotelling's T² residuals
-        hotelling = HotellingT2(model, confidence=confidence)
-        hotelling.fit(X)
-        t2 = hotelling.predict_residuals(X)
-
-        # Calculate Q residuals
-        q_res_model = QResiduals(model, confidence=confidence)
-        q_res_model.fit(X)
-        q = q_res_model.predict_residuals(X)
+        t2 = hotelling_detector.predict_residuals(X)
+        q = q_residuals_detector.predict_residuals(X)
 
         color_by = select_primary_target(y) if (color_by_y and y is not None) else None
         dataset_color = (
@@ -566,11 +615,13 @@ def create_model_distances_plot(
         )
 
         # Only draw confidence limits when plotting the training dataset
-        should_draw_limits = (not multi_dataset) or (ds_name.lower() == "train")
+        should_draw_limits = (not multi_dataset) or (
+            ds_name.lower() == training_dataset_lower
+        )
         confidence_lines = (
             (
-                hotelling.critical_value_,
-                q_res_model.critical_value_,
+                hotelling_detector.critical_value_,
+                q_residuals_detector.critical_value_,
             )
             if should_draw_limits
             else None

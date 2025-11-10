@@ -677,6 +677,42 @@ class TestPCAInspectorInspect:
         assert len(figures) == 4
         assert "distances" in figures
 
+    def test_inspect_multi_dataset_returns_dataset_specific_scores(
+        self, fitted_pca, dummy_data_loader
+    ):
+        """Multi-dataset inspect exposes per-dataset score figures."""
+        # Arrange
+        X, y = dummy_data_loader
+        X_train, X_test = X[:80], X[80:]
+        y_train, y_test = y[:80], y[80:]
+        inspector = PCAInspector(
+            model=fitted_pca,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            y_test=y_test,
+        )
+
+        # Act
+        figures = inspector.inspect(
+            dataset=["train", "test"],
+            components_scores=(0, 1),
+            loadings_components=[0, 1],
+        )
+
+        # Assert
+        assert "scores_1" in figures
+        assert "scores_1_train" in figures
+        assert "scores_1_test" in figures
+
+        legend = figures["scores_1"].axes[0].get_legend()
+        assert legend is not None
+        legend_labels = {text.get_text() for text in legend.get_texts()}
+        assert legend_labels == {"Train", "Test"}
+
+        for fig in figures.values():
+            plt.close(fig)
+
     def test_inspect_closes_figures_properly(self, fitted_pca, dummy_data_loader):
         """Test that figures can be properly closed after creation."""
         # Arrange

@@ -492,17 +492,19 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
 
         Returns
         -------
-        figures : dict
-            Dictionary containing all created figures with keys:
-            - 'scores_1', 'scores_2', ...: One or more scores plots (with 95% confidence ellipses)
-            - 'loadings': Loadings plot
-            - 'variance': Explained variance plot
-            - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
-            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+                figures : dict
+                        Dictionary containing all created figures with keys:
+                        - 'scores_1', 'scores_2', ...: Combined scores plots (95% confidence ellipses)
+                        - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
+                            (only when multiple datasets are provided); each plot uses a dedicated dataset colour
+                        - 'loadings': Loadings plot
+                        - 'variance': Explained variance plot
+                        - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
+                        - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
 
-            For multiple datasets, scores, distances, and spectra plots show all datasets together
-            on the same figure, colored by dataset. Number of 'scores_N' entries depends on
-            components_scores parameter
+                        Combined scores plots render all requested datasets on shared axes, coloured by
+                        dataset. The number of 'scores_N*' entries depends on the ``components_scores``
+                        parameter.
 
         Examples
         --------

@@ -12,6 +12,8 @@ from chemotools.inspector._utils import (
     normalize_components,
     normalize_datasets,
 )
+from chemotools.plotting._styles import DATASET_COLORS
+from chemotools.outliers import HotellingT2, QResiduals
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
@@ -113,6 +115,8 @@ class LatentVariableMixin:
         components_list = normalize_components(components)
         figures: Dict[str, "Figure"] = {}
         multi_dataset = len(dataset_names) > 1
+        requested_color_by_y = color_by_y
+        color_by_for_multi = False if multi_dataset else color_by_y
         explained_var = self._get_explained_variance_for_scores(dataset_names[0])
         component_label = self._get_latent_component_label()
 
@@ -123,12 +127,34 @@ class LatentVariableMixin:
                     component_spec=component_spec,
                     datasets_data=datasets_data,
                     explained_var=explained_var,
-                    color_by_y=color_by_y,
+                    color_by_y=color_by_for_multi,
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
                 )
                 figures[f"scores_{idx}"] = fig
+
+                for ds_name in dataset_names:
+                    ds_scores = datasets_data[ds_name]["scores"]
+                    ds_y = datasets_data[ds_name]["y"]
+                    if ds_scores is None:
+                        raise ValueError(
+                            f"Scores not available for dataset '{ds_name}'"
+                        )
+
+                    ds_fig = _latent_plots.create_scores_plot_single_dataset(
+                        component_spec=component_spec,
+                        scores=ds_scores,
+                        y=ds_y,
+                        explained_var=explained_var,
+                        dataset_name=ds_name,
+                        color_by_y=requested_color_by_y,
+                        annotate_by=annotate_by,
+                        figsize=figsize,
+                        component_label=component_label,
+                        dataset_color=DATASET_COLORS.get(ds_name, "#7f7f7f"),
+                    )
+                    figures[f"scores_{idx}_{ds_name}"] = ds_fig
         else:
             dataset_name = dataset_names[0]
             scores = self.get_latent_scores(dataset_name)
@@ -142,10 +168,11 @@ class LatentVariableMixin:
                     y=y,
                     explained_var=explained_var,
                     dataset_name=dataset_name,
-                    color_by_y=color_by_y,
+                    color_by_y=requested_color_by_y,
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
+                    dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
                 )
                 figures[f"scores_{idx}"] = fig
 
@@ -167,12 +194,22 @@ class LatentVariableMixin:
             X, y = inspector._get_raw_data(ds)
             datasets_data[ds] = {"X": X, "y": y}
 
+        # Fit detectors once on the training data to ensure consistent limits
+        train_X, _ = inspector._get_raw_data("train")
+        hotelling = HotellingT2(inspector.model, confidence=inspector.confidence)
+        hotelling.fit(train_X)
+
+        q_detector = QResiduals(inspector.model, confidence=inspector.confidence)
+        q_detector.fit(train_X)
+
         return _latent_plots.create_model_distances_plot(
             datasets_data=datasets_data,
             model=inspector.model,
             confidence=inspector.confidence,
             color_by_y=color_by_y,
             figsize=figsize,
+            hotelling_detector=hotelling,
+            q_residuals_detector=q_detector,
         )
 
     # ------------------------------------------------------------------

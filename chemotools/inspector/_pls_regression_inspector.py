@@ -544,8 +544,17 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
         Returns
         -------
-        figures : dict
-            Dictionary containing all created figures
+                figures : dict
+                        Dictionary containing all created figures. Keys include:
+                        - 'scores_1', 'scores_2', ...: Combined X-scores plots coloured by dataset
+                        - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
+                            (present only when multiple datasets are provided)
+                        - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
+                        - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
+                        - 'variance_x', 'variance_y': Explained variance plots (when available)
+                        - 'distances_hotelling_q', 'distances_leverage_studentized': Distance diagnostics
+                        - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
+                        - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
         """
         figures = {}
 
@@ -614,21 +623,36 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         )
 
         coef = self.get_regression_coefficients()
+        if coef.ndim == 1:
+            coef_matrix = coef.reshape(-1, 1)
+            coef_components = [0]
+            component_label = "Coeff"
+        else:
+            coef_matrix = coef
+            coef_components = list(range(coef_matrix.shape[1]))
+            component_label = "Target"
+
         coef_fig = _latent_plots.create_loadings_plot(
-            loadings=coef.reshape(-1, 1),
+            loadings=coef_matrix,
             feature_names=preprocessed_wavenumbers,
-            loadings_components=[0],
+            loadings_components=coef_components,
             xlabel=xlabel,
             figsize=loadings_figsize,
-            component_label=self.component_label,
-        )
-        coef_fig.axes[0].set_title(
-            "Regression Coefficients", fontsize=12, fontweight="bold"
+            component_label=component_label,
         )
         coef_ax = coef_fig.axes[0]
+        coef_ax.set_title("Regression Coefficients", fontsize=12, fontweight="bold")
+
         handles, _ = coef_ax.get_legend_handles_labels()
         if handles:
-            coef_ax.legend(handles, ["Coefficients"], loc="best")
+            if coef_matrix.shape[1] == 1:
+                coef_ax.legend(handles, ["Coefficient"], loc="best")
+            else:
+                target_labels = [
+                    f"Target {idx + 1}" for idx in range(coef_matrix.shape[1])
+                ]
+                coef_ax.legend(handles, target_labels, loc="best")
+
         figures["regression_coefficients"] = coef_fig
 
         scores_figures = self.create_latent_scores_figures(
