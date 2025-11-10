@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy import stats
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     split_figure_plot_kwargs,
@@ -16,7 +17,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class ResidualDistributionPlot:
+class ResidualDistributionPlot(Display):
     """Histogram plot of residuals to assess normality and distribution shape.
 
     This class creates histogram plots of residuals with optional overlay of

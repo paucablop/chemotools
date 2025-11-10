@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
@@ -20,7 +21,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class ScoresPlot:
+class ScoresPlot(Display):
     """Simple, composable scores plot for a single dataset.
 
     This class creates scatter plots of model scores (projections) for one dataset.

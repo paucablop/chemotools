@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     calculate_ylim_for_xlim,
@@ -15,7 +16,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class LoadingsPlot:
+class LoadingsPlot(Display):
     """Loadings plot implementing Display protocol for model inspection.
 
     This class creates line plots of model loadings (feature weights),

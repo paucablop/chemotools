@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
@@ -16,7 +17,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class PredictedVsActualPlot:
+class PredictedVsActualPlot(Display):
     """Scatter plot of predicted vs actual values to assess regression fit.
 
     This class creates scatter plots comparing predicted values against actual
@@ -206,14 +207,29 @@ class PredictedVsActualPlot:
         plt.tight_layout()
         return fig
 
-    def render(self, ax: Axes) -> None:
+    def render(self, ax: Optional[Axes] = None, **kwargs: Any) -> tuple[Figure, Axes]:
         """Render the plot on existing axes.
 
         Parameters
         ----------
+        ax : Axes, optional
+            Matplotlib axes to render the plot on. If None, creates new figure and axes.
+        **kwargs : Any
+            Additional keyword arguments (ignored for compatibility).
+
+        Returns
+        -------
+        fig : Figure
+            The matplotlib Figure object.
         ax : Axes
-            Matplotlib axes to render the plot on.
+            The matplotlib Axes object with the rendered plot.
         """
+        if ax is None:
+            fig, ax = plt.subplots(figsize=kwargs.get("figsize"))
+        else:
+            # ax.figure might be SubFigure, so we get the parent Figure
+            fig = ax.get_figure()  # type: ignore[assignment]
+
         # Prepare colors
         colors: Union[np.ndarray, str, None]
         if self.color_by is not None:
@@ -271,3 +287,5 @@ class PredictedVsActualPlot:
                 ax.legend(handles=patches, loc="best", framealpha=0.9)
         elif self.label is not None:
             ax.legend(loc="best", framealpha=0.9)
+
+        return fig, ax

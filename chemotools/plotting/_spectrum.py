@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
@@ -24,7 +25,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class SpectrumPlot:
+class SpectrumPlot(Display):
     """Plot class for visualizing spectral data.
 
     This class implements the Display protocol and provides flexible options

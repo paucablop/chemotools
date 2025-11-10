@@ -7,6 +7,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy import stats
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     annotate_points,
@@ -17,7 +18,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class QQPlot:
+class QQPlot(Display):
     """Quantile-Quantile plot to assess if residuals follow a normal distribution.
 
     This class creates Q-Q plots comparing the quantiles of residuals against

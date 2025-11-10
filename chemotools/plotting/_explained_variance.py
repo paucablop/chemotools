@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     split_figure_plot_kwargs,
@@ -14,7 +15,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class ExplainedVariancePlot:
+class ExplainedVariancePlot(Display):
     """Visualize explained variance by component with cumulative variance.
 
     Shows both individual and cumulative explained variance ratios across

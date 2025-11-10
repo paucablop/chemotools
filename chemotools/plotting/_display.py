@@ -37,12 +37,7 @@ class Display(Protocol):
     >>> fig = plot.show()
     """
 
-    def show(
-        self,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        **kwargs: Any,
-    ) -> Figure:
+    def show(self, **kwargs: Any) -> Figure:
         """Create and return a complete figure with the plot.
 
         This method creates a new figure and displays the plot on it.
@@ -50,12 +45,21 @@ class Display(Protocol):
 
         Parameters
         ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches.
-        title : str, optional
-            Title for the plot.
         **kwargs : Any
-            Additional keyword arguments for customizing the plot.
+            Keyword arguments for customizing the plot. Common parameters include:
+
+            - figsize : tuple[float, float], optional
+                Figure size as (width, height) in inches.
+            - title : str, optional
+                Title for the plot.
+            - xlabel : str, optional
+                X-axis label.
+            - ylabel : str, optional
+                Y-axis label.
+            - xlim : tuple[float, float], optional
+                X-axis limits.
+            - ylim : tuple[float, float], optional
+                Y-axis limits.
 
         Returns
         -------
@@ -69,11 +73,7 @@ class Display(Protocol):
         """
         ...
 
-    def render(
-        self,
-        ax: Optional[Axes] = None,
-        **kwargs: Any,
-    ) -> tuple[Figure, Axes]:
+    def render(self, ax: Optional[Axes] = None, **kwargs: Any) -> Any:
         """Render the plot on the given axes or create new ones.
 
         This method is more flexible than `show()` as it allows plotting
@@ -89,10 +89,9 @@ class Display(Protocol):
 
         Returns
         -------
-        fig : Figure
-            The matplotlib Figure object.
-        ax : Axes
-            The matplotlib Axes object with the rendered plot.
+        Any
+            Typically returns tuple[Figure, Axes] or just Axes, depending on implementation.
+            Implementations may vary in their return type based on specific needs.
 
         Examples
         --------

@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
@@ -20,7 +21,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class YResidualsPlot:
+class YResidualsPlot(Display):
     """Plot of residuals to assess homoscedasticity and model fit quality.
 
     This class creates scatter plots of Y residuals (observed - predicted) versus
