@@ -19,13 +19,7 @@ from chemotools.plotting import (
     LoadingsPlot,
     ScoresPlot,
 )
-from chemotools.plotting._utils import (
-    add_colorbar,
-    annotate_points,
-    detect_categorical,
-    get_colors_from_labels,
-    get_default_colormap,
-)
+from chemotools.plotting._utils import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.outliers import HotellingT2, QResiduals
 
@@ -167,6 +161,8 @@ def create_scores_plot_single_dataset(
     *,
     component_label: str = "PC",
     dataset_color: Optional[str] = None,
+    confidence: float = 0.95,
+    train_scores_for_ellipse: Optional[np.ndarray] = None,
 ) -> Figure:
     """Create scores plot for a single dataset.
 
@@ -196,6 +192,12 @@ def create_scores_plot_single_dataset(
     dataset_color : Optional[str], optional
         Fixed colour for the dataset when ``color_by_y`` is False. When
         provided, this colour is applied to the rendered points.
+    confidence : float, optional
+        Confidence level for the ellipse (default 0.95).
+    train_scores_for_ellipse : Optional[np.ndarray], optional
+        Training scores to use for drawing confidence ellipse reference.
+        If provided, a confidence ellipse will be drawn even if dataset_name != 'train'.
+        If None and dataset_name == 'train', will use the scores parameter.
 
     Returns
     -------
@@ -212,63 +214,35 @@ def create_scores_plot_single_dataset(
     """
     fig, ax = plt.subplots(figsize=figsize)
 
-    color_reference = select_primary_target(y) if color_by_y else None
-
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         pc_scores = scores[:, component_spec]
         var_pct = explained_var[component_spec] * 100
 
-        if color_reference is not None:
-            x_values = color_reference
+        # Determine x-axis values and color_by parameter
+        color_by = select_primary_target(y) if color_by_y and y is not None else None
 
-            if x_values.shape[0] != pc_scores.shape[0]:
-                raise ValueError(
-                    "Length of target values must match number of samples. "
-                    f"Got {x_values.shape[0]} vs {pc_scores.shape[0]}."
-                )
-
-            color_array = np.asarray(x_values)
-            is_categorical = detect_categorical(color_array)
-
-            if is_categorical:
-                colormap = get_default_colormap(True, None)
-                colors = get_colors_from_labels(color_array, colormap)
-                unique_values = np.unique(color_array)
-                for value in unique_values:
-                    mask = color_array == value
-                    ax.scatter(
-                        x_values[mask],
-                        pc_scores[mask],
-                        color=colors[mask][0],
-                        alpha=0.7,
-                        s=50,
-                        label=f"{dataset_name.capitalize()} - {value}",
-                    )
-                ax.legend(loc="best")
-            else:
-                colormap = get_default_colormap(False, None)
-                ax.scatter(
-                    x_values,
-                    pc_scores,
-                    c=color_array,
-                    cmap=colormap,
-                    alpha=0.7,
-                    s=50,
-                )
-                add_colorbar(ax, color_array, colormap, label="y-value")
-
+        if color_by is not None:
+            x_values = color_by
             xlabel_text = "y-value"
         else:
-            # Plot PC score vs sample index
-            ax.scatter(
-                range(len(pc_scores)),
-                pc_scores,
-                alpha=0.7,
-                s=50,
-                color=dataset_color,
-            )
+            x_values = np.arange(len(pc_scores))
             xlabel_text = "Sample Index"
+
+        # Create synthetic 2D data for ScoresPlot (x_values, pc_scores)
+        scores_for_plot = np.column_stack([x_values, pc_scores])
+
+        # Create and render ScoresPlot
+        scores_plot = ScoresPlot(
+            scores=scores_for_plot,
+            components=(0, 1),
+            color_by=color_by,
+            label=dataset_name.capitalize(),
+            color=dataset_color if color_by is None else None,
+            colormap=None,
+            confidence_ellipse=None,
+        )
+        scores_plot.render(ax)
 
         # Apply decorations
         ax.set_xlabel(xlabel_text, fontsize=10)
@@ -287,10 +261,36 @@ def create_scores_plot_single_dataset(
         var_x = explained_var[components_pair[0]] * 100
         var_y = explained_var[components_pair[1]] * 100
 
-        # Determine color_by parameter
-        color_by = color_reference if color_reference is not None else None
+        # Determine which scores to use for the confidence ellipse
+        ellipse_scores = train_scores_for_ellipse
+        if ellipse_scores is None and dataset_name.lower() == "train":
+            ellipse_scores = scores
 
-        # Create and render ScoresPlot
+        # Determine color_by parameter for the dataset
+        color_by = select_primary_target(y) if color_by_y and y is not None else None
+
+        # First: Draw training confidence ellipse as reference (if available)
+        if ellipse_scores is not None:
+            ellipse_plot = ScoresPlot(
+                scores=ellipse_scores,
+                components=components_pair,
+                color_by=None,
+                label="",  # Empty label - won't show in legend
+                color="red",  # Use red color for training ellipse visibility
+                colormap=None,
+                confidence_ellipse=confidence,
+            )
+            # Render only the ellipse
+            ellipse_plot.render(ax)
+            # Remove the scatter points from this plot (keep only ellipse)
+            from matplotlib.collections import PathCollection
+
+            for collection in ax.collections:
+                if isinstance(collection, PathCollection):
+                    collection.remove()
+                    break
+
+        # Create and render ScoresPlot for the actual dataset (without ellipse)
         scores_plot = ScoresPlot(
             scores=scores,
             components=components_pair,
@@ -298,7 +298,7 @@ def create_scores_plot_single_dataset(
             label=dataset_name.capitalize(),
             color=dataset_color if color_by is None else None,
             colormap=None,
-            confidence_ellipse=0.95,  # Always show 95% confidence ellipse
+            confidence_ellipse=None,  # Ellipse already drawn above
         )
         scores_plot.render(ax=ax)
 
@@ -343,6 +343,8 @@ def create_scores_plot_multi_dataset(
     figsize: Tuple[float, float],
     *,
     component_label: str = "PC",
+    train_scores_for_ellipse: Optional[np.ndarray] = None,
+    confidence: float = 0.95,
 ) -> Figure:
     """Create scores plot with multiple datasets on same axes.
 
@@ -363,9 +365,15 @@ def create_scores_plot_multi_dataset(
         Annotation specification
     figsize : Tuple[float, float]
         Figure size (width, height) in inches
-
     component_label : str, optional
         Prefix used in axis labels and titles (default "PC").
+    train_scores_for_ellipse : Optional[np.ndarray], optional
+        Training scores to use for drawing confidence ellipse reference.
+        If provided, a confidence ellipse will be drawn even if 'train'
+        is not in datasets_data. If None, will use train data from datasets_data
+        if available.
+    confidence : float, optional
+        Confidence level for the ellipse (default 0.95).
 
     Returns
     -------
@@ -447,7 +455,34 @@ def create_scores_plot_multi_dataset(
         var_x = explained_var[components_pair[0]] * 100
         var_y = explained_var[components_pair[1]] * 100
 
-        # Compose multiple datasets on same axes
+        # First pass: Draw training confidence ellipse as reference
+        # Use train_scores_for_ellipse if provided, otherwise check datasets_data
+        ellipse_scores = train_scores_for_ellipse
+        if ellipse_scores is None and "train" in datasets_data:
+            ellipse_scores = datasets_data["train"]["scores"]
+
+        if ellipse_scores is not None:
+            # Draw only the confidence ellipse for training (invisible points)
+            ellipse_plot = ScoresPlot(
+                scores=ellipse_scores,
+                components=components_pair,
+                color_by=None,
+                label="",  # Empty label - won't show in legend
+                color="red",  # Use red color for training ellipse visibility
+                colormap=None,
+                confidence_ellipse=confidence,
+            )
+            # Render only the ellipse (we'll plot points separately below if train is in datasets)
+            ellipse_plot.render(ax)
+            # Remove the scatter points from this plot (keep only ellipse)
+            from matplotlib.collections import PathCollection
+
+            for collection in ax.collections:
+                if isinstance(collection, PathCollection):
+                    collection.remove()
+                    break
+
+        # Second pass: Compose multiple datasets on same axes
         for ds_name, data in datasets_data.items():
             scores = data["scores"]
             y = data["y"]
@@ -463,8 +498,8 @@ def create_scores_plot_multi_dataset(
             )
             color_by = color_reference
 
-            # Only show confidence ellipse for training dataset
-            ellipse = 0.95 if ds_name == "train" else None
+            # Don't draw ellipse again (already drawn above)
+            ellipse = None
 
             # Create and render ScoresPlot for this dataset
             plot = ScoresPlot(

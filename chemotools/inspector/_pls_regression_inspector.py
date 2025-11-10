@@ -543,6 +543,9 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     "y": y,
                 }
 
+            # Get training scores for confidence ellipse reference (even if train not requested)
+            train_scores_for_ellipse = self.get_x_scores("train")
+
             # explained_var might be None, but the plot function expects an array
             # Use zeros if not available
             var_for_plot = (
@@ -560,6 +563,8 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=self.component_label,
+                    train_scores_for_ellipse=train_scores_for_ellipse,
+                    confidence=self.confidence,
                 )
                 figures[f"scores_{idx}"] = fig
         else:
@@ -576,6 +581,15 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 else np.zeros(self.nr_components)
             )
 
+            # Get training scores for ellipse reference (if not already train dataset)
+            train_scores_for_ellipse = None
+            if dataset_name.lower() != "train":
+                try:
+                    train_scores_for_ellipse = self.get_x_scores("train")
+                except (ValueError, KeyError):
+                    # Train dataset not available, skip ellipse
+                    pass
+
             for idx, component_spec in enumerate(components_list, start=1):
                 fig = _latent_plots.create_scores_plot_single_dataset(
                     component_spec=component_spec,
@@ -588,6 +602,8 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     figsize=figsize,
                     component_label=self.component_label,
                     dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
+                    confidence=self.confidence,
+                    train_scores_for_ellipse=train_scores_for_ellipse,
                 )
                 figures[f"scores_{idx}"] = fig
 
@@ -656,7 +672,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     color_by=color_reference,
                     label="Train",
                     colormap=None,
-                    confidence_ellipse=0.95,
+                    confidence_ellipse=self.confidence,
                 )
                 plot.render(ax)
 
@@ -1022,6 +1038,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["qq_plot"] = create_qq_plot(
                 datasets_data=qq_data,
                 figsize=regression_figsize,
+                confidence=self.confidence,
             )
         else:
             ds = datasets[0]
@@ -1039,6 +1056,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["qq_plot"] = create_qq_plot(
                 datasets_data=qq_data,
                 figsize=regression_figsize,
+                confidence=self.confidence,
             )
 
         # Residual distribution

@@ -122,6 +122,14 @@ class LatentVariableMixin:
 
         if multi_dataset:
             datasets_data = self._prepare_scores_datasets(dataset_names)
+
+            # Get training scores for confidence ellipse reference (even if train not requested)
+            train_scores_for_ellipse = self.get_latent_scores("train")
+
+            # Get confidence level from inspector
+            inspector = self._latent_inspector()
+            confidence_level = inspector.confidence
+
             for idx, component_spec in enumerate(components_list, start=1):
                 fig = _latent_plots.create_scores_plot_multi_dataset(
                     component_spec=component_spec,
@@ -131,6 +139,8 @@ class LatentVariableMixin:
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
+                    train_scores_for_ellipse=train_scores_for_ellipse,
+                    confidence=confidence_level,
                 )
                 figures[f"scores_{idx}"] = fig
 
@@ -153,6 +163,8 @@ class LatentVariableMixin:
                         figsize=figsize,
                         component_label=component_label,
                         dataset_color=DATASET_COLORS.get(ds_name, "#7f7f7f"),
+                        confidence=confidence_level,
+                        train_scores_for_ellipse=train_scores_for_ellipse,
                     )
                     figures[f"scores_{idx}_{ds_name}"] = ds_fig
         else:
@@ -160,6 +172,18 @@ class LatentVariableMixin:
             scores = self.get_latent_scores(dataset_name)
             inspector = self._latent_inspector()
             _, y = inspector._get_raw_data(dataset_name)
+
+            # Get confidence level from inspector
+            confidence_level = inspector.confidence
+
+            # Get training scores for ellipse reference (if not already train dataset)
+            train_scores_for_ellipse = None
+            if dataset_name.lower() != "train":
+                try:
+                    train_scores_for_ellipse = self.get_latent_scores("train")
+                except (ValueError, KeyError):
+                    # Train dataset not available, skip ellipse
+                    pass
 
             for idx, component_spec in enumerate(components_list, start=1):
                 fig = _latent_plots.create_scores_plot_single_dataset(
@@ -173,6 +197,8 @@ class LatentVariableMixin:
                     figsize=figsize,
                     component_label=component_label,
                     dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
+                    confidence=confidence_level,
+                    train_scores_for_ellipse=train_scores_for_ellipse,
                 )
                 figures[f"scores_{idx}"] = fig
 

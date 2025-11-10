@@ -205,6 +205,7 @@ def create_y_residual_plot(
 def create_qq_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
     figsize: Tuple[float, float],
+    confidence: float = 0.95,
 ) -> Figure:
     """Create Q-Q plots for one or multiple datasets.
 
@@ -217,6 +218,8 @@ def create_qq_plot(
         Dictionary mapping dataset names to dicts with 'y_true', 'y_pred' keys
     figsize : Tuple[float, float]
         Figure size
+    confidence : float, default=0.95
+        Confidence level for the confidence band
 
     Returns
     -------
@@ -234,7 +237,7 @@ def create_qq_plot(
 
         fig, ax = plt.subplots(figsize=figsize)
 
-        qq_plot = QQPlot(residuals=residuals, add_confidence_band=0.95)
+        qq_plot = QQPlot(residuals=residuals, add_confidence_band=confidence)
         qq_plot.render(ax=ax)
 
         ax.set_title(f"Q-Q Plot ({dataset_name})", fontsize=12, fontweight="bold")
@@ -257,7 +260,7 @@ def create_qq_plot(
         y_pred = data["y_pred"]
         residuals = y_true - y_pred
 
-        qq_plot = QQPlot(residuals=residuals, add_confidence_band=0.95)
+        qq_plot = QQPlot(residuals=residuals, add_confidence_band=confidence)
         qq_plot.render(ax=ax)
 
         ax.set_title(f"{dataset_name}", fontsize=12, fontweight="bold")
