@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
+from chemotools.plotting import Display
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
@@ -20,7 +21,7 @@ from chemotools.plotting._utils import (
 )
 
 
-class DistancesPlot:
+class DistancesPlot(Display):
     """Simple, composable distances plot for a single dataset.
 
     This class creates scatter plots of distance measures (e.g., Q residuals, Hotelling's T²)

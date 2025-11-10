@@ -463,6 +463,9 @@ def create_scores_plot_multi_dataset(
             )
             color_by = color_reference
 
+            # Only show confidence ellipse for training dataset
+            ellipse = 0.95 if ds_name == "train" else None
+
             # Create and render ScoresPlot for this dataset
             plot = ScoresPlot(
                 scores=scores,
@@ -471,7 +474,7 @@ def create_scores_plot_multi_dataset(
                 label=ds_name.capitalize(),
                 color=color if color_by is None else None,
                 colormap=None,
-                confidence_ellipse=0.95,  # Always show 95% confidence ellipse
+                confidence_ellipse=ellipse,
             )
             plot.render(ax)
 
@@ -607,12 +610,16 @@ def create_model_distances_plot(
         t2 = hotelling_detector.predict_residuals(X)
         q = q_residuals_detector.predict_residuals(X)
 
-        color_by = select_primary_target(y) if (color_by_y and y is not None) else None
-        dataset_color = (
-            DATASET_COLORS.get(ds_name, "#7f7f7f")
-            if color_by is None and multi_dataset
-            else None
-        )
+        # When multiple datasets, always color by dataset, not by y values
+        if multi_dataset:
+            color_by = None
+            dataset_color = DATASET_COLORS.get(ds_name, "#7f7f7f")
+        else:
+            # Single dataset: respect color_by_y parameter
+            color_by = (
+                select_primary_target(y) if (color_by_y and y is not None) else None
+            )
+            dataset_color = None
 
         # Only draw confidence limits when plotting the training dataset
         should_draw_limits = (not multi_dataset) or (

@@ -487,6 +487,214 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
         return summary_dict
 
+    def create_latent_scores_figures(
+        self,
+        dataset: Union[str, Sequence[str]],
+        components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
+        *,
+        color_by_y: bool,
+        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
+        figsize: Tuple[float, float],
+    ) -> Dict[str, matplotlib.figure.Figure]:
+        """Generate X-scores plots for requested datasets.
+
+        For PLS, when multiple datasets are provided, only creates the combined
+        multi-dataset plots (not individual per-dataset plots) to reduce clutter.
+
+        Parameters
+        ----------
+        dataset : str or sequence of str
+            Dataset(s) to plot ('train', 'test', 'val')
+        components : tuple or sequence of tuples
+            Component pairs to plot
+        color_by_y : bool
+            Whether to color by y values
+        annotate_by : str or dict, optional
+            Annotation specification
+        figsize : tuple of float
+            Figure size
+
+        Returns
+        -------
+        dict
+            Dictionary of figures with keys like 'scores_1', 'scores_2', etc.
+        """
+        from ._utils import normalize_datasets, normalize_components
+        from . import _plot_utils_latent_space as _latent_plots
+        from chemotools.plotting._styles import DATASET_COLORS
+
+        dataset_names = list(normalize_datasets(dataset))
+        if not dataset_names:
+            raise ValueError("At least one dataset is required for scores plotting")
+
+        components_list = normalize_components(components)
+        figures: Dict[str, matplotlib.figure.Figure] = {}
+        multi_dataset = len(dataset_names) > 1
+        explained_var = self.get_explained_x_variance_ratio()
+
+        if multi_dataset:
+            # For PLS with multiple datasets, only create combined plots
+            datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
+            for ds_name in dataset_names:
+                x_scores = self.get_x_scores(ds_name)
+                _, y = self._get_raw_data(ds_name)
+                datasets_data[ds_name] = {
+                    "scores": x_scores,
+                    "y": y,
+                }
+
+            # explained_var might be None, but the plot function expects an array
+            # Use zeros if not available
+            var_for_plot = (
+                explained_var
+                if explained_var is not None
+                else np.zeros(self.nr_components)
+            )
+
+            for idx, component_spec in enumerate(components_list, start=1):
+                fig = _latent_plots.create_scores_plot_multi_dataset(
+                    component_spec=component_spec,
+                    datasets_data=datasets_data,
+                    explained_var=var_for_plot,
+                    color_by_y=False,  # Color by dataset in multi-dataset mode
+                    annotate_by=annotate_by,
+                    figsize=figsize,
+                    component_label=self.component_label,
+                )
+                figures[f"scores_{idx}"] = fig
+        else:
+            # Single dataset - create one plot per component spec
+            dataset_name = dataset_names[0]
+            x_scores = self.get_x_scores(dataset_name)
+            _, y = self._get_raw_data(dataset_name)
+
+            # explained_var might be None, but the plot function expects an array
+            # Use zeros if not available
+            var_for_plot = (
+                explained_var
+                if explained_var is not None
+                else np.zeros(self.nr_components)
+            )
+
+            for idx, component_spec in enumerate(components_list, start=1):
+                fig = _latent_plots.create_scores_plot_single_dataset(
+                    component_spec=component_spec,
+                    scores=x_scores,
+                    y=y,
+                    explained_var=var_for_plot,
+                    dataset_name=dataset_name,
+                    color_by_y=color_by_y,
+                    annotate_by=annotate_by,
+                    figsize=figsize,
+                    component_label=self.component_label,
+                    dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
+                )
+                figures[f"scores_{idx}"] = fig
+
+        return figures
+
+    def _create_x_vs_y_scores_figures(
+        self,
+        components: Union[Tuple[int, int], Sequence[Tuple[int, int]]],
+        color_by_y: bool,
+        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
+        figsize: Tuple[float, float],
+    ) -> Dict[str, matplotlib.figure.Figure]:
+        """Create X-scores vs Y-scores plots for PLS (training set only).
+
+        Parameters
+        ----------
+        components : tuple or sequence of tuples
+            Component pairs to plot
+        color_by_y : bool
+            Whether to color by y values
+        annotate_by : str or dict, optional
+            Annotation specification
+        figsize : tuple of float
+            Figure size
+
+        Returns
+        -------
+        dict
+            Dictionary of figures with keys like 'x_vs_y_scores_1', 'x_vs_y_scores_2', etc.
+        """
+        from chemotools.plotting import ScoresPlot
+        from ._utils import normalize_components, prepare_annotations
+
+        components_list = normalize_components(components)
+        figures: Dict[str, matplotlib.figure.Figure] = {}
+
+        # Get training data
+        x_scores = self.get_x_scores("train")
+        y_scores = self.get_y_scores("train")
+        _, y_train = self._get_raw_data("train")
+
+        for idx, component_spec in enumerate(components_list, start=1):
+            # Only create 2D plots (component pairs)
+            if isinstance(component_spec, tuple):
+                import matplotlib.pyplot as plt
+
+                fig, ax = plt.subplots(figsize=figsize)
+
+                # Create combined scores array [X-score, Y-score]
+                combined_scores = np.column_stack(
+                    [
+                        x_scores[:, component_spec[0]],
+                        y_scores[:, component_spec[1]],
+                    ]
+                )
+
+                # Determine color_by parameter
+                color_reference = (
+                    y_train if color_by_y and y_train is not None else None
+                )
+
+                # Create ScoresPlot
+                plot = ScoresPlot(
+                    scores=combined_scores,
+                    components=(0, 1),  # We already selected the right columns
+                    color_by=color_reference,
+                    label="Train",
+                    colormap=None,
+                    confidence_ellipse=0.95,
+                )
+                plot.render(ax)
+
+                # Add annotations if requested
+                labels = prepare_annotations(annotate_by, "train", x_scores, y_train)
+                if labels is not None:
+                    from chemotools.plotting._utils import annotate_points
+
+                    annotate_points(
+                        ax,
+                        combined_scores[:, 0],
+                        combined_scores[:, 1],
+                        labels,
+                        fontsize=8,
+                        alpha=0.7,
+                        xytext=(3, 3),
+                        textcoords="offset points",
+                    )
+
+                # Set custom labels
+                ax.set_xlabel(
+                    f"X-{self.component_label}{component_spec[0] + 1}", fontsize=10
+                )
+                ax.set_ylabel(
+                    f"Y-{self.component_label}{component_spec[1] + 1}", fontsize=10
+                )
+                ax.set_title(
+                    f"X-scores vs Y-scores: {self.component_label}{component_spec[0] + 1} vs {self.component_label}{component_spec[1] + 1}",
+                    fontsize=12,
+                    fontweight="bold",
+                )
+                ax.grid(alpha=0.3)
+
+                plt.tight_layout()
+                figures[f"x_vs_y_scores_{idx}"] = fig
+
+        return figures
+
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
@@ -546,9 +754,8 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         -------
                 figures : dict
                         Dictionary containing all created figures. Keys include:
-                        - 'scores_1', 'scores_2', ...: Combined X-scores plots coloured by dataset
-                        - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
-                            (present only when multiple datasets are provided)
+                        - 'scores_1', 'scores_2', ...: X-scores plots (combined multi-dataset when multiple datasets provided)
+                        - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...: X-scores vs Y-scores plots (training set only)
                         - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
                         - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
                         - 'variance_x', 'variance_y': Explained variance plots (when available)
@@ -663,6 +870,15 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figsize=scores_figsize,
         )
         figures.update(scores_figures)
+
+        # X-scores vs Y-scores plots (training set only)
+        x_y_scores_figures = self._create_x_vs_y_scores_figures(
+            components=components_scores,
+            color_by_y=color_by_y,
+            annotate_by=annotate_by,
+            figsize=scores_figsize,
+        )
+        figures.update(x_y_scores_figures)
 
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
