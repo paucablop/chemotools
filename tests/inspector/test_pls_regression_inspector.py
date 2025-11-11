@@ -43,14 +43,16 @@ def fitted_pipeline(regression_data):
 def multi_target_regression_data():
     rng = np.random.default_rng(7)
     X = rng.normal(size=(90, 6))
-    coef = np.array([
-        [1.0, -0.4],
-        [-0.6, 0.8],
-        [0.2, 0.5],
-        [0.0, -0.3],
-        [0.7, 0.1],
-        [-1.1, 0.9],
-    ])
+    coef = np.array(
+        [
+            [1.0, -0.4],
+            [-0.6, 0.8],
+            [0.2, 0.5],
+            [0.0, -0.3],
+            [0.7, 0.1],
+            [-1.1, 0.9],
+        ]
+    )
     y = X @ coef + rng.normal(scale=0.1, size=(90, 2))
     X_train, X_test, X_val = X[:50], X[50:70], X[70:]
     y_train, y_test, y_val = y[:50], y[50:70], y[70:]
@@ -431,9 +433,7 @@ class TestAdditionalCoverage:
         for fig in figures.values():
             plt.close(fig)
 
-    def test_create_x_vs_y_scores_mixed_components(
-        self, fitted_pls, regression_data
-    ):
+    def test_create_x_vs_y_scores_mixed_components(self, fitted_pls, regression_data):
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
