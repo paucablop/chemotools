@@ -59,6 +59,7 @@ class TestCreatePredictedVsActualPlot:
 
     def test_single_dataset(self, sample_regression_data):
         """Test predicted vs actual plot for single dataset."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -66,19 +67,26 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"],
             }
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_multi_dataset(self, sample_regression_data):
         """Test predicted vs actual plot for multiple datasets."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -91,19 +99,26 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"][:30],
             },
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_color_by_y(self, sample_regression_data):
         """Test predicted vs actual plot with y-coloring."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -111,14 +126,20 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"],
             }
         }
+        color_by_y = True
+        figsize = (6, 6)
 
+        # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=True,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
+
+        # Cleanup
         plt.close(fig)
 
 
@@ -127,6 +148,7 @@ class TestCreateYResidualPlot:
 
     def test_single_dataset(self, sample_regression_data):
         """Test residual plot for single dataset."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -134,19 +156,26 @@ class TestCreateYResidualPlot:
                 "y": sample_regression_data["y"],
             }
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_y_residual_plot(
             datasets_data=datasets_data,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_multi_dataset(self, sample_regression_data):
         """Test residual plot for multiple datasets (side-by-side)."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -159,15 +188,21 @@ class TestCreateYResidualPlot:
                 "y": sample_regression_data["y"][:30],
             },
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_y_residual_plot(
             datasets_data=datasets_data,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 2  # Side-by-side subplots
+
+        # Cleanup
         plt.close(fig)
 
 
@@ -176,24 +211,31 @@ class TestCreateQQPlot:
 
     def test_single_dataset(self, sample_regression_data):
         """Test Q-Q plot for single dataset."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
+        figsize = (6, 6)
 
+        # Act
         fig = create_qq_plot(
             datasets_data=datasets_data,
-            figsize=(6, 6),
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_multi_dataset(self, sample_regression_data):
         """Test Q-Q plot for multiple datasets."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -204,14 +246,19 @@ class TestCreateQQPlot:
                 "y_pred": sample_regression_data["y_pred"][:30],
             },
         }
+        figsize = (6, 6)
 
+        # Act
         fig = create_qq_plot(
             datasets_data=datasets_data,
-            figsize=(6, 6),
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 2  # Side-by-side subplots
+
+        # Cleanup
         plt.close(fig)
 
 
@@ -220,24 +267,31 @@ class TestCreateResidualDistributionPlot:
 
     def test_single_dataset(self, sample_regression_data):
         """Test residual distribution plot for single dataset."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
+        figsize = (6, 6)
 
+        # Act
         fig = create_residual_distribution_plot(
             datasets_data=datasets_data,
-            figsize=(6, 6),
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_multi_dataset(self, sample_regression_data):
         """Test residual distribution plot for multiple datasets."""
+        # Arrange
         datasets_data = {
             "train": {
                 "y_true": sample_regression_data["y_true"],
@@ -248,14 +302,19 @@ class TestCreateResidualDistributionPlot:
                 "y_pred": sample_regression_data["y_pred"][:30],
             },
         }
+        figsize = (6, 6)
 
+        # Act
         fig = create_residual_distribution_plot(
             datasets_data=datasets_data,
-            figsize=(6, 6),
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 2  # Side-by-side subplots
+
+        # Cleanup
         plt.close(fig)
 
 
@@ -264,8 +323,8 @@ class TestCreateRegressionDistancesPlot:
 
     def test_single_dataset(self, sample_regression_data, sample_detectors):
         """Test regression distances plot for single dataset."""
+        # Arrange
         leverage_detector, student_detector = sample_detectors
-
         datasets_data = {
             "train": {
                 "X": sample_regression_data["X"],
@@ -274,23 +333,29 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_regression_distances_plot(
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1
+
+        # Cleanup
         plt.close(fig)
 
     def test_multi_dataset(self, sample_regression_data, sample_detectors):
         """Test regression distances plot for multiple datasets."""
+        # Arrange
         leverage_detector, student_detector = sample_detectors
-
         datasets_data = {
             "train": {
                 "X": sample_regression_data["X"],
@@ -305,23 +370,29 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"][:30],
             },
         }
+        color_by_y = False
+        figsize = (6, 6)
 
+        # Act
         fig = create_regression_distances_plot(
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         assert len(fig.axes) == 1  # Overlaid on same axes
+
+        # Cleanup
         plt.close(fig)
 
     def test_uses_distances_plot_class(self, sample_regression_data, sample_detectors):
         """Test that the function uses DistancesPlot class."""
+        # Arrange
         leverage_detector, student_detector = sample_detectors
-
         datasets_data = {
             "train": {
                 "X": sample_regression_data["X"],
@@ -330,19 +401,24 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
+        color_by_y = False
+        figsize = (6, 6)
 
-        # This should not raise any errors
+        # Act
         fig = create_regression_distances_plot(
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=False,
-            figsize=(6, 6),
+            color_by_y=color_by_y,
+            figsize=figsize,
         )
 
+        # Assert
         assert fig is not None
         # Check that confidence lines are present
         ax = fig.axes[0]
         # Should have vertical and horizontal lines for confidence limits
         assert len(ax.lines) > 0
+
+        # Cleanup
         plt.close(fig)

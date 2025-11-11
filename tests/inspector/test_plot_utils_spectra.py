@@ -29,77 +29,141 @@ class TestCreateSpectraPlotsSingleDataset:
 
     def test_basic_spectra_plots(self, sample_spectra_data):
         """Test basic spectra plots creation."""
+        # Arrange
+        X_raw = sample_spectra_data["X_raw"]
+        X_preprocessed = sample_spectra_data["X_preprocessed"]
+        y = sample_spectra_data["y"]
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        dataset_name = "train"
+        color_by_y = True
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = None
+        figsize = (12, 5)
+
+        # Act
         figs = create_spectra_plots_single_dataset(
-            X_raw=sample_spectra_data["X_raw"],
-            X_preprocessed=sample_spectra_data["X_preprocessed"],
-            y=sample_spectra_data["y"],
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            dataset_name="train",
-            color_by_y=True,
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=None,
-            figsize=(12, 5),
+            X_raw=X_raw,
+            X_preprocessed=X_preprocessed,
+            y=y,
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            dataset_name=dataset_name,
+            color_by_y=color_by_y,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
         assert "raw_spectra" in figs
         assert "preprocessed_spectra" in figs
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
     def test_without_y(self, sample_spectra_data):
         """Test spectra plots without y data."""
+        # Arrange
+        X_raw = sample_spectra_data["X_raw"]
+        X_preprocessed = sample_spectra_data["X_preprocessed"]
+        y = None
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        dataset_name = "train"
+        color_by_y = False
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = None
+        figsize = (12, 5)
+
+        # Act
         figs = create_spectra_plots_single_dataset(
-            X_raw=sample_spectra_data["X_raw"],
-            X_preprocessed=sample_spectra_data["X_preprocessed"],
-            y=None,
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            dataset_name="train",
-            color_by_y=False,
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=None,
-            figsize=(12, 5),
+            X_raw=X_raw,
+            X_preprocessed=X_preprocessed,
+            y=y,
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            dataset_name=dataset_name,
+            color_by_y=color_by_y,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
         assert len(figs) == 2
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
     def test_with_xlim(self, sample_spectra_data):
         """Test spectra plots with xlim."""
+        # Arrange
+        X_raw = sample_spectra_data["X_raw"]
+        X_preprocessed = sample_spectra_data["X_preprocessed"]
+        y = sample_spectra_data["y"]
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        dataset_name = "test"
+        color_by_y = False
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = (3000, 2800)
+        figsize = (12, 5)
+
+        # Act
         figs = create_spectra_plots_single_dataset(
-            X_raw=sample_spectra_data["X_raw"],
-            X_preprocessed=sample_spectra_data["X_preprocessed"],
-            y=sample_spectra_data["y"],
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            dataset_name="test",
-            color_by_y=False,
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=(3000, 2800),
-            figsize=(12, 5),
+            X_raw=X_raw,
+            X_preprocessed=X_preprocessed,
+            y=y,
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            dataset_name=dataset_name,
+            color_by_y=color_by_y,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
     def test_with_feature_indices(self, sample_spectra_data):
         """Test spectra plots with feature indices instead of wavenumbers."""
-        n_features = sample_spectra_data["X_raw"].shape[1]
+        # Arrange
+        X_raw = sample_spectra_data["X_raw"]
+        X_preprocessed = sample_spectra_data["X_preprocessed"]
+        y = None
+        n_features = X_raw.shape[1]
+        wavenumbers = np.arange(n_features)
+        dataset_name = "val"
+        color_by_y = False
+        xlabel = "Feature Index"
+        xlim = None
+        figsize = (12, 5)
+
+        # Act
         figs = create_spectra_plots_single_dataset(
-            X_raw=sample_spectra_data["X_raw"],
-            X_preprocessed=sample_spectra_data["X_preprocessed"],
-            y=None,
-            wavenumbers=np.arange(n_features),
-            preprocessed_wavenumbers=np.arange(n_features),
-            dataset_name="val",
-            color_by_y=False,
-            xlabel="Feature Index",
-            xlim=None,
-            figsize=(12, 5),
+            X_raw=X_raw,
+            X_preprocessed=X_preprocessed,
+            y=y,
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            dataset_name=dataset_name,
+            color_by_y=color_by_y,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
@@ -109,6 +173,7 @@ class TestCreateSpectraPlotsMultiDataset:
 
     def test_multi_dataset_spectra(self, sample_spectra_data):
         """Test multi-dataset spectra plots."""
+        # Arrange
         raw_data = {
             "train": sample_spectra_data["X_raw"],
             "test": np.random.rand(30, 100),
@@ -117,43 +182,63 @@ class TestCreateSpectraPlotsMultiDataset:
             "train": sample_spectra_data["X_preprocessed"],
             "test": np.random.rand(30, 100) * 0.8,
         }
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = None
+        figsize = (12, 5)
 
+        # Act
         figs = create_spectra_plots_multi_dataset(
             raw_data=raw_data,
             preprocessed_data=preprocessed_data,
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=None,
-            figsize=(12, 5),
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
         assert "raw_spectra" in figs
         assert "preprocessed_spectra" in figs
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
     def test_single_dataset_in_multi(self, sample_spectra_data):
         """Test multi-dataset function with single dataset."""
+        # Arrange
         raw_data = {"train": sample_spectra_data["X_raw"]}
         preprocessed_data = {"train": sample_spectra_data["X_preprocessed"]}
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = None
+        figsize = (12, 5)
 
+        # Act
         figs = create_spectra_plots_multi_dataset(
             raw_data=raw_data,
             preprocessed_data=preprocessed_data,
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=None,
-            figsize=(12, 5),
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
         assert len(figs) == 2
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)
 
     def test_with_xlim_multi(self, sample_spectra_data):
         """Test multi-dataset spectra plots with xlim."""
+        # Arrange
         raw_data = {
             "train": sample_spectra_data["X_raw"],
             "test": np.random.rand(30, 100),
@@ -162,16 +247,25 @@ class TestCreateSpectraPlotsMultiDataset:
             "train": sample_spectra_data["X_preprocessed"],
             "test": np.random.rand(30, 100) * 0.8,
         }
+        wavenumbers = sample_spectra_data["wavenumbers"]
+        xlabel = "Wavenumber (cm⁻¹)"
+        xlim = (3500, 2500)
+        figsize = (12, 5)
 
+        # Act
         figs = create_spectra_plots_multi_dataset(
             raw_data=raw_data,
             preprocessed_data=preprocessed_data,
-            wavenumbers=sample_spectra_data["wavenumbers"],
-            preprocessed_wavenumbers=sample_spectra_data["wavenumbers"],
-            xlabel="Wavenumber (cm⁻¹)",
-            xlim=(3500, 2500),
-            figsize=(12, 5),
+            wavenumbers=wavenumbers,
+            preprocessed_wavenumbers=wavenumbers,
+            xlabel=xlabel,
+            xlim=xlim,
+            figsize=figsize,
         )
+
+        # Assert
         assert isinstance(figs, dict)
+
+        # Cleanup
         for fig in figs.values():
             plt.close(fig)

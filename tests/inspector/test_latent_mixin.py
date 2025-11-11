@@ -55,8 +55,11 @@ class DummyLatentInspector(LatentVariableMixin):
 
 
 def test_create_latent_scores_single_dataset():
+    """Test latent scores figure creation for a single dataset."""
+    # Arrange
     inspector = DummyLatentInspector()
 
+    # Act
     figures = inspector.create_latent_scores_figures(
         dataset="train",
         components=(0, 1),
@@ -65,15 +68,25 @@ def test_create_latent_scores_single_dataset():
         figsize=(4, 4),
     )
 
+    # Assert
     assert set(figures.keys()) == {"scores_1"}
     fig = figures["scores_1"]
     ax = fig.axes[0]
     assert ax.get_xlabel().startswith("LV1")
 
+    # Cleanup
+    import matplotlib.pyplot as plt
+
+    for fig in figures.values():
+        plt.close(fig)
+
 
 def test_create_latent_scores_multi_dataset():
+    """Test latent scores figure creation for multiple datasets with confidence ellipse."""
+    # Arrange
     inspector = DummyLatentInspector()
 
+    # Act
     figures = inspector.create_latent_scores_figures(
         dataset=["train", "test"],
         components=((0, 1),),
@@ -82,6 +95,7 @@ def test_create_latent_scores_multi_dataset():
         figsize=(4, 4),
     )
 
+    # Assert
     assert "scores_1" in figures
     assert "scores_1_train" in figures
     assert "scores_1_test" in figures
@@ -89,10 +103,17 @@ def test_create_latent_scores_multi_dataset():
     # Confidence ellipse from training data leaves at least one patch
     assert len(multi_ax.patches) >= 1
 
+    # Cleanup
+    import matplotlib.pyplot as plt
+
+    for fig in figures.values():
+        plt.close(fig)
+
 
 def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
+    """Test latent distance figure with mocked Hotelling T2 and Q-residuals detectors."""
+    # Arrange
     inspector = DummyLatentInspector()
-
     hot_instances = []
     q_instances = []
 
@@ -115,12 +136,14 @@ def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
         q_factory,
     )
 
+    # Act
     fig = inspector.create_latent_distance_figure(
         dataset=["train", "test"],
         color_by_y=False,
         figsize=(4, 4),
     )
 
+    # Assert
     assert fig is not None
     assert len(hot_instances) == 1
     assert len(q_instances) == 1
@@ -131,3 +154,8 @@ def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
     # Two datasets produce two predict calls each
     assert len(hot.predict_calls) == 2
     assert len(q_det.predict_calls) == 2
+
+    # Cleanup
+    import matplotlib.pyplot as plt
+
+    plt.close(fig)

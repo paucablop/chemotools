@@ -276,8 +276,6 @@ class TestInspectFigures:
             plt.close(fig)
 
 
-
-
 class TestRegressionDiagnostics:
     def test_regression_metrics_cached(self, fitted_pls, regression_data):
         """Test that regression metrics (RMSE, R2) are computed once and cached."""

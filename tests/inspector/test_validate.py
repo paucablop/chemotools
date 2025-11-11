@@ -17,6 +17,9 @@ class TestValidateAndExtractModel:
 
     def test_validate_fitted_pca(self, fitted_pca):
         """Test validation with a fitted PCA model."""
+        # Arrange
+        # (fitted_pca fixture provides the fitted model)
+
         # Act
         estimator, transformer = _validate_and_extract_model(fitted_pca)
 
@@ -26,6 +29,9 @@ class TestValidateAndExtractModel:
 
     def test_validate_fitted_pls(self, fitted_pls):
         """Test validation with a fitted PLS model."""
+        # Arrange
+        # (fitted_pls fixture provides the fitted model)
+
         # Act
         estimator, transformer = _validate_and_extract_model(fitted_pls)
 
@@ -35,6 +41,9 @@ class TestValidateAndExtractModel:
 
     def test_validate_fitted_pipeline_pca(self, fitted_pipeline_pca):
         """Test validation with a fitted pipeline containing PCA."""
+        # Arrange
+        # (fitted_pipeline_pca fixture provides the fitted pipeline)
+
         # Act
         estimator, transformer = _validate_and_extract_model(fitted_pipeline_pca)
 
@@ -46,25 +55,37 @@ class TestValidateAndExtractModel:
 
     def test_unfitted_pca_raises_error(self, unfitted_pca):
         """Test that unfitted PCA raises NotFittedError."""
-        # Assert
+        # Arrange
+        # (unfitted_pca fixture provides the unfitted model)
+
+        # Act & Assert
         with pytest.raises(NotFittedError):
             _validate_and_extract_model(unfitted_pca)
 
     def test_unfitted_pls_raises_error(self, unfitted_pls):
         """Test that unfitted PLS raises NotFittedError."""
-        # Assert
+        # Arrange
+        # (unfitted_pls fixture provides the unfitted model)
+
+        # Act & Assert
         with pytest.raises(NotFittedError):
             _validate_and_extract_model(unfitted_pls)
 
     def test_unfitted_pipeline_raises_error(self, unfitted_pipeline):
         """Test that unfitted pipeline raises NotFittedError."""
-        # Assert
+        # Arrange
+        # (unfitted_pipeline fixture provides the unfitted pipeline)
+
+        # Act & Assert
         with pytest.raises(NotFittedError):
             _validate_and_extract_model(unfitted_pipeline)
 
     def test_invalid_model_type_raises_error(self, fitted_invalid_model):
         """Test that invalid model type raises TypeError."""
-        # Assert
+        # Arrange
+        # (fitted_invalid_model fixture provides a model of wrong type)
+
+        # Act & Assert
         with pytest.raises(TypeError, match="Model must be _BasePCA, _PLS"):
             _validate_and_extract_model(fitted_invalid_model)
 
@@ -74,7 +95,7 @@ class TestValidateAndExtractModel:
         X, _ = dummy_data_loader
         pipeline = make_pipeline(StandardScaler(), SVR()).fit(X, np.ones(len(X)))
 
-        # Assert
+        # Act & Assert
         with pytest.raises(TypeError, match="Model must be _BasePCA, _PLS"):
             _validate_and_extract_model(pipeline)
 
@@ -116,7 +137,7 @@ class TestValidateDatasetsConsistency:
         # Arrange
         X_train = np.random.rand(100, 10)
 
-        # Act & Assert (should not raise)
+        # Act
         _validate_datasets_consistency(
             X_train=X_train,
             y_train=None,
@@ -127,13 +148,16 @@ class TestValidateDatasetsConsistency:
             supervised=False,
         )
 
+        # Assert
+        # (no exception raised means validation passed)
+
     def test_valid_train_test_unsupervised(self):
         """Test valid training and test data for unsupervised learning."""
         # Arrange
         X_train = np.random.rand(100, 10)
         X_test = np.random.rand(50, 10)
 
-        # Act & Assert (should not raise)
+        # Act
         _validate_datasets_consistency(
             X_train=X_train,
             y_train=None,
@@ -144,6 +168,9 @@ class TestValidateDatasetsConsistency:
             supervised=False,
         )
 
+        # Assert
+        # (no exception raised means validation passed)
+
     def test_valid_all_datasets_unsupervised(self):
         """Test valid training, test, and validation data for unsupervised."""
         # Arrange
@@ -151,7 +178,7 @@ class TestValidateDatasetsConsistency:
         X_test = np.random.rand(50, 10)
         X_val = np.random.rand(30, 10)
 
-        # Act & Assert (should not raise)
+        # Act
         _validate_datasets_consistency(
             X_train=X_train,
             y_train=None,
@@ -162,13 +189,16 @@ class TestValidateDatasetsConsistency:
             supervised=False,
         )
 
+        # Assert
+        # (no exception raised means validation passed)
+
     def test_valid_train_only_supervised(self):
         """Test valid training data only for supervised learning."""
         # Arrange
         X_train = np.random.rand(100, 10)
         y_train = np.random.rand(100)
 
-        # Act & Assert (should not raise)
+        # Act
         _validate_datasets_consistency(
             X_train=X_train,
             y_train=y_train,
@@ -179,6 +209,9 @@ class TestValidateDatasetsConsistency:
             supervised=True,
         )
 
+        # Assert
+        # (no exception raised means validation passed)
+
     def test_valid_train_test_supervised(self):
         """Test valid training and test data for supervised learning."""
         # Arrange
@@ -187,7 +220,7 @@ class TestValidateDatasetsConsistency:
         X_test = np.random.rand(50, 10)
         y_test = np.random.rand(50)
 
-        # Act & Assert (should not raise)
+        # Act
         _validate_datasets_consistency(
             X_train=X_train,
             y_train=y_train,
@@ -197,6 +230,9 @@ class TestValidateDatasetsConsistency:
             y_val=None,
             supervised=True,
         )
+
+        # Assert
+        # (no exception raised means validation passed)
 
     def test_inconsistent_features_in_test(self):
         """Test that inconsistent features in test set raises ValueError."""
@@ -295,9 +331,11 @@ class TestValidateDatasetsConsistency:
 
     def test_train_y_length_mismatch_raises(self):
         """Train y length must match X_train regardless of supervised flag."""
+        # Arrange
         X_train = np.random.rand(20, 5)
         y_train = np.random.rand(19)
 
+        # Act & Assert
         with pytest.raises(ValueError, match="same number of samples"):
             _validate_datasets_consistency(
                 X_train=X_train,
@@ -311,11 +349,13 @@ class TestValidateDatasetsConsistency:
 
     def test_test_y_length_mismatch_raises(self):
         """Test y length must match X_test when provided."""
+        # Arrange
         X_train = np.random.rand(30, 4)
         y_train = np.random.rand(30)
         X_test = np.random.rand(15, 4)
         y_test = np.random.rand(14)
 
+        # Act & Assert
         with pytest.raises(ValueError, match="same number of samples"):
             _validate_datasets_consistency(
                 X_train=X_train,
@@ -329,11 +369,13 @@ class TestValidateDatasetsConsistency:
 
     def test_val_y_length_mismatch_raises(self):
         """Validation y length must match X_val when provided."""
+        # Arrange
         X_train = np.random.rand(30, 4)
         y_train = np.random.rand(30)
         X_val = np.random.rand(10, 4)
         y_val = np.random.rand(9)
 
+        # Act & Assert
         with pytest.raises(ValueError, match="same number of samples"):
             _validate_datasets_consistency(
                 X_train=X_train,

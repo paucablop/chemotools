@@ -54,6 +54,8 @@ def regression_setup():
 
 
 def test_regression_metrics_match_sklearn(regression_setup):
+    """Test that regression metrics (RMSE, R2) match sklearn calculations."""
+    # Arrange
     inspector, raw_data, estimator = regression_setup
     X_train, y_train = raw_data["train"]
     X_test, y_test = raw_data["test"]
@@ -65,25 +67,43 @@ def test_regression_metrics_match_sklearn(regression_setup):
     expected_train_r2 = r2_score(y_train, estimator.predict(X_train))
     expected_test_r2 = r2_score(y_test, estimator.predict(X_test))
 
-    assert inspector.RMSE_train == pytest.approx(expected_train_rmse)
-    assert inspector.RMSE_test == pytest.approx(expected_test_rmse)
-    assert inspector.R2_train == pytest.approx(expected_train_r2)
-    assert inspector.R2_test == pytest.approx(expected_test_r2)
-    assert inspector.RMSE_val is None
-    assert inspector.R2_val is None
+    # Act
+    rmse_train = inspector.RMSE_train
+    rmse_test = inspector.RMSE_test
+    r2_train = inspector.R2_train
+    r2_test = inspector.R2_test
+    rmse_val = inspector.RMSE_val
+    r2_val = inspector.R2_val
+
+    # Assert
+    assert rmse_train == pytest.approx(expected_train_rmse)
+    assert rmse_test == pytest.approx(expected_test_rmse)
+    assert r2_train == pytest.approx(expected_train_r2)
+    assert r2_test == pytest.approx(expected_test_r2)
+    assert rmse_val is None
+    assert r2_val is None
 
 
 def test_predictions_are_cached(regression_setup):
+    """Test that model predictions are computed once and cached."""
+    # Arrange
     inspector, _, _ = regression_setup
 
+    # Act
     inspector._get_predictions("train")
-    assert inspector.model.predict_calls == 1
+    first_call_count = inspector.model.predict_calls
 
     inspector._get_predictions("train")
-    assert inspector.model.predict_calls == 1
+    second_call_count = inspector.model.predict_calls
+
+    # Assert
+    assert first_call_count == 1
+    assert second_call_count == 1
 
 
 def test_detectors_are_cached(monkeypatch, regression_setup):
+    """Test that outlier detectors (Leverage, StudentizedResiduals) are created once and cached."""
+    # Arrange
     inspector, raw_data, _ = regression_setup
     X_train, y_train = raw_data["train"]
 
@@ -120,15 +140,18 @@ def test_detectors_are_cached(monkeypatch, regression_setup):
         FakeStudentized,
     )
 
+    # Act
     leverage = inspector.leverage_detector
     student = inspector.studentized_detector
+    leverage_again = inspector.leverage_detector
+    student_again = inspector.studentized_detector
 
+    # Assert
     assert leverage.fit_calls == 1
     assert student.fit_calls == 1
     assert_allclose(leverage.fitted_with[0], X_train)
     assert_allclose(leverage.fitted_with[1], y_train)
     assert_allclose(student.fitted_with[0], X_train)
     assert_allclose(student.fitted_with[1], y_train)
-
-    assert inspector.leverage_detector is leverage
-    assert inspector.studentized_detector is student
+    assert leverage_again is leverage
+    assert student_again is student
