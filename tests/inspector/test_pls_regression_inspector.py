@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import matplotlib.pyplot as plt
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -34,6 +35,36 @@ def fitted_pls(regression_data):
 def fitted_pipeline(regression_data):
     X_train, y_train = regression_data["train"]
     model = make_pipeline(StandardScaler(), PLSRegression(n_components=2))
+    model.fit(X_train, y_train)
+    return model
+
+
+@pytest.fixture
+def multi_target_regression_data():
+    rng = np.random.default_rng(7)
+    X = rng.normal(size=(90, 6))
+    coef = np.array([
+        [1.0, -0.4],
+        [-0.6, 0.8],
+        [0.2, 0.5],
+        [0.0, -0.3],
+        [0.7, 0.1],
+        [-1.1, 0.9],
+    ])
+    y = X @ coef + rng.normal(scale=0.1, size=(90, 2))
+    X_train, X_test, X_val = X[:50], X[50:70], X[70:]
+    y_train, y_test, y_val = y[:50], y[50:70], y[70:]
+    return {
+        "train": (X_train, y_train),
+        "test": (X_test, y_test),
+        "val": (X_val, y_val),
+    }
+
+
+@pytest.fixture
+def fitted_pls_multi(multi_target_regression_data):
+    X_train, y_train = multi_target_regression_data["train"]
+    model = PLSRegression(n_components=2)
     model.fit(X_train, y_train)
     return model
 
@@ -110,7 +141,9 @@ class TestInspectFigures:
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
-        figures = inspector.inspect(dataset="train", components_scores=(0, 1))
+        figures = inspector.inspect(
+            dataset="train", components_scores=(0, 1), loadings_components=[0, 1]
+        )
 
         expected_keys = {
             "scores_1",
@@ -203,13 +236,218 @@ class TestRegressionDiagnostics:
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
-        figures = inspector.inspect(dataset="train", components_scores=(0, 1))
+        figures = inspector.inspect(
+            dataset="train",
+            components_scores=(0, 1),
+            loadings_components=[0, 1],
+            color_by_y=False,
+        )
 
         assert "distances_leverage_studentized" in figures
         fig = figures["distances_leverage_studentized"]
         ax = fig.axes[0]
         assert ax.get_xlabel() == "Leverage"
         assert ax.get_ylabel() == "Studentized Residuals"
+
+
+class TestAdditionalCoverage:
+    def test_detector_limits_cached(self, fitted_pls, regression_data, monkeypatch):
+        X_train, y_train = regression_data["train"]
+
+        hot_calls = []
+        q_calls = []
+
+        class _DummyHotelling:
+            def __init__(self, model, confidence):
+                self.model = model
+                self.confidence = confidence
+                self.critical_value_ = 0.0
+
+            def fit(self, X):
+                hot_calls.append(X.copy())
+                self.critical_value_ = 1.23
+                return self
+
+        class _DummyQ:
+            def __init__(self, model, confidence):
+                self.model = model
+                self.confidence = confidence
+                self.critical_value_ = 0.0
+
+            def fit(self, X):
+                q_calls.append(X.copy())
+                self.critical_value_ = 4.56
+                return self
+
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.HotellingT2",
+            _DummyHotelling,
+        )
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.QResiduals",
+            _DummyQ,
+        )
+
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        assert inspector.hotelling_t2_limit == pytest.approx(1.23)
+        assert inspector.hotelling_t2_limit == pytest.approx(1.23)
+        assert len(hot_calls) == 1
+
+        assert inspector.q_residuals_limit == pytest.approx(4.56)
+        assert inspector.q_residuals_limit == pytest.approx(4.56)
+        assert len(q_calls) == 1
+
+    def test_component_selection_helpers(self, fitted_pls, regression_data):
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        all_loadings = inspector.get_x_loadings()
+        single_loading = inspector.get_x_loadings(0)
+        multi_loading = inspector.get_x_loadings([0, 1])
+
+        assert single_loading.shape[1] == 1
+        assert multi_loading.shape[1] == 2
+        assert np.allclose(single_loading.squeeze(), all_loadings[:, 0])
+
+        single_weight = inspector.get_x_weights(1)
+        list_weights = inspector.get_x_weights([0, 2])
+        assert single_weight.shape[1] == 1
+        assert list_weights.shape[1] == 2
+
+        single_rotation = inspector.get_x_rotations(1)
+        list_rotations = inspector.get_x_rotations([0, 2])
+        assert single_rotation.shape[1] == 1
+        assert list_rotations.shape[1] == 2
+
+    def test_regression_coefficients_multitarget_and_legend(
+        self, fitted_pls_multi, multi_target_regression_data, monkeypatch
+    ):
+        X_train, y_train = multi_target_regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls_multi, X_train, y_train)
+
+        coef = inspector.get_regression_coefficients()
+        assert coef.shape[1] == 2
+
+        def _dummy_figure(*args, **kwargs):
+            fig, _ = plt.subplots()
+            return fig
+
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.create_regression_distances_plot",
+            _dummy_figure,
+        )
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.create_predicted_vs_actual_plot",
+            _dummy_figure,
+        )
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.create_y_residual_plot",
+            _dummy_figure,
+        )
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.create_qq_plot",
+            _dummy_figure,
+        )
+        monkeypatch.setattr(
+            "chemotools.inspector._pls_regression_inspector.create_residual_distribution_plot",
+            _dummy_figure,
+        )
+
+        figures = inspector.inspect(
+            dataset="train",
+            components_scores=(0, 1),
+            loadings_components=[0, 1],
+            color_by_y=False,
+        )
+        coef_fig = figures["regression_coefficients"]
+        legend = coef_fig.axes[0].legend_
+        assert legend is not None
+        legend_labels = [text.get_text() for text in legend.get_texts()]
+        assert legend_labels == ["Target 1", "Target 2"]
+
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_create_latent_scores_missing_train_fallback(
+        self, fitted_pls, regression_data, monkeypatch
+    ):
+        X_train, y_train = regression_data["train"]
+        X_test, y_test = regression_data["test"]
+        inspector = PLSRegressionInspector(
+            fitted_pls,
+            X_train,
+            y_train,
+            X_test=X_test,
+            y_test=y_test,
+        )
+
+        original_get = inspector.get_x_scores
+        first_call = {"trigger": True}
+
+        def _patched_get(dataset="train"):
+            if dataset == "train" and first_call["trigger"]:
+                first_call["trigger"] = False
+                raise KeyError("train missing")
+            return original_get(dataset)
+
+        monkeypatch.setattr(inspector, "get_x_scores", _patched_get)
+
+        figures = inspector.create_latent_scores_figures(
+            dataset="test",
+            components=(0, 1),
+            color_by_y=False,
+            annotate_by=None,
+            figsize=(3, 3),
+        )
+
+        assert "scores_1" in figures
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_create_latent_scores_multi_dataset_combined(
+        self, fitted_pls, regression_data
+    ):
+        X_train, y_train = regression_data["train"]
+        X_test, y_test = regression_data["test"]
+        inspector = PLSRegressionInspector(
+            fitted_pls,
+            X_train,
+            y_train,
+            X_test=X_test,
+            y_test=y_test,
+        )
+
+        figures = inspector.create_latent_scores_figures(
+            dataset=["train", "test"],
+            components=(0, 1),
+            color_by_y=False,
+            annotate_by=None,
+            figsize=(3, 3),
+        )
+
+        assert set(figures.keys()) == {"scores_1"}
+
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_create_x_vs_y_scores_mixed_components(
+        self, fitted_pls, regression_data
+    ):
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        annotate_by = {"train": np.arange(X_train.shape[0])}
+        figures = inspector._create_x_vs_y_scores_figures(
+            components=[(0, 1), 2],
+            color_by_y=True,
+            annotate_by=annotate_by,
+            figsize=(3, 3),
+        )
+
+        assert set(figures.keys()) == {"x_vs_y_scores_1"}
+        for fig in figures.values():
+            plt.close(fig)
 
 
 class TestValidationPropagation:
