@@ -1003,3 +1003,129 @@ class TestPCAInspectorIntegration:
         # Cleanup
         for fig in {**figures1, **figures2}.values():
             plt.close(fig)
+
+
+class TestPCAInspectorAdditionalCoverage:
+    """Additional tests to improve code coverage."""
+
+    def test_init_with_invalid_confidence_raises_error(
+        self, fitted_pca, dummy_data_loader
+    ):
+        """Test that invalid confidence values raise ValueError."""
+        # Arrange
+        X, y = dummy_data_loader
+
+        # Act & Assert - confidence = 0
+        with pytest.raises(ValueError, match="confidence must be between 0 and 1"):
+            PCAInspector(model=fitted_pca, X_train=X, y_train=y, confidence=0)
+
+        # Act & Assert - confidence = 1
+        with pytest.raises(ValueError, match="confidence must be between 0 and 1"):
+            PCAInspector(model=fitted_pca, X_train=X, y_train=y, confidence=1)
+
+        # Act & Assert - confidence > 1
+        with pytest.raises(ValueError, match="confidence must be between 0 and 1"):
+            PCAInspector(model=fitted_pca, X_train=X, y_train=y, confidence=1.5)
+
+        # Act & Assert - confidence < 0
+        with pytest.raises(ValueError, match="confidence must be between 0 and 1"):
+            PCAInspector(model=fitted_pca, X_train=X, y_train=y, confidence=-0.1)
+
+    def test_hotelling_t2_limit_caching(self, fitted_pca, dummy_data_loader):
+        """Test that Hotelling T² limit is cached after first access."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(
+            model=fitted_pca, X_train=X, y_train=y, confidence=0.95
+        )
+
+        # Act - access limit twice
+        limit1 = inspector.hotelling_t2_limit
+        limit2 = inspector.hotelling_t2_limit
+
+        # Assert - should be same value (cached)
+        assert limit1 == limit2
+        assert isinstance(limit1, (float, np.floating))
+        assert limit1 > 0
+
+    def test_q_residuals_limit_caching(self, fitted_pca, dummy_data_loader):
+        """Test that Q residuals limit is cached after first access."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(
+            model=fitted_pca, X_train=X, y_train=y, confidence=0.95
+        )
+
+        # Act - access limit twice
+        limit1 = inspector.q_residuals_limit
+        limit2 = inspector.q_residuals_limit
+
+        # Assert - should be same value (cached)
+        assert limit1 == limit2
+        assert isinstance(limit1, (float, np.floating))
+        assert limit1 > 0
+
+    def test_summary_pc_variances_with_different_components(self, dummy_data_loader):
+        """Test summary pc_variances dict adjusts to number of components."""
+        # Arrange
+        X, y = dummy_data_loader
+
+        # Act & Assert - 1 component
+        pca_one = PCA(n_components=1).fit(X)
+        inspector_one = PCAInspector(model=pca_one, X_train=X, y_train=y)
+        summary_one = inspector_one.summary()
+        assert "PC1" in summary_one["pc_variances"]
+        assert "PC2" not in summary_one["pc_variances"]
+        assert "PC3" not in summary_one["pc_variances"]
+
+        # Act & Assert - 3+ components
+        pca_three = PCA(n_components=3).fit(X)
+        inspector_three = PCAInspector(model=pca_three, X_train=X, y_train=y)
+        summary_three = inspector_three.summary()
+        assert "PC1" in summary_three["pc_variances"]
+        assert "PC2" in summary_three["pc_variances"]
+        assert "PC3" in summary_three["pc_variances"]
+
+    def test_summary_preprocessing_steps_empty_for_plain_model(
+        self, fitted_pca, dummy_data_loader
+    ):
+        """Test that preprocessing_steps is empty list for plain PCA model."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
+
+        # Act
+        summary = inspector.summary()
+
+        # Assert
+        assert "preprocessing_steps" in summary
+        assert summary["preprocessing_steps"] == []
+        assert summary["has_preprocessing"] is False
+
+    def test_inspect_spectra_with_multiple_datasets(
+        self, fitted_pipeline_pca, dummy_data_loader
+    ):
+        """Test inspect_spectra with multiple datasets (multi-dataset path)."""
+        # Arrange
+        X, y = dummy_data_loader
+        X_train, X_test = X[:80], X[80:]
+        y_train, y_test = y[:80], y[80:]
+        inspector = PCAInspector(
+            model=fitted_pipeline_pca,
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            y_test=y_test,
+        )
+
+        # Act
+        figures = inspector.inspect_spectra(dataset=["train", "test"])
+
+        # Assert - should have both raw and preprocessed figures
+        assert isinstance(figures, dict)
+        assert "raw_spectra" in figures
+        assert "preprocessed_spectra" in figures
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
