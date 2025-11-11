@@ -124,10 +124,19 @@ class StudentizedResiduals(_ModelResidualsBase):
         if self.transformer_:
             X = self.transformer_.transform(X)
 
-        # Calculate y residuals
-        y_residuals = y - self.estimator_.predict(X)
+        if y is None:
+            raise ValueError("y cannot be None when fitting studentized residuals")
+
+        y_arr = np.asarray(y)
+        if y_arr.ndim == 1:
+            y_arr = y_arr.reshape(-1, 1)
+
+        predictions = np.asarray(self.estimator_.predict(X))
+        if predictions.ndim == 1:
+            predictions = predictions.reshape(-1, 1)
+        y_residuals = y_arr - predictions
         y_residuals = (
-            y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
+            y_residuals.reshape(-1, 1) if y_residuals.ndim == 1 else y_residuals
         )
 
         # Calculate the studentized residuals
@@ -187,10 +196,19 @@ class StudentizedResiduals(_ModelResidualsBase):
         if self.transformer_:
             X = self.transformer_.transform(X)
 
-        # Calculate y residuals
-        y_residuals = y - self.estimator_.predict(X)
+        if y is None:
+            raise ValueError("y cannot be None when computing studentized residuals")
+
+        y_arr = np.asarray(y)
+        if y_arr.ndim == 1:
+            y_arr = y_arr.reshape(-1, 1)
+
+        predictions = np.asarray(self.estimator_.predict(X))
+        if predictions.ndim == 1:
+            predictions = predictions.reshape(-1, 1)
+        y_residuals = y_arr - predictions
         y_residuals = (
-            y_residuals.reshape(-1, 1) if len(y_residuals.shape) == 1 else y_residuals
+            y_residuals.reshape(-1, 1) if y_residuals.ndim == 1 else y_residuals
         )
 
         return calculate_studentized_residuals(self.estimator_, X, y_residuals)

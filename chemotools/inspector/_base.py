@@ -69,11 +69,11 @@ class InspectorState:
         estimator, transformer = _validate_and_extract_model(model)
 
         X_train = np.asarray(X_train)
-        y_train_arr = np.asarray(y_train) if y_train is not None else None
+        y_train_arr = self._normalize_target_array(y_train)
         X_test_arr = np.asarray(X_test) if X_test is not None else None
-        y_test_arr = np.asarray(y_test) if y_test is not None else None
+        y_test_arr = self._normalize_target_array(y_test)
         X_val_arr = np.asarray(X_val) if X_val is not None else None
-        y_val_arr = np.asarray(y_val) if y_val is not None else None
+        y_val_arr = self._normalize_target_array(y_val)
 
         _validate_datasets_consistency(
             X_train,
@@ -131,6 +131,15 @@ class InspectorState:
         }
 
         self._preprocessed_cache: Dict[str, np.ndarray] = {}
+
+    @staticmethod
+    def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        if target is None:
+            return None
+        arr = np.asarray(target)
+        if arr.ndim == 2 and arr.shape[1] == 1:
+            return arr.ravel()
+        return arr
 
     @staticmethod
     def _prepare_labels(

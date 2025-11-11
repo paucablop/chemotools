@@ -292,3 +292,55 @@ class TestValidateDatasetsConsistency:
                 y_val=None,
                 supervised=True,
             )
+
+    def test_train_y_length_mismatch_raises(self):
+        """Train y length must match X_train regardless of supervised flag."""
+        X_train = np.random.rand(20, 5)
+        y_train = np.random.rand(19)
+
+        with pytest.raises(ValueError, match="same number of samples"):
+            _validate_datasets_consistency(
+                X_train=X_train,
+                y_train=y_train,
+                X_test=None,
+                y_test=None,
+                X_val=None,
+                y_val=None,
+                supervised=False,
+            )
+
+    def test_test_y_length_mismatch_raises(self):
+        """Test y length must match X_test when provided."""
+        X_train = np.random.rand(30, 4)
+        y_train = np.random.rand(30)
+        X_test = np.random.rand(15, 4)
+        y_test = np.random.rand(14)
+
+        with pytest.raises(ValueError, match="same number of samples"):
+            _validate_datasets_consistency(
+                X_train=X_train,
+                y_train=y_train,
+                X_test=X_test,
+                y_test=y_test,
+                X_val=None,
+                y_val=None,
+                supervised=True,
+            )
+
+    def test_val_y_length_mismatch_raises(self):
+        """Validation y length must match X_val when provided."""
+        X_train = np.random.rand(30, 4)
+        y_train = np.random.rand(30)
+        X_val = np.random.rand(10, 4)
+        y_val = np.random.rand(9)
+
+        with pytest.raises(ValueError, match="same number of samples"):
+            _validate_datasets_consistency(
+                X_train=X_train,
+                y_train=y_train,
+                X_test=None,
+                y_test=None,
+                X_val=X_val,
+                y_val=y_val,
+                supervised=True,
+            )
