@@ -162,7 +162,7 @@ class LatentVariableMixin:
                         annotate_by=annotate_by,
                         figsize=figsize,
                         component_label=component_label,
-                        dataset_color=DATASET_COLORS.get(ds_name, "#7f7f7f"),
+                        dataset_color=DATASET_COLORS.get(ds_name, "gray"),
                         confidence=confidence_level,
                         train_scores_for_ellipse=train_scores_for_ellipse,
                     )
@@ -196,7 +196,7 @@ class LatentVariableMixin:
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
-                    dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
+                    dataset_color=DATASET_COLORS.get(dataset_name, "gray"),
                     confidence=confidence_level,
                     train_scores_for_ellipse=train_scores_for_ellipse,
                 )

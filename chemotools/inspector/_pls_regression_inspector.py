@@ -601,7 +601,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=self.component_label,
-                    dataset_color=DATASET_COLORS.get(dataset_name, "#1f77b4"),
+                    dataset_color=DATASET_COLORS.get(dataset_name, "gray"),
                     confidence=self.confidence,
                     train_scores_for_ellipse=train_scores_for_ellipse,
                 )

@@ -428,7 +428,7 @@ def create_scores_plot_multi_dataset(
                 components=(0, 1),
                 color_by=None,
                 label=ds_name.capitalize(),
-                color=DATASET_COLORS.get(ds_name, "#7f7f7f"),
+                color=DATASET_COLORS.get(ds_name),
                 confidence_ellipse=None,
             )
             plot.render(
@@ -490,7 +490,8 @@ def create_scores_plot_multi_dataset(
             # Scores should always be present
             assert scores is not None, f"Scores data is required for dataset {ds_name}"
 
-            color = DATASET_COLORS.get(ds_name, "#7f7f7f")
+            color = DATASET_COLORS.get(ds_name, "grey")
+            marker = DATASET_MARKERS.get(ds_name, "grey")
 
             # Determine color_by parameter
             color_reference = (
@@ -511,7 +512,7 @@ def create_scores_plot_multi_dataset(
                 colormap=None,
                 confidence_ellipse=ellipse,
             )
-            plot.render(ax)
+            plot.render(ax, marker=marker)
 
             # Add annotations if requested
             labels = prepare_annotations(annotate_by, ds_name, scores, y)
@@ -648,7 +649,9 @@ def create_model_distances_plot(
         # When multiple datasets, always color by dataset, not by y values
         if multi_dataset:
             color_by = None
-            dataset_color = DATASET_COLORS.get(ds_name, "#7f7f7f")
+            dataset_color = DATASET_COLORS.get(
+                ds_name,
+            )
         else:
             # Single dataset: respect color_by_y parameter
             color_by = (

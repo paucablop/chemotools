@@ -172,7 +172,9 @@ def create_spectra_plots_multi_dataset(
     fig1, ax1 = plt.subplots(figsize=figsize)
 
     for ds_name, X in raw_data.items():
-        color = DATASET_COLORS.get(ds_name, "#7f7f7f")
+        color = DATASET_COLORS.get(
+            ds_name,
+        )
         for i in range(X.shape[0]):
             ax1.plot(
                 wavenumbers,
@@ -197,7 +199,7 @@ def create_spectra_plots_multi_dataset(
     fig2, ax2 = plt.subplots(figsize=figsize)
 
     for ds_name, X in preprocessed_data.items():
-        color = DATASET_COLORS.get(ds_name, "#7f7f7f")
+        color = DATASET_COLORS.get(ds_name)
         for i in range(X.shape[0]):
             ax2.plot(
                 preprocessed_wavenumbers,
