@@ -6,7 +6,7 @@ from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union
 
 import numpy as np
 
-from .. import _plot_utils_latent_space as _latent_plots
+from ..helpers import _latent_space as _latent_plots
 from chemotools.inspector._utils import (
     ComponentSpec,
     normalize_components,

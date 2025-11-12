@@ -5,7 +5,7 @@ import pytest
 import matplotlib.pyplot as plt
 from sklearn.cross_decomposition import PLSRegression
 
-from chemotools.inspector._plot_utils_regression import (
+from chemotools.inspector.helpers._regression import (
     create_predicted_vs_actual_plot,
     create_y_residual_plot,
     create_qq_plot,

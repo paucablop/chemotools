@@ -5,7 +5,7 @@ import pytest
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
-from chemotools.inspector._plot_utils_latent_space import (
+from chemotools.inspector.helpers._latent_space import (
     create_model_distances_plot,
     create_variance_plot,
     create_loadings_plot,

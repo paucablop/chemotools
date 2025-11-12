@@ -24,7 +24,7 @@ from chemotools.plotting import (
 )
 from chemotools.plotting._styles import DATASET_COLORS
 
-from ._utils import select_primary_target
+from .._utils import select_primary_target
 
 
 def create_predicted_vs_actual_plot(

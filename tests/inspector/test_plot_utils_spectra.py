@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import matplotlib.pyplot as plt
 
-from chemotools.inspector._plot_utils_spectra import (
+from chemotools.inspector.helpers._spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )

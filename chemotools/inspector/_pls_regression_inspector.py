@@ -17,12 +17,12 @@ from ._utils import (
     normalize_datasets,
     get_xlabel_for_features,
 )
-from . import _plot_utils_latent_space as _latent_plots
-from ._plot_utils_spectra import (
+from .helpers import _latent_space as _latent_plots
+from .helpers._spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )
-from ._plot_utils_regression import (
+from .helpers._regression import (
     create_predicted_vs_actual_plot,
     create_y_residual_plot,
     create_qq_plot,
@@ -520,7 +520,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             Dictionary of figures with keys like 'scores_1', 'scores_2', etc.
         """
         from ._utils import normalize_datasets, normalize_components
-        from . import _plot_utils_latent_space as _latent_plots
+        from .helpers import _latent_space as _latent_plots
         from chemotools.plotting._styles import DATASET_COLORS
 
         dataset_names = list(normalize_datasets(dataset))

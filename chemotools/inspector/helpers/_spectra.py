@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 from chemotools.plotting import SpectrumPlot
 from chemotools.plotting._styles import DATASET_COLORS
 
-from ._utils import select_primary_target
+from .._utils import select_primary_target
 
 
 def create_spectra_plots_single_dataset(

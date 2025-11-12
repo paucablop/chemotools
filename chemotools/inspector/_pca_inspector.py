@@ -17,7 +17,7 @@ from ._utils import (
     normalize_datasets,
     get_xlabel_for_features,
 )
-from ._plot_utils_spectra import (
+from .helpers._spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )

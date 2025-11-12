@@ -23,7 +23,7 @@ from chemotools.plotting._utils import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.outliers import HotellingT2, QResiduals
 
-from ._utils import (
+from .._utils import (
     ComponentSpec,
     prepare_annotations,
     select_primary_target,
