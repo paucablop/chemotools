@@ -96,9 +96,14 @@ def test_create_latent_scores_multi_dataset():
     )
 
     # Assert
+    # Multi-dataset mode only creates combined plots, not individual dataset plots
     assert "scores_1" in figures
-    assert "scores_1_train" in figures
-    assert "scores_1_test" in figures
+    assert (
+        "scores_1_train" not in figures
+    )  # Individual plots not created in multi-dataset mode
+    assert (
+        "scores_1_test" not in figures
+    )  # Individual plots not created in multi-dataset mode
     multi_ax = figures["scores_1"].axes[0]
     # Confidence ellipse from training data leaves at least one patch
     assert len(multi_ax.patches) >= 1

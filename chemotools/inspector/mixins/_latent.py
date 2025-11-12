@@ -143,30 +143,6 @@ class LatentVariableMixin:
                     confidence=confidence_level,
                 )
                 figures[f"scores_{idx}"] = fig
-
-                for ds_name in dataset_names:
-                    ds_scores = datasets_data[ds_name]["scores"]
-                    ds_y = datasets_data[ds_name]["y"]
-                    if ds_scores is None:
-                        raise ValueError(
-                            f"Scores not available for dataset '{ds_name}'"
-                        )
-
-                    ds_fig = _latent_plots.create_scores_plot_single_dataset(
-                        component_spec=component_spec,
-                        scores=ds_scores,
-                        y=ds_y,
-                        explained_var=explained_var,
-                        dataset_name=ds_name,
-                        color_by_y=requested_color_by_y,
-                        annotate_by=annotate_by,
-                        figsize=figsize,
-                        component_label=component_label,
-                        dataset_color=DATASET_COLORS.get(ds_name, "gray"),
-                        confidence=confidence_level,
-                        train_scores_for_ellipse=train_scores_for_ellipse,
-                    )
-                    figures[f"scores_{idx}_{ds_name}"] = ds_fig
         else:
             dataset_name = dataset_names[0]
             scores = self.get_latent_scores(dataset_name)

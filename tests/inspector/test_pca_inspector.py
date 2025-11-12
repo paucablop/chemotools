@@ -701,9 +701,14 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
+        # Multi-dataset mode only creates combined plots, not individual ones
         assert "scores_1" in figures
-        assert "scores_1_train" in figures
-        assert "scores_1_test" in figures
+        assert (
+            "scores_1_train" not in figures
+        )  # Individual plots not created in multi-dataset mode
+        assert (
+            "scores_1_test" not in figures
+        )  # Individual plots not created in multi-dataset mode
 
         legend = figures["scores_1"].axes[0].get_legend()
         assert legend is not None
