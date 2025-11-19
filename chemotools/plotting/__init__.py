@@ -1,5 +1,7 @@
 """Plotting utilities and display protocols for chemotools visualizations."""
 
+import warnings
+
 from chemotools.plotting._display import Display, is_displayable
 from chemotools.plotting._utils import (
     setup_figure,
@@ -43,3 +45,13 @@ __all__ = [
     "DATASET_COLORS",
     "DATASET_MARKERS",
 ]
+
+# Show experimental warning on module import
+warnings.warn(
+    "The plotting module is experimental and under active development. "
+    "The API may change in future versions. We welcome your feedback! "
+    "Please report issues or suggestions at: "
+    "https://github.com/paucablop/chemotools/issues/208",
+    FutureWarning,
+    stacklevel=2,
+)
