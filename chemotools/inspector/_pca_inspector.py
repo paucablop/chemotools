@@ -16,6 +16,8 @@ from .mixins import LatentVariableMixin
 from ._utils import (
     normalize_datasets,
     get_xlabel_for_features,
+    get_default_scores_components,
+    get_default_loadings_components,
 )
 from .helpers._spectra import (
     create_spectra_plots_single_dataset,
@@ -431,11 +433,10 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
-        components_scores: Union[Tuple[int, int], Sequence[Tuple[int, int]]] = (
-            (0, 1),
-            (1, 2),
-        ),
-        loadings_components: Union[int, Sequence[int]] = [0, 1, 2],
+        components_scores: Optional[
+            Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]]
+        ] = None,
+        loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
@@ -448,7 +449,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         """Create multiple independent PCA diagnostic plots.
 
         This method creates separate figure windows for:
-        - One or more scores plots (default: PC1 vs PC2 and PC2 vs PC3)
+        - One or more scores plots (default depends on model components)
         - One loadings plot (overlaid or single component)
         - One explained variance plot
         - Raw and preprocessed spectra plots (if include_spectra=True and preprocessing exists)
@@ -461,13 +462,22 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         dataset : Union[str, Sequence[str]], default='train'
             Dataset(s) to inspect. Can be a single dataset name ("train", "test", or "val")
             or a sequence of dataset names (e.g., ["train", "test"]).
-        components_scores : int, tuple of two ints, or sequence, default=((0, 1), (1, 2))
-            Component(s) for scores plots. Can be:
+        components_scores : int, tuple of two ints, sequence, or None, optional
+            Component(s) for scores plots. If None (default), automatically selects based
+            on number of components:
+            - 1 component: 0 (PC1 vs sample index/y)
+            - 2 components: (0, 1) (PC1 vs PC2)
+            - 3+ components: ((0, 1), (1, 2)) (two 2D plots)
+            Can also be manually specified as:
             - Single int: Creates one 1D plot (e.g., 0 for PC1 vs sample index/y-value)
             - Single tuple (x, y): Creates one 2D scatter plot (e.g., (0, 1) for PC1 vs PC2)
             - Sequence: Creates multiple plots (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
-        loadings_components : int or sequence of int, default=[0, 1, 2]
-            Which components to show in loadings plot
+        loadings_components : int, sequence of int, or None, optional
+            Which components to show in loadings plot. If None (default), automatically
+            selects based on number of components:
+            - 1 component: 0
+            - 2 components: [0, 1]
+            - 3+ components: [0, 1, 2]
         variance_threshold : float, default=0.95
             Threshold line for explained variance plot
         color_by_y : bool, default=True
@@ -530,6 +540,12 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
         >>> figs['loadings'].savefig('loadings.png')
         """
+        # Generate smart defaults based on number of components
+        if components_scores is None:
+            components_scores = get_default_scores_components(self.nr_components)
+        if loadings_components is None:
+            loadings_components = get_default_loadings_components(self.nr_components)
+
         figures = {}
 
         datasets = normalize_datasets(dataset)

@@ -16,6 +16,8 @@ from .mixins import LatentVariableMixin, RegressionMixin
 from ._utils import (
     normalize_datasets,
     get_xlabel_for_features,
+    get_default_scores_components,
+    get_default_loadings_components,
 )
 from .helpers import _latent_space as _latent_plots
 from .helpers._spectra import (
@@ -611,17 +613,22 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
     def _create_x_vs_y_scores_figures(
         self,
-        components: Union[Tuple[int, int], Sequence[Tuple[int, int]]],
+        components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
         color_by_y: bool,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
         figsize: Tuple[float, float],
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create X-scores vs Y-scores plots for PLS (training set only).
 
+        Note: Only 2D component pairs (tuples) will be plotted. Single component
+        specifications (ints) will be silently skipped since X vs Y scores
+        requires two components.
+
         Parameters
         ----------
-        components : tuple or sequence of tuples
-            Component pairs to plot
+        components : int, tuple, or sequence
+            Component pairs to plot. Only tuple specifications will be used;
+            int specifications are ignored.
         color_by_y : bool
             Whether to color by y values
         annotate_by : str or dict, optional
@@ -633,6 +640,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         -------
         dict
             Dictionary of figures with keys like 'x_vs_y_scores_1', 'x_vs_y_scores_2', etc.
+            Empty dict if no 2D component pairs are provided.
         """
         from chemotools.plotting import ScoresPlot
         from ._utils import normalize_components, prepare_annotations
@@ -714,11 +722,10 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
-        components_scores: Union[Tuple[int, int], Sequence[Tuple[int, int]]] = (
-            (0, 1),
-            (1, 2),
-        ),
-        loadings_components: Union[int, Sequence[int]] = [0, 1, 2],
+        components_scores: Optional[
+            Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]]
+        ] = None,
+        loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
@@ -732,7 +739,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         """Create multiple independent PLS diagnostic plots.
 
         This method creates separate figure windows for:
-        - One or more scores plots (X-scores, default: LV1 vs LV2 and LV2 vs LV3)
+        - One or more scores plots (X-scores, default depends on model components)
         - Multiple loadings plots (X-loadings, X-weights, X-rotations, coefficients)
         - Explained variance plots (X and Y spaces, if available)
         - Raw and preprocessed spectra plots (if preprocessing exists)
@@ -743,10 +750,19 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         ----------
         dataset : Union[str, Sequence[str]], default='train'
             Dataset(s) to inspect
-        components_scores : int, tuple, or sequence, default=((0, 1), (1, 2))
-            Component(s) for scores plots
-        loadings_components : int or sequence of int, default=[0, 1, 2]
-            Which components to show in loadings plots
+        components_scores : int, tuple, sequence, or None, optional
+            Component(s) for scores plots. If None (default), automatically selects based
+            on number of components:
+            - 1 component: 0 (LV1 vs sample index/y)
+            - 2 components: (0, 1) (LV1 vs LV2)
+            - 3+ components: ((0, 1), (1, 2)) (two 2D plots)
+            Can also be manually specified.
+        loadings_components : int, sequence of int, or None, optional
+            Which components to show in loadings plots. If None (default), automatically
+            selects based on number of components:
+            - 1 component: 0
+            - 2 components: [0, 1]
+            - 3+ components: [0, 1, 2]
         variance_threshold : float, default=0.95
             Threshold line for explained variance plot
         color_by_y : bool, default=True
@@ -779,6 +795,12 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                         - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
                         - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
         """
+        # Generate smart defaults based on number of components
+        if components_scores is None:
+            components_scores = get_default_scores_components(self.nr_components)
+        if loadings_components is None:
+            loadings_components = get_default_loadings_components(self.nr_components)
+
         figures = {}
 
         datasets = normalize_datasets(dataset)

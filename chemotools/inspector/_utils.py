@@ -94,6 +94,78 @@ def normalize_components(components_input: ComponentsInput) -> List[ComponentSpe
         return list(components_input)  # type: ignore[return-value]
 
 
+def get_default_scores_components(
+    n_components: int,
+) -> Union[int, Tuple[int, int], Tuple[Tuple[int, int], ...]]:
+    """Generate sensible default component pairs for scores plots based on available components.
+
+    Parameters
+    ----------
+    n_components : int
+        Number of components in the model
+
+    Returns
+    -------
+    Union[int, Tuple[int, int], Tuple[Tuple[int, int], ...]]
+        Default component specification:
+        - For 1 component: 0 (single 1D plot)
+        - For 2 components: (0, 1) (single 2D plot)
+        - For 3+ components: ((0, 1), (1, 2)) (two 2D plots)
+
+    Examples
+    --------
+    >>> get_default_scores_components(1)
+    0
+    >>> get_default_scores_components(2)
+    (0, 1)
+    >>> get_default_scores_components(3)
+    ((0, 1), (1, 2))
+    >>> get_default_scores_components(5)
+    ((0, 1), (1, 2))
+    """
+    if n_components == 1:
+        return 0
+    elif n_components == 2:
+        return (0, 1)
+    else:  # 3 or more
+        return ((0, 1), (1, 2))
+
+
+def get_default_loadings_components(n_components: int) -> Union[int, List[int]]:
+    """Generate sensible default components for loadings plots based on available components.
+
+    Parameters
+    ----------
+    n_components : int
+        Number of components in the model
+
+    Returns
+    -------
+    Union[int, List[int]]
+        Default component indices:
+        - For 1 component: 0
+        - For 2 components: [0, 1]
+        - For 3+ components: [0, 1, 2]
+
+    Examples
+    --------
+    >>> get_default_loadings_components(1)
+    0
+    >>> get_default_loadings_components(2)
+    [0, 1]
+    >>> get_default_loadings_components(3)
+    [0, 1, 2]
+    >>> get_default_loadings_components(5)
+    [0, 1, 2]
+    """
+    if n_components == 1:
+        return 0
+    elif n_components == 2:
+        return [0, 1]
+    else:  # 3 or more
+        return [0, 1, 2]
+
+
 # ==============================================================================
 # Label and text helpers
 # ==============================================================================

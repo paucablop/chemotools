@@ -214,6 +214,33 @@ def create_scores_plot_single_dataset(
     """
     fig, ax = plt.subplots(figsize=figsize)
 
+    # Get number of available components
+    n_components = scores.shape[1]
+
+    # Validate component indices
+    if isinstance(component_spec, int):
+        if component_spec < 0 or component_spec >= n_components:
+            raise ValueError(
+                f"Component index {component_spec} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+    else:
+        comp_x, comp_y = component_spec
+        if comp_x < 0 or comp_x >= n_components:
+            raise ValueError(
+                f"Component index {comp_x} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+        if comp_y < 0 or comp_y >= n_components:
+            raise ValueError(
+                f"Component index {comp_y} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+        if comp_x == comp_y:
+            raise ValueError(
+                f"Component indices must be different, got both as {comp_x}"
+            )
+
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         pc_scores = scores[:, component_spec]
@@ -394,6 +421,36 @@ def create_scores_plot_multi_dataset(
     ... )
     """
     fig, ax = plt.subplots(figsize=figsize)
+
+    # Get number of available components from first dataset
+    first_dataset_scores = next(iter(datasets_data.values()))["scores"]
+    if first_dataset_scores is None:
+        raise ValueError("At least one dataset must have scores data")
+    n_components = first_dataset_scores.shape[1]
+
+    # Validate component indices
+    if isinstance(component_spec, int):
+        if component_spec < 0 or component_spec >= n_components:
+            raise ValueError(
+                f"Component index {component_spec} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+    else:
+        comp_x, comp_y = component_spec
+        if comp_x < 0 or comp_x >= n_components:
+            raise ValueError(
+                f"Component index {comp_x} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+        if comp_y < 0 or comp_y >= n_components:
+            raise ValueError(
+                f"Component index {comp_y} is invalid. "
+                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
+            )
+        if comp_x == comp_y:
+            raise ValueError(
+                f"Component indices must be different, got both as {comp_x}"
+            )
 
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
