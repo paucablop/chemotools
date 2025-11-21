@@ -195,7 +195,7 @@ def create_y_residual_plot(
 
         ax.set_xlabel("Predicted Values", fontsize=10)
         ax.set_ylabel("Residuals", fontsize=10)
-        ax.set_title(f"{dataset_name}", fontsize=12, fontweight="bold")
+        ax.set_title(f"{dataset_name.capitalize()}", fontsize=12, fontweight="bold")
         ax.grid(alpha=0.3)
 
     fig.suptitle("Residual Plot", fontsize=14, fontweight="bold", y=0.98)
@@ -265,7 +265,7 @@ def create_qq_plot(
         qq_plot = QQPlot(residuals=residuals, add_confidence_band=confidence)
         qq_plot.render(ax=ax)
 
-        ax.set_title(f"{dataset_name}", fontsize=12, fontweight="bold")
+        ax.set_title(f"{dataset_name.capitalize()}", fontsize=12, fontweight="bold")
         ax.grid(alpha=0.3)
 
     fig.suptitle("Q-Q Plot", fontsize=14, fontweight="bold", y=0.98)
@@ -333,7 +333,7 @@ def create_residual_distribution_plot(
         dist_plot = ResidualDistributionPlot(residuals=residuals, bins=30)
         dist_plot.render(ax=ax)
 
-        ax.set_title(f"{dataset_name}", fontsize=12, fontweight="bold")
+        ax.set_title(f"{dataset_name.capitalize()}", fontsize=12, fontweight="bold")
         ax.grid(alpha=0.3, axis="y")
 
     fig.suptitle("Residual Distribution", fontsize=14, fontweight="bold", y=0.98)
