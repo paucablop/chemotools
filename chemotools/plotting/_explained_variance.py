@@ -242,8 +242,8 @@ class ExplainedVariancePlot(Display):
         # Default bar plot settings
         bar_defaults: dict[str, Any] = {
             "alpha": 0.6,
-            "color": "steelblue",
-            "edgecolor": "black",
+            "color": "#008BFB",
+            "edgecolor": "#008BFB",
         }
         bar_defaults.update(bar_kwargs)  # type: ignore[arg-type]
 
@@ -257,11 +257,11 @@ class ExplainedVariancePlot(Display):
 
         # Default line plot settings
         line_defaults: dict[str, Any] = {
-            "color": "red",
+            "color": "#FF0051",
             "marker": "o",
             "linestyle": "-",
-            "linewidth": 2,
-            "markersize": 6,
+            "linewidth": 1,
+            "markersize": 2,
         }
         line_defaults.update(line_kwargs)  # type: ignore[arg-type]
 

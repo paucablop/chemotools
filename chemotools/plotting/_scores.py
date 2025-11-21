@@ -394,7 +394,7 @@ class ScoresPlot(Display):
                 y,
                 confidence=self.confidence_level,
                 edgecolor=self.color,
-                linewidth=2,
+                linewidth=1,
                 linestyle="--",
                 alpha=0.8,
             )

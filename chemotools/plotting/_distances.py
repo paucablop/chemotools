@@ -422,7 +422,7 @@ class DistancesPlot(Display):
                 y_threshold=self.y_threshold,
                 color="red",
                 linestyle="--",
-                linewidth=2,
+                linewidth=1,
                 alpha=0.7,
             )
 

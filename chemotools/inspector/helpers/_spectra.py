@@ -83,12 +83,18 @@ def create_spectra_plots_single_dataset(
     if color_by_y and y is not None:
         color_values = select_primary_target(y)
 
+    # Suppress default labels when not using color_by to avoid cluttered legend
+    # Pass empty strings as labels to prevent "Spectrum 0", "Spectrum 1", etc.
+    suppress_labels = color_values is None
+    empty_labels = [""] * X_raw.shape[0] if suppress_labels else None
+
     # Figure 1: Raw spectra
     plot_raw = SpectrumPlot(
         x=wavenumbers,
         y=X_raw,
         color_by=color_values,
         colormap="viridis",
+        labels=empty_labels,
     )
     fig1 = plot_raw.show(
         figsize=figsize,
@@ -100,11 +106,13 @@ def create_spectra_plots_single_dataset(
     figures["raw_spectra"] = fig1
 
     # Figure 2: Preprocessed spectra
+    empty_labels_preproc = [""] * X_preprocessed.shape[0] if suppress_labels else None
     plot_preprocessed = SpectrumPlot(
         x=preprocessed_wavenumbers,
         y=X_preprocessed,
         color_by=color_values,
         colormap="viridis",
+        labels=empty_labels_preproc,
     )
     fig2 = plot_preprocessed.show(
         figsize=figsize,
@@ -172,17 +180,16 @@ def create_spectra_plots_multi_dataset(
     fig1, ax1 = plt.subplots(figsize=figsize)
 
     for ds_name, X in raw_data.items():
-        color = DATASET_COLORS.get(
-            ds_name,
-        )
-        for i in range(X.shape[0]):
+        color = DATASET_COLORS.get(ds_name)
+        n_spectra = X.shape[0]
+        for i in range(n_spectra):
             ax1.plot(
                 wavenumbers,
                 X[i, :],
                 color=color,
                 alpha=0.6,
                 linewidth=1,
-                label=ds_name.capitalize() if i == 0 else None,
+                label=f"{ds_name.capitalize()} (n={n_spectra})" if i == 0 else None,
             )
 
     ax1.set_xlabel(xlabel, fontsize=10)
@@ -200,14 +207,15 @@ def create_spectra_plots_multi_dataset(
 
     for ds_name, X in preprocessed_data.items():
         color = DATASET_COLORS.get(ds_name)
-        for i in range(X.shape[0]):
+        n_spectra = X.shape[0]
+        for i in range(n_spectra):
             ax2.plot(
                 preprocessed_wavenumbers,
                 X[i, :],
                 color=color,
                 alpha=0.6,
                 linewidth=1,
-                label=ds_name.capitalize() if i == 0 else None,
+                label=f"{ds_name.capitalize()} (n={n_spectra})" if i == 0 else None,
             )
 
     ax2.set_xlabel(xlabel, fontsize=10)

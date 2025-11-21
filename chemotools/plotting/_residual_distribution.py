@@ -114,7 +114,7 @@ class ResidualDistributionPlot(Display):
         density: bool = True,
         add_normal_curve: bool = True,
         add_stats: bool = True,
-        color: str = "steelblue",
+        color: str = "#008BFB",
         alpha: float = 0.6,
     ):
         self.residuals = np.asarray(residuals)
@@ -294,7 +294,7 @@ class ResidualDistributionPlot(Display):
                 x,
                 normal_pdf,
                 "r-",
-                linewidth=2.5,
+                linewidth=2.0,
                 alpha=0.8,
                 label=f"Normal(μ={self.mean:.3f}, σ={self.std:.3f})",
             )

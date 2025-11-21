@@ -38,7 +38,7 @@ class QQPlot(Display):
     label : str, optional
         Legend label for this dataset (default: "Residuals").
     color : str, optional
-        Color for the points (default: "steelblue").
+        Color for the points (default: "#008BFB").
     add_reference_line : bool, optional
         Whether to add the diagonal reference line (default: True).
     add_confidence_band : bool or float, optional
@@ -105,7 +105,7 @@ class QQPlot(Display):
         target_index: int = 0,
         annotations: Optional[list[str]] = None,
         label: str = "Residuals",
-        color: str = "steelblue",
+        color: str = "#008BFB",
         add_reference_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
     ):

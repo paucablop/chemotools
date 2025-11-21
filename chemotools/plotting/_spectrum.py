@@ -234,7 +234,10 @@ class SpectrumPlot(Display):
 
         # Add legend or colorbar
         if self.color_by is None or self.is_categorical:
-            ax.legend()
+            # Only add legend if there are labeled artists
+            handles, labels = ax.get_legend_handles_labels()
+            if handles and any(label for label in labels):
+                ax.legend()
         else:
             # Add colorbar for continuous data
             add_colorbar(ax, self.color_by, self.colormap, self.colorbar_label)
