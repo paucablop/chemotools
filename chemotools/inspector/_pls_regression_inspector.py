@@ -744,7 +744,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         - Explained variance plots (X and Y spaces, if available)
         - Raw and preprocessed spectra plots (if preprocessing exists)
         - Regression diagnostic plots (predicted vs actual, residuals, Q-Q, distribution)
-        - Distance plots (Hotelling's T² vs Q residuals, Leverage vs Studentized residuals)
+        - Distance plots (Hotelling's T² vs Q residuals, Q residuals vs Y residuals, Leverage vs Studentized residuals)
 
         Parameters
         ----------
@@ -791,7 +791,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                         - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
                         - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
                         - 'variance_x', 'variance_y': Explained variance plots (when available)
-                        - 'distances_hotelling_q', 'distances_leverage_studentized': Distance diagnostics
+                        - 'distances_hotelling_q', 'distances_q_y_residuals', 'distances_leverage_studentized': Distance diagnostics
                         - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
                         - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
         """
@@ -923,6 +923,65 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             color_by_y=color_by_y,
             figsize=distances_figsize,
         )
+
+        # Q residuals vs Y residuals
+        if use_suffix:
+            q_y_datasets: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
+            for ds in datasets:
+                X, y_true = self._get_raw_data(ds)
+                y_pred = self._get_predictions(ds)
+                q_y_datasets[ds] = {
+                    "X": X,
+                    "y": y_true,
+                    "y_true": y_true,
+                    "y_pred": y_pred,
+                }
+
+            # Fit Q detector on training data for consistent limits
+            X_train, y_train = self._get_raw_data("train")
+            q_detector = QResiduals(self.model, confidence=self.confidence)
+            q_detector.fit(X_train)
+
+            figures["distances_q_y_residuals"] = (
+                _latent_plots.create_q_vs_y_residuals_plot(
+                    datasets_data=q_y_datasets,
+                    model=self.model,
+                    confidence=self.confidence,
+                    color_by_y=color_by_y,
+                    figsize=distances_figsize,
+                    q_residuals_detector=q_detector,
+                )
+            )
+        else:
+            ds = datasets[0]
+            X, y_true = self._get_raw_data(ds)
+            y_pred = self._get_predictions(ds)
+
+            # Create single-item dict for unified function
+            q_y_datasets = {
+                ds: {
+                    "X": X,
+                    "y": y_true,
+                    "y_true": y_true,
+                    "y_pred": y_pred,
+                }
+            }
+
+            # Fit Q detector on training data for consistent limits
+            X_train, y_train = self._get_raw_data("train")
+            q_detector = QResiduals(self.model, confidence=self.confidence)
+            q_detector.fit(X_train)
+
+            figures["distances_q_y_residuals"] = (
+                _latent_plots.create_q_vs_y_residuals_plot(
+                    datasets_data=q_y_datasets,
+                    model=self.model,
+                    confidence=self.confidence,
+                    color_by_y=color_by_y,
+                    figsize=distances_figsize,
+                    q_residuals_detector=q_detector,
+                )
+            )
 
         # Leverage vs Studentized residuals
         if use_suffix:

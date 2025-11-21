@@ -758,3 +758,202 @@ def create_model_distances_plot(
     ax.grid(alpha=0.3)
     plt.tight_layout()
     return fig
+
+
+def create_q_vs_y_residuals_plot(
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    model,
+    confidence: float,
+    color_by_y: bool,
+    figsize: Tuple[float, float],
+    *,
+    q_residuals_detector: Optional[QResiduals] = None,
+    training_dataset: str = "train",
+) -> Figure:
+    """Create Q residuals vs Y residuals diagnostic plot for regression models.
+
+    This function renders Q residuals (SPE) vs Y residuals (prediction errors) for
+    regression models with latent variables (PLS, PCR). This plot helps identify
+    different types of problematic samples:
+    - High Q, Low Y residuals → Poor X-space fit but good predictions
+    - Low Q, High Y residuals → Good X-space fit but poor predictions
+    - High Q, High Y residuals → Problems in both spaces (true outliers)
+    - Low Q, Low Y residuals → Well-behaved samples
+
+    Parameters
+    ----------
+    datasets_data : Dict[str, Dict[str, Optional[np.ndarray]]]
+        Mapping from dataset name to a dictionary containing ``"X"``
+        (required), ``"y_pred"`` (required), ``"y_true"`` (required),
+        and optional ``"y"`` arrays.
+        The function renders each dataset on the same axes, applying
+        dataset-specific colours when ``color_by_y`` is False or target
+        values are unavailable.
+    model : fitted model
+        Fitted regression model with latent variables (PLS, PCR, etc.) that
+        provides both X-space reconstruction and Y predictions.
+    confidence : float
+        Confidence level for the Q residual detector.
+    color_by_y : bool
+        Whether to colour points using the provided ``y`` targets.
+    figsize : Tuple[float, float]
+        Figure size (width, height) in inches.
+
+    Other Parameters
+    ----------------
+    q_residuals_detector : Optional[QResiduals], default=None
+        Pre-fitted Q residuals detector. When provided, ``datasets_data`` is
+        evaluated using this detector without refitting. When omitted, the
+        function fits a fresh detector on the training dataset (see below).
+    training_dataset : str, default="train"
+        Name of the dataset used to train the detectors when they are not
+        supplied. If the named dataset is absent, the first dataset in
+        ``datasets_data`` is used as a fallback.
+
+    Returns
+    -------
+    Figure
+        Matplotlib figure containing the Q vs Y residuals plot.
+
+    Notes
+    -----
+    This plot is specifically designed for regression models with latent
+    variables (like PLS or PCR). It combines X-space diagnostics (Q residuals)
+    with Y-space diagnostics (prediction residuals) to provide a comprehensive
+    view of model fit quality.
+
+    For multi-target regression models, Y residuals are computed as the L2 norm
+    (Euclidean distance) of residuals across all targets, providing a single
+    overall measure of prediction error per sample.
+    """
+
+    if not datasets_data:
+        raise ValueError("datasets_data must contain at least one dataset")
+
+    fig, ax = plt.subplots(figsize=figsize)
+    dataset_items = list(datasets_data.items())
+    multi_dataset = len(dataset_items) > 1
+
+    training_dataset_lower = training_dataset.lower()
+
+    # Fit Q residuals detector if not provided
+    if q_residuals_detector is None:
+        if not dataset_items:
+            raise ValueError("datasets_data must contain at least one dataset")
+
+        if training_dataset in datasets_data:
+            train_entry = datasets_data[training_dataset]
+        else:
+            # Fallback to first dataset while preserving its name for limit drawing
+            first_name, first_entry = dataset_items[0]
+            training_dataset_lower = first_name.lower()
+            train_entry = first_entry
+
+        train_X = train_entry.get("X")
+
+        if train_X is None:
+            raise ValueError(
+                "X data is required for detector fitting when detectors are not supplied"
+            )
+
+        q_residuals_detector = QResiduals(model, confidence=confidence)
+        q_residuals_detector.fit(train_X)
+
+    # Plot each dataset
+    for ds_name, data in dataset_items:
+        X = data.get("X")
+        y = data.get("y")
+        y_true = data.get("y_true")
+        y_pred = data.get("y_pred")
+
+        if X is None:
+            raise ValueError(f"X data is required for dataset '{ds_name}'")
+        if y_true is None:
+            raise ValueError(f"y_true data is required for dataset '{ds_name}'")
+        if y_pred is None:
+            raise ValueError(f"y_pred data is required for dataset '{ds_name}'")
+
+        q = q_residuals_detector.predict_residuals(X)
+
+        # Calculate Y residuals as simple difference
+        # Handle both single-target and multi-target regression
+        y_true_arr = np.asarray(y_true)
+        y_pred_arr = np.asarray(y_pred)
+
+        if y_true_arr.ndim == 1:
+            y_true_arr = y_true_arr.reshape(-1, 1)
+        if y_pred_arr.ndim == 1:
+            y_pred_arr = y_pred_arr.reshape(-1, 1)
+
+        # For multi-target, use L2 norm of residuals across targets
+        residuals_matrix = y_true_arr - y_pred_arr
+        if residuals_matrix.shape[1] == 1:
+            # Single target: just flatten
+            y_residuals = residuals_matrix.ravel()
+        else:
+            # Multi-target: compute L2 norm across targets
+            y_residuals = np.linalg.norm(residuals_matrix, axis=1)
+
+        # When multiple datasets, always color by dataset, not by y values
+        if multi_dataset:
+            color_by = None
+            dataset_color = DATASET_COLORS.get(ds_name)
+        else:
+            # Single dataset: respect color_by_y parameter
+            color_by = (
+                select_primary_target(y) if (color_by_y and y is not None) else None
+            )
+            dataset_color = None
+
+        # Only draw Q residuals confidence limit when plotting the training dataset
+        should_draw_limits = (not multi_dataset) or (
+            ds_name.lower() == training_dataset_lower
+        )
+        confidence_lines = (
+            (
+                None,  # No confidence limit for Y residuals (x-axis)
+                q_residuals_detector.critical_value_,  # Q residuals limit (y-axis)
+            )
+            if should_draw_limits
+            else None
+        )
+
+        dist_plot = DistancesPlot(
+            y=q,  # Q residuals on y-axis
+            x=y_residuals,  # Y residuals on x-axis
+            color_by=color_by,
+            label=ds_name.capitalize(),
+            color=dataset_color,
+            colormap=None,
+            confidence_lines=confidence_lines,
+        )
+        dist_plot.render(ax)
+
+    # Add zero line for Y residuals (vertical now since Y residuals are on x-axis)
+    ax.axvline(
+        x=0,
+        color="black",
+        linestyle="-",
+        linewidth=1,
+        alpha=0.5,
+        zorder=1,
+    )
+
+    ax.set_xlabel("Y Residuals (Prediction Error)", fontsize=10)
+    ax.set_ylabel("Q Residuals (SPE)", fontsize=10)
+
+    title_prefix = "Regression Distances: Q Residuals vs Y Residuals"
+    if multi_dataset:
+        ax.set_title(title_prefix, fontsize=12, fontweight="bold")
+        ax.legend(loc="best")
+    else:
+        dataset_name = dataset_items[0][0].capitalize()
+        ax.set_title(
+            f"{title_prefix} ({dataset_name})",
+            fontsize=12,
+            fontweight="bold",
+        )
+
+    ax.grid(alpha=0.3)
+    plt.tight_layout()
+    return fig

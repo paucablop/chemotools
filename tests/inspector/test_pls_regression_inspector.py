@@ -179,6 +179,7 @@ class TestInspectFigures:
             "loadings_rotations",
             "regression_coefficients",
             "distances_hotelling_q",
+            "distances_q_y_residuals",
             "distances_leverage_studentized",
             "predicted_vs_actual",
             "residuals",
@@ -217,6 +218,73 @@ class TestInspectFigures:
         assert "distances_leverage_studentized" in figures
         assert "predicted_vs_actual" in figures
         assert "residuals" in figures
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_inspect_includes_q_vs_y_residuals_plot(self, fitted_pls, regression_data):
+        """Test that inspect() includes the Q vs Y residuals plot in output."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        figures = inspector.inspect(dataset="train")
+
+        # Assert
+        assert "distances_q_y_residuals" in figures
+        fig = figures["distances_q_y_residuals"]
+        assert fig is not None
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Y Residuals (Prediction Error)"
+        assert ax.get_ylabel() == "Q Residuals (SPE)"
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_q_vs_y_residuals_single_dataset(self, fitted_pls, regression_data):
+        """Test Q vs Y residuals plot for single dataset in inspector."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        figures = inspector.inspect(dataset="train")
+
+        # Assert
+        fig = figures["distances_q_y_residuals"]
+        ax = fig.axes[0]
+        assert "Train" in ax.get_title()
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_q_vs_y_residuals_multi_dataset(self, fitted_pls, regression_data):
+        """Test Q vs Y residuals plot for multiple datasets in inspector."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        X_test, y_test = regression_data["test"]
+        inspector = PLSRegressionInspector(
+            fitted_pls,
+            X_train,
+            y_train,
+            X_test=X_test,
+            y_test=y_test,
+        )
+
+        # Act
+        figures = inspector.inspect(dataset=["train", "test"])
+
+        # Assert
+        fig = figures["distances_q_y_residuals"]
+        ax = fig.axes[0]
+        assert ax.get_legend() is not None
+        legend_labels = [t.get_text() for t in ax.get_legend().get_texts()]
+        assert "Train" in legend_labels
+        assert "Test" in legend_labels
 
         # Cleanup
         for fig in figures.values():

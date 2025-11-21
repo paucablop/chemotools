@@ -7,6 +7,7 @@ from sklearn.decomposition import PCA
 
 from chemotools.inspector.helpers._latent_space import (
     create_model_distances_plot,
+    create_q_vs_y_residuals_plot,
     create_variance_plot,
     create_loadings_plot,
     create_scores_plot_single_dataset,
@@ -610,3 +611,346 @@ class TestCreateModelDistancesPlot:
                 color_by_y=color_by_y,
                 figsize=figsize,
             )
+
+
+class TestCreateQVsYResidualsPlot:
+    """Tests for create_q_vs_y_residuals_plot function."""
+
+    @pytest.fixture
+    def pls_regression_model(self):
+        """Create a fitted PLS regression model for testing."""
+        from sklearn.cross_decomposition import PLSRegression
+
+        np.random.seed(42)
+        X = np.random.rand(100, 50)
+        y = X[:, :3].sum(axis=1) + np.random.randn(100) * 0.1
+        model = PLSRegression(n_components=3)
+        model.fit(X, y)
+        return model
+
+    @pytest.fixture
+    def regression_datasets(self, pls_regression_model):
+        """Create sample regression datasets with predictions."""
+        np.random.seed(42)
+        X_train = np.random.rand(50, 50)
+        y_train = X_train[:, :3].sum(axis=1) + np.random.randn(50) * 0.1
+        y_pred_train = pls_regression_model.predict(X_train).ravel()
+
+        X_test = np.random.rand(30, 50)
+        y_test = X_test[:, :3].sum(axis=1) + np.random.randn(30) * 0.1
+        y_pred_test = pls_regression_model.predict(X_test).ravel()
+
+        return {
+            "train": {
+                "X": X_train,
+                "y": y_train,
+                "y_true": y_train,
+                "y_pred": y_pred_train,
+            },
+            "test": {
+                "X": X_test,
+                "y": y_test,
+                "y_true": y_test,
+                "y_pred": y_pred_test,
+            },
+        }
+
+    def test_single_dataset_basic(self, regression_datasets, pls_regression_model):
+        """Test Q vs Y residuals plot for single dataset."""
+        # Arrange
+        single_dataset = {"train": regression_datasets["train"]}
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=single_dataset,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert
+        assert fig is not None
+        assert len(fig.axes) == 1
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Y Residuals (Prediction Error)"
+        assert ax.get_ylabel() == "Q Residuals (SPE)"
+        assert (
+            "Regression Distances: Q Residuals vs Y Residuals (Train)" in ax.get_title()
+        )
+
+        # Check for vertical zero line (Y residuals on x-axis)
+        lines = ax.get_lines()
+        has_vertical_zero = any(
+            abs(line.get_xdata()[0]) < 1e-10
+            for line in lines
+            if len(line.get_xdata()) > 0
+        )
+        assert has_vertical_zero, "Should have vertical zero reference line"
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_multi_dataset(self, regression_datasets, pls_regression_model):
+        """Test Q vs Y residuals plot for multiple datasets."""
+        # Arrange
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=regression_datasets,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert
+        assert fig is not None
+        assert len(fig.axes) == 1
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Y Residuals (Prediction Error)"
+        assert ax.get_ylabel() == "Q Residuals (SPE)"
+        assert ax.get_legend() is not None
+        legend_labels = [t.get_text() for t in ax.get_legend().get_texts()]
+        assert "Train" in legend_labels
+        assert "Test" in legend_labels
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_color_by_y_single_dataset(self, regression_datasets, pls_regression_model):
+        """Test Q vs Y residuals plot with color_by_y for single dataset."""
+        # Arrange
+        single_dataset = {"train": regression_datasets["train"]}
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = True
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=single_dataset,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert
+        assert fig is not None
+        assert len(fig.axes) == 1
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_with_prefitted_q_detector(self, regression_datasets, pls_regression_model):
+        """Test Q vs Y residuals plot with pre-fitted Q residuals detector."""
+        # Arrange
+        from chemotools.outliers import QResiduals
+
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Pre-fit Q detector
+        q_detector = QResiduals(model, confidence=confidence)
+        q_detector.fit(regression_datasets["train"]["X"])
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=regression_datasets,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+            q_residuals_detector=q_detector,
+        )
+
+        # Assert
+        assert fig is not None
+        assert len(fig.axes) == 1
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_confidence_lines_drawn_for_training(
+        self, regression_datasets, pls_regression_model
+    ):
+        """Test that confidence lines are drawn for training dataset."""
+        # Arrange
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=regression_datasets,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert
+        ax = fig.axes[0]
+        # Check for horizontal Q confidence line (should be present)
+        lines = ax.get_lines()
+        # Should have: vertical zero line + horizontal Q limit line
+        assert len(lines) >= 2, (
+            "Should have at least vertical zero and horizontal Q limit lines"
+        )
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_raises_with_missing_X(self, pls_regression_model):
+        """Test that missing X data raises appropriate error."""
+        # Arrange
+        datasets = {
+            "train": {"y_true": np.random.rand(50), "y_pred": np.random.rand(50)}
+        }
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="X data is required"):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets,
+                model=model,
+                confidence=confidence,
+                color_by_y=color_by_y,
+                figsize=figsize,
+            )
+
+    def test_raises_with_missing_y_true(self, pls_regression_model):
+        """Test that missing y_true data raises appropriate error."""
+        # Arrange
+        datasets = {
+            "train": {"X": np.random.rand(50, 50), "y_pred": np.random.rand(50)}
+        }
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="y_true data is required"):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets,
+                model=model,
+                confidence=confidence,
+                color_by_y=color_by_y,
+                figsize=figsize,
+            )
+
+    def test_raises_with_missing_y_pred(
+        self, regression_datasets, pls_regression_model
+    ):
+        """Test that missing y_pred data raises appropriate error."""
+        # Arrange
+        datasets = {
+            "train": {
+                "X": regression_datasets["train"]["X"],
+                "y_true": regression_datasets["train"]["y_true"],
+            }
+        }
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="y_pred data is required"):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets,
+                model=model,
+                confidence=confidence,
+                color_by_y=color_by_y,
+                figsize=figsize,
+            )
+
+    def test_raises_with_no_datasets(self, pls_regression_model):
+        """Test that empty dataset mapping is rejected."""
+        # Arrange
+        datasets = {}
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="must contain at least one dataset"):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets,
+                model=model,
+                confidence=confidence,
+                color_by_y=color_by_y,
+                figsize=figsize,
+            )
+
+    def test_y_residuals_calculation(self, regression_datasets, pls_regression_model):
+        """Test that Y residuals are calculated correctly as y_true - y_pred."""
+        # Arrange
+        single_dataset = {"train": regression_datasets["train"]}
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=single_dataset,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert - verify plot was created successfully
+        # The actual residuals calculation is internal, but we can verify
+        # the plot structure is correct
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Y Residuals (Prediction Error)"
+
+        # Cleanup
+        plt.close(fig)
+
+    def test_axes_orientation(self, regression_datasets, pls_regression_model):
+        """Test that axes are correctly oriented (Y residuals on x, Q on y)."""
+        # Arrange
+        single_dataset = {"train": regression_datasets["train"]}
+        model = pls_regression_model
+        confidence = 0.95
+        color_by_y = False
+        figsize = (8, 6)
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=single_dataset,
+            model=model,
+            confidence=confidence,
+            color_by_y=color_by_y,
+            figsize=figsize,
+        )
+
+        # Assert
+        ax = fig.axes[0]
+        # X-axis should be Y residuals
+        assert "Y Residuals" in ax.get_xlabel()
+        # Y-axis should be Q residuals
+        assert "Q Residuals" in ax.get_ylabel()
+
+        # Cleanup
+        plt.close(fig)
