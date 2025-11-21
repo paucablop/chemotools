@@ -35,6 +35,9 @@ class LoadingsPlot(Display):
         - Single int (default 0): plots one component
         - List of ints: plots multiple components overlaid with legend
         Uses 0-based indexing.
+    component_label : str, optional
+        Prefix for component naming in legend and titles (default "PC").
+        Use "LV" for PLS models, "PC" for PCA models, "IC" for ICA, etc.
 
     Raises
     ------
@@ -105,6 +108,7 @@ class LoadingsPlot(Display):
         *,
         feature_names: Optional[np.ndarray | list] = None,
         components: int | list[int] = 0,
+        component_label: str = "PC",
     ):
         # Validate loadings shape
         if loadings.ndim != 2:
@@ -115,6 +119,7 @@ class LoadingsPlot(Display):
 
         self.loadings = loadings
         self.n_features, self.n_components = loadings.shape
+        self.component_label = component_label
 
         # Handle components parameter - convert to list
         if isinstance(components, int):
@@ -218,9 +223,11 @@ class LoadingsPlot(Display):
         # Auto-generate title if not provided
         if title is None:
             if len(self.components) == 1:
-                title = f"PC{self.components[0] + 1} Loadings"
+                title = f"{self.component_label}{self.components[0] + 1} Loadings"
             else:
-                comp_names = ", ".join([f"PC{c + 1}" for c in self.components])
+                comp_names = ", ".join(
+                    [f"{self.component_label}{c + 1}" for c in self.components]
+                )
                 title = f"Loadings: {comp_names}"
 
         # Use setup_figure utility for consistent styling
@@ -346,7 +353,7 @@ class LoadingsPlot(Display):
         # Plot each component
         for comp_idx in self.components:
             loadings = self.loadings[:, comp_idx]
-            label = f"PC{comp_idx + 1}"
+            label = f"{self.component_label}{comp_idx + 1}"
 
             ax.plot(
                 x,

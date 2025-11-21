@@ -94,7 +94,7 @@ def create_predicted_vs_actual_plot(
         pred_actual_plot = PredictedVsActualPlot(
             y_true=y_true,
             y_pred=y_pred,
-            label=dataset_name,
+            label=dataset_name.capitalize(),
             color=color,
             marker=marker,
             add_ideal_line=(i == 0),
@@ -440,7 +440,7 @@ def create_regression_distances_plot(
         distances_plot = DistancesPlot(
             y=studentized,
             x=leverages,
-            label=dataset_name,
+            label=dataset_name.capitalize(),
             color=color,
             marker=marker,
             confidence_lines=(leverage_limit, student_limit) if i == 0 else None,

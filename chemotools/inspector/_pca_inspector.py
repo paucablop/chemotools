@@ -474,10 +474,9 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             - Sequence: Creates multiple plots (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
         loadings_components : int, sequence of int, or None, optional
             Which components to show in loadings plot. If None (default), automatically
-            selects based on number of components:
+            selects all available components:
             - 1 component: 0
-            - 2 components: [0, 1]
-            - 3+ components: [0, 1, 2]
+            - 2+ components: [0, 1, ..., n_components-1] (all components)
         variance_threshold : float, default=0.95
             Threshold line for explained variance plot
         color_by_y : bool, default=True

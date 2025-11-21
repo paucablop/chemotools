@@ -144,8 +144,7 @@ def get_default_loadings_components(n_components: int) -> Union[int, List[int]]:
     Union[int, List[int]]
         Default component indices:
         - For 1 component: 0
-        - For 2 components: [0, 1]
-        - For 3+ components: [0, 1, 2]
+        - For 2+ components: [0, 1, ..., n_components-1] (all components)
 
     Examples
     --------
@@ -156,14 +155,12 @@ def get_default_loadings_components(n_components: int) -> Union[int, List[int]]:
     >>> get_default_loadings_components(3)
     [0, 1, 2]
     >>> get_default_loadings_components(5)
-    [0, 1, 2]
+    [0, 1, 2, 3, 4]
     """
     if n_components == 1:
         return 0
-    elif n_components == 2:
-        return [0, 1]
-    else:  # 3 or more
-        return [0, 1, 2]
+    else:  # 2 or more
+        return list(range(n_components))
 
 
 # ==============================================================================

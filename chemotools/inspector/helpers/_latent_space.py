@@ -130,6 +130,7 @@ def create_loadings_plot(
         loadings=loadings,
         feature_names=feature_names,
         components=loadings_comps,
+        component_label=component_label,
     )
     loadings_plot.render(ax=ax, linewidth=1, alpha=0.7)
 
