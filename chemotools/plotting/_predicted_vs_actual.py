@@ -46,6 +46,8 @@ class PredictedVsActualPlot(Display):
         Colormap name. Colorblind-friendly defaults:
         - "tab10" for categorical data
         - "viridis" for continuous data
+    marker : str, optional
+        Marker style for scatter points (default: "o"). Examples: "o", "s", "^", "v", "D".
     add_ideal_line : bool, optional
         Whether to add diagonal y=x line showing ideal predictions (default: True).
 
@@ -95,6 +97,7 @@ class PredictedVsActualPlot(Display):
         label: Optional[str] = None,
         color: Optional[str] = None,
         colormap: Optional[str] = None,
+        marker: str = "o",
         add_ideal_line: bool = True,
     ):
         self.y_true = np.asarray(y_true)
@@ -103,6 +106,7 @@ class PredictedVsActualPlot(Display):
         self.color_by = color_by
         self.label = label
         self.color = color
+        self.marker = marker
         self.add_ideal_line = add_ideal_line
 
         # Validate inputs
@@ -250,6 +254,7 @@ class PredictedVsActualPlot(Display):
             c=colors,
             alpha=0.7,
             s=50,
+            marker=self.marker,
             label=self.label,
             edgecolors="none",
         )

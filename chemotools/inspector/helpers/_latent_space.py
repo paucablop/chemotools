@@ -131,7 +131,7 @@ def create_loadings_plot(
         feature_names=feature_names,
         components=loadings_comps,
     )
-    loadings_plot.render(ax=ax, linewidth=2, alpha=0.7)
+    loadings_plot.render(ax=ax, linewidth=1, alpha=0.7)
 
     # Apply decorations
     ax.set_xlabel(xlabel, fontsize=10)
@@ -709,12 +709,14 @@ def create_model_distances_plot(
             dataset_color = DATASET_COLORS.get(
                 ds_name,
             )
+            marker = DATASET_MARKERS.get(ds_name, "o")
         else:
             # Single dataset: respect color_by_y parameter
             color_by = (
                 select_primary_target(y) if (color_by_y and y is not None) else None
             )
             dataset_color = None
+            marker = "o"
 
         # Only draw confidence limits when plotting the training dataset
         should_draw_limits = (not multi_dataset) or (
@@ -736,6 +738,7 @@ def create_model_distances_plot(
             label=ds_name.capitalize(),
             color=dataset_color,
             colormap=None,
+            marker=marker,
             confidence_lines=confidence_lines,
         )
         dist_plot.render(ax)
@@ -898,12 +901,14 @@ def create_q_vs_y_residuals_plot(
         if multi_dataset:
             color_by = None
             dataset_color = DATASET_COLORS.get(ds_name)
+            marker = DATASET_MARKERS.get(ds_name, "o")
         else:
             # Single dataset: respect color_by_y parameter
             color_by = (
                 select_primary_target(y) if (color_by_y and y is not None) else None
             )
             dataset_color = None
+            marker = "o"
 
         # Only draw Q residuals confidence limit when plotting the training dataset
         should_draw_limits = (not multi_dataset) or (
@@ -925,6 +930,7 @@ def create_q_vs_y_residuals_plot(
             label=ds_name.capitalize(),
             color=dataset_color,
             colormap=None,
+            marker=marker,
             confidence_lines=confidence_lines,
         )
         dist_plot.render(ax)

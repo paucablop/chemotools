@@ -49,6 +49,8 @@ class DistancesPlot(Display):
         Colormap name. Colorblind-friendly defaults:
         - "tab10" for categorical data
         - "viridis" for continuous data
+    marker : str, optional
+        Marker style for scatter points (default: "o"). Examples: "o", "s", "^", "v", "D".
     confidence_lines : bool or tuple[float | None, float | None], optional
         Whether to draw confidence/threshold lines.
         - If True: draws lines at distances using default method
@@ -134,6 +136,7 @@ class DistancesPlot(Display):
         label: str = "Data",
         color: Optional[str] = None,
         colormap: Optional[str] = None,
+        marker: str = "o",
         confidence_lines: Optional[bool | tuple[float | None, float | None]] = None,
     ):
         self._x: np.ndarray
@@ -143,6 +146,7 @@ class DistancesPlot(Display):
         self.label = label
         self.color = color
         self.colormap: Optional[str]
+        self.marker = marker
 
         # Process confidence lines parameter
         if confidence_lines is True:
@@ -358,6 +362,7 @@ class DistancesPlot(Display):
         """Internal method to render the distances plot on given axes."""
         alpha = kwargs.pop("alpha", 0.7)
         s = kwargs.pop("s", 50)
+        marker = kwargs.pop("marker", self.marker)
 
         # Extract data for plotting
         x = self._x
@@ -372,6 +377,7 @@ class DistancesPlot(Display):
                 label=self.label,
                 alpha=alpha,
                 s=s,
+                marker=marker,
                 **kwargs,
             )
         elif self.is_categorical:
@@ -390,6 +396,7 @@ class DistancesPlot(Display):
                     label=f"{self.label} - {value}",
                     alpha=alpha,
                     s=s,
+                    marker=marker,
                     **kwargs,
                 )
         else:
@@ -411,6 +418,7 @@ class DistancesPlot(Display):
                 label=self.label,
                 alpha=alpha,
                 s=s,
+                marker=marker,
                 **kwargs,
             )
 

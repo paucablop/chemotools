@@ -22,7 +22,7 @@ from chemotools.plotting import (
     PredictedVsActualPlot,
     DistancesPlot,
 )
-from chemotools.plotting._styles import DATASET_COLORS
+from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 
 from .._utils import select_primary_target
 
@@ -87,6 +87,7 @@ def create_predicted_vs_actual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         color = DATASET_COLORS.get(dataset_name, "gray")
+        marker = DATASET_MARKERS.get(dataset_name, "o")
 
         # Create predicted vs actual plot for this dataset
         # Add ideal line only for the first dataset to avoid duplicates
@@ -95,6 +96,7 @@ def create_predicted_vs_actual_plot(
             y_pred=y_pred,
             label=dataset_name,
             color=color,
+            marker=marker,
             add_ideal_line=(i == 0),
         )
         pred_actual_plot.render(ax=ax)
@@ -404,7 +406,7 @@ def create_regression_distances_plot(
                 y=negative_limit,
                 color="red",
                 linestyle="--",
-                linewidth=2,
+                linewidth=1,
                 alpha=0.7,
             )
 
@@ -432,6 +434,7 @@ def create_regression_distances_plot(
         studentized = student_detector.predict_residuals(X, y_true)
 
         color = DATASET_COLORS.get(dataset_name, "gray")
+        marker = DATASET_MARKERS.get(dataset_name, "o")
 
         # Create distances plot - only add confidence lines for first dataset
         distances_plot = DistancesPlot(
@@ -439,6 +442,7 @@ def create_regression_distances_plot(
             x=leverages,
             label=dataset_name,
             color=color,
+            marker=marker,
             confidence_lines=(leverage_limit, student_limit) if i == 0 else None,
         )
         distances_plot.render(ax=ax)
@@ -449,7 +453,7 @@ def create_regression_distances_plot(
             y=negative_limit,
             color="red",
             linestyle="--",
-            linewidth=2,
+            linewidth=1,
             alpha=0.7,
         )
 
