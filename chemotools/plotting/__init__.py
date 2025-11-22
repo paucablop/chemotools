@@ -2,8 +2,7 @@
 
 import warnings
 
-from chemotools.plotting._display import Display, is_displayable
-from chemotools.plotting._base import BasePlot
+from chemotools.plotting._base import BasePlot, Display, is_displayable
 from chemotools.plotting._utils import (
     setup_figure,
     get_colors_from_labels,
