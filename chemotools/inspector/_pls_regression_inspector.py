@@ -743,6 +743,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             dataset=dataset,
             color_by_y=color_by_y,
             figsize=distances_figsize,
+            annotate_by=annotate_by,
         )
 
         # Q residuals vs Y residuals
@@ -771,6 +772,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     color_by_y=color_by_y,
                     figsize=distances_figsize,
                     q_residuals_detector=q_detector,
+                    annotate_by=annotate_by,
                 )
             )
         else:
@@ -801,6 +803,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     color_by_y=color_by_y,
                     figsize=distances_figsize,
                     q_residuals_detector=q_detector,
+                    annotate_by=annotate_by,
                 )
             )
 
@@ -823,6 +826,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 student_detector=self.studentized_detector,
                 color_by_y=color_by_y,
                 figsize=distances_figsize,
+                annotate_by=annotate_by,
             )
             figures["distances_leverage_studentized"] = fig_leverage
         else:
@@ -846,6 +850,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 student_detector=self.studentized_detector,
                 color_by_y=color_by_y,
                 figsize=distances_figsize,
+                annotate_by=annotate_by,
             )
             figures["distances_leverage_studentized"] = fig_leverage
 
@@ -862,12 +867,14 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     "y_true": y_true,
                     "y_pred": y_pred,
                     "y": y_true,
+                    "X": self._get_raw_data(ds)[0],
                 }
 
             figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
                 datasets_data=predicted_vs_actual_data,
                 color_by_y=color_by_y,
                 figsize=regression_figsize,
+                annotate_by=annotate_by,
             )
         else:
             ds = datasets[0]
@@ -880,6 +887,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     "y_true": y_true,
                     "y_pred": y_pred,
                     "y": y_true,
+                    "X": self._get_raw_data(ds)[0],
                 }
             }
 
@@ -887,6 +895,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 datasets_data=predicted_vs_actual_data,
                 color_by_y=color_by_y,
                 figsize=regression_figsize,
+                annotate_by=annotate_by,
             )
 
         # Residual scatter plot
@@ -899,12 +908,14 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     "y_true": y_true,
                     "y_pred": y_pred,
                     "y": y_true,
+                    "X": self._get_raw_data(ds)[0],
                 }
 
             figures["residuals"] = create_y_residual_plot(
                 datasets_data=residuals_data,
                 color_by_y=color_by_y,
                 figsize=regression_figsize,
+                annotate_by=annotate_by,
             )
         else:
             ds = datasets[0]
@@ -917,6 +928,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     "y_true": y_true,
                     "y_pred": y_pred,
                     "y": y_true,
+                    "X": self._get_raw_data(ds)[0],
                 }
             }
 
@@ -924,6 +936,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 datasets_data=residuals_data,
                 color_by_y=color_by_y,
                 figsize=regression_figsize,
+                annotate_by=annotate_by,
             )
 
         # Q-Q plot

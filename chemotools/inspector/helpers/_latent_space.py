@@ -615,6 +615,7 @@ def create_model_distances_plot(
     hotelling_detector: Optional[HotellingT2] = None,
     q_residuals_detector: Optional[QResiduals] = None,
     training_dataset: str = "train",
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
 ) -> Figure:
     """Create model diagnostic distances plot across one or more datasets.
 
@@ -639,6 +640,8 @@ def create_model_distances_plot(
         Whether to colour points using the provided ``y`` targets.
     figsize : Tuple[float, float]
         Figure size (width, height) in inches.
+    annotate_by : str or dict, optional
+        Annotations for plot points.
 
     Other Parameters
     ----------------
@@ -744,6 +747,20 @@ def create_model_distances_plot(
         )
         dist_plot.render(ax)
 
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, ds_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                t2,
+                q,
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+
     ax.set_xlabel("Hotelling's T²", fontsize=10)
     ax.set_ylabel("Q Residuals", fontsize=10)
 
@@ -773,6 +790,7 @@ def create_q_vs_y_residuals_plot(
     *,
     q_residuals_detector: Optional[QResiduals] = None,
     training_dataset: str = "train",
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
 ) -> Figure:
     """Create Q residuals vs Y residuals diagnostic plot for regression models.
 
@@ -802,6 +820,8 @@ def create_q_vs_y_residuals_plot(
         Whether to colour points using the provided ``y`` targets.
     figsize : Tuple[float, float]
         Figure size (width, height) in inches.
+    annotate_by : str or dict, optional
+        Annotations for plot points.
 
     Other Parameters
     ----------------
@@ -935,6 +955,20 @@ def create_q_vs_y_residuals_plot(
             confidence_lines=confidence_lines,
         )
         dist_plot.render(ax)
+
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, ds_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                y_residuals,
+                q,
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
 
     # Add zero line for Y residuals (vertical now since Y residuals are on x-axis)
     ax.axvline(

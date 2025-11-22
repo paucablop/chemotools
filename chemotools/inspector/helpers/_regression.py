@@ -8,7 +8,7 @@ plot objects from the chemotools.plotting module for consistent rendering.
 """
 
 from __future__ import annotations
-from typing import Dict, Tuple, TYPE_CHECKING
+from typing import Dict, Tuple, TYPE_CHECKING, Optional, Union
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -23,14 +23,16 @@ from chemotools.plotting import (
     DistancesPlot,
 )
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
+from chemotools.plotting._utils import annotate_points
 
-from .._utils import select_primary_target
+from .._utils import select_primary_target, prepare_annotations
 
 
 def create_predicted_vs_actual_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
     color_by_y: bool,
     figsize: Tuple[float, float],
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
 ) -> Figure:
     """Create predicted vs actual plot for one or multiple datasets.
 
@@ -45,6 +47,8 @@ def create_predicted_vs_actual_plot(
         Whether to color by y values (only used for single dataset)
     figsize : Tuple[float, float]
         Figure size
+    annotate_by : str or dict, optional
+        Annotations for plot points.
 
     Returns
     -------
@@ -59,6 +63,8 @@ def create_predicted_vs_actual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        X = data.get("X")
+
         color_reference = (
             select_primary_target(y) if (color_by_y and y is not None) else None
         )
@@ -71,6 +77,20 @@ def create_predicted_vs_actual_plot(
             color_by=color_reference,
         )
         pred_actual_plot.render(ax=ax)
+
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                y_true.ravel(),
+                y_pred.ravel(),
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
 
         ax.set_title(
             f"Predicted vs Actual ({dataset_name})", fontsize=12, fontweight="bold"
@@ -86,6 +106,9 @@ def create_predicted_vs_actual_plot(
     for i, (dataset_name, data) in enumerate(datasets_data.items()):
         y_true = data["y_true"]
         y_pred = data["y_pred"]
+        y = data.get("y")
+        X = data.get("X")
+
         color = DATASET_COLORS.get(dataset_name, "gray")
         marker = DATASET_MARKERS.get(dataset_name, "o")
 
@@ -101,6 +124,20 @@ def create_predicted_vs_actual_plot(
         )
         pred_actual_plot.render(ax=ax)
 
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                y_true.ravel(),
+                y_pred.ravel(),
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+
     ax.set_xlabel("Actual", fontsize=10)
     ax.set_ylabel("Predicted", fontsize=10)
     ax.set_title("Predicted vs Actual", fontsize=12, fontweight="bold")
@@ -115,6 +152,7 @@ def create_y_residual_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
     color_by_y: bool,
     figsize: Tuple[float, float],
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
 ) -> Figure:
     """Create residual scatter plot for one or multiple datasets.
 
@@ -130,6 +168,8 @@ def create_y_residual_plot(
         Whether to color by y values (only used for single dataset)
     figsize : Tuple[float, float]
         Figure size
+    annotate_by : str or dict, optional
+        Annotations for plot points.
 
     Returns
     -------
@@ -144,6 +184,8 @@ def create_y_residual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        X = data.get("X")
+
         color_reference = (
             select_primary_target(y) if (color_by_y and y is not None) else None
         )
@@ -158,6 +200,20 @@ def create_y_residual_plot(
             add_confidence_band=2.0,
         )
         residuals_plot.render(ax=ax)
+
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                y_pred.ravel(),
+                residuals.ravel(),
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
 
         ax.set_xlabel("Predicted Values", fontsize=10)
         ax.set_ylabel("Residuals", fontsize=10)
@@ -180,6 +236,8 @@ def create_y_residual_plot(
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
+        X = data.get("X")
+
         color_reference = (
             select_primary_target(y) if (color_by_y and y is not None) else None
         )
@@ -193,14 +251,26 @@ def create_y_residual_plot(
         )
         residuals_plot.render(ax=ax)
 
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                y_pred.ravel(),
+                residuals.ravel(),
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+
         ax.set_xlabel("Predicted Values", fontsize=10)
         ax.set_ylabel("Residuals", fontsize=10)
         ax.set_title(f"{dataset_name.capitalize()}", fontsize=12, fontweight="bold")
         ax.grid(alpha=0.3)
 
-    fig.suptitle("Residual Plot", fontsize=14, fontweight="bold", y=0.98)
     plt.tight_layout()
-
     return fig
 
 
@@ -348,6 +418,7 @@ def create_regression_distances_plot(
     student_detector,
     color_by_y: bool,
     figsize: Tuple[float, float],
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
 ) -> Figure:
     """Create regression diagnostic distances plot for one or multiple datasets.
 
@@ -367,6 +438,8 @@ def create_regression_distances_plot(
         Whether to color by y (only for single dataset, ignored for multiple)
     figsize : Tuple[float, float]
         Figure size
+    annotate_by : str or dict, optional
+        Annotations for plot points.
 
     Returns
     -------
@@ -400,6 +473,20 @@ def create_regression_distances_plot(
         )
         distances_plot.render(ax=ax)
 
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                leverages,
+                studentized,
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+
         if student_limit is not None:
             negative_limit = -abs(student_limit)
             ax.axhline(
@@ -429,6 +516,7 @@ def create_regression_distances_plot(
     for i, (dataset_name, data) in enumerate(datasets_data.items()):
         X = data["X"]
         y_true = data["y_true"]
+        y = data.get("y")
 
         leverages = leverage_detector.predict_residuals(X)
         studentized = student_detector.predict_residuals(X, y_true)
@@ -436,16 +524,35 @@ def create_regression_distances_plot(
         color = DATASET_COLORS.get(dataset_name, "gray")
         marker = DATASET_MARKERS.get(dataset_name, "o")
 
-        # Create distances plot - only add confidence lines for first dataset
+        # Create distances plot
+        # Add confidence lines only for the first dataset (or training set)
+        # Here we just add them once for simplicity
+        should_add_lines = i == 0
+        confidence_lines = (leverage_limit, student_limit) if should_add_lines else None
+
         distances_plot = DistancesPlot(
             y=studentized,
             x=leverages,
             label=dataset_name.capitalize(),
             color=color,
             marker=marker,
-            confidence_lines=(leverage_limit, student_limit) if i == 0 else None,
+            confidence_lines=confidence_lines,
         )
         distances_plot.render(ax=ax)
+
+        # Add annotations if requested
+        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                leverages,
+                studentized,
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
 
     if student_limit is not None:
         negative_limit = -abs(student_limit)

@@ -3,8 +3,8 @@ from matplotlib.colors import LinearSegmentedColormap
 
 DATASET_COLORS = {
     "train": "#008BFB",  # Blue
-    "test": "#E69F00",   # Orange
-    "val": "#FF0051",    # Red
+    "test": "#E69F00",  # Orange
+    "val": "#FF0051",  # Red
 }
 
 # Default marker styles for datasets

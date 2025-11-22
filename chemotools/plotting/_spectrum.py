@@ -5,7 +5,7 @@ The :mod:`chemotools.plotting._spectrum` module implements the SpectrumPlot clas
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Optional, Any
+from typing import Optional, Any, Sequence
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -29,7 +29,7 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         X-axis data (e.g., wavelengths, wavenumbers).
     y : np.ndarray
         Y-axis data (e.g., spectra intensities). Can be 1D or 2D.
-    labels : list[str], optional
+    labels : list[str] or list[str | None], optional
         Labels for each spectrum (used for legend).
     color_by : np.ndarray, optional
         Reference vector for coloring spectra. Can be:
@@ -47,7 +47,6 @@ class SpectrumPlot(BasePlot, ColoringMixin):
     colorbar_label : str, optional
         Label for the colorbar when using continuous coloring.
         Default is "Reference Value". Only applies when color_by is continuous.
-
     Examples
     --------
     Basic usage:
@@ -105,7 +104,7 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         x: np.ndarray,
         y: np.ndarray,
         *,
-        labels: Optional[list[str]] = None,
+        labels: Optional[Sequence[Optional[str]]] = None,
         color_by: Optional[np.ndarray] = None,
         colormap: Optional[str] = None,
         categorical: Optional[bool] = None,

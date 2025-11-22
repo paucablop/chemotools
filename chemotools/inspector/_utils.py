@@ -223,7 +223,7 @@ def get_xlabel_for_features(wavenumbers_provided: bool) -> str:
 def prepare_annotations(
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     dataset_name: str,
-    scores: np.ndarray,
+    scores: Optional[np.ndarray],
     y: Optional[np.ndarray],
 ) -> Optional[np.ndarray]:
     """Prepare annotation labels for a dataset.
@@ -237,8 +237,8 @@ def prepare_annotations(
         - dict: Map dataset names to annotation arrays
     dataset_name : str
         Name of current dataset
-    scores : np.ndarray
-        Scores array (used to get sample count)
+    scores : Optional[np.ndarray]
+        Scores array (used to get sample count). Can be None if not available.
     y : Optional[np.ndarray]
         Target values
 
@@ -259,6 +259,8 @@ def prepare_annotations(
 
     if isinstance(annotate_by, str):
         if annotate_by == "sample_index":
+            if scores is None:
+                return None
             return np.arange(scores.shape[0])
         elif annotate_by == "y":
             return select_primary_target(y)

@@ -229,6 +229,7 @@ class LatentVariableMixin:
         *,
         color_by_y: bool,
         figsize: Tuple[float, float],
+        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     ) -> "Figure":
         """Create Hotelling T² vs Q residuals plot for the provided datasets."""
 
@@ -255,6 +256,7 @@ class LatentVariableMixin:
             figsize=figsize,
             hotelling_detector=hotelling,
             q_residuals_detector=q_detector,
+            annotate_by=annotate_by,
         )
 
     # ------------------------------------------------------------------

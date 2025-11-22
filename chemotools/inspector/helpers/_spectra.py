@@ -178,29 +178,20 @@ def create_spectra_plots_multi_dataset(
 
     # Create raw spectra plot with all datasets
     fig_raw, ax_raw = plt.subplots(figsize=figsize)
-    
+
     for name, X in raw_data.items():
         # Get color for this dataset (default to black if not found)
         color = DATASET_COLORS.get(name, "black")
-        
+
         # Create plot for this dataset
         # We use the dataset name as label for all spectra in this group
         # Matplotlib handles duplicate labels in legend automatically
         # But to be safe and efficient, we only label the first spectrum
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectrumPlot(
-            x=wavenumbers,
-            y=X,
-            labels=labels
-        )
-        
-        plot.render(
-            ax=ax_raw,
-            color=color,
-            alpha=0.6,
-            linewidth=1
-        )
-    
+        plot = SpectrumPlot(x=wavenumbers, y=X, labels=labels)
+
+        plot.render(ax=ax_raw, color=color, alpha=0.6, linewidth=1)
+
     ax_raw.set_title("Raw Spectra Comparison", fontsize=14, fontweight="bold")
     ax_raw.set_xlabel(xlabel, fontsize=12)
     ax_raw.set_ylabel("Intensity", fontsize=12)
@@ -208,29 +199,20 @@ def create_spectra_plots_multi_dataset(
     if xlim:
         ax_raw.set_xlim(xlim)
     ax_raw.legend()
-    
+
     figures["raw_spectra"] = fig_raw
 
     # Create preprocessed spectra plot with all datasets
     fig_prep, ax_prep = plt.subplots(figsize=figsize)
-    
+
     for name, X in preprocessed_data.items():
         color = DATASET_COLORS.get(name, "black")
-        
+
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectrumPlot(
-            x=preprocessed_wavenumbers,
-            y=X,
-            labels=labels
-        )
-        
-        plot.render(
-            ax=ax_prep,
-            color=color,
-            alpha=0.6,
-            linewidth=1
-        )
-        
+        plot = SpectrumPlot(x=preprocessed_wavenumbers, y=X, labels=labels)
+
+        plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
+
     ax_prep.set_title("Preprocessed Spectra Comparison", fontsize=14, fontweight="bold")
     ax_prep.set_xlabel(xlabel, fontsize=12)
     ax_prep.set_ylabel("Intensity", fontsize=12)
@@ -238,7 +220,7 @@ def create_spectra_plots_multi_dataset(
     if xlim:
         ax_prep.set_xlim(xlim)
     ax_prep.legend()
-    
+
     figures["preprocessed_spectra"] = fig_prep
 
     return figures

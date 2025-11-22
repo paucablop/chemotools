@@ -494,6 +494,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             dataset=dataset,
             color_by_y=color_by_y,
             figsize=distances_figsize,
+            annotate_by=annotate_by,
         )
 
         # Add spectra plots if preprocessing exists

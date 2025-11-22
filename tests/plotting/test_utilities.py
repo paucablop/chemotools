@@ -322,7 +322,7 @@ class TestGetDefaultColormap:
         cmap = get_default_colormap(is_categorical=False)
 
         # Assert
-        assert cmap == "viridis"
+        assert cmap == "shap"
 
     def test_custom_colormap_override(self):
         """Test that custom colormap overrides defaults."""
