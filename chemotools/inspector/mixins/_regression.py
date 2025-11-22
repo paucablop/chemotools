@@ -167,3 +167,26 @@ class RegressionMixin:
             detector.fit(X_train, y_train)
             self._studentized_detector = detector
         return self._studentized_detector
+
+    def prediction_summary(self) -> Dict[str, Dict[str, float]]:
+        """Return a summary of prediction metrics (RMSE, R2) for all available datasets.
+
+        Returns
+        -------
+        summary : dict
+            Dictionary where keys are dataset names ('train', 'test', 'val') and
+            values are dictionaries containing 'RMSE' and 'R2' metrics.
+        """
+        summary = {}
+        inspector = self._regression_inspector()
+        datasets = getattr(inspector, "datasets_", {})
+
+        for name in datasets:
+            # Only calculate if target values are available
+            _, y = inspector._get_raw_data(name)
+            if y is not None:
+                summary[name] = {
+                    "RMSE": self.regression_rmse(name),
+                    "R2": self.regression_r2(name),
+                }
+        return summary
