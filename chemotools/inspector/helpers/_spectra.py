@@ -8,13 +8,11 @@ decomposition models (IR, Raman, NMR, etc.).
 from __future__ import annotations
 from typing import Dict, Optional, Tuple, TYPE_CHECKING
 import numpy as np
-import matplotlib.pyplot as plt
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 from chemotools.plotting import SpectrumPlot
-from chemotools.plotting._styles import DATASET_COLORS
 
 from .._utils import select_primary_target
 
@@ -176,56 +174,52 @@ def create_spectra_plots_multi_dataset(
     """
     figures = {}
 
+    def _prepare_data(
+        data_dict: Dict[str, np.ndarray],
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        X_list = []
+        labels = []
+        for name, X in data_dict.items():
+            X_list.append(X)
+            labels.extend([name] * X.shape[0])
+        return np.vstack(X_list), np.array(labels)
+
     # Create raw spectra plot with all datasets
-    fig1, ax1 = plt.subplots(figsize=figsize)
-
-    for ds_name, X in raw_data.items():
-        color = DATASET_COLORS.get(ds_name)
-        n_spectra = X.shape[0]
-        for i in range(n_spectra):
-            ax1.plot(
-                wavenumbers,
-                X[i, :],
-                color=color,
-                alpha=0.6,
-                linewidth=1,
-                label=f"{ds_name.capitalize()} (n={n_spectra})" if i == 0 else None,
-            )
-
-    ax1.set_xlabel(xlabel, fontsize=10)
-    ax1.set_ylabel("Intensity", fontsize=10)
-    ax1.set_title("Raw Spectra Comparison", fontsize=12, fontweight="bold")
-    ax1.grid(alpha=0.3)
-    if xlim:
-        ax1.set_xlim(xlim)
-    ax1.legend(loc="best")
-    plt.tight_layout()
-    figures["raw_spectra"] = fig1
+    X_raw, labels_raw = _prepare_data(raw_data)
+    plot_raw = SpectrumPlot(
+        x=wavenumbers,
+        y=X_raw,
+        color_by=labels_raw,
+        colormap="tab10",
+        categorical=True,
+    )
+    figures["raw_spectra"] = plot_raw.show(
+        figsize=figsize,
+        title="Raw Spectra Comparison",
+        xlabel=xlabel,
+        ylabel="Intensity",
+        xlim=xlim,
+        alpha=0.6,
+        linewidth=1,
+    )
 
     # Create preprocessed spectra plot with all datasets
-    fig2, ax2 = plt.subplots(figsize=figsize)
-
-    for ds_name, X in preprocessed_data.items():
-        color = DATASET_COLORS.get(ds_name)
-        n_spectra = X.shape[0]
-        for i in range(n_spectra):
-            ax2.plot(
-                preprocessed_wavenumbers,
-                X[i, :],
-                color=color,
-                alpha=0.6,
-                linewidth=1,
-                label=f"{ds_name.capitalize()} (n={n_spectra})" if i == 0 else None,
-            )
-
-    ax2.set_xlabel(xlabel, fontsize=10)
-    ax2.set_ylabel("Intensity", fontsize=10)
-    ax2.set_title("Preprocessed Spectra Comparison", fontsize=12, fontweight="bold")
-    ax2.grid(alpha=0.3)
-    if xlim:
-        ax2.set_xlim(xlim)
-    ax2.legend(loc="best")
-    plt.tight_layout()
-    figures["preprocessed_spectra"] = fig2
+    X_prep, labels_prep = _prepare_data(preprocessed_data)
+    plot_prep = SpectrumPlot(
+        x=preprocessed_wavenumbers,
+        y=X_prep,
+        color_by=labels_prep,
+        colormap="tab10",
+        categorical=True,
+    )
+    figures["preprocessed_spectra"] = plot_prep.show(
+        figsize=figsize,
+        title="Preprocessed Spectra Comparison",
+        xlabel=xlabel,
+        ylabel="Intensity",
+        xlim=xlim,
+        alpha=0.6,
+        linewidth=1,
+    )
 
     return figures
