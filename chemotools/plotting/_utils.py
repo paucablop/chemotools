@@ -5,6 +5,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from chemotools.plotting._styles import CUSTOM_CMAP
+
+# Register custom colormaps
+try:
+    import matplotlib as mpl
+
+    # Check if already registered to avoid errors on reload
+    if "shap" not in mpl.colormaps:
+        mpl.colormaps.register(name="shap", cmap=CUSTOM_CMAP)
+except (ImportError, AttributeError):
+    # Fallback for older matplotlib versions or if something goes wrong
+    pass
 
 # Keys that should be forwarded to ``plt.subplots`` via ``setup_figure``.
 FIGURE_SETUP_KEYS: frozenset[str] = frozenset(
@@ -318,7 +330,7 @@ def get_default_colormap(is_categorical: bool, colormap: Optional[str] = None) -
     -----
     Defaults are colorblind-friendly:
     - "tab10" for categorical data
-    - "viridis" for continuous data
+    - "shap" (custom Red-Blue) for continuous data
 
     Examples
     --------
@@ -326,14 +338,14 @@ def get_default_colormap(is_categorical: bool, colormap: Optional[str] = None) -
     'tab10'
 
     >>> get_default_colormap(is_categorical=False)
-    'viridis'
+    'shap'
 
     >>> get_default_colormap(is_categorical=True, colormap='Set2')
     'Set2'
     """
     if colormap is not None:
         return colormap
-    return "tab10" if is_categorical else "viridis"
+    return "tab10" if is_categorical else "shap"
 
 
 def add_colorbar(

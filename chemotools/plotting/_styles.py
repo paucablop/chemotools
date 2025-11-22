@@ -1,14 +1,10 @@
-# Default color palettes
-# DATASET_COLORS = {
-#    "train": "#0072B2",  # Blue
-#    "test": "#E69F00",  # Orange
-#    "val": "#CC79A7",  # Purple/Magenta
-# }
+from matplotlib.colors import LinearSegmentedColormap
+
 
 DATASET_COLORS = {
     "train": "#008BFB",  # Blue
-    "test": "#E69F00",  # Orange
-    "val": "#FF0051",  # Purple/Magenta
+    "test": "#E69F00",   # Orange
+    "val": "#FF0051",    # Red
 }
 
 # Default marker styles for datasets
@@ -17,3 +13,7 @@ DATASET_MARKERS = {
     "test": "s",
     "val": "^",
 }
+
+# Custom colormaps
+CUSTOM_COLORS = ["#008BFB", "#FF0051"]
+CUSTOM_CMAP = LinearSegmentedColormap.from_list("shap", CUSTOM_COLORS)
