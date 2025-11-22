@@ -418,11 +418,11 @@ class TestAdditionalCoverage:
                 return self
 
         monkeypatch.setattr(
-            "chemotools.inspector._pls_regression_inspector.HotellingT2",
+            "chemotools.inspector.mixins._latent.HotellingT2",
             _DummyHotelling,
         )
         monkeypatch.setattr(
-            "chemotools.inspector._pls_regression_inspector.QResiduals",
+            "chemotools.inspector.mixins._latent.QResiduals",
             _DummyQ,
         )
 
