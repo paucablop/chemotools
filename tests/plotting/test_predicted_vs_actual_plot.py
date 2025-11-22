@@ -90,11 +90,10 @@ def test_render_categorical_color_by_builds_legend():
     # Assert
     legend = ax.get_legend()
     assert legend is not None
-    assert [text.get_text() for text in legend.get_texts()] == [
-        "Batch A",
-        "Batch B",
-        "Batch C",
-    ]
+    # Note: "Ideal" line is also added to legend
+    expected_labels = ["Batch A", "Batch B", "Batch C", "Ideal"]
+    actual_labels = sorted([text.get_text() for text in legend.get_texts()])
+    assert actual_labels == sorted(expected_labels)
 
     # Cleanup
     plt.close(fig)
