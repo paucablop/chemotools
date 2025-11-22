@@ -121,6 +121,8 @@ class SpectrumPlot(Display):
     ):
         self.x = x
         self.y = y if y.ndim == 2 else y.reshape(1, -1)
+        # Store whether labels were explicitly provided
+        self._labels_provided = labels is not None
         self.labels = labels or [f"Spectrum {i}" for i in range(len(self.y))]
         self.color_by = color_by
         self.colorbar_label = colorbar_label
@@ -234,9 +236,17 @@ class SpectrumPlot(Display):
 
         # Add legend or colorbar
         if self.color_by is None or self.is_categorical:
-            # Only add legend if there are labeled artists
+            # Only add legend if:
+            # 1. Labels were explicitly provided by user, OR
+            # 2. Number of spectra is small (≤ 10) and there are labeled artists
             handles, labels = ax.get_legend_handles_labels()
-            if handles and any(label for label in labels):
+            should_show_legend = (
+                (self._labels_provided or len(self.y) <= 10)
+                and handles
+                and any(label for label in labels)
+            )
+
+            if should_show_legend:
                 ax.legend()
         else:
             # Add colorbar for continuous data
@@ -315,11 +325,14 @@ class SpectrumPlot(Display):
 
         if self.color_by is None:
             # No color reference: use default colors
+            # Only use labels if explicitly provided or small number of spectra
+            use_labels = self._labels_provided or len(self.y) <= 10
+
             for spectrum, label in zip(self.y, self.labels):
                 ax.plot(
                     self.x,
                     spectrum,
-                    label=label,
+                    label=label if use_labels else None,
                     alpha=alpha,
                     linewidth=linewidth,
                     **kwargs,
