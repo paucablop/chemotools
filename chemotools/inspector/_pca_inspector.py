@@ -9,7 +9,6 @@ from sklearn.pipeline import Pipeline
 if TYPE_CHECKING:
     import matplotlib.figure
 
-from chemotools.outliers import HotellingT2, QResiduals
 
 from ._base import _BaseInspector
 from .mixins import LatentVariableMixin
@@ -141,18 +140,11 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             y_val=y_val,
             supervised=False,
             feature_names=wavenumbers,
+            confidence=confidence,
         )
 
-        if not 0 < confidence < 1:
-            raise ValueError(f"confidence must be between 0 and 1, got {confidence}")
-        self._confidence = confidence
-
-        if self.feature_names is not None:
-            self._wavenumbers = np.array(self.feature_names, copy=True)
-        else:
-            self._wavenumbers = np.arange(self.n_features_in_)
-
         self._scores_cache: Dict[str, np.ndarray] = {}
+        # Limits are handled lazily by LatentVariableMixin
         self._hotelling_t2_limit: Optional[float] = None
         self._q_residuals_limit: Optional[float] = None
 
@@ -174,81 +166,6 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
     def transformer(self) -> Optional[Pipeline]:
         """Return the preprocessing pipeline (if available)."""
         return super().transformer
-
-    @property
-    def nr_components(self) -> int:
-        """Return the number of principal components."""
-        return self.n_components_
-
-    @property
-    def nr_features(self) -> int:
-        """Return the number of features in original data."""
-        return self.n_features_in_
-
-    @property
-    def nr_samples(self) -> Dict[str, int]:
-        """Return the number of samples in each dataset."""
-        return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
-
-    @property
-    def wavenumbers(self) -> np.ndarray:
-        """Return the feature names/indices."""
-        return self._wavenumbers
-
-    @property
-    def confidence(self) -> float:
-        """Return the confidence level for outlier detection."""
-        return self._confidence
-
-    @property
-    def hotelling_t2_limit(self) -> float:
-        """Return the Hotelling's T² critical value at the specified confidence level.
-
-        Calculated using the training data. The limit is cached after first calculation.
-
-        Returns
-        -------
-        limit : float
-            Critical value for Hotelling's T² statistic
-
-        Examples
-        --------
-        >>> inspector = PCAInspector(pca, X_train, confidence=0.95)
-        >>> t2_limit = inspector.hotelling_t2_limit
-        >>> # Check if samples are outliers
-        >>> t2_values = inspector.get_scores('test')  # Use custom method if needed
-        """
-        if self._hotelling_t2_limit is None:
-            hotelling = HotellingT2(self.model, confidence=self._confidence)
-            X_train, _ = self._get_raw_data("train")
-            hotelling.fit(X_train)
-            self._hotelling_t2_limit = hotelling.critical_value_
-        return self._hotelling_t2_limit
-
-    @property
-    def q_residuals_limit(self) -> float:
-        """Return the Q residuals critical value at the specified confidence level.
-
-        Calculated using the training data. The limit is cached after first calculation.
-
-        Returns
-        -------
-        limit : float
-            Critical value for Q residuals statistic
-
-        Examples
-        --------
-        >>> inspector = PCAInspector(pca, X_train, confidence=0.99)
-        >>> q_limit = inspector.q_residuals_limit
-        >>> # Check if samples are outliers
-        >>> q_values = inspector.get_scores('test')  # Use custom method if needed
-        """
-        if self._q_residuals_limit is None:
-            q_detector = QResiduals(self.model, confidence=self._confidence)
-            X_train, _ = self._get_raw_data("train")
-            q_detector.fit(X_train)
-            self._q_residuals_limit = q_detector.critical_value_
-        return self._q_residuals_limit
 
     # ==================================================================================
     # Private Methods

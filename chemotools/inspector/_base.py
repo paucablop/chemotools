@@ -244,7 +244,12 @@ class _BaseInspector(ABC):
         supervised: bool = False,
         feature_names: Optional[Sequence] = None,
         sample_labels: Optional[Dict[str, Sequence]] = None,
+        confidence: float = 0.95,
     ) -> None:
+        if not 0 < confidence < 1:
+            raise ValueError(f"confidence must be between 0 and 1, got {confidence}")
+        self._confidence = confidence
+
         self._state = InspectorState(
             model=model,
             X_train=X_train,
@@ -266,6 +271,11 @@ class _BaseInspector(ABC):
         self.n_features_in_: int = self._state.n_features_in_
         self.feature_names = self._state.feature_names_
         self.sample_labels = self._state.sample_labels
+
+        if self.feature_names is not None:
+            self._wavenumbers = np.array(self.feature_names, copy=True)
+        else:
+            self._wavenumbers = np.arange(self.n_features_in_)
 
         # Backwards-compatible attributes used in existing tests/extensions
         train_dataset = self.datasets_["train"]
@@ -290,6 +300,26 @@ class _BaseInspector(ABC):
     @property
     def transformer(self) -> Optional[Pipeline]:
         return self.transformer_
+
+    @property
+    def nr_features(self) -> int:
+        """Return the number of features in original data."""
+        return self.n_features_in_
+
+    @property
+    def nr_samples(self) -> Dict[str, int]:
+        """Return the number of samples in each dataset."""
+        return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
+
+    @property
+    def wavenumbers(self) -> np.ndarray:
+        """Return the feature names/indices."""
+        return self._wavenumbers
+
+    @property
+    def confidence(self) -> float:
+        """Return the confidence level for outlier detection."""
+        return self._confidence
 
     def _get_dataset(self, name: str) -> InspectorDataset:
         return self._state.get_dataset(name)

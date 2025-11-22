@@ -48,6 +48,49 @@ class LatentVariableMixin:
         return self  # type: ignore[return-value]
 
     # ------------------------------------------------------------------
+    # Properties
+    # ------------------------------------------------------------------
+
+    @property
+    def nr_components(self) -> int:
+        """Return the number of latent variables/components."""
+        inspector = self._latent_inspector()
+        # Access n_components_ from the inspector instance (provided by _BaseInspector)
+        return getattr(inspector, "n_components_", 0)
+
+    @property
+    def hotelling_t2_limit(self) -> float:
+        """Return the Hotelling's T² critical value at the specified confidence level.
+
+        Calculated using the training data. The limit is cached after first calculation.
+        """
+        limit = getattr(self, "_hotelling_t2_limit", None)
+        if limit is None:
+            inspector = self._latent_inspector()
+            hotelling = HotellingT2(inspector.model, confidence=inspector.confidence)
+            X_train, _ = inspector._get_raw_data("train")
+            hotelling.fit(X_train)
+            limit = hotelling.critical_value_
+            setattr(self, "_hotelling_t2_limit", limit)
+        return limit
+
+    @property
+    def q_residuals_limit(self) -> float:
+        """Return the Q residuals critical value at the specified confidence level.
+
+        Calculated using the training data. The limit is cached after first calculation.
+        """
+        limit = getattr(self, "_q_residuals_limit", None)
+        if limit is None:
+            inspector = self._latent_inspector()
+            q_detector = QResiduals(inspector.model, confidence=inspector.confidence)
+            X_train, _ = inspector._get_raw_data("train")
+            q_detector.fit(X_train)
+            limit = q_detector.critical_value_
+            setattr(self, "_q_residuals_limit", limit)
+        return limit
+
+    # ------------------------------------------------------------------
     # Abstract hooks expected from concrete inspectors
     # ------------------------------------------------------------------
     def get_latent_scores(self, dataset: str) -> np.ndarray:  # pragma: no cover
