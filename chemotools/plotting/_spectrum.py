@@ -7,25 +7,17 @@ The :mod:`chemotools.plotting._spectrum` module implements the SpectrumPlot clas
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    setup_figure,
     get_colors_from_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
     calculate_ylim_for_xlim,
-    split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
 )
 
 
-class SpectrumPlot(Display):
+class SpectrumPlot(BasePlot, ColoringMixin):
     """Plot class for visualizing spectral data.
 
     This class implements the Display protocol and provides flexible options
@@ -124,29 +116,16 @@ class SpectrumPlot(Display):
         # Store whether labels were explicitly provided
         self._labels_provided = labels is not None
         self.labels = labels or [f"Spectrum {i}" for i in range(len(self.y))]
-        self.color_by = color_by
-        self.colorbar_label = colorbar_label
 
-        # Determine if color_by is categorical or continuous
-        if categorical is not None:
-            # User explicitly specified the type
-            self.is_categorical = categorical
-        elif color_by is not None:
-            # Automatic detection using utility function
-            self.is_categorical = detect_categorical(color_by)
-        else:
-            self.is_categorical = False
-
-        # Set colormap with colorblind-friendly defaults
-        self.colormap = get_default_colormap(self.is_categorical, colormap)
+        self._init_coloring(color_by, colormap, categorical, colorbar_label)
 
     def show(
         self,
         *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
-        xlabel: str = "Wavelength (nm)",
-        ylabel: str = "Absorbance",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -208,59 +187,27 @@ class SpectrumPlot(Display):
 
         >>> plot.show(title="Custom Range", xlim=(2800, 3000), ylim=(0, 0.5))
         """
-        # Separate kwargs for setup_figure vs plot
-        # These are kwargs that should go to plt.subplots() via setup_figure
-        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
+        if xlabel is None:
+            xlabel = "Wavelength (nm)"
+        if ylabel is None:
+            ylabel = "Absorbance"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (10, 3),
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
-            **figure_kwargs,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        # Render the actual plot
-        self._render_plot(ax, **plot_kwargs)
-
-        # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-            # Auto-scale y-axis to data within xlim if ylim not provided
-            if ylim is None:
-                ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
-
-        apply_limits(ax, ylim=ylim)
-
-        # Add legend or colorbar
-        if self.color_by is None or self.is_categorical:
-            # Only add legend if:
-            # 1. Labels were explicitly provided by user, OR
-            # 2. Number of spectra is small (≤ 10) and there are labeled artists
-            handles, labels = ax.get_legend_handles_labels()
-            should_show_legend = (
-                (self._labels_provided or len(self.y) <= 10)
-                and handles
-                and any(label for label in labels)
-            )
-
-            if should_show_legend:
-                ax.legend()
-        else:
-            # Add colorbar for continuous data
-            add_colorbar(ax, self.color_by, self.colormap, self.colorbar_label)
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
         ax: Optional[Axes] = None,
         *,
-        xlabel: str = "Wavelength (nm)",
-        ylabel: str = "Absorbance",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -290,23 +237,41 @@ class SpectrumPlot(Display):
         ax : Axes
             The matplotlib Axes object with the rendered plot.
         """
-        fig, ax = ensure_axes(ax, figsize=(10, 6))
+        if xlabel is None:
+            xlabel = "Wavelength (nm)"
+        if ylabel is None:
+            ylabel = "Absorbance"
 
-        self._render_plot(ax, **kwargs)
+        # Auto-scale y-axis to data within xlim if ylim not provided
+        if xlim is not None and ylim is None:
+            ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
 
-        # Set axis labels
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
-        # Apply axis limits
-        if xlim is not None:
-            ax.set_xlim(xlim)
+        # Add legend or colorbar
+        if self.color_by is None or self.is_categorical:
+            # Only add legend if:
+            # 1. Labels were explicitly provided by user, OR
+            # 2. Number of spectra is small (≤ 10) and there are labeled artists
+            handles, labels = ax.get_legend_handles_labels()
+            should_show_legend = (
+                (self._labels_provided or len(self.y) <= 10)
+                and handles
+                and any(label for label in labels)
+            )
 
-            # Auto-scale y-axis to data within xlim if ylim not provided
-            if ylim is None:
-                ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)
-
-        apply_limits(ax, ylim=ylim)
+            if should_show_legend:
+                ax.legend()
+        else:
+            # Add colorbar for continuous data
+            self._add_colorbar_if_needed(ax)
 
         return fig, ax
 
@@ -339,6 +304,7 @@ class SpectrumPlot(Display):
                 )
         elif self.is_categorical:
             # Categorical coloring: use discrete colors
+            assert self.colormap is not None
             colors = get_colors_from_labels(self.color_by, self.colormap)
             unique_values = np.unique(self.color_by)
 

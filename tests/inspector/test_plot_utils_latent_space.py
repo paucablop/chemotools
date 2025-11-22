@@ -746,7 +746,7 @@ class TestCreateQVsYResidualsPlot:
 
         # Assert
         assert fig is not None
-        assert len(fig.axes) == 1
+        assert len(fig.axes) == 2  # Main plot + colorbar
 
         # Cleanup
         plt.close(fig)

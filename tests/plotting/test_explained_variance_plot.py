@@ -148,17 +148,18 @@ class TestExplainedVariancePlotBasics:
         plt.close(fig)
 
     def test_render_returns_axes(self):
-        """Test that render() returns Axes object."""
+        """Test that render() returns Figure and Axes object."""
         # Arrange
         variance_ratios = np.array([0.45, 0.25, 0.15, 0.10, 0.05])
         plot = ExplainedVariancePlot(variance_ratios)
 
         # Act
-        ax = plot.render()
+        fig, ax = plot.render()
 
         # Assert
+        assert isinstance(fig, Figure)
         assert isinstance(ax, Axes)
-        plt.close(ax.figure)
+        plt.close(fig)
 
     def test_render_on_existing_axes(self):
         """Test rendering on existing axes."""
@@ -168,10 +169,11 @@ class TestExplainedVariancePlotBasics:
         fig, ax = plt.subplots()
 
         # Act
-        result_ax = plot.render(ax=ax)
+        result_fig, result_ax = plot.render(ax=ax)
 
         # Assert
         assert result_ax is ax
+        assert result_fig is fig
         plt.close(fig)
 
 
@@ -252,11 +254,11 @@ class TestExplainedVariancePlotRendering:
         plot = ExplainedVariancePlot(variance_ratios)
 
         # Act
-        ax = plot.render()
+        fig, ax = plot.render()
 
         # Assert
         assert ax.yaxis.get_gridlines()[0].get_visible()
-        plt.close(ax.figure)
+        plt.close(fig)
 
     def test_threshold_line_present(self):
         """Test that threshold line is drawn."""

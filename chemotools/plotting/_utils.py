@@ -83,13 +83,15 @@ def set_default_axis_labels(
 
 
 def setup_figure(
-    figsize: tuple = (10, 8),
+    figsize: Optional[tuple] = (10, 8),
     title: Optional[str] = None,
     xlabel: Optional[str] = None,
     ylabel: Optional[str] = None,
     **kwargs,
 ) -> tuple[Figure, Axes]:
     """Create a figure with consistent styling."""
+    if figsize is None:
+        figsize = (10, 8)
     fig, ax = plt.subplots(figsize=figsize, **kwargs)
     if title:
         ax.set_title(title, fontsize=14, fontweight="bold")

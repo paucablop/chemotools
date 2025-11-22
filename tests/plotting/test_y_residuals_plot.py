@@ -59,7 +59,7 @@ class TestYResidualsPlotBasics:
 
         # Assert
         np.testing.assert_array_equal(plot.x_axis, x_values)
-        assert plot.x_label == "X"
+        assert plot.x_label == "X Values"
 
     def test_zero_line_added_by_default(self):
         """Test that zero reference line is added by default."""
@@ -119,7 +119,7 @@ class TestYResidualsPlotMultivariate:
         residuals = np.random.randn(100, 3)
 
         # Act & Assert
-        with pytest.raises(ValueError, match="target_index 5 is out of bounds"):
+        with pytest.raises(ValueError, match="Invalid target_index 5"):
             YResidualsPlot(residuals, target_index=5)
 
     def test_univariate_residuals_ignores_target_index(self):
@@ -153,7 +153,7 @@ class TestYResidualsPlotValidation:
         residuals = np.random.randn(10, 5, 3)
 
         # Act & Assert
-        with pytest.raises(ValueError, match="residuals must be 1D or 2D array"):
+        with pytest.raises(ValueError, match="Residuals must be 1D or 2D array"):
             YResidualsPlot(residuals)
 
     def test_mismatched_x_values_length_raises_error(self):

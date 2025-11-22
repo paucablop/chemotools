@@ -1,23 +1,15 @@
 """Predicted vs Actual plot for regression model evaluation."""
 
-from typing import Optional, Any, Union
+from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
-from chemotools.plotting._utils import (
-    setup_figure,
-    get_colors_from_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
-    apply_limits,
-)
+from chemotools.plotting._base import BasePlot, ColoringMixin
+from chemotools.plotting._utils import get_colors_from_labels
 
 
-class PredictedVsActualPlot(Display):
+class PredictedVsActualPlot(BasePlot, ColoringMixin):
     """Scatter plot of predicted vs actual values to assess regression fit.
 
     This class creates scatter plots comparing predicted values against actual
@@ -103,7 +95,6 @@ class PredictedVsActualPlot(Display):
         self.y_true = np.asarray(y_true)
         self.y_pred = np.asarray(y_pred)
         self.target_index = target_index
-        self.color_by = color_by
         self.label = label
         self.color = color
         self.marker = marker
@@ -127,13 +118,8 @@ class PredictedVsActualPlot(Display):
         else:
             raise ValueError("y_true and y_pred must be 1D or 2D arrays")
 
-        # Detect if color_by is categorical
-        self.is_categorical = (
-            detect_categorical(color_by) if color_by is not None else False
-        )
-
-        # Get colormap
-        self.colormap = get_default_colormap(self.is_categorical, colormap)
+        # Initialize coloring
+        self._init_coloring(color_by, colormap, colorbar_label="Color By")
 
     def _validate_inputs(self) -> None:
         """Validate y_true and y_pred arrays."""
@@ -191,73 +177,144 @@ class PredictedVsActualPlot(Display):
             else:
                 title = "Predicted vs Actual"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (8, 8),
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
 
-        # Render the actual plot
-        self.render(ax)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        # Add grid
-        ax.grid(alpha=0.3, linestyle="--")
-
-        plt.tight_layout()
-        return fig
-
-    def render(self, ax: Optional[Axes] = None, **kwargs: Any) -> tuple[Figure, Axes]:
-        """Render the plot on existing axes.
+    def render(
+        self,
+        ax: Optional[Axes] = None,
+        *,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[tuple[float, float]] = None,
+        ylim: Optional[tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> tuple[Figure, Axes]:
+        """Render the plot on existing or new axes.
 
         Parameters
         ----------
         ax : Axes, optional
-            Matplotlib axes to render the plot on. If None, creates new figure and axes.
+            Matplotlib axes to render on. If None, creates new figure/axes.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
+        xlim : tuple[float, float], optional
+            X-axis limits (min, max).
+        ylim : tuple[float, float], optional
+            Y-axis limits (min, max).
         **kwargs : Any
-            Additional keyword arguments (ignored for compatibility).
+            Additional keyword arguments passed to scatter plot.
 
         Returns
         -------
-        fig : Figure
-            The matplotlib Figure object.
-        ax : Axes
-            The matplotlib Axes object with the rendered plot.
+        tuple[Figure, Axes]
+            The Figure and Axes objects containing the plot.
         """
-        if ax is None:
-            fig, ax = plt.subplots(figsize=kwargs.get("figsize"))
-        else:
-            # ax.figure might be SubFigure, so we get the parent Figure
-            fig = ax.get_figure()  # type: ignore[assignment]
+        # Auto-generate labels if not provided
+        if xlabel is None:
+            xlabel = "Actual"
+        if ylabel is None:
+            ylabel = "Predicted"
 
-        # Prepare colors
-        colors: Union[np.ndarray, str, None]
+        # Remove figsize from kwargs as it is not used in render
+        kwargs.pop("figsize", None)
+
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
+
+        # Add colorbar for continuous data
+        self._add_colorbar_if_needed(ax)
+
+        # Add legend if categorical or if label is provided
+        if self.is_categorical or self.label:
+            # Only add legend if there are labeled artists
+            handles, labels = ax.get_legend_handles_labels()
+            if handles:
+                ax.legend()
+
+        return fig, ax
+
+    def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
+        """Internal method to render the plot on given axes."""
+        alpha = kwargs.pop("alpha", 0.7)
+        s = kwargs.pop("s", 50)
+        edgecolors = kwargs.pop("edgecolors", "none")
+
+        # Determine colors
         if self.color_by is not None:
             if self.is_categorical:
+                assert self.colormap is not None
                 colors = get_colors_from_labels(self.color_by, colormap=self.colormap)
-            else:
-                # For continuous data, use the values directly for colormap
-                colors = self.color_by
-        elif self.color is not None:
-            colors = self.color
-        else:
-            colors = None
+                unique_values = np.unique(self.color_by)
 
-        # Create scatter plot
-        ax.scatter(
-            self.y_true_1d,
-            self.y_pred_1d,
-            c=colors,
-            alpha=0.7,
-            s=50,
-            marker=self.marker,
-            label=self.label,
-            edgecolors="none",
-        )
+                for value in unique_values:
+                    mask = self.color_by == value
+                    ax.scatter(
+                        self.y_true_1d[mask],
+                        self.y_pred_1d[mask],
+                        color=colors[mask][0],
+                        label=f"{self.label} - {value}" if self.label else f"{value}",
+                        alpha=alpha,
+                        s=s,
+                        marker=self.marker,
+                        edgecolors=edgecolors,
+                        **kwargs,
+                    )
+            else:
+                # Continuous
+                import matplotlib as mpl
+                import matplotlib.colors as mcolors
+
+                norm = mcolors.Normalize(
+                    vmin=self.color_by.min(), vmax=self.color_by.max()
+                )
+                colormap_name = (
+                    self.colormap if self.colormap is not None else "viridis"
+                )
+                cmap = mpl.colormaps.get_cmap(colormap_name)
+
+                ax.scatter(
+                    self.y_true_1d,
+                    self.y_pred_1d,
+                    c=self.color_by,
+                    cmap=cmap,
+                    norm=norm,
+                    label=self.label,
+                    alpha=alpha,
+                    s=s,
+                    marker=self.marker,
+                    edgecolors=edgecolors,
+                    **kwargs,
+                )
+        else:
+            # Single color
+            color = self.color if self.color is not None else "steelblue"
+            ax.scatter(
+                self.y_true_1d,
+                self.y_pred_1d,
+                c=color,
+                label=self.label,
+                alpha=alpha,
+                s=s,
+                marker=self.marker,
+                edgecolors=edgecolors,
+                **kwargs,
+            )
 
         # Add ideal prediction line (y=x)
         if self.add_ideal_line:
@@ -268,29 +325,3 @@ class PredictedVsActualPlot(Display):
             ax.plot(
                 lims, lims, "k--", alpha=0.5, zorder=0, label="Ideal", linewidth=1.5
             )
-
-        # Add colorbar for continuous color_by
-        if self.color_by is not None and not self.is_categorical:
-            add_colorbar(ax, self.color_by, self.colormap, label="Color By")
-
-        # Add legend for categorical color_by
-        if self.color_by is not None and self.is_categorical:
-            from matplotlib import cm
-            import matplotlib.patches as mpatches
-
-            unique_labels = np.unique(self.color_by)
-            if (
-                len(unique_labels) <= 10
-            ):  # Only show legend for reasonable number of categories
-                cmap_obj = cm.get_cmap(self.colormap)
-                patches = [
-                    mpatches.Patch(
-                        color=cmap_obj(i / len(unique_labels)), label=f"{lbl}"
-                    )
-                    for i, lbl in enumerate(unique_labels)
-                ]
-                ax.legend(handles=patches, loc="best", framealpha=0.9)
-        elif self.label is not None:
-            ax.legend(loc="best", framealpha=0.9)
-
-        return fig, ax

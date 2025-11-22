@@ -2,21 +2,16 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import (
-    setup_figure,
     calculate_ylim_for_xlim,
-    split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
 )
 
 
-class LoadingsPlot(Display):
+class LoadingsPlot(BasePlot):
     """Loadings plot implementing Display protocol for model inspection.
 
     This class creates line plots of model loadings (feature weights),
@@ -152,8 +147,8 @@ class LoadingsPlot(Display):
         *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
-        xlabel: str = "Feature",
-        ylabel: str = "Loading",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -217,8 +212,10 @@ class LoadingsPlot(Display):
         ...     alpha=0.7
         ... )
         """
-        # Separate kwargs for setup_figure vs plot
-        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
+        if xlabel is None:
+            xlabel = "Feature"
+        if ylabel is None:
+            ylabel = "Loading"
 
         # Auto-generate title if not provided
         if title is None:
@@ -230,43 +227,22 @@ class LoadingsPlot(Display):
                 )
                 title = f"Loadings: {comp_names}"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (12, 4),
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
-            **figure_kwargs,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        # Render the actual plot
-        self._render_plot(ax, **plot_kwargs)
-
-        # Add zero reference line
-        ax.axhline(y=0, color="k", linestyle="-", linewidth=0.5, alpha=0.3)
-
-        # Add legend if multiple components
-        if len(self.components) > 1:
-            ax.legend()
-
-        # Apply axis limits with auto-scaling
-        ylim_to_apply = ylim
-        if xlim is not None and ylim is None:
-            # Collect all y-data for components being plotted
-            y_data = self.loadings[:, self.components]
-            ylim_to_apply = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
-
-        apply_limits(ax, xlim=xlim, ylim=ylim_to_apply)
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
         ax: Optional[Axes] = None,
         *,
-        xlabel: str = "Feature",
-        ylabel: str = "Loading",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -308,13 +284,25 @@ class LoadingsPlot(Display):
         >>> plot1.render(ax=axes[0])
         >>> plot2.render(ax=axes[1])
         """
-        fig, ax = ensure_axes(ax, figsize=(12, 4))
+        if xlabel is None:
+            xlabel = "Feature"
+        if ylabel is None:
+            ylabel = "Loading"
 
-        self._render_plot(ax, **kwargs)
+        # Apply axis limits with auto-scaling
+        if xlim is not None and ylim is None:
+            # Collect all y-data for components being plotted
+            y_data = self.loadings[:, self.components]
+            ylim = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
 
-        # Set axis labels
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
         # Add zero reference line
         ax.axhline(y=0, color="k", linestyle="-", linewidth=0.5, alpha=0.3)
@@ -322,15 +310,6 @@ class LoadingsPlot(Display):
         # Add legend if multiple components
         if len(self.components) > 1:
             ax.legend()
-
-        # Apply axis limits with auto-scaling
-        ylim_to_apply = ylim
-        if xlim is not None and ylim is None:
-            # Collect all y-data for components being plotted
-            y_data = self.loadings[:, self.components]
-            ylim_to_apply = calculate_ylim_for_xlim(self.feature_names, y_data, xlim)
-
-        apply_limits(ax, xlim=xlim, ylim=ylim_to_apply)
 
         return fig, ax
 

@@ -2,20 +2,13 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
-from chemotools.plotting._utils import (
-    setup_figure,
-    split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
-)
+from chemotools.plotting._base import BasePlot
 
 
-class ExplainedVariancePlot(Display):
+class ExplainedVariancePlot(BasePlot):
     """Visualize explained variance by component with cumulative variance.
 
     Shows both individual and cumulative explained variance ratios across
@@ -117,8 +110,8 @@ class ExplainedVariancePlot(Display):
         *,
         figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
-        xlabel: str = "Component",
-        ylabel: str = "Explained Variance Ratio",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -149,40 +142,38 @@ class ExplainedVariancePlot(Display):
         Figure
             The matplotlib Figure object.
         """
-        # Extract figure setup kwargs
-        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
+        if xlabel is None:
+            xlabel = "Component"
+        if ylabel is None:
+            ylabel = "Explained Variance Ratio"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        fig = super().show(
             figsize=figsize or (10, 6),
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
-            **figure_kwargs,
-        )
-
-        self.render(
-            ax=ax,
-            xlabel=xlabel,
-            ylabel=ylabel,
             xlim=xlim,
             ylim=ylim,
-            **plot_kwargs,
+            **kwargs,
         )
-        ax.legend()
-        plt.tight_layout()
+
+        # Add legend (BasePlot.show calls render, but render returns fig, ax)
+        # Wait, BasePlot.show returns fig.
+        # But BasePlot.show calls self.render.
+        # If I add legend in render, it will be there.
+
         return fig
 
     def render(
         self,
         ax: Optional[Axes] = None,
         *,
-        xlabel: str = "Component",
-        ylabel: str = "Explained Variance Ratio",
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
-    ) -> Axes:
+    ) -> tuple[Figure, Axes]:
         """Render the plot on the given axes or create new ones.
 
         Parameters
@@ -205,18 +196,23 @@ class ExplainedVariancePlot(Display):
         Axes
             The matplotlib Axes object.
         """
-        _fig, ax = ensure_axes(ax, figsize=(10, 6))
+        if xlabel is None:
+            xlabel = "Component"
+        if ylabel is None:
+            ylabel = "Explained Variance Ratio"
 
-        self._render_plot(ax, **kwargs)
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
-        # Set labels
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        ax.legend()
 
-        # Apply axis limits if provided
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        return ax
+        return fig, ax
 
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Internal method to render the variance plot.

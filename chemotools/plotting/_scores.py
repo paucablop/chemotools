@@ -2,26 +2,18 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    setup_figure,
     get_colors_from_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
     annotate_points,
     add_confidence_ellipse,
-    ensure_axes,
-    apply_limits,
-    set_default_axis_labels,
 )
 
 
-class ScoresPlot(Display):
+class ScoresPlot(BasePlot, ColoringMixin):
     """Simple, composable scores plot for a single dataset.
 
     This class creates scatter plots of model scores (projections) for one dataset.
@@ -122,7 +114,6 @@ class ScoresPlot(Display):
     ):
         self.scores = scores
         self.components = components
-        self.color_by = color_by
         self.annotations = annotations
         self.label = label
         self.color = color
@@ -140,15 +131,8 @@ class ScoresPlot(Display):
         self._validate_scores()
         self._validate_components()
 
-        # Determine if coloring is categorical or continuous
-        if color_by is not None:
-            self.is_categorical = detect_categorical(color_by)
-            self.colormap: Optional[str] = get_default_colormap(
-                self.is_categorical, colormap
-            )
-        else:
-            self.is_categorical = False
-            self.colormap = colormap
+        # Initialize coloring
+        self._init_coloring(color_by, colormap)
 
     def _validate_scores(self) -> None:
         """Validate that scores array has correct shape."""
@@ -228,33 +212,21 @@ class ScoresPlot(Display):
         """
         comp1, comp2 = self.components
 
-        # Determine axis labels
-        xlabel_text = xlabel if xlabel is not None else f"PC{comp1 + 1}"
-        ylabel_text = ylabel if ylabel is not None else f"PC{comp2 + 1}"
+        # Determine default axis labels if not provided
+        if xlabel is None:
+            xlabel = f"PC{comp1 + 1}"
+        if ylabel is None:
+            ylabel = f"PC{comp2 + 1}"
 
-        # Create figure
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (8, 8),
             title=title,
-            xlabel=xlabel_text,
-            ylabel=ylabel_text,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        self._render_plot(ax, **kwargs)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        # Add colorbar for continuous data
-        if self.color_by is not None and not self.is_categorical:
-            assert self.colormap is not None  # colormap is set by get_default_colormap
-            add_colorbar(ax, self.color_by, self.colormap, "Value")
-
-        # Add legend
-        ax.legend()
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
@@ -304,25 +276,28 @@ class ScoresPlot(Display):
         >>> ax.legend()
         >>> plt.show()
         """
-        fig, ax = ensure_axes(ax, figsize=(8, 8))
+        comp1, comp2 = self.components
 
-        self._render_plot(ax, **kwargs)
+        # Determine default axis labels if not provided
+        if xlabel is None:
+            xlabel = f"PC{comp1 + 1}"
+        if ylabel is None:
+            ylabel = f"PC{comp2 + 1}"
 
-        # Set axis labels if provided
-        if xlabel is not None:
-            ax.set_xlabel(xlabel)
-        else:
-            comp1, _ = self.components
-            set_default_axis_labels(ax, xlabel=f"PC{comp1 + 1}")
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
-        if ylabel is not None:
-            ax.set_ylabel(ylabel)
-        else:
-            _, comp2 = self.components
-            set_default_axis_labels(ax, ylabel=f"PC{comp2 + 1}")
+        # Add colorbar for continuous data
+        self._add_colorbar_if_needed(ax)
 
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
+        # Add legend
+        ax.legend()
 
         return fig, ax
 

@@ -2,26 +2,18 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    setup_figure,
     get_colors_from_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
     annotate_points,
     add_confidence_lines,
-    ensure_axes,
-    apply_limits,
-    set_default_axis_labels,
 )
 
 
-class DistancesPlot(Display):
+class DistancesPlot(BasePlot, ColoringMixin):
     """Simple, composable distances plot for a single dataset.
 
     This class creates scatter plots of distance measures (e.g., Q residuals, Hotelling's T²)
@@ -141,11 +133,9 @@ class DistancesPlot(Display):
     ):
         self._x: np.ndarray
         self._y: np.ndarray
-        self.color_by = color_by
         self.annotations = annotations
         self.label = label
         self.color = color
-        self.colormap: Optional[str]
         self.marker = marker
 
         # Process confidence lines parameter
@@ -163,14 +153,8 @@ class DistancesPlot(Display):
         self._default_ylabel: str
         self._init_from_xy(x, y)
 
-        # Determine if coloring is categorical or continuous
-        if self.color_by is not None:
-            self.color_by = np.asarray(self.color_by)
-            self.is_categorical = detect_categorical(self.color_by)
-            self.colormap = get_default_colormap(self.is_categorical, colormap)
-        else:
-            self.is_categorical = False
-            self.colormap = colormap
+        # Initialize coloring
+        self._init_coloring(color_by, colormap)
 
         self._validate_color_and_annotations()
 
@@ -264,29 +248,15 @@ class DistancesPlot(Display):
         xlabel_text = xlabel if xlabel is not None else self._default_xlabel
         ylabel_text = ylabel if ylabel is not None else self._default_ylabel
 
-        # Create figure
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (8, 8),
             title=title,
             xlabel=xlabel_text,
             ylabel=ylabel_text,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        self._render_plot(ax, **kwargs)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        # Add colorbar for continuous data
-        if self.color_by is not None and not self.is_categorical:
-            assert self.colormap is not None  # colormap is set by get_default_colormap
-            add_colorbar(ax, self.color_by, self.colormap, "Value")
-
-        # Add legend
-        ax.legend()
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
@@ -338,23 +308,24 @@ class DistancesPlot(Display):
         >>> ax.legend()
         >>> plt.show()
         """
-        fig, ax = ensure_axes(ax, figsize=(8, 8))
+        # Determine axis labels
+        xlabel_text = xlabel if xlabel is not None else self._default_xlabel
+        ylabel_text = ylabel if ylabel is not None else self._default_ylabel
 
-        self._render_plot(ax, **kwargs)
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel_text,
+            ylabel=ylabel_text,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
-        # Set axis labels if provided
-        if xlabel is not None:
-            ax.set_xlabel(xlabel)
-        else:
-            set_default_axis_labels(ax, xlabel=self._default_xlabel)
+        # Add colorbar for continuous data
+        self._add_colorbar_if_needed(ax)
 
-        if ylabel is not None:
-            ax.set_ylabel(ylabel)
-        else:
-            set_default_axis_labels(ax, ylabel=self._default_ylabel)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
+        # Add legend
+        ax.legend()
 
         return fig, ax
 

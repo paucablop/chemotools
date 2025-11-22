@@ -2,26 +2,17 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    setup_figure,
     get_colors_from_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
     annotate_points,
-    split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
-    set_default_axis_labels,
 )
 
 
-class YResidualsPlot(Display):
+class YResidualsPlot(BasePlot, ColoringMixin):
     """Plot of residuals to assess homoscedasticity and model fit quality.
 
     This class creates scatter plots of Y residuals (observed - predicted) versus
@@ -98,20 +89,6 @@ class YResidualsPlot(Display):
 
     >>> fig, ax = plt.subplots()
     >>> YResidualsPlot(train_residuals, label="Train", color="blue").render(ax)
-    >>> YResidualsPlot(test_residuals, label="Test", color="red").render(ax)
-    >>> ax.legend()
-    >>> plt.show()
-
-    **With categorical coloring:**
-
-    >>> plot = YResidualsPlot(residuals, x_values=y_pred, color_by=classes)
-    >>> fig = plot.show(title="Residuals by Class")
-
-    **Multivariate regression - plot specific target:**
-
-    >>> residuals = y_true - y_pred  # shape (n_samples, n_targets)
-    >>> plot = YResidualsPlot(residuals, target_index=1)  # Second target
-    >>> fig = plot.show(title="Residuals for Target 2")
     """
 
     def __init__(
@@ -128,132 +105,117 @@ class YResidualsPlot(Display):
         add_zero_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
     ):
-        self.residuals = np.asarray(residuals)
-        self.x_values = x_values if x_values is None else np.asarray(x_values)
+        self.residuals = residuals
+        self.x_values = x_values
         self.target_index = target_index
-        self.color_by = color_by
         self.annotations = annotations
         self.label = label
         self.color = color
         self.add_zero_line = add_zero_line
         self.add_confidence_band = add_confidence_band
 
-        # Validate inputs
         self._validate_residuals()
+        self._init_xy_data()
 
-        # Extract the specific target's residuals if multivariate
-        if self.residuals.ndim == 2:
-            if target_index >= self.residuals.shape[1]:
-                raise ValueError(
-                    f"target_index {target_index} is out of bounds for "
-                    f"residuals with {self.residuals.shape[1]} targets"
-                )
-            self.residuals_1d = self.residuals[:, target_index]
-        elif self.residuals.ndim == 1:
-            self.residuals_1d = self.residuals
-        else:
-            raise ValueError("residuals must be 1D or 2D array")
-
-        # Set up x-axis values
-        if self.x_values is None:
-            self.x_axis = np.asarray(np.arange(len(self.residuals_1d)))
-            self.x_label = "Sample Index"
-        else:
-            if len(self.x_values) != len(self.residuals_1d):
-                raise ValueError(
-                    f"x_values length ({len(self.x_values)}) must match "
-                    f"residuals length ({len(self.residuals_1d)})"
-                )
-            self.x_axis = self.x_values
-            self.x_label = "X"
-
-        # Detect if color_by is categorical
-        self.is_categorical = (
-            detect_categorical(color_by) if color_by is not None else False
-        )
-
-        # Get colormap
-        self.colormap = get_default_colormap(self.is_categorical, colormap)
+        # Initialize coloring
+        self._init_coloring(color_by, colormap)
 
     def _validate_residuals(self) -> None:
-        """Validate residuals array."""
+        """Validate residuals shape and target index."""
         if self.residuals.size == 0:
             raise ValueError("residuals array cannot be empty")
+
+        if self.residuals.ndim == 1:
+            self.residuals_1d = self.residuals
+        elif self.residuals.ndim == 2:
+            n_targets = self.residuals.shape[1]
+            if self.target_index < 0 or self.target_index >= n_targets:
+                raise ValueError(
+                    f"Invalid target_index {self.target_index}. "
+                    f"Residuals have {n_targets} targets."
+                )
+            self.residuals_1d = self.residuals[:, self.target_index]
+        else:
+            raise ValueError(
+                f"Residuals must be 1D or 2D array, got shape {self.residuals.shape}"
+            )
+
+    def _init_xy_data(self) -> None:
+        """Initialize x and y data for plotting."""
+        n_samples = self.residuals_1d.shape[0]
+
+        if self.x_values is None:
+            self.x_axis = np.arange(n_samples)
+            self.x_label = "Sample Index"
+        else:
+            if self.x_values.shape[0] != n_samples:
+                raise ValueError(
+                    f"x_values length ({self.x_values.shape[0]}) must match "
+                    f"residuals length ({n_samples})"
+                )
+            self.x_axis = self.x_values
+            self.x_label = "X Values"
 
     def show(
         self,
         *,
+        figsize: Optional[tuple[float, float]] = None,
         title: Optional[str] = None,
         xlabel: Optional[str] = None,
         ylabel: Optional[str] = None,
-        figsize: Optional[tuple[float, float]] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
     ) -> Figure:
-        """Create and display the residuals plot.
+        """Create and return a complete figure with the residuals plot.
 
         Parameters
         ----------
-        title : str, optional
-            Plot title (default: auto-generated based on configuration).
-        xlabel : str, optional
-            X-axis label (default: auto-generated).
-        ylabel : str, optional
-            Y-axis label (default: "Residuals").
         figsize : tuple[float, float], optional
-            Figure size (width, height) in inches (default: (10, 6)).
+            Figure size as (width, height) in inches. Default is (10, 6).
+        title : str, optional
+            Title for the plot.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses "Sample Index" or "X Values".
+        ylabel : str, optional
+            Custom y-axis label. If None, uses "Residuals".
         xlim : tuple[float, float], optional
-            X-axis limits (min, max).
+            X-axis limits as (xmin, xmax).
         ylim : tuple[float, float], optional
-            Y-axis limits (min, max).
+            Y-axis limits as (ymin, ymax).
         **kwargs : Any
-            Additional keyword arguments passed to setup_figure.
+            Additional keyword arguments passed to ax.scatter().
 
         Returns
         -------
         Figure
             The matplotlib Figure object containing the plot.
         """
-        # Separate kwargs for setup_figure vs plot
-        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
+        xlabel_text = xlabel if xlabel is not None else self.x_label
+        ylabel_text = ylabel if ylabel is not None else "Residuals"
 
-        # Auto-generate labels if not provided
-        if xlabel is None:
-            xlabel = self.x_label
-        if ylabel is None:
-            ylabel = "Residuals"
         if title is None:
             if self.residuals.ndim == 2:
-                title = f"Residuals for Target {self.target_index + 1}"
+                title = f"Residuals Plot - Target {self.target_index + 1}"
             else:
                 title = "Residuals Plot"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (10, 6),
             title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            **figure_kwargs,
+            xlabel=xlabel_text,
+            ylabel=ylabel_text,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        # Render the actual plot
-        self._render_plot(ax, **plot_kwargs)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        # Add grid
-        ax.grid(alpha=0.3, linestyle="--")
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
         ax: Optional[Axes] = None,
         *,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -264,6 +226,10 @@ class YResidualsPlot(Display):
         ----------
         ax : Axes, optional
             Matplotlib axes to render on. If None, creates new figure/axes.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
         xlim : tuple[float, float], optional
             X-axis limits (min, max).
         ylim : tuple[float, float], optional
@@ -276,58 +242,97 @@ class YResidualsPlot(Display):
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        fig, ax = ensure_axes(ax, figsize=(10, 6))
+        xlabel_text = xlabel if xlabel is not None else self.x_label
+        ylabel_text = ylabel if ylabel is not None else "Residuals"
 
-        # Render the plot
-        self._render_plot(ax, **kwargs)
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel_text,
+            ylabel=ylabel_text,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
-        # Set default labels if axes don't have them
-        set_default_axis_labels(ax, xlabel=self.x_label, ylabel="Residuals")
+        # Add colorbar for continuous data
+        self._add_colorbar_if_needed(ax)
 
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
+        # Add legend if categorical or if label is provided
+        if self.is_categorical or self.label:
+            # Only add legend if there are labeled artists
+            handles, labels = ax.get_legend_handles_labels()
+            if handles:
+                ax.legend()
 
         return fig, ax
 
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Internal method to render the plot on given axes."""
-        # Determine colors for points
-        colors: np.ndarray | str
+        alpha = kwargs.pop("alpha", 0.6)
+        s = kwargs.pop("s", 50)
+        edgecolors = kwargs.pop("edgecolors", "black")
+        linewidths = kwargs.pop("linewidths", 0.5)
+
+        # Determine colors
         if self.color_by is not None:
             if self.is_categorical:
+                assert self.colormap is not None
                 colors = get_colors_from_labels(self.color_by, colormap=self.colormap)
+                unique_values = np.unique(self.color_by)
+
+                for value in unique_values:
+                    mask = self.color_by == value
+                    ax.scatter(
+                        self.x_axis[mask],
+                        self.residuals_1d[mask],
+                        color=colors[mask][0],
+                        label=f"{self.label} - {value}",
+                        alpha=alpha,
+                        s=s,
+                        edgecolors=edgecolors,
+                        linewidths=linewidths,
+                        **kwargs,
+                    )
             else:
-                # Will use scatter's c parameter for continuous coloring
-                colors = self.color_by
-        elif self.color is not None:
-            colors = self.color
+                # Continuous
+                import matplotlib as mpl
+                import matplotlib.colors as mcolors
+
+                norm = mcolors.Normalize(
+                    vmin=self.color_by.min(), vmax=self.color_by.max()
+                )
+                colormap_name = (
+                    self.colormap if self.colormap is not None else "viridis"
+                )
+                cmap = mpl.colormaps.get_cmap(colormap_name)
+
+                ax.scatter(
+                    self.x_axis,
+                    self.residuals_1d,
+                    c=self.color_by,
+                    cmap=cmap,
+                    norm=norm,
+                    label=self.label,
+                    alpha=alpha,
+                    s=s,
+                    edgecolors=edgecolors,
+                    linewidths=linewidths,
+                    **kwargs,
+                )
         else:
-            colors = "steelblue"
-
-        # Create scatter plot
-        scatter_kwargs = {
-            "alpha": kwargs.get("alpha", 0.6),
-            "s": kwargs.get("s", 50),
-            "edgecolors": kwargs.get("edgecolors", "black"),
-            "linewidths": kwargs.get("linewidths", 0.5),
-            "label": self.label,
-        }
-
-        if isinstance(colors, np.ndarray) and not self.is_categorical:
-            # Continuous coloring
+            # Single color
+            color = self.color if self.color is not None else "steelblue"
             ax.scatter(
                 self.x_axis,
                 self.residuals_1d,
-                c=colors,
-                cmap=self.colormap,
-                **scatter_kwargs,
+                c=color,
+                label=self.label,
+                alpha=alpha,
+                s=s,
+                edgecolors=edgecolors,
+                linewidths=linewidths,
+                **kwargs,
             )
-            # Add colorbar
-            if ax.get_figure() is not None:
-                add_colorbar(ax, colors, self.colormap)
-        else:
-            # Single color or categorical
-            ax.scatter(self.x_axis, self.residuals_1d, c=colors, **scatter_kwargs)
 
         # Add zero reference line
         if self.add_zero_line:

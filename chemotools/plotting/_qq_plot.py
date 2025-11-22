@@ -2,23 +2,17 @@
 
 from typing import Optional, Any
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from scipy import stats
 
-from chemotools.plotting import Display
+from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import (
-    setup_figure,
     annotate_points,
-    split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
-    set_default_axis_labels,
 )
 
 
-class QQPlot(Display):
+class QQPlot(BasePlot):
     """Quantile-Quantile plot to assess if residuals follow a normal distribution.
 
     This class creates Q-Q plots comparing the quantiles of residuals against
@@ -184,16 +178,13 @@ class QQPlot(Display):
         ylim : tuple[float, float], optional
             Y-axis limits (min, max).
         **kwargs : Any
-            Additional keyword arguments passed to setup_figure.
+            Additional keyword arguments passed to ax.scatter().
 
         Returns
         -------
         Figure
             The matplotlib Figure object containing the plot.
         """
-        # Separate kwargs for setup_figure vs plot
-        figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
-
         # Auto-generate labels if not provided
         if xlabel is None:
             xlabel = "Theoretical Quantiles"
@@ -205,31 +196,22 @@ class QQPlot(Display):
             else:
                 title = "Q-Q Plot"
 
-        # Use setup_figure utility for consistent styling
-        fig, ax = setup_figure(
+        return super().show(
             figsize=figsize or (8, 8),
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
-            **figure_kwargs,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        # Render the actual plot
-        self._render_plot(ax, **plot_kwargs)
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
-
-        # Add grid
-        ax.grid(alpha=0.3, linestyle="--")
-
-        plt.tight_layout()
-        return fig
 
     def render(
         self,
         ax: Optional[Axes] = None,
         *,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         **kwargs: Any,
@@ -240,6 +222,10 @@ class QQPlot(Display):
         ----------
         ax : Axes, optional
             Matplotlib axes to render on. If None, creates new figure/axes.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
         xlim : tuple[float, float], optional
             X-axis limits (min, max).
         ylim : tuple[float, float], optional
@@ -252,20 +238,20 @@ class QQPlot(Display):
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        fig, ax = ensure_axes(ax, figsize=(10, 6))
+        # Auto-generate labels if not provided
+        if xlabel is None:
+            xlabel = "Theoretical Quantiles"
+        if ylabel is None:
+            ylabel = "Sample Quantiles"
 
-        # Render the plot
-        self._render_plot(ax, **kwargs)
-
-        # Set default labels if axes don't have them
-        set_default_axis_labels(
-            ax,
-            xlabel="Theoretical Quantiles",
-            ylabel="Sample Quantiles",
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
         )
-
-        # Apply axis limits
-        apply_limits(ax, xlim=xlim, ylim=ylim)
 
         return fig, ax
 
