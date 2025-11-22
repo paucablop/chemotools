@@ -395,22 +395,18 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         summary : dict
             Dictionary containing model information
         """
+        pred_summary = self.prediction_summary()
+        rmse_dict = {ds: metrics["RMSE"] for ds, metrics in pred_summary.items()}
+        r2_dict = {ds: metrics["R2"] for ds, metrics in pred_summary.items()}
+
         summary_dict: Dict[str, SummaryValue] = {
             "model_type": type(self.estimator).__name__,
             "has_preprocessing": self.transformer is not None,
             "nr_features": self.nr_features,
             "nr_components": self.nr_components,
             "nr_samples": self.nr_samples.copy(),
-            "RMSE": {
-                "train": self.RMSE_train,
-                "test": self.RMSE_test,
-                "val": self.RMSE_val,
-            },
-            "R2": {
-                "train": self.R2_train,
-                "test": self.R2_test,
-                "val": self.R2_val,
-            },
+            "RMSE": rmse_dict,
+            "R2": r2_dict,
         }
 
         # Add variance info if available
@@ -436,128 +432,6 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             summary_dict["preprocessing_steps"] = []
 
         return summary_dict
-
-    def create_latent_scores_figures(
-        self,
-        dataset: Union[str, Sequence[str]],
-        components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
-        *,
-        color_by_y: bool,
-        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
-        figsize: Tuple[float, float],
-    ) -> Dict[str, matplotlib.figure.Figure]:
-        """Generate X-scores plots for requested datasets.
-
-        For PLS, when multiple datasets are provided, only creates the combined
-        multi-dataset plots (not individual per-dataset plots) to reduce clutter.
-
-        Parameters
-        ----------
-        dataset : str or sequence of str
-            Dataset(s) to plot ('train', 'test', 'val')
-        components : tuple or sequence of tuples
-            Component pairs to plot
-        color_by_y : bool
-            Whether to color by y values
-        annotate_by : str or dict, optional
-            Annotation specification
-        figsize : tuple of float
-            Figure size
-
-        Returns
-        -------
-        dict
-            Dictionary of figures with keys like 'scores_1', 'scores_2', etc.
-        """
-        from ._utils import normalize_datasets, normalize_components
-        from .helpers import _latent_space as _latent_plots
-        from chemotools.plotting._styles import DATASET_COLORS
-
-        dataset_names = list(normalize_datasets(dataset))
-        if not dataset_names:
-            raise ValueError("At least one dataset is required for scores plotting")
-
-        components_list = normalize_components(components)
-        figures: Dict[str, matplotlib.figure.Figure] = {}
-        multi_dataset = len(dataset_names) > 1
-        explained_var = self.get_explained_x_variance_ratio()
-
-        if multi_dataset:
-            # For PLS with multiple datasets, only create combined plots
-            datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
-            for ds_name in dataset_names:
-                x_scores = self.get_x_scores(ds_name)
-                _, y = self._get_raw_data(ds_name)
-                datasets_data[ds_name] = {
-                    "scores": x_scores,
-                    "y": y,
-                }
-
-            # Get training scores for confidence ellipse reference (even if train not requested)
-            train_scores_for_ellipse = self.get_x_scores("train")
-
-            # explained_var might be None, but the plot function expects an array
-            # Use zeros if not available
-            var_for_plot = (
-                explained_var
-                if explained_var is not None
-                else np.zeros(self.nr_components)
-            )
-
-            for idx, component_spec in enumerate(components_list, start=1):
-                fig = _latent_plots.create_scores_plot_multi_dataset(
-                    component_spec=component_spec,
-                    datasets_data=datasets_data,
-                    explained_var=var_for_plot,
-                    color_by_y=False,  # Color by dataset in multi-dataset mode
-                    annotate_by=annotate_by,
-                    figsize=figsize,
-                    component_label=self.component_label,
-                    train_scores_for_ellipse=train_scores_for_ellipse,
-                    confidence=self.confidence,
-                )
-                figures[f"scores_{idx}"] = fig
-        else:
-            # Single dataset - create one plot per component spec
-            dataset_name = dataset_names[0]
-            x_scores = self.get_x_scores(dataset_name)
-            _, y = self._get_raw_data(dataset_name)
-
-            # explained_var might be None, but the plot function expects an array
-            # Use zeros if not available
-            var_for_plot = (
-                explained_var
-                if explained_var is not None
-                else np.zeros(self.nr_components)
-            )
-
-            # Get training scores for ellipse reference (if not already train dataset)
-            train_scores_for_ellipse = None
-            if dataset_name.lower() != "train":
-                try:
-                    train_scores_for_ellipse = self.get_x_scores("train")
-                except (ValueError, KeyError):
-                    # Train dataset not available, skip ellipse
-                    pass
-
-            for idx, component_spec in enumerate(components_list, start=1):
-                fig = _latent_plots.create_scores_plot_single_dataset(
-                    component_spec=component_spec,
-                    scores=x_scores,
-                    y=y,
-                    explained_var=var_for_plot,
-                    dataset_name=dataset_name,
-                    color_by_y=color_by_y,
-                    annotate_by=annotate_by,
-                    figsize=figsize,
-                    component_label=self.component_label,
-                    dataset_color=DATASET_COLORS.get(dataset_name, "gray"),
-                    confidence=self.confidence,
-                    train_scores_for_ellipse=train_scores_for_ellipse,
-                )
-                figures[f"scores_{idx}"] = fig
-
-        return figures
 
     def _create_x_vs_y_scores_figures(
         self,
