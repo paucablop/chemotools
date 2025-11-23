@@ -11,6 +11,7 @@ from chemotools.plotting._utils import (
     calculate_ylim_for_xlim,
 )
 from chemotools.plotting._spectrum import SpectrumPlot
+from chemotools.plotting._feature_selection import FeatureSelectionPlot
 from chemotools.plotting._scores import ScoresPlot
 from chemotools.plotting._loadings import LoadingsPlot
 from chemotools.plotting._distances import DistancesPlot
@@ -28,6 +29,7 @@ __all__ = [
     "BasePlot",
     # Plot classes
     "SpectrumPlot",
+    "FeatureSelectionPlot",
     "ScoresPlot",
     "LoadingsPlot",
     "DistancesPlot",
