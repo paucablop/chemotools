@@ -12,7 +12,7 @@ from chemotools.plotting._spectrum import SpectrumPlot
 class FeatureSelectionPlot(SpectrumPlot):
     """Plot class for visualizing feature selection on spectral data.
 
-    This class extends SpectrumPlot to highlight selected features using
+    This class extends SpectrumPlot to highlight excluded features using
     colored vertical spans.
 
     Parameters
@@ -25,7 +25,7 @@ class FeatureSelectionPlot(SpectrumPlot):
         Boolean mask indicating selected features (True means selected).
         Must have same length as x.
     selection_color : str, optional
-        Color to use for highlighting selected features. Default is "red".
+        Color to use for highlighting excluded features. Default is "red".
     selection_alpha : float, optional
         Transparency of the selection highlight. Default is 0.2.
     **kwargs : Any
@@ -66,8 +66,8 @@ class FeatureSelectionPlot(SpectrumPlot):
         # 1. Render the standard spectrum plot
         super()._render_plot(ax, **kwargs)
 
-        # 2. Overlay the selection regions
-        regions = self._get_continuous_regions(self.support)
+        # 2. Overlay the selection regions (highlight excluded features)
+        regions = self._get_continuous_regions(~self.support)
 
         # Add label only once for the legend
         label_added = False
@@ -83,7 +83,7 @@ class FeatureSelectionPlot(SpectrumPlot):
             if x_start > x_end:
                 x_start, x_end = x_end, x_start
 
-            label = "Selected Features" if not label_added else None
+            label = "Excluded Features" if not label_added else None
 
             ax.axvspan(
                 x_start,
