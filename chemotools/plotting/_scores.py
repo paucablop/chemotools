@@ -363,12 +363,14 @@ class ScoresPlot(BasePlot, ColoringMixin):
 
         # Add confidence ellipse if requested
         if self.confidence_level is not None:
+            # Default to black if no color specified
+            edgecolor = self.color if self.color is not None else "black"
             add_confidence_ellipse(
                 ax,
                 x,
                 y,
                 confidence=self.confidence_level,
-                edgecolor=self.color,
+                edgecolor=edgecolor,
                 linewidth=1,
                 linestyle="--",
                 alpha=0.8,

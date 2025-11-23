@@ -502,7 +502,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     color_by=color_reference,
                     label="Train",
                     colormap=None,
-                    confidence_ellipse=self.confidence,
+                    confidence_ellipse=None,
                 )
                 plot.render(ax)
 
