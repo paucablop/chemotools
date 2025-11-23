@@ -258,10 +258,11 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         if self.color_by is None or self.is_categorical:
             # Only add legend if:
             # 1. Labels were explicitly provided by user, OR
-            # 2. Number of spectra is small (≤ 10) and there are labeled artists
+            # 2. Number of spectra is small (≤ 10) and there are labeled artists, OR
+            # 3. Coloring is categorical (shows categories in legend)
             handles, labels = ax.get_legend_handles_labels()
             should_show_legend = (
-                (self._labels_provided or len(self.y) <= 10)
+                (self._labels_provided or len(self.y) <= 10 or self.is_categorical)
                 and handles
                 and any(label for label in labels)
             )
