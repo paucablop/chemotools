@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
-from chemotools.plotting._utils import get_colors_from_labels
+from chemotools.plotting._utils import get_colors_from_labels, validate_data
 
 
 class PredictedVsActualPlot(BasePlot, ColoringMixin):
@@ -92,8 +92,8 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         marker: str = "o",
         add_ideal_line: bool = True,
     ):
-        self.y_true = np.asarray(y_true)
-        self.y_pred = np.asarray(y_pred)
+        self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
+        self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
         self.target_index = target_index
         self.label = label
         self.color = color
@@ -102,6 +102,11 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
 
         # Validate inputs
         self._validate_inputs()
+
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
 
         # Extract the specific target if multivariate
         if self.y_true.ndim == 2:
@@ -115,8 +120,6 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         elif self.y_true.ndim == 1:
             self.y_true_1d = self.y_true
             self.y_pred_1d = self.y_pred
-        else:
-            raise ValueError("y_true and y_pred must be 1D or 2D arrays")
 
         # Initialize coloring
         self._init_coloring(color_by, colormap, colorbar_label="Color By")
@@ -128,8 +131,6 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
                 f"y_true and y_pred must have same shape. "
                 f"Got y_true: {self.y_true.shape}, y_pred: {self.y_pred.shape}"
             )
-        if self.y_true.size == 0:
-            raise ValueError("y_true and y_pred arrays cannot be empty")
 
     def show(
         self,

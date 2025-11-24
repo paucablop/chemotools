@@ -1,7 +1,9 @@
 """Core plotting utilities for chemotools visualizations."""
 
-from typing import Optional, Union, Iterable, cast
+from typing import Optional, Union, Iterable, cast, Any
+import inspect
 import numpy as np
+from sklearn.utils import check_array
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -18,6 +20,14 @@ except (ImportError, AttributeError):
     # Fallback for older matplotlib versions or if something goes wrong
     pass
 
+# Determine check_array finite parameter name (sklearn 1.6+ rename)
+_CHECK_ARRAY_SIG = inspect.signature(check_array)
+if "ensure_all_finite" in _CHECK_ARRAY_SIG.parameters:
+    _FINITE_PARAM_NAME = "ensure_all_finite"
+else:
+    _FINITE_PARAM_NAME = "force_all_finite"
+
+# Keys that should be forwarded to ``plt.subplots`` via ``setup_figure``.
 # Keys that should be forwarded to ``plt.subplots`` via ``setup_figure``.
 FIGURE_SETUP_KEYS: frozenset[str] = frozenset(
     {"subplot_kw", "gridspec_kw", "sharex", "sharey"}
@@ -546,3 +556,33 @@ def add_confidence_lines(
             alpha=alpha,
             label=label_y,
         )
+
+
+def validate_data(
+    X: Any,
+    name: str = "Input",
+    ensure_2d: bool = False,
+    numeric: bool = True,
+) -> np.ndarray:
+    """Validate input data using sklearn check_array.
+
+    Parameters
+    ----------
+    X : array-like
+        Input data to validate.
+    name : str, default="Input"
+        Name of the input for error messages.
+    ensure_2d : bool, default=False
+        Whether to force 2D array.
+    """
+    dtype = "numeric" if numeric else None
+    kwargs = {_FINITE_PARAM_NAME: numeric}
+
+    # check_array parameters
+    return check_array(
+        X,
+        dtype=dtype,
+        ensure_2d=ensure_2d,
+        input_name=name,
+        **kwargs,
+    )

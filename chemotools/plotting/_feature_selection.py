@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.axes import Axes
 
 from chemotools.plotting._spectrum import SpectrumPlot
+from chemotools.plotting._utils import validate_data
 
 
 class FeatureSelectionPlot(SpectrumPlot):
@@ -44,12 +45,15 @@ class FeatureSelectionPlot(SpectrumPlot):
     ):
         super().__init__(x, y, **kwargs)
 
-        if len(support) != len(x):
+        self.support = validate_data(
+            support, name="support", ensure_2d=False, numeric=False
+        ).astype(bool)
+
+        if len(self.support) != len(self.x):
             raise ValueError(
-                f"Support mask length ({len(support)}) must match x length ({len(x)})"
+                f"Support mask length ({len(self.support)}) must match x length ({len(self.x)})"
             )
 
-        self.support = support
         self.selection_color = selection_color
         self.selection_alpha = selection_alpha
 

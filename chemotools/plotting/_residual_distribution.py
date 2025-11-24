@@ -7,6 +7,7 @@ from matplotlib.axes import Axes
 from scipy import stats
 
 from chemotools.plotting._base import BasePlot
+from chemotools.plotting._utils import validate_data
 
 
 class ResidualDistributionPlot(BasePlot):
@@ -109,7 +110,7 @@ class ResidualDistributionPlot(BasePlot):
         color: str = "#008BFB",
         alpha: float = 0.6,
     ):
-        self.residuals = np.asarray(residuals)
+        self.residuals = validate_data(residuals, name="residuals", ensure_2d=False)
         self.target_index = target_index
         self.bins = bins
         self.density = density

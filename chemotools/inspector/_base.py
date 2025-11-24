@@ -8,6 +8,7 @@ from abc import ABC
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
+from sklearn.utils import check_array
 
 from ._validation import _validate_and_extract_model, _validate_datasets_consistency
 
@@ -68,11 +69,21 @@ class InspectorState:
     ) -> None:
         estimator, transformer = _validate_and_extract_model(model)
 
-        X_train = np.asarray(X_train)
+        X_train = check_array(
+            X_train, dtype="numeric", ensure_2d=True, input_name="X_train"
+        )
         y_train_arr = self._normalize_target_array(y_train)
-        X_test_arr = np.asarray(X_test) if X_test is not None else None
+        X_test_arr = (
+            check_array(X_test, dtype="numeric", ensure_2d=True, input_name="X_test")
+            if X_test is not None
+            else None
+        )
         y_test_arr = self._normalize_target_array(y_test)
-        X_val_arr = np.asarray(X_val) if X_val is not None else None
+        X_val_arr = (
+            check_array(X_val, dtype="numeric", ensure_2d=True, input_name="X_val")
+            if X_val is not None
+            else None
+        )
         y_val_arr = self._normalize_target_array(y_val)
 
         _validate_datasets_consistency(
@@ -136,7 +147,7 @@ class InspectorState:
     def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
         if target is None:
             return None
-        arr = np.asarray(target)
+        arr = check_array(target, dtype=None, ensure_2d=False, input_name="target")
         if arr.ndim == 2 and arr.shape[1] == 1:
             return arr.ravel()
         return arr

@@ -9,6 +9,7 @@ from scipy import stats
 from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import (
     annotate_points,
+    validate_data,
 )
 
 
@@ -103,7 +104,7 @@ class QQPlot(BasePlot):
         add_reference_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
     ):
-        self.residuals = np.asarray(residuals)
+        self.residuals = validate_data(residuals, name="residuals", ensure_2d=False)
         self.target_index = target_index
         self.annotations = annotations
         self.label = label
@@ -124,16 +125,12 @@ class QQPlot(BasePlot):
             self.residuals_1d = self.residuals[:, target_index]
         elif self.residuals.ndim == 1:
             self.residuals_1d = self.residuals
-        else:
-            raise ValueError("residuals must be 1D or 2D array")
 
         # Calculate Q-Q plot data
         self._calculate_qq_data()
 
     def _validate_residuals(self) -> None:
         """Validate residuals array."""
-        if self.residuals.size == 0:
-            raise ValueError("residuals array cannot be empty")
         if self.residuals.size < 3:
             raise ValueError("Need at least 3 residuals for Q-Q plot")
 

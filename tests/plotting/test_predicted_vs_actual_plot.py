@@ -110,7 +110,7 @@ def test_predicted_vs_actual_validation_errors():
         PredictedVsActualPlot(y_true, y_pred)
 
     # Act & Assert - empty arrays
-    with pytest.raises(ValueError, match="cannot be empty"):
+    with pytest.raises(ValueError, match="Found array with 0 sample"):
         PredictedVsActualPlot(np.array([]), np.array([]))
 
     # Act & Assert - target_index out of bounds

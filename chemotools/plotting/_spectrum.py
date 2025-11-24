@@ -14,6 +14,7 @@ from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
     get_colors_from_labels,
     calculate_ylim_for_xlim,
+    validate_data,
 )
 
 
@@ -110,11 +111,18 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         categorical: Optional[bool] = None,
         colorbar_label: str = "Reference Value",
     ):
-        self.x = x
+        self.x = validate_data(x, name="x", ensure_2d=False)
+        y = validate_data(y, name="y", ensure_2d=False)
         self.y = y if y.ndim == 2 else y.reshape(1, -1)
+
         # Store whether labels were explicitly provided
         self._labels_provided = labels is not None
         self.labels = labels or [f"Spectrum {i}" for i in range(len(self.y))]
+
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
 
         self._init_coloring(color_by, colormap, categorical, colorbar_label)
 

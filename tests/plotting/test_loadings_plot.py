@@ -286,7 +286,7 @@ class TestLoadingsPlotInputValidation:
         loadings_1d = np.random.randn(100)
 
         # Act & Assert
-        with pytest.raises(ValueError, match="loadings must be 2D array"):
+        with pytest.raises(ValueError, match="Expected 2D array, got 1D array instead"):
             LoadingsPlot(loadings_1d, components=0)
 
     def test_feature_names_length_mismatch(self):

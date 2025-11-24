@@ -10,6 +10,7 @@ from chemotools.plotting._utils import (
     get_colors_from_labels,
     annotate_points,
     add_confidence_ellipse,
+    validate_data,
 )
 
 
@@ -112,7 +113,7 @@ class ScoresPlot(BasePlot, ColoringMixin):
         colormap: Optional[str] = None,
         confidence_ellipse: Optional[bool | float] = None,
     ):
-        self.scores = scores
+        self.scores = validate_data(scores, name="scores", ensure_2d=True)
         self.components = components
         self.annotations = annotations
         self.label = label
@@ -128,16 +129,16 @@ class ScoresPlot(BasePlot, ColoringMixin):
             self.confidence_level = None
 
         # Validate inputs
-        self._validate_scores()
         self._validate_components()
 
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
+
+        # Initialize coloring
         # Initialize coloring
         self._init_coloring(color_by, colormap)
-
-    def _validate_scores(self) -> None:
-        """Validate that scores array has correct shape."""
-        if self.scores.ndim != 2:
-            raise ValueError(f"Scores must be 2D array, got shape {self.scores.shape}")
 
     def _validate_components(self) -> None:
         """Validate that component indices are valid.

@@ -9,6 +9,7 @@ from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
     get_colors_from_labels,
     annotate_points,
+    validate_data,
 )
 
 
@@ -105,8 +106,14 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         add_zero_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
     ):
-        self.residuals = residuals
-        self.x_values = x_values
+        self.residuals = validate_data(residuals, name="residuals", ensure_2d=False)
+
+        self.x_values: Optional[np.ndarray]
+        if x_values is not None:
+            self.x_values = validate_data(x_values, name="x_values", ensure_2d=False)
+        else:
+            self.x_values = None
+
         self.target_index = target_index
         self.annotations = annotations
         self.label = label
@@ -114,17 +121,22 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         self.add_zero_line = add_zero_line
         self.add_confidence_band = add_confidence_band
 
+        self.x_axis: np.ndarray
+        self.x_label: str
+
         self._validate_residuals()
         self._init_xy_data()
+
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
 
         # Initialize coloring
         self._init_coloring(color_by, colormap)
 
     def _validate_residuals(self) -> None:
         """Validate residuals shape and target index."""
-        if self.residuals.size == 0:
-            raise ValueError("residuals array cannot be empty")
-
         if self.residuals.ndim == 1:
             self.residuals_1d = self.residuals
         elif self.residuals.ndim == 2:
@@ -135,13 +147,9 @@ class YResidualsPlot(BasePlot, ColoringMixin):
                     f"Residuals have {n_targets} targets."
                 )
             self.residuals_1d = self.residuals[:, self.target_index]
-        else:
-            raise ValueError(
-                f"Residuals must be 1D or 2D array, got shape {self.residuals.shape}"
-            )
 
     def _init_xy_data(self) -> None:
-        """Initialize x and y data for plotting."""
+        """Initialize x/y data for plotting."""
         n_samples = self.residuals_1d.shape[0]
 
         if self.x_values is None:

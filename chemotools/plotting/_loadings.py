@@ -8,6 +8,7 @@ from matplotlib.axes import Axes
 from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import (
     calculate_ylim_for_xlim,
+    validate_data,
 )
 
 
@@ -105,15 +106,8 @@ class LoadingsPlot(BasePlot):
         components: int | list[int] = 0,
         component_label: str = "PC",
     ):
-        # Validate loadings shape
-        if loadings.ndim != 2:
-            raise ValueError(
-                f"loadings must be 2D array with shape (n_features, n_components), "
-                f"got shape {loadings.shape}"
-            )
-
-        self.loadings = loadings
-        self.n_features, self.n_components = loadings.shape
+        self.loadings = validate_data(loadings, name="loadings", ensure_2d=True)
+        self.n_features, self.n_components = self.loadings.shape
         self.component_label = component_label
 
         # Handle components parameter - convert to list
@@ -132,13 +126,14 @@ class LoadingsPlot(BasePlot):
 
         # Set up feature names/values for x-axis
         if feature_names is not None:
-            feature_names = np.asarray(feature_names)
-            if len(feature_names) != self.n_features:
+            self.feature_names = validate_data(
+                feature_names, name="feature_names", ensure_2d=False, numeric=False
+            )
+            if len(self.feature_names) != self.n_features:
                 raise ValueError(
-                    f"feature_names length ({len(feature_names)}) must match "
+                    f"feature_names length ({len(self.feature_names)}) must match "
                     f"number of features ({self.n_features})"
                 )
-            self.feature_names = feature_names
         else:
             self.feature_names = np.arange(self.n_features)
 

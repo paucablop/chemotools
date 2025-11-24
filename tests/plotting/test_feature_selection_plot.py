@@ -31,7 +31,7 @@ class TestFeatureSelectionPlot:
         plot = FeatureSelectionPlot(x, y, support)
 
         # Assert
-        assert plot.support is support
+        np.testing.assert_array_equal(plot.support, support)
         assert plot.selection_color == "red"
         assert plot.selection_alpha == 0.2
 

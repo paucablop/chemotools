@@ -6,6 +6,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from chemotools.plotting._base import BasePlot
+from chemotools.plotting._utils import validate_data
 
 
 class ExplainedVariancePlot(BasePlot):
@@ -86,23 +87,22 @@ class ExplainedVariancePlot(BasePlot):
         threshold: Optional[float] = 0.95,
     ):
         # Validate input
-        if not isinstance(explained_variance_ratio, np.ndarray):
-            explained_variance_ratio = np.asarray(explained_variance_ratio)
+        self.explained_variance_ratio = validate_data(
+            explained_variance_ratio,
+            name="explained_variance_ratio",
+            ensure_2d=False,
+        )
 
-        if explained_variance_ratio.ndim != 1:
+        if self.explained_variance_ratio.ndim != 1:
             raise ValueError(
-                f"explained_variance_ratio must be 1D, got shape {explained_variance_ratio.shape}"
+                f"explained_variance_ratio must be 1D, got shape {self.explained_variance_ratio.shape}"
             )
-
-        if len(explained_variance_ratio) == 0:
-            raise ValueError("explained_variance_ratio cannot be empty")
 
         # Validate threshold if provided
         if threshold is not None and not (0 < threshold <= 1):
             raise ValueError(f"threshold must be between 0 and 1, got {threshold}")
 
-        self.explained_variance_ratio = explained_variance_ratio
-        self.cumulative_variance = np.cumsum(explained_variance_ratio)
+        self.cumulative_variance = np.cumsum(self.explained_variance_ratio)
         self.threshold = threshold
 
     def show(

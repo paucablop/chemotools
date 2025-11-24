@@ -10,6 +10,7 @@ from chemotools.plotting._utils import (
     get_colors_from_labels,
     annotate_points,
     add_confidence_lines,
+    validate_data,
 )
 
 
@@ -149,6 +150,16 @@ class DistancesPlot(BasePlot, ColoringMixin):
             self.x_threshold = None
             self.y_threshold = None
 
+        # Validate inputs
+        y = validate_data(y, name="y", ensure_2d=False)
+        if x is not None:
+            x = validate_data(x, name="x", ensure_2d=False)
+
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
+
         self._default_xlabel: str
         self._default_ylabel: str
         self._init_from_xy(x, y)
@@ -165,23 +176,21 @@ class DistancesPlot(BasePlot, ColoringMixin):
     ) -> None:
         """Initialize internal state from explicit x/y arrays."""
 
-        y_arr = np.asarray(y)
-        if y_arr.ndim != 1:
+        if y.ndim != 1:
             raise ValueError("Explicit 'y' must be a 1D array.")
 
         if x is None:
-            self._x = np.arange(y_arr.shape[0])
+            self._x = np.arange(y.shape[0])
             auto_xlabel = "Sample Index"
         else:
-            x_arr = np.asarray(x)
-            if x_arr.ndim != 1:
+            if x.ndim != 1:
                 raise ValueError("Explicit 'x' must be a 1D array.")
-            if x_arr.shape[0] != y_arr.shape[0]:
+            if x.shape[0] != y.shape[0]:
                 raise ValueError("'x' and 'y' must have the same length.")
-            self._x = x_arr
+            self._x = x
             auto_xlabel = "X"
 
-        self._y = y_arr
+        self._y = y
 
         auto_ylabel = "Distance"
 

@@ -178,7 +178,7 @@ class TestResidualDistributionPlotValidation:
         residuals = np.array([])
 
         # Act & Assert
-        with pytest.raises(ValueError, match="residuals array cannot be empty"):
+        with pytest.raises(ValueError, match="Found array with 0 sample"):
             ResidualDistributionPlot(residuals)
 
     def test_too_few_residuals_raises_error(self):
@@ -196,7 +196,7 @@ class TestResidualDistributionPlotValidation:
         residuals = np.random.randn(10, 5, 3)
 
         # Act & Assert
-        with pytest.raises(ValueError, match="residuals must be 1D or 2D array"):
+        with pytest.raises(ValueError, match="Found array with dim 3"):
             ResidualDistributionPlot(residuals)
 
 

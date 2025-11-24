@@ -186,7 +186,7 @@ class TestExplainedVariancePlotValidation:
         variance_ratios = np.array([])
 
         # Act & Assert
-        with pytest.raises(ValueError, match="cannot be empty"):
+        with pytest.raises(ValueError, match="Found array with 0 sample"):
             ExplainedVariancePlot(variance_ratios)
 
     def test_2d_array_raises_error(self):
