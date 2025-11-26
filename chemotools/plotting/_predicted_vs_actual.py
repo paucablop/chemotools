@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
-from chemotools.plotting._utils import get_colors_from_labels, validate_data
+from chemotools.plotting._utils import validate_data, scatter_with_colormap
 
 
 class PredictedVsActualPlot(BasePlot, ColoringMixin):
@@ -207,65 +207,21 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         edgecolors = kwargs.pop("edgecolors", "none")
 
         # Determine colors
-        if self.color_by is not None:
-            if self.is_categorical:
-                assert self.colormap is not None
-                colors = get_colors_from_labels(self.color_by, colormap=self.colormap)
-                unique_values = np.unique(self.color_by)
-
-                for value in unique_values:
-                    mask = self.color_by == value
-                    ax.scatter(
-                        self.y_true_1d[mask],
-                        self.y_pred_1d[mask],
-                        color=colors[mask][0],
-                        label=f"{self.label} - {value}" if self.label else f"{value}",
-                        alpha=alpha,
-                        s=s,
-                        marker=self.marker,
-                        edgecolors=edgecolors,
-                        **kwargs,
-                    )
-            else:
-                # Continuous
-                import matplotlib as mpl
-                import matplotlib.colors as mcolors
-
-                norm = mcolors.Normalize(
-                    vmin=self.color_by.min(), vmax=self.color_by.max()
-                )
-                colormap_name = (
-                    self.colormap if self.colormap is not None else "viridis"
-                )
-                cmap = mpl.colormaps.get_cmap(colormap_name)
-
-                ax.scatter(
-                    self.y_true_1d,
-                    self.y_pred_1d,
-                    c=self.color_by,
-                    cmap=cmap,
-                    norm=norm,
-                    label=self.label,
-                    alpha=alpha,
-                    s=s,
-                    marker=self.marker,
-                    edgecolors=edgecolors,
-                    **kwargs,
-                )
-        else:
-            # Single color
-            color = self.color if self.color is not None else "steelblue"
-            ax.scatter(
-                self.y_true_1d,
-                self.y_pred_1d,
-                c=color,
-                label=self.label,
-                alpha=alpha,
-                s=s,
-                marker=self.marker,
-                edgecolors=edgecolors,
-                **kwargs,
-            )
+        scatter_with_colormap(
+            ax,
+            self.y_true_1d,
+            self.y_pred_1d,
+            color_by=self.color_by,
+            is_categorical=self.is_categorical,
+            colormap=self.colormap,
+            color=self.color if self.color is not None else "steelblue",
+            label=self.label,
+            alpha=alpha,
+            s=s,
+            marker=self.marker,
+            edgecolors=edgecolors,
+            **kwargs,
+        )
 
         # Add ideal prediction line (y=x)
         if self.add_ideal_line:

@@ -7,10 +7,10 @@ from matplotlib.axes import Axes
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    get_colors_from_labels,
     annotate_points,
     add_confidence_ellipse,
     validate_data,
+    scatter_with_colormap,
 )
 
 
@@ -249,56 +249,19 @@ class ScoresPlot(BasePlot, ColoringMixin):
         x = self.scores[:, comp1]
         y = self.scores[:, comp2]
 
-        if self.color_by is None:
-            # Simple scatter with single color
-            ax.scatter(
-                x,
-                y,
-                c=self.color,
-                label=self.label,
-                alpha=alpha,
-                s=s,
-                **kwargs,
-            )
-        elif self.is_categorical:
-            # Categorical coloring
-            assert self.colormap is not None  # colormap is set by get_default_colormap
-            colors = get_colors_from_labels(self.color_by, self.colormap)
-            unique_values = np.unique(self.color_by)
-
-            # Plot each category
-            for value in unique_values:
-                mask = self.color_by == value
-                ax.scatter(
-                    x[mask],
-                    y[mask],
-                    color=colors[mask][0],  # All same color for this category
-                    label=f"{self.label} - {value}",
-                    alpha=alpha,
-                    s=s,
-                    **kwargs,
-                )
-        else:
-            # Continuous coloring
-            import matplotlib as mpl
-            import matplotlib.colors as mcolors
-
-            norm = mcolors.Normalize(vmin=self.color_by.min(), vmax=self.color_by.max())
-            # Ensure we have a valid colormap (should not be None here, but be defensive)
-            colormap_name = self.colormap if self.colormap is not None else "viridis"
-            cmap = mpl.colormaps.get_cmap(colormap_name)
-
-            ax.scatter(
-                x,
-                y,
-                c=self.color_by,
-                cmap=cmap,
-                norm=norm,
-                label=self.label,
-                alpha=alpha,
-                s=s,
-                **kwargs,
-            )
+        scatter_with_colormap(
+            ax,
+            x,
+            y,
+            color_by=self.color_by,
+            is_categorical=self.is_categorical,
+            colormap=self.colormap,
+            color=self.color,
+            label=self.label,
+            alpha=alpha,
+            s=s,
+            **kwargs,
+        )
 
         # Add confidence ellipse if requested
         if self.confidence_level is not None:

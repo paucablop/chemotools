@@ -13,6 +13,7 @@ from chemotools.plotting._utils import (
     detect_categorical,
     get_default_colormap,
     add_colorbar,
+    scatter_with_colormap,
 )
 
 
@@ -404,3 +405,71 @@ class TestCalculateYlimForXlim:
         y = np.random.rand(50, 60)  # Neither dimension matches x
         with pytest.raises(ValueError, match="x length .* must match either dimension"):
             calculate_ylim_for_xlim(x, y, xlim=(3, 7))
+
+
+class TestScatterWithColormap:
+    """Test scatter_with_colormap utility function."""
+
+    def test_simple_scatter(self):
+        """Test simple scatter plot without coloring."""
+        fig, ax = plt.subplots()
+        x = np.array([1, 2, 3])
+        y = np.array([1, 2, 3])
+
+        scatter_with_colormap(ax, x, y, color="blue", label="Test")
+
+        # Check if scatter was called
+        assert len(ax.collections) == 1
+        # Check label
+        assert ax.collections[0].get_label() == "Test"
+        plt.close(fig)
+
+    def test_categorical_coloring(self):
+        """Test scatter plot with categorical coloring."""
+        fig, ax = plt.subplots()
+        x = np.array([1, 2, 3, 4])
+        y = np.array([1, 2, 3, 4])
+        color_by = np.array(["A", "B", "A", "B"])
+
+        scatter_with_colormap(
+            ax,
+            x,
+            y,
+            color_by=color_by,
+            is_categorical=True,
+            colormap="tab10",
+            label="Data",
+        )
+
+        # Should have 2 collections (one for A, one for B)
+        assert len(ax.collections) == 2
+        # Check labels
+        labels = [c.get_label() for c in ax.collections]
+        assert "Data - A" in labels
+        assert "Data - B" in labels
+        plt.close(fig)
+
+    def test_continuous_coloring(self):
+        """Test scatter plot with continuous coloring."""
+        fig, ax = plt.subplots()
+        x = np.array([1, 2, 3])
+        y = np.array([1, 2, 3])
+        color_by = np.array([0.1, 0.5, 0.9])
+
+        scatter_with_colormap(
+            ax,
+            x,
+            y,
+            color_by=color_by,
+            is_categorical=False,
+            colormap="viridis",
+            label="Data",
+        )
+
+        # Should have 1 collection
+        assert len(ax.collections) == 1
+        # Check label
+        assert ax.collections[0].get_label() == "Data"
+        # Check if array is set for colormapping
+        assert ax.collections[0].get_array() is not None
+        plt.close(fig)

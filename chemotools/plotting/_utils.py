@@ -586,3 +586,82 @@ def validate_data(
         input_name=name,
         **kwargs,
     )
+
+
+def scatter_with_colormap(
+    ax: Axes,
+    x: np.ndarray,
+    y: np.ndarray,
+    color_by: Optional[np.ndarray] = None,
+    is_categorical: bool = False,
+    colormap: Optional[str] = None,
+    color: Optional[str] = None,
+    label: Optional[str] = None,
+    **kwargs: Any,
+) -> None:
+    """Scatter plot with automatic colormap handling for categorical/continuous data.
+
+    Parameters
+    ----------
+    ax : Axes
+        Matplotlib axes to plot on.
+    x : np.ndarray
+        X-coordinates.
+    y : np.ndarray
+        Y-coordinates.
+    color_by : np.ndarray, optional
+        Values for coloring samples.
+    is_categorical : bool, optional
+        Whether color_by is categorical.
+    colormap : str, optional
+        Colormap name.
+    color : str, optional
+        Fallback color if color_by is None.
+    label : str, optional
+        Legend label.
+    **kwargs : Any
+        Additional arguments passed to ax.scatter.
+    """
+    if color_by is None:
+        # Simple scatter with single color
+        ax.scatter(
+            x,
+            y,
+            c=color,
+            label=label,
+            **kwargs,
+        )
+    elif is_categorical:
+        # Categorical coloring
+        assert colormap is not None
+        colors = get_colors_from_labels(color_by, colormap)
+        unique_values = np.unique(color_by)
+
+        # Plot each category
+        for value in unique_values:
+            mask = color_by == value
+            ax.scatter(
+                x[mask],
+                y[mask],
+                color=colors[mask][0],
+                label=f"{label} - {value}" if label else f"{value}",
+                **kwargs,
+            )
+    else:
+        # Continuous coloring
+        import matplotlib as mpl
+        import matplotlib.colors as mcolors
+
+        norm = mcolors.Normalize(vmin=color_by.min(), vmax=color_by.max())
+        colormap_name = colormap if colormap is not None else "viridis"
+        cmap = mpl.colormaps.get_cmap(colormap_name)
+
+        ax.scatter(
+            x,
+            y,
+            c=color_by,
+            cmap=cmap,
+            norm=norm,
+            label=label,
+            **kwargs,
+        )

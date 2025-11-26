@@ -7,9 +7,9 @@ from matplotlib.axes import Axes
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    get_colors_from_labels,
     annotate_points,
     validate_data,
+    scatter_with_colormap,
 )
 
 
@@ -236,66 +236,21 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         edgecolors = kwargs.pop("edgecolors", "black")
         linewidths = kwargs.pop("linewidths", 0.5)
 
-        # Determine colors
-        if self.color_by is not None:
-            if self.is_categorical:
-                assert self.colormap is not None
-                colors = get_colors_from_labels(self.color_by, colormap=self.colormap)
-                unique_values = np.unique(self.color_by)
-
-                for value in unique_values:
-                    mask = self.color_by == value
-                    ax.scatter(
-                        self.x_axis[mask],
-                        self.residuals_1d[mask],
-                        color=colors[mask][0],
-                        label=f"{self.label} - {value}",
-                        alpha=alpha,
-                        s=s,
-                        edgecolors=edgecolors,
-                        linewidths=linewidths,
-                        **kwargs,
-                    )
-            else:
-                # Continuous
-                import matplotlib as mpl
-                import matplotlib.colors as mcolors
-
-                norm = mcolors.Normalize(
-                    vmin=self.color_by.min(), vmax=self.color_by.max()
-                )
-                colormap_name = (
-                    self.colormap if self.colormap is not None else "viridis"
-                )
-                cmap = mpl.colormaps.get_cmap(colormap_name)
-
-                ax.scatter(
-                    self.x_axis,
-                    self.residuals_1d,
-                    c=self.color_by,
-                    cmap=cmap,
-                    norm=norm,
-                    label=self.label,
-                    alpha=alpha,
-                    s=s,
-                    edgecolors=edgecolors,
-                    linewidths=linewidths,
-                    **kwargs,
-                )
-        else:
-            # Single color
-            color = self.color if self.color is not None else "steelblue"
-            ax.scatter(
-                self.x_axis,
-                self.residuals_1d,
-                c=color,
-                label=self.label,
-                alpha=alpha,
-                s=s,
-                edgecolors=edgecolors,
-                linewidths=linewidths,
-                **kwargs,
-            )
+        scatter_with_colormap(
+            ax,
+            self.x_axis,
+            self.residuals_1d,
+            color_by=self.color_by,
+            is_categorical=self.is_categorical,
+            colormap=self.colormap,
+            color=self.color if self.color is not None else "steelblue",
+            label=self.label,
+            alpha=alpha,
+            s=s,
+            edgecolors=edgecolors,
+            linewidths=linewidths,
+            **kwargs,
+        )
 
         # Add zero reference line
         if self.add_zero_line:
