@@ -93,7 +93,7 @@ def create_spectra_plots_single_dataset(
         x=wavenumbers,
         y=X_raw,
         color_by=color_values,
-        colormap="viridis",
+        colormap="shap",
         labels=empty_labels,
     )
     fig1 = plot_raw.show(
@@ -111,7 +111,7 @@ def create_spectra_plots_single_dataset(
         x=preprocessed_wavenumbers,
         y=X_preprocessed,
         color_by=color_values,
-        colormap="viridis",
+        colormap="shap",
         labels=empty_labels_preproc,
     )
     fig2 = plot_preprocessed.show(
