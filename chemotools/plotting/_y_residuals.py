@@ -164,59 +164,17 @@ class YResidualsPlot(BasePlot, ColoringMixin):
             self.x_axis = self.x_values
             self.x_label = "X Values"
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and return a complete figure with the residuals plot.
+    def _get_default_labels(self) -> dict[str, str]:
+        if self.residuals.ndim == 2:
+            default_title = f"Residuals Plot - Target {self.target_index + 1}"
+        else:
+            default_title = "Residuals Plot"
 
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches. Default is (10, 6).
-        title : str, optional
-            Title for the plot.
-        xlabel : str, optional
-            Custom x-axis label. If None, uses "Sample Index" or "X Values".
-        ylabel : str, optional
-            Custom y-axis label. If None, uses "Residuals".
-        xlim : tuple[float, float], optional
-            X-axis limits as (xmin, xmax).
-        ylim : tuple[float, float], optional
-            Y-axis limits as (ymin, ymax).
-        **kwargs : Any
-            Additional keyword arguments passed to ax.scatter().
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-        """
-        xlabel_text = xlabel if xlabel is not None else self.x_label
-        ylabel_text = ylabel if ylabel is not None else "Residuals"
-
-        if title is None:
-            if self.residuals.ndim == 2:
-                title = f"Residuals Plot - Target {self.target_index + 1}"
-            else:
-                title = "Residuals Plot"
-
-        return super().show(
-            figsize=figsize or (10, 6),
-            title=title,
-            xlabel=xlabel_text,
-            ylabel=ylabel_text,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+        return {
+            "xlabel": self.x_label,
+            "ylabel": "Residuals",
+            "title": default_title,
+        }
 
     def render(
         self,
@@ -250,13 +208,10 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        xlabel_text = xlabel if xlabel is not None else self.x_label
-        ylabel_text = ylabel if ylabel is not None else "Residuals"
-
         fig, ax = super().render(
             ax=ax,
-            xlabel=xlabel_text,
-            ylabel=ylabel_text,
+            xlabel=xlabel,
+            ylabel=ylabel,
             xlim=xlim,
             ylim=ylim,
             **kwargs,

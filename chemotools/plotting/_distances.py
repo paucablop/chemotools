@@ -210,62 +210,11 @@ class DistancesPlot(BasePlot, ColoringMixin):
                 "annotations must have the same length as the plotted data."
             )
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and return a complete figure with the distances plot.
-
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches. Default is (8, 8).
-        title : str, optional
-            Title for the plot.
-        xlabel : str, optional
-            Custom x-axis label. If None, uses the auto-detected default label
-            (e.g., ``"Sample Index"`` or ``"X"``).
-        ylabel : str, optional
-            Custom y-axis label. If None, uses the auto-detected default label
-            (e.g., ``"Distance"``).
-        xlim : tuple[float, float], optional
-            X-axis limits as (xmin, xmax).
-        ylim : tuple[float, float], optional
-            Y-axis limits as (ymin, ymax).
-        **kwargs : Any
-            Additional keyword arguments passed to ax.scatter().
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-
-        Examples
-        --------
-        >>> plot.show(title="Diagnostic Measures")
-        >>> plot.show(figsize=(10, 10), xlim=(0, 20), ylim=(0, 10))
-        >>> plot.show(title="Outliers", xlabel="Hotelling T²", ylabel="Q Residuals")
-        """
-        # Determine axis labels
-        xlabel_text = xlabel if xlabel is not None else self._default_xlabel
-        ylabel_text = ylabel if ylabel is not None else self._default_ylabel
-
-        return super().show(
-            figsize=figsize or (8, 8),
-            title=title,
-            xlabel=xlabel_text,
-            ylabel=ylabel_text,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+    def _get_default_labels(self) -> dict[str, str]:
+        return {
+            "xlabel": self._default_xlabel,
+            "ylabel": self._default_ylabel,
+        }
 
     def render(
         self,
@@ -317,14 +266,10 @@ class DistancesPlot(BasePlot, ColoringMixin):
         >>> ax.legend()
         >>> plt.show()
         """
-        # Determine axis labels
-        xlabel_text = xlabel if xlabel is not None else self._default_xlabel
-        ylabel_text = ylabel if ylabel is not None else self._default_ylabel
-
         fig, ax = super().render(
             ax=ax,
-            xlabel=xlabel_text,
-            ylabel=ylabel_text,
+            xlabel=xlabel,
+            ylabel=ylabel,
             xlim=xlim,
             ylim=ylim,
             **kwargs,

@@ -152,61 +152,17 @@ class ResidualDistributionPlot(BasePlot):
         self.skewness = stats.skew(self.residuals_1d)
         self.kurtosis = stats.kurtosis(self.residuals_1d)  # Excess kurtosis
 
-    def show(
-        self,
-        *,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        figsize: Optional[tuple[float, float]] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and display the distribution plot.
+    def _get_default_labels(self) -> dict[str, str]:
+        if self.residuals.ndim == 2:
+            title = f"Residual Distribution for Target {self.target_index + 1}"
+        else:
+            title = "Residual Distribution"
 
-        Parameters
-        ----------
-        title : str, optional
-            Plot title (default: "Residual Distribution").
-        xlabel : str, optional
-            X-axis label (default: "Residuals").
-        ylabel : str, optional
-            Y-axis label (default: "Density" or "Count" based on density parameter).
-        figsize : tuple[float, float], optional
-            Figure size (width, height) in inches (default: (10, 6)).
-        xlim : tuple[float, float], optional
-            X-axis limits (min, max).
-        ylim : tuple[float, float], optional
-            Y-axis limits (min, max).
-        **kwargs : Any
-            Additional keyword arguments passed to setup_figure.
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-        """
-        # Auto-generate labels if not provided
-        if xlabel is None:
-            xlabel = "Residuals"
-        if ylabel is None:
-            ylabel = "Density" if self.density else "Count"
-        if title is None:
-            if self.residuals.ndim == 2:
-                title = f"Residual Distribution for Target {self.target_index + 1}"
-            else:
-                title = "Residual Distribution"
-
-        return super().show(
-            figsize=figsize or (10, 6),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+        return {
+            "xlabel": "Residuals",
+            "ylabel": "Density" if self.density else "Count",
+            "title": title,
+        }
 
     def render(
         self,
@@ -240,12 +196,6 @@ class ResidualDistributionPlot(BasePlot):
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        # Auto-generate labels if not provided
-        if xlabel is None:
-            xlabel = "Residuals"
-        if ylabel is None:
-            ylabel = "Density" if self.density else "Count"
-
         fig, ax = super().render(
             ax=ax,
             xlabel=xlabel,

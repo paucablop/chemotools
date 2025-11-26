@@ -151,6 +151,16 @@ class BasePlot(Display, ABC):
     if they need custom logic before/after the standard rendering pipeline.
     """
 
+    def _get_default_labels(self) -> dict[str, str]:
+        """Return default labels for the plot.
+
+        Returns
+        -------
+        dict[str, str]
+            Dictionary with keys 'xlabel', 'ylabel', and optionally 'title'.
+        """
+        return {}
+
     def show(
         self,
         *,
@@ -166,6 +176,14 @@ class BasePlot(Display, ABC):
 
         This method handles figure creation and then delegates to `render()`.
         """
+        # Get defaults
+        defaults = self._get_default_labels()
+
+        # Resolve labels: argument > default > None
+        title = title if title is not None else defaults.get("title")
+        xlabel = xlabel if xlabel is not None else defaults.get("xlabel")
+        ylabel = ylabel if ylabel is not None else defaults.get("ylabel")
+
         # Split kwargs into figure setup (e.g. subplot_kw) and plotting kwargs
         figure_kwargs, plot_kwargs = split_figure_plot_kwargs(kwargs)
 
@@ -202,6 +220,13 @@ class BasePlot(Display, ABC):
         **kwargs: Any,
     ) -> Tuple[Figure, Axes]:
         """Render the plot on the given axes or create new ones."""
+        # Get defaults
+        defaults = self._get_default_labels()
+
+        # Resolve labels
+        xlabel = xlabel if xlabel is not None else defaults.get("xlabel")
+        ylabel = ylabel if ylabel is not None else defaults.get("ylabel")
+
         fig, ax = ensure_axes(ax)
 
         # Hook for actual plotting logic

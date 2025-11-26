@@ -126,88 +126,11 @@ class SpectrumPlot(BasePlot, ColoringMixin):
 
         self._init_coloring(color_by, colormap, categorical, colorbar_label)
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and return a complete figure with the spectrum plot.
-
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches. Default is (10, 3).
-        title : str, optional
-            Title for the plot.
-        xlabel : str, optional
-            X-axis label. Default is "X-axis".
-        ylabel : str, optional
-            Y-axis label. Default is "Y-axis".
-        xlim : tuple[float, float], optional
-            X-axis limits as (xmin, xmax). Useful for zooming into spectral regions.
-            When xlim is set without ylim, the y-axis automatically scales to fit
-            the data within the x-range.
-        ylim : tuple[float, float], optional
-            Y-axis limits as (ymin, ymax). When provided, disables automatic y-scaling.
-            Use this for manual control over the y-axis range.
-        **kwargs : Any
-            Additional keyword arguments. These are split into:
-            - Figure setup kwargs (subplot_kw, gridspec_kw, etc.) passed to setup_figure
-            - Plot kwargs (alpha, linewidth, linestyle, marker, etc.) passed to ax.plot()
-
-            Common figure setup kwargs:
-            - subplot_kw : dict, optional
-                Dict with keywords passed to the add_subplot call
-            - gridspec_kw : dict, optional
-                Dict with keywords passed to the GridSpec constructor
-
-            Common plot kwargs:
-            - alpha : float, optional (default: 0.7)
-            - linewidth or lw : float, optional (default: 1.5)
-            - linestyle or ls : str, optional (default: '-')
-            - marker : str, optional
-            - markersize : float, optional
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-
-        Examples
-        --------
-        Zoom into a spectral region (y-axis auto-scales):
-
-        >>> plot = SpectrumPlot(wavenumbers, spectra)
-        >>> plot.show(
-        ...     title="C-H Stretch Region",
-        ...     xlabel="Wavenumber (cm⁻¹)",
-        ...     xlim=(2800, 3000)
-        ... )
-
-        Manual control over both axes:
-
-        >>> plot.show(title="Custom Range", xlim=(2800, 3000), ylim=(0, 0.5))
-        """
-        if xlabel is None:
-            xlabel = "X-axis"
-        if ylabel is None:
-            ylabel = "Y-axis"
-
-        return super().show(
-            figsize=figsize or (10, 3),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+    def _get_default_labels(self) -> dict[str, str]:
+        return {
+            "xlabel": "X-axis",
+            "ylabel": "Y-axis",
+        }
 
     def render(
         self,
@@ -244,11 +167,6 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         ax : Axes
             The matplotlib Axes object with the rendered plot.
         """
-        if xlabel is None:
-            xlabel = "X-axis"
-        if ylabel is None:
-            ylabel = "Y-axis"
-
         # Auto-scale y-axis to data within xlim if ylim not provided
         if xlim is not None and ylim is None:
             ylim = calculate_ylim_for_xlim(self.x, self.y, xlim)

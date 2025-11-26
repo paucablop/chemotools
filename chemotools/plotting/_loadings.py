@@ -137,100 +137,21 @@ class LoadingsPlot(BasePlot):
         else:
             self.feature_names = np.arange(self.n_features)
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and return a complete figure with the loadings plot.
-
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches. Default is (12, 4).
-        title : str, optional
-            Title for the plot. If None, auto-generates title based on components.
-        xlabel : str, optional
-            X-axis label. Default is "Feature".
-        ylabel : str, optional
-            Y-axis label. Default is "Loading".
-        xlim : tuple[float, float], optional
-            X-axis limits as (xmin, xmax). Useful for zooming into specific
-            feature regions (e.g., spectral bands).
-        ylim : tuple[float, float], optional
-            Y-axis limits as (ymin, ymax). Useful for focusing on certain
-            loading magnitudes.
-        **kwargs : Any
-            Additional keyword arguments split into:
-            - Figure setup kwargs (subplot_kw, gridspec_kw) → setup_figure()
-            - Plot kwargs (linewidth, linestyle, alpha, etc.) → ax.plot()
-
-            Common plot kwargs:
-            - linewidth or lw : float, optional (default: 1.5)
-            - linestyle or ls : str, optional (default: '-')
-            - alpha : float, optional (default: 0.8)
-            - marker : str, optional (e.g., 'o', 's', '^')
-            - markersize : float, optional
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-
-        Examples
-        --------
-        Basic usage:
-
-        >>> plot.show()
-
-        With custom title and figure size:
-
-        >>> plot.show(figsize=(15, 5), title="Principal Component Loadings")
-
-        Zoom into a spectral region:
-
-        >>> plot.show(title="C-H Stretch Region", xlim=(2800, 3000))
-
-        Custom labels and styling:
-
-        >>> plot.show(
-        ...     title="Custom Styled Loadings",
-        ...     xlabel="Wavenumber (cm⁻¹)",
-        ...     ylabel="Loading Coefficient",
-        ...     linewidth=2.5,
-        ...     alpha=0.7
-        ... )
-        """
-        if xlabel is None:
-            xlabel = "Feature"
-        if ylabel is None:
-            ylabel = "Loading"
-
+    def _get_default_labels(self) -> dict[str, str]:
         # Auto-generate title if not provided
-        if title is None:
-            if len(self.components) == 1:
-                title = f"{self.component_label}{self.components[0] + 1} Loadings"
-            else:
-                comp_names = ", ".join(
-                    [f"{self.component_label}{c + 1}" for c in self.components]
-                )
-                title = f"Loadings: {comp_names}"
+        if len(self.components) == 1:
+            title = f"{self.component_label}{self.components[0] + 1} Loadings"
+        else:
+            comp_names = ", ".join(
+                [f"{self.component_label}{c + 1}" for c in self.components]
+            )
+            title = f"Loadings: {comp_names}"
 
-        return super().show(
-            figsize=figsize or (12, 4),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+        return {
+            "xlabel": "Feature",
+            "ylabel": "Loading",
+            "title": title,
+        }
 
     def render(
         self,
@@ -279,11 +200,6 @@ class LoadingsPlot(BasePlot):
         >>> plot1.render(ax=axes[0])
         >>> plot2.render(ax=axes[1])
         """
-        if xlabel is None:
-            xlabel = "Feature"
-        if ylabel is None:
-            ylabel = "Loading"
-
         # Apply axis limits with auto-scaling
         if xlim is not None and ylim is None:
             # Collect all y-data for components being plotted

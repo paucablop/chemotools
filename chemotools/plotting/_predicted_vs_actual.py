@@ -132,61 +132,17 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
                 f"Got y_true: {self.y_true.shape}, y_pred: {self.y_pred.shape}"
             )
 
-    def show(
-        self,
-        *,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        figsize: Optional[tuple[float, float]] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and display the predicted vs actual plot.
+    def _get_default_labels(self) -> dict[str, str]:
+        if self.y_true.ndim == 2:
+            default_title = f"Predicted vs Actual (Target {self.target_index + 1})"
+        else:
+            default_title = "Predicted vs Actual"
 
-        Parameters
-        ----------
-        title : str, optional
-            Plot title (default: "Predicted vs Actual").
-        xlabel : str, optional
-            X-axis label (default: "Actual").
-        ylabel : str, optional
-            Y-axis label (default: "Predicted").
-        figsize : tuple[float, float], optional
-            Figure size (width, height) in inches (default: (8, 8)).
-        xlim : tuple[float, float], optional
-            X-axis limits (min, max).
-        ylim : tuple[float, float], optional
-            Y-axis limits (min, max).
-        **kwargs : Any
-            Additional keyword arguments passed to setup_figure.
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-        """
-        # Auto-generate labels if not provided
-        if xlabel is None:
-            xlabel = "Actual"
-        if ylabel is None:
-            ylabel = "Predicted"
-        if title is None:
-            if self.y_true.ndim == 2:
-                title = f"Predicted vs Actual (Target {self.target_index + 1})"
-            else:
-                title = "Predicted vs Actual"
-
-        return super().show(
-            figsize=figsize or (8, 8),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+        return {
+            "xlabel": "Actual",
+            "ylabel": "Predicted",
+            "title": default_title,
+        }
 
     def render(
         self,
@@ -220,12 +176,6 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         tuple[Figure, Axes]
             The Figure and Axes objects containing the plot.
         """
-        # Auto-generate labels if not provided
-        if xlabel is None:
-            xlabel = "Actual"
-        if ylabel is None:
-            ylabel = "Predicted"
-
         # Remove figsize from kwargs as it is not used in render
         kwargs.pop("figsize", None)
 

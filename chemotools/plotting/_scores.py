@@ -168,66 +168,12 @@ class ScoresPlot(BasePlot, ColoringMixin):
                 f"Component indices must be different, got both as {comp1}"
             )
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and return a complete figure with the scores plot.
-
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size as (width, height) in inches. Default is (8, 8).
-        title : str, optional
-            Title for the plot.
-        xlabel : str, optional
-            Custom x-axis label. If None, defaults to "PC{comp1+1}".
-        ylabel : str, optional
-            Custom y-axis label. If None, defaults to "PC{comp2+1}".
-        xlim : tuple[float, float], optional
-            X-axis limits as (xmin, xmax).
-        ylim : tuple[float, float], optional
-            Y-axis limits as (ymin, ymax).
-        **kwargs : Any
-            Additional keyword arguments passed to ax.scatter().
-            Common options: alpha, s (marker size), marker, edgecolors, linewidths.
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object containing the plot.
-
-        Examples
-        --------
-        >>> plot.show(title="PCA Scores")
-        >>> plot.show(figsize=(10, 10), xlim=(-5, 5), ylim=(-3, 3))
-        >>> plot.show(alpha=0.8, s=100, edgecolors='black')
-        >>> plot.show(title="Custom", xlabel="First PC", ylabel="Second PC")
-        """
+    def _get_default_labels(self) -> dict[str, str]:
         comp1, comp2 = self.components
-
-        # Determine default axis labels if not provided
-        if xlabel is None:
-            xlabel = f"PC{comp1 + 1}"
-        if ylabel is None:
-            ylabel = f"PC{comp2 + 1}"
-
-        return super().show(
-            figsize=figsize or (8, 8),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
+        return {
+            "xlabel": f"PC{comp1 + 1}",
+            "ylabel": f"PC{comp2 + 1}",
+        }
 
     def render(
         self,
@@ -277,14 +223,6 @@ class ScoresPlot(BasePlot, ColoringMixin):
         >>> ax.legend()
         >>> plt.show()
         """
-        comp1, comp2 = self.components
-
-        # Determine default axis labels if not provided
-        if xlabel is None:
-            xlabel = f"PC{comp1 + 1}"
-        if ylabel is None:
-            ylabel = f"PC{comp2 + 1}"
-
         fig, ax = super().render(
             ax=ax,
             xlabel=xlabel,

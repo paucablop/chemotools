@@ -105,64 +105,11 @@ class ExplainedVariancePlot(BasePlot):
         self.cumulative_variance = np.cumsum(self.explained_variance_ratio)
         self.threshold = threshold
 
-    def show(
-        self,
-        *,
-        figsize: Optional[tuple[float, float]] = None,
-        title: Optional[str] = None,
-        xlabel: Optional[str] = None,
-        ylabel: Optional[str] = None,
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        **kwargs: Any,
-    ) -> Figure:
-        """Create and display a complete figure with the variance plot.
-
-        Parameters
-        ----------
-        figsize : tuple[float, float], optional
-            Figure size (width, height) in inches.
-        title : str, optional
-            Plot title.
-        xlabel : str, optional
-            Label for x-axis. Default is "Component".
-        ylabel : str, optional
-            Label for y-axis. Default is "Explained Variance Ratio".
-        xlim : tuple[float, float], optional
-            X-axis limits (min, max).
-        ylim : tuple[float, float], optional
-            Y-axis limits (min, max).
-        **kwargs : Any
-            Additional keyword arguments passed to the plotting functions.
-            Can include bar plot kwargs (alpha, color, edgecolor) and
-            line plot kwargs (linewidth, markersize).
-
-        Returns
-        -------
-        Figure
-            The matplotlib Figure object.
-        """
-        if xlabel is None:
-            xlabel = "Component"
-        if ylabel is None:
-            ylabel = "Explained Variance Ratio"
-
-        fig = super().show(
-            figsize=figsize or (10, 6),
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            xlim=xlim,
-            ylim=ylim,
-            **kwargs,
-        )
-
-        # Add legend (BasePlot.show calls render, but render returns fig, ax)
-        # Wait, BasePlot.show returns fig.
-        # But BasePlot.show calls self.render.
-        # If I add legend in render, it will be there.
-
-        return fig
+    def _get_default_labels(self) -> dict[str, str]:
+        return {
+            "xlabel": "Component",
+            "ylabel": "Explained Variance Ratio",
+        }
 
     def render(
         self,
@@ -196,11 +143,6 @@ class ExplainedVariancePlot(BasePlot):
         Axes
             The matplotlib Axes object.
         """
-        if xlabel is None:
-            xlabel = "Component"
-        if ylabel is None:
-            ylabel = "Explained Variance Ratio"
-
         fig, ax = super().render(
             ax=ax,
             xlabel=xlabel,

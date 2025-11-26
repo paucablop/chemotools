@@ -81,8 +81,8 @@ class TestSpectrumPlotBasics:
 
         # Assert
         ax = fig.axes[0]
-        assert ax.get_xlabel() == "Wavelength (nm)"
-        assert ax.get_ylabel() == "Absorbance"
+        assert ax.get_xlabel() == "X-axis"
+        assert ax.get_ylabel() == "Y-axis"
         plt.close(fig)
 
     def test_show_with_title(self):
