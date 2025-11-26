@@ -32,8 +32,8 @@ class TestPCAInspectorInitialization:
         assert inspector.nr_components == 2
         assert inspector.nr_features == 3
         assert inspector.nr_samples == {"train": 100}
-        assert inspector.wavenumbers.shape == (3,)
-        np.testing.assert_array_equal(inspector.wavenumbers, np.arange(3))
+        assert inspector.x_axis.shape == (3,)
+        np.testing.assert_array_equal(inspector.x_axis, np.arange(3))
 
     def test_init_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
         """Test initialization with fitted pipeline."""
@@ -97,11 +97,11 @@ class TestPCAInspectorInitialization:
 
         # Act
         inspector = PCAInspector(
-            model=fitted_pca, X_train=X, y_train=y, wavenumbers=wavenumbers
+            model=fitted_pca, X_train=X, y_train=y, x_axis=wavenumbers
         )
 
         # Assert
-        np.testing.assert_array_equal(inspector.wavenumbers, wavenumbers)
+        np.testing.assert_array_equal(inspector.x_axis, wavenumbers)
 
     def test_init_without_y(self, fitted_pca, dummy_data_loader):
         """Test initialization without y values (unsupervised)."""
@@ -123,10 +123,8 @@ class TestPCAInspectorInitialization:
         wavenumbers = np.array([1000, 1500])  # Wrong length
 
         # Assert
-        with pytest.raises(ValueError, match="wavenumbers length"):
-            PCAInspector(
-                model=fitted_pca, X_train=X, y_train=y, wavenumbers=wavenumbers
-            )
+        with pytest.raises(ValueError, match="x_axis length"):
+            PCAInspector(model=fitted_pca, X_train=X, y_train=y, x_axis=wavenumbers)
 
 
 class TestPCAInspectorProperties:
@@ -950,7 +948,7 @@ class TestPCAInspectorIntegration:
             y_train=y_train,
             X_test=X_test,
             y_test=y_test,
-            wavenumbers=np.arange(3),
+            x_axis=np.arange(3),
         )
 
         # Summary

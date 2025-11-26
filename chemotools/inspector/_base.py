@@ -130,7 +130,7 @@ class InspectorState:
             feature_array = np.asarray(feature_names)
             if feature_array.shape[0] != self.n_features_in_:
                 raise ValueError(
-                    "wavenumbers length must match number of features. "
+                    "x_axis length must match number of features. "
                     f"Got {feature_array.shape[0]} vs {self.n_features_in_}."
                 )
             self.feature_names_ = feature_array
@@ -284,9 +284,9 @@ class _BaseInspector(ABC):
         self.sample_labels = self._state.sample_labels
 
         if self.feature_names is not None:
-            self._wavenumbers = np.array(self.feature_names, copy=True)
+            self._x_axis = np.array(self.feature_names, copy=True)
         else:
-            self._wavenumbers = np.arange(self.n_features_in_)
+            self._x_axis = np.arange(self.n_features_in_)
 
         # Backwards-compatible attributes used in existing tests/extensions
         train_dataset = self.datasets_["train"]
@@ -323,9 +323,9 @@ class _BaseInspector(ABC):
         return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
 
     @property
-    def wavenumbers(self) -> np.ndarray:
+    def x_axis(self) -> np.ndarray:
         """Return the feature names/indices."""
-        return self._wavenumbers
+        return self._x_axis
 
     @property
     def confidence(self) -> float:

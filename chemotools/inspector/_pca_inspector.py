@@ -52,7 +52,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         Validation data
     y_val : array-like of shape (n_samples,), optional
         Validation labels/targets
-    wavenumbers : array-like of shape (n_features,), optional
+    x_axis : array-like of shape (n_features,), optional
         Feature names (e.g., wavenumbers for spectroscopy)
         If None, uses feature indices
     confidence : float, default=0.95
@@ -73,7 +73,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         Number of features in original data
     nr_samples : dict
         Number of samples in each dataset
-    wavenumbers : ndarray
+    x_axis : ndarray
         Feature names/indices
     confidence : float
         Confidence level for outlier detection
@@ -100,7 +100,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
     >>> pipeline.fit(X)
     >>>
     >>> # Create inspector
-    >>> inspector = PCAInspector(pipeline, X, y, wavenumbers=X.columns)
+    >>> inspector = PCAInspector(pipeline, X, y, x_axis=X.columns)
     >>>
     >>> # Print summary table
     >>> inspector.summary()
@@ -127,7 +127,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         y_test: Optional[np.ndarray] = None,
         X_val: Optional[np.ndarray] = None,
         y_val: Optional[np.ndarray] = None,
-        wavenumbers: Optional[Sequence] = None,
+        x_axis: Optional[Sequence] = None,
         confidence: float = 0.95,
     ):
         super().__init__(
@@ -139,7 +139,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             X_val=X_val,
             y_val=y_val,
             supervised=False,
-            feature_names=wavenumbers,
+            feature_names=x_axis,
             confidence=confidence,
         )
 
@@ -171,14 +171,14 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
     # Private Methods
     # ==================================================================================
 
-    def _get_preprocessed_wavenumbers(self) -> np.ndarray:
-        """Get wavenumbers after feature selection.
+    def _get_preprocessed_x_axis(self) -> np.ndarray:
+        """Get x_axis after feature selection.
 
         Returns
         -------
-        wavenumbers : np.ndarray
-            Wavenumbers/feature indices after feature selection. If no feature
-            selector is present, returns the original wavenumbers.
+        x_axis : np.ndarray
+            X-axis/feature indices after feature selection. If no feature
+            selector is present, returns the original x_axis.
         """
         return self._get_preprocessed_feature_names()
 
@@ -571,11 +571,11 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         datasets = normalize_datasets(dataset)
         is_multi_dataset = len(datasets) > 1
 
-        # Determine xlabel based on wavenumbers
+        # Determine xlabel based on x_axis
         xlabel = get_xlabel_for_features(self.feature_names is not None)
 
-        # Get preprocessed wavenumbers (may be subset if feature selection)
-        preprocessed_wavenumbers = self._get_preprocessed_wavenumbers()
+        # Get preprocessed x_axis (may be subset if feature selection)
+        preprocessed_x_axis = self._get_preprocessed_x_axis()
 
         if is_multi_dataset:
             # Multiple datasets: plot all on same figure, color by dataset
@@ -590,8 +590,8 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             figures = create_spectra_plots_multi_dataset(
                 raw_data=raw_data,
                 preprocessed_data=preprocessed_data,
-                wavenumbers=self.wavenumbers,
-                preprocessed_wavenumbers=preprocessed_wavenumbers,
+                x_axis=self.x_axis,
+                preprocessed_x_axis=preprocessed_x_axis,
                 xlabel=xlabel,
                 xlim=xlim,
                 figsize=figsize,
@@ -606,8 +606,8 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
                 X_raw=X_raw,
                 X_preprocessed=X_preprocessed,
                 y=y,
-                wavenumbers=self.wavenumbers,
-                preprocessed_wavenumbers=preprocessed_wavenumbers,
+                x_axis=self.x_axis,
+                preprocessed_x_axis=preprocessed_x_axis,
                 dataset_name=ds,
                 color_by_y=color_by_y,
                 xlabel=xlabel,

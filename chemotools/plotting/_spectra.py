@@ -39,7 +39,7 @@ class SpectraPlot(BasePlot, ColoringMixin):
     colormap : str, optional
         Colormap name. Colorblind-friendly defaults:
         - "tab10" for categorical data (default)
-        - "viridis" for continuous data
+        - "shap" for continuous data
         Other options: "plasma", "cividis", "coolwarm"
     categorical : bool, optional
         Explicitly specify whether color_by should be treated as categorical.

@@ -23,8 +23,8 @@ def create_spectra_plots_single_dataset(
     X_raw: np.ndarray,
     X_preprocessed: np.ndarray,
     y: Optional[np.ndarray],
-    wavenumbers: np.ndarray,
-    preprocessed_wavenumbers: np.ndarray,
+    x_axis: np.ndarray,
+    preprocessed_x_axis: np.ndarray,
     dataset_name: str,
     color_by_y: bool,
     xlabel: str,
@@ -44,10 +44,10 @@ def create_spectra_plots_single_dataset(
         Preprocessed spectra data of shape (n_samples, n_features_preprocessed)
     y : Optional[np.ndarray]
         Target values for coloring spectra
-    wavenumbers : np.ndarray
-        Wavenumbers/wavelengths for raw spectra
-    preprocessed_wavenumbers : np.ndarray
-        Wavenumbers/wavelengths for preprocessed spectra
+    x_axis : np.ndarray
+        X-axis values (e.g. wavenumbers/wavelengths) for raw spectra
+    preprocessed_x_axis : np.ndarray
+        X-axis values (e.g. wavenumbers/wavelengths) for preprocessed spectra
         (may differ if feature selection was applied)
     dataset_name : str
         Name of dataset (e.g., 'train', 'test', 'val')
@@ -90,7 +90,7 @@ def create_spectra_plots_single_dataset(
 
     # Figure 1: Raw spectra
     plot_raw = SpectraPlot(
-        x=wavenumbers,
+        x=x_axis,
         y=X_raw,
         color_by=color_values,
         colormap="shap",
@@ -108,7 +108,7 @@ def create_spectra_plots_single_dataset(
     # Figure 2: Preprocessed spectra
     empty_labels_preproc = [""] * X_preprocessed.shape[0] if suppress_labels else None
     plot_preprocessed = SpectraPlot(
-        x=preprocessed_wavenumbers,
+        x=preprocessed_x_axis,
         y=X_preprocessed,
         color_by=color_values,
         colormap="shap",
@@ -129,8 +129,8 @@ def create_spectra_plots_single_dataset(
 def create_spectra_plots_multi_dataset(
     raw_data: Dict[str, np.ndarray],
     preprocessed_data: Dict[str, np.ndarray],
-    wavenumbers: np.ndarray,
-    preprocessed_wavenumbers: np.ndarray,
+    x_axis: np.ndarray,
+    preprocessed_x_axis: np.ndarray,
     xlabel: str,
     xlim: Optional[Tuple[float, float]],
     figsize: Tuple[float, float],
@@ -146,10 +146,10 @@ def create_spectra_plots_multi_dataset(
         Dictionary mapping dataset names to raw spectra arrays
     preprocessed_data : Dict[str, np.ndarray]
         Dictionary mapping dataset names to preprocessed spectra arrays
-    wavenumbers : np.ndarray
-        Wavenumbers/wavelengths for raw spectra
-    preprocessed_wavenumbers : np.ndarray
-        Wavenumbers/wavelengths for preprocessed spectra
+    x_axis : np.ndarray
+        X-axis values (e.g. wavenumbers/wavelengths) for raw spectra
+    preprocessed_x_axis : np.ndarray
+        X-axis values (e.g. wavenumbers/wavelengths) for preprocessed spectra
     xlabel : str
         Label for x-axis (e.g., "Wavenumber (cm⁻¹)")
     xlim : Optional[Tuple[float, float]]
@@ -168,9 +168,9 @@ def create_spectra_plots_multi_dataset(
     >>> test = np.random.rand(30, 1000)
     >>> raw_data = {'train': train, 'test': test}
     >>> preprocessed_data = {'train': train * 2, 'test': test * 2}
-    >>> wavenumbers = np.linspace(4000, 400, 1000)
+    >>> x_axis = np.linspace(4000, 400, 1000)
     >>> figs = create_spectra_plots_multi_dataset(
-    ...     raw_data, preprocessed_data, wavenumbers, wavenumbers,
+    ...     raw_data, preprocessed_data, x_axis, x_axis,
     ...     'Wavenumber (cm⁻¹)', None, (12, 5)
     ... )
     """
@@ -188,7 +188,7 @@ def create_spectra_plots_multi_dataset(
         # Matplotlib handles duplicate labels in legend automatically
         # But to be safe and efficient, we only label the first spectrum
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectraPlot(x=wavenumbers, y=X, labels=labels)
+        plot = SpectraPlot(x=x_axis, y=X, labels=labels)
 
         plot.render(ax=ax_raw, color=color, alpha=0.6, linewidth=1)
 
@@ -209,7 +209,7 @@ def create_spectra_plots_multi_dataset(
         color = DATASET_COLORS.get(name, "black")
 
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectraPlot(x=preprocessed_wavenumbers, y=X, labels=labels)
+        plot = SpectraPlot(x=preprocessed_x_axis, y=X, labels=labels)
 
         plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
 
