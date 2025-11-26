@@ -146,9 +146,9 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         title : str, optional
             Title for the plot.
         xlabel : str, optional
-            X-axis label. Default is "Wavelength (nm)".
+            X-axis label. Default is "X-axis".
         ylabel : str, optional
-            Y-axis label. Default is "Absorbance".
+            Y-axis label. Default is "Y-axis".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax). Useful for zooming into spectral regions.
             When xlim is set without ylim, the y-axis automatically scales to fit
@@ -195,9 +195,9 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         >>> plot.show(title="Custom Range", xlim=(2800, 3000), ylim=(0, 0.5))
         """
         if xlabel is None:
-            xlabel = "Wavelength (nm)"
+            xlabel = "X-axis"
         if ylabel is None:
-            ylabel = "Absorbance"
+            ylabel = "Y-axis"
 
         return super().show(
             figsize=figsize or (10, 3),
@@ -226,9 +226,9 @@ class SpectrumPlot(BasePlot, ColoringMixin):
         ax : Axes, optional
             Matplotlib axes to plot on. If None, creates new figure and axes.
         xlabel : str, optional
-            X-axis label. Default is "Wavelength (nm)".
+            X-axis label. Default is "X-axis".
         ylabel : str, optional
-            Y-axis label. Default is "Absorbance".
+            Y-axis label. Default is "Y-axis".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax). When set without ylim, the y-axis
             automatically scales to fit the data within the x-range.
@@ -245,9 +245,9 @@ class SpectrumPlot(BasePlot, ColoringMixin):
             The matplotlib Axes object with the rendered plot.
         """
         if xlabel is None:
-            xlabel = "Wavelength (nm)"
+            xlabel = "X-axis"
         if ylabel is None:
-            ylabel = "Absorbance"
+            ylabel = "Y-axis"
 
         # Auto-scale y-axis to data within xlim if ylim not provided
         if xlim is not None and ylim is None:
