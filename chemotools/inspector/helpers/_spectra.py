@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
-from chemotools.plotting import SpectrumPlot
+from chemotools.plotting import SpectraPlot
 from chemotools.plotting._styles import DATASET_COLORS
 
 from .._utils import select_primary_target
@@ -89,7 +89,7 @@ def create_spectra_plots_single_dataset(
     empty_labels = [""] * X_raw.shape[0] if suppress_labels else None
 
     # Figure 1: Raw spectra
-    plot_raw = SpectrumPlot(
+    plot_raw = SpectraPlot(
         x=wavenumbers,
         y=X_raw,
         color_by=color_values,
@@ -107,7 +107,7 @@ def create_spectra_plots_single_dataset(
 
     # Figure 2: Preprocessed spectra
     empty_labels_preproc = [""] * X_preprocessed.shape[0] if suppress_labels else None
-    plot_preprocessed = SpectrumPlot(
+    plot_preprocessed = SpectraPlot(
         x=preprocessed_wavenumbers,
         y=X_preprocessed,
         color_by=color_values,
@@ -188,7 +188,7 @@ def create_spectra_plots_multi_dataset(
         # Matplotlib handles duplicate labels in legend automatically
         # But to be safe and efficient, we only label the first spectrum
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectrumPlot(x=wavenumbers, y=X, labels=labels)
+        plot = SpectraPlot(x=wavenumbers, y=X, labels=labels)
 
         plot.render(ax=ax_raw, color=color, alpha=0.6, linewidth=1)
 
@@ -209,7 +209,7 @@ def create_spectra_plots_multi_dataset(
         color = DATASET_COLORS.get(name, "black")
 
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectrumPlot(x=preprocessed_wavenumbers, y=X, labels=labels)
+        plot = SpectraPlot(x=preprocessed_wavenumbers, y=X, labels=labels)
 
         plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
 

@@ -6,14 +6,14 @@ from typing import Any
 import numpy as np
 from matplotlib.axes import Axes
 
-from chemotools.plotting._spectrum import SpectrumPlot
+from chemotools.plotting._spectra import SpectraPlot
 from chemotools.plotting._utils import validate_data
 
 
-class FeatureSelectionPlot(SpectrumPlot):
+class FeatureSelectionPlot(SpectraPlot):
     """Plot class for visualizing feature selection on spectral data.
 
-    This class extends SpectrumPlot to highlight excluded features using
+    This class extends SpectraPlot to highlight excluded features using
     colored vertical spans.
 
     Parameters
@@ -30,7 +30,7 @@ class FeatureSelectionPlot(SpectrumPlot):
     selection_alpha : float, optional
         Transparency of the selection highlight. Default is 0.2.
     **kwargs : Any
-        Additional arguments passed to SpectrumPlot.__init__.
+        Additional arguments passed to SpectraPlot.__init__.
     """
 
     def __init__(

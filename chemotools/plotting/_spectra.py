@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.plotting._spectrum` module implements the SpectrumPlot class for visualizing spectral data.
+The :mod:`chemotools.plotting._spectra` module implements the SpectraPlot class for visualizing spectral data.
 """
 
 # Authors: Pau Cabaneros
@@ -54,24 +54,24 @@ class SpectraPlot(BasePlot, ColoringMixin):
 
     >>> x = np.linspace(400, 2500, 100)
     >>> y = np.random.randn(5, 100)
-    >>> plotter = SpectrumPlot(x, y)
+    >>> plotter = SpectraPlot(x, y)
     >>> fig = plotter.show(title="NIR Spectra", xlabel="Wavelength (nm)", ylabel="Absorbance")
 
     With categorical coloring:
 
     >>> classes = np.array(['A', 'A', 'B', 'B', 'C'])
-    >>> plotter = SpectrumPlot(x, y, color_by=classes)
+    >>> plotter = SpectraPlot(x, y, color_by=classes)
     >>> fig = plotter.show(title="Spectra by Class")
 
     With continuous coloring:
 
     >>> concentrations = np.array([0.1, 0.3, 0.5, 0.7, 0.9])
-    >>> plotter = SpectrumPlot(x, y, color_by=concentrations, colormap="viridis")
+    >>> plotter = SpectraPlot(x, y, color_by=concentrations, colormap="viridis")
     >>> fig = plotter.show(title="Spectra by Concentration")
 
     With custom colorbar label:
 
-    >>> plotter = SpectrumPlot(
+    >>> plotter = SpectraPlot(
     ...     x, y, color_by=concentrations,
     ...     colormap="viridis", colorbar_label="Concentration (mg/L)"
     ... )
@@ -80,12 +80,12 @@ class SpectraPlot(BasePlot, ColoringMixin):
     Override categorical detection for small numeric datasets:
 
     >>> levels = np.array([1, 2, 3, 4])  # 4 unique values - might be detected as categorical
-    >>> plotter = SpectrumPlot(x, y, color_by=levels, categorical=False)
+    >>> plotter = SpectraPlot(x, y, color_by=levels, categorical=False)
     >>> fig = plotter.show(title="4 Concentration Levels")
 
     With custom axis labels:
 
-    >>> plotter = SpectrumPlot(x, y)
+    >>> plotter = SpectraPlot(x, y)
     >>> fig = plotter.show(
     ...     title="Raman Spectra",
     ...     xlabel="Wavenumber (cm⁻¹)",

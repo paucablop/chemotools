@@ -1,4 +1,4 @@
-"""Tests for SpectrumPlot class."""
+"""Tests for SpectraPlot class."""
 
 import pytest
 import numpy as np
@@ -6,20 +6,20 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 
-from chemotools.plotting import SpectrumPlot, is_displayable
+from chemotools.plotting import SpectraPlot, is_displayable
 
 
-class TestSpectrumPlotBasics:
-    """Test basic functionality of SpectrumPlot."""
+class TestSpectraPlotBasics:
+    """Test basic functionality of SpectraPlot."""
 
     def test_implements_display_protocol(self):
-        """Test that SpectrumPlot implements Display protocol."""
+        """Test that SpectraPlot implements Display protocol."""
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(5, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Assert
         assert is_displayable(plot)
@@ -31,7 +31,7 @@ class TestSpectrumPlotBasics:
         y = np.random.randn(100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show()
 
         # Assert
@@ -45,7 +45,7 @@ class TestSpectrumPlotBasics:
         y = np.random.randn(5, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show()
 
         # Assert
@@ -59,7 +59,7 @@ class TestSpectrumPlotBasics:
         y = np.random.randn(3, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show(xlabel="Wavenumber (cm⁻¹)", ylabel="Intensity (a.u.)")
 
         # Assert
@@ -76,7 +76,7 @@ class TestSpectrumPlotBasics:
         y = np.random.randn(3, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show()
 
         # Assert
@@ -90,7 +90,7 @@ class TestSpectrumPlotBasics:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig = plot.show(title="Test Spectra")
@@ -105,7 +105,7 @@ class TestSpectrumPlotBasics:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig = plot.show(figsize=(12, 6))
@@ -120,7 +120,7 @@ class TestSpectrumPlotBasics:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         result = plot.render()
@@ -138,7 +138,7 @@ class TestSpectrumPlotBasics:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig, ax = plt.subplots()
 
         # Act
@@ -154,7 +154,7 @@ class TestSpectrumPlotBasics:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig = plot.show(xlim=(1000, 2000), ylim=(-1, 1))
@@ -166,7 +166,7 @@ class TestSpectrumPlotBasics:
         plt.close(fig)
 
 
-class TestSpectrumPlotCategoricalColoring:
+class TestSpectraPlotCategoricalColoring:
     """Test categorical coloring functionality."""
 
     def test_categorical_with_strings(self):
@@ -177,7 +177,7 @@ class TestSpectrumPlotCategoricalColoring:
         classes = np.array(["A", "A", "B", "B", "C", "C"])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=classes)
+        plot = SpectraPlot(x, y, color_by=classes)
         fig = plot.show()
 
         # Assert
@@ -194,7 +194,7 @@ class TestSpectrumPlotCategoricalColoring:
         classes = np.array([1, 1, 2, 2, 3, 3, 4, 4])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=classes)
+        plot = SpectraPlot(x, y, color_by=classes)
         fig = plot.show()
 
         # Assert
@@ -212,7 +212,7 @@ class TestSpectrumPlotCategoricalColoring:
         groups = np.array([1.0, 1.0, 2.0, 2.0, 3.0, 3.0])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=groups)
+        plot = SpectraPlot(x, y, color_by=groups)
         fig = plot.show()
 
         # Assert
@@ -231,7 +231,7 @@ class TestSpectrumPlotCategoricalColoring:
         )
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=classes, colormap="Set2")
+        plot = SpectraPlot(x, y, color_by=classes, colormap="Set2")
         fig = plot.show()
 
         # Assert
@@ -247,7 +247,7 @@ class TestSpectrumPlotCategoricalColoring:
         values = np.array([1.0, 2.0, 3.0, 4.0])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=values, categorical=True)
+        plot = SpectraPlot(x, y, color_by=values, categorical=True)
         fig = plot.show()
 
         # Assert
@@ -258,7 +258,7 @@ class TestSpectrumPlotCategoricalColoring:
         plt.close(fig)
 
 
-class TestSpectrumPlotContinuousColoring:
+class TestSpectraPlotContinuousColoring:
     """Test continuous coloring functionality."""
 
     def test_continuous_with_floats(self):
@@ -269,7 +269,7 @@ class TestSpectrumPlotContinuousColoring:
         concentrations = np.linspace(0.1, 1.0, 10)
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=concentrations, colormap="viridis")
+        plot = SpectraPlot(x, y, color_by=concentrations, colormap="viridis")
         fig = plot.show()
 
         # Assert
@@ -286,7 +286,7 @@ class TestSpectrumPlotContinuousColoring:
         concentrations = np.linspace(0.5, 5.0, 8)
 
         # Act
-        plot = SpectrumPlot(
+        plot = SpectraPlot(
             x,
             y,
             color_by=concentrations,
@@ -312,7 +312,7 @@ class TestSpectrumPlotContinuousColoring:
 
         for cmap in ["viridis", "plasma", "cividis", "coolwarm"]:
             # Act
-            plot = SpectrumPlot(x, y, color_by=values, colormap=cmap)
+            plot = SpectraPlot(x, y, color_by=values, colormap=cmap)
             fig = plot.show()
 
             # Assert
@@ -328,9 +328,7 @@ class TestSpectrumPlotContinuousColoring:
         levels = np.array([1, 2, 3, 4, 5])
 
         # Act
-        plot = SpectrumPlot(
-            x, y, color_by=levels, categorical=False, colormap="viridis"
-        )
+        plot = SpectraPlot(x, y, color_by=levels, categorical=False, colormap="viridis")
         fig = plot.show()
 
         # Assert
@@ -348,7 +346,7 @@ class TestSpectrumPlotContinuousColoring:
         levels = np.array([1.0, 2.0, 3.0, 4.0])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=levels, colormap="viridis")
+        plot = SpectraPlot(x, y, color_by=levels, colormap="viridis")
         fig = plot.show()
 
         # Assert
@@ -358,7 +356,7 @@ class TestSpectrumPlotContinuousColoring:
         plt.close(fig)
 
 
-class TestSpectrumPlotNoColoring:
+class TestSpectraPlotNoColoring:
     """Test default behavior without color_by."""
 
     def test_no_color_by_parameter(self):
@@ -368,7 +366,7 @@ class TestSpectrumPlotNoColoring:
         y = np.random.randn(5, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show()
 
         # Assert
@@ -385,7 +383,7 @@ class TestSpectrumPlotNoColoring:
         labels = ["Sample 1", "Sample 2", "Sample 3"]
 
         # Act
-        plot = SpectrumPlot(x, y, labels=labels)
+        plot = SpectraPlot(x, y, labels=labels)
         fig = plot.show()
 
         # Assert
@@ -396,7 +394,7 @@ class TestSpectrumPlotNoColoring:
         plt.close(fig)
 
 
-class TestSpectrumPlotEdgeCases:
+class TestSpectraPlotEdgeCases:
     """Test edge cases and error handling."""
 
     def test_mismatched_x_y_dimensions(self):
@@ -406,7 +404,7 @@ class TestSpectrumPlotEdgeCases:
         y = np.random.randn(5, 100)  # 5 spectra, 100 points each
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show()
 
         # Assert
@@ -422,7 +420,7 @@ class TestSpectrumPlotEdgeCases:
         color_value = np.array([0.5])
 
         # Act
-        plot = SpectrumPlot(x, y, color_by=color_value)
+        plot = SpectraPlot(x, y, color_by=color_value)
         fig = plot.show()
 
         # Assert
@@ -436,7 +434,7 @@ class TestSpectrumPlotEdgeCases:
         y = np.random.randn(3, 100)
 
         # Act
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
         fig = plot.show(alpha=0.5, linewidth=2)
 
         # Assert
@@ -444,19 +442,19 @@ class TestSpectrumPlotEdgeCases:
         plt.close(fig)
 
 
-class TestSpectrumPlotSubplots:
-    """Test SpectrumPlot with subplots."""
+class TestSpectraPlotSubplots:
+    """Test SpectraPlot with subplots."""
 
     def test_multiple_renders_on_subplots(self):
-        """Test rendering multiple SpectrumPlots on subplots."""
+        """Test rendering multiple SpectraPlots on subplots."""
         # Arrange
         x1 = np.linspace(400, 2500, 100)
         y1 = np.random.randn(3, 100)
-        plot1 = SpectrumPlot(x1, y1)
+        plot1 = SpectraPlot(x1, y1)
 
         x2 = np.linspace(1000, 2000, 100)
         y2 = np.random.randn(3, 100)
-        plot2 = SpectrumPlot(x2, y2)
+        plot2 = SpectraPlot(x2, y2)
 
         fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
@@ -476,7 +474,7 @@ class TestSpectrumPlotSubplots:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(5, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig, ax = plot.render()
@@ -510,7 +508,7 @@ def test_colormap_with_appropriate_data(colormap, is_categorical):
         color_by = np.linspace(0.1, 1.0, 8)
 
     # Act
-    plot = SpectrumPlot(x, y, color_by=color_by, colormap=colormap)
+    plot = SpectraPlot(x, y, color_by=color_by, colormap=colormap)
     fig = plot.show()
 
     # Assert
@@ -529,7 +527,7 @@ def test_different_numbers_of_spectra(n_spectra):
         y = np.random.randn(n_spectra, 100)
 
     # Act
-    plot = SpectrumPlot(x, y)
+    plot = SpectraPlot(x, y)
     fig = plot.show()
 
     # Assert
@@ -537,7 +535,7 @@ def test_different_numbers_of_spectra(n_spectra):
     plt.close(fig)
 
 
-class TestSpectrumPlotAxisLimits:
+class TestSpectraPlotAxisLimits:
     """Test axis limits and auto-scaling functionality."""
 
     def test_xlim_with_auto_yscaling(self):
@@ -545,7 +543,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 210)
         y = np.random.randn(3, 210)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act - xlim without ylim should auto-scale y-axis
         fig = plot.show(xlim=(1000, 1500))
@@ -563,7 +561,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act - both xlim and ylim specified
         fig = plot.show(xlim=(1000, 1500), ylim=(-2, 2))
@@ -579,7 +577,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 210)
         y = np.random.randn(5, 210)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig, ax = plot.render(xlim=(800, 1200))
@@ -596,7 +594,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Create a mock axes object with get_figure() returning None
         from unittest.mock import Mock
@@ -613,7 +611,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act - xlim outside data range
         fig = plot.show(xlim=(3000, 4000))
@@ -631,7 +629,7 @@ class TestSpectrumPlotAxisLimits:
         x = np.linspace(400, 2500, 100)
         # Create spectra with constant values
         y = np.ones((3, 100)) * 5.0
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig = plot.show(xlim=(1000, 1500))
@@ -650,7 +648,7 @@ class TestSpectrumPlotAxisLimits:
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(3, 100)
-        plot = SpectrumPlot(x, y)
+        plot = SpectraPlot(x, y)
 
         # Act
         fig = plot.show(xlim=(1000, 1500))

@@ -16,7 +16,7 @@ class LoadingsPlot(BasePlot):
     """Loadings plot implementing Display protocol for model inspection.
 
     This class creates line plots of model loadings (feature weights),
-    following the same design pattern as SpectrumPlot and ScoresPlot.
+    following the same design pattern as SpectraPlot and ScoresPlot.
     Supports plotting single or multiple components overlaid on the same plot.
 
     Parameters

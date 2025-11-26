@@ -458,7 +458,7 @@ def calculate_ylim_for_xlim(
         y_in_range = y[mask]
     else:
         # For 2D data, determine if x corresponds to rows or columns
-        # If x length matches axis 1 (columns), filter columns (SpectrumPlot style)
+        # If x length matches axis 1 (columns), filter columns (SpectraPlot style)
         # If x length matches axis 0 (rows), filter rows (LoadingsPlot style)
         if len(x) == y.shape[1]:
             # x maps to columns: y has shape (n_spectra, n_points)

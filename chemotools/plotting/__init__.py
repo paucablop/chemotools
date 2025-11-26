@@ -10,7 +10,7 @@ from chemotools.plotting._utils import (
     annotate_points,
     calculate_ylim_for_xlim,
 )
-from chemotools.plotting._spectrum import SpectrumPlot
+from chemotools.plotting._spectra import SpectraPlot
 from chemotools.plotting._feature_selection import FeatureSelectionPlot
 from chemotools.plotting._scores import ScoresPlot
 from chemotools.plotting._loadings import LoadingsPlot
@@ -28,7 +28,7 @@ __all__ = [
     "is_displayable",
     "BasePlot",
     # Plot classes
-    "SpectrumPlot",
+    "SpectraPlot",
     "FeatureSelectionPlot",
     "ScoresPlot",
     "LoadingsPlot",
