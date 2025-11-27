@@ -18,6 +18,7 @@ from ._utils import (
     get_xlabel_for_features,
     get_default_scores_components,
     get_default_loadings_components,
+    select_components,
 )
 from .helpers import _latent_space as _latent_plots
 from .helpers._regression import (
@@ -175,25 +176,6 @@ class PLSRegressionInspector(
         self._y_scores_cache: Dict[str, np.ndarray] = {}
 
     # ==================================================================================
-    # Properties
-    # ==================================================================================
-
-    @property
-    def model(self) -> Union[_PLS, Pipeline]:
-        """Return the original model (PLS or Pipeline)."""
-        return super().model
-
-    @property
-    def estimator(self) -> _PLS:
-        """Return the PLS estimator."""
-        return self.estimator_
-
-    @property
-    def transformer(self) -> Optional[Pipeline]:
-        """Return the preprocessing pipeline (if available)."""
-        return super().transformer
-
-    # ==================================================================================
     # Private Methods
     # ==================================================================================
 
@@ -280,14 +262,7 @@ class PLSRegressionInspector(
         x_loadings : ndarray of shape (n_features, n_components_selected)
             PLS X-loadings
         """
-        loadings = self.estimator.x_loadings_
-
-        if components is not None:
-            if isinstance(components, int):
-                components = [components]
-            loadings = loadings[:, components]
-
-        return loadings
+        return select_components(self.estimator.x_loadings_, components)
 
     def get_x_weights(
         self, components: Optional[Union[int, Sequence[int]]] = None
@@ -304,14 +279,7 @@ class PLSRegressionInspector(
         x_weights : ndarray of shape (n_features, n_components_selected)
             PLS X-weights
         """
-        weights = self.estimator.x_weights_
-
-        if components is not None:
-            if isinstance(components, int):
-                components = [components]
-            weights = weights[:, components]
-
-        return weights
+        return select_components(self.estimator.x_weights_, components)
 
     def get_x_rotations(
         self, components: Optional[Union[int, Sequence[int]]] = None
@@ -328,14 +296,7 @@ class PLSRegressionInspector(
         x_rotations : ndarray of shape (n_features, n_components_selected)
             PLS X-rotations
         """
-        rotations = self.estimator.x_rotations_
-
-        if components is not None:
-            if isinstance(components, int):
-                components = [components]
-            rotations = rotations[:, components]
-
-        return rotations
+        return select_components(self.estimator.x_rotations_, components)
 
     def get_regression_coefficients(self) -> np.ndarray:
         """Get PLS regression coefficients (regression vector).
@@ -386,19 +347,16 @@ class PLSRegressionInspector(
         summary : dict
             Dictionary containing model information
         """
+        # Start with common summary fields
+        summary_dict: Dict[str, SummaryValue] = self._base_summary()
+
+        # Add PLS regression-specific metrics
         pred_summary = self.prediction_summary()
         rmse_dict = {ds: metrics["RMSE"] for ds, metrics in pred_summary.items()}
         r2_dict = {ds: metrics["R2"] for ds, metrics in pred_summary.items()}
 
-        summary_dict: Dict[str, SummaryValue] = {
-            "model_type": type(self.estimator).__name__,
-            "has_preprocessing": self.transformer is not None,
-            "nr_features": self.nr_features,
-            "nr_components": self.nr_components,
-            "nr_samples": self.nr_samples.copy(),
-            "RMSE": rmse_dict,
-            "R2": r2_dict,
-        }
+        summary_dict["RMSE"] = rmse_dict
+        summary_dict["R2"] = r2_dict
 
         # Add variance info if available
         x_var = self.get_explained_x_variance_ratio()
@@ -411,16 +369,6 @@ class PLSRegressionInspector(
         if y_var is not None:
             summary_dict["explained_y_variance_ratio"] = y_var
             summary_dict["total_y_variance"] = y_var.sum() * 100
-
-        # Add preprocessing steps if available
-        if self.transformer is not None:
-            preprocessing_steps = [
-                {"step": i, "name": name, "type": type(transform).__name__}
-                for i, (name, transform) in enumerate(self.transformer.steps, 1)
-            ]
-            summary_dict["preprocessing_steps"] = preprocessing_steps
-        else:
-            summary_dict["preprocessing_steps"] = []
 
         return summary_dict
 

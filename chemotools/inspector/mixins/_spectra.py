@@ -41,7 +41,7 @@ if TYPE_CHECKING:  # pragma: no cover
         ) -> np.ndarray:  # pragma: no cover
             ...
 
-        def _get_preprocessed_feature_names(self) -> np.ndarray:  # pragma: no cover
+        def _get_preprocessed_x_axis(self) -> np.ndarray:  # pragma: no cover
             ...
 
 
@@ -58,23 +58,11 @@ class SpectraMixin:
     - `feature_names` property returning Optional[np.ndarray]
     - `_get_raw_data(dataset)` method
     - `_get_preprocessed_data(dataset)` method
-    - `_get_preprocessed_feature_names()` method
+    - `_get_preprocessed_x_axis()` method
     """
 
     def _spectra_inspector(self) -> "_SpectraInspectorProto":
         return self  # type: ignore[return-value]
-
-    def _get_preprocessed_x_axis(self) -> np.ndarray:
-        """Get x_axis after feature selection.
-
-        Returns
-        -------
-        x_axis : np.ndarray
-            X-axis/feature indices after feature selection. If no feature
-            selector is present, returns the original x_axis.
-        """
-        inspector = self._spectra_inspector()
-        return inspector._get_preprocessed_feature_names()
 
     def inspect_spectra(
         self,
@@ -142,7 +130,7 @@ class SpectraMixin:
         xlabel = get_xlabel_for_features(inspector.feature_names is not None)
 
         # Get preprocessed x_axis (may be subset if feature selection)
-        preprocessed_x_axis = self._get_preprocessed_x_axis()
+        preprocessed_x_axis = inspector._get_preprocessed_x_axis()
 
         if is_multi_dataset:
             # Multiple datasets: plot all on same figure, color by dataset

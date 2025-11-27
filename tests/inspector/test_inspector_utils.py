@@ -7,7 +7,83 @@ from chemotools.inspector._utils import (
     normalize_components,
     get_xlabel_for_features,
     prepare_annotations,
+    select_components,
 )
+
+
+class TestSelectComponents:
+    """Tests for select_components function."""
+
+    def test_returns_full_matrix_when_components_is_none(self):
+        """Test that full matrix is returned when components is None."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, None)
+
+        # Assert
+        np.testing.assert_array_equal(result, matrix)
+
+    def test_selects_single_component_from_int(self):
+        """Test selecting a single component using an integer."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, 0)
+
+        # Assert
+        expected = np.array([[1], [4]])
+        np.testing.assert_array_equal(result, expected)
+
+    def test_selects_single_component_from_list(self):
+        """Test selecting a single component using a list."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, [1])
+
+        # Assert
+        expected = np.array([[2], [5]])
+        np.testing.assert_array_equal(result, expected)
+
+    def test_selects_multiple_components(self):
+        """Test selecting multiple components."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, [0, 2])
+
+        # Assert
+        expected = np.array([[1, 3], [4, 6]])
+        np.testing.assert_array_equal(result, expected)
+
+    def test_preserves_order_of_components(self):
+        """Test that component order is preserved."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, [2, 0])
+
+        # Assert
+        expected = np.array([[3, 1], [6, 4]])
+        np.testing.assert_array_equal(result, expected)
+
+    def test_works_with_tuple_of_components(self):
+        """Test selecting components using a tuple."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act
+        result = select_components(matrix, (0, 2))
+
+        # Assert
+        expected = np.array([[1, 3], [4, 6]])
+        np.testing.assert_array_equal(result, expected)
 
 
 class TestNormalizeDatasets:

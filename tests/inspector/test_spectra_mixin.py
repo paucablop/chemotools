@@ -61,6 +61,10 @@ class _DummyInspectorBase:
     def _get_preprocessed_feature_names(self):
         return self._preprocessed_feature_names
 
+    def _get_preprocessed_x_axis(self):
+        """Get x_axis after feature selection (delegates to _get_preprocessed_feature_names)."""
+        return self._get_preprocessed_feature_names()
+
 
 class DummySpectraInspector(SpectraMixin, _DummyInspectorBase):
     """Dummy inspector for testing SpectraMixin."""

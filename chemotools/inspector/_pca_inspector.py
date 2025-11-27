@@ -17,6 +17,7 @@ from ._utils import (
     get_xlabel_for_features,
     get_default_scores_components,
     get_default_loadings_components,
+    select_components,
 )
 
 
@@ -142,25 +143,6 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         self._scores_cache: Dict[str, np.ndarray] = {}
 
     # ==================================================================================
-    # Properties
-    # ==================================================================================
-
-    @property
-    def model(self) -> Union[_BasePCA, Pipeline]:
-        """Return the original model (PCA or Pipeline)."""
-        return self._model
-
-    @property
-    def estimator(self) -> _BasePCA:
-        """Return the PCA estimator."""
-        return self.estimator_
-
-    @property
-    def transformer(self) -> Optional[Pipeline]:
-        """Return the preprocessing pipeline (if available)."""
-        return super().transformer
-
-    # ==================================================================================
     # Public Methods
     # ==================================================================================
 
@@ -211,13 +193,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             PCA loadings (components transposed)
         """
         loadings = self.estimator.components_.T
-
-        if components is not None:
-            if isinstance(components, int):
-                components = [components]
-            loadings = loadings[:, components]
-
-        return loadings
+        return select_components(loadings, components)
 
     def get_explained_variance_ratio(self) -> np.ndarray:
         """Get explained variance ratio for all components.
@@ -256,6 +232,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         >>> print(f"PC1 explains: {summary['pc_variances']['PC1']:.2f}%")
         >>> print(f"Components for 95% variance: {summary['variance_thresholds']['95%']}")
         """
+        # Start with common summary fields
+        summary_dict = self._base_summary()
+
         # Calculate cumulative variance
         explained_var = self.get_explained_variance_ratio()
         cumsum = np.cumsum(explained_var)
@@ -286,42 +265,29 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         if self.nr_components > 2:
             pc_variances["PC3"] = explained_var[2] * 100
 
-        # Build summary dictionary
-        summary_dict = {
-            "model_type": type(self.estimator).__name__,
-            "has_preprocessing": self.transformer is not None,
-            "nr_features": self.nr_features,
-            "nr_components": self.nr_components,
-            "nr_samples": self.nr_samples.copy(),
-            "explained_variance_ratio": explained_var,
-            "cumulative_variance": cumsum,
-            "pc_variances": pc_variances,
-            "total_variance": cumsum[-1] * 100,
-            "variance_thresholds": {
-                "90%": {
-                    "n_components": n_90,
-                    "actual_variance": cumsum[n_90 - 1] * 100,
+        # Add PCA-specific fields
+        summary_dict.update(
+            {
+                "explained_variance_ratio": explained_var,
+                "cumulative_variance": cumsum,
+                "pc_variances": pc_variances,
+                "total_variance": cumsum[-1] * 100,
+                "variance_thresholds": {
+                    "90%": {
+                        "n_components": n_90,
+                        "actual_variance": cumsum[n_90 - 1] * 100,
+                    },
+                    "95%": {
+                        "n_components": n_95,
+                        "actual_variance": cumsum[n_95 - 1] * 100,
+                    },
+                    "99%": {
+                        "n_components": n_99,
+                        "actual_variance": cumsum[n_99 - 1] * 100,
+                    },
                 },
-                "95%": {
-                    "n_components": n_95,
-                    "actual_variance": cumsum[n_95 - 1] * 100,
-                },
-                "99%": {
-                    "n_components": n_99,
-                    "actual_variance": cumsum[n_99 - 1] * 100,
-                },
-            },
-        }
-
-        # Add preprocessing steps if available
-        if self.transformer is not None:
-            preprocessing_steps = [
-                {"step": i, "name": name, "type": type(transform).__name__}
-                for i, (name, transform) in enumerate(self.transformer.steps, 1)
-            ]
-            summary_dict["preprocessing_steps"] = preprocessing_steps
-        else:
-            summary_dict["preprocessing_steps"] = []
+            }
+        )
 
         return summary_dict
 

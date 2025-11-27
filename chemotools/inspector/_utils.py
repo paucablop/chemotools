@@ -23,6 +23,52 @@ DatasetInput = Union[str, Sequence[str]]
 
 
 # ==============================================================================
+# Array manipulation utilities
+# ==============================================================================
+
+
+def select_components(
+    matrix: np.ndarray, components: Optional[Union[int, Sequence[int]]]
+) -> np.ndarray:
+    """Select specific components from a matrix.
+
+    This utility function handles the common pattern of extracting specific
+    columns (components) from loadings, weights, or rotation matrices.
+
+    Parameters
+    ----------
+    matrix : np.ndarray
+        Matrix of shape (n_features, n_components)
+    components : int, sequence of int, or None
+        Which components to return. If None, returns all components.
+        If int, converts to a single-element list.
+
+    Returns
+    -------
+    np.ndarray
+        Matrix with selected components, shape (n_features, n_selected)
+
+    Examples
+    --------
+    >>> matrix = np.array([[1, 2, 3], [4, 5, 6]])
+    >>> select_components(matrix, None)  # Returns full matrix
+    array([[1, 2, 3],
+            [4, 5, 6]])
+    >>> select_components(matrix, 0)  # Single component
+    array([[1],
+            [4]])
+    >>> select_components(matrix, [0, 2])  # Multiple components
+    array([[1, 3],
+            [4, 6]])
+    """
+    if components is None:
+        return matrix
+    if isinstance(components, int):
+        components = [components]
+    return matrix[:, components]
+
+
+# ==============================================================================
 # Input normalization functions
 # ==============================================================================
 

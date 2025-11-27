@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from abc import ABC
@@ -309,6 +309,11 @@ class _BaseInspector(ABC):
         return self._model
 
     @property
+    def estimator(self) -> Union[_BasePCA, _PLS]:
+        """Return the underlying estimator (PCA or PLS)."""
+        return self.estimator_
+
+    @property
     def transformer(self) -> Optional[Pipeline]:
         return self.transformer_
 
@@ -332,6 +337,46 @@ class _BaseInspector(ABC):
         """Return the confidence level for outlier detection."""
         return self._confidence
 
+    def _base_summary(self) -> Dict[str, Any]:
+        """Generate common summary fields shared by all inspectors.
+
+        Returns
+        -------
+        summary : dict
+            Dictionary containing common model information:
+            - 'model_type': Name of the estimator class
+            - 'has_preprocessing': Whether preprocessing pipeline exists
+            - 'nr_features': Number of features in original data
+            - 'nr_components': Number of components/latent variables
+            - 'nr_samples': Dictionary with sample counts per dataset
+            - 'preprocessing_steps': List of preprocessing step info (if available)
+        """
+        summary: Dict[str, Any] = {
+            "model_type": type(self.estimator).__name__,
+            "has_preprocessing": self.transformer is not None,
+            "nr_features": self.nr_features,
+            "nr_components": self.n_components_,
+            "nr_samples": self.nr_samples.copy(),
+            "preprocessing_steps": self._get_preprocessing_steps(),
+        }
+        return summary
+
+    def _get_preprocessing_steps(self) -> List[Dict[str, Union[int, str]]]:
+        """Get list of preprocessing steps with their details.
+
+        Returns
+        -------
+        steps : list of dict
+            List of dictionaries with 'step', 'name', and 'type' keys.
+            Empty list if no preprocessing pipeline exists.
+        """
+        if self.transformer is None:
+            return []
+        return [
+            {"step": i, "name": name, "type": type(transform).__name__}
+            for i, (name, transform) in enumerate(self.transformer.steps, 1)
+        ]
+
     def _get_dataset(self, name: str) -> InspectorDataset:
         return self._state.get_dataset(name)
 
@@ -343,6 +388,17 @@ class _BaseInspector(ABC):
 
     def _get_preprocessed_feature_names(self) -> np.ndarray:
         return self._state.get_preprocessed_feature_names()
+
+    def _get_preprocessed_x_axis(self) -> np.ndarray:
+        """Get x_axis after feature selection.
+
+        Returns
+        -------
+        x_axis : np.ndarray
+            X-axis/feature indices after feature selection. If no feature
+            selector is present, returns the original x_axis.
+        """
+        return self._get_preprocessed_feature_names()
 
     def _get_feature_mask(self) -> Optional[np.ndarray]:
         return self._state.get_feature_mask()
