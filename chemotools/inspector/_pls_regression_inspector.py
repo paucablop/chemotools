@@ -433,114 +433,6 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
         return summary_dict
 
-    def _create_x_vs_y_scores_figures(
-        self,
-        components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
-        color_by_y: bool,
-        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
-        figsize: Tuple[float, float],
-    ) -> Dict[str, matplotlib.figure.Figure]:
-        """Create X-scores vs Y-scores plots for PLS (training set only).
-
-        Note: Only 2D component pairs (tuples) will be plotted. Single component
-        specifications (ints) will be silently skipped since X vs Y scores
-        requires two components.
-
-        Parameters
-        ----------
-        components : int, tuple, or sequence
-            Component pairs to plot. Only tuple specifications will be used;
-            int specifications are ignored.
-        color_by_y : bool
-            Whether to color by y values
-        annotate_by : str or dict, optional
-            Annotation specification
-        figsize : tuple of float
-            Figure size
-
-        Returns
-        -------
-        dict
-            Dictionary of figures with keys like 'x_vs_y_scores_1', 'x_vs_y_scores_2', etc.
-            Empty dict if no 2D component pairs are provided.
-        """
-        from chemotools.plotting import ScoresPlot
-        from ._utils import normalize_components, prepare_annotations
-
-        components_list = normalize_components(components)
-        figures: Dict[str, matplotlib.figure.Figure] = {}
-
-        # Get training data
-        x_scores = self.get_x_scores("train")
-        y_scores = self.get_y_scores("train")
-        _, y_train = self._get_raw_data("train")
-
-        for idx, component_spec in enumerate(components_list, start=1):
-            # Only create 2D plots (component pairs)
-            if isinstance(component_spec, tuple):
-                import matplotlib.pyplot as plt
-
-                fig, ax = plt.subplots(figsize=figsize)
-
-                # Create combined scores array [X-score, Y-score]
-                combined_scores = np.column_stack(
-                    [
-                        x_scores[:, component_spec[0]],
-                        y_scores[:, component_spec[1]],
-                    ]
-                )
-
-                # Determine color_by parameter
-                color_reference = (
-                    y_train if color_by_y and y_train is not None else None
-                )
-
-                # Create ScoresPlot
-                plot = ScoresPlot(
-                    scores=combined_scores,
-                    components=(0, 1),  # We already selected the right columns
-                    color_by=color_reference,
-                    label="Train",
-                    colormap=None,
-                    confidence_ellipse=None,
-                )
-                plot.render(ax)
-
-                # Add annotations if requested
-                labels = prepare_annotations(annotate_by, "train", x_scores, y_train)
-                if labels is not None:
-                    from chemotools.plotting._utils import annotate_points
-
-                    annotate_points(
-                        ax,
-                        combined_scores[:, 0],
-                        combined_scores[:, 1],
-                        labels,
-                        fontsize=8,
-                        alpha=0.7,
-                        xytext=(3, 3),
-                        textcoords="offset points",
-                    )
-
-                # Set custom labels
-                ax.set_xlabel(
-                    f"X-{self.component_label}{component_spec[0] + 1}", fontsize=10
-                )
-                ax.set_ylabel(
-                    f"Y-{self.component_label}{component_spec[1] + 1}", fontsize=10
-                )
-                ax.set_title(
-                    f"X-scores vs Y-scores: {self.component_label}{component_spec[0] + 1} vs {self.component_label}{component_spec[1] + 1}",
-                    fontsize=12,
-                    fontweight="bold",
-                )
-                ax.grid(alpha=0.3)
-
-                plt.tight_layout()
-                figures[f"x_vs_y_scores_{idx}"] = fig
-
-        return figures
-
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
@@ -727,11 +619,19 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         figures.update(scores_figures)
 
         # X-scores vs Y-scores plots (training set only)
-        x_y_scores_figures = self._create_x_vs_y_scores_figures(
+        x_scores = self.get_x_scores("train")
+        y_scores = self.get_y_scores("train")
+        _, y_train = self._get_raw_data("train")
+
+        x_y_scores_figures = _latent_plots.create_x_vs_y_scores_plots(
+            x_scores=x_scores,
+            y_scores=y_scores,
+            y_train=y_train,
             components=components_scores,
             color_by_y=color_by_y,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
+            component_label=self.component_label,
         )
         figures.update(x_y_scores_figures)
 

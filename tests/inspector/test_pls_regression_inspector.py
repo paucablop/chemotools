@@ -599,15 +599,20 @@ class TestAdditionalCoverage:
         annotate_by = {"train": np.arange(X_train.shape[0])}
 
         # Act
-        figures = inspector._create_x_vs_y_scores_figures(
-            components=[(0, 1), 2],
+        figures = inspector.inspect(
+            components_scores=[(0, 1), 2],
             color_by_y=True,
             annotate_by=annotate_by,
-            figsize=(3, 3),
+            scores_figsize=(3, 3),
         )
 
         # Assert
-        assert set(figures.keys()) == {"x_vs_y_scores_1"}
+        assert "x_vs_y_scores_1" in figures
+        assert "x_vs_y_scores_2" not in figures
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
 
         # Cleanup
         for fig in figures.values():

@@ -27,6 +27,7 @@ from .._utils import (
     ComponentSpec,
     prepare_annotations,
     select_primary_target,
+    normalize_components,
 )
 
 
@@ -998,3 +999,103 @@ def create_q_vs_y_residuals_plot(
     ax.grid(alpha=0.3)
     plt.tight_layout()
     return fig
+
+
+def create_x_vs_y_scores_plots(
+    x_scores: np.ndarray,
+    y_scores: np.ndarray,
+    y_train: Optional[np.ndarray],
+    components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
+    color_by_y: bool,
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    figsize: Tuple[float, float],
+    component_label: str = "LV",
+) -> Dict[str, Figure]:
+    """Create X-scores vs Y-scores plots (typically for PLS).
+
+    Note: Only 2D component pairs (tuples) will be plotted. Single component
+    specifications (ints) will be silently skipped since X vs Y scores
+    requires two components.
+
+    Parameters
+    ----------
+    x_scores : np.ndarray
+        X-scores array
+    y_scores : np.ndarray
+        Y-scores array
+    y_train : np.ndarray, optional
+        Target values for coloring
+    components : int, tuple, or sequence
+        Component pairs to plot. Only tuple specifications will be used.
+    color_by_y : bool
+        Whether to color by y values
+    annotate_by : str or dict, optional
+        Annotation specification
+    figsize : tuple of float
+        Figure size
+    component_label : str, default="LV"
+        Label for components (e.g., "LV", "PC")
+
+    Returns
+    -------
+    dict
+        Dictionary of figures with keys like 'x_vs_y_scores_1', 'x_vs_y_scores_2', etc.
+    """
+    components_list = normalize_components(components)
+    figures: Dict[str, Figure] = {}
+
+    for idx, component_spec in enumerate(components_list, start=1):
+        # Only create 2D plots (component pairs)
+        if isinstance(component_spec, tuple):
+            fig, ax = plt.subplots(figsize=figsize)
+
+            # Create combined scores array [X-score, Y-score]
+            combined_scores = np.column_stack(
+                [
+                    x_scores[:, component_spec[0]],
+                    y_scores[:, component_spec[1]],
+                ]
+            )
+
+            # Determine color_by parameter
+            color_reference = y_train if color_by_y and y_train is not None else None
+
+            # Create ScoresPlot
+            plot = ScoresPlot(
+                scores=combined_scores,
+                components=(0, 1),  # We already selected the right columns
+                color_by=color_reference,
+                label="Train",
+                colormap=None,
+                confidence_ellipse=None,
+            )
+            plot.render(ax)
+
+            # Add annotations if requested
+            labels = prepare_annotations(annotate_by, "train", x_scores, y_train)
+            if labels is not None:
+                annotate_points(
+                    ax,
+                    combined_scores[:, 0],
+                    combined_scores[:, 1],
+                    labels,
+                    fontsize=8,
+                    alpha=0.7,
+                    xytext=(3, 3),
+                    textcoords="offset points",
+                )
+
+            # Set custom labels
+            ax.set_xlabel(f"X-{component_label}{component_spec[0] + 1}", fontsize=10)
+            ax.set_ylabel(f"Y-{component_label}{component_spec[1] + 1}", fontsize=10)
+            ax.set_title(
+                f"X-scores vs Y-scores: {component_label}{component_spec[0] + 1} vs {component_label}{component_spec[1] + 1}",
+                fontsize=12,
+                fontweight="bold",
+            )
+            ax.grid(alpha=0.3)
+
+            plt.tight_layout()
+            figures[f"x_vs_y_scores_{idx}"] = fig
+
+    return figures
