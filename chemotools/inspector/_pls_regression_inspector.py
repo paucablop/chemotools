@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 from chemotools.outliers import QResiduals
 
 from ._base import _BaseInspector, InspectorPlotConfig
-from .mixins import LatentVariableMixin, RegressionMixin
+from .mixins import LatentVariableMixin, RegressionMixin, SpectraMixin
 from ._utils import (
     normalize_datasets,
     get_xlabel_for_features,
@@ -20,10 +20,6 @@ from ._utils import (
     get_default_loadings_components,
 )
 from .helpers import _latent_space as _latent_plots
-from .helpers._spectra import (
-    create_spectra_plots_single_dataset,
-    create_spectra_plots_multi_dataset,
-)
 from .helpers._regression import (
     create_predicted_vs_actual_plot,
     create_y_residual_plot,
@@ -38,7 +34,9 @@ SummaryValue = Union[
 ]
 
 
-class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspector):
+class PLSRegressionInspector(
+    SpectraMixin, RegressionMixin, LatentVariableMixin, _BaseInspector
+):
     """Inspector for PLS Regression model diagnostics and visualization.
 
     This class provides a unified interface for inspecting PLS regression models by
@@ -209,10 +207,6 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
     def _get_preprocessed_data(self, dataset: str) -> np.ndarray:
         """Get preprocessed X data for specified dataset."""
         return super()._get_preprocessed_data(dataset)
-
-    def _get_preprocessed_x_axis(self) -> np.ndarray:
-        """Get x_axis after feature selection."""
-        return self._get_preprocessed_feature_names()
 
     # ==================================================================================
     # Public Methods
@@ -728,93 +722,5 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 figsize=config.spectra_figsize,
             )
             figures.update(spectra_figs)
-
-        return figures
-
-    def inspect_spectra(
-        self,
-        dataset: Union[str, Sequence[str]] = "train",
-        color_by_y: bool = True,
-        xlim: Optional[Tuple[float, float]] = None,
-        figsize: Tuple[float, float] = (12, 5),
-    ) -> Dict[str, matplotlib.figure.Figure]:
-        """Create independent plots comparing raw and preprocessed spectra.
-
-        Only available if model is a Pipeline with preprocessing steps.
-
-        Parameters
-        ----------
-        dataset : Union[str, Sequence[str]], default='train'
-            Dataset(s) to visualize
-        color_by_y : bool, default=True
-            Whether to color by y values (single dataset only)
-        xlim : tuple of float, optional
-            X-axis limits for zooming
-        figsize : tuple of float, default=(12, 5)
-            Figure size for each plot
-
-        Returns
-        -------
-        figures : dict
-            Dictionary containing 'raw_spectra' and 'preprocessed_spectra'
-
-        Raises
-        ------
-        ValueError
-            If no preprocessing pipeline is available
-        """
-        if self.transformer is None:
-            raise ValueError(
-                "Spectra inspection requires a preprocessing pipeline. "
-                "Model must be a Pipeline with preprocessing steps."
-            )
-
-        # Normalize dataset to always be a list
-        datasets = normalize_datasets(dataset)
-        is_multi_dataset = len(datasets) > 1
-
-        # Determine xlabel
-        xlabel = get_xlabel_for_features(self.x_axis is not None)
-
-        # Get preprocessed x_axis
-        preprocessed_x_axis = self._get_preprocessed_x_axis()
-
-        if is_multi_dataset:
-            # Multiple datasets
-            raw_data = {}
-            preprocessed_data = {}
-            for ds in datasets:
-                X_raw, _ = self._get_raw_data(ds)
-                X_preprocessed = self._get_preprocessed_data(ds)
-                raw_data[ds] = X_raw
-                preprocessed_data[ds] = X_preprocessed
-
-            figures = create_spectra_plots_multi_dataset(
-                raw_data=raw_data,
-                preprocessed_data=preprocessed_data,
-                x_axis=self.x_axis,
-                preprocessed_x_axis=preprocessed_x_axis,
-                xlabel=xlabel,
-                xlim=xlim,
-                figsize=figsize,
-            )
-        else:
-            # Single dataset
-            ds = datasets[0]
-            X_raw, y = self._get_raw_data(ds)
-            X_preprocessed = self._get_preprocessed_data(ds)
-
-            figures = create_spectra_plots_single_dataset(
-                X_raw=X_raw,
-                X_preprocessed=X_preprocessed,
-                y=y,
-                x_axis=self.x_axis,
-                preprocessed_x_axis=preprocessed_x_axis,
-                dataset_name=ds,
-                color_by_y=color_by_y,
-                xlabel=xlabel,
-                xlim=xlim,
-                figsize=figsize,
-            )
 
         return figures
