@@ -175,9 +175,6 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
         self._x_scores_cache: Dict[str, np.ndarray] = {}
         self._y_scores_cache: Dict[str, np.ndarray] = {}
-        # Limits are handled lazily by LatentVariableMixin
-        self._hotelling_t2_limit: Optional[float] = None
-        self._q_residuals_limit: Optional[float] = None
 
     # ==================================================================================
     # Properties
@@ -642,266 +639,84 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             annotate_by=annotate_by,
         )
 
-        # Q residuals vs Y residuals
-        if use_suffix:
-            q_y_datasets: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
-            for ds in datasets:
-                X, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                q_y_datasets[ds] = {
-                    "X": X,
-                    "y": y_true,
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-
-            # Fit Q detector on training data for consistent limits
-            X_train, y_train = self._get_raw_data("train")
-            q_detector = QResiduals(self.model, confidence=self.confidence)
-            q_detector.fit(X_train)
-
-            figures["distances_q_y_residuals"] = (
-                _latent_plots.create_q_vs_y_residuals_plot(
-                    datasets_data=q_y_datasets,
-                    model=self.model,
-                    confidence=self.confidence,
-                    color_by_y=color_by_y,
-                    figsize=config.distances_figsize,
-                    q_residuals_detector=q_detector,
-                    annotate_by=annotate_by,
-                )
-            )
-        else:
-            ds = datasets[0]
+        # ============================================================================
+        # Prepare data for regression diagnostics
+        # ============================================================================
+        # We create a unified data dictionary that can be used by all regression plots
+        # This avoids repeating the data extraction logic for each plot type
+        datasets_data: Dict[str, Dict[str, Any]] = {}
+        for ds in datasets:
             X, y_true = self._get_raw_data(ds)
             y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            q_y_datasets = {
-                ds: {
-                    "X": X,
-                    "y": y_true,
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
+            datasets_data[ds] = {
+                "X": X,
+                "y": y_true,
+                "y_true": y_true,
+                "y_pred": y_pred,
             }
 
-            # Fit Q detector on training data for consistent limits
-            X_train, y_train = self._get_raw_data("train")
-            q_detector = QResiduals(self.model, confidence=self.confidence)
-            q_detector.fit(X_train)
+        # ============================================================================
+        # Distance plots (Q vs Y residuals, Leverage vs Studentized)
+        # ============================================================================
 
-            figures["distances_q_y_residuals"] = (
-                _latent_plots.create_q_vs_y_residuals_plot(
-                    datasets_data=q_y_datasets,
-                    model=self.model,
-                    confidence=self.confidence,
-                    color_by_y=color_by_y,
-                    figsize=config.distances_figsize,
-                    q_residuals_detector=q_detector,
-                    annotate_by=annotate_by,
-                )
-            )
+        # Q residuals vs Y residuals
+        # Fit Q detector on training data for consistent limits
+        X_train, _ = self._get_raw_data("train")
+        q_detector = QResiduals(self.model, confidence=self.confidence)
+        q_detector.fit(X_train)
+
+        figures["distances_q_y_residuals"] = _latent_plots.create_q_vs_y_residuals_plot(
+            datasets_data=datasets_data,
+            model=self.model,
+            confidence=self.confidence,
+            color_by_y=color_by_y,
+            figsize=config.distances_figsize,
+            q_residuals_detector=q_detector,
+            annotate_by=annotate_by,
+        )
 
         # Leverage vs Studentized residuals
-        if use_suffix:
-            regression_datasets: Dict[str, Dict[str, np.ndarray]] = {}
-            for ds in datasets:
-                X, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                regression_datasets[ds] = {
-                    "X": X,
-                    "y": y_true,
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-
-            fig_leverage = create_regression_distances_plot(
-                datasets_data=regression_datasets,
-                leverage_detector=self.leverage_detector,
-                student_detector=self.studentized_detector,
-                color_by_y=color_by_y,
-                figsize=config.distances_figsize,
-                annotate_by=annotate_by,
-            )
-            figures["distances_leverage_studentized"] = fig_leverage
-        else:
-            ds = datasets[0]
-            X, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            regression_datasets = {
-                ds: {
-                    "X": X,
-                    "y": y_true,
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-            }
-
-            fig_leverage = create_regression_distances_plot(
-                datasets_data=regression_datasets,
-                leverage_detector=self.leverage_detector,
-                student_detector=self.studentized_detector,
-                color_by_y=color_by_y,
-                figsize=config.distances_figsize,
-                annotate_by=annotate_by,
-            )
-            figures["distances_leverage_studentized"] = fig_leverage
+        figures["distances_leverage_studentized"] = create_regression_distances_plot(
+            datasets_data=datasets_data,
+            leverage_detector=self.leverage_detector,
+            student_detector=self.studentized_detector,
+            color_by_y=color_by_y,
+            figsize=config.distances_figsize,
+            annotate_by=annotate_by,
+        )
 
         # ============================================================================
         # Regression diagnostic plots
         # ============================================================================
+
         # Predicted vs Actual
-        if use_suffix:
-            predicted_vs_actual_data: Dict[str, Dict[str, np.ndarray]] = {}
-            for ds in datasets:
-                _, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                predicted_vs_actual_data[ds] = {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                    "y": y_true,
-                    "X": self._get_raw_data(ds)[0],
-                }
-
-            figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
-                datasets_data=predicted_vs_actual_data,
-                color_by_y=color_by_y,
-                figsize=config.regression_figsize,
-                annotate_by=annotate_by,
-            )
-        else:
-            ds = datasets[0]
-            _, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            predicted_vs_actual_data = {
-                ds: {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                    "y": y_true,
-                    "X": self._get_raw_data(ds)[0],
-                }
-            }
-
-            figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
-                datasets_data=predicted_vs_actual_data,
-                color_by_y=color_by_y,
-                figsize=config.regression_figsize,
-                annotate_by=annotate_by,
-            )
+        figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
+            datasets_data=datasets_data,
+            color_by_y=color_by_y,
+            figsize=config.regression_figsize,
+            annotate_by=annotate_by,
+        )
 
         # Residual scatter plot
-        if use_suffix:
-            residuals_data: Dict[str, Dict[str, np.ndarray]] = {}
-            for ds in datasets:
-                _, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                residuals_data[ds] = {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                    "y": y_true,
-                    "X": self._get_raw_data(ds)[0],
-                }
-
-            figures["residuals"] = create_y_residual_plot(
-                datasets_data=residuals_data,
-                color_by_y=color_by_y,
-                figsize=config.regression_figsize,
-                annotate_by=annotate_by,
-            )
-        else:
-            ds = datasets[0]
-            _, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            residuals_data = {
-                ds: {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                    "y": y_true,
-                    "X": self._get_raw_data(ds)[0],
-                }
-            }
-
-            figures["residuals"] = create_y_residual_plot(
-                datasets_data=residuals_data,
-                color_by_y=color_by_y,
-                figsize=config.regression_figsize,
-                annotate_by=annotate_by,
-            )
+        figures["residuals"] = create_y_residual_plot(
+            datasets_data=datasets_data,
+            color_by_y=color_by_y,
+            figsize=config.regression_figsize,
+            annotate_by=annotate_by,
+        )
 
         # Q-Q plot
-        if use_suffix:
-            qq_data: Dict[str, Dict[str, np.ndarray]] = {}
-            for ds in datasets:
-                _, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                qq_data[ds] = {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-
-            figures["qq_plot"] = create_qq_plot(
-                datasets_data=qq_data,
-                figsize=config.regression_figsize,
-                confidence=self.confidence,
-            )
-        else:
-            ds = datasets[0]
-            _, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            qq_data = {
-                ds: {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-            }
-
-            figures["qq_plot"] = create_qq_plot(
-                datasets_data=qq_data,
-                figsize=config.regression_figsize,
-                confidence=self.confidence,
-            )
+        figures["qq_plot"] = create_qq_plot(
+            datasets_data=datasets_data,
+            figsize=config.regression_figsize,
+            confidence=self.confidence,
+        )
 
         # Residual distribution
-        if use_suffix:
-            residual_dist_data: Dict[str, Dict[str, np.ndarray]] = {}
-            for ds in datasets:
-                _, y_true = self._get_raw_data(ds)
-                y_pred = self._get_predictions(ds)
-                residual_dist_data[ds] = {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-
-            figures["residual_distribution"] = create_residual_distribution_plot(
-                datasets_data=residual_dist_data,
-                figsize=config.regression_figsize,
-            )
-        else:
-            ds = datasets[0]
-            _, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
-
-            # Create single-item dict for unified function
-            residual_dist_data = {
-                ds: {
-                    "y_true": y_true,
-                    "y_pred": y_pred,
-                }
-            }
-
-            figures["residual_distribution"] = create_residual_distribution_plot(
-                datasets_data=residual_dist_data,
-                figsize=config.regression_figsize,
-            )
+        figures["residual_distribution"] = create_residual_distribution_plot(
+            datasets_data=datasets_data,
+            figsize=config.regression_figsize,
+        )
 
         # ============================================================================
         # Spectra plots (if preprocessing exists)

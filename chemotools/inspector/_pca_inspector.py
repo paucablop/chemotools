@@ -144,9 +144,6 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         )
 
         self._scores_cache: Dict[str, np.ndarray] = {}
-        # Limits are handled lazily by LatentVariableMixin
-        self._hotelling_t2_limit: Optional[float] = None
-        self._q_residuals_limit: Optional[float] = None
 
     # ==================================================================================
     # Properties
