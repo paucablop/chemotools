@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 from chemotools.outliers import QResiduals
 
-from ._base import _BaseInspector
+from ._base import _BaseInspector, InspectorPlotConfig
 from .mixins import LatentVariableMixin, RegressionMixin
 from ._utils import (
     normalize_datasets,
@@ -551,12 +551,8 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
-        scores_figsize: Tuple[float, float] = (6, 6),
-        loadings_figsize: Tuple[float, float] = (10, 5),
-        variance_figsize: Tuple[float, float] = (10, 5),
-        spectra_figsize: Tuple[float, float] = (12, 5),
-        distances_figsize: Tuple[float, float] = (8, 6),
-        regression_figsize: Tuple[float, float] = (8, 6),
+        plot_config: Optional[InspectorPlotConfig] = None,
+        **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create multiple independent PLS diagnostic plots.
 
@@ -590,18 +586,11 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             Whether to color scores by y values (if available)
         annotate_by : str or dict, optional
             Annotations for score plot points
-        scores_figsize : tuple of float, default=(6, 6)
-            Figure size for each scores plot
-        loadings_figsize : tuple of float, default=(10, 5)
-            Figure size for loadings plots
-        variance_figsize : tuple of float, default=(10, 5)
-            Figure size for variance plots
-        spectra_figsize : tuple of float, default=(12, 5)
-            Figure size for spectra plots
-        distances_figsize : tuple of float, default=(8, 6)
-            Figure size for distances plots
-        regression_figsize : tuple of float, default=(8, 6)
-            Figure size for regression plots
+        plot_config : InspectorPlotConfig, optional
+            Configuration object for plot sizes and styles. If None, defaults are used.
+        **kwargs
+            Optional keyword arguments to override specific fields in plot_config
+            (e.g., scores_figsize=(8, 8)).
 
         Returns
         -------
@@ -622,6 +611,13 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         if loadings_components is None:
             loadings_components = get_default_loadings_components(self.nr_components)
 
+        # Handle configuration
+        config = plot_config or InspectorPlotConfig()
+        # Allow kwargs to override config for convenience
+        for key, value in kwargs.items():
+            if hasattr(config, key):
+                setattr(config, key, value)
+
         figures = {}
 
         datasets = normalize_datasets(dataset)
@@ -634,7 +630,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         if x_var is not None:
             variance_x_fig = self.create_latent_variance_figure(
                 variance_threshold=variance_threshold,
-                figsize=variance_figsize,
+                figsize=config.variance_figsize,
             )
             if variance_x_fig is not None:
                 variance_x_fig.axes[0].set_title(
@@ -649,7 +645,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             variance_y_fig = _latent_plots.create_variance_plot(
                 explained_variance_ratio=y_var,
                 variance_threshold=variance_threshold,
-                figsize=variance_figsize,
+                figsize=config.variance_figsize,
             )
             variance_y_fig.axes[0].set_title(
                 "Explained Variance in Y-space", fontsize=12, fontweight="bold"
@@ -659,7 +655,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
         loadings_x_fig = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
-            figsize=loadings_figsize,
+            figsize=config.loadings_figsize,
         )
         loadings_x_fig.axes[0].set_title("X-Loadings", fontsize=12, fontweight="bold")
         figures["loadings_x"] = loadings_x_fig
@@ -669,7 +665,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             feature_names=preprocessed_x_axis,
             loadings_components=loadings_components,
             xlabel=xlabel,
-            figsize=loadings_figsize,
+            figsize=config.loadings_figsize,
             component_label=self.component_label,
         )
         figures["loadings_weights"].axes[0].set_title(
@@ -681,7 +677,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             feature_names=preprocessed_x_axis,
             loadings_components=loadings_components,
             xlabel=xlabel,
-            figsize=loadings_figsize,
+            figsize=config.loadings_figsize,
             component_label=self.component_label,
         )
         figures["loadings_rotations"].axes[0].set_title(
@@ -703,7 +699,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             feature_names=preprocessed_x_axis,
             loadings_components=coef_components,
             xlabel=xlabel,
-            figsize=loadings_figsize,
+            figsize=config.loadings_figsize,
             component_label=component_label,
         )
         coef_ax = coef_fig.axes[0]
@@ -726,7 +722,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             components=components_scores,
             color_by_y=color_by_y,
             annotate_by=annotate_by,
-            figsize=scores_figsize,
+            figsize=config.scores_figsize,
         )
         figures.update(scores_figures)
 
@@ -735,14 +731,14 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             components=components_scores,
             color_by_y=color_by_y,
             annotate_by=annotate_by,
-            figsize=scores_figsize,
+            figsize=config.scores_figsize,
         )
         figures.update(x_y_scores_figures)
 
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by_y=color_by_y,
-            figsize=distances_figsize,
+            figsize=config.distances_figsize,
             annotate_by=annotate_by,
         )
 
@@ -770,7 +766,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     model=self.model,
                     confidence=self.confidence,
                     color_by_y=color_by_y,
-                    figsize=distances_figsize,
+                    figsize=config.distances_figsize,
                     q_residuals_detector=q_detector,
                     annotate_by=annotate_by,
                 )
@@ -801,7 +797,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                     model=self.model,
                     confidence=self.confidence,
                     color_by_y=color_by_y,
-                    figsize=distances_figsize,
+                    figsize=config.distances_figsize,
                     q_residuals_detector=q_detector,
                     annotate_by=annotate_by,
                 )
@@ -825,7 +821,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 leverage_detector=self.leverage_detector,
                 student_detector=self.studentized_detector,
                 color_by_y=color_by_y,
-                figsize=distances_figsize,
+                figsize=config.distances_figsize,
                 annotate_by=annotate_by,
             )
             figures["distances_leverage_studentized"] = fig_leverage
@@ -849,7 +845,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
                 leverage_detector=self.leverage_detector,
                 student_detector=self.studentized_detector,
                 color_by_y=color_by_y,
-                figsize=distances_figsize,
+                figsize=config.distances_figsize,
                 annotate_by=annotate_by,
             )
             figures["distances_leverage_studentized"] = fig_leverage
@@ -873,7 +869,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
                 datasets_data=predicted_vs_actual_data,
                 color_by_y=color_by_y,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 annotate_by=annotate_by,
             )
         else:
@@ -894,7 +890,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
                 datasets_data=predicted_vs_actual_data,
                 color_by_y=color_by_y,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 annotate_by=annotate_by,
             )
 
@@ -914,7 +910,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["residuals"] = create_y_residual_plot(
                 datasets_data=residuals_data,
                 color_by_y=color_by_y,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 annotate_by=annotate_by,
             )
         else:
@@ -935,7 +931,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             figures["residuals"] = create_y_residual_plot(
                 datasets_data=residuals_data,
                 color_by_y=color_by_y,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 annotate_by=annotate_by,
             )
 
@@ -952,7 +948,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
             figures["qq_plot"] = create_qq_plot(
                 datasets_data=qq_data,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 confidence=self.confidence,
             )
         else:
@@ -970,7 +966,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
             figures["qq_plot"] = create_qq_plot(
                 datasets_data=qq_data,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
                 confidence=self.confidence,
             )
 
@@ -987,7 +983,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
             figures["residual_distribution"] = create_residual_distribution_plot(
                 datasets_data=residual_dist_data,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
             )
         else:
             ds = datasets[0]
@@ -1004,7 +1000,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
 
             figures["residual_distribution"] = create_residual_distribution_plot(
                 datasets_data=residual_dist_data,
-                figsize=regression_figsize,
+                figsize=config.regression_figsize,
             )
 
         # ============================================================================
@@ -1014,7 +1010,7 @@ class PLSRegressionInspector(RegressionMixin, LatentVariableMixin, _BaseInspecto
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,
-                figsize=spectra_figsize,
+                figsize=config.spectra_figsize,
             )
             figures.update(spectra_figs)
 

@@ -381,3 +381,15 @@ class _BaseInspector(ABC):
 
         X_transformed = self._transform_data(np.asarray(X))
         return self.estimator_.transform(X_transformed)
+
+
+@dataclass
+class InspectorPlotConfig:
+    """Configuration for inspector plots."""
+
+    scores_figsize: Tuple[float, float] = (6, 6)
+    loadings_figsize: Tuple[float, float] = (10, 5)
+    variance_figsize: Tuple[float, float] = (10, 5)
+    spectra_figsize: Tuple[float, float] = (12, 5)
+    distances_figsize: Tuple[float, float] = (8, 6)
+    regression_figsize: Tuple[float, float] = (8, 6)

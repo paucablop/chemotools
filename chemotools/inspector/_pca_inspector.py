@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     import matplotlib.figure
 
 
-from ._base import _BaseInspector
+from ._base import _BaseInspector, InspectorPlotConfig
 from .mixins import LatentVariableMixin
 from ._utils import (
     normalize_datasets,
@@ -357,11 +357,8 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         variance_threshold: float = 0.95,
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
-        scores_figsize: Tuple[float, float] = (6, 6),
-        loadings_figsize: Tuple[float, float] = (10, 5),
-        variance_figsize: Tuple[float, float] = (10, 5),
-        spectra_figsize: Tuple[float, float] = (12, 5),
-        distances_figsize: Tuple[float, float] = (8, 6),
+        plot_config: Optional[InspectorPlotConfig] = None,
+        **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create multiple independent PCA diagnostic plots.
 
@@ -405,16 +402,11 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             - dict: Dictionary mapping dataset names to annotation arrays
               e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
             If None (default), no annotations are added.
-        scores_figsize : tuple of float, default=(6, 6)
-            Figure size for each scores plot (width, height) in inches
-        loadings_figsize : tuple of float, default=(10, 5)
-            Figure size for loadings plot (width, height) in inches
-        variance_figsize : tuple of float, default=(10, 5)
-            Figure size for variance plot (width, height) in inches
-        spectra_figsize : tuple of float, default=(12, 5)
-            Figure size for spectra plots (width, height) in inches
-        distances_figsize : tuple of float, default=(8, 6)
-            Figure size for distances plot (width, height) in inches
+        plot_config : InspectorPlotConfig, optional
+            Configuration object for plot sizes and styles. If None, defaults are used.
+        **kwargs
+            Optional keyword arguments to override specific fields in plot_config
+            (e.g., scores_figsize=(8, 8)).
 
         Returns
         -------
@@ -462,6 +454,13 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         if loadings_components is None:
             loadings_components = get_default_loadings_components(self.nr_components)
 
+        # Handle configuration
+        config = plot_config or InspectorPlotConfig()
+        # Allow kwargs to override config for convenience
+        for key, value in kwargs.items():
+            if hasattr(config, key):
+                setattr(config, key, value)
+
         figures = {}
 
         datasets = normalize_datasets(dataset)
@@ -469,7 +468,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
 
         variance_fig = self.create_latent_variance_figure(
             variance_threshold=variance_threshold,
-            figsize=variance_figsize,
+            figsize=config.variance_figsize,
         )
         if variance_fig is not None:
             figures["variance"] = variance_fig
@@ -478,7 +477,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
         figures["loadings"] = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
-            figsize=loadings_figsize,
+            figsize=config.loadings_figsize,
         )
 
         scores_figures = self.create_latent_scores_figures(
@@ -486,14 +485,14 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             components=components_scores,
             color_by_y=color_by_y,
             annotate_by=annotate_by,
-            figsize=scores_figsize,
+            figsize=config.scores_figsize,
         )
         figures.update(scores_figures)
 
         figures["distances"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by_y=color_by_y,
-            figsize=distances_figsize,
+            figsize=config.distances_figsize,
             annotate_by=annotate_by,
         )
 
@@ -503,7 +502,7 @@ class PCAInspector(LatentVariableMixin, _BaseInspector):
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,
-                figsize=spectra_figsize,
+                figsize=config.spectra_figsize,
             )
             figures.update(spectra_figs)
 
