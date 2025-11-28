@@ -176,21 +176,6 @@ class PLSRegressionInspector(
         self._y_scores_cache: Dict[str, np.ndarray] = {}
 
     # ==================================================================================
-    # Private Methods
-    # ==================================================================================
-
-    def _get_raw_data(self, dataset: str) -> Tuple[np.ndarray, np.ndarray]:
-        """Get raw X and y data for specified dataset."""
-        X, y = super()._get_raw_data(dataset)
-        if y is None:
-            raise ValueError(f"Target values not available for dataset '{dataset}'.")
-        return X, y
-
-    def _get_preprocessed_data(self, dataset: str) -> np.ndarray:
-        """Get preprocessed X data for specified dataset."""
-        return super()._get_preprocessed_data(dataset)
-
-    # ==================================================================================
     # Public Methods
     # ==================================================================================
 
@@ -198,14 +183,20 @@ class PLSRegressionInspector(
     # LatentVariableMixin hooks
     # ------------------------------------------------------------------
     def get_latent_scores(self, dataset: str) -> np.ndarray:
+        """Hook for LatentVariableMixin - returns X-scores."""
         return self.get_x_scores(dataset)
 
     def get_latent_explained_variance(self) -> Optional[np.ndarray]:
+        """Hook for LatentVariableMixin - returns explained X variance ratio."""
         return self.get_explained_x_variance_ratio()
 
     def get_latent_loadings(self) -> np.ndarray:
+        """Hook for LatentVariableMixin - returns X-loadings."""
         return self.get_x_loadings()
 
+    # ------------------------------------------------------------------
+    # Scores methods
+    # ------------------------------------------------------------------
     def get_x_scores(self, dataset: str = "train") -> np.ndarray:
         """Get PLS X-scores for specified dataset.
 
@@ -247,6 +238,9 @@ class PLSRegressionInspector(
             self._y_scores_cache[dataset] = y_scores
         return self._y_scores_cache[dataset]
 
+    # ------------------------------------------------------------------
+    # Loadings and weights methods
+    # ------------------------------------------------------------------
     def get_x_loadings(
         self, components: Optional[Union[int, Sequence[int]]] = None
     ) -> np.ndarray:
@@ -298,6 +292,9 @@ class PLSRegressionInspector(
         """
         return select_components(self.estimator.x_rotations_, components)
 
+    # ------------------------------------------------------------------
+    # Regression coefficients
+    # ------------------------------------------------------------------
     def get_regression_coefficients(self) -> np.ndarray:
         """Get PLS regression coefficients (regression vector).
 
@@ -315,6 +312,9 @@ class PLSRegressionInspector(
             coef = coef.ravel()
         return coef
 
+    # ------------------------------------------------------------------
+    # Variance methods
+    # ------------------------------------------------------------------
     def get_explained_x_variance_ratio(self) -> Optional[np.ndarray]:
         """Get explained variance ratio in X-space for all components.
 
@@ -339,6 +339,9 @@ class PLSRegressionInspector(
             return self.estimator.explained_y_variance_ratio_
         return None
 
+    # ------------------------------------------------------------------
+    # Summary method
+    # ------------------------------------------------------------------
     def summary(self) -> Dict[str, SummaryValue]:
         """Get a summary dictionary of the PLS regression model.
 
@@ -372,6 +375,9 @@ class PLSRegressionInspector(
 
         return summary_dict
 
+    # ------------------------------------------------------------------
+    # Main inspection method
+    # ------------------------------------------------------------------
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
@@ -454,9 +460,12 @@ class PLSRegressionInspector(
         datasets = normalize_datasets(dataset)
         use_suffix = len(datasets) > 1
 
-        xlabel = get_xlabel_for_features(self.x_axis is not None)
+        xlabel = get_xlabel_for_features(self.feature_names is not None)
         preprocessed_x_axis = self._get_preprocessed_x_axis()
 
+        # ------------------------------------------------------------------
+        # Variance plots (X and Y space)
+        # ------------------------------------------------------------------
         x_var = self.get_explained_x_variance_ratio()
         if x_var is not None:
             variance_x_fig = self.create_latent_variance_figure(
@@ -471,6 +480,7 @@ class PLSRegressionInspector(
                 )
                 figures["variance_x"] = variance_x_fig
 
+        # Y-space variance
         y_var = self.get_explained_y_variance_ratio()
         if y_var is not None:
             variance_y_fig = _latent_plots.create_variance_plot(
@@ -483,6 +493,9 @@ class PLSRegressionInspector(
             )
             figures["variance_y"] = variance_y_fig
 
+        # ------------------------------------------------------------------
+        # Loadings plots (X-loadings, X-weights, X-rotations, coefficients)
+        # ------------------------------------------------------------------
         loadings_x_fig = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
@@ -548,6 +561,9 @@ class PLSRegressionInspector(
 
         figures["regression_coefficients"] = coef_fig
 
+        # ------------------------------------------------------------------
+        # Scores plots (X-scores and X vs Y scores)
+        # ------------------------------------------------------------------
         scores_figures = self.create_latent_scores_figures(
             dataset=dataset,
             components=components_scores,
@@ -574,6 +590,9 @@ class PLSRegressionInspector(
         )
         figures.update(x_y_scores_figures)
 
+        # ------------------------------------------------------------------
+        # Distance plots (Hotelling T², Q residuals, leverage, studentized)
+        # ------------------------------------------------------------------
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by_y=color_by_y,
@@ -581,11 +600,7 @@ class PLSRegressionInspector(
             annotate_by=annotate_by,
         )
 
-        # ============================================================================
         # Prepare data for regression diagnostics
-        # ============================================================================
-        # We create a unified data dictionary that can be used by all regression plots
-        # This avoids repeating the data extraction logic for each plot type
         datasets_data: Dict[str, Dict[str, Any]] = {}
         for ds in datasets:
             X, y_true = self._get_raw_data(ds)
@@ -596,10 +611,6 @@ class PLSRegressionInspector(
                 "y_true": y_true,
                 "y_pred": y_pred,
             }
-
-        # ============================================================================
-        # Distance plots (Q vs Y residuals, Leverage vs Studentized)
-        # ============================================================================
 
         # Q residuals vs Y residuals
         # Fit Q detector on training data for consistent limits
@@ -627,10 +638,9 @@ class PLSRegressionInspector(
             annotate_by=annotate_by,
         )
 
-        # ============================================================================
+        # ------------------------------------------------------------------
         # Regression diagnostic plots
-        # ============================================================================
-
+        # ------------------------------------------------------------------
         # Predicted vs Actual
         figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
@@ -660,9 +670,9 @@ class PLSRegressionInspector(
             figsize=config.regression_figsize,
         )
 
-        # ============================================================================
+        # ------------------------------------------------------------------
         # Spectra plots (if preprocessing exists)
-        # ============================================================================
+        # ------------------------------------------------------------------
         if self.transformer is not None:
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],

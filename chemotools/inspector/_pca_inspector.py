@@ -150,14 +150,20 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     # LatentVariableMixin hooks
     # ------------------------------------------------------------------
     def get_latent_scores(self, dataset: str) -> np.ndarray:
+        """Hook for LatentVariableMixin - returns scores."""
         return self.get_scores(dataset)
 
     def get_latent_explained_variance(self) -> Optional[np.ndarray]:
+        """Hook for LatentVariableMixin - returns explained variance ratio."""
         return self.get_explained_variance_ratio()
 
     def get_latent_loadings(self) -> np.ndarray:
+        """Hook for LatentVariableMixin - returns loadings."""
         return self.get_loadings()
 
+    # ------------------------------------------------------------------
+    # Scores methods
+    # ------------------------------------------------------------------
     def get_scores(self, dataset: str = "train") -> np.ndarray:
         """Get PCA scores for specified dataset.
 
@@ -177,6 +183,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             self._scores_cache[dataset] = scores
         return self._scores_cache[dataset]
 
+    # ------------------------------------------------------------------
+    # Loadings methods
+    # ------------------------------------------------------------------
     def get_loadings(
         self, components: Optional[Union[int, Sequence[int]]] = None
     ) -> np.ndarray:
@@ -195,6 +204,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         loadings = self.estimator.components_.T
         return select_components(loadings, components)
 
+    # ------------------------------------------------------------------
+    # Variance methods
+    # ------------------------------------------------------------------
     def get_explained_variance_ratio(self) -> np.ndarray:
         """Get explained variance ratio for all components.
 
@@ -205,6 +217,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         """
         return self.estimator.explained_variance_ratio_
 
+    # ------------------------------------------------------------------
+    # Summary method
+    # ------------------------------------------------------------------
     def summary(self) -> Dict[str, Union[str, int, float, Dict, np.ndarray]]:
         """Get a summary dictionary of the PCA model.
 
@@ -291,6 +306,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         return summary_dict
 
+    # ------------------------------------------------------------------
+    # Main inspection method
+    # ------------------------------------------------------------------
     def inspect(
         self,
         dataset: Union[str, Sequence[str]] = "train",
@@ -410,6 +428,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         datasets = normalize_datasets(dataset)
         use_suffix = len(datasets) > 1
 
+        # ------------------------------------------------------------------
+        # Variance plot
+        # ------------------------------------------------------------------
         variance_fig = self.create_latent_variance_figure(
             variance_threshold=variance_threshold,
             figsize=config.variance_figsize,
@@ -417,6 +438,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         if variance_fig is not None:
             figures["variance"] = variance_fig
 
+        # ------------------------------------------------------------------
+        # Loadings plot
+        # ------------------------------------------------------------------
         xlabel = get_xlabel_for_features(self.feature_names is not None)
         figures["loadings"] = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
@@ -424,6 +448,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             figsize=config.loadings_figsize,
         )
 
+        # ------------------------------------------------------------------
+        # Scores plots
+        # ------------------------------------------------------------------
         scores_figures = self.create_latent_scores_figures(
             dataset=dataset,
             components=components_scores,
@@ -433,6 +460,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         )
         figures.update(scores_figures)
 
+        # ------------------------------------------------------------------
+        # Distance plot (Hotelling T² vs Q residuals)
+        # ------------------------------------------------------------------
         figures["distances"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by_y=color_by_y,
@@ -440,8 +470,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             annotate_by=annotate_by,
         )
 
-        # Add spectra plots if preprocessing exists
-        # Note: We call inspect_spectra once with all datasets to plot them together
+        # ------------------------------------------------------------------
+        # Spectra plots (if preprocessing exists)
+        # ------------------------------------------------------------------
         if self.transformer is not None:
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
