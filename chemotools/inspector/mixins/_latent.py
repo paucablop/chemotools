@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union
+from typing import Dict, Literal, Optional, Sequence, Tuple, TYPE_CHECKING, Union
 
 import numpy as np
 
-from ..helpers import _latent_space as _latent_plots
+from ..helpers import _latent as _latent_plots
 from chemotools.inspector._utils import (
     ComponentSpec,
     normalize_components,
@@ -148,6 +148,7 @@ class LatentVariableMixin:
         color_by_y: bool,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
         figsize: Tuple[float, float],
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> Dict[str, "Figure"]:
         """Generate per-component latent scores plots for requested datasets."""
 
@@ -184,6 +185,7 @@ class LatentVariableMixin:
                     component_label=component_label,
                     train_scores_for_ellipse=train_scores_for_ellipse,
                     confidence=confidence_level,
+                    color_mode=color_mode,
                 )
                 figures[f"scores_{idx}"] = fig
         else:
@@ -218,6 +220,7 @@ class LatentVariableMixin:
                     dataset_color=DATASET_COLORS.get(dataset_name, "gray"),
                     confidence=confidence_level,
                     train_scores_for_ellipse=train_scores_for_ellipse,
+                    color_mode=color_mode,
                 )
                 figures[f"scores_{idx}"] = fig
 
@@ -230,6 +233,7 @@ class LatentVariableMixin:
         color_by_y: bool,
         figsize: Tuple[float, float],
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> "Figure":
         """Create Hotelling T² vs Q residuals plot for the provided datasets."""
 
@@ -257,6 +261,7 @@ class LatentVariableMixin:
             hotelling_detector=hotelling,
             q_residuals_detector=q_detector,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
     # ------------------------------------------------------------------

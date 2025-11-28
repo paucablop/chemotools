@@ -1,6 +1,6 @@
 """Predicted vs Actual plot for regression model evaluation."""
 
-from typing import Optional, Any
+from typing import Literal, Optional, Any
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -91,7 +91,29 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         colormap: Optional[str] = None,
         marker: str = "o",
         add_ideal_line: bool = True,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ):
+        self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
+        self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
+        self.target_index = target_index
+        self.label = label
+        self.color = color
+        self.marker = marker
+        self.add_ideal_line = add_ideal_line
+
+        # Validate shapes match
+        if self.y_true.shape != self.y_pred.shape:
+            raise ValueError(
+                f"y_true and y_pred must have same shape, got {self.y_true.shape} and {self.y_pred.shape}"
+            )
+
+        if color_by is not None:
+            color_by = validate_data(
+                color_by, name="color_by", ensure_2d=False, numeric=False
+            )
+
+        # Initialize coloring
+        self._init_coloring(color_by, colormap, color_mode=color_mode)
         self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
         self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
         self.target_index = target_index

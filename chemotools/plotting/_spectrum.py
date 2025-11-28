@@ -5,7 +5,7 @@ The :mod:`chemotools.plotting._spectrum` module implements the SpectrumPlot clas
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Optional, Any, Sequence
+from typing import Optional, Any, Sequence, Literal
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -108,7 +108,7 @@ class SpectraPlot(BasePlot, ColoringMixin):
         labels: Optional[Sequence[Optional[str]]] = None,
         color_by: Optional[np.ndarray] = None,
         colormap: Optional[str] = None,
-        categorical: Optional[bool] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
         colorbar_label: str = "Reference Value",
     ):
         self.x = validate_data(x, name="x", ensure_2d=False)
@@ -124,7 +124,7 @@ class SpectraPlot(BasePlot, ColoringMixin):
                 color_by, name="color_by", ensure_2d=False, numeric=False
             )
 
-        self._init_coloring(color_by, colormap, categorical, colorbar_label)
+        self._init_coloring(color_by, colormap, color_mode, colorbar_label)
 
     def _get_default_labels(self) -> dict[str, str]:
         return {

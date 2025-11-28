@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union
+from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union, Literal
 
 import numpy as np
 
@@ -70,6 +70,7 @@ class SpectraMixin:
         color_by_y: bool = True,
         xlim: Optional[Tuple[float, float]] = None,
         figsize: Tuple[float, float] = (12, 5),
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> Dict[str, "Figure"]:
         """Create independent plots comparing raw and preprocessed spectra.
 
@@ -91,6 +92,8 @@ class SpectraMixin:
             X-axis limits for zooming into spectral regions
         figsize : tuple of float, default=(12, 5)
             Figure size for each plot (width, height) in inches
+        color_mode : Literal["continuous", "categorical"], default="continuous"
+            Mode for coloring points.
 
         Returns
         -------
@@ -150,6 +153,7 @@ class SpectraMixin:
                 xlabel=xlabel,
                 xlim=xlim,
                 figsize=figsize,
+                color_mode=color_mode,
             )
         else:
             # Single dataset
@@ -168,6 +172,7 @@ class SpectraMixin:
                 xlabel=xlabel,
                 xlim=xlim,
                 figsize=figsize,
+                color_mode=color_mode,
             )
 
         return figures

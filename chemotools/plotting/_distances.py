@@ -1,6 +1,6 @@
 """Distances plot for visualizing diagnostic measures and outlier detection."""
 
-from typing import Optional, Any
+from typing import Literal, Optional, Any
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -131,9 +131,8 @@ class DistancesPlot(BasePlot, ColoringMixin):
         colormap: Optional[str] = None,
         marker: str = "o",
         confidence_lines: Optional[bool | tuple[float | None, float | None]] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ):
-        self._x: np.ndarray
-        self._y: np.ndarray
         self.annotations = annotations
         self.label = label
         self.color = color
@@ -165,7 +164,7 @@ class DistancesPlot(BasePlot, ColoringMixin):
         self._init_from_xy(x, y)
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap)
+        self._init_coloring(color_by, colormap, color_mode=color_mode)
 
         self._validate_color_and_annotations()
 

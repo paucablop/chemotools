@@ -1,7 +1,17 @@
 """PLS Regression Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Sequence, Tuple, TYPE_CHECKING, Union
+from typing import (
+    Dict,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    Any,
+    TYPE_CHECKING,
+    Literal,
+    List,
+)
 import numpy as np
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
@@ -20,7 +30,7 @@ from ._utils import (
     get_default_loadings_components,
     select_components,
 )
-from .helpers import _latent_space as _latent_plots
+from .helpers import _latent as _latent_plots
 from .helpers._regression import (
     create_predicted_vs_actual_plot,
     create_y_residual_plot,
@@ -389,6 +399,7 @@ class PLSRegressionInspector(
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
+        color_mode: Literal["continuous", "categorical"] = "continuous",
         **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create multiple independent PLS diagnostic plots.
@@ -425,6 +436,8 @@ class PLSRegressionInspector(
             Annotations for score plot points
         plot_config : InspectorPlotConfig, optional
             Configuration object for plot sizes and styles. If None, defaults are used.
+        color_mode : Literal["continuous", "categorical"], default="continuous"
+            Mode for coloring points.
         **kwargs
             Optional keyword arguments to override specific fields in plot_config
             (e.g., scores_figsize=(8, 8)).
@@ -570,6 +583,7 @@ class PLSRegressionInspector(
             color_by_y=color_by_y,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
+            color_mode=color_mode,
         )
         figures.update(scores_figures)
 
@@ -587,6 +601,7 @@ class PLSRegressionInspector(
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
             component_label=self.component_label,
+            color_mode=color_mode,
         )
         figures.update(x_y_scores_figures)
 
@@ -598,6 +613,7 @@ class PLSRegressionInspector(
             color_by_y=color_by_y,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # Prepare data for regression diagnostics
@@ -626,6 +642,7 @@ class PLSRegressionInspector(
             figsize=config.distances_figsize,
             q_residuals_detector=q_detector,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # Leverage vs Studentized residuals
@@ -636,6 +653,7 @@ class PLSRegressionInspector(
             color_by_y=color_by_y,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # ------------------------------------------------------------------
@@ -647,6 +665,7 @@ class PLSRegressionInspector(
             color_by_y=color_by_y,
             figsize=config.regression_figsize,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # Residual scatter plot
@@ -655,6 +674,7 @@ class PLSRegressionInspector(
             color_by_y=color_by_y,
             figsize=config.regression_figsize,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # Q-Q plot
@@ -678,6 +698,7 @@ class PLSRegressionInspector(
                 dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,
                 figsize=config.spectra_figsize,
+                color_mode=color_mode,
             )
             figures.update(spectra_figs)
 

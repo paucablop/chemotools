@@ -6,7 +6,7 @@ decomposition models (IR, Raman, NMR, etc.).
 """
 
 from __future__ import annotations
-from typing import Dict, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, Tuple, TYPE_CHECKING, Literal
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,6 +30,7 @@ def create_spectra_plots_single_dataset(
     xlabel: str,
     xlim: Optional[Tuple[float, float]],
     figsize: Tuple[float, float],
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Dict[str, Figure]:
     """Create raw and preprocessed spectra plots for a single dataset.
 
@@ -59,6 +60,8 @@ def create_spectra_plots_single_dataset(
         X-axis limits for zooming into spectral regions
     figsize : Tuple[float, float]
         Figure size (width, height) in inches
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Returns
     -------
@@ -95,6 +98,7 @@ def create_spectra_plots_single_dataset(
         color_by=color_values,
         colormap="shap",
         labels=empty_labels,
+        color_mode=color_mode,
     )
     fig1 = plot_raw.show(
         figsize=figsize,
@@ -113,6 +117,7 @@ def create_spectra_plots_single_dataset(
         color_by=color_values,
         colormap="shap",
         labels=empty_labels_preproc,
+        color_mode=color_mode,
     )
     fig2 = plot_preprocessed.show(
         figsize=figsize,
@@ -134,6 +139,7 @@ def create_spectra_plots_multi_dataset(
     xlabel: str,
     xlim: Optional[Tuple[float, float]],
     figsize: Tuple[float, float],
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Dict[str, Figure]:
     """Create raw and preprocessed spectra plots with multiple datasets.
 
@@ -147,32 +153,22 @@ def create_spectra_plots_multi_dataset(
     preprocessed_data : Dict[str, np.ndarray]
         Dictionary mapping dataset names to preprocessed spectra arrays
     x_axis : np.ndarray
-        X-axis values (e.g. wavenumbers/wavelengths) for raw spectra
+        X-axis values for raw spectra
     preprocessed_x_axis : np.ndarray
-        X-axis values (e.g. wavenumbers/wavelengths) for preprocessed spectra
+        X-axis values for preprocessed spectra
     xlabel : str
-        Label for x-axis (e.g., "Wavenumber (cm⁻¹)")
+        Label for x-axis
     xlim : Optional[Tuple[float, float]]
-        X-axis limits for zooming
+        X-axis limits
     figsize : Tuple[float, float]
-        Figure size (width, height) in inches
+        Figure size
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Returns
     -------
     Dict[str, Figure]
         Dictionary with 'raw_spectra' and 'preprocessed_spectra' keys
-
-    Examples
-    --------
-    >>> train = np.random.rand(50, 1000)
-    >>> test = np.random.rand(30, 1000)
-    >>> raw_data = {'train': train, 'test': test}
-    >>> preprocessed_data = {'train': train * 2, 'test': test * 2}
-    >>> x_axis = np.linspace(4000, 400, 1000)
-    >>> figs = create_spectra_plots_multi_dataset(
-    ...     raw_data, preprocessed_data, x_axis, x_axis,
-    ...     'Wavenumber (cm⁻¹)', None, (12, 5)
-    ... )
     """
     figures = {}
 
@@ -188,7 +184,7 @@ def create_spectra_plots_multi_dataset(
         # Matplotlib handles duplicate labels in legend automatically
         # But to be safe and efficient, we only label the first spectrum
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectraPlot(x=x_axis, y=X, labels=labels)
+        plot = SpectraPlot(x=x_axis, y=X, labels=labels, color_mode=color_mode)
 
         plot.render(ax=ax_raw, color=color, alpha=0.6, linewidth=1)
 
@@ -209,7 +205,9 @@ def create_spectra_plots_multi_dataset(
         color = DATASET_COLORS.get(name, "black")
 
         labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectraPlot(x=preprocessed_x_axis, y=X, labels=labels)
+        plot = SpectraPlot(
+            x=preprocessed_x_axis, y=X, labels=labels, color_mode=color_mode
+        )
 
         plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
 

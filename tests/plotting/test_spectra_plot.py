@@ -239,7 +239,7 @@ class TestSpectraPlotCategoricalColoring:
         plt.close(fig)
 
     def test_force_categorical_with_parameter(self):
-        """Test forcing categorical treatment with categorical=True."""
+        """Test forcing categorical treatment with color_mode='categorical'."""
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(4, 100)
@@ -247,7 +247,7 @@ class TestSpectraPlotCategoricalColoring:
         values = np.array([1.0, 2.0, 3.0, 4.0])
 
         # Act
-        plot = SpectraPlot(x, y, color_by=values, categorical=True)
+        plot = SpectraPlot(x, y, color_by=values, color_mode="categorical")
         fig = plot.show()
 
         # Assert
@@ -320,7 +320,7 @@ class TestSpectraPlotContinuousColoring:
             plt.close(fig)
 
     def test_force_continuous_with_parameter(self):
-        """Test forcing continuous treatment with categorical=False."""
+        """Test forcing continuous treatment with color_mode='continuous'."""
         # Arrange
         x = np.linspace(400, 2500, 100)
         y = np.random.randn(5, 100)
@@ -328,7 +328,9 @@ class TestSpectraPlotContinuousColoring:
         levels = np.array([1, 2, 3, 4, 5])
 
         # Act
-        plot = SpectraPlot(x, y, color_by=levels, categorical=False, colormap="viridis")
+        plot = SpectraPlot(
+            x, y, color_by=levels, color_mode="continuous", colormap="viridis"
+        )
         fig = plot.show()
 
         # Assert

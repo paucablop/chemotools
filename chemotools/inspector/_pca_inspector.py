@@ -1,7 +1,7 @@
 """PCA Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
-from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING
+from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING, Literal
 import numpy as np
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
@@ -320,6 +320,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         color_by_y: bool = True,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
+        color_mode: Literal["continuous", "categorical"] = "continuous",
         **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create multiple independent PCA diagnostic plots.
@@ -366,6 +367,8 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             If None (default), no annotations are added.
         plot_config : InspectorPlotConfig, optional
             Configuration object for plot sizes and styles. If None, defaults are used.
+        color_mode : Literal["continuous", "categorical"], default="continuous"
+            Mode for coloring points.
         **kwargs
             Optional keyword arguments to override specific fields in plot_config
             (e.g., scores_figsize=(8, 8)).
@@ -457,6 +460,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             color_by_y=color_by_y,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
+            color_mode=color_mode,
         )
         figures.update(scores_figures)
 
@@ -468,6 +472,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             color_by_y=color_by_y,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
+            color_mode=color_mode,
         )
 
         # ------------------------------------------------------------------
@@ -478,6 +483,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
                 dataset=datasets if use_suffix else datasets[0],
                 color_by_y=color_by_y,
                 figsize=config.spectra_figsize,
+                color_mode=color_mode,
             )
             figures.update(spectra_figs)
 

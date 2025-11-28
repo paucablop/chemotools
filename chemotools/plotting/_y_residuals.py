@@ -1,6 +1,6 @@
 """Y residuals plot for regression diagnostics and homoscedasticity analysis."""
 
-from typing import Optional, Any
+from typing import Optional, Any, Literal
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -105,6 +105,7 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         colormap: Optional[str] = None,
         add_zero_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ):
         self.residuals = validate_data(residuals, name="residuals", ensure_2d=False)
 
@@ -133,7 +134,7 @@ class YResidualsPlot(BasePlot, ColoringMixin):
             )
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap)
+        self._init_coloring(color_by, colormap, color_mode=color_mode)
 
     def _validate_residuals(self) -> None:
         """Validate residuals shape and target index."""

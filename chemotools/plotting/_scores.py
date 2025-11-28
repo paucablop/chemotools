@@ -1,6 +1,6 @@
 """Scores plot for visualizing model projections and latent space."""
 
-from typing import Optional, Any
+from typing import Literal, Optional, Any
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -112,6 +112,7 @@ class ScoresPlot(BasePlot, ColoringMixin):
         color: Optional[str] = None,
         colormap: Optional[str] = None,
         confidence_ellipse: Optional[bool | float] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ):
         self.scores = validate_data(scores, name="scores", ensure_2d=True)
         self.components = components
@@ -137,8 +138,7 @@ class ScoresPlot(BasePlot, ColoringMixin):
             )
 
         # Initialize coloring
-        # Initialize coloring
-        self._init_coloring(color_by, colormap)
+        self._init_coloring(color_by, colormap, color_mode=color_mode)
 
     def _validate_components(self) -> None:
         """Validate that component indices are valid.

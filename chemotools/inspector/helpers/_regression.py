@@ -8,7 +8,7 @@ plot objects from the chemotools.plotting module for consistent rendering.
 """
 
 from __future__ import annotations
-from typing import Dict, Tuple, TYPE_CHECKING, Optional, Union
+from typing import Dict, Tuple, TYPE_CHECKING, Optional, Union, Literal
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -33,6 +33,7 @@ def create_predicted_vs_actual_plot(
     color_by_y: bool,
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Figure:
     """Create predicted vs actual plot for one or multiple datasets.
 
@@ -49,6 +50,8 @@ def create_predicted_vs_actual_plot(
         Figure size
     annotate_by : str or dict, optional
         Annotations for plot points.
+    color_mode : str, optional
+        Coloring mode ("continuous" or "categorical").
 
     Returns
     -------
@@ -75,6 +78,7 @@ def create_predicted_vs_actual_plot(
             y_true=y_true,
             y_pred=y_pred,
             color_by=color_reference,
+            color_mode=color_mode,
         )
         pred_actual_plot.render(ax=ax)
 
@@ -153,6 +157,7 @@ def create_y_residual_plot(
     color_by_y: bool,
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Figure:
     """Create residual scatter plot for one or multiple datasets.
 
@@ -170,6 +175,8 @@ def create_y_residual_plot(
         Figure size
     annotate_by : str or dict, optional
         Annotations for plot points.
+    color_mode : str, optional
+        Coloring mode ("continuous" or "categorical").
 
     Returns
     -------
@@ -198,6 +205,7 @@ def create_y_residual_plot(
             x_values=y_pred,
             color_by=color_reference,
             add_confidence_band=2.0,
+            color_mode=color_mode,
         )
         residuals_plot.render(ax=ax)
 
@@ -248,6 +256,7 @@ def create_y_residual_plot(
             x_values=y_pred,
             color_by=color_reference,
             add_confidence_band=2.0,
+            color_mode=color_mode,
         )
         residuals_plot.render(ax=ax)
 
@@ -419,6 +428,7 @@ def create_regression_distances_plot(
     color_by_y: bool,
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    color_mode: Literal["continuous", "categorical"] = "continuous",
 ) -> Figure:
     """Create regression diagnostic distances plot for one or multiple datasets.
 
@@ -440,6 +450,8 @@ def create_regression_distances_plot(
         Figure size
     annotate_by : str or dict, optional
         Annotations for plot points.
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Returns
     -------
@@ -470,6 +482,7 @@ def create_regression_distances_plot(
             x=leverages,
             color_by=select_primary_target(y) if color_by_y else None,
             confidence_lines=(leverage_limit, student_limit),
+            color_mode=color_mode,
         )
         distances_plot.render(ax=ax)
 

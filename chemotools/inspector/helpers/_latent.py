@@ -6,7 +6,7 @@ decomposition methods.
 """
 
 from __future__ import annotations
-from typing import Dict, Union, Optional, Tuple, Sequence, TYPE_CHECKING
+from typing import Dict, Union, Optional, Tuple, Sequence, TYPE_CHECKING, Literal
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -165,6 +165,7 @@ def create_scores_plot_single_dataset(
     dataset_color: Optional[str] = None,
     confidence: float = 0.95,
     train_scores_for_ellipse: Optional[np.ndarray] = None,
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Figure:
     """Create scores plot for a single dataset.
 
@@ -200,6 +201,8 @@ def create_scores_plot_single_dataset(
         Training scores to use for drawing confidence ellipse reference.
         If provided, a confidence ellipse will be drawn even if dataset_name != 'train'.
         If None and dataset_name == 'train', will use the scores parameter.
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Returns
     -------
@@ -270,6 +273,7 @@ def create_scores_plot_single_dataset(
             color=dataset_color if color_by is None else None,
             colormap=None,
             confidence_ellipse=None,
+            color_mode=color_mode,
         )
         scores_plot.render(ax)
 
@@ -328,6 +332,7 @@ def create_scores_plot_single_dataset(
             color=dataset_color if color_by is None else None,
             colormap=None,
             confidence_ellipse=None,  # Ellipse already drawn above
+            color_mode=color_mode,
         )
         scores_plot.render(ax=ax)
 
@@ -374,6 +379,7 @@ def create_scores_plot_multi_dataset(
     component_label: str = "PC",
     train_scores_for_ellipse: Optional[np.ndarray] = None,
     confidence: float = 0.95,
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Figure:
     """Create scores plot with multiple datasets on same axes.
 
@@ -398,9 +404,8 @@ def create_scores_plot_multi_dataset(
         Prefix used in axis labels and titles (default "PC").
     train_scores_for_ellipse : Optional[np.ndarray], optional
         Training scores to use for drawing confidence ellipse reference.
-        If provided, a confidence ellipse will be drawn even if 'train'
-        is not in datasets_data. If None, will use train data from datasets_data
-        if available.
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
     confidence : float, optional
         Confidence level for the ellipse (default 0.95).
 
@@ -489,6 +494,7 @@ def create_scores_plot_multi_dataset(
                 label=ds_name.capitalize(),
                 color=DATASET_COLORS.get(ds_name),
                 confidence_ellipse=None,
+                color_mode=color_mode,
             )
             plot.render(
                 ax=ax,
@@ -570,6 +576,7 @@ def create_scores_plot_multi_dataset(
                 color=color if color_by is None else None,
                 colormap=None,
                 confidence_ellipse=ellipse,
+                color_mode=color_mode,
             )
             plot.render(ax, marker=marker)
 
@@ -617,6 +624,7 @@ def create_model_distances_plot(
     q_residuals_detector: Optional[QResiduals] = None,
     training_dataset: str = "train",
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Figure:
     """Create model diagnostic distances plot across one or more datasets.
 
@@ -643,6 +651,8 @@ def create_model_distances_plot(
         Figure size (width, height) in inches.
     annotate_by : str or dict, optional
         Annotations for plot points.
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Other Parameters
     ----------------
@@ -745,6 +755,7 @@ def create_model_distances_plot(
             colormap=None,
             marker=marker,
             confidence_lines=confidence_lines,
+            color_mode=color_mode,
         )
         dist_plot.render(ax)
 
@@ -792,6 +803,7 @@ def create_q_vs_y_residuals_plot(
     q_residuals_detector: Optional[QResiduals] = None,
     training_dataset: str = "train",
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    color_mode: Literal["continuous", "categorical"] = "continuous",
 ) -> Figure:
     """Create Q residuals vs Y residuals diagnostic plot for regression models.
 
@@ -823,6 +835,8 @@ def create_q_vs_y_residuals_plot(
         Figure size (width, height) in inches.
     annotate_by : str or dict, optional
         Annotations for plot points.
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Other Parameters
     ----------------
@@ -954,6 +968,7 @@ def create_q_vs_y_residuals_plot(
             colormap=None,
             marker=marker,
             confidence_lines=confidence_lines,
+            color_mode=color_mode,
         )
         dist_plot.render(ax)
 
@@ -1010,6 +1025,7 @@ def create_x_vs_y_scores_plots(
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     component_label: str = "LV",
+    color_mode: Literal["continuous", "categorical"] = "continuous",
 ) -> Dict[str, Figure]:
     """Create X-scores vs Y-scores plots (typically for PLS).
 
@@ -1035,6 +1051,8 @@ def create_x_vs_y_scores_plots(
         Figure size
     component_label : str, default="LV"
         Label for components (e.g., "LV", "PC")
+    color_mode : Literal["continuous", "categorical"], default="continuous"
+        Mode for coloring points.
 
     Returns
     -------
@@ -1068,6 +1086,7 @@ def create_x_vs_y_scores_plots(
                 label="Train",
                 colormap=None,
                 confidence_ellipse=None,
+                color_mode=color_mode,
             )
             plot.render(ax)
 

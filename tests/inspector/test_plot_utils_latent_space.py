@@ -5,7 +5,7 @@ import pytest
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 
-from chemotools.inspector.helpers._latent_space import (
+from chemotools.inspector.helpers._latent import (
     create_model_distances_plot,
     create_q_vs_y_residuals_plot,
     create_variance_plot,
@@ -195,11 +195,13 @@ class TestCreateScoresPlotSingleDataset:
             color_by_y=color_by_y,
             annotate_by=annotate_by,
             figsize=figsize,
+            color_mode="continuous",
         )
 
         # Assert
         assert fig is not None
-        assert len(fig.axes) == 1
+        # Should have 2 axes (main plot + colorbar) because color_by_y=True and y is numeric
+        assert len(fig.axes) == 2
 
         # Cleanup
         plt.close(fig)
@@ -422,11 +424,13 @@ class TestCreateModelDistancesPlot:
             confidence=confidence,
             color_by_y=color_by_y,
             figsize=figsize,
+            color_mode="continuous",
         )
 
         # Assert
         assert fig is not None
-        assert len(fig.axes) == 1
+        # Should have 2 axes (main plot + colorbar) because color_by_y=True and y is numeric
+        assert len(fig.axes) == 2
 
         # Cleanup
         plt.close(fig)

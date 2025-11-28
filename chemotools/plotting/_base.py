@@ -1,6 +1,6 @@
 """Base classes and mixins for chemotools plotting."""
 
-from typing import Optional, Any, Tuple, Protocol, runtime_checkable
+from typing import Optional, Any, Tuple, Protocol, runtime_checkable, Literal
 from abc import ABC, abstractmethod
 import numpy as np
 import matplotlib.pyplot as plt
@@ -268,15 +268,17 @@ class ColoringMixin:
         self,
         color_by: Optional[np.ndarray],
         colormap: Optional[str],
-        categorical: Optional[bool] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
         colorbar_label: str = "Value",
     ) -> None:
         """Initialize coloring attributes."""
         self.color_by = color_by
         self.colorbar_label = colorbar_label
 
-        if categorical is not None:
-            self.is_categorical = categorical
+        if color_mode == "categorical":
+            self.is_categorical = True
+        elif color_mode == "continuous":
+            self.is_categorical = False
         elif color_by is not None:
             self.is_categorical = detect_categorical(color_by)
         else:

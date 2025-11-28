@@ -5,7 +5,7 @@ The :mod:`chemotools.plotting._spectra` module implements the SpectraPlot class 
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Optional, Any, Sequence
+from typing import Literal, Optional, Any, Sequence
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -41,8 +41,8 @@ class SpectraPlot(BasePlot, ColoringMixin):
         - "tab10" for categorical data (default)
         - "shap" for continuous data
         Other options: "plasma", "cividis", "coolwarm"
-    categorical : bool, optional
-        Explicitly specify whether color_by should be treated as categorical.
+    color_mode : str, optional
+        Explicitly specify coloring mode ("continuous" or "categorical").
         If None (default), automatically detects based on dtype and unique values.
         Use this to override automatic detection for edge cases.
     colorbar_label : str, optional
@@ -80,7 +80,7 @@ class SpectraPlot(BasePlot, ColoringMixin):
     Override categorical detection for small numeric datasets:
 
     >>> levels = np.array([1, 2, 3, 4])  # 4 unique values - might be detected as categorical
-    >>> plotter = SpectraPlot(x, y, color_by=levels, categorical=False)
+    >>> plotter = SpectraPlot(x, y, color_by=levels, color_mode="continuous")
     >>> fig = plotter.show(title="4 Concentration Levels")
 
     With custom axis labels:
@@ -108,7 +108,7 @@ class SpectraPlot(BasePlot, ColoringMixin):
         labels: Optional[Sequence[Optional[str]]] = None,
         color_by: Optional[np.ndarray] = None,
         colormap: Optional[str] = None,
-        categorical: Optional[bool] = None,
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
         colorbar_label: str = "Reference Value",
     ):
         self.x = validate_data(x, name="x", ensure_2d=False)
@@ -124,7 +124,9 @@ class SpectraPlot(BasePlot, ColoringMixin):
                 color_by, name="color_by", ensure_2d=False, numeric=False
             )
 
-        self._init_coloring(color_by, colormap, categorical, colorbar_label)
+        self._init_coloring(
+            color_by, colormap, color_mode=color_mode, colorbar_label=colorbar_label
+        )
 
     def _get_default_labels(self) -> dict[str, str]:
         return {
