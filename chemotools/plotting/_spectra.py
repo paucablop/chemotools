@@ -134,6 +134,26 @@ class SpectraPlot(BasePlot, ColoringMixin):
             "ylabel": "Y-axis",
         }
 
+    def show(
+        self,
+        figsize=(12, 4),
+        title=None,
+        xlabel="X-axis",
+        ylabel="Y-axis",
+        xlim=None,
+        ylim=None,
+        **kwargs,
+    ) -> Figure:
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
+
     def render(
         self,
         ax: Optional[Axes] = None,
