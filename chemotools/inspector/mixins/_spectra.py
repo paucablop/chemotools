@@ -61,9 +61,15 @@ class SpectraMixin:
     - `_get_preprocessed_x_axis()` method
     """
 
+    # ------------------------------------------------------------------
+    # Private methods
+    # ------------------------------------------------------------------
     def _spectra_inspector(self) -> "_SpectraInspectorProto":
         return self  # type: ignore[return-value]
 
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
     def inspect_spectra(
         self,
         dataset: Union[str, Sequence[str]] = "train",
@@ -179,3 +185,23 @@ class SpectraMixin:
             )
 
         return figures
+
+    def create_spectra_figures(
+        self,
+        dataset: Union[str, Sequence[str]] = "train",
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = "y",
+        xlim: Optional[Tuple[float, float]] = None,
+        figsize: Tuple[float, float] = (12, 5),
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
+    ) -> Dict[str, "Figure"]:
+        """Create independent plots comparing raw and preprocessed spectra.
+
+        Alias for inspect_spectra with default arguments.
+        """
+        return self.inspect_spectra(
+            dataset=dataset,
+            color_by=color_by,
+            xlim=xlim,
+            figsize=figsize,
+            color_mode=color_mode,
+        )

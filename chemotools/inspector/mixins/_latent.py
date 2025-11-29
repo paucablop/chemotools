@@ -11,6 +11,7 @@ from chemotools.inspector._utils import (
     ComponentSpec,
     normalize_components,
     normalize_datasets,
+    get_xlabel_for_features,
 )
 from chemotools.plotting._styles import DATASET_COLORS
 from chemotools.outliers import HotellingT2, QResiduals
@@ -43,9 +44,6 @@ class LatentVariableMixin:
     """Mixin providing reusable helpers for latent-space visualisations."""
 
     component_label: str = "LV"
-
-    def _latent_inspector(self) -> "_LatentInspectorProto":
-        return self  # type: ignore[return-value]
 
     # ------------------------------------------------------------------
     # Properties
@@ -103,12 +101,43 @@ class LatentVariableMixin:
         raise NotImplementedError
 
     # ------------------------------------------------------------------
-    # Public helpers used by inspectors
+    # Private methods
+    # ------------------------------------------------------------------
+    def _latent_inspector(self) -> "_LatentInspectorProto":
+        return self  # type: ignore[return-value]
+
+    def _get_latent_component_label(self) -> str:
+        return getattr(self, "component_label", "LV")
+
+    def _get_latent_feature_names(self) -> np.ndarray:
+        inspector = self._latent_inspector()
+        return inspector._get_preprocessed_feature_names()
+
+    def _get_explained_variance_for_scores(self, reference_dataset: str) -> np.ndarray:
+        variance = self.get_latent_explained_variance()
+        if variance is not None:
+            return variance
+        scores = self.get_latent_scores(reference_dataset)
+        return np.zeros(scores.shape[1], dtype=float)
+
+    def _prepare_scores_datasets(
+        self, dataset_names: Sequence[str]
+    ) -> Dict[str, Dict[str, Optional[np.ndarray]]]:
+        datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
+        inspector = self._latent_inspector()
+        for ds in dataset_names:
+            scores = self.get_latent_scores(ds)
+            _, y = inspector._get_raw_data(ds)
+            datasets_data[ds] = {"scores": scores, "y": y}
+        return datasets_data
+
+    # ------------------------------------------------------------------
+    # Public API
     # ------------------------------------------------------------------
     def create_latent_variance_figure(
         self,
-        variance_threshold: float,
-        figsize: Tuple[float, float],
+        variance_threshold: float = 0.95,
+        figsize: Tuple[float, float] = (8, 4),
     ) -> Optional["Figure"]:
         """Create explained-variance plot for latent components, if available."""
 
@@ -123,14 +152,18 @@ class LatentVariableMixin:
 
     def create_latent_loadings_figure(
         self,
-        loadings_components: Union[int, Sequence[int]],
-        xlabel: str,
-        figsize: Tuple[float, float],
+        loadings_components: Union[int, Sequence[int]] = 0,
+        xlabel: Optional[str] = None,
+        figsize: Tuple[float, float] = (8, 4),
     ) -> "Figure":
         """Create loadings-style plot for the latent variables."""
 
         loadings = self.get_latent_loadings()
         feature_names = self._get_latent_feature_names()
+
+        if xlabel is None:
+            xlabel = get_xlabel_for_features(feature_names is not None)
+
         return _latent_plots.create_loadings_plot(
             loadings=loadings,
             feature_names=feature_names,
@@ -142,12 +175,12 @@ class LatentVariableMixin:
 
     def create_latent_scores_figures(
         self,
-        dataset: Union[str, Sequence[str]],
-        components: Union[ComponentSpec, Sequence[ComponentSpec]],
+        dataset: Union[str, Sequence[str]] = "train",
+        components: Union[ComponentSpec, Sequence[ComponentSpec]] = (0, 1),
         *,
-        color_by: Optional[Union[str, Dict[str, np.ndarray]]],
-        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
-        figsize: Tuple[float, float],
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        figsize: Tuple[float, float] = (8, 6),
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> Dict[str, "Figure"]:
         """Generate per-component latent scores plots for requested datasets."""
@@ -261,31 +294,3 @@ class LatentVariableMixin:
             annotate_by=annotate_by,
             color_mode=color_mode,
         )
-
-    # ------------------------------------------------------------------
-    # Internal utilities
-    # ------------------------------------------------------------------
-    def _get_latent_component_label(self) -> str:
-        return getattr(self, "component_label", "LV")
-
-    def _get_latent_feature_names(self) -> np.ndarray:
-        inspector = self._latent_inspector()
-        return inspector._get_preprocessed_feature_names()
-
-    def _get_explained_variance_for_scores(self, reference_dataset: str) -> np.ndarray:
-        variance = self.get_latent_explained_variance()
-        if variance is not None:
-            return variance
-        scores = self.get_latent_scores(reference_dataset)
-        return np.zeros(scores.shape[1], dtype=float)
-
-    def _prepare_scores_datasets(
-        self, dataset_names: Sequence[str]
-    ) -> Dict[str, Dict[str, Optional[np.ndarray]]]:
-        datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]] = {}
-        inspector = self._latent_inspector()
-        for ds in dataset_names:
-            scores = self.get_latent_scores(ds)
-            _, y = inspector._get_raw_data(ds)
-            datasets_data[ds] = {"scores": scores, "y": y}
-        return datasets_data
