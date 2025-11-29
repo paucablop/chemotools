@@ -144,6 +144,30 @@ class SpectraPlot(BasePlot, ColoringMixin):
         ylim=None,
         **kwargs,
     ) -> Figure:
+        """Show the spectra plot with given figure size and labels.
+
+        Parameters
+        ----------
+        figsize : tuple, optional
+            Figure size as (width, height) in inches. Default is (12, 4).
+        title : str, optional
+            Title for the plot. If None, a default title is generated.
+        xlabel : str, optional
+            X-axis label. Default is "X-axis".
+        ylabel : str, optional
+            Y-axis label. Default is "Y-axis".
+        xlim : tuple, optional
+            X-axis limits as (xmin, xmax). Default is None (auto).
+        ylim : tuple, optional
+            Y-axis limits as (ymin, ymax). Default is None (auto).
+        **kwargs : Any
+            Additional keyword arguments passed to the plot function.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
         return super().show(
             figsize=figsize,
             title=title,

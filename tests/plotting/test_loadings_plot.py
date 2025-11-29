@@ -124,8 +124,8 @@ class TestLoadingsPlotBasics:
 
         # Assert
         ax = fig.axes[0]
-        assert ax.get_xlabel() == "Feature"
-        assert ax.get_ylabel() == "Loading"
+        assert ax.get_xlabel() == "X-axis"
+        assert ax.get_ylabel() == "Y-axis"
         plt.close(fig)
 
     def test_show_with_title(self):
