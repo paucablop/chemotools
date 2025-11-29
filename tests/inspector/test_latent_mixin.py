@@ -63,7 +63,7 @@ def test_create_latent_scores_single_dataset():
     figures = inspector.create_latent_scores_figures(
         dataset="train",
         components=(0, 1),
-        color_by_y=True,
+        color_by="y",
         annotate_by="sample_index",
         figsize=(4, 4),
     )
@@ -90,7 +90,7 @@ def test_create_latent_scores_multi_dataset():
     figures = inspector.create_latent_scores_figures(
         dataset=["train", "test"],
         components=((0, 1),),
-        color_by_y=False,
+        color_by=None,
         annotate_by=None,
         figsize=(4, 4),
     )
@@ -144,7 +144,7 @@ def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
     # Act
     fig = inspector.create_latent_distance_figure(
         dataset=["train", "test"],
-        color_by_y=False,
+        color_by=None,
         figsize=(4, 4),
     )
 

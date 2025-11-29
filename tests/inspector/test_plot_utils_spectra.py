@@ -35,7 +35,7 @@ class TestCreateSpectraPlotsSingleDataset:
         y = sample_spectra_data["y"]
         wavenumbers = sample_spectra_data["wavenumbers"]
         dataset_name = "train"
-        color_by_y = True
+        color_by = "y"
         xlabel = "Wavenumber (cm⁻¹)"
         xlim = None
         figsize = (12, 5)
@@ -48,7 +48,7 @@ class TestCreateSpectraPlotsSingleDataset:
             x_axis=wavenumbers,
             preprocessed_x_axis=wavenumbers,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             xlabel=xlabel,
             xlim=xlim,
             figsize=figsize,
@@ -71,7 +71,7 @@ class TestCreateSpectraPlotsSingleDataset:
         y = None
         wavenumbers = sample_spectra_data["wavenumbers"]
         dataset_name = "train"
-        color_by_y = False
+        color_by = None
         xlabel = "Wavenumber (cm⁻¹)"
         xlim = None
         figsize = (12, 5)
@@ -84,7 +84,7 @@ class TestCreateSpectraPlotsSingleDataset:
             x_axis=wavenumbers,
             preprocessed_x_axis=wavenumbers,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             xlabel=xlabel,
             xlim=xlim,
             figsize=figsize,
@@ -106,7 +106,7 @@ class TestCreateSpectraPlotsSingleDataset:
         y = sample_spectra_data["y"]
         wavenumbers = sample_spectra_data["wavenumbers"]
         dataset_name = "test"
-        color_by_y = False
+        color_by = None
         xlabel = "Wavenumber (cm⁻¹)"
         xlim = (3000, 2800)
         figsize = (12, 5)
@@ -119,7 +119,7 @@ class TestCreateSpectraPlotsSingleDataset:
             x_axis=wavenumbers,
             preprocessed_x_axis=wavenumbers,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             xlabel=xlabel,
             xlim=xlim,
             figsize=figsize,
@@ -141,7 +141,7 @@ class TestCreateSpectraPlotsSingleDataset:
         n_features = X_raw.shape[1]
         wavenumbers = np.arange(n_features)
         dataset_name = "val"
-        color_by_y = False
+        color_by = None
         xlabel = "Feature Index"
         xlim = None
         figsize = (12, 5)
@@ -154,7 +154,7 @@ class TestCreateSpectraPlotsSingleDataset:
             x_axis=wavenumbers,
             preprocessed_x_axis=wavenumbers,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             xlabel=xlabel,
             xlim=xlim,
             figsize=figsize,

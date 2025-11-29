@@ -181,7 +181,7 @@ class TestCreateScoresPlotSingleDataset:
         y = sample_data["y"]
         explained_var = sample_data["explained_var"]
         dataset_name = "train"
-        color_by_y = True
+        color_by = "y"
         annotate_by = None
         figsize = (6, 6)
 
@@ -192,7 +192,7 @@ class TestCreateScoresPlotSingleDataset:
             y=y,
             explained_var=explained_var,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
             color_mode="continuous",
@@ -200,7 +200,7 @@ class TestCreateScoresPlotSingleDataset:
 
         # Assert
         assert fig is not None
-        # Should have 2 axes (main plot + colorbar) because color_by_y=True and y is numeric
+        # Should have 2 axes (main plot + colorbar) because color_by="y" and y is numeric
         assert len(fig.axes) == 2
 
         # Cleanup
@@ -214,7 +214,7 @@ class TestCreateScoresPlotSingleDataset:
         y = sample_data["y"]
         explained_var = sample_data["explained_var"]
         dataset_name = "train"
-        color_by_y = False
+        color_by = None
         annotate_by = None
         figsize = (6, 6)
 
@@ -225,7 +225,7 @@ class TestCreateScoresPlotSingleDataset:
             y=y,
             explained_var=explained_var,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -244,7 +244,7 @@ class TestCreateScoresPlotSingleDataset:
         y = None
         explained_var = sample_data["explained_var"]
         dataset_name = "train"
-        color_by_y = False
+        color_by = None
         annotate_by = None
         figsize = (6, 6)
 
@@ -255,7 +255,7 @@ class TestCreateScoresPlotSingleDataset:
             y=y,
             explained_var=explained_var,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -274,7 +274,7 @@ class TestCreateScoresPlotSingleDataset:
         y = sample_data["y"]
         explained_var = sample_data["explained_var"]
         dataset_name = "train"
-        color_by_y = False
+        color_by = None
         annotate_by = "sample_index"
         figsize = (6, 6)
 
@@ -285,7 +285,7 @@ class TestCreateScoresPlotSingleDataset:
             y=y,
             explained_var=explained_var,
             dataset_name=dataset_name,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -315,7 +315,7 @@ class TestCreateScoresPlotMultiDataset:
         }
         component_spec = (0, 1)
         explained_var = sample_data["explained_var"]
-        color_by_y = False
+        color_by = None
         annotate_by = None
         figsize = (6, 6)
 
@@ -324,7 +324,7 @@ class TestCreateScoresPlotMultiDataset:
             component_spec=component_spec,
             datasets_data=datasets_data,
             explained_var=explained_var,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -351,7 +351,7 @@ class TestCreateScoresPlotMultiDataset:
         }
         component_spec = 0
         explained_var = sample_data["explained_var"]
-        color_by_y = False
+        color_by = None
         annotate_by = None
         figsize = (6, 6)
 
@@ -360,7 +360,7 @@ class TestCreateScoresPlotMultiDataset:
             component_spec=component_spec,
             datasets_data=datasets_data,
             explained_var=explained_var,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -382,7 +382,7 @@ class TestCreateScoresPlotMultiDataset:
         }
         component_spec = (0, 1)
         explained_var = sample_data["explained_var"]
-        color_by_y = False
+        color_by = None
         annotate_by = None
         figsize = (6, 6)
 
@@ -391,7 +391,7 @@ class TestCreateScoresPlotMultiDataset:
             component_spec=component_spec,
             datasets_data=datasets_data,
             explained_var=explained_var,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=figsize,
         )
@@ -414,7 +414,7 @@ class TestCreateModelDistancesPlot:
         }
         model = pca_model
         confidence = 0.95
-        color_by_y = True
+        color_by = "y"
         figsize = (8, 6)
 
         # Act
@@ -422,14 +422,14 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
             color_mode="continuous",
         )
 
         # Assert
         assert fig is not None
-        # Should have 2 axes (main plot + colorbar) because color_by_y=True and y is numeric
+        # Should have 2 axes (main plot + colorbar) because color_by="y" and y is numeric
         assert len(fig.axes) == 2
 
         # Cleanup
@@ -441,7 +441,7 @@ class TestCreateModelDistancesPlot:
         datasets = {"train": {"X": sample_data_distances["X"], "y": None}}
         model = pca_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -449,7 +449,7 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -467,7 +467,7 @@ class TestCreateModelDistancesPlot:
         datasets = {"train": {"X": sample_data_distances["X"], "y": None}}
         model = pca_model
         confidence = 0.99
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -475,7 +475,7 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -502,7 +502,7 @@ class TestCreateModelDistancesPlot:
         }
         model = pca_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -510,7 +510,7 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -531,7 +531,7 @@ class TestCreateModelDistancesPlot:
         }
         model = pca_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -539,7 +539,7 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -560,7 +560,7 @@ class TestCreateModelDistancesPlot:
         }
         model = pca_model
         confidence = 0.95
-        color_by_y = True
+        color_by = "y"
         figsize = (8, 6)
 
         # Act
@@ -568,7 +568,7 @@ class TestCreateModelDistancesPlot:
             datasets_data=datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -584,7 +584,7 @@ class TestCreateModelDistancesPlot:
         datasets = {"train": {"X": None, "y": np.array([1, 2, 3])}}
         model = pca_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -593,7 +593,7 @@ class TestCreateModelDistancesPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -603,7 +603,7 @@ class TestCreateModelDistancesPlot:
         datasets = {}
         model = pca_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -612,7 +612,7 @@ class TestCreateModelDistancesPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -665,7 +665,7 @@ class TestCreateQVsYResidualsPlot:
         single_dataset = {"train": regression_datasets["train"]}
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -673,7 +673,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=single_dataset,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -704,7 +704,7 @@ class TestCreateQVsYResidualsPlot:
         # Arrange
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -712,7 +712,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=regression_datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -736,7 +736,7 @@ class TestCreateQVsYResidualsPlot:
         single_dataset = {"train": regression_datasets["train"]}
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = True
+        color_by = "y"
         figsize = (8, 6)
 
         # Act
@@ -744,7 +744,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=single_dataset,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -762,7 +762,7 @@ class TestCreateQVsYResidualsPlot:
 
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Pre-fit Q detector
@@ -774,7 +774,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=regression_datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
             q_residuals_detector=q_detector,
         )
@@ -793,7 +793,6 @@ class TestCreateQVsYResidualsPlot:
         # Arrange
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
         figsize = (8, 6)
 
         # Act
@@ -801,7 +800,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=regression_datasets,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=None,
             figsize=figsize,
         )
 
@@ -825,7 +824,7 @@ class TestCreateQVsYResidualsPlot:
         }
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -834,7 +833,7 @@ class TestCreateQVsYResidualsPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -846,7 +845,7 @@ class TestCreateQVsYResidualsPlot:
         }
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -855,7 +854,7 @@ class TestCreateQVsYResidualsPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -872,7 +871,7 @@ class TestCreateQVsYResidualsPlot:
         }
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -881,7 +880,7 @@ class TestCreateQVsYResidualsPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -891,7 +890,7 @@ class TestCreateQVsYResidualsPlot:
         datasets = {}
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act & Assert
@@ -900,7 +899,7 @@ class TestCreateQVsYResidualsPlot:
                 datasets_data=datasets,
                 model=model,
                 confidence=confidence,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=figsize,
             )
 
@@ -910,7 +909,7 @@ class TestCreateQVsYResidualsPlot:
         single_dataset = {"train": regression_datasets["train"]}
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -918,7 +917,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=single_dataset,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -937,7 +936,7 @@ class TestCreateQVsYResidualsPlot:
         single_dataset = {"train": regression_datasets["train"]}
         model = pls_regression_model
         confidence = 0.95
-        color_by_y = False
+        color_by = None
         figsize = (8, 6)
 
         # Act
@@ -945,7 +944,7 @@ class TestCreateQVsYResidualsPlot:
             datasets_data=single_dataset,
             model=model,
             confidence=confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 

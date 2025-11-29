@@ -26,7 +26,7 @@ from chemotools.outliers import HotellingT2, QResiduals
 from .._utils import (
     ComponentSpec,
     prepare_annotations,
-    select_primary_target,
+    prepare_color_values,
     normalize_components,
 )
 
@@ -157,7 +157,7 @@ def create_scores_plot_single_dataset(
     y: Optional[np.ndarray],
     explained_var: np.ndarray,
     dataset_name: str,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     *,
@@ -183,8 +183,8 @@ def create_scores_plot_single_dataset(
         Explained variance ratios for axis labels
     dataset_name : str
         Name of the dataset (e.g., 'train', 'test', 'val')
-    color_by_y : bool
-        Whether to color points by y values
+    color_by : str or dict, optional
+        Coloring specification
     annotate_by : Optional[Union[str, Dict]]
         Annotation specification ('sample_index', 'y', or dict)
     figsize : Tuple[float, float]
@@ -193,7 +193,7 @@ def create_scores_plot_single_dataset(
     component_label : str, optional
         Prefix used in axis labels and titles (default "PC").
     dataset_color : Optional[str], optional
-        Fixed colour for the dataset when ``color_by_y`` is False. When
+        Fixed colour for the dataset when ``color_by`` is None. When
         provided, this colour is applied to the rendered points.
     confidence : float, optional
         Confidence level for the ellipse (default 0.95).
@@ -214,7 +214,7 @@ def create_scores_plot_single_dataset(
     >>> scores = np.random.rand(50, 5)
     >>> var_ratios = np.array([0.45, 0.25, 0.15, 0.10, 0.05])
     >>> fig = create_scores_plot_single_dataset(
-    ...     (0, 1), scores, None, var_ratios, 'train', False, None, (6, 6)
+    ...     (0, 1), scores, None, var_ratios, 'train', None, None, (6, 6)
     ... )
     """
     fig, ax = plt.subplots(figsize=figsize)
@@ -246,17 +246,21 @@ def create_scores_plot_single_dataset(
                 f"Component indices must be different, got both as {comp_x}"
             )
 
+    # Prepare color values
+    color_values = prepare_color_values(color_by, dataset_name, y, scores.shape[0])
+
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         pc_scores = scores[:, component_spec]
         var_pct = explained_var[component_spec] * 100
 
-        # Determine x-axis values and color_by parameter
-        color_by = select_primary_target(y) if color_by_y and y is not None else None
-
-        if color_by is not None:
-            x_values = color_by
-            xlabel_text = "y-value"
+        if color_values is not None:
+            x_values = color_values
+            xlabel_text = "Color Value"
+            if color_by == "y":
+                xlabel_text = "y-value"
+            elif color_by == "sample_index":
+                xlabel_text = "Sample Index"
         else:
             x_values = np.arange(len(pc_scores))
             xlabel_text = "Sample Index"
@@ -268,9 +272,9 @@ def create_scores_plot_single_dataset(
         scores_plot = ScoresPlot(
             scores=scores_for_plot,
             components=(0, 1),
-            color_by=color_by,
+            color_by=color_values,
             label=dataset_name.capitalize(),
-            color=dataset_color if color_by is None else None,
+            color=dataset_color if color_values is None else None,
             colormap=None,
             confidence_ellipse=None,
             color_mode=color_mode,
@@ -299,9 +303,6 @@ def create_scores_plot_single_dataset(
         if ellipse_scores is None and dataset_name.lower() == "train":
             ellipse_scores = scores
 
-        # Determine color_by parameter for the dataset
-        color_by = select_primary_target(y) if color_by_y and y is not None else None
-
         # First: Draw training confidence ellipse as reference (if available)
         if ellipse_scores is not None:
             ellipse_plot = ScoresPlot(
@@ -327,9 +328,9 @@ def create_scores_plot_single_dataset(
         scores_plot = ScoresPlot(
             scores=scores,
             components=components_pair,
-            color_by=color_by,
+            color_by=color_values,
             label=dataset_name.capitalize(),
-            color=dataset_color if color_by is None else None,
+            color=dataset_color if color_values is None else None,
             colormap=None,
             confidence_ellipse=None,  # Ellipse already drawn above
             color_mode=color_mode,
@@ -372,7 +373,7 @@ def create_scores_plot_multi_dataset(
     component_spec: ComponentSpec,
     datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
     explained_var: np.ndarray,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     *,
@@ -394,8 +395,8 @@ def create_scores_plot_multi_dataset(
         'y' can be None
     explained_var : np.ndarray
         Explained variance ratios for axis labels
-    color_by_y : bool
-        Whether to color by y values (when single dataset and y available)
+    color_by : str or dict, optional
+        Coloring specification
     annotate_by : Optional[Union[str, Dict]]
         Annotation specification
     figsize : Tuple[float, float]
@@ -424,7 +425,7 @@ def create_scores_plot_multi_dataset(
     ... }
     >>> var_ratios = np.array([0.45, 0.25, 0.15, 0.10, 0.05])
     >>> fig = create_scores_plot_multi_dataset(
-    ...     (0, 1), data, var_ratios, False, None, (6, 6)
+    ...     (0, 1), data, var_ratios, None, None, (6, 6)
     ... )
     """
     fig, ax = plt.subplots(figsize=figsize)
@@ -475,12 +476,17 @@ def create_scores_plot_multi_dataset(
             pc_scores = scores[:, component_spec]
             marker = DATASET_MARKERS.get(ds_name, "o")
 
-            y_values = select_primary_target(y) if y is not None else None
+            # Prepare color values
+            color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
 
-            if color_by_y and y_values is not None:
-                x_values = y_values
-                xlabel_for_dataset = "y-value"
-                xlabel_text = "y-value"
+            if color_values is not None:
+                x_values = color_values
+                xlabel_for_dataset = "Color Value"
+                if color_by == "y":
+                    xlabel_for_dataset = "y-value"
+                    xlabel_text = "y-value"
+                elif color_by == "sample_index":
+                    xlabel_for_dataset = "Sample Index"
             else:
                 x_values = np.arange(pc_scores.shape[0])
                 xlabel_for_dataset = "Sample Index"
@@ -490,9 +496,9 @@ def create_scores_plot_multi_dataset(
             plot = ScoresPlot(
                 scores=scores_for_plot,
                 components=(0, 1),
-                color_by=None,
+                color_by=color_values,
                 label=ds_name.capitalize(),
-                color=DATASET_COLORS.get(ds_name),
+                color=DATASET_COLORS.get(ds_name) if color_values is None else None,
                 confidence_ellipse=None,
                 color_mode=color_mode,
             )
@@ -558,11 +564,8 @@ def create_scores_plot_multi_dataset(
             color = DATASET_COLORS.get(ds_name, "grey")
             marker = DATASET_MARKERS.get(ds_name, "grey")
 
-            # Determine color_by parameter
-            color_reference = (
-                select_primary_target(y) if (color_by_y and y is not None) else None
-            )
-            color_by = color_reference
+            # Prepare color values
+            color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
 
             # Don't draw ellipse again (already drawn above)
             ellipse = None
@@ -571,9 +574,9 @@ def create_scores_plot_multi_dataset(
             plot = ScoresPlot(
                 scores=scores,
                 components=components_pair,
-                color_by=color_by,
+                color_by=color_values,
                 label=ds_name.capitalize(),
-                color=color if color_by is None else None,
+                color=color if color_values is None else None,
                 colormap=None,
                 confidence_ellipse=ellipse,
                 color_mode=color_mode,
@@ -617,7 +620,7 @@ def create_model_distances_plot(
     datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
     model,
     confidence: float,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     *,
     hotelling_detector: Optional[HotellingT2] = None,
@@ -639,14 +642,14 @@ def create_model_distances_plot(
         Mapping from dataset name to a dictionary containing ``"X"``
         (required) and optional ``"y"`` arrays. The function renders each
         dataset on the same axes, applying dataset-specific colours when
-        ``color_by_y`` is False or target values are unavailable.
+        ``color_by`` is None or target values are unavailable.
     model : fitted model
         Fitted decomposition model (PCA, PLS, etc.) that provides latent
         scores used by the distance detectors.
     confidence : float
         Confidence level for the Hotelling's T² and Q residual detectors.
-    color_by_y : bool
-        Whether to colour points using the provided ``y`` targets.
+    color_by : str or dict, optional
+        Coloring specification
     figsize : Tuple[float, float]
         Figure size (width, height) in inches.
     annotate_by : str or dict, optional
@@ -718,18 +721,15 @@ def create_model_distances_plot(
         t2 = hotelling_detector.predict_residuals(X)
         q = q_residuals_detector.predict_residuals(X)
 
-        # When multiple datasets, always color by dataset, not by y values
+        # Prepare color values
+        color_values = prepare_color_values(color_by, ds_name, y, X.shape[0])
+
         if multi_dataset:
-            color_by = None
             dataset_color = DATASET_COLORS.get(
                 ds_name,
             )
             marker = DATASET_MARKERS.get(ds_name, "o")
         else:
-            # Single dataset: respect color_by_y parameter
-            color_by = (
-                select_primary_target(y) if (color_by_y and y is not None) else None
-            )
             dataset_color = None
             marker = "o"
 
@@ -749,9 +749,9 @@ def create_model_distances_plot(
         dist_plot = DistancesPlot(
             y=q,
             x=t2,
-            color_by=color_by,
+            color_by=color_values,
             label=ds_name.capitalize(),
-            color=dataset_color,
+            color=dataset_color if color_values is None else None,
             colormap=None,
             marker=marker,
             confidence_lines=confidence_lines,
@@ -797,7 +797,7 @@ def create_q_vs_y_residuals_plot(
     datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
     model,
     confidence: float,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     *,
     q_residuals_detector: Optional[QResiduals] = None,
@@ -822,15 +822,15 @@ def create_q_vs_y_residuals_plot(
         (required), ``"y_pred"`` (required), ``"y_true"`` (required),
         and optional ``"y"`` arrays.
         The function renders each dataset on the same axes, applying
-        dataset-specific colours when ``color_by_y`` is False or target
+        dataset-specific colours when ``color_by`` is None or target
         values are unavailable.
     model : fitted model
         Fitted regression model with latent variables (PLS, PCR, etc.) that
         provides both X-space reconstruction and Y predictions.
     confidence : float
         Confidence level for the Q residual detector.
-    color_by_y : bool
-        Whether to colour points using the provided ``y`` targets.
+    color_by : str or dict, optional
+        Coloring specification
     figsize : Tuple[float, float]
         Figure size (width, height) in inches.
     annotate_by : str or dict, optional
@@ -935,14 +935,12 @@ def create_q_vs_y_residuals_plot(
 
         # When multiple datasets, always color by dataset, not by y values
         if multi_dataset:
-            color_by = None
+            color_values = None
             dataset_color = DATASET_COLORS.get(ds_name)
             marker = DATASET_MARKERS.get(ds_name, "o")
         else:
-            # Single dataset: respect color_by_y parameter
-            color_by = (
-                select_primary_target(y) if (color_by_y and y is not None) else None
-            )
+            # Single dataset: respect color_by parameter
+            color_values = prepare_color_values(color_by, ds_name, y, q.shape[0])
             dataset_color = None
             marker = "o"
 
@@ -962,7 +960,7 @@ def create_q_vs_y_residuals_plot(
         dist_plot = DistancesPlot(
             y=q,  # Q residuals on y-axis
             x=y_residuals,  # Y residuals on x-axis
-            color_by=color_by,
+            color_by=color_values,
             label=ds_name.capitalize(),
             color=dataset_color,
             colormap=None,
@@ -1021,7 +1019,7 @@ def create_x_vs_y_scores_plots(
     y_scores: np.ndarray,
     y_train: Optional[np.ndarray],
     components: Union[int, Tuple[int, int], Sequence[Union[int, Tuple[int, int]]]],
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     component_label: str = "LV",
@@ -1043,8 +1041,8 @@ def create_x_vs_y_scores_plots(
         Target values for coloring
     components : int, tuple, or sequence
         Component pairs to plot. Only tuple specifications will be used.
-    color_by_y : bool
-        Whether to color by y values
+    color_by : str or dict, optional
+        Coloring specification
     annotate_by : str or dict, optional
         Annotation specification
     figsize : tuple of float
@@ -1076,13 +1074,15 @@ def create_x_vs_y_scores_plots(
             )
 
             # Determine color_by parameter
-            color_reference = y_train if color_by_y and y_train is not None else None
+            color_values = prepare_color_values(
+                color_by, "train", y_train, x_scores.shape[0]
+            )
 
             # Create ScoresPlot
             plot = ScoresPlot(
                 scores=combined_scores,
                 components=(0, 1),  # We already selected the right columns
-                color_by=color_reference,
+                color_by=color_values,
                 label="Train",
                 colormap=None,
                 confidence_ellipse=None,

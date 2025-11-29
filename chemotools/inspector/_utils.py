@@ -316,3 +316,46 @@ def prepare_annotations(
         return select_primary_target(np.asarray(annotate_by[dataset_name]))
     else:
         return None
+
+
+def prepare_color_values(
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    dataset_name: str,
+    y: Optional[np.ndarray],
+    n_samples: int,
+) -> Optional[np.ndarray]:
+    """Prepare color values for a dataset based on color_by specification.
+
+    Parameters
+    ----------
+    color_by : Optional[Union[str, Dict]]
+        Color specification:
+        - 'y': Use y values (default)
+        - 'sample_index': Use sample indices
+        - dict: Map dataset names to color arrays
+    dataset_name : str
+        Name of current dataset
+    y : Optional[np.ndarray]
+        Target values
+    n_samples : int
+        Number of samples in the dataset
+
+    Returns
+    -------
+    Optional[np.ndarray]
+        Color values array or None if no coloring
+    """
+    if color_by is None:
+        return None
+
+    if isinstance(color_by, str):
+        if color_by == "y":
+            return select_primary_target(y)
+        elif color_by == "sample_index":
+            return np.arange(n_samples)
+        else:
+            return None
+    elif isinstance(color_by, dict) and dataset_name in color_by:
+        return select_primary_target(np.asarray(color_by[dataset_name]))
+    else:
+        return None

@@ -145,7 +145,7 @@ class LatentVariableMixin:
         dataset: Union[str, Sequence[str]],
         components: Union[ComponentSpec, Sequence[ComponentSpec]],
         *,
-        color_by_y: bool,
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]],
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
         figsize: Tuple[float, float],
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
@@ -159,8 +159,6 @@ class LatentVariableMixin:
         components_list = normalize_components(components)
         figures: Dict[str, "Figure"] = {}
         multi_dataset = len(dataset_names) > 1
-        requested_color_by_y = color_by_y
-        color_by_for_multi = False if multi_dataset else color_by_y
         explained_var = self._get_explained_variance_for_scores(dataset_names[0])
         component_label = self._get_latent_component_label()
 
@@ -179,7 +177,7 @@ class LatentVariableMixin:
                     component_spec=component_spec,
                     datasets_data=datasets_data,
                     explained_var=explained_var,
-                    color_by_y=color_by_for_multi,
+                    color_by=color_by,
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
@@ -213,7 +211,7 @@ class LatentVariableMixin:
                     y=y,
                     explained_var=explained_var,
                     dataset_name=dataset_name,
-                    color_by_y=requested_color_by_y,
+                    color_by=color_by,
                     annotate_by=annotate_by,
                     figsize=figsize,
                     component_label=component_label,
@@ -230,7 +228,7 @@ class LatentVariableMixin:
         self,
         dataset: Union[str, Sequence[str]],
         *,
-        color_by_y: bool,
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]],
         figsize: Tuple[float, float],
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
@@ -256,7 +254,7 @@ class LatentVariableMixin:
             datasets_data=datasets_data,
             model=inspector.model,
             confidence=inspector.confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
             hotelling_detector=hotelling,
             q_residuals_detector=q_detector,

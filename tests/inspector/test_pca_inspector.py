@@ -776,7 +776,7 @@ class TestPCAInspectorInspectSpectra:
         inspector = PCAInspector(model=fitted_pipeline_pca, X_train=X, y_train=y)
 
         # Act
-        figures = inspector.inspect_spectra(color_by_y=True)
+        figures = inspector.inspect_spectra(color_by="y")
 
         # Assert
         assert len(figures) == 2
@@ -790,7 +790,7 @@ class TestPCAInspectorInspectSpectra:
         inspector = PCAInspector(model=fitted_pipeline_pca, X_train=X, y_train=y)
 
         # Act
-        figures = inspector.inspect_spectra(color_by_y=False)
+        figures = inspector.inspect_spectra(color_by=None)
 
         # Assert
         assert len(figures) == 2

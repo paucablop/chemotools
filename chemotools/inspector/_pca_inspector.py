@@ -7,7 +7,7 @@ from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
 if TYPE_CHECKING:
-    import matplotlib.figure
+    from matplotlib.figure import Figure
 
 
 from ._base import _BaseInspector, InspectorPlotConfig
@@ -317,12 +317,172 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         ] = None,
         loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
-        color_by_y: bool = True,
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
-        color_mode: Literal["continuous", "categorical"] = "continuous",
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
         **kwargs,
-    ) -> Dict[str, matplotlib.figure.Figure]:
+    ) -> Dict[str, Figure]:
+        """Create all diagnostic plots for the PCA model.
+
+        Parameters
+        ----------
+        dataset : str or sequence of str, default='train'
+            Dataset(s) to visualize. Can be 'train', 'test', 'val', or a list.
+        components_scores : int, tuple, or sequence, optional
+            Components to plot for scores.
+            - Int: Creates one 1D scatter plot (e.g., 0 for PC1 vs sample index)
+            - Single tuple (x, y): Creates one 2D scatter plot (e.g., (0, 1) for PC1 vs PC2)
+            - Sequence: Creates multiple plots (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
+        loadings_components : int, sequence of int, or None, optional
+            Which components to show in loadings plot. If None (default), automatically
+            selects all available components:
+            - 1 component: 0
+            - 2+ components: [0, 1, ..., n_components-1] (all components)
+        variance_threshold : float, default=0.95
+            Threshold line for explained variance plot
+        color_by : str or dict, optional
+            Coloring specification:
+            - 'y': Color by y values (if available)
+            - 'sample_index': Color by sample index
+            - dict: Map dataset names to color arrays
+            - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
+        annotate_by : str or dict, optional
+            Annotations for score plot points. Can be:
+            - 'sample_index': Annotate with sample indices (0, 1, 2, ...)
+            - 'y': Annotate with y values (only for single dataset)
+            - dict: Dictionary mapping dataset names to annotation arrays
+              e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
+            If None (default), no annotations are added.
+        plot_config : InspectorPlotConfig, optional
+            Configuration object for plot sizes and styles. If None, defaults are used.
+        color_mode : Literal["continuous", "categorical"], default="continuous"
+            Mode for coloring points.
+        **kwargs
+            Optional keyword arguments to override specific fields in plot_config
+            (e.g., scores_figsize=(8, 8)).
+
+        Returns
+        -------
+                figures : dict
+                        Dictionary containing all created figures with keys:
+                        - 'scores_1', 'scores_2', ...: Combined scores plots (95% confidence ellipses)
+                        - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
+                            (only when multiple datasets are provided); each plot uses a dedicated dataset colour
+                        - 'loadings': Loadings plot
+                        - 'variance': Explained variance plot
+                        - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
+                        - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+
+                        Combined scores plots render all requested datasets on shared axes, coloured by
+                        dataset. The number of 'scores_N*' entries depends on the ``components_scores``
+                        parameter.
+
+        Examples
+        --------
+        >>> inspector = PCAInspector(pca, X_train, y_train)
+        >>> # Default: 2 scores plots + loadings + variance + spectra (if preprocessing exists)
+        >>> figs = inspector.inspect()
+        >>> # Multiple datasets for comparison
+        >>> inspector.X_test = X_test
+        >>> inspector.y_test = y_test
+        >>> figs = inspector.inspect(dataset=["train", "test"])
+        >>> # Access individual figures
+        >>> figs["scores_1_train"].savefig("scores_1_train.png")
+        >>> figs["scores_1_test"].savefig("scores_1_test.png")
+        >>> # Single 2D scores plot (PC1 vs PC2)
+        >>> figs = inspector.inspect(components_scores=(0, 1))
+        >>> # Single 1D scores plot (PC1 vs sample index or y)
+        >>> figs = inspector.inspect(components_scores=0)
+        >>> # Three plots: 2D, 2D, and 1D
+        >>> figs = inspector.inspect(components_scores=((0, 1), (1, 2), 2))
+        >>> # Mix of 1D and 2D plots
+        >>> figs = inspector.inspect(components_scores=[0, 1, (0, 1)])
+        >>> # Save individual plots
+        >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
+        >>> figs['loadings'].savefig('loadings.png')
+        """
+        # Generate smart defaults based on number of components
+        if components_scores is None:
+            components_scores = get_default_scores_components(self.nr_components)
+        if loadings_components is None:
+            loadings_components = get_default_loadings_components(self.nr_components)
+
+        # Handle configuration
+        config = plot_config or InspectorPlotConfig()
+        # Allow kwargs to override config for convenience
+        for key, value in kwargs.items():
+            if hasattr(config, key):
+                setattr(config, key, value)
+
+        figures = {}
+
+        datasets = normalize_datasets(dataset)
+        use_suffix = len(datasets) > 1
+
+        # Auto-resolve color_by if None
+        # If single dataset, default to coloring by 'y' (if available)
+        # If multiple datasets, default to coloring by dataset (color_by=None)
+        if color_by is None and not use_suffix:
+            color_by = "y"
+
+        # ------------------------------------------------------------------
+        # Variance plot
+        # ------------------------------------------------------------------
+        variance_fig = self.create_latent_variance_figure(
+            variance_threshold=variance_threshold,
+            figsize=config.variance_figsize,
+        )
+        if variance_fig is not None:
+            figures["variance"] = variance_fig
+
+        # ------------------------------------------------------------------
+        # Loadings plot
+        # ------------------------------------------------------------------
+        xlabel = get_xlabel_for_features(self.feature_names is not None)
+        figures["loadings"] = self.create_latent_loadings_figure(
+            loadings_components=loadings_components,
+            xlabel=xlabel,
+            figsize=config.loadings_figsize,
+        )
+
+        # ------------------------------------------------------------------
+        # Scores plots
+        # ------------------------------------------------------------------
+        scores_figures = self.create_latent_scores_figures(
+            dataset=dataset,
+            components=components_scores,
+            color_by=color_by,
+            annotate_by=annotate_by,
+            figsize=config.scores_figsize,
+            color_mode=color_mode,
+        )
+        figures.update(scores_figures)
+
+        # ------------------------------------------------------------------
+        # Distance plot (Hotelling T² vs Q residuals)
+        # ------------------------------------------------------------------
+        figures["distances"] = self.create_latent_distance_figure(
+            dataset=dataset,
+            color_by=color_by,
+            figsize=config.distances_figsize,
+            annotate_by=annotate_by,
+            color_mode=color_mode,
+        )
+
+        # ------------------------------------------------------------------
+        # Spectra plots (if preprocessing exists)
+        # ------------------------------------------------------------------
+        if self.transformer is not None:
+            spectra_figs = self.inspect_spectra(
+                dataset=datasets if use_suffix else datasets[0],
+                color_by=color_by,
+                figsize=config.spectra_figsize,
+                color_mode=color_mode,
+            )
+            figures.update(spectra_figs)
+
+        return figures
         """Create multiple independent PCA diagnostic plots.
 
         This method creates separate figure windows for:
@@ -356,8 +516,11 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             - 2+ components: [0, 1, ..., n_components-1] (all components)
         variance_threshold : float, default=0.95
             Threshold line for explained variance plot
-        color_by_y : bool, default=True
-            Whether to color scores by y values (if available)
+        color_by : str or dict, default='y'
+            Coloring specification:
+            - 'y': Color by y values (if available)
+            - 'sample_index': Color by sample index
+            - dict: Map dataset names to color arrays
         annotate_by : str or dict, optional
             Annotations for score plot points. Can be:
             - 'sample_index': Annotate with sample indices (0, 1, 2, ...)
@@ -457,7 +620,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         scores_figures = self.create_latent_scores_figures(
             dataset=dataset,
             components=components_scores,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
             color_mode=color_mode,
@@ -469,7 +632,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # ------------------------------------------------------------------
         figures["distances"] = self.create_latent_distance_figure(
             dataset=dataset,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
@@ -481,7 +644,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         if self.transformer is not None:
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=config.spectra_figsize,
                 color_mode=color_mode,
             )

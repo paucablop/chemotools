@@ -6,7 +6,7 @@ decomposition models (IR, Raman, NMR, etc.).
 """
 
 from __future__ import annotations
-from typing import Dict, Optional, Tuple, TYPE_CHECKING, Literal
+from typing import Dict, Optional, Tuple, TYPE_CHECKING, Literal, Union
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 from chemotools.plotting import SpectraPlot
 from chemotools.plotting._styles import DATASET_COLORS
 
-from .._utils import select_primary_target
+from .._utils import prepare_color_values
 
 
 def create_spectra_plots_single_dataset(
@@ -26,7 +26,7 @@ def create_spectra_plots_single_dataset(
     x_axis: np.ndarray,
     preprocessed_x_axis: np.ndarray,
     dataset_name: str,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     xlabel: str,
     xlim: Optional[Tuple[float, float]],
     figsize: Tuple[float, float],
@@ -52,8 +52,8 @@ def create_spectra_plots_single_dataset(
         (may differ if feature selection was applied)
     dataset_name : str
         Name of dataset (e.g., 'train', 'test', 'val')
-    color_by_y : bool
-        Whether to color spectra by y values
+    color_by : str or dict, optional
+        Coloring specification
     xlabel : str
         Label for x-axis (e.g., "Wavenumber (cm⁻¹)")
     xlim : Optional[Tuple[float, float]]
@@ -76,15 +76,13 @@ def create_spectra_plots_single_dataset(
     >>> preprocessed_wn = np.linspace(4000, 400, 800)
     >>> figs = create_spectra_plots_single_dataset(
     ...     X_raw, X_preprocessed, None, wavenumbers, preprocessed_wn,
-    ...     'train', False, 'Wavenumber (cm⁻¹)', None, (12, 5)
+    ...     'train', None, 'Wavenumber (cm⁻¹)', None, (12, 5)
     ... )
     >>> figs['raw_spectra'].savefig('raw.png')
     """
     figures = {}
 
-    color_values = None
-    if color_by_y and y is not None:
-        color_values = select_primary_target(y)
+    color_values = prepare_color_values(color_by, dataset_name, y, X_raw.shape[0])
 
     # Suppress default labels when not using color_by to avoid cluttered legend
     # Pass empty strings as labels to prevent "Spectrum 0", "Spectrum 1", etc.

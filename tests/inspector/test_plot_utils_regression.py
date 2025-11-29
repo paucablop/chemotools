@@ -67,13 +67,13 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"],
             }
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -99,13 +99,13 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"][:30],
             },
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -126,13 +126,13 @@ class TestCreatePredictedVsActualPlot:
                 "y": sample_regression_data["y"],
             }
         }
-        color_by_y = True
+        color_by = "y"
         figsize = (6, 6)
 
         # Act
         fig = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -156,13 +156,13 @@ class TestCreateYResidualPlot:
                 "y": sample_regression_data["y"],
             }
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_y_residual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -188,13 +188,13 @@ class TestCreateYResidualPlot:
                 "y": sample_regression_data["y"][:30],
             },
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_y_residual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -333,7 +333,7 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
@@ -341,7 +341,7 @@ class TestCreateRegressionDistancesPlot:
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -370,7 +370,7 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"][:30],
             },
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
@@ -378,7 +378,7 @@ class TestCreateRegressionDistancesPlot:
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 
@@ -401,7 +401,7 @@ class TestCreateRegressionDistancesPlot:
                 "y_pred": sample_regression_data["y_pred"],
             }
         }
-        color_by_y = False
+        color_by = None
         figsize = (6, 6)
 
         # Act
@@ -409,7 +409,7 @@ class TestCreateRegressionDistancesPlot:
             datasets_data=datasets_data,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=figsize,
         )
 

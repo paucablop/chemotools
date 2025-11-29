@@ -67,7 +67,7 @@ class SpectraMixin:
     def inspect_spectra(
         self,
         dataset: Union[str, Sequence[str]] = "train",
-        color_by_y: bool = True,
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = "y",
         xlim: Optional[Tuple[float, float]] = None,
         figsize: Tuple[float, float] = (12, 5),
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
@@ -85,8 +85,11 @@ class SpectraMixin:
         dataset : Union[str, Sequence[str]], default='train'
             Dataset(s) to visualize. Can be a single dataset name or a sequence
             of dataset names (e.g., ["train", "test"]).
-        color_by_y : bool, default=True
-            Whether to color by y values (if available). Only used for single dataset.
+        color_by : str or dict, default='y'
+            Coloring specification:
+            - 'y': Color by y values (if available)
+            - 'sample_index': Color by sample index
+            - dict: Map dataset names to color arrays
             Ignored when multiple datasets are provided (colors by dataset instead).
         xlim : tuple of float, optional
             X-axis limits for zooming into spectral regions
@@ -168,7 +171,7 @@ class SpectraMixin:
                 x_axis=inspector.x_axis,
                 preprocessed_x_axis=preprocessed_x_axis,
                 dataset_name=ds,
-                color_by_y=color_by_y,
+                color_by=color_by,
                 xlabel=xlabel,
                 xlim=xlim,
                 figsize=figsize,

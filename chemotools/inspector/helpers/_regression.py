@@ -25,12 +25,12 @@ from chemotools.plotting import (
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._utils import annotate_points
 
-from .._utils import select_primary_target, prepare_annotations
+from .._utils import prepare_annotations, prepare_color_values
 
 
 def create_predicted_vs_actual_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     color_mode: Optional[Literal["continuous", "categorical"]] = None,
@@ -44,8 +44,8 @@ def create_predicted_vs_actual_plot(
     ----------
     datasets_data : Dict[str, Dict[str, np.ndarray]]
         Dictionary mapping dataset names to dicts with 'y_true', 'y_pred', 'y' keys
-    color_by_y : bool
-        Whether to color by y values (only used for single dataset)
+    color_by : str or dict, optional
+        Coloring specification
     figsize : Tuple[float, float]
         Figure size
     annotate_by : str or dict, optional
@@ -61,23 +61,21 @@ def create_predicted_vs_actual_plot(
     n_datasets = len(datasets_data)
 
     if n_datasets == 1:
-        # Single dataset - use color_by_y option
+        # Single dataset - use color_by option
         dataset_name, data = list(datasets_data.items())[0]
         y_true = data["y_true"]
         y_pred = data["y_pred"]
         y = data.get("y")
         X = data.get("X")
 
-        color_reference = (
-            select_primary_target(y) if (color_by_y and y is not None) else None
-        )
+        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
 
         fig, ax = plt.subplots(figsize=figsize)
 
         pred_actual_plot = PredictedVsActualPlot(
             y_true=y_true,
             y_pred=y_pred,
-            color_by=color_reference,
+            color_by=color_values,
             color_mode=color_mode,
         )
         pred_actual_plot.render(ax=ax)
@@ -154,7 +152,7 @@ def create_predicted_vs_actual_plot(
 
 def create_y_residual_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     color_mode: Optional[Literal["continuous", "categorical"]] = None,
@@ -169,8 +167,8 @@ def create_y_residual_plot(
     ----------
     datasets_data : Dict[str, Dict[str, np.ndarray]]
         Dictionary mapping dataset names to dicts with 'y_true', 'y_pred', 'y' keys
-    color_by_y : bool
-        Whether to color by y values (only used for single dataset)
+    color_by : str or dict, optional
+        Coloring specification
     figsize : Tuple[float, float]
         Figure size
     annotate_by : str or dict, optional
@@ -193,9 +191,7 @@ def create_y_residual_plot(
         y = data.get("y")
         X = data.get("X")
 
-        color_reference = (
-            select_primary_target(y) if (color_by_y and y is not None) else None
-        )
+        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
         residuals = y_true - y_pred
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -203,7 +199,7 @@ def create_y_residual_plot(
         residuals_plot = YResidualsPlot(
             residuals=residuals,
             x_values=y_pred,
-            color_by=color_reference,
+            color_by=color_values,
             add_confidence_band=2.0,
             color_mode=color_mode,
         )
@@ -246,15 +242,13 @@ def create_y_residual_plot(
         y = data.get("y")
         X = data.get("X")
 
-        color_reference = (
-            select_primary_target(y) if (color_by_y and y is not None) else None
-        )
+        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
         residuals = y_true - y_pred
 
         residuals_plot = YResidualsPlot(
             residuals=residuals,
             x_values=y_pred,
-            color_by=color_reference,
+            color_by=color_values,
             add_confidence_band=2.0,
             color_mode=color_mode,
         )
@@ -425,7 +419,7 @@ def create_regression_distances_plot(
     datasets_data: Dict[str, Dict[str, np.ndarray]],
     leverage_detector,
     student_detector,
-    color_by_y: bool,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     figsize: Tuple[float, float],
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     color_mode: Literal["continuous", "categorical"] = "continuous",
@@ -444,8 +438,8 @@ def create_regression_distances_plot(
         Fitted leverage detector
     student_detector : StudentizedResiduals
         Fitted studentized residuals detector
-    color_by_y : bool
-        Whether to color by y (only for single dataset, ignored for multiple)
+    color_by : str or dict, optional
+        Coloring specification
     figsize : Tuple[float, float]
         Figure size
     annotate_by : str or dict, optional
@@ -474,13 +468,17 @@ def create_regression_distances_plot(
         leverages = leverage_detector.predict_residuals(X)
         studentized = student_detector.predict_residuals(X, y_true)
 
+        color_values = prepare_color_values(
+            color_by, dataset_name, y, leverages.shape[0]
+        )
+
         fig, ax = plt.subplots(figsize=figsize)
 
         # Create distances plot
         distances_plot = DistancesPlot(
             y=studentized,
             x=leverages,
-            color_by=select_primary_target(y) if color_by_y else None,
+            color_by=color_values,
             confidence_lines=(leverage_limit, student_limit),
             color_mode=color_mode,
         )

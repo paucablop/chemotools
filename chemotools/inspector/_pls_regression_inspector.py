@@ -396,57 +396,53 @@ class PLSRegressionInspector(
         ] = None,
         loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
-        color_by_y: bool = True,
+        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
-        color_mode: Literal["continuous", "categorical"] = "continuous",
+        color_mode: Optional[Literal["continuous", "categorical"]] = None,
         **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
-        """Create multiple independent PLS diagnostic plots.
-
-        This method creates separate figure windows for:
-        - One or more scores plots (X-scores, default depends on model components)
-        - Multiple loadings plots (X-loadings, X-weights, X-rotations, coefficients)
-        - Explained variance plots (X and Y spaces, if available)
-        - Raw and preprocessed spectra plots (if preprocessing exists)
-        - Regression diagnostic plots (predicted vs actual, residuals, Q-Q, distribution)
-        - Distance plots (Hotelling's T² vs Q residuals, Q residuals vs Y residuals, Leverage vs Studentized residuals)
+        """Create all diagnostic plots for the PLS model.
 
         Parameters
         ----------
-        dataset : Union[str, Sequence[str]], default='train'
-            Dataset(s) to inspect
-        components_scores : int, tuple, sequence, or None, optional
-            Component(s) for scores plots. If None (default), automatically selects based
-            on number of components:
-            - 1 component: 0 (LV1 vs sample index/y)
-            - 2 components: (0, 1) (LV1 vs LV2)
-            - 3+ components: ((0, 1), (1, 2)) (two 2D plots)
-            Can also be manually specified.
-        loadings_components : int, sequence of int, or None, optional
-            Which components to show in loadings plots. If None (default), automatically
-            selects all available components:
-            - 1 component: 0
-            - 2+ components: [0, 1, ..., n_components-1] (all components)
+        dataset : str or sequence of str, default='train'
+            Dataset(s) to visualize. Can be 'train', 'test', 'val', or a list.
+        components_scores : int, tuple, or sequence, optional
+            Components to plot for scores.
+            - If int: plots first N components against sample index
+            - If tuple (i, j): plots component i vs j
+            - If sequence: plots multiple specifications
+            - If None: defaults to (0, 1) and (1, 2) if enough components exist
+        loadings_components : int or sequence of int, optional
+            Components to plot for loadings.
+            - If int: plots first N components
+            - If sequence: plots specified components
+            - If None: defaults to first 3 components
         variance_threshold : float, default=0.95
-            Threshold line for explained variance plot
-        color_by_y : bool, default=True
-            Whether to color scores by y values (if available)
+            Cumulative variance threshold for variance plots
+        color_by : str or dict, optional
+            Coloring specification.
+            - "y": Color by target values (default for single dataset)
+            - "sample_index": Color by sample index
+            - dict: Dictionary mapping dataset names to color arrays
+            - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
         annotate_by : str or dict, optional
-            Annotations for score plot points
+            Annotations for plot points.
+            - "sample_index": Annotate with sample indices
+            - dict: Dictionary mapping dataset names to annotation arrays
         plot_config : InspectorPlotConfig, optional
-            Configuration object for plot sizes and styles. If None, defaults are used.
-        color_mode : Literal["continuous", "categorical"], default="continuous"
-            Mode for coloring points.
+            Configuration for plot sizes and styles
+        color_mode : str, optional
+            Coloring mode ("continuous" or "categorical").
         **kwargs
-            Optional keyword arguments to override specific fields in plot_config
-            (e.g., scores_figsize=(8, 8)).
+            Additional arguments passed to InspectorPlotConfig
 
         Returns
         -------
-                figures : dict
-                        Dictionary containing all created figures. Keys include:
-                        - 'scores_1', 'scores_2', ...: X-scores plots (combined multi-dataset when multiple datasets provided)
+        dict
+            Dictionary of matplotlib Figures with keys:
+                        - 'scores_1', 'scores_2', ...: Scores plots
                         - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...: X-scores vs Y-scores plots (training set only)
                         - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
                         - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
@@ -472,6 +468,21 @@ class PLSRegressionInspector(
 
         datasets = normalize_datasets(dataset)
         use_suffix = len(datasets) > 1
+
+        # Auto-resolve color_by if None
+        # If single dataset, default to coloring by 'y' (if available)
+        # If multiple datasets, default to coloring by dataset (color_by=None)
+        if color_by is None and not use_suffix:
+            color_by = "y"
+
+        # For plots that separate datasets (subplots) or show only one dataset,
+        # we prefer coloring by target 'y' instead of dataset color (which is uniform)
+        separated_color_by = color_by
+        if separated_color_by is None:
+            separated_color_by = "y"
+
+        # Resolve color_mode for helpers that require a non-None value
+        effective_color_mode = color_mode if color_mode is not None else "continuous"
 
         xlabel = get_xlabel_for_features(self.feature_names is not None)
         preprocessed_x_axis = self._get_preprocessed_x_axis()
@@ -580,7 +591,7 @@ class PLSRegressionInspector(
         scores_figures = self.create_latent_scores_figures(
             dataset=dataset,
             components=components_scores,
-            color_by_y=color_by_y,
+            color_by=color_by,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
             color_mode=color_mode,
@@ -597,11 +608,11 @@ class PLSRegressionInspector(
             y_scores=y_scores,
             y_train=y_train,
             components=components_scores,
-            color_by_y=color_by_y,
+            color_by=separated_color_by,
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
             component_label=self.component_label,
-            color_mode=color_mode,
+            color_mode=effective_color_mode,
         )
         figures.update(x_y_scores_figures)
 
@@ -610,7 +621,7 @@ class PLSRegressionInspector(
         # ------------------------------------------------------------------
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
@@ -638,11 +649,11 @@ class PLSRegressionInspector(
             datasets_data=datasets_data,
             model=self.model,
             confidence=self.confidence,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=config.distances_figsize,
             q_residuals_detector=q_detector,
             annotate_by=annotate_by,
-            color_mode=color_mode,
+            color_mode=effective_color_mode,
         )
 
         # Leverage vs Studentized residuals
@@ -650,10 +661,10 @@ class PLSRegressionInspector(
             datasets_data=datasets_data,
             leverage_detector=self.leverage_detector,
             student_detector=self.studentized_detector,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
-            color_mode=color_mode,
+            color_mode=effective_color_mode,
         )
 
         # ------------------------------------------------------------------
@@ -662,7 +673,7 @@ class PLSRegressionInspector(
         # Predicted vs Actual
         figures["predicted_vs_actual"] = create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=color_by,
             figsize=config.regression_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
@@ -671,7 +682,7 @@ class PLSRegressionInspector(
         # Residual scatter plot
         figures["residuals"] = create_y_residual_plot(
             datasets_data=datasets_data,
-            color_by_y=color_by_y,
+            color_by=separated_color_by,
             figsize=config.regression_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
@@ -696,7 +707,7 @@ class PLSRegressionInspector(
         if self.transformer is not None:
             spectra_figs = self.inspect_spectra(
                 dataset=datasets if use_suffix else datasets[0],
-                color_by_y=color_by_y,
+                color_by=color_by,
                 figsize=config.spectra_figsize,
                 color_mode=color_mode,
             )

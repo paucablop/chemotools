@@ -157,6 +157,25 @@ class TestSummary:
         assert summary["has_preprocessing"] is True
         assert len(summary["preprocessing_steps"]) == 1
 
+    def test_summary_variance_coverage(self, fitted_pls, regression_data):
+        """Test summary method when variance ratios are available."""
+        X_train, y_train = regression_data["train"]
+
+        # Manually add variance ratios to simulate a model that has them
+        fitted_pls.explained_x_variance_ratio_ = np.array([0.4, 0.3, 0.1])
+        fitted_pls.explained_y_variance_ratio_ = np.array([0.5, 0.4, 0.05])
+
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        summary = inspector.summary()
+
+        assert "explained_x_variance_ratio" in summary
+        assert "total_x_variance" in summary
+        assert "explained_y_variance_ratio" in summary
+        assert "total_y_variance" in summary
+        assert summary["total_x_variance"] == pytest.approx(80.0)
+        assert summary["total_y_variance"] == pytest.approx(95.0)
+
 
 class TestInspectFigures:
     def test_inspect_single_dataset(self, fitted_pls, regression_data):
@@ -504,7 +523,7 @@ class TestAdditionalCoverage:
             dataset="train",
             components_scores=(0, 1),
             loadings_components=[0, 1],
-            color_by_y=False,
+            color_by=None,
         )
 
         # Assert
@@ -548,7 +567,7 @@ class TestAdditionalCoverage:
         figures = inspector.create_latent_scores_figures(
             dataset="test",
             components=(0, 1),
-            color_by_y=False,
+            color_by=None,
             annotate_by=None,
             figsize=(3, 3),
         )
@@ -579,7 +598,7 @@ class TestAdditionalCoverage:
         figures = inspector.create_latent_scores_figures(
             dataset=["train", "test"],
             components=(0, 1),
-            color_by_y=False,
+            color_by=None,
             annotate_by=None,
             figsize=(3, 3),
         )
@@ -601,7 +620,7 @@ class TestAdditionalCoverage:
         # Act
         figures = inspector.inspect(
             components_scores=[(0, 1), 2],
-            color_by_y=True,
+            color_by="y",
             annotate_by=annotate_by,
             scores_figsize=(3, 3),
         )
@@ -643,3 +662,30 @@ class TestValidationPropagation:
                 X_test=X_test,
                 y_test=y_test[:-1],
             )
+
+    def test_inspect_color_by_default(self, fitted_pls, regression_data):
+        """Test inspect method default color_by logic."""
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Call inspect without color_by and single dataset
+        figures = inspector.inspect(dataset="train")
+
+        assert len(figures) > 0
+        for fig in figures.values():
+            plt.close(fig)
+
+    def test_inspect_y_variance_plot(self, fitted_pls, regression_data):
+        """Test inspect method creates Y-variance plot when available."""
+        X_train, y_train = regression_data["train"]
+
+        # Manually add variance ratios
+        fitted_pls.explained_y_variance_ratio_ = np.array([0.5, 0.4, 0.05])
+
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        figures = inspector.inspect(dataset="train")
+
+        assert "variance_y" in figures
+        for fig in figures.values():
+            plt.close(fig)

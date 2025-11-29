@@ -209,7 +209,7 @@ class TestSpectraMixinInspectSpectra:
             plt.close(fig)
 
     def test_inspect_spectra_with_color_by_y(self, sample_spectra_data):
-        """Test inspect_spectra with color_by_y enabled."""
+        """Test inspect_spectra with color_by='y' enabled."""
         # Arrange
         inspector = DummySpectraInspector(
             raw_data=sample_spectra_data["raw_data"],
@@ -223,7 +223,7 @@ class TestSpectraMixinInspectSpectra:
         )
 
         # Act
-        figures = inspector.inspect_spectra(color_by_y=True)
+        figures = inspector.inspect_spectra(color_by="y")
 
         # Assert
         assert len(figures) == 2
@@ -233,7 +233,7 @@ class TestSpectraMixinInspectSpectra:
             plt.close(fig)
 
     def test_inspect_spectra_without_color_by_y(self, sample_spectra_data):
-        """Test inspect_spectra with color_by_y disabled."""
+        """Test inspect_spectra with color_by='y' disabled."""
         # Arrange
         inspector = DummySpectraInspector(
             raw_data=sample_spectra_data["raw_data"],
@@ -247,7 +247,7 @@ class TestSpectraMixinInspectSpectra:
         )
 
         # Act
-        figures = inspector.inspect_spectra(color_by_y=False)
+        figures = inspector.inspect_spectra(color_by=None)
 
         # Assert
         assert len(figures) == 2
