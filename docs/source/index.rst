@@ -9,8 +9,8 @@
    :hidden:
 
    User Guide <user/index>
-   Methods <methods/index>
    Explore <explore/index>
+   Methods <methods/index>
    Learn <learn/index>
    Cite <cite/index>
    API <api/index>
@@ -40,6 +40,10 @@
 .. image:: https://joss.theoj.org/papers/10.21105/joss.06802/status.svg
    :target: https://doi.org/10.21105/joss.06802
    :alt: DOI
+
+.. image:: https://www.codefactor.io/repository/github/paucablop/chemotools/badge/main
+   :target: https://www.codefactor.io/repository/github/paucablop/chemotools/overview/main
+   :alt: CodeFactor
 
 ----
 

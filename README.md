@@ -9,6 +9,7 @@
 [![Coverage](https://codecov.io/github/paucablop/chemotools/branch/main/graph/badge.svg?token=D7JUJM89LN)](https://codecov.io/github/paucablop/chemotools)
 [![Downloads](https://static.pepy.tech/badge/chemotools)](https://pepy.tech/project/chemotools)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.06802/status.svg)](https://doi.org/10.21105/joss.06802)
+[![CodeFactor](https://www.codefactor.io/repository/github/paucablop/chemotools/badge/main)](https://www.codefactor.io/repository/github/paucablop/chemotools/overview/main)
 
 ---
 

@@ -15,6 +15,9 @@ Discover the environment
    optimize
    dataframes
    persist
+   plotting_fundamentals
+   inspector_fundamentals
+   astartes
 
 .. grid:: 1 1 3 3
    :gutter: 2 3 4 4
@@ -85,3 +88,37 @@ Discover the environment
             :click-parent:
 
             **Persisting your models**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/explore/plotting.png
+      :text-align: center
+
+      .. button-ref:: ./plotting_fundamentals
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Plotting fundamentals**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/explore/inspector.png
+      :text-align: center
+
+      .. button-ref:: ./inspector_fundamentals
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Inspecting your models**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/explore/astartes.png
+      :text-align: center
+
+      .. button-ref:: ./astartes
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Sampling with Astartes**
+
