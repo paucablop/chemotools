@@ -19,7 +19,8 @@ from sklearn.pipeline import Pipeline
 if TYPE_CHECKING:
     import matplotlib.figure
 
-from chemotools.outliers import QResiduals
+from chemotools.outliers import QResiduals, HotellingT2, Leverage, StudentizedResiduals
+from chemotools.outliers._studentized_residuals import calculate_studentized_residuals
 
 from ._base import _BaseInspector, InspectorPlotConfig
 from .mixins import LatentVariableMixin, RegressionMixin, SpectraMixin
@@ -400,6 +401,7 @@ class PLSRegressionInspector(
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        target_index: int = 0,
         **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
         """Create all diagnostic plots for the PLS model.
@@ -435,6 +437,8 @@ class PLSRegressionInspector(
             Configuration for plot sizes and styles
         color_mode : str, optional
             Coloring mode ("continuous" or "categorical").
+        target_index : int, default=0
+            Index of the target variable to inspect (for multi-output PLS).
         **kwargs
             Additional arguments passed to InspectorPlotConfig
 
@@ -468,6 +472,23 @@ class PLSRegressionInspector(
 
         datasets = normalize_datasets(dataset)
         use_suffix = len(datasets) > 1
+
+        # Validate target_index
+        _, y_train_full = self._get_raw_data("train")
+        # Validated in __init__, but needed for type narrowing :/
+        assert y_train_full is not None, "y_train is required for PLS inspection"
+
+        if y_train_full.ndim > 1:
+            n_targets = y_train_full.shape[1]
+            if target_index < 0 or target_index >= n_targets:
+                raise ValueError(
+                    f"target_index {target_index} is out of bounds for "
+                    f"y_train with {n_targets} targets"
+                )
+        elif target_index != 0:
+            raise ValueError(
+                f"target_index {target_index} is invalid for single-target model"
+            )
 
         # Auto-resolve color_by if None
         # If single dataset, default to coloring by 'y' (if available)
@@ -553,14 +574,18 @@ class PLSRegressionInspector(
         )
 
         coef = self.get_regression_coefficients()
+        manual_legend = None
+
         if coef.ndim == 1:
             coef_matrix = coef.reshape(-1, 1)
             coef_components = [0]
             component_label = "Coeff"
+            manual_legend = ["Coefficient"]
         else:
+            # Plot all targets
             coef_matrix = coef
-            coef_components = list(range(coef_matrix.shape[1]))
-            component_label = "Target"
+            coef_components = list(range(coef.shape[1]))
+            component_label = "Target "
 
         coef_fig = _latent_plots.create_loadings_plot(
             loadings=coef_matrix,
@@ -573,15 +598,10 @@ class PLSRegressionInspector(
         coef_ax = coef_fig.axes[0]
         coef_ax.set_title("Regression Coefficients", fontsize=12, fontweight="bold")
 
-        handles, _ = coef_ax.get_legend_handles_labels()
-        if handles:
-            if coef_matrix.shape[1] == 1:
-                coef_ax.legend(handles, ["Coefficient"], loc="best")
-            else:
-                target_labels = [
-                    f"Target {idx + 1}" for idx in range(coef_matrix.shape[1])
-                ]
-                coef_ax.legend(handles, target_labels, loc="best")
+        if manual_legend:
+            handles, _ = coef_ax.get_legend_handles_labels()
+            if handles:
+                coef_ax.legend(handles, manual_legend, loc="best")
 
         figures["regression_coefficients"] = coef_fig
 
@@ -603,6 +623,13 @@ class PLSRegressionInspector(
         y_scores = self.get_y_scores("train")
         _, y_train = self._get_raw_data("train")
 
+        # Validated in __init__, but needed for type narrowing :/
+        assert y_train is not None, "y_train is required for PLS inspection"
+
+        # Slice y_train if needed for coloring
+        if y_train.ndim > 1:
+            y_train = y_train[:, target_index]
+
         x_y_scores_figures = _latent_plots.create_x_vs_y_scores_plots(
             x_scores=x_scores,
             y_scores=y_scores,
@@ -619,32 +646,99 @@ class PLSRegressionInspector(
         # ------------------------------------------------------------------
         # Distance plots (Hotelling T², Q residuals, leverage, studentized)
         # ------------------------------------------------------------------
+        # Fit detectors once on training data for consistent limits and efficiency
+        X_train, y_train_full = self._get_raw_data("train")
+        # Validated in __init__, but needed for type narrowing :/
+        assert y_train_full is not None, "y_train is required for PLS inspection"
+
+        hotelling_detector = HotellingT2(self.model, confidence=self.confidence)
+        hotelling_detector.fit(X_train)
+
+        q_detector = QResiduals(self.model, confidence=self.confidence)
+        q_detector.fit(X_train)
+
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
+            hotelling_detector=hotelling_detector,
+            q_residuals_detector=q_detector,
         )
+
+        # Prepare leverage and studentized detectors
+        leverage_detector = Leverage(self.model, confidence=self.confidence)
+        leverage_detector.fit(X_train)
+
+        # Calculate studentized residuals for training data to determine limit
+        # We need to do this manually to handle target slicing correctly
+        y_pred_train = self._get_predictions("train")
+
+        if y_train_full.ndim > 1:
+            y_train_sliced = y_train_full[:, target_index]
+            y_pred_train_sliced = y_pred_train[:, target_index]
+        else:
+            y_train_sliced = y_train_full
+            y_pred_train_sliced = y_pred_train
+
+        y_res_train = y_train_sliced - y_pred_train_sliced
+        if y_res_train.ndim == 1:
+            y_res_train = y_res_train.reshape(-1, 1)
+
+        studentized_train = calculate_studentized_residuals(
+            self.estimator, X_train, y_res_train
+        )
+        student_limit = np.percentile(np.abs(studentized_train), self.confidence * 100)
+
+        student_detector = StudentizedResiduals(self.model, confidence=self.confidence)
+        student_detector.critical_value_ = student_limit
 
         # Prepare data for regression diagnostics
         datasets_data: Dict[str, Dict[str, Any]] = {}
         for ds in datasets:
-            X, y_true = self._get_raw_data(ds)
-            y_pred = self._get_predictions(ds)
+            if ds == "train":
+                # Use pre-calculated values for training set
+                X = X_train
+                y_true_sliced = y_train_sliced
+                y_pred_sliced = y_pred_train_sliced
+                studentized = studentized_train
+                leverages = leverage_detector.predict_residuals(X)
+            else:
+                X, y_true = self._get_raw_data(ds)
+                # Validated in __init__, but needed for type narrowing :/
+                assert y_true is not None, f"y data is required for dataset {ds}"
+                y_pred = self._get_predictions(ds)
+
+                # Slice Y data for the specific target
+                if y_true.ndim > 1:
+                    y_true_sliced = y_true[:, target_index]
+                else:
+                    y_true_sliced = y_true
+
+                if y_pred.ndim > 1:
+                    y_pred_sliced = y_pred[:, target_index]
+                else:
+                    y_pred_sliced = y_pred
+
+                # Calculate studentized residuals for the specific target
+                y_res = y_true_sliced - y_pred_sliced
+                if y_res.ndim == 1:
+                    y_res = y_res.reshape(-1, 1)
+
+                studentized = calculate_studentized_residuals(self.estimator, X, y_res)
+                leverages = leverage_detector.predict_residuals(X)
+
             datasets_data[ds] = {
                 "X": X,
-                "y": y_true,
-                "y_true": y_true,
-                "y_pred": y_pred,
+                "y": y_true_sliced,
+                "y_true": y_true_sliced,
+                "y_pred": y_pred_sliced,
+                "studentized": studentized,
+                "leverages": leverages,
             }
 
         # Q residuals vs Y residuals
-        # Fit Q detector on training data for consistent limits
-        X_train, _ = self._get_raw_data("train")
-        q_detector = QResiduals(self.model, confidence=self.confidence)
-        q_detector.fit(X_train)
-
         figures["distances_q_y_residuals"] = _latent_plots.create_q_vs_y_residuals_plot(
             datasets_data=datasets_data,
             model=self.model,
@@ -659,8 +753,8 @@ class PLSRegressionInspector(
         # Leverage vs Studentized residuals
         figures["distances_leverage_studentized"] = create_regression_distances_plot(
             datasets_data=datasets_data,
-            leverage_detector=self.leverage_detector,
-            student_detector=self.studentized_detector,
+            leverage_detector=leverage_detector,
+            student_detector=student_detector,
             color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,

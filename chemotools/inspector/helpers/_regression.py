@@ -529,8 +529,16 @@ def create_regression_distances_plot(
         y_true = data["y_true"]
         y = data.get("y")
 
-        leverages = leverage_detector.predict_residuals(X)
-        studentized = student_detector.predict_residuals(X, y_true)
+        # Use pre-calculated values if available, otherwise calculate them
+        if "leverages" in data:
+            leverages = data["leverages"]
+        else:
+            leverages = leverage_detector.predict_residuals(X)
+
+        if "studentized" in data:
+            studentized = data["studentized"]
+        else:
+            studentized = student_detector.predict_residuals(X, y_true)
 
         color = DATASET_COLORS.get(dataset_name, "gray")
         marker = DATASET_MARKERS.get(dataset_name, "o")

@@ -265,6 +265,8 @@ class LatentVariableMixin:
         figsize: Tuple[float, float],
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        hotelling_detector: Optional[HotellingT2] = None,
+        q_residuals_detector: Optional[QResiduals] = None,
     ) -> "Figure":
         """Create Hotelling T² vs Q residuals plot for the provided datasets."""
 
@@ -276,12 +278,21 @@ class LatentVariableMixin:
             datasets_data[ds] = {"X": X, "y": y}
 
         # Fit detectors once on the training data to ensure consistent limits
-        train_X, _ = inspector._get_raw_data("train")
-        hotelling = HotellingT2(inspector.model, confidence=inspector.confidence)
-        hotelling.fit(train_X)
+        # Only if not provided
+        if hotelling_detector is None or q_residuals_detector is None:
+            train_X, _ = inspector._get_raw_data("train")
 
-        q_detector = QResiduals(inspector.model, confidence=inspector.confidence)
-        q_detector.fit(train_X)
+            if hotelling_detector is None:
+                hotelling_detector = HotellingT2(
+                    inspector.model, confidence=inspector.confidence
+                )
+                hotelling_detector.fit(train_X)
+
+            if q_residuals_detector is None:
+                q_residuals_detector = QResiduals(
+                    inspector.model, confidence=inspector.confidence
+                )
+                q_residuals_detector.fit(train_X)
 
         return _latent_plots.create_model_distances_plot(
             datasets_data=datasets_data,
@@ -289,8 +300,8 @@ class LatentVariableMixin:
             confidence=inspector.confidence,
             color_by=color_by,
             figsize=figsize,
-            hotelling_detector=hotelling,
-            q_residuals_detector=q_detector,
+            hotelling_detector=hotelling_detector,
+            q_residuals_detector=q_residuals_detector,
             annotate_by=annotate_by,
             color_mode=color_mode,
         )

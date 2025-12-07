@@ -6,6 +6,8 @@ import numpy as np
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
+from chemotools.outliers import QResiduals, HotellingT2
+
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
@@ -462,12 +464,23 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # ------------------------------------------------------------------
         # Distance plot (Hotelling T² vs Q residuals)
         # ------------------------------------------------------------------
+        # Fit detectors once on training data for consistent limits and efficiency
+        X_train, _ = self._get_raw_data("train")
+
+        hotelling_detector = HotellingT2(self.model, confidence=self.confidence)
+        hotelling_detector.fit(X_train)
+
+        q_detector = QResiduals(self.model, confidence=self.confidence)
+        q_detector.fit(X_train)
+
         figures["distances"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
+            hotelling_detector=hotelling_detector,
+            q_residuals_detector=q_detector,
         )
 
         # ------------------------------------------------------------------
@@ -630,12 +643,23 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # ------------------------------------------------------------------
         # Distance plot (Hotelling T² vs Q residuals)
         # ------------------------------------------------------------------
+        # Fit detectors once on training data for consistent limits and efficiency
+        X_train, _ = self._get_raw_data("train")
+
+        hotelling_detector = HotellingT2(self.model, confidence=self.confidence)
+        hotelling_detector.fit(X_train)
+
+        q_detector = QResiduals(self.model, confidence=self.confidence)
+        q_detector.fit(X_train)
+
         figures["distances"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,
+            hotelling_detector=hotelling_detector,
+            q_residuals_detector=q_detector,
         )
 
         # ------------------------------------------------------------------
