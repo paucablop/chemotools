@@ -42,6 +42,7 @@ class RegressionMixin:
         self._predictions_cache: Dict[str, np.ndarray] = {}
         self._rmse_cache: Dict[str, float] = {}
         self._r2_cache: Dict[str, float] = {}
+        self._bias_cache: Dict[str, float] = {}
         self._leverage_detector: Optional[Leverage] = None
         self._studentized_detector: Optional[StudentizedResiduals] = None
 
@@ -145,6 +146,23 @@ class RegressionMixin:
         self._r2_cache[dataset] = score
         return score
 
+    def _calculate_bias(self, dataset: str) -> float:
+        _, y_true = self._get_regression_raw_data(dataset)
+        y_pred = self._get_predictions(dataset)
+
+        # Ensure shapes match for subtraction to avoid broadcasting errors
+        y_true = np.asarray(y_true)
+        if y_true.shape != y_pred.shape:
+            if y_true.ndim == 2 and y_true.shape[1] == 1 and y_pred.ndim == 1:
+                y_true = y_true.ravel()
+            elif y_pred.ndim == 2 and y_pred.shape[1] == 1 and y_true.ndim == 1:
+                y_pred = y_pred.ravel()
+
+        # Bias = Mean(y_pred - y_true)
+        bias = float(np.mean(y_pred - y_true))
+        self._bias_cache[dataset] = bias
+        return bias
+
     def _optional_rmse(self, dataset: str) -> Optional[float]:
         if not self._regression_dataset_exists(dataset):
             return None
@@ -187,6 +205,12 @@ class RegressionMixin:
             self._calculate_r2(dataset)
         return self._r2_cache[dataset]
 
+    def regression_bias(self, dataset: str) -> float:
+        """Return prediction bias (mean error) for the specified dataset."""
+        if dataset not in self._bias_cache:
+            self._calculate_bias(dataset)
+        return self._bias_cache[dataset]
+
     def prediction_summary(self) -> Dict[str, Dict[str, float]]:
         """Return a summary of prediction metrics (RMSE, R2) for all available datasets.
 
@@ -207,6 +231,7 @@ class RegressionMixin:
                 summary[name] = {
                     "RMSE": self.regression_rmse(name),
                     "R2": self.regression_r2(name),
+                    "Bias": self.regression_bias(name),
                 }
         return summary
 

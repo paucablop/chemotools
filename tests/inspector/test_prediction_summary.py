@@ -41,3 +41,26 @@ class TestPredictionSummary:
         assert "train" in summary
         assert "test" in summary
         assert "val" not in summary
+
+    def test_prediction_summary_bias_calculation(self):
+        # Arrange
+        X = np.array([[1, 2], [3, 4], [5, 6]])
+        y = np.array([1, 2, 3])
+
+        pls = PLSRegression(n_components=1)
+        pls.fit(X, y)
+
+        inspector = PLSRegressionInspector(pls, X, y)
+
+        # Calculate expected bias manually
+        y_pred = pls.predict(X).ravel()
+        expected_bias = np.mean(y_pred - y)
+
+        # Act
+        summary = inspector.prediction_summary()
+        bias = summary["train"]["Bias"]
+
+        # Assert
+        assert "Bias" in summary["train"]
+        assert isinstance(bias, float)
+        np.testing.assert_almost_equal(bias, expected_bias)
