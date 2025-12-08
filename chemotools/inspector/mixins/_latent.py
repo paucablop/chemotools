@@ -118,7 +118,7 @@ class LatentVariableMixin:
         if variance is not None:
             return variance
         scores = self.get_latent_scores(reference_dataset)
-        return np.zeros(scores.shape[1], dtype=float)
+        return np.full(scores.shape[1], np.nan)
 
     def _prepare_scores_datasets(
         self, dataset_names: Sequence[str]
