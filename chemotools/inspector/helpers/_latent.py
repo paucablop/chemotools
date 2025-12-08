@@ -253,6 +253,7 @@ def create_scores_plot_single_dataset(
         # 1D plot: Single component vs sample index or y-value
         pc_scores = scores[:, component_spec]
         var_pct = explained_var[component_spec] * 100
+        var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
 
         if color_values is not None:
             x_values = color_values
@@ -283,9 +284,7 @@ def create_scores_plot_single_dataset(
 
         # Apply decorations
         ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(
-            f"{component_label}{component_spec + 1} ({var_pct:.1f}%)", fontsize=10
-        )
+        ax.set_ylabel(f"{component_label}{component_spec + 1}{var_label}", fontsize=10)
         ax.set_title(
             f"Scores: {component_label}{component_spec + 1} ({dataset_name.capitalize()})",
             fontsize=12,
@@ -297,6 +296,8 @@ def create_scores_plot_single_dataset(
         components_pair = component_spec
         var_x = explained_var[components_pair[0]] * 100
         var_y = explained_var[components_pair[1]] * 100
+        var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
+        var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
 
         # Determine which scores to use for the confidence ellipse
         ellipse_scores = train_scores_for_ellipse
@@ -353,10 +354,10 @@ def create_scores_plot_single_dataset(
 
         # Apply decorations with variance percentages
         ax.set_xlabel(
-            f"{component_label}{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+            f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
         )
         ax.set_ylabel(
-            f"{component_label}{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+            f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
         )
         ax.set_title(
             f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1} ({dataset_name.capitalize()})",
@@ -463,7 +464,8 @@ def create_scores_plot_multi_dataset(
     if isinstance(component_spec, int):
         # 1D plot: Single component vs sample index or y-value
         var_pct = explained_var[component_spec] * 100
-        ylabel_text = f"{component_label}{component_spec + 1} ({var_pct:.1f}%)"
+        var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
+        ylabel_text = f"{component_label}{component_spec + 1}{var_label}"
         xlabel_text = "Sample Index"
 
         for ds_name, data in datasets_data.items():
@@ -525,6 +527,8 @@ def create_scores_plot_multi_dataset(
         components_pair = component_spec
         var_x = explained_var[components_pair[0]] * 100
         var_y = explained_var[components_pair[1]] * 100
+        var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
+        var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
 
         # First pass: Draw training confidence ellipse as reference
         # Use train_scores_for_ellipse if provided, otherwise check datasets_data
@@ -599,10 +603,10 @@ def create_scores_plot_multi_dataset(
 
         # Apply decorations with variance percentages
         ax.set_xlabel(
-            f"{component_label}{components_pair[0] + 1} ({var_x:.1f}%)", fontsize=10
+            f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
         )
         ax.set_ylabel(
-            f"{component_label}{components_pair[1] + 1} ({var_y:.1f}%)", fontsize=10
+            f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
         )
         ax.set_title(
             f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1}",
