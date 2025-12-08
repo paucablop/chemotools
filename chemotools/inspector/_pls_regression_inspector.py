@@ -690,7 +690,7 @@ class PLSRegressionInspector(
             y_res_train = y_res_train.reshape(-1, 1)
 
         studentized_train = calculate_studentized_residuals(
-            self.estimator, X_train, y_res_train
+            self.estimator, self._get_preprocessed_data("train"), y_res_train
         )
         student_limit = np.percentile(np.abs(studentized_train), self.confidence * 100)
 
@@ -729,7 +729,9 @@ class PLSRegressionInspector(
                 if y_res.ndim == 1:
                     y_res = y_res.reshape(-1, 1)
 
-                studentized = calculate_studentized_residuals(self.estimator, X, y_res)
+                studentized = calculate_studentized_residuals(
+                    self.estimator, self._get_preprocessed_data(ds), y_res
+                )
                 leverages = leverage_detector.predict_residuals(X)
 
             datasets_data[ds] = {
