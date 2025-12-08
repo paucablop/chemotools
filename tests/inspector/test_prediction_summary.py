@@ -4,7 +4,7 @@ from chemotools.inspector import PLSRegressionInspector
 
 
 class TestPredictionSummary:
-    def test_prediction_summary_structure(self):
+    def test_regression_summary_structure(self):
         # Arrange
         X = np.random.rand(10, 5)
         y = np.random.rand(10)
@@ -12,7 +12,7 @@ class TestPredictionSummary:
         inspector = PLSRegressionInspector(pls, X, y)
 
         # Act
-        summary = inspector.prediction_summary()
+        summary = inspector.regression_summary()
 
         # Assert
         assert isinstance(summary, dict)
@@ -22,7 +22,7 @@ class TestPredictionSummary:
         assert isinstance(summary["train"]["RMSE"], float)
         assert isinstance(summary["train"]["R2"], float)
 
-    def test_prediction_summary_multiple_datasets(self):
+    def test_regression_summary_multiple_datasets(self):
         # Arrange
         X_train = np.random.rand(10, 5)
         y_train = np.random.rand(10)
@@ -35,14 +35,14 @@ class TestPredictionSummary:
         )
 
         # Act
-        summary = inspector.prediction_summary()
+        summary = inspector.regression_summary()
 
         # Assert
         assert "train" in summary
         assert "test" in summary
         assert "val" not in summary
 
-    def test_prediction_summary_bias_calculation(self):
+    def test_regression_summary_bias_calculation(self):
         # Arrange
         X = np.array([[1, 2], [3, 4], [5, 6]])
         y = np.array([1, 2, 3])
@@ -57,7 +57,7 @@ class TestPredictionSummary:
         expected_bias = np.mean(y_pred - y)
 
         # Act
-        summary = inspector.prediction_summary()
+        summary = inspector.regression_summary()
         bias = summary["train"]["Bias"]
 
         # Assert

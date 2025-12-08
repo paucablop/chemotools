@@ -211,7 +211,7 @@ class RegressionMixin:
             self._calculate_bias(dataset)
         return self._bias_cache[dataset]
 
-    def prediction_summary(self) -> Dict[str, Dict[str, float]]:
+    def regression_summary(self) -> Dict[str, Dict[str, float]]:
         """Return a summary of prediction metrics (RMSE, R2) for all available datasets.
 
         Returns

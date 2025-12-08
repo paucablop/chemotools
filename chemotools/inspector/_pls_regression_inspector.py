@@ -365,7 +365,7 @@ class PLSRegressionInspector(
         summary_dict: Dict[str, SummaryValue] = self._base_summary()
 
         # Add PLS regression-specific metrics
-        pred_summary = self.prediction_summary()
+        pred_summary = self.regression_summary()
         rmse_dict = {ds: metrics["RMSE"] for ds, metrics in pred_summary.items()}
         r2_dict = {ds: metrics["R2"] for ds, metrics in pred_summary.items()}
 

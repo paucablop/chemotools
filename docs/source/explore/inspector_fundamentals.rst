@@ -181,7 +181,15 @@ This will produce plots where training, test, and validation samples are visuali
 Summarize the models
 -------------------------
 
-Besides plotting, the inspectors also provide summary statistics of the models, which can be accessed via the ``.summary()`` and ``.prediction_summary()`` methods.
+Besides plotting, the inspectors also provide summary statistics of the models, which can be accessed via the ``.summary()`` and ``.regression_summary()`` methods.
+
+.. code-block:: python
+
+    # Get model summary
+    inspector.summary()
+
+    # Get prediction summary
+    inspector.regression_summary()
 
 Summary of the model
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,7 +231,7 @@ Summary of the predictions
 .. code-block:: python
 
     # Get prediction summary
-    inspector.prediction_summary()
+    inspector.regression_summary()
 
 This produced a dictionary with key statistics about the predictions. This dictionary can be visualized in a ``pandas.DataFrame`` for tabular visualization.
 
@@ -231,7 +239,7 @@ This produced a dictionary with key statistics about the predictions. This dicti
 
     import pandas as pd
 
-    pred_summary = inspector.prediction_summary()
+    pred_summary = inspector.regression_summary()
     pd.DataFrame(pred_summary)
 
 .. raw:: html
