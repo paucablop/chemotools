@@ -305,3 +305,20 @@ class LatentVariableMixin:
             annotate_by=annotate_by,
             color_mode=color_mode,
         )
+
+    def latent_summary(self) -> Dict[str, Union[int, float]]:
+        """Return summary of latent variable model properties.
+
+        Returns
+        -------
+        summary : dict
+            Dictionary containing:
+            - 'nr_components': Number of latent variables
+            - 'hotelling_t2_limit': Critical value for Hotelling's T²
+            - 'q_residuals_limit': Critical value for Q residuals
+        """
+        return {
+            "nr_components": self.nr_components,
+            "hotelling_t2_limit": self.hotelling_t2_limit,
+            "q_residuals_limit": self.q_residuals_limit,
+        }

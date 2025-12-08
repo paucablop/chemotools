@@ -347,7 +347,6 @@ class _BaseInspector(ABC):
             - 'model_type': Name of the estimator class
             - 'has_preprocessing': Whether preprocessing pipeline exists
             - 'nr_features': Number of features in original data
-            - 'nr_components': Number of components/latent variables
             - 'nr_samples': Dictionary with sample counts per dataset
             - 'preprocessing_steps': List of preprocessing step info (if available)
         """
@@ -355,7 +354,6 @@ class _BaseInspector(ABC):
             "model_type": type(self.estimator).__name__,
             "has_preprocessing": self.transformer is not None,
             "nr_features": self.nr_features,
-            "nr_components": self.n_components_,
             "nr_samples": self.nr_samples.copy(),
             "preprocessing_steps": self._get_preprocessing_steps(),
         }

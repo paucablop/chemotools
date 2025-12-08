@@ -252,6 +252,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # Start with common summary fields
         summary_dict = self._base_summary()
 
+        # Add latent variable summary
+        summary_dict.update(self.latent_summary())
+
         # Calculate cumulative variance
         explained_var = self.get_explained_variance_ratio()
         cumsum = np.cumsum(explained_var)

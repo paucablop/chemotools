@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.decomposition import PCA
 
 from chemotools.inspector.mixins import LatentVariableMixin
 
@@ -24,15 +25,22 @@ class DummyLatentInspector(LatentVariableMixin):
 
     def __init__(self):
         self.confidence = 0.95
-        self.model = object()
+
+        # Create a valid fitted model for HotellingT2/QResiduals
+        self.model = PCA(n_components=2)
+        X_train = np.random.rand(10, 3)
+        self.model.fit(X_train)
+
+        X_test = np.random.rand(5, 3)
+
         self._scores = {
-            "train": np.array([[0.0, 1.0], [1.0, 0.0], [0.5, 0.5]]),
-            "test": np.array([[0.5, 0.2], [0.3, 0.7], [0.6, 0.1]]),
+            "train": self.model.transform(X_train),
+            "test": self.model.transform(X_test),
         }
-        self._explained = np.array([0.6, 0.3])
+        self._explained = self.model.explained_variance_ratio_
         self._raw = {
-            "train": (np.ones((3, 3)), np.array([0, 1, 0])),
-            "test": (np.zeros((3, 3)), np.array([1, 0, 1])),
+            "train": (X_train, np.zeros(10)),
+            "test": (X_test, np.zeros(5)),
         }
         self._feature_names = np.array([10, 20, 30])
 
@@ -164,3 +172,22 @@ def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
     import matplotlib.pyplot as plt
 
     plt.close(fig)
+
+
+def test_latent_summary():
+    """Test latent summary generation."""
+    # Arrange
+    inspector = DummyLatentInspector()
+    # Mock the n_components_ attribute that would normally come from _BaseInspector
+    inspector.n_components_ = 2
+
+    # Act
+    summary = inspector.latent_summary()
+
+    # Assert
+    assert isinstance(summary, dict)
+    assert summary["nr_components"] == 2
+    assert "hotelling_t2_limit" in summary
+    assert "q_residuals_limit" in summary
+    assert isinstance(summary["hotelling_t2_limit"], float)
+    assert isinstance(summary["q_residuals_limit"], float)

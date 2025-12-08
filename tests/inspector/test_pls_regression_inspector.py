@@ -176,6 +176,23 @@ class TestSummary:
         assert summary["total_x_variance"] == pytest.approx(80.0)
         assert summary["total_y_variance"] == pytest.approx(95.0)
 
+    def test_summary_includes_latent_info(self, fitted_pls, regression_data):
+        """Test that summary includes latent variable information."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        summary = inspector.summary()
+
+        # Assert
+        assert "nr_components" in summary
+        assert summary["nr_components"] == 3
+        assert "hotelling_t2_limit" in summary
+        assert "q_residuals_limit" in summary
+        assert isinstance(summary["hotelling_t2_limit"], float)
+        assert isinstance(summary["q_residuals_limit"], float)
+
 
 class TestInspectFigures:
     def test_inspect_single_dataset(self, fitted_pls, regression_data):

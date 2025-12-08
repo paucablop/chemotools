@@ -364,6 +364,9 @@ class PLSRegressionInspector(
         # Start with common summary fields
         summary_dict: Dict[str, SummaryValue] = self._base_summary()
 
+        # Add latent variable summary
+        summary_dict.update(self.latent_summary())
+
         # Add PLS regression-specific metrics
         pred_summary = self.regression_summary()
         rmse_dict = {ds: metrics["RMSE"] for ds, metrics in pred_summary.items()}

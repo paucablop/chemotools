@@ -457,6 +457,23 @@ class TestPCAInspectorSummary:
             assert "n_components" in result["variance_thresholds"][threshold]
             assert "actual_variance" in result["variance_thresholds"][threshold]
 
+    def test_summary_includes_latent_info(self, fitted_pca, dummy_data_loader):
+        """Test that summary includes latent variable information."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
+
+        # Act
+        summary = inspector.summary()
+
+        # Assert
+        assert "nr_components" in summary
+        assert summary["nr_components"] == 2
+        assert "hotelling_t2_limit" in summary
+        assert "q_residuals_limit" in summary
+        assert isinstance(summary["hotelling_t2_limit"], float)
+        assert isinstance(summary["q_residuals_limit"], float)
+
 
 class TestPCAInspectorInspect:
     """Test inspect method."""
