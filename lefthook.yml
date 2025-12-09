@@ -1,10 +1,14 @@
 pre-commit:
   parallel: true
   commands:
-    format-check:
-      run: task format-check
     lint:
       run: task lint
+      glob: "**/*.py"
+    format-check:
+      run: task format-check
+      glob: "**/*.py"
+    
+
 
 commit-msg:
   commands:
