@@ -324,8 +324,6 @@ class TestCreateScoresPlotSingleDataset:
         # Cleanup
         plt.close(fig)
 
-
-class TestCreateScoresPlotSingleDatasetCoverage:
     def test_raises_value_error_same_components(self, sample_data_coverage):
         """Test that ValueError is raised when component indices are the same."""
         # Arrange
@@ -505,8 +503,6 @@ class TestCreateScoresPlotMultiDataset:
         # Cleanup
         plt.close(fig)
 
-
-class TestCreateScoresPlotMultiDatasetCoverage:
     def test_raises_value_error_same_components(self, sample_data_coverage):
         """Test that ValueError is raised when component indices are the same."""
         # Arrange
@@ -833,8 +829,6 @@ class TestCreateModelDistancesPlot:
                 figsize=figsize,
             )
 
-
-class TestCreateModelDistancesPlotCoverage:
     def test_raises_value_error_empty_datasets(self, pca_model_coverage):
         """Test that ValueError is raised when datasets_data is empty."""
         # Arrange
@@ -1237,8 +1231,6 @@ class TestCreateQVsYResidualsPlot:
         # Cleanup
         plt.close(fig)
 
-
-class TestCreateQVsYResidualsPlotCoverage:
     def test_raises_value_error_empty_datasets(self, pls_model_coverage):
         """Test that ValueError is raised when datasets_data is empty."""
         # Arrange
