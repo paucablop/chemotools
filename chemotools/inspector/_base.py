@@ -421,10 +421,6 @@ class _BaseInspector(ABC):
 
         if isinstance(X, str):
             dataset_name = X if dataset_name is None else dataset_name
-            if dataset_name is None:
-                raise ValueError(
-                    "Dataset name must be provided when using string input."
-                )
             X_preprocessed = self._get_preprocessed_data(dataset_name)
             return self.estimator_.transform(X_preprocessed)
 
