@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.decomposition import PCA
 
-from chemotools.inspector.mixins import LatentVariableMixin
+from chemotools.inspector.core.latent import LatentVariableMixin
 
 
 class _DummyDetector:
@@ -141,11 +141,11 @@ def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
         return detector
 
     monkeypatch.setattr(
-        "chemotools.inspector.mixins._latent.HotellingT2",
+        "chemotools.inspector.core.latent.HotellingT2",
         hot_factory,
     )
     monkeypatch.setattr(
-        "chemotools.inspector.mixins._latent.QResiduals",
+        "chemotools.inspector.core.latent.QResiduals",
         q_factory,
     )
 
@@ -185,9 +185,9 @@ def test_latent_summary():
     summary = inspector.latent_summary()
 
     # Assert
-    assert isinstance(summary, dict)
-    assert summary["nr_components"] == 2
-    assert "hotelling_t2_limit" in summary
-    assert "q_residuals_limit" in summary
-    assert isinstance(summary["hotelling_t2_limit"], float)
-    assert isinstance(summary["q_residuals_limit"], float)
+    from chemotools.inspector.core.latent import LatentSummary
+
+    assert isinstance(summary, LatentSummary)
+    assert summary.nr_components == 2
+    assert isinstance(summary.hotelling_t2_limit, float)
+    assert isinstance(summary.q_residuals_limit, float)

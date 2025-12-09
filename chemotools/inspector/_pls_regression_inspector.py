@@ -22,9 +22,12 @@ if TYPE_CHECKING:
 from chemotools.outliers import QResiduals, HotellingT2, Leverage, StudentizedResiduals
 from chemotools.outliers._studentized_residuals import calculate_studentized_residuals
 
-from ._base import _BaseInspector, InspectorPlotConfig
-from .mixins import LatentVariableMixin, RegressionMixin, SpectraMixin
-from ._utils import (
+from .core.base import _BaseInspector, InspectorPlotConfig
+from .core.latent import LatentVariableMixin
+from .core.regression import RegressionMixin
+from .core.spectra import SpectraMixin
+from .core.summaries import InspectorSummary, PLSVarianceSummary
+from .core.utils import (
     normalize_datasets,
     get_xlabel_for_features,
     get_default_scores_components,
@@ -353,41 +356,32 @@ class PLSRegressionInspector(
     # ------------------------------------------------------------------
     # Summary method
     # ------------------------------------------------------------------
-    def summary(self) -> Dict[str, SummaryValue]:
-        """Get a summary dictionary of the PLS regression model.
+    def summary(self) -> InspectorSummary:
+        """Get a summary of the PLS regression model.
 
         Returns
         -------
-        summary : dict
-            Dictionary containing model information
+        summary : InspectorSummary
+            Object containing model information
         """
-        # Start with common summary fields
-        summary_dict: Dict[str, SummaryValue] = self._base_summary()
-
-        # Add latent variable summary
-        summary_dict.update(self.latent_summary())
-
-        # Add PLS regression-specific metrics
-        pred_summary = self.regression_summary()
-        rmse_dict = {ds: metrics["RMSE"] for ds, metrics in pred_summary.items()}
-        r2_dict = {ds: metrics["R2"] for ds, metrics in pred_summary.items()}
-
-        summary_dict["RMSE"] = rmse_dict
-        summary_dict["R2"] = r2_dict
-
-        # Add variance info if available
         x_var = self.get_explained_x_variance_ratio()
         y_var = self.get_explained_y_variance_ratio()
 
-        if x_var is not None:
-            summary_dict["explained_x_variance_ratio"] = x_var
-            summary_dict["total_x_variance"] = x_var.sum() * 100
+        pls_variance = None
+        if x_var is not None or y_var is not None:
+            pls_variance = PLSVarianceSummary(
+                explained_x_variance_ratio=x_var,
+                total_x_variance=np.sum(x_var) * 100 if x_var is not None else None,
+                explained_y_variance_ratio=y_var,
+                total_y_variance=np.sum(y_var) * 100 if y_var is not None else None,
+            )
 
-        if y_var is not None:
-            summary_dict["explained_y_variance_ratio"] = y_var
-            summary_dict["total_y_variance"] = y_var.sum() * 100
-
-        return summary_dict
+        return InspectorSummary(
+            base=self._base_summary(),
+            latent=self.latent_summary(),
+            regression=self.regression_summary(),
+            pls_variance=pls_variance,
+        )
 
     # ------------------------------------------------------------------
     # Main inspection method

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from abc import ABC
@@ -10,7 +10,8 @@ from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils import check_array
 
-from ._validation import _validate_and_extract_model, _validate_datasets_consistency
+from .validation import _validate_and_extract_model, _validate_datasets_consistency
+from .summaries import BaseSummary
 
 ModelTypes = Union[_BasePCA, _PLS, Pipeline]
 
@@ -337,27 +338,26 @@ class _BaseInspector(ABC):
         """Return the confidence level for outlier detection."""
         return self._confidence
 
-    def _base_summary(self) -> Dict[str, Any]:
+    def _base_summary(self) -> BaseSummary:
         """Generate common summary fields shared by all inspectors.
 
         Returns
         -------
-        summary : dict
-            Dictionary containing common model information:
+        summary : BaseSummary
+            Object containing common model information:
             - 'model_type': Name of the estimator class
             - 'has_preprocessing': Whether preprocessing pipeline exists
             - 'nr_features': Number of features in original data
             - 'nr_samples': Dictionary with sample counts per dataset
             - 'preprocessing_steps': List of preprocessing step info (if available)
         """
-        summary: Dict[str, Any] = {
-            "model_type": type(self.estimator).__name__,
-            "has_preprocessing": self.transformer is not None,
-            "nr_features": self.nr_features,
-            "nr_samples": self.nr_samples.copy(),
-            "preprocessing_steps": self._get_preprocessing_steps(),
-        }
-        return summary
+        return BaseSummary(
+            model_type=type(self.estimator).__name__,
+            has_preprocessing=self.transformer is not None,
+            nr_features=self.nr_features,
+            nr_samples=self.nr_samples.copy(),
+            preprocessing_steps=self._get_preprocessing_steps(),
+        )
 
     def _get_preprocessing_steps(self) -> List[Dict[str, Union[int, str]]]:
         """Get list of preprocessing steps with their details.

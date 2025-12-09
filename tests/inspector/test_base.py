@@ -10,7 +10,11 @@ from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 import matplotlib.pyplot as plt
 
-from chemotools.inspector._base import _BaseInspector, InspectorDataset, InspectorState
+from chemotools.inspector.core.base import (
+    _BaseInspector,
+    InspectorDataset,
+    InspectorState,
+)
 
 
 # Concrete implementation for testing the abstract base class
@@ -574,7 +578,7 @@ class TestInspectorStateErrors:
 
         # Patch _validate_and_extract_model to bypass type checks
         with mock.patch(
-            "chemotools.inspector._base._validate_and_extract_model",
+            "chemotools.inspector.core.base._validate_and_extract_model",
             return_value=(model, None),
         ):
             # Act & Assert
@@ -683,7 +687,7 @@ class TestFeatureSelection:
 
         # Patch _validate_and_extract_model to return our selector as transformer
         with mock.patch(
-            "chemotools.inspector._base._validate_and_extract_model",
+            "chemotools.inspector.core.base._validate_and_extract_model",
             return_value=(pca, selector),
         ):
             inspector = ConcreteInspector(

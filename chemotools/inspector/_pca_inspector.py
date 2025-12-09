@@ -12,9 +12,11 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 
-from ._base import _BaseInspector, InspectorPlotConfig
-from .mixins import LatentVariableMixin, SpectraMixin
-from ._utils import (
+from .core.base import _BaseInspector, InspectorPlotConfig
+from .core.latent import LatentVariableMixin
+from .core.spectra import SpectraMixin
+from .core.summaries import InspectorSummary, PCASummary
+from .core.utils import (
     normalize_datasets,
     get_xlabel_for_features,
     get_default_scores_components,
@@ -148,6 +150,75 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     # Public Methods
     # ==================================================================================
 
+    def summary(self) -> InspectorSummary:
+        """Get a summary of the PCA model.
+
+        Returns
+        -------
+        summary : InspectorSummary
+            Object containing model information
+        """
+        # Calculate cumulative variance
+        explained_var = self.get_explained_variance_ratio()
+        cumsum = np.cumsum(explained_var)
+
+        # Find components for common variance thresholds
+        n_90 = (
+            np.argmax(cumsum >= 0.90) + 1
+            if np.any(cumsum >= 0.90)
+            else self.nr_components
+        )
+        n_95 = (
+            np.argmax(cumsum >= 0.95) + 1
+            if np.any(cumsum >= 0.95)
+            else self.nr_components
+        )
+        n_99 = (
+            np.argmax(cumsum >= 0.99) + 1
+            if np.any(cumsum >= 0.99)
+            else self.nr_components
+        )
+
+        # Build PC variances dictionary
+        pc_variances = {
+            "PC1": explained_var[0] * 100,
+        }
+        if self.nr_components > 1:
+            pc_variances["PC2"] = explained_var[1] * 100
+        if self.nr_components > 2:
+            pc_variances["PC3"] = explained_var[2] * 100
+
+        pca_summary = PCASummary(
+            explained_variance_ratio=explained_var,
+            cumulative_variance=cumsum,
+            pc_variances=pc_variances,
+            total_variance=cumsum[-1] * 100,
+            variance_thresholds={
+                "90%": {
+                    "n_components": n_90,
+                    "actual_variance": cumsum[n_90 - 1] * 100,
+                },
+                "95%": {
+                    "n_components": n_95,
+                    "actual_variance": cumsum[n_95 - 1] * 100,
+                },
+                "99%": {
+                    "n_components": n_99,
+                    "actual_variance": cumsum[n_99 - 1] * 100,
+                },
+            },
+        )
+
+        return InspectorSummary(
+            base=self._base_summary(),
+            latent=self.latent_summary(),
+            pca=pca_summary,
+        )
+
+    # ==================================================================================
+    # Public Methods
+    # ==================================================================================
+
     # ------------------------------------------------------------------
     # LatentVariableMixin hooks
     # ------------------------------------------------------------------
@@ -218,98 +289,6 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             Explained variance ratio
         """
         return self.estimator.explained_variance_ratio_
-
-    # ------------------------------------------------------------------
-    # Summary method
-    # ------------------------------------------------------------------
-    def summary(self) -> Dict[str, Union[str, int, float, Dict, np.ndarray]]:
-        """Get a summary dictionary of the PCA model.
-
-        Returns
-        -------
-        summary : dict
-            Dictionary containing model information with keys:
-            - 'model_type': Name of the PCA estimator class
-            - 'has_preprocessing': Whether preprocessing pipeline exists
-            - 'nr_features': Number of features in original data
-            - 'nr_components': Number of principal components
-            - 'nr_samples': Dictionary with sample counts per dataset
-            - 'explained_variance_ratio': Array of variance ratios per component
-            - 'cumulative_variance': Array of cumulative variance
-            - 'pc_variances': Dictionary with variance explained by PC1, PC2, PC3
-            - 'total_variance': Total variance explained by all components
-            - 'variance_thresholds': Dictionary with components needed for 90%, 95%, 99% variance
-            - 'preprocessing_steps': List of preprocessing step names (if available)
-
-        Examples
-        --------
-        >>> inspector = PCAInspector(pca, X_train, y_train)
-        >>> summary = inspector.summary()
-        >>> print(f"Model type: {summary['model_type']}")
-        >>> print(f"PC1 explains: {summary['pc_variances']['PC1']:.2f}%")
-        >>> print(f"Components for 95% variance: {summary['variance_thresholds']['95%']}")
-        """
-        # Start with common summary fields
-        summary_dict = self._base_summary()
-
-        # Add latent variable summary
-        summary_dict.update(self.latent_summary())
-
-        # Calculate cumulative variance
-        explained_var = self.get_explained_variance_ratio()
-        cumsum = np.cumsum(explained_var)
-
-        # Find components for common variance thresholds
-        n_90 = (
-            np.argmax(cumsum >= 0.90) + 1
-            if np.any(cumsum >= 0.90)
-            else self.nr_components
-        )
-        n_95 = (
-            np.argmax(cumsum >= 0.95) + 1
-            if np.any(cumsum >= 0.95)
-            else self.nr_components
-        )
-        n_99 = (
-            np.argmax(cumsum >= 0.99) + 1
-            if np.any(cumsum >= 0.99)
-            else self.nr_components
-        )
-
-        # Build PC variances dictionary
-        pc_variances = {
-            "PC1": explained_var[0] * 100,
-        }
-        if self.nr_components > 1:
-            pc_variances["PC2"] = explained_var[1] * 100
-        if self.nr_components > 2:
-            pc_variances["PC3"] = explained_var[2] * 100
-
-        # Add PCA-specific fields
-        summary_dict.update(
-            {
-                "explained_variance_ratio": explained_var,
-                "cumulative_variance": cumsum,
-                "pc_variances": pc_variances,
-                "total_variance": cumsum[-1] * 100,
-                "variance_thresholds": {
-                    "90%": {
-                        "n_components": n_90,
-                        "actual_variance": cumsum[n_90 - 1] * 100,
-                    },
-                    "95%": {
-                        "n_components": n_95,
-                        "actual_variance": cumsum[n_95 - 1] * 100,
-                    },
-                    "99%": {
-                        "n_components": n_99,
-                        "actual_variance": cumsum[n_99 - 1] * 100,
-                    },
-                },
-            }
-        )
-
-        return summary_dict
 
     # ------------------------------------------------------------------
     # Main inspection method

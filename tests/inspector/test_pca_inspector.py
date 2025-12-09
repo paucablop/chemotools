@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
 from chemotools.inspector import PCAInspector
+from chemotools.inspector.core.summaries import InspectorSummary
 
 
 class TestPCAInspectorInitialization:
@@ -388,7 +389,7 @@ class TestPCAInspectorSummary:
 
         # Act & Assert - should not raise
         result = inspector.summary()
-        assert isinstance(result, dict)
+        assert isinstance(result, InspectorSummary)
 
     def test_summary_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
         """Test summary with preprocessing pipeline."""
@@ -398,9 +399,9 @@ class TestPCAInspectorSummary:
 
         # Act & Assert - should not raise
         result = inspector.summary()
-        assert isinstance(result, dict)
-        assert "preprocessing_steps" in result
-        assert len(result["preprocessing_steps"]) > 0
+        assert isinstance(result, InspectorSummary)
+        assert result.base.preprocessing_steps is not None
+        assert len(result.base.preprocessing_steps) > 0
 
     def test_summary_with_multiple_datasets(self, fitted_pca, dummy_data_loader):
         """Test summary with multiple datasets."""
@@ -420,9 +421,9 @@ class TestPCAInspectorSummary:
 
         # Act & Assert - should not raise
         result = inspector.summary()
-        assert isinstance(result, dict)
-        assert "nr_samples" in result
-        assert len(result["nr_samples"]) == 3  # train, test, val
+        assert isinstance(result, InspectorSummary)
+        assert result.base.nr_samples is not None
+        assert len(result.base.nr_samples) == 3  # train, test, val
 
     def test_summary_output_format(self, fitted_pca, dummy_data_loader):
         """Test that summary returns dictionary with expected keys."""
@@ -434,28 +435,28 @@ class TestPCAInspectorSummary:
         result = inspector.summary()
 
         # Assert - check for key content
-        assert isinstance(result, dict)
-        assert "model_type" in result
-        assert "has_preprocessing" in result
-        assert "nr_features" in result
-        assert "nr_components" in result
-        assert "nr_samples" in result
-        assert "explained_variance_ratio" in result
-        assert "cumulative_variance" in result
-        assert "pc_variances" in result
-        assert "total_variance" in result
-        assert "variance_thresholds" in result
-        assert "preprocessing_steps" in result
+        assert isinstance(result, InspectorSummary)
+        assert result.base.model_type is not None
+        assert result.base.has_preprocessing is not None
+        assert result.base.nr_features is not None
+        assert result.latent.nr_components is not None
+        assert result.base.nr_samples is not None
+        assert result.pca.explained_variance_ratio is not None
+        assert result.pca.cumulative_variance is not None
+        assert result.pca.pc_variances is not None
+        assert result.pca.total_variance is not None
+        assert result.pca.variance_thresholds is not None
+        assert result.base.preprocessing_steps is not None
 
         # Check variance thresholds structure
-        assert "90%" in result["variance_thresholds"]
-        assert "95%" in result["variance_thresholds"]
-        assert "99%" in result["variance_thresholds"]
+        assert "90%" in result.pca.variance_thresholds
+        assert "95%" in result.pca.variance_thresholds
+        assert "99%" in result.pca.variance_thresholds
 
         # Check each threshold has required keys
         for threshold in ["90%", "95%", "99%"]:
-            assert "n_components" in result["variance_thresholds"][threshold]
-            assert "actual_variance" in result["variance_thresholds"][threshold]
+            assert "n_components" in result.pca.variance_thresholds[threshold]
+            assert "actual_variance" in result.pca.variance_thresholds[threshold]
 
     def test_summary_includes_latent_info(self, fitted_pca, dummy_data_loader):
         """Test that summary includes latent variable information."""
@@ -467,12 +468,9 @@ class TestPCAInspectorSummary:
         summary = inspector.summary()
 
         # Assert
-        assert "nr_components" in summary
-        assert summary["nr_components"] == 2
-        assert "hotelling_t2_limit" in summary
-        assert "q_residuals_limit" in summary
-        assert isinstance(summary["hotelling_t2_limit"], float)
-        assert isinstance(summary["q_residuals_limit"], float)
+        assert summary.latent.nr_components == 2
+        assert isinstance(summary.latent.hotelling_t2_limit, float)
+        assert isinstance(summary.latent.q_residuals_limit, float)
 
 
 class TestPCAInspectorInspect:
@@ -1094,17 +1092,17 @@ class TestPCAInspectorAdditionalCoverage:
         pca_one = PCA(n_components=1).fit(X)
         inspector_one = PCAInspector(model=pca_one, X_train=X, y_train=y)
         summary_one = inspector_one.summary()
-        assert "PC1" in summary_one["pc_variances"]
-        assert "PC2" not in summary_one["pc_variances"]
-        assert "PC3" not in summary_one["pc_variances"]
+        assert "PC1" in summary_one.pca.pc_variances
+        assert "PC2" not in summary_one.pca.pc_variances
+        assert "PC3" not in summary_one.pca.pc_variances
 
         # Act & Assert - 3+ components
         pca_three = PCA(n_components=3).fit(X)
         inspector_three = PCAInspector(model=pca_three, X_train=X, y_train=y)
         summary_three = inspector_three.summary()
-        assert "PC1" in summary_three["pc_variances"]
-        assert "PC2" in summary_three["pc_variances"]
-        assert "PC3" in summary_three["pc_variances"]
+        assert "PC1" in summary_three.pca.pc_variances
+        assert "PC2" in summary_three.pca.pc_variances
+        assert "PC3" in summary_three.pca.pc_variances
 
     def test_summary_preprocessing_steps_empty_for_plain_model(
         self, fitted_pca, dummy_data_loader
@@ -1118,9 +1116,8 @@ class TestPCAInspectorAdditionalCoverage:
         summary = inspector.summary()
 
         # Assert
-        assert "preprocessing_steps" in summary
-        assert summary["preprocessing_steps"] == []
-        assert summary["has_preprocessing"] is False
+        assert summary.base.preprocessing_steps == []
+        assert summary.base.has_preprocessing is False
 
     def test_inspect_spectra_with_multiple_datasets(
         self, fitted_pipeline_pca, dummy_data_loader

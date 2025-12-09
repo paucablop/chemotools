@@ -25,7 +25,7 @@ from chemotools.plotting import (
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._utils import annotate_points
 
-from .._utils import prepare_annotations, prepare_color_values
+from ..core.utils import prepare_annotations, prepare_color_values
 
 
 def create_predicted_vs_actual_plot(

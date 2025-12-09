@@ -17,10 +17,10 @@ class TestPredictionSummary:
         # Assert
         assert isinstance(summary, dict)
         assert "train" in summary
-        assert "RMSE" in summary["train"]
-        assert "R2" in summary["train"]
-        assert isinstance(summary["train"]["RMSE"], float)
-        assert isinstance(summary["train"]["R2"], float)
+        assert summary["train"].rmse is not None
+        assert summary["train"].r2 is not None
+        assert isinstance(summary["train"].rmse, float)
+        assert isinstance(summary["train"].r2, float)
 
     def test_regression_summary_multiple_datasets(self):
         # Arrange
@@ -58,9 +58,9 @@ class TestPredictionSummary:
 
         # Act
         summary = inspector.regression_summary()
-        bias = summary["train"]["Bias"]
+        bias = summary["train"].bias
 
         # Assert
-        assert "Bias" in summary["train"]
+        assert summary["train"].bias is not None
         assert isinstance(bias, float)
         np.testing.assert_almost_equal(bias, expected_bias)

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from chemotools.inspector.mixins import SpectraMixin
+from chemotools.inspector.core.spectra import SpectraMixin
 
 
 class _DummyTransformer(Pipeline):

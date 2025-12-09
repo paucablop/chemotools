@@ -3,24 +3,25 @@
 from __future__ import annotations
 
 from typing import Dict, Literal, Optional, Sequence, Tuple, TYPE_CHECKING, Union
+from dataclasses import dataclass
 
 import numpy as np
 
-from ..helpers import _latent as _latent_plots
-from chemotools.inspector._utils import (
+from chemotools.inspector.helpers import _latent as _latent_plots
+from chemotools.plotting._styles import DATASET_COLORS
+from chemotools.outliers import HotellingT2, QResiduals
+from .utils import (
     ComponentSpec,
     normalize_components,
     normalize_datasets,
     get_xlabel_for_features,
 )
-from chemotools.plotting._styles import DATASET_COLORS
-from chemotools.outliers import HotellingT2, QResiduals
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
 
     from matplotlib.figure import Figure
-    from chemotools.inspector._base import ModelTypes
+    from chemotools.inspector.core.base import ModelTypes
 
     class _LatentInspectorProto(Protocol):
         @property
@@ -38,6 +39,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
         def _get_preprocessed_feature_names(self) -> np.ndarray:  # pragma: no cover
             ...
+
+
+@dataclass
+class LatentSummary:
+    nr_components: int
+    hotelling_t2_limit: float
+    q_residuals_limit: float
 
 
 class LatentVariableMixin:
@@ -306,19 +314,19 @@ class LatentVariableMixin:
             color_mode=color_mode,
         )
 
-    def latent_summary(self) -> Dict[str, Union[int, float]]:
+    def latent_summary(self) -> LatentSummary:
         """Return summary of latent variable model properties.
 
         Returns
         -------
-        summary : dict
-            Dictionary containing:
+        summary : LatentSummary
+            Object containing:
             - 'nr_components': Number of latent variables
             - 'hotelling_t2_limit': Critical value for Hotelling's T²
             - 'q_residuals_limit': Critical value for Q residuals
         """
-        return {
-            "nr_components": self.nr_components,
-            "hotelling_t2_limit": self.hotelling_t2_limit,
-            "q_residuals_limit": self.q_residuals_limit,
-        }
+        return LatentSummary(
+            nr_components=self.nr_components,
+            hotelling_t2_limit=self.hotelling_t2_limit,
+            q_residuals_limit=self.q_residuals_limit,
+        )

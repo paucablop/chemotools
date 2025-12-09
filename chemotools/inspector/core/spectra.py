@@ -6,11 +6,11 @@ from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union, Litera
 
 import numpy as np
 
-from ..helpers._spectra import (
+from chemotools.inspector.helpers._spectra import (
     create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
 )
-from .._utils import normalize_datasets, get_xlabel_for_features
+from .utils import normalize_datasets, get_xlabel_for_features
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol

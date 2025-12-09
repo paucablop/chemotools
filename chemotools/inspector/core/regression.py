@@ -3,19 +3,20 @@
 from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING, Union, Sequence
+from dataclasses import dataclass
 
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 
 from chemotools.outliers import Leverage, StudentizedResiduals
 from chemotools.inspector.helpers import _regression as _regression_plots
-from chemotools.inspector._utils import normalize_datasets
+from .utils import normalize_datasets
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol, Literal
     from matplotlib.figure import Figure
 
-    from chemotools.inspector._base import ModelTypes
+    from chemotools.inspector.core.base import ModelTypes
 
     class _RegressionInspectorProto(Protocol):
         datasets_: Dict[str, Any]
@@ -32,6 +33,13 @@ if TYPE_CHECKING:  # pragma: no cover
             self, dataset: str
         ) -> Tuple[np.ndarray, Optional[np.ndarray]]:  # pragma: no cover
             ...
+
+
+@dataclass
+class RegressionMetrics:
+    rmse: float
+    r2: float
+    bias: float
 
 
 class RegressionMixin:
@@ -211,14 +219,14 @@ class RegressionMixin:
             self._calculate_bias(dataset)
         return self._bias_cache[dataset]
 
-    def regression_summary(self) -> Dict[str, Dict[str, float]]:
+    def regression_summary(self) -> Dict[str, RegressionMetrics]:
         """Return a summary of prediction metrics (RMSE, R2) for all available datasets.
 
         Returns
         -------
-        summary : dict
+        summary : Dict[str, RegressionMetrics]
             Dictionary where keys are dataset names ('train', 'test', 'val') and
-            values are dictionaries containing 'RMSE' and 'R2' metrics.
+            values are RegressionMetrics objects containing 'rmse', 'r2', 'bias'.
         """
         summary = {}
         inspector = self._regression_inspector()
@@ -228,11 +236,11 @@ class RegressionMixin:
             # Only calculate if target values are available
             _, y = inspector._get_raw_data(name)
             if y is not None:
-                summary[name] = {
-                    "RMSE": self.regression_rmse(name),
-                    "R2": self.regression_r2(name),
-                    "Bias": self.regression_bias(name),
-                }
+                summary[name] = RegressionMetrics(
+                    rmse=self.regression_rmse(name),
+                    r2=self.regression_r2(name),
+                    bias=self.regression_bias(name),
+                )
         return summary
 
     def create_predicted_vs_actual_plot(

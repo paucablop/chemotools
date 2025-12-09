@@ -5,7 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from matplotlib.figure import Figure
 
-from chemotools.inspector.mixins import RegressionMixin
+from chemotools.inspector.core.regression import RegressionMixin
 
 
 class _CountingModel:
@@ -133,11 +133,11 @@ def test_detectors_are_cached(monkeypatch, regression_setup):
             return self
 
     monkeypatch.setattr(
-        "chemotools.inspector.mixins._regression.Leverage",
+        "chemotools.inspector.core.regression.Leverage",
         FakeLeverage,
     )
     monkeypatch.setattr(
-        "chemotools.inspector.mixins._regression.StudentizedResiduals",
+        "chemotools.inspector.core.regression.StudentizedResiduals",
         FakeStudentized,
     )
 
