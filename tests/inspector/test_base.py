@@ -6,7 +6,7 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 import matplotlib.pyplot as plt
 
@@ -484,6 +484,7 @@ class TestBaseInspectorProperties:
 
         assert isinstance(inspector.transformer_, Pipeline)
 
+
 class TestInspectorDataset:
     """Tests for InspectorDataset class."""
 
@@ -498,7 +499,7 @@ class TestInspectorDataset:
         # Act & Assert
         # Test keys
         assert dataset.keys() == ("X", "y", "labels")
-        
+
         # Test __contains__
         assert "X" in dataset
         assert "y" in dataset
@@ -510,7 +511,7 @@ class TestInspectorDataset:
         assert np.array_equal(items["X"], X)
         assert np.array_equal(items["y"], y)
         assert np.array_equal(items["labels"], labels)
-        
+
         keys = list(dataset)
         assert keys == ["X", "y", "labels"]
 
@@ -526,6 +527,7 @@ class TestInspectorDataset:
         with pytest.raises(KeyError):
             _ = dataset["invalid_key"]
 
+
 class TestInspectorStateErrors:
     """Tests for error handling in InspectorState."""
 
@@ -535,9 +537,11 @@ class TestInspectorStateErrors:
         X = np.zeros((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
-        
+
         # Act & Assert
-        with pytest.raises(ValueError, match="Sample labels for 'train' must have length 5"):
+        with pytest.raises(
+            ValueError, match="Sample labels for 'train' must have length 5"
+        ):
             InspectorState(
                 model=model,
                 X_train=X,
@@ -547,27 +551,36 @@ class TestInspectorStateErrors:
                 X_val=None,
                 y_val=None,
                 supervised=False,
-                sample_labels={"train": ["a", "b"]} # Length 2 != 5
+                sample_labels={"train": ["a", "b"]},  # Length 2 != 5
             )
 
     def test_resolve_n_components_error(self):
         """Test AttributeError when estimator has no n_components."""
+
         # Arrange
         class MockEstimator(BaseEstimator):
-            def fit(self, X, y=None): 
+            def fit(self, X, y=None):
                 self.fitted_ = True
                 return self
-            def transform(self, X): return X
+
+            def transform(self, X):
+                return X
+
             # No n_components attribute
-    
+
         model = MockEstimator()
         X = np.zeros((5, 2))
         model.fit(X)
-        
+
         # Patch _validate_and_extract_model to bypass type checks
-        with mock.patch("chemotools.inspector._base._validate_and_extract_model", return_value=(model, None)):
+        with mock.patch(
+            "chemotools.inspector._base._validate_and_extract_model",
+            return_value=(model, None),
+        ):
             # Act & Assert
-            with pytest.raises(AttributeError, match="Cannot determine number of components"):
+            with pytest.raises(
+                AttributeError, match="Cannot determine number of components"
+            ):
                 InspectorState(
                     model=model,
                     X_train=X,
@@ -576,7 +589,7 @@ class TestInspectorStateErrors:
                     y_test=None,
                     X_val=None,
                     y_val=None,
-                    supervised=False
+                    supervised=False,
                 )
 
     def test_get_dataset_errors(self):
@@ -593,7 +606,7 @@ class TestInspectorStateErrors:
             y_test=None,
             X_val=None,
             y_val=None,
-            supervised=False
+            supervised=False,
         )
 
         # Act & Assert
@@ -609,6 +622,7 @@ class TestInspectorStateErrors:
         with pytest.raises(ValueError, match="Invalid dataset 'invalid'"):
             state.get_dataset("invalid")
 
+
 class TestFeatureSelection:
     """Tests for feature selection and mask handling."""
 
@@ -616,33 +630,32 @@ class TestFeatureSelection:
         """Test get_feature_mask with a pipeline containing a selector."""
         # Arrange
         X = np.random.rand(10, 5)
-        y = np.array([0]*5 + [1]*5)
-        
+        y = np.array([0] * 5 + [1] * 5)
+
         # Create pipeline with selector
         selector = SelectKBest(f_classif, k=2)
         pca = PCA(n_components=2)
-        pipeline = Pipeline([
-            ("select", selector),
-            ("pca", pca)
-        ])
+        pipeline = Pipeline([("select", selector), ("pca", pca)])
         pipeline.fit(X, y)
 
         # Act
-        inspector = ConcreteInspector(model=pipeline, X_train=X, y_train=y, supervised=True)
+        inspector = ConcreteInspector(
+            model=pipeline, X_train=X, y_train=y, supervised=True
+        )
         mask = inspector._get_feature_mask()
-        
+
         # Assert
         assert mask is not None
         assert mask.sum() == 2
-        
+
         # Also test _get_preprocessed_feature_names with mask
         feature_names = np.array([f"feat_{i}" for i in range(5)])
         inspector = ConcreteInspector(
-            model=pipeline, 
-            X_train=X, 
-            y_train=y, 
+            model=pipeline,
+            X_train=X,
+            y_train=y,
             supervised=True,
-            feature_names=feature_names
+            feature_names=feature_names,
         )
         selected_names = inspector._get_preprocessed_feature_names()
         assert len(selected_names) == 2
@@ -652,24 +665,35 @@ class TestFeatureSelection:
         """Test get_feature_mask when the transformer is a selector instance."""
         # Arrange
         X = np.random.rand(10, 5)
-        y = np.array([0]*5 + [1]*5)
-        
+        y = np.array([0] * 5 + [1] * 5)
+
         class MockSelector(BaseEstimator, SelectorMixin):
-            def fit(self, X, y=None): return self
-            def transform(self, X): return X[:, :2]
-            def _get_support_mask(self): return np.array([True, True, False, False, False])
+            def fit(self, X, y=None):
+                return self
+
+            def transform(self, X):
+                return X[:, :2]
+
+            def _get_support_mask(self):
+                return np.array([True, True, False, False, False])
 
         selector = MockSelector()
         pca = PCA(n_components=2)
-        pca.fit(X) # Fit PCA separately as we are mocking the extraction
-        
+        pca.fit(X)  # Fit PCA separately as we are mocking the extraction
+
         # Patch _validate_and_extract_model to return our selector as transformer
-        with mock.patch("chemotools.inspector._base._validate_and_extract_model", return_value=(pca, selector)):
-            inspector = ConcreteInspector(model=pca, X_train=X, y_train=y, supervised=True)
+        with mock.patch(
+            "chemotools.inspector._base._validate_and_extract_model",
+            return_value=(pca, selector),
+        ):
+            inspector = ConcreteInspector(
+                model=pca, X_train=X, y_train=y, supervised=True
+            )
             mask = inspector._get_feature_mask()
-            
+
             assert mask is not None
             assert np.array_equal(mask, np.array([True, True, False, False, False]))
+
 
 class TestBaseInspectorMethods:
     """Tests for _BaseInspector methods."""
@@ -695,7 +719,9 @@ class TestBaseInspectorMethods:
         model = PCA(n_components=2)
         model.fit(X)
         feature_names = ["f1", "f2"]
-        inspector = ConcreteInspector(model=model, X_train=X, feature_names=feature_names)
+        inspector = ConcreteInspector(
+            model=model, X_train=X, feature_names=feature_names
+        )
 
         # Act
         names = inspector._get_preprocessed_feature_names()
