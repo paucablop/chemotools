@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import PLSRegression
 
 from chemotools.inspector.helpers._latent import (
     create_model_distances_plot,
@@ -45,6 +46,33 @@ def pca_model():
     X = np.random.rand(100, 50)
     model = PCA(n_components=5)
     model.fit(X)
+    return model
+
+
+@pytest.fixture
+def sample_data_coverage():
+    np.random.seed(42)
+    return {
+        "scores": np.random.rand(50, 5),
+        "explained_var": np.array([0.45, 0.25, 0.15, 0.10, 0.05]),
+        "y": np.random.rand(50),
+    }
+
+
+@pytest.fixture
+def pca_model_coverage():
+    X = np.random.rand(20, 10)
+    model = PCA(n_components=2)
+    model.fit(X)
+    return model
+
+
+@pytest.fixture
+def pls_model_coverage():
+    X = np.random.rand(20, 10)
+    Y = np.random.rand(20, 2)
+    model = PLSRegression(n_components=2)
+    model.fit(X, Y)
     return model
 
 
@@ -297,6 +325,82 @@ class TestCreateScoresPlotSingleDataset:
         plt.close(fig)
 
 
+class TestCreateScoresPlotSingleDatasetCoverage:
+    def test_raises_value_error_same_components(self, sample_data_coverage):
+        """Test that ValueError is raised when component indices are the same."""
+        # Arrange
+        component_spec = (0, 0)
+        scores = sample_data_coverage["scores"]
+        explained_var = sample_data_coverage["explained_var"]
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Component indices must be different"):
+            create_scores_plot_single_dataset(
+                component_spec=component_spec,
+                scores=scores,
+                y=None,
+                explained_var=explained_var,
+                dataset_name="train",
+                color_by=None,
+                annotate_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_color_by_y_1d_plot(self, sample_data_coverage):
+        """Test 1D scores plot colored by y-values."""
+        # Arrange
+        component_spec = 0
+        scores = sample_data_coverage["scores"]
+        y = sample_data_coverage["y"]
+        explained_var = sample_data_coverage["explained_var"]
+        color_by = "y"
+
+        # Act
+        fig = create_scores_plot_single_dataset(
+            component_spec=component_spec,
+            scores=scores,
+            y=y,
+            explained_var=explained_var,
+            dataset_name="train",
+            color_by=color_by,
+            annotate_by=None,
+            figsize=(6, 6),
+        )
+
+        # Assert
+        assert fig is not None
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "y-value"
+        assert "Scores: PC1 (Train)" in ax.get_title()
+        plt.close(fig)
+
+    def test_color_by_sample_index_1d_plot(self, sample_data_coverage):
+        """Test 1D scores plot colored by sample index."""
+        # Arrange
+        component_spec = 0
+        scores = sample_data_coverage["scores"]
+        explained_var = sample_data_coverage["explained_var"]
+        color_by = "sample_index"
+
+        # Act
+        fig = create_scores_plot_single_dataset(
+            component_spec=component_spec,
+            scores=scores,
+            y=None,
+            explained_var=explained_var,
+            dataset_name="train",
+            color_by=color_by,
+            annotate_by=None,
+            figsize=(6, 6),
+        )
+
+        # Assert
+        assert fig is not None
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "Sample Index"
+        plt.close(fig)
+
+
 class TestCreateScoresPlotMultiDataset:
     """Tests for create_scores_plot_multi_dataset function."""
 
@@ -383,7 +487,6 @@ class TestCreateScoresPlotMultiDataset:
         component_spec = (0, 1)
         explained_var = sample_data["explained_var"]
         color_by = None
-        annotate_by = None
         figsize = (6, 6)
 
         # Act
@@ -392,7 +495,7 @@ class TestCreateScoresPlotMultiDataset:
             datasets_data=datasets_data,
             explained_var=explained_var,
             color_by=color_by,
-            annotate_by=annotate_by,
+            annotate_by=None,
             figsize=figsize,
         )
 
@@ -400,6 +503,120 @@ class TestCreateScoresPlotMultiDataset:
         assert fig is not None
 
         # Cleanup
+        plt.close(fig)
+
+
+class TestCreateScoresPlotMultiDatasetCoverage:
+    def test_raises_value_error_same_components(self, sample_data_coverage):
+        """Test that ValueError is raised when component indices are the same."""
+        # Arrange
+        component_spec = (0, 0)
+        datasets_data = {"train": {"scores": sample_data_coverage["scores"], "y": None}}
+        explained_var = sample_data_coverage["explained_var"]
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Component indices must be different"):
+            create_scores_plot_multi_dataset(
+                component_spec=component_spec,
+                datasets_data=datasets_data,
+                explained_var=explained_var,
+                color_by=None,
+                annotate_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_nan_explained_variance(self, sample_data_coverage):
+        """Test handling of NaN values in explained variance."""
+        # Arrange
+        explained_var = np.array([np.nan, 0.25])
+        datasets_data = {"train": {"scores": sample_data_coverage["scores"], "y": None}}
+        component_spec = 0
+
+        # Act
+        fig = create_scores_plot_multi_dataset(
+            component_spec=component_spec,
+            datasets_data=datasets_data,
+            explained_var=explained_var,
+            color_by=None,
+            annotate_by=None,
+            figsize=(6, 6),
+        )
+
+        # Assert
+        assert fig is not None
+        # Check that label doesn't contain "nan%"
+        ax = fig.axes[0]
+        assert "nan%" not in ax.get_ylabel()
+        plt.close(fig)
+
+    def test_scores_is_none_assertion(self, sample_data_coverage):
+        """Test assertions for missing scores data."""
+        # Arrange
+        datasets_data_1d = {"train": {"scores": None, "y": None}}
+        datasets_data_mixed = {
+            "train": {"scores": sample_data_coverage["scores"], "y": None},
+            "test": {"scores": None, "y": None},
+        }
+        explained_var = sample_data_coverage["explained_var"]
+
+        # Act & Assert (1D case)
+        with pytest.raises(
+            ValueError, match="At least one dataset must have scores data"
+        ):
+            create_scores_plot_multi_dataset(
+                component_spec=0,
+                datasets_data=datasets_data_1d,
+                explained_var=explained_var,
+                color_by=None,
+                annotate_by=None,
+                figsize=(6, 6),
+            )
+
+        # Act & Assert (2D case)
+        with pytest.raises(
+            AssertionError, match="Scores data is required for dataset test"
+        ):
+            create_scores_plot_multi_dataset(
+                component_spec=(0, 1),
+                datasets_data=datasets_data_mixed,
+                explained_var=explained_var,
+                color_by=None,
+                annotate_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_color_by_y_1d_plot(self, sample_data_coverage):
+        """Test 1D multi-dataset scores plot colored by y-values."""
+        # Arrange
+        datasets_data = {
+            "train": {
+                "scores": sample_data_coverage["scores"],
+                "y": sample_data_coverage["y"],
+            }
+        }
+        explained_var = sample_data_coverage["explained_var"]
+        color_by = "y"
+        component_spec = 0
+
+        # Act
+        fig = create_scores_plot_multi_dataset(
+            component_spec=component_spec,
+            datasets_data=datasets_data,
+            explained_var=explained_var,
+            color_by=color_by,
+            annotate_by=None,
+            figsize=(6, 6),
+        )
+
+        # Assert
+        assert fig is not None
+        ax = fig.axes[0]
+        assert ax.get_xlabel() == "y-value"
+        assert "Scores: PC1" in ax.get_title()
+        # Check grid and legend (lines 490-491)
+        # Scatter plots use collections, not lines
+        assert len(ax.collections) > 0
+        assert ax.get_legend() is not None
         plt.close(fig)
 
 
@@ -614,6 +831,68 @@ class TestCreateModelDistancesPlot:
                 confidence=confidence,
                 color_by=color_by,
                 figsize=figsize,
+            )
+
+
+class TestCreateModelDistancesPlotCoverage:
+    def test_raises_value_error_empty_datasets(self, pca_model_coverage):
+        """Test that ValueError is raised when datasets_data is empty."""
+        # Arrange
+        datasets_data = {}
+        model = pca_model_coverage
+
+        # Act & Assert
+        with pytest.raises(
+            ValueError, match="datasets_data must contain at least one dataset"
+        ):
+            create_model_distances_plot(
+                datasets_data=datasets_data,
+                model=model,
+                confidence=0.95,
+                color_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_fallback_training_dataset(self, pca_model_coverage):
+        """Test fallback to first dataset when training_dataset is not found."""
+        # Arrange
+        X = np.random.rand(20, 10)
+        datasets_data = {"test": {"X": X, "y": None}}
+        model = pca_model_coverage
+
+        # Act
+        # Should not raise error, should use "test" as training data for detectors
+        fig = create_model_distances_plot(
+            datasets_data=datasets_data,
+            model=model,
+            confidence=0.95,
+            color_by=None,
+            figsize=(6, 6),
+            training_dataset="train",  # "train" not in datasets_data
+        )
+
+        # Assert
+        assert fig is not None
+        plt.close(fig)
+
+    def test_raises_value_error_missing_X(self, pca_model_coverage):
+        """Test that ValueError is raised when X data is missing."""
+        # Arrange
+        X = np.random.rand(20, 10)
+        datasets_data_mixed = {
+            "train": {"X": X, "y": None},
+            "test": {"X": None, "y": None},
+        }
+        model = pca_model_coverage
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="X data is required for dataset 'test'"):
+            create_model_distances_plot(
+                datasets_data=datasets_data_mixed,
+                model=model,
+                confidence=0.95,
+                color_by=None,
+                figsize=(6, 6),
             )
 
 
@@ -956,4 +1235,104 @@ class TestCreateQVsYResidualsPlot:
         assert "Q Residuals" in ax.get_ylabel()
 
         # Cleanup
+        plt.close(fig)
+
+
+class TestCreateQVsYResidualsPlotCoverage:
+    def test_raises_value_error_empty_datasets(self, pls_model_coverage):
+        """Test that ValueError is raised when datasets_data is empty."""
+        # Arrange
+        datasets_data = {}
+        model = pls_model_coverage
+
+        # Act & Assert
+        with pytest.raises(
+            ValueError, match="datasets_data must contain at least one dataset"
+        ):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets_data,
+                model=model,
+                confidence=0.95,
+                color_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_fallback_training_dataset(self, pls_model_coverage):
+        """Test fallback to first dataset when training_dataset is not found."""
+        # Arrange
+        X = np.random.rand(20, 10)
+        y_true = np.random.rand(20, 2)
+        y_pred = np.random.rand(20, 2)
+
+        datasets_data = {
+            "test": {"X": X, "y_true": y_true, "y_pred": y_pred, "y": None}
+        }
+        model = pls_model_coverage
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=datasets_data,
+            model=model,
+            confidence=0.95,
+            color_by=None,
+            figsize=(6, 6),
+            training_dataset="train",  # "train" not in datasets_data
+        )
+
+        # Assert
+        assert fig is not None
+        plt.close(fig)
+
+    def test_raises_value_error_missing_X(self, pls_model_coverage):
+        """Test that ValueError is raised when X data is missing."""
+        # Arrange
+        X = np.random.rand(20, 10)
+        y_true = np.random.rand(20, 2)
+        y_pred = np.random.rand(20, 2)
+
+        datasets_data_mixed = {
+            "train": {"X": X, "y_true": y_true, "y_pred": y_pred, "y": None},
+            "test": {"X": None, "y_true": y_true, "y_pred": y_pred, "y": None},
+        }
+        model = pls_model_coverage
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="X data is required for dataset 'test'"):
+            create_q_vs_y_residuals_plot(
+                datasets_data=datasets_data_mixed,
+                model=model,
+                confidence=0.95,
+                color_by=None,
+                figsize=(6, 6),
+            )
+
+    def test_multi_target_residuals(self, pls_model_coverage):
+        """Test residuals calculation for multi-target regression."""
+        # Arrange
+        X = np.random.rand(20, 10)
+        # Multi-target (2 targets)
+        y_true = np.random.rand(20, 2)
+        y_pred = np.random.rand(20, 2)
+
+        datasets_data = {
+            "train": {
+                "X": X,
+                "y_true": y_true,
+                "y_pred": y_pred,
+                "y": None,
+            }
+        }
+        model = pls_model_coverage
+
+        # Act
+        fig = create_q_vs_y_residuals_plot(
+            datasets_data=datasets_data,
+            model=model,
+            confidence=0.95,
+            color_by=None,
+            figsize=(6, 6),
+        )
+
+        # Assert
+        assert fig is not None
         plt.close(fig)
