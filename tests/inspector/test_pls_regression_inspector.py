@@ -141,9 +141,9 @@ class TestSummary:
 
         # Assert
         assert isinstance(summary, InspectorSummary)
-        assert "train" in summary.regression
-        assert summary.regression["train"].rmse is not None
-        assert summary.regression["train"].r2 is not None
+        assert summary.train is not None
+        assert summary.train.rmse is not None
+        assert summary.train.r2 is not None
         assert summary.model_type is not None
         assert summary.model_type.startswith("PLS")
 

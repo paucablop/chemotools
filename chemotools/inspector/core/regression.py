@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING, Union, Sequence
-from dataclasses import dataclass
 
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
@@ -11,6 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from chemotools.outliers import Leverage, StudentizedResiduals
 from chemotools.inspector.helpers import _regression as _regression_plots
 from .utils import normalize_datasets
+from .summaries import RegressionMetrics, RegressionSummary
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol, Literal
@@ -33,13 +33,6 @@ if TYPE_CHECKING:  # pragma: no cover
             self, dataset: str
         ) -> Tuple[np.ndarray, Optional[np.ndarray]]:  # pragma: no cover
             ...
-
-
-@dataclass
-class RegressionMetrics:
-    rmse: float
-    r2: float
-    bias: float
 
 
 class RegressionMixin:
@@ -219,29 +212,36 @@ class RegressionMixin:
             self._calculate_bias(dataset)
         return self._bias_cache[dataset]
 
-    def regression_summary(self) -> Dict[str, RegressionMetrics]:
+    def regression_summary(self) -> RegressionSummary:
         """Return a summary of prediction metrics (RMSE, R2) for all available datasets.
 
         Returns
         -------
-        summary : Dict[str, RegressionMetrics]
-            Dictionary where keys are dataset names ('train', 'test', 'val') and
-            values are RegressionMetrics objects containing 'rmse', 'r2', 'bias'.
+        summary : RegressionSummary
+            Object containing RegressionMetrics for 'train', 'test', and 'val' datasets.
         """
-        summary = {}
+        metrics = {}
         inspector = self._regression_inspector()
         datasets = getattr(inspector, "datasets_", {})
 
-        for name in datasets:
+        for name in ["train", "test", "val"]:
+            if name not in datasets:
+                continue
+
             # Only calculate if target values are available
             _, y = inspector._get_raw_data(name)
             if y is not None:
-                summary[name] = RegressionMetrics(
+                metrics[name] = RegressionMetrics(
                     rmse=self.regression_rmse(name),
                     r2=self.regression_r2(name),
                     bias=self.regression_bias(name),
                 )
-        return summary
+
+        return RegressionSummary(
+            train=metrics["train"],
+            test=metrics.get("test"),
+            val=metrics.get("val"),
+        )
 
     def create_predicted_vs_actual_plot(
         self,

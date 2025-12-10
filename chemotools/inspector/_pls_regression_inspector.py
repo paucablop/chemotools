@@ -378,7 +378,9 @@ class PLSRegressionInspector(
             # Latent fields
             **asdict(latent_summary),
             # Regression fields
-            regression=regression_summary,
+            train=regression_summary.train,
+            test=regression_summary.test,
+            val=regression_summary.val,
             # PLS specific fields
             explained_x_variance_ratio=x_var.tolist() if x_var is not None else None,
             total_x_variance=float(np.sum(x_var) * 100) if x_var is not None else None,
