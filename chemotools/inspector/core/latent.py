@@ -326,7 +326,7 @@ class LatentVariableMixin:
             - 'q_residuals_limit': Critical value for Q residuals
         """
         return LatentSummary(
-            nr_components=self.nr_components,
-            hotelling_t2_limit=self.hotelling_t2_limit,
-            q_residuals_limit=self.q_residuals_limit,
+            nr_components=int(self.nr_components),
+            hotelling_t2_limit=float(self.hotelling_t2_limit),
+            q_residuals_limit=float(self.q_residuals_limit),
         )

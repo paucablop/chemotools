@@ -11,7 +11,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils import check_array
 
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
-from .summaries import BaseSummary
+from .summaries import InspectorSummary
 
 ModelTypes = Union[_BasePCA, _PLS, Pipeline]
 
@@ -338,24 +338,13 @@ class _BaseInspector(ABC):
         """Return the confidence level for outlier detection."""
         return self._confidence
 
-    def _base_summary(self) -> BaseSummary:
-        """Generate common summary fields shared by all inspectors.
-
-        Returns
-        -------
-        summary : BaseSummary
-            Object containing common model information:
-            - 'model_type': Name of the estimator class
-            - 'has_preprocessing': Whether preprocessing pipeline exists
-            - 'nr_features': Number of features in original data
-            - 'nr_samples': Dictionary with sample counts per dataset
-            - 'preprocessing_steps': List of preprocessing step info (if available)
-        """
-        return BaseSummary(
-            model_type=type(self.estimator).__name__,
+    def _base_summary(self) -> InspectorSummary:
+        """Create base summary with common model information."""
+        return InspectorSummary(
+            model_type=self.model.__class__.__name__,
             has_preprocessing=self.transformer is not None,
-            nr_features=self.nr_features,
-            nr_samples=self.nr_samples.copy(),
+            nr_features=self.n_features_in_,
+            nr_samples={name: ds.n_samples for name, ds in self.datasets_.items()},
             preprocessing_steps=self._get_preprocessing_steps(),
         )
 

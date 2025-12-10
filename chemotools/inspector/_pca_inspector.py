@@ -1,6 +1,7 @@
 """PCA Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
+from dataclasses import asdict
 from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING, Literal
 import numpy as np
 from sklearn.decomposition._base import _BasePCA
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 from .core.base import _BaseInspector, InspectorPlotConfig
 from .core.latent import LatentVariableMixin
 from .core.spectra import SpectraMixin
-from .core.summaries import InspectorSummary, PCASummary
+from .core.summaries import PCASummary
 from .core.utils import (
     normalize_datasets,
     get_xlabel_for_features,
@@ -150,12 +151,12 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     # Public Methods
     # ==================================================================================
 
-    def summary(self) -> InspectorSummary:
+    def summary(self) -> PCASummary:
         """Get a summary of the PCA model.
 
         Returns
         -------
-        summary : InspectorSummary
+        summary : PCASummary
             Object containing model information
         """
         # Calculate cumulative variance
@@ -181,38 +182,40 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         # Build PC variances dictionary
         pc_variances = {
-            "PC1": explained_var[0] * 100,
+            "PC1": float(explained_var[0] * 100),
         }
         if self.nr_components > 1:
-            pc_variances["PC2"] = explained_var[1] * 100
+            pc_variances["PC2"] = float(explained_var[1] * 100)
         if self.nr_components > 2:
-            pc_variances["PC3"] = explained_var[2] * 100
+            pc_variances["PC3"] = float(explained_var[2] * 100)
 
-        pca_summary = PCASummary(
-            explained_variance_ratio=explained_var,
-            cumulative_variance=cumsum,
+        base_summary = self._base_summary()
+        latent_summary = self.latent_summary()
+
+        return PCASummary(
+            # Base fields
+            **base_summary.to_dict(),
+            # Latent fields
+            **asdict(latent_summary),
+            # PCA fields
+            explained_variance_ratio=explained_var.tolist(),
+            cumulative_variance=cumsum.tolist(),
             pc_variances=pc_variances,
-            total_variance=cumsum[-1] * 100,
+            total_variance=float(cumsum[-1] * 100),
             variance_thresholds={
                 "90%": {
-                    "n_components": n_90,
-                    "actual_variance": cumsum[n_90 - 1] * 100,
+                    "n_components": int(n_90),
+                    "actual_variance": float(cumsum[n_90 - 1] * 100),
                 },
                 "95%": {
-                    "n_components": n_95,
-                    "actual_variance": cumsum[n_95 - 1] * 100,
+                    "n_components": int(n_95),
+                    "actual_variance": float(cumsum[n_95 - 1] * 100),
                 },
                 "99%": {
-                    "n_components": n_99,
-                    "actual_variance": cumsum[n_99 - 1] * 100,
+                    "n_components": int(n_99),
+                    "actual_variance": float(cumsum[n_99 - 1] * 100),
                 },
             },
-        )
-
-        return InspectorSummary(
-            base=self._base_summary(),
-            latent=self.latent_summary(),
-            pca=pca_summary,
         )
 
     # ==================================================================================

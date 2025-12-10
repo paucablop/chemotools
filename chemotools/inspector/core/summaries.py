@@ -5,38 +5,43 @@ from .regression import RegressionMetrics
 
 
 @dataclass
-class BaseSummary:
+class InspectorSummary:
+    """Base class for all inspector summaries."""
+
     model_type: str
     has_preprocessing: bool
     nr_features: int
     nr_samples: Dict[str, int]
     preprocessing_steps: List[Dict[str, Any]]
 
+    def to_dict(self):
+        return asdict(self)
+
 
 @dataclass
-class PCASummary:
-    explained_variance_ratio: Any
-    cumulative_variance: Any
+class PCASummary(InspectorSummary, LatentSummary):
+    """Summary for PCA models."""
+
+    explained_variance_ratio: List[float]
+    cumulative_variance: List[float]
     pc_variances: Dict[str, float]
     total_variance: float
     variance_thresholds: Dict[str, Dict[str, Any]]
 
 
 @dataclass
-class PLSVarianceSummary:
-    explained_x_variance_ratio: Optional[Any] = None
-    total_x_variance: Optional[float] = None
-    explained_y_variance_ratio: Optional[Any] = None
-    total_y_variance: Optional[float] = None
+class RegressionSummary:
+    regression: Dict[str, RegressionMetrics]
 
 
 @dataclass
-class InspectorSummary:
-    base: BaseSummary
-    latent: Optional[LatentSummary] = None
-    regression: Optional[Dict[str, RegressionMetrics]] = None
-    pca: Optional[PCASummary] = None
-    pls_variance: Optional[PLSVarianceSummary] = None
+class PLSRegressionSummary(InspectorSummary, LatentSummary, RegressionSummary):
+    """Summary for PLS Regression models."""
+
+    explained_x_variance_ratio: Optional[List[float]] = None
+    total_x_variance: Optional[float] = None
+    explained_y_variance_ratio: Optional[List[float]] = None
+    total_y_variance: Optional[float] = None
 
     def to_dict(self):
         return asdict(self)

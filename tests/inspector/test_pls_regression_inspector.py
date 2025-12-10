@@ -144,8 +144,8 @@ class TestSummary:
         assert "train" in summary.regression
         assert summary.regression["train"].rmse is not None
         assert summary.regression["train"].r2 is not None
-        assert summary.base.model_type is not None
-        assert summary.base.model_type.startswith("PLS")
+        assert summary.model_type is not None
+        assert summary.model_type.startswith("PLS")
 
     def test_summary_with_pipeline(self, fitted_pipeline, regression_data):
         """Test that summary correctly identifies preprocessing steps in a pipeline."""
@@ -157,8 +157,8 @@ class TestSummary:
         summary = inspector.summary()
 
         # Assert
-        assert summary.base.has_preprocessing is True
-        assert len(summary.base.preprocessing_steps) == 1
+        assert summary.has_preprocessing is True
+        assert len(summary.preprocessing_steps) == 1
 
     def test_summary_variance_coverage(self, fitted_pls, regression_data):
         """Test summary method when variance ratios are available."""
@@ -172,12 +172,12 @@ class TestSummary:
 
         summary = inspector.summary()
 
-        assert summary.pls_variance.explained_x_variance_ratio is not None
-        assert summary.pls_variance.total_x_variance is not None
-        assert summary.pls_variance.explained_y_variance_ratio is not None
-        assert summary.pls_variance.total_y_variance is not None
-        assert summary.pls_variance.total_x_variance == pytest.approx(80.0)
-        assert summary.pls_variance.total_y_variance == pytest.approx(95.0)
+        assert summary.explained_x_variance_ratio is not None
+        assert summary.total_x_variance is not None
+        assert summary.explained_y_variance_ratio is not None
+        assert summary.total_y_variance is not None
+        assert summary.total_x_variance == pytest.approx(80.0)
+        assert summary.total_y_variance == pytest.approx(95.0)
 
     def test_summary_includes_latent_info(self, fitted_pls, regression_data):
         """Test that summary includes latent variable information."""
@@ -189,9 +189,9 @@ class TestSummary:
         summary = inspector.summary()
 
         # Assert
-        assert summary.latent.nr_components == 3
-        assert isinstance(summary.latent.hotelling_t2_limit, float)
-        assert isinstance(summary.latent.q_residuals_limit, float)
+        assert summary.nr_components == 3
+        assert isinstance(summary.hotelling_t2_limit, float)
+        assert isinstance(summary.q_residuals_limit, float)
 
 
 class TestInspectFigures:

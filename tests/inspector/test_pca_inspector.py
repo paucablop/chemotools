@@ -400,8 +400,8 @@ class TestPCAInspectorSummary:
         # Act & Assert - should not raise
         result = inspector.summary()
         assert isinstance(result, InspectorSummary)
-        assert result.base.preprocessing_steps is not None
-        assert len(result.base.preprocessing_steps) > 0
+        assert result.preprocessing_steps is not None
+        assert len(result.preprocessing_steps) > 0
 
     def test_summary_with_multiple_datasets(self, fitted_pca, dummy_data_loader):
         """Test summary with multiple datasets."""
@@ -422,8 +422,8 @@ class TestPCAInspectorSummary:
         # Act & Assert - should not raise
         result = inspector.summary()
         assert isinstance(result, InspectorSummary)
-        assert result.base.nr_samples is not None
-        assert len(result.base.nr_samples) == 3  # train, test, val
+        assert result.nr_samples is not None
+        assert len(result.nr_samples) == 3  # train, test, val
 
     def test_summary_output_format(self, fitted_pca, dummy_data_loader):
         """Test that summary returns dictionary with expected keys."""
@@ -436,27 +436,27 @@ class TestPCAInspectorSummary:
 
         # Assert - check for key content
         assert isinstance(result, InspectorSummary)
-        assert result.base.model_type is not None
-        assert result.base.has_preprocessing is not None
-        assert result.base.nr_features is not None
-        assert result.latent.nr_components is not None
-        assert result.base.nr_samples is not None
-        assert result.pca.explained_variance_ratio is not None
-        assert result.pca.cumulative_variance is not None
-        assert result.pca.pc_variances is not None
-        assert result.pca.total_variance is not None
-        assert result.pca.variance_thresholds is not None
-        assert result.base.preprocessing_steps is not None
+        assert result.model_type is not None
+        assert result.has_preprocessing is not None
+        assert result.nr_features is not None
+        assert result.nr_components is not None
+        assert result.nr_samples is not None
+        assert result.explained_variance_ratio is not None
+        assert result.cumulative_variance is not None
+        assert result.pc_variances is not None
+        assert result.total_variance is not None
+        assert result.variance_thresholds is not None
+        assert result.preprocessing_steps is not None
 
         # Check variance thresholds structure
-        assert "90%" in result.pca.variance_thresholds
-        assert "95%" in result.pca.variance_thresholds
-        assert "99%" in result.pca.variance_thresholds
+        assert "90%" in result.variance_thresholds
+        assert "95%" in result.variance_thresholds
+        assert "99%" in result.variance_thresholds
 
         # Check each threshold has required keys
         for threshold in ["90%", "95%", "99%"]:
-            assert "n_components" in result.pca.variance_thresholds[threshold]
-            assert "actual_variance" in result.pca.variance_thresholds[threshold]
+            assert "n_components" in result.variance_thresholds[threshold]
+            assert "actual_variance" in result.variance_thresholds[threshold]
 
     def test_summary_includes_latent_info(self, fitted_pca, dummy_data_loader):
         """Test that summary includes latent variable information."""
@@ -468,9 +468,9 @@ class TestPCAInspectorSummary:
         summary = inspector.summary()
 
         # Assert
-        assert summary.latent.nr_components == 2
-        assert isinstance(summary.latent.hotelling_t2_limit, float)
-        assert isinstance(summary.latent.q_residuals_limit, float)
+        assert summary.nr_components == 2
+        assert isinstance(summary.hotelling_t2_limit, float)
+        assert isinstance(summary.q_residuals_limit, float)
 
 
 class TestPCAInspectorInspect:
@@ -1092,17 +1092,17 @@ class TestPCAInspectorAdditionalCoverage:
         pca_one = PCA(n_components=1).fit(X)
         inspector_one = PCAInspector(model=pca_one, X_train=X, y_train=y)
         summary_one = inspector_one.summary()
-        assert "PC1" in summary_one.pca.pc_variances
-        assert "PC2" not in summary_one.pca.pc_variances
-        assert "PC3" not in summary_one.pca.pc_variances
+        assert "PC1" in summary_one.pc_variances
+        assert "PC2" not in summary_one.pc_variances
+        assert "PC3" not in summary_one.pc_variances
 
         # Act & Assert - 3+ components
         pca_three = PCA(n_components=3).fit(X)
         inspector_three = PCAInspector(model=pca_three, X_train=X, y_train=y)
         summary_three = inspector_three.summary()
-        assert "PC1" in summary_three.pca.pc_variances
-        assert "PC2" in summary_three.pca.pc_variances
-        assert "PC3" in summary_three.pca.pc_variances
+        assert "PC1" in summary_three.pc_variances
+        assert "PC2" in summary_three.pc_variances
+        assert "PC3" in summary_three.pc_variances
 
     def test_summary_preprocessing_steps_empty_for_plain_model(
         self, fitted_pca, dummy_data_loader
@@ -1116,8 +1116,8 @@ class TestPCAInspectorAdditionalCoverage:
         summary = inspector.summary()
 
         # Assert
-        assert summary.base.preprocessing_steps == []
-        assert summary.base.has_preprocessing is False
+        assert summary.preprocessing_steps == []
+        assert summary.has_preprocessing is False
 
     def test_inspect_spectra_with_multiple_datasets(
         self, fitted_pipeline_pca, dummy_data_loader

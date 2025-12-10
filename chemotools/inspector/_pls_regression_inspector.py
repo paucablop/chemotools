@@ -1,6 +1,7 @@
 """PLS Regression Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
+from dataclasses import asdict
 from typing import (
     Dict,
     Optional,
@@ -26,7 +27,7 @@ from .core.base import _BaseInspector, InspectorPlotConfig
 from .core.latent import LatentVariableMixin
 from .core.regression import RegressionMixin
 from .core.spectra import SpectraMixin
-from .core.summaries import InspectorSummary, PLSVarianceSummary
+from .core.summaries import PLSRegressionSummary
 from .core.utils import (
     normalize_datasets,
     get_xlabel_for_features,
@@ -356,31 +357,33 @@ class PLSRegressionInspector(
     # ------------------------------------------------------------------
     # Summary method
     # ------------------------------------------------------------------
-    def summary(self) -> InspectorSummary:
+    def summary(self) -> PLSRegressionSummary:
         """Get a summary of the PLS regression model.
 
         Returns
         -------
-        summary : InspectorSummary
+        summary : PLSRegressionSummary
             Object containing model information
         """
         x_var = self.get_explained_x_variance_ratio()
         y_var = self.get_explained_y_variance_ratio()
 
-        pls_variance = None
-        if x_var is not None or y_var is not None:
-            pls_variance = PLSVarianceSummary(
-                explained_x_variance_ratio=x_var,
-                total_x_variance=np.sum(x_var) * 100 if x_var is not None else None,
-                explained_y_variance_ratio=y_var,
-                total_y_variance=np.sum(y_var) * 100 if y_var is not None else None,
-            )
+        base_summary = self._base_summary()
+        latent_summary = self.latent_summary()
+        regression_summary = self.regression_summary()
 
-        return InspectorSummary(
-            base=self._base_summary(),
-            latent=self.latent_summary(),
-            regression=self.regression_summary(),
-            pls_variance=pls_variance,
+        return PLSRegressionSummary(
+            # Base fields
+            **base_summary.to_dict(),
+            # Latent fields
+            **asdict(latent_summary),
+            # Regression fields
+            regression=regression_summary,
+            # PLS specific fields
+            explained_x_variance_ratio=x_var.tolist() if x_var is not None else None,
+            total_x_variance=float(np.sum(x_var) * 100) if x_var is not None else None,
+            explained_y_variance_ratio=y_var.tolist() if y_var is not None else None,
+            total_y_variance=float(np.sum(y_var) * 100) if y_var is not None else None,
         )
 
     # ------------------------------------------------------------------
