@@ -1,6 +1,5 @@
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Any
-from .latent import LatentSummary
 from .regression import RegressionMetrics
 
 
@@ -19,6 +18,18 @@ class InspectorSummary:
 
 
 @dataclass
+class LatentSummary:
+    nr_components: int
+    hotelling_t2_limit: float
+    q_residuals_limit: float
+
+
+@dataclass
+class RegressionSummary:
+    regression: Dict[str, RegressionMetrics]
+
+
+@dataclass
 class PCASummary(InspectorSummary, LatentSummary):
     """Summary for PCA models."""
 
@@ -30,11 +41,6 @@ class PCASummary(InspectorSummary, LatentSummary):
 
 
 @dataclass
-class RegressionSummary:
-    regression: Dict[str, RegressionMetrics]
-
-
-@dataclass
 class PLSRegressionSummary(InspectorSummary, LatentSummary, RegressionSummary):
     """Summary for PLS Regression models."""
 
@@ -42,6 +48,3 @@ class PLSRegressionSummary(InspectorSummary, LatentSummary, RegressionSummary):
     total_x_variance: Optional[float] = None
     explained_y_variance_ratio: Optional[List[float]] = None
     total_y_variance: Optional[float] = None
-
-    def to_dict(self):
-        return asdict(self)

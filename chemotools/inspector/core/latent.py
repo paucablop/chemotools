@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from typing import Dict, Literal, Optional, Sequence, Tuple, TYPE_CHECKING, Union
-from dataclasses import dataclass
 
 import numpy as np
 
@@ -16,6 +15,7 @@ from .utils import (
     normalize_datasets,
     get_xlabel_for_features,
 )
+from .summaries import LatentSummary
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
@@ -36,16 +36,8 @@ if TYPE_CHECKING:  # pragma: no cover
             self, dataset: str
         ) -> Tuple[np.ndarray, Optional[np.ndarray]]:  # pragma: no cover
             ...
-
         def _get_preprocessed_feature_names(self) -> np.ndarray:  # pragma: no cover
             ...
-
-
-@dataclass
-class LatentSummary:
-    nr_components: int
-    hotelling_t2_limit: float
-    q_residuals_limit: float
 
 
 class LatentVariableMixin:
