@@ -57,217 +57,6 @@ class InspectorDataset:
         return self.X.shape[0]
 
 
-class InspectorState:
-    """Shared lifecycle state for inspector implementations."""
-
-    def __init__(
-        self,
-        model: ModelTypes,
-        X_train: np.ndarray,
-        y_train: Optional[np.ndarray],
-        X_test: Optional[np.ndarray],
-        y_test: Optional[np.ndarray],
-        X_val: Optional[np.ndarray],
-        y_val: Optional[np.ndarray],
-        *,
-        supervised: bool,
-        feature_names: Optional[Sequence] = None,
-        sample_labels: Optional[Dict[str, Sequence]] = None,
-    ) -> None:
-        estimator, transformer = _validate_and_extract_model(model)
-
-        X_train = check_array(
-            X_train,
-            dtype="numeric",
-            ensure_2d=True,
-            ensure_all_finite=True,
-            input_name="X_train",
-        )
-        y_train_arr = self._normalize_target_array(y_train)
-        X_test_arr = (
-            check_array(
-                X_test,
-                dtype="numeric",
-                ensure_2d=True,
-                ensure_all_finite=True,
-                input_name="X_test",
-            )
-            if X_test is not None
-            else None
-        )
-        y_test_arr = self._normalize_target_array(y_test)
-        X_val_arr = (
-            check_array(
-                X_val,
-                dtype="numeric",
-                ensure_2d=True,
-                ensure_all_finite=True,
-                input_name="X_val",
-            )
-            if X_val is not None
-            else None
-        )
-        y_val_arr = self._normalize_target_array(y_val)
-
-        _validate_datasets_consistency(
-            X_train,
-            y_train_arr,
-            X_test_arr,
-            y_test_arr,
-            X_val_arr,
-            y_val_arr,
-            supervised=supervised,
-        )
-
-        self.model: ModelTypes = model
-        self.estimator: Union[_BasePCA, _PLS] = estimator
-        self.transformer: Optional[Pipeline] = transformer
-
-        self.datasets: Dict[str, InspectorDataset] = {
-            "train": InspectorDataset(
-                X=X_train,
-                y=y_train_arr,
-                labels=self._prepare_labels("train", X_train.shape[0], sample_labels),
-            )
-        }
-
-        if X_test_arr is not None:
-            self.datasets["test"] = InspectorDataset(
-                X=X_test_arr,
-                y=y_test_arr,
-                labels=self._prepare_labels("test", X_test_arr.shape[0], sample_labels),
-            )
-
-        if X_val_arr is not None:
-            self.datasets["val"] = InspectorDataset(
-                X=X_val_arr,
-                y=y_val_arr,
-                labels=self._prepare_labels("val", X_val_arr.shape[0], sample_labels),
-            )
-
-        self.n_features_in_: int = X_train.shape[1]
-        self.n_components_: int = self._resolve_n_components()
-
-        self.feature_names_: Optional[np.ndarray] = None
-        if feature_names is not None:
-            feature_array = np.asarray(feature_names)
-            if feature_array.shape[0] != self.n_features_in_:
-                raise ValueError(
-                    "x_axis length must match number of features. "
-                    f"Got {feature_array.shape[0]} vs {self.n_features_in_}."
-                )
-            self.feature_names_ = feature_array
-
-        self.sample_labels: Dict[str, np.ndarray] = {
-            name: dataset.labels
-            for name, dataset in self.datasets.items()
-            if dataset.labels is not None
-        }
-
-        self._preprocessed_cache: Dict[str, np.ndarray] = {}
-
-    @staticmethod
-    def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
-        if target is None:
-            return None
-        arr = check_array(
-            target,
-            dtype=None,
-            ensure_2d=False,
-            ensure_all_finite=True,
-            input_name="target",
-        )
-        if arr.ndim == 2 and arr.shape[1] == 1:
-            return arr.ravel()
-        return arr
-
-    @staticmethod
-    def _prepare_labels(
-        dataset_name: str,
-        expected_len: int,
-        sample_labels: Optional[Dict[str, Sequence]],
-    ) -> Optional[np.ndarray]:
-        if not sample_labels or dataset_name not in sample_labels:
-            return None
-        labels = np.asarray(sample_labels[dataset_name])
-        if labels.shape[0] != expected_len:
-            raise ValueError(
-                f"Sample labels for '{dataset_name}' must have length {expected_len}. "
-                f"Got {labels.shape[0]}."
-            )
-        return labels
-
-    def _resolve_n_components(self) -> int:
-        if hasattr(self.estimator, "n_components_"):
-            return int(self.estimator.n_components_)
-        if hasattr(self.estimator, "n_components"):
-            return int(self.estimator.n_components)
-        raise AttributeError("Cannot determine number of components for estimator")
-
-    def get_dataset(self, name: str) -> InspectorDataset:
-        try:
-            return self.datasets[name]
-        except KeyError as exc:
-            available = ", ".join(self.datasets.keys())
-            if name == "test":
-                raise ValueError(
-                    "Test data not provided. Initialize with X_test/y_test."
-                ) from exc
-            if name == "val":
-                raise ValueError(
-                    "Validation data not provided. Initialize with X_val/y_val."
-                ) from exc
-            raise ValueError(
-                f"Invalid dataset '{name}'. Available options: {available}."
-            ) from exc
-
-    def iter_datasets(
-        self, names: Iterable[str]
-    ) -> Iterable[Tuple[str, InspectorDataset]]:
-        for name in names:
-            yield name, self.get_dataset(name)
-
-    def get_raw_xy(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        dataset = self.get_dataset(name)
-        return dataset.X, dataset.y
-
-    def get_preprocessed_X(self, name: str) -> np.ndarray:
-        if name in self._preprocessed_cache:
-            return self._preprocessed_cache[name]
-
-        X = self.get_dataset(name).X
-        if self.transformer is None:
-            self._preprocessed_cache[name] = X
-        else:
-            self._preprocessed_cache[name] = self.transformer.transform(X)
-        return self._preprocessed_cache[name]
-
-    def get_feature_mask(self) -> Optional[np.ndarray]:
-        from sklearn.feature_selection._base import SelectorMixin
-
-        transformer = self.transformer
-        if transformer is None:
-            return None
-
-        if isinstance(transformer, Pipeline):
-            for _, step in transformer.steps:
-                if isinstance(step, SelectorMixin):
-                    return step.get_support()
-        elif isinstance(transformer, SelectorMixin):
-            return transformer.get_support()
-
-        return None
-
-    def get_preprocessed_feature_names(self, base_dataset: str = "train") -> np.ndarray:
-        mask = self.get_feature_mask()
-        if mask is not None and self.feature_names_ is not None:
-            return self.feature_names_[mask]
-        if self.feature_names_ is not None:
-            return self.feature_names_
-        X = self.get_preprocessed_X(base_dataset)
-        return np.arange(X.shape[1])
-
-
 @dataclass
 class InspectorPlotConfig:
     """Configuration for inspector plots."""
@@ -302,36 +91,248 @@ class _BaseInspector(ABC):
             raise ValueError(f"confidence must be between 0 and 1, got {confidence}")
         self._confidence = confidence
 
-        self._state = InspectorState(
-            model=model,
-            X_train=X_train,
-            y_train=y_train,
-            X_test=X_test,
-            y_test=y_test,
-            X_val=X_val,
-            y_val=y_val,
+        # Validate and extract model components
+        estimator, transformer = _validate_and_extract_model(model)
+
+        # Validate and normalize input arrays
+        X_train = check_array(
+            X_train,
+            dtype="numeric",
+            ensure_2d=True,
+            ensure_all_finite=True,
+            input_name="X_train",
+        )
+        y_train_arr = self._normalize_target_array(y_train)
+        X_test_arr = (
+            check_array(
+                X_test,
+                dtype="numeric",
+                ensure_2d=True,
+                ensure_all_finite=True,
+                input_name="X_test",
+            )
+            if X_test is not None
+            else None
+        )
+        y_test_arr = self._normalize_target_array(y_test)
+        X_val_arr = (
+            check_array(
+                X_val,
+                dtype="numeric",
+                ensure_2d=True,
+                ensure_all_finite=True,
+                input_name="X_val",
+            )
+            if X_val is not None
+            else None
+        )
+        y_val_arr = self._normalize_target_array(y_val)
+
+        # Validate dataset consistency
+        _validate_datasets_consistency(
+            X_train,
+            y_train_arr,
+            X_test_arr,
+            y_test_arr,
+            X_val_arr,
+            y_val_arr,
             supervised=supervised,
-            feature_names=feature_names,
-            sample_labels=sample_labels,
         )
 
-        self._model = self._state.model
-        self.estimator_ = self._state.estimator
-        self.transformer_ = self._state.transformer
-        self.datasets_: Dict[str, InspectorDataset] = self._state.datasets
-        self.n_components_: int = self._state.n_components_
-        self.n_features_in_: int = self._state.n_features_in_
-        self.feature_names = self._state.feature_names_
-        self.sample_labels = self._state.sample_labels
+        # Store model components
+        self._model: ModelTypes = model
+        self.estimator_: Union[_BasePCA, _PLS] = estimator
+        self.transformer_: Optional[Pipeline] = transformer
 
+        # Build datasets dictionary
+        self.datasets_: Dict[str, InspectorDataset] = {
+            "train": InspectorDataset(
+                X=X_train,
+                y=y_train_arr,
+                labels=self._prepare_labels("train", X_train.shape[0], sample_labels),
+            )
+        }
+
+        if X_test_arr is not None:
+            self.datasets_["test"] = InspectorDataset(
+                X=X_test_arr,
+                y=y_test_arr,
+                labels=self._prepare_labels("test", X_test_arr.shape[0], sample_labels),
+            )
+
+        if X_val_arr is not None:
+            self.datasets_["val"] = InspectorDataset(
+                X=X_val_arr,
+                y=y_val_arr,
+                labels=self._prepare_labels("val", X_val_arr.shape[0], sample_labels),
+            )
+
+        # Store dimensions
+        self.n_features_in_: int = X_train.shape[1]
+        self.n_components_: int = self._resolve_n_components()
+
+        # Process feature names
+        self.feature_names: Optional[np.ndarray] = None
+        if feature_names is not None:
+            feature_array = np.asarray(feature_names)
+            if feature_array.shape[0] != self.n_features_in_:
+                raise ValueError(
+                    "x_axis length must match number of features. "
+                    f"Got {feature_array.shape[0]} vs {self.n_features_in_}."
+                )
+            self.feature_names = feature_array
+
+        # Set up x_axis for plotting
         if self.feature_names is not None:
             self._x_axis = np.array(self.feature_names, copy=True)
         else:
             self._x_axis = np.arange(self.n_features_in_)
 
+        # Caches
+        self._preprocessed_cache: Dict[str, np.ndarray] = {}
+
         # Figure tracking for automatic cleanup
         self._tracked_figures: List["Figure"] = []
 
+    # -------------------------------------------------------------------------
+    # Input normalization helpers
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        """Normalize target array to 1D if needed."""
+        if target is None:
+            return None
+        arr = check_array(
+            target,
+            dtype=None,
+            ensure_2d=False,
+            ensure_all_finite=True,
+            input_name="target",
+        )
+        if arr.ndim == 2 and arr.shape[1] == 1:
+            return arr.ravel()
+        return arr
+
+    @staticmethod
+    def _prepare_labels(
+        dataset_name: str,
+        expected_len: int,
+        sample_labels: Optional[Dict[str, Sequence]],
+    ) -> Optional[np.ndarray]:
+        """Prepare and validate sample labels for a dataset."""
+        if not sample_labels or dataset_name not in sample_labels:
+            return None
+        labels = np.asarray(sample_labels[dataset_name])
+        if labels.shape[0] != expected_len:
+            raise ValueError(
+                f"Sample labels for '{dataset_name}' must have length {expected_len}. "
+                f"Got {labels.shape[0]}."
+            )
+        return labels
+
+    def _resolve_n_components(self) -> int:
+        """Resolve the number of components from the estimator."""
+        if hasattr(self.estimator_, "n_components_"):
+            return int(self.estimator_.n_components_)
+        if hasattr(self.estimator_, "n_components"):
+            return int(self.estimator_.n_components)
+        raise AttributeError("Cannot determine number of components for estimator")
+
+    # -------------------------------------------------------------------------
+    # Dataset access methods
+    # -------------------------------------------------------------------------
+    def _get_dataset(self, name: str) -> InspectorDataset:
+        """Get a dataset by name with helpful error messages."""
+        try:
+            return self.datasets_[name]
+        except KeyError as exc:
+            available = ", ".join(self.datasets_.keys())
+            if name == "test":
+                raise ValueError(
+                    "Test data not provided. Initialize with X_test/y_test."
+                ) from exc
+            if name == "val":
+                raise ValueError(
+                    "Validation data not provided. Initialize with X_val/y_val."
+                ) from exc
+            raise ValueError(
+                f"Invalid dataset '{name}'. Available options: {available}."
+            ) from exc
+
+    def _iter_datasets(
+        self, names: Iterable[str]
+    ) -> Iterable[Tuple[str, InspectorDataset]]:
+        """Iterate over datasets by name."""
+        for name in names:
+            yield name, self._get_dataset(name)
+
+    def _get_raw_data(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+        """Get raw X and y for a dataset."""
+        dataset = self._get_dataset(name)
+        return dataset.X, dataset.y
+
+    def _get_preprocessed_data(self, name: str) -> np.ndarray:
+        """Get preprocessed X for a dataset (cached)."""
+        if name in self._preprocessed_cache:
+            return self._preprocessed_cache[name]
+
+        X = self._get_dataset(name).X
+        if self.transformer_ is None:
+            self._preprocessed_cache[name] = X
+        else:
+            self._preprocessed_cache[name] = self.transformer_.transform(X)
+        return self._preprocessed_cache[name]
+
+    def _get_feature_mask(self) -> Optional[np.ndarray]:
+        """Get feature selection mask if a selector is present in the pipeline."""
+        from sklearn.feature_selection._base import SelectorMixin
+
+        transformer = self.transformer_
+        if transformer is None:
+            return None
+
+        if isinstance(transformer, Pipeline):
+            for _, step in transformer.steps:
+                if isinstance(step, SelectorMixin):
+                    return step.get_support()
+        elif isinstance(transformer, SelectorMixin):
+            return transformer.get_support()
+
+        return None
+
+    def _get_preprocessed_feature_names(
+        self, base_dataset: str = "train"
+    ) -> np.ndarray:
+        """Get feature names after preprocessing (accounting for feature selection)."""
+        mask = self._get_feature_mask()
+        if mask is not None and self.feature_names is not None:
+            return self.feature_names[mask]
+        if self.feature_names is not None:
+            return self.feature_names
+        X = self._get_preprocessed_data(base_dataset)
+        return np.arange(X.shape[1])
+
+    def _get_preprocessed_x_axis(self) -> np.ndarray:
+        """Get x_axis after feature selection.
+
+        Returns
+        -------
+        x_axis : np.ndarray
+            X-axis/feature indices after feature selection. If no feature
+            selector is present, returns the original x_axis.
+        """
+        return self._get_preprocessed_feature_names()
+
+    def _transform_data(self, X: np.ndarray) -> np.ndarray:
+        """Transform data through the preprocessing pipeline."""
+        X_array = np.asarray(X)
+        if self.transformer_ is None:
+            return X_array
+        return self.transformer_.transform(X_array)
+
+    # -------------------------------------------------------------------------
+    # Configuration helpers
+    # -------------------------------------------------------------------------
     def _prepare_inspection_config(
         self,
         dataset: Union[str, Sequence[str]],
@@ -399,11 +400,12 @@ class _BaseInspector(ABC):
 
         return datasets, color_by, annotate_by  # type: ignore
 
-    # ---------------------------------------------------------------------
-    # Convenience helpers shared by concrete inspectors
-    # ---------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Properties
+    # -------------------------------------------------------------------------
     @property
     def model(self) -> ModelTypes:
+        """Return the original model."""
         return self._model
 
     @property
@@ -413,6 +415,7 @@ class _BaseInspector(ABC):
 
     @property
     def transformer(self) -> Optional[Pipeline]:
+        """Return the preprocessing transformer (if any)."""
         return self.transformer_
 
     @property
@@ -478,6 +481,9 @@ class _BaseInspector(ABC):
         """Close previously tracked figures to prevent memory leaks."""
         self.close_figures()
 
+    # -------------------------------------------------------------------------
+    # Summary helpers
+    # -------------------------------------------------------------------------
     def _base_summary(self) -> InspectorSummary:
         """Create base summary with common model information."""
         return InspectorSummary(
@@ -503,60 +509,3 @@ class _BaseInspector(ABC):
             {"step": i, "name": name, "type": type(transform).__name__}
             for i, (name, transform) in enumerate(self.transformer.steps, 1)
         ]
-
-    def _get_dataset(self, name: str) -> InspectorDataset:
-        return self._state.get_dataset(name)
-
-    def _get_raw_data(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        return self._state.get_raw_xy(name)
-
-    def _get_preprocessed_data(self, name: str) -> np.ndarray:
-        return self._state.get_preprocessed_X(name)
-
-    def _get_preprocessed_feature_names(self) -> np.ndarray:
-        return self._state.get_preprocessed_feature_names()
-
-    def _get_preprocessed_x_axis(self) -> np.ndarray:
-        """Get x_axis after feature selection.
-
-        Returns
-        -------
-        x_axis : np.ndarray
-            X-axis/feature indices after feature selection. If no feature
-            selector is present, returns the original x_axis.
-        """
-        return self._get_preprocessed_feature_names()
-
-    def _get_feature_mask(self) -> Optional[np.ndarray]:
-        return self._state.get_feature_mask()
-
-    def _iter_datasets(
-        self, names: Iterable[str]
-    ) -> Iterable[Tuple[str, InspectorDataset]]:
-        return self._state.iter_datasets(names)
-
-    def _transform_data(self, X: np.ndarray) -> np.ndarray:
-        X_array = np.asarray(X)
-        if self.transformer_ is None:
-            return X_array
-        return self.transformer_.transform(X_array)
-
-    def _get_scores(
-        self,
-        X: Union[str, np.ndarray],
-        dataset: Optional[str] = None,
-    ) -> np.ndarray:
-        dataset_name: Optional[str] = dataset
-
-        if isinstance(X, str):
-            dataset_name = X if dataset_name is None else dataset_name
-            X_preprocessed = self._get_preprocessed_data(dataset_name)
-            return self.estimator_.transform(X_preprocessed)
-
-        if dataset_name and isinstance(dataset_name, str):
-            # Dataset name provided but explicit data supplied - use provided data
-            X_transformed = self._transform_data(np.asarray(X))
-            return self.estimator_.transform(X_transformed)
-
-        X_transformed = self._transform_data(np.asarray(X))
-        return self.estimator_.transform(X_transformed)

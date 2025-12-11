@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 from chemotools.inspector.core.base import (
     _BaseInspector,
     InspectorDataset,
-    InspectorState,
 )
 
 
@@ -26,7 +25,8 @@ class ConcreteInspector(_BaseInspector):
         fig, ax = plt.subplots()
         for dataset in datasets:
             if dataset in self.datasets_:
-                scores = self._get_scores(dataset)
+                X_preprocessed = self._get_preprocessed_data(dataset)
+                scores = self.estimator_.transform(X_preprocessed)
                 ax.scatter(scores[:, components[0]], scores[:, components[1]])
         return fig
 
@@ -163,9 +163,9 @@ class TestBaseInspectorInitialization:
             model=fitted_pca, X_train=X, sample_labels=sample_labels
         )
 
-        # Assert
-        assert "train" in inspector.sample_labels
-        assert len(inspector.sample_labels["train"]) == 100
+        # Assert - labels are stored in InspectorDataset
+        assert inspector.datasets_["train"].labels is not None
+        assert len(inspector.datasets_["train"].labels) == 100
 
     def test_init_with_unfitted_model(self, unfitted_pca, dummy_data_loader):
         """Test that unfitted model raises error."""
@@ -308,70 +308,6 @@ class TestBaseInspectorTransformData:
         assert not np.array_equal(X_transformed, X)
         assert np.allclose(np.mean(X_transformed, axis=0), 0, atol=1e-10)
         assert np.allclose(np.std(X_transformed, axis=0), 1, atol=1e-10)
-
-
-class TestBaseInspectorGetScores:
-    """Test _get_scores method."""
-
-    def test_get_scores_pca(self, fitted_pca, dummy_data_loader):
-        """Test getting scores from PCA model."""
-        # Arrange
-        X, _ = dummy_data_loader
-        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
-
-        # Act
-        scores = inspector._get_scores(X)
-
-        # Assert
-        assert scores.shape == (100, 2)
-        # Verify it matches direct transform
-        expected_scores = fitted_pca.transform(X)
-        assert np.allclose(scores, expected_scores)
-
-    def test_get_scores_pls(self, fitted_pls, dummy_data_loader):
-        """Test getting scores from PLS model."""
-        # Arrange
-        X, y = dummy_data_loader
-        inspector = ConcreteInspector(model=fitted_pls, X_train=X, y_train=y)
-
-        # Act
-        scores = inspector._get_scores(X)
-
-        # Assert
-        assert scores.shape == (100, 2)
-        # Verify it matches direct transform
-        expected_scores = fitted_pls.transform(X)
-        assert np.allclose(scores, expected_scores)
-
-    def test_get_scores_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
-        """Test getting scores with preprocessing pipeline."""
-        # Arrange
-        X, _ = dummy_data_loader
-        inspector = ConcreteInspector(model=fitted_pipeline_pca, X_train=X)
-
-        # Act
-        scores = inspector._get_scores(X)
-
-        # Assert
-        assert scores.shape == (100, 2)
-        # Verify it matches direct transform
-        expected_scores = fitted_pipeline_pca.transform(X)
-        assert np.allclose(scores, expected_scores)
-
-    def test_get_scores_different_dataset(self, fitted_pca, dummy_data_loader):
-        """Test getting scores for different dataset split."""
-        # Arrange
-        X, _ = dummy_data_loader
-        X_train, X_test = X[:80], X[80:]
-        inspector = ConcreteInspector(model=fitted_pca, X_train=X_train, X_test=X_test)
-
-        # Act
-        train_scores = inspector._get_scores(X_train, "train")
-        test_scores = inspector._get_scores(X_test, "test")
-
-        # Assert
-        assert train_scores.shape == (80, 2)
-        assert test_scores.shape == (20, 2)
 
 
 class TestBaseInspectorPlotScores:
@@ -533,8 +469,8 @@ class TestInspectorDataset:
             dataset.X = np.array([[5, 6]])
 
 
-class TestInspectorStateErrors:
-    """Tests for error handling in InspectorState."""
+class TestInspectorErrors:
+    """Tests for error handling in _BaseInspector initialization."""
 
     def test_prepare_labels_length_mismatch(self):
         """Test ValueError when sample labels length does not match data length."""
@@ -548,15 +484,9 @@ class TestInspectorStateErrors:
         with pytest.raises(
             ValueError, match="Sample labels for 'train' must have length 5"
         ):
-            InspectorState(
+            ConcreteInspector(
                 model=model,
                 X_train=X,
-                y_train=None,
-                X_test=None,
-                y_test=None,
-                X_val=None,
-                y_val=None,
-                supervised=False,
                 sample_labels={"train": ["a", "b"]},  # Length 2 != 5
             )
 
@@ -588,47 +518,35 @@ class TestInspectorStateErrors:
             with pytest.raises(
                 AttributeError, match="Cannot determine number of components"
             ):
-                InspectorState(
+                ConcreteInspector(
                     model=model,
                     X_train=X,
-                    y_train=None,
-                    X_test=None,
-                    y_test=None,
-                    X_val=None,
-                    y_val=None,
-                    supervised=False,
                 )
 
     def test_get_dataset_errors(self):
-        """Test get_dataset raises appropriate errors."""
+        """Test _get_dataset raises appropriate errors."""
         # Arrange
         rng = np.random.default_rng(42)
         X = rng.random((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
-        state = InspectorState(
+        inspector = ConcreteInspector(
             model=model,
             X_train=X,
-            y_train=None,
-            X_test=None,
-            y_test=None,
-            X_val=None,
-            y_val=None,
-            supervised=False,
         )
 
         # Act & Assert
         # Test missing test data
         with pytest.raises(ValueError, match="Test data not provided"):
-            state.get_dataset("test")
+            inspector._get_dataset("test")
 
         # Test missing validation data
         with pytest.raises(ValueError, match="Validation data not provided"):
-            state.get_dataset("val")
+            inspector._get_dataset("val")
 
         # Test invalid dataset name
         with pytest.raises(ValueError, match="Invalid dataset 'invalid'"):
-            state.get_dataset("invalid")
+            inspector._get_dataset("invalid")
 
     def test_nan_in_X_train_raises_error(self):
         """Test ValueError when X_train contains NaN values."""
@@ -643,15 +561,9 @@ class TestInspectorStateErrors:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Input X_train contains NaN"):
-            InspectorState(
+            ConcreteInspector(
                 model=model,
                 X_train=X_with_nan,
-                y_train=None,
-                X_test=None,
-                y_test=None,
-                X_val=None,
-                y_val=None,
-                supervised=False,
             )
 
     def test_inf_in_X_train_raises_error(self):
@@ -667,15 +579,9 @@ class TestInspectorStateErrors:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Input X_train contains infinity"):
-            InspectorState(
+            ConcreteInspector(
                 model=model,
                 X_train=X_with_inf,
-                y_train=None,
-                X_test=None,
-                y_test=None,
-                X_val=None,
-                y_val=None,
-                supervised=False,
             )
 
     def test_nan_in_X_test_raises_error(self):
@@ -691,15 +597,10 @@ class TestInspectorStateErrors:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Input X_test contains NaN"):
-            InspectorState(
+            ConcreteInspector(
                 model=model,
                 X_train=X_train,
-                y_train=None,
                 X_test=X_test_with_nan,
-                y_test=None,
-                X_val=None,
-                y_val=None,
-                supervised=False,
             )
 
     def test_nan_in_y_train_raises_error(self):
@@ -715,15 +616,10 @@ class TestInspectorStateErrors:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Input target contains NaN"):
-            InspectorState(
+            ConcreteInspector(
                 model=model,
                 X_train=X_train,
                 y_train=y_with_nan,
-                X_test=None,
-                y_test=None,
-                X_val=None,
-                y_val=None,
-                supervised=False,
             )
 
 
