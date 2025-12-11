@@ -48,6 +48,11 @@ def select_components(
     np.ndarray
         Matrix with selected components, shape (n_features, n_selected)
 
+    Raises
+    ------
+    IndexError
+        If any component index is out of bounds.
+
     Examples
     --------
     >>> matrix = np.array([[1, 2, 3], [4, 5, 6]])
@@ -65,6 +70,17 @@ def select_components(
         return matrix
     if isinstance(components, int):
         components = [components]
+
+    # Validate component indices
+    n_components = matrix.shape[1]
+    for comp in components:
+        if comp < 0 or comp >= n_components:
+            raise IndexError(
+                f"Component index {comp} is out of bounds. "
+                f"Valid range: 0 to {n_components - 1} "
+                f"(model has {n_components} components)."
+            )
+
     return matrix[:, components]
 
 

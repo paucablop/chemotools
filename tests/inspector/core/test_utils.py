@@ -1,5 +1,7 @@
 """Tests for inspector utility functions."""
 
+import pytest
+
 import numpy as np
 
 from chemotools.inspector.core.utils import (
@@ -84,6 +86,46 @@ class TestSelectComponents:
         # Assert
         expected = np.array([[1, 3], [4, 6]])
         np.testing.assert_array_equal(result, expected)
+
+    def test_raises_index_error_for_out_of_bounds_component(self):
+        """Test that IndexError is raised for out of bounds component index."""
+
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])  # 3 components (0, 1, 2)
+
+        # Act & Assert
+        with pytest.raises(IndexError, match="Component index 5 is out of bounds"):
+            select_components(matrix, 5)
+
+    def test_raises_index_error_for_negative_component(self):
+        """Test that IndexError is raised for negative component index."""
+
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+        # Act & Assert
+        with pytest.raises(IndexError, match="Component index -1 is out of bounds"):
+            select_components(matrix, -1)
+
+    def test_raises_index_error_for_out_of_bounds_in_list(self):
+        """Test that IndexError is raised when any component in list is out of bounds."""
+        # Arrange
+        matrix = np.array([[1, 2, 3], [4, 5, 6]])  # 3 components (0, 1, 2)
+
+        # Act & Assert
+        with pytest.raises(IndexError, match="Component index 10 is out of bounds"):
+            select_components(matrix, [0, 1, 10])
+
+    def test_error_message_includes_valid_range(self):
+        """Test that error message includes the valid range of components."""
+        # Arrange
+        matrix = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])  # 5 components
+
+        # Act & Assert
+        with pytest.raises(
+            IndexError, match=r"Valid range: 0 to 4 \(model has 5 components\)"
+        ):
+            select_components(matrix, 99)
 
 
 class TestNormalizeDatasets:
