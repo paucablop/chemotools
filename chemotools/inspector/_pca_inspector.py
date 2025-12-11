@@ -115,6 +115,11 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     >>> # Access underlying data for custom analysis
     >>> scores = inspector.get_scores('train')
     >>> loadings = inspector.get_loadings([0, 1, 2])
+
+    Notes
+    -----
+    Memory usage scales linearly with dataset size. For very large datasets
+    (>100,000 samples), consider subsampling for initial exploration.
     """
 
     component_label = "PC"

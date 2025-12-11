@@ -156,6 +156,11 @@ class PLSRegressionInspector(
     >>> y_scores = inspector.get_y_scores('train')
     >>> x_loadings = inspector.get_x_loadings([0, 1, 2])
     >>> coeffs = inspector.get_regression_coefficients()
+
+    Notes
+    -----
+    Memory usage scales linearly with dataset size. For very large datasets
+    (>100,000 samples), consider subsampling for initial exploration.
     """
 
     component_label = "LV"
