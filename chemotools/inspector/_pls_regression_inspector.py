@@ -380,6 +380,7 @@ class PLSRegressionInspector(
             test=regression_summary.test,
             val=regression_summary.val,
             # PLS specific fields
+            # TODO: remove when PR approved (#32722 in sklearn)
             explained_x_variance_ratio=x_var.tolist() if x_var is not None else None,
             total_x_variance=float(np.sum(x_var) * 100) if x_var is not None else None,
             explained_y_variance_ratio=y_var.tolist() if y_var is not None else None,
