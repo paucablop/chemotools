@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from unittest.mock import MagicMock
 from numpy.testing import assert_allclose
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
@@ -19,8 +20,9 @@ class _CountingModel:
 
 
 class _DummyInspectorBase:
-    def __init__(self, *, model, raw_data, confidence=0.95, **kwargs):
+    def __init__(self, *, model, raw_data, estimator=None, confidence=0.95, **kwargs):
         self.model = model
+        self.estimator = estimator
         self.confidence = confidence
         self._raw_store = raw_data
         self.datasets_ = {name: object() for name in raw_data}
@@ -28,6 +30,9 @@ class _DummyInspectorBase:
 
     def _get_raw_data(self, dataset: str):
         return self._raw_store[dataset]
+
+    def _get_preprocessed_data(self, dataset: str):
+        return self._raw_store[dataset][0]
 
 
 class DummyInspector(RegressionMixin, _DummyInspectorBase):
@@ -43,6 +48,9 @@ def regression_setup():
     y_test = np.array([7.9, 9.7])
 
     estimator = LinearRegression().fit(X_train, y_train)
+    # Mock transform for leverage calculation
+    estimator.transform = MagicMock(return_value=X_train)
+    estimator.n_components = 1
     model = _CountingModel(estimator)
 
     raw_data = {
@@ -50,7 +58,7 @@ def regression_setup():
         "test": (X_test, y_test),
     }
 
-    inspector = DummyInspector(model=model, raw_data=raw_data)
+    inspector = DummyInspector(model=model, raw_data=raw_data, estimator=estimator)
     return inspector, raw_data, estimator
 
 
@@ -223,3 +231,35 @@ def test_plotting_methods_smoke_test(regression_setup):
     assert isinstance(fig2, Figure)
     assert isinstance(fig3, Figure)
     assert isinstance(fig4, Figure)
+
+
+def test_get_regression_stats(regression_setup):
+    # Arrange
+    inspector, raw_data, _ = regression_setup
+    X_train, y_train = raw_data["train"]
+    dataset = "train"
+    target_index = 0
+
+    # Mock leverage detector
+    leverage_detector = MagicMock()
+    expected_leverages = np.array([0.1, 0.2, 0.3, 0.4])
+    leverage_detector.predict_residuals.return_value = expected_leverages
+
+    # Act
+    stats = inspector._get_regression_stats(dataset, target_index, leverage_detector)
+
+    # Assert
+    assert "X" in stats
+    assert "y" in stats
+    assert "y_true" in stats
+    assert "y_pred" in stats
+    assert "studentized" in stats
+    assert "leverages" in stats
+
+    assert_allclose(stats["X"], X_train)
+    assert_allclose(stats["y"], y_train)
+    assert_allclose(stats["leverages"], expected_leverages)
+
+    # Check studentized residuals calculation (indirectly via shape/type)
+    assert isinstance(stats["studentized"], np.ndarray)
+    assert len(stats["studentized"]) == len(y_train)

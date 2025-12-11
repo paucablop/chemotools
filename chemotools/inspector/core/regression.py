@@ -8,6 +8,7 @@ import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 
 from chemotools.outliers import Leverage, StudentizedResiduals
+from chemotools.outliers._studentized_residuals import calculate_studentized_residuals
 from chemotools.inspector.helpers import _regression as _regression_plots
 from .utils import normalize_datasets
 from .summaries import RegressionMetrics, RegressionSummary
@@ -32,6 +33,18 @@ if TYPE_CHECKING:  # pragma: no cover
         def _get_raw_data(
             self, dataset: str
         ) -> Tuple[np.ndarray, Optional[np.ndarray]]:  # pragma: no cover
+            ...
+
+        def _get_predictions(self, dataset: str) -> np.ndarray:  # pragma: no cover
+            ...
+
+        @property
+        def estimator(self) -> Any:  # pragma: no cover
+            ...
+
+        def _get_preprocessed_data(
+            self, dataset: str
+        ) -> np.ndarray:  # pragma: no cover
             ...
 
 
@@ -304,3 +317,46 @@ class RegressionMixin:
             datasets_data=datasets_data,
             figsize=figsize,
         )
+
+    def _get_regression_stats(
+        self,
+        dataset: str,
+        target_index: int,
+        leverage_detector: Leverage,
+    ) -> Dict[str, Any]:
+        """Calculate regression statistics for a single dataset."""
+        inspector = self._regression_inspector()
+        X, y_true = inspector._get_raw_data(dataset)
+        # Validated in __init__, but needed for type narrowing :/
+        assert y_true is not None, f"y data is required for dataset {dataset}"
+        y_pred = inspector._get_predictions(dataset)
+
+        # Slice Y data for the specific target
+        if y_true.ndim > 1:
+            y_true_sliced = y_true[:, target_index]
+        else:
+            y_true_sliced = y_true
+
+        if y_pred.ndim > 1:
+            y_pred_sliced = y_pred[:, target_index]
+        else:
+            y_pred_sliced = y_pred
+
+        # Calculate studentized residuals for the specific target
+        y_res = y_true_sliced - y_pred_sliced
+        if y_res.ndim == 1:
+            y_res = y_res.reshape(-1, 1)
+
+        studentized = calculate_studentized_residuals(
+            inspector.estimator, inspector._get_preprocessed_data(dataset), y_res
+        )
+        leverages = leverage_detector.predict_residuals(X)
+
+        return {
+            "X": X,
+            "y": y_true_sliced,
+            "y_true": y_true_sliced,
+            "y_pred": y_pred_sliced,
+            "studentized": studentized,
+            "leverages": leverages,
+        }
