@@ -329,19 +329,6 @@ class _BaseInspector(ABC):
         else:
             self._x_axis = np.arange(self.n_features_in_)
 
-        # Backwards-compatible attributes used in existing tests/extensions
-        train_dataset = self.datasets_["train"]
-        self._X_train = train_dataset.X
-        self._y_train = train_dataset.y
-
-        test_dataset = self.datasets_.get("test")
-        self._X_test = test_dataset.X if test_dataset is not None else None
-        self._y_test = test_dataset.y if test_dataset is not None else None
-
-        val_dataset = self.datasets_.get("val")
-        self._X_val = val_dataset.X if val_dataset is not None else None
-        self._y_val = val_dataset.y if val_dataset is not None else None
-
         # Figure tracking for automatic cleanup
         self._tracked_figures: List["Figure"] = []
 

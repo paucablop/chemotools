@@ -1005,8 +1005,8 @@ class TestPCAInspectorEdgeCases:
         inspector = PCAInspector(model=fitted_pca, X_train=X_list, y_train=y_list)
 
         # Assert - should convert to numpy arrays internally
-        assert isinstance(inspector._X_train, np.ndarray)
-        assert isinstance(inspector._y_train, np.ndarray)
+        assert isinstance(inspector.datasets_["train"].X, np.ndarray)
+        assert isinstance(inspector.datasets_["train"].y, np.ndarray)
 
 
 class TestPCAInspectorIntegration:
