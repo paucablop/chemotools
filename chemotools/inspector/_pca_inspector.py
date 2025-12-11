@@ -304,8 +304,12 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         ] = None,
         loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
-        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
-        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        color_by: Optional[
+            Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
+        ] = None,
+        annotate_by: Optional[
+            Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
+        ] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
         **kwargs,
@@ -404,14 +408,10 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         figures = {}
 
-        datasets = normalize_datasets(dataset)
+        datasets, color_by, annotate_by = self._prepare_inspection_config(
+            dataset, color_by, annotate_by
+        )
         use_suffix = len(datasets) > 1
-
-        # Auto-resolve color_by if None
-        # If single dataset, default to coloring by 'y' (if available)
-        # If multiple datasets, default to coloring by dataset (color_by=None)
-        if color_by is None and not use_suffix:
-            color_by = "y"
 
         # ------------------------------------------------------------------
         # Variance plot

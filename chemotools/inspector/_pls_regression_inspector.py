@@ -29,7 +29,6 @@ from .core.regression import RegressionMixin
 from .core.spectra import SpectraMixin
 from .core.summaries import PLSRegressionSummary
 from .core.utils import (
-    normalize_datasets,
     get_xlabel_for_features,
     get_default_scores_components,
     get_default_loadings_components,
@@ -399,8 +398,12 @@ class PLSRegressionInspector(
         ] = None,
         loadings_components: Optional[Union[int, Sequence[int]]] = None,
         variance_threshold: float = 0.95,
-        color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
-        annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+        color_by: Optional[
+            Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
+        ] = None,
+        annotate_by: Optional[
+            Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
+        ] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
         target_index: int = 0,
@@ -472,11 +475,14 @@ class PLSRegressionInspector(
 
         figures = {}
 
-        datasets = normalize_datasets(dataset)
+        datasets, color_by, annotate_by = self._prepare_inspection_config(
+            dataset, color_by, annotate_by
+        )
         use_suffix = len(datasets) > 1
 
         # Validate target_index
         _, y_train_full = self._get_raw_data("train")
+
         # Validated in __init__, but needed for type narrowing :/
         assert y_train_full is not None, "y_train is required for PLS inspection"
 
@@ -491,12 +497,6 @@ class PLSRegressionInspector(
             raise ValueError(
                 f"target_index {target_index} is invalid for single-target model"
             )
-
-        # Auto-resolve color_by if None
-        # If single dataset, default to coloring by 'y' (if available)
-        # If multiple datasets, default to coloring by dataset (color_by=None)
-        if color_by is None and not use_suffix:
-            color_by = "y"
 
         # For plots that separate datasets (subplots) or show only one dataset,
         # we prefer coloring by target 'y' instead of dataset color (which is uniform)

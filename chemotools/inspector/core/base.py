@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from abc import ABC
@@ -12,6 +12,7 @@ from sklearn.utils import check_array
 
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
 from .summaries import InspectorSummary
+from .utils import normalize_datasets
 
 ModelTypes = Union[_BasePCA, _PLS, Pipeline]
 
@@ -240,6 +241,18 @@ class InspectorState:
         return np.arange(X.shape[1])
 
 
+@dataclass
+class InspectorPlotConfig:
+    """Configuration for inspector plots."""
+
+    scores_figsize: Tuple[float, float] = (6, 6)
+    loadings_figsize: Tuple[float, float] = (10, 5)
+    variance_figsize: Tuple[float, float] = (10, 5)
+    spectra_figsize: Tuple[float, float] = (12, 5)
+    distances_figsize: Tuple[float, float] = (8, 6)
+    regression_figsize: Tuple[float, float] = (8, 6)
+
+
 class _BaseInspector(ABC):
     """Base class encapsulating shared inspector responsibilities."""
 
@@ -301,6 +314,73 @@ class _BaseInspector(ABC):
         val_dataset = self.datasets_.get("val")
         self._X_val = val_dataset.X if val_dataset is not None else None
         self._y_val = val_dataset.y if val_dataset is not None else None
+
+    def _prepare_inspection_config(
+        self,
+        dataset: Union[str, Sequence[str]],
+        color_by: Optional[
+            Union[str, Dict[str, Any], Sequence[Any], np.ndarray]
+        ] = None,
+        annotate_by: Optional[
+            Union[str, Dict[str, Any], Sequence[Any], np.ndarray]
+        ] = None,
+    ) -> Tuple[
+        List[str],
+        Optional[Union[str, Dict[str, Any]]],
+        Optional[Union[str, Dict[str, Any]]],
+    ]:
+        """
+        Prepare the configuration for inspection by normalizing datasets and arguments.
+
+        This method handles the logic for:
+        1. Normalizing the dataset argument to a list of strings.
+        2. Wrapping raw array inputs for color_by/annotate_by into dictionaries
+           when inspecting a single dataset.
+        3. Setting default values for color_by if not provided.
+
+        Parameters
+        ----------
+        dataset : str or sequence of str
+            The dataset(s) to inspect.
+        color_by : str, dict, or sequence, optional
+            The coloring configuration.
+        annotate_by : str, dict, or sequence, optional
+            The annotation configuration.
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - datasets (List[str]): The list of dataset names to inspect.
+            - color_by (Optional[Union[str, Dict[str, Any]]]): The normalized color_by configuration.
+            - annotate_by (Optional[Union[str, Dict[str, Any]]]): The normalized annotate_by configuration.
+        """
+        datasets = normalize_datasets(dataset)
+        use_suffix = len(datasets) > 1
+
+        # Handle color_by
+        if color_by is not None:
+            if not isinstance(color_by, (str, dict)):
+                if use_suffix:
+                    raise ValueError(
+                        "When inspecting multiple datasets, color_by must be a string or a dictionary."
+                    )
+                color_by = {datasets[0]: color_by}
+
+        # Handle annotate_by
+        if annotate_by is not None:
+            if not isinstance(annotate_by, (str, dict)):
+                if use_suffix:
+                    raise ValueError(
+                        "When inspecting multiple datasets, annotate_by must be a string or a dictionary."
+                    )
+                annotate_by = {datasets[0]: annotate_by}
+
+        # Default color_by logic
+        if color_by is None and not use_suffix:
+            color_by = "y"
+
+        return datasets, color_by, annotate_by  # type: ignore
 
     # ---------------------------------------------------------------------
     # Convenience helpers shared by concrete inspectors
@@ -420,15 +500,3 @@ class _BaseInspector(ABC):
 
         X_transformed = self._transform_data(np.asarray(X))
         return self.estimator_.transform(X_transformed)
-
-
-@dataclass
-class InspectorPlotConfig:
-    """Configuration for inspector plots."""
-
-    scores_figsize: Tuple[float, float] = (6, 6)
-    loadings_figsize: Tuple[float, float] = (10, 5)
-    variance_figsize: Tuple[float, float] = (10, 5)
-    spectra_figsize: Tuple[float, float] = (12, 5)
-    distances_figsize: Tuple[float, float] = (8, 6)
-    regression_figsize: Tuple[float, float] = (8, 6)

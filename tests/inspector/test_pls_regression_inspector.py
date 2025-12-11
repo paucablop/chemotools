@@ -682,27 +682,63 @@ class TestValidationPropagation:
 
     def test_inspect_color_by_default(self, fitted_pls, regression_data):
         """Test inspect method default color_by logic."""
+        # Arrange
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
-        # Call inspect without color_by and single dataset
+        # Act
         figures = inspector.inspect(dataset="train")
 
+        # Assert
         assert len(figures) > 0
+
+        # Cleanup
         for fig in figures.values():
             plt.close(fig)
 
     def test_inspect_y_variance_plot(self, fitted_pls, regression_data):
         """Test inspect method creates Y-variance plot when available."""
+        # Arrange
         X_train, y_train = regression_data["train"]
-
         # Manually add variance ratios
         fitted_pls.explained_y_variance_ratio_ = np.array([0.5, 0.4, 0.05])
-
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
+        # Act
         figures = inspector.inspect(dataset="train")
 
+        # Assert
         assert "variance_y" in figures
+
+        # Cleanup
         for fig in figures.values():
             plt.close(fig)
+
+
+def test_inspect_single_dataset_raw_array_arguments(fitted_pls, regression_data):
+    """Test that raw arrays can be passed for color_by/annotate_by when inspecting a single dataset."""
+    # Arrange
+    X_train, y_train = regression_data["train"]
+    inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+    # Create dummy color/annotation arrays matching sample count
+    n_samples = X_train.shape[0]
+    color_array = np.random.rand(n_samples)
+    annotate_array = np.arange(n_samples)
+
+    # Act
+    figs = inspector.inspect(
+        dataset="train", color_by=color_array, annotate_by=annotate_array
+    )
+
+    # Assert
+    assert len(figs) > 0
+    for fig in figs.values():
+        plt.close(fig)
+
+    # Act & Assert - Error cases
+    with pytest.raises(ValueError, match="When inspecting multiple datasets"):
+        inspector.inspect(dataset=["train", "train"], color_by=color_array)
+
+    with pytest.raises(ValueError, match="When inspecting multiple datasets"):
+        inspector.inspect(dataset=["train", "train"], annotate_by=annotate_array)
