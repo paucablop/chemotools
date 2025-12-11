@@ -392,15 +392,21 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
         >>> figs['loadings'].savefig('loadings.png')
         """
-        # Close previous figures to prevent memory leaks
-        self._cleanup_previous_figures()
-
+        # ------------------------------------------------------------------
+        # Input Validation
+        # ------------------------------------------------------------------
         # Validate color_mode
         if color_mode not in ["continuous", "categorical"]:
             raise ValueError(
                 f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
             )
 
+        # Close previous figures to prevent memory leaks
+        self._cleanup_previous_figures()
+
+        # ------------------------------------------------------------------
+        # Configs
+        # ------------------------------------------------------------------
         # Generate smart defaults based on number of components
         if components_scores is None:
             components_scores = get_default_scores_components(self.n_components)
@@ -409,6 +415,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         # Handle configuration
         config = plot_config or InspectorPlotConfig()
+
         # Allow kwargs to override config for convenience
         for key, value in kwargs.items():
             if hasattr(config, key):
@@ -416,10 +423,21 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         figures = {}
 
+        # Prepare datasets and visual properties
+        # Normalizes inputs (e.g. single string -> list) and resolves
+        # color/annotation dictionaries for each dataset
         datasets, color_by, annotate_by = self._prepare_inspection_config(
             dataset, color_by, annotate_by
         )
+
+        # If multiple datasets are being inspected, we append suffixes to keys
+        # to distinguish them (e.g. 'scores_train', 'scores_test')
         use_suffix = len(datasets) > 1
+
+        # ------------------------------------------------------------------
+        # Plotting Setup
+        # ------------------------------------------------------------------
+        xlabel = get_xlabel_for_features(self.feature_names is not None)
 
         # ------------------------------------------------------------------
         # Variance plot
@@ -434,7 +452,6 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # ------------------------------------------------------------------
         # Loadings plot
         # ------------------------------------------------------------------
-        xlabel = get_xlabel_for_features(self.feature_names is not None)
         figures["loadings"] = self.create_latent_loadings_figure(
             loadings_components=loadings_components,
             xlabel=xlabel,
@@ -455,7 +472,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         figures.update(scores_figures)
 
         # ------------------------------------------------------------------
-        # Distance plot (Hotelling T² vs Q residuals)
+        # Latent Variable Distances (Hotelling T² vs Q residuals)
         # ------------------------------------------------------------------
         # Fit detectors once on training data for consistent limits and efficiency
         X_train, _ = self._get_raw_data("train")
