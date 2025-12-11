@@ -732,3 +732,100 @@ class TestBaseInspectorMethods:
 
         # Assert
         assert np.array_equal(names, np.array(feature_names))
+
+
+class TestBaseInspectorFigureManagement:
+    """Tests for figure tracking and cleanup functionality."""
+
+    def test_initial_tracked_figures_empty(self, fitted_pca, dummy_data_loader):
+        """Test that tracked figures list is empty on initialization."""
+        # Arrange
+        X, _ = dummy_data_loader
+
+        # Act
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+
+        # Assert
+        assert inspector._tracked_figures == []
+
+    def test_track_figures_stores_figures(self, fitted_pca, dummy_data_loader):
+        """Test that _track_figures stores figure references."""
+        # Arrange
+        X, _ = dummy_data_loader
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+        fig1, _ = plt.subplots()
+        fig2, _ = plt.subplots()
+        figures = {"fig1": fig1, "fig2": fig2}
+
+        # Act
+        result = inspector._track_figures(figures)
+
+        # Assert
+        assert len(inspector._tracked_figures) == 2
+        assert fig1 in inspector._tracked_figures
+        assert fig2 in inspector._tracked_figures
+        assert result is figures  # Returns the same dict
+
+    def test_close_figures_closes_all_tracked(self, fitted_pca, dummy_data_loader):
+        """Test that close_figures closes all tracked figures."""
+        # Arrange
+        X, _ = dummy_data_loader
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+        fig1, _ = plt.subplots()
+        fig2, _ = plt.subplots()
+        inspector._track_figures({"fig1": fig1, "fig2": fig2})
+
+        # Act
+        inspector.close_figures()
+
+        # Assert
+        assert inspector._tracked_figures == []
+        # Verify figures are actually closed (number should be 0)
+        assert fig1.number not in plt.get_fignums()
+        assert fig2.number not in plt.get_fignums()
+
+    def test_cleanup_previous_figures_clears_old_figures(
+        self, fitted_pca, dummy_data_loader
+    ):
+        """Test that _cleanup_previous_figures closes existing tracked figures."""
+        # Arrange
+        X, _ = dummy_data_loader
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+        fig1, _ = plt.subplots()
+        inspector._track_figures({"fig1": fig1})
+        old_fig_num = fig1.number
+
+        # Act
+        inspector._cleanup_previous_figures()
+
+        # Assert
+        assert inspector._tracked_figures == []
+        assert old_fig_num not in plt.get_fignums()
+
+    def test_multiple_track_calls_accumulate(self, fitted_pca, dummy_data_loader):
+        """Test that multiple _track_figures calls accumulate figures."""
+        # Arrange
+        X, _ = dummy_data_loader
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+        fig1, _ = plt.subplots()
+        fig2, _ = plt.subplots()
+
+        # Act
+        inspector._track_figures({"fig1": fig1})
+        inspector._track_figures({"fig2": fig2})
+
+        # Assert
+        assert len(inspector._tracked_figures) == 2
+
+    def test_close_figures_is_idempotent(self, fitted_pca, dummy_data_loader):
+        """Test that calling close_figures multiple times is safe."""
+        # Arrange
+        X, _ = dummy_data_loader
+        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
+        fig, _ = plt.subplots()
+        inspector._track_figures({"fig": fig})
+
+        # Act & Assert - should not raise
+        inspector.close_figures()
+        inspector.close_figures()
+        assert inspector._tracked_figures == []

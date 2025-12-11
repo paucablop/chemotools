@@ -748,6 +748,72 @@ class TestPCAInspectorInspect:
         assert True
 
 
+class TestPCAInspectorFigureCleanup:
+    """Test automatic figure cleanup in PCAInspector."""
+
+    def test_inspect_tracks_figures(self, fitted_pca, dummy_data_loader):
+        """Test that inspect() tracks created figures."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
+
+        # Act
+        figures = inspector.inspect(
+            components_scores=(0, 1), loadings_components=[0, 1]
+        )
+
+        # Assert
+        assert len(inspector._tracked_figures) == len(figures)
+        for fig in figures.values():
+            assert fig in inspector._tracked_figures
+
+    def test_inspect_cleans_up_previous_figures(self, fitted_pca, dummy_data_loader):
+        """Test that calling inspect() twice cleans up previous figures."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
+
+        # Act - first call
+        figures1 = inspector.inspect(
+            components_scores=(0, 1), loadings_components=[0, 1]
+        )
+        first_call_figures = list(figures1.values())
+        num_first_call = len(figures1)
+
+        # Act - second call (should cleanup first figures)
+        figures2 = inspector.inspect(
+            components_scores=(0, 1), loadings_components=[0, 1]
+        )
+
+        # Assert - only second call figures are tracked (not accumulated)
+        assert len(inspector._tracked_figures) == len(figures2)
+        assert len(inspector._tracked_figures) == num_first_call  # Same number
+
+        # Assert - tracked figures are the new ones, not the old ones
+        for fig in figures2.values():
+            assert fig in inspector._tracked_figures
+        for fig in first_call_figures:
+            assert fig not in inspector._tracked_figures
+
+    def test_close_figures_clears_tracked(self, fitted_pca, dummy_data_loader):
+        """Test that close_figures() properly clears tracked figures."""
+        # Arrange
+        X, y = dummy_data_loader
+        inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
+        figures = inspector.inspect(
+            components_scores=(0, 1), loadings_components=[0, 1]
+        )
+        fig_nums = [fig.number for fig in figures.values()]
+
+        # Act
+        inspector.close_figures()
+
+        # Assert
+        assert inspector._tracked_figures == []
+        for fig_num in fig_nums:
+            assert fig_num not in plt.get_fignums()
+
+
 class TestPCAInspectorInspectSpectra:
     """Test inspect_spectra method."""
 

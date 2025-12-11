@@ -423,6 +423,72 @@ class TestRegressionDiagnostics:
             plt.close(fig)
 
 
+class TestPLSRegressionInspectorFigureCleanup:
+    """Test automatic figure cleanup in PLSRegressionInspector."""
+
+    def test_inspect_tracks_figures(self, fitted_pls, regression_data):
+        """Test that inspect() tracks created figures."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        figures = inspector.inspect(
+            dataset="train", components_scores=(0, 1), loadings_components=[0, 1]
+        )
+
+        # Assert
+        assert len(inspector._tracked_figures) == len(figures)
+        for fig in figures.values():
+            assert fig in inspector._tracked_figures
+
+    def test_inspect_cleans_up_previous_figures(self, fitted_pls, regression_data):
+        """Test that calling inspect() twice cleans up previous figures."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act - first call
+        figures1 = inspector.inspect(
+            dataset="train", components_scores=(0, 1), loadings_components=[0, 1]
+        )
+        first_call_figures = list(figures1.values())
+        num_first_call = len(figures1)
+
+        # Act - second call (should cleanup first figures)
+        figures2 = inspector.inspect(
+            dataset="train", components_scores=(0, 1), loadings_components=[0, 1]
+        )
+
+        # Assert - only second call figures are tracked (not accumulated)
+        assert len(inspector._tracked_figures) == len(figures2)
+        assert len(inspector._tracked_figures) == num_first_call  # Same number
+
+        # Assert - tracked figures are the new ones, not the old ones
+        for fig in figures2.values():
+            assert fig in inspector._tracked_figures
+        for fig in first_call_figures:
+            assert fig not in inspector._tracked_figures
+
+    def test_close_figures_clears_tracked(self, fitted_pls, regression_data):
+        """Test that close_figures() properly clears tracked figures."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+        figures = inspector.inspect(
+            dataset="train", components_scores=(0, 1), loadings_components=[0, 1]
+        )
+        fig_nums = [fig.number for fig in figures.values()]
+
+        # Act
+        inspector.close_figures()
+
+        # Assert
+        assert inspector._tracked_figures == []
+        for fig_num in fig_nums:
+            assert fig_num not in plt.get_fignums()
+
+
 class TestAdditionalCoverage:
     def test_detector_limits_cached(self, fitted_pls, regression_data, monkeypatch):
         """Test that Hotelling T2 and Q-residuals limits are computed once and cached."""
