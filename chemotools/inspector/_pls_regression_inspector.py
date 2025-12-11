@@ -487,6 +487,9 @@ class PLSRegressionInspector(
                 f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
             )
 
+        # Close previous figures to prevent memory leaks
+        self._cleanup_previous_figures()
+
         # ------------------------------------------------------------------
         # Configs
         # ------------------------------------------------------------------
@@ -799,4 +802,4 @@ class PLSRegressionInspector(
             )
             figures.update(spectra_figs)
 
-        return figures
+        return self._track_figures(figures)

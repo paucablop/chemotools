@@ -392,6 +392,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
         >>> figs['loadings'].savefig('loadings.png')
         """
+        # Close previous figures to prevent memory leaks
+        self._cleanup_previous_figures()
+
         # Validate color_mode
         if color_mode not in ["continuous", "categorical"]:
             raise ValueError(
@@ -485,4 +488,4 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             )
             figures.update(spectra_figs)
 
-        return figures
+        return self._track_figures(figures)

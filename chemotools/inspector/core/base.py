@@ -1,13 +1,26 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    TYPE_CHECKING,
+)
 
 import numpy as np
 from abc import ABC
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
+
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 from sklearn.utils import check_array
 
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
@@ -315,6 +328,9 @@ class _BaseInspector(ABC):
         self._X_val = val_dataset.X if val_dataset is not None else None
         self._y_val = val_dataset.y if val_dataset is not None else None
 
+        # Figure tracking for automatic cleanup
+        self._tracked_figures: List["Figure"] = []
+
     def _prepare_inspection_config(
         self,
         dataset: Union[str, Sequence[str]],
@@ -417,6 +433,49 @@ class _BaseInspector(ABC):
     def confidence(self) -> float:
         """Return the confidence level for outlier detection."""
         return self._confidence
+
+    # -------------------------------------------------------------------------
+    # Figure Management
+    # -------------------------------------------------------------------------
+    def close_figures(self) -> None:
+        """Close all figures created by this inspector.
+
+        This method closes all matplotlib figures that were created by previous
+        calls to `inspect()` or `inspect_spectra()`. Use this to free memory
+        when you're done with the plots.
+
+        Examples
+        --------
+        >>> inspector = PCAInspector(model, X_train)
+        >>> figures = inspector.inspect()
+        >>> # ... work with figures ...
+        >>> inspector.close_figures()  # Free memory
+        """
+        import matplotlib.pyplot as plt
+
+        for fig in self._tracked_figures:
+            plt.close(fig)
+        self._tracked_figures.clear()
+
+    def _track_figures(self, figures: Dict[str, "Figure"]) -> Dict[str, "Figure"]:
+        """Track figures for later cleanup and return them.
+
+        Parameters
+        ----------
+        figures : dict
+            Dictionary of figure name to Figure object
+
+        Returns
+        -------
+        dict
+            The same dictionary (for chaining)
+        """
+        self._tracked_figures.extend(figures.values())
+        return figures
+
+    def _cleanup_previous_figures(self) -> None:
+        """Close previously tracked figures to prevent memory leaks."""
+        self.close_figures()
 
     def _base_summary(self) -> InspectorSummary:
         """Create base summary with common model information."""
