@@ -188,6 +188,6 @@ def test_latent_summary():
     from chemotools.inspector.core.latent import LatentSummary
 
     assert isinstance(summary, LatentSummary)
-    assert summary.nr_components == 2
+    assert summary.n_components == 2
     assert isinstance(summary.hotelling_t2_limit, float)
     assert isinstance(summary.q_residuals_limit, float)

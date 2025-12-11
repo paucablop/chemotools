@@ -50,7 +50,7 @@ class LatentVariableMixin:
     # ------------------------------------------------------------------
 
     @property
-    def nr_components(self) -> int:
+    def n_components(self) -> int:
         """Return the number of latent variables/components."""
         inspector = self._latent_inspector()
         # Access n_components_ from the inspector instance (provided by _BaseInspector)
@@ -313,12 +313,12 @@ class LatentVariableMixin:
         -------
         summary : LatentSummary
             Object containing:
-            - 'nr_components': Number of latent variables
+            - 'n_components': Number of latent variables
             - 'hotelling_t2_limit': Critical value for Hotelling's T²
             - 'q_residuals_limit': Critical value for Q residuals
         """
         return LatentSummary(
-            nr_components=int(self.nr_components),
+            n_components=int(self.n_components),
             hotelling_t2_limit=float(self.hotelling_t2_limit),
             q_residuals_limit=float(self.q_residuals_limit),
         )

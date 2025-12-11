@@ -30,9 +30,9 @@ class TestPCAInspectorInitialization:
         # Assert
         assert inspector.estimator is fitted_pca
         assert inspector.transformer is None
-        assert inspector.nr_components == 2
-        assert inspector.nr_features == 3
-        assert inspector.nr_samples == {"train": 100}
+        assert inspector.n_components == 2
+        assert inspector.n_features == 3
+        assert inspector.n_samples == {"train": 100}
         assert inspector.x_axis.shape == (3,)
         np.testing.assert_array_equal(inspector.x_axis, np.arange(3))
 
@@ -67,7 +67,7 @@ class TestPCAInspectorInitialization:
         )
 
         # Assert
-        assert inspector.nr_samples == {"train": 80, "test": 20}
+        assert inspector.n_samples == {"train": 80, "test": 20}
 
     def test_init_with_validation_data(self, fitted_pca, dummy_data_loader):
         """Test initialization with train, test, and validation data."""
@@ -88,7 +88,7 @@ class TestPCAInspectorInitialization:
         )
 
         # Assert
-        assert inspector.nr_samples == {"train": 60, "test": 20, "val": 20}
+        assert inspector.n_samples == {"train": 60, "test": 20, "val": 20}
 
     def test_init_with_custom_wavenumbers(self, fitted_pca, dummy_data_loader):
         """Test initialization with custom wavenumbers."""
@@ -113,7 +113,7 @@ class TestPCAInspectorInitialization:
         inspector = PCAInspector(model=fitted_pca, X_train=X)
 
         # Assert
-        assert inspector.nr_samples == {"train": 100}
+        assert inspector.n_samples == {"train": 100}
 
     def test_init_wavenumbers_length_mismatch_raises_error(
         self, fitted_pca, dummy_data_loader
@@ -161,42 +161,42 @@ class TestPCAInspectorProperties:
         # Act & Assert
         assert inspector.transformer is None
 
-    def test_nr_components_property(self, fitted_pca, dummy_data_loader):
-        """Test nr_components property."""
+    def test_n_components_property(self, fitted_pca, dummy_data_loader):
+        """Test n_components property."""
         # Arrange
         X, _ = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X)
 
         # Act & Assert
-        assert inspector.nr_components == 2
+        assert inspector.n_components == 2
 
-    def test_nr_features_property(self, fitted_pca, dummy_data_loader):
-        """Test nr_features property."""
+    def test_n_features_property(self, fitted_pca, dummy_data_loader):
+        """Test n_features property."""
         # Arrange
         X, _ = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X)
 
         # Act & Assert
-        assert inspector.nr_features == 3
+        assert inspector.n_features == 3
 
-    def test_nr_samples_property_single_dataset(self, fitted_pca, dummy_data_loader):
-        """Test nr_samples property with single dataset."""
+    def test_n_samples_property_single_dataset(self, fitted_pca, dummy_data_loader):
+        """Test n_samples property with single dataset."""
         # Arrange
         X, _ = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X)
 
         # Act & Assert
-        assert inspector.nr_samples == {"train": 100}
+        assert inspector.n_samples == {"train": 100}
 
-    def test_nr_samples_property_multiple_datasets(self, fitted_pca, dummy_data_loader):
-        """Test nr_samples property with multiple datasets."""
+    def test_n_samples_property_multiple_datasets(self, fitted_pca, dummy_data_loader):
+        """Test n_samples property with multiple datasets."""
         # Arrange
         X, _ = dummy_data_loader
         X_train, X_test = X[:80], X[80:]
         inspector = PCAInspector(model=fitted_pca, X_train=X_train, X_test=X_test)
 
         # Act & Assert
-        assert inspector.nr_samples == {"train": 80, "test": 20}
+        assert inspector.n_samples == {"train": 80, "test": 20}
 
 
 class TestPCAInspectorGetScores:
@@ -422,8 +422,8 @@ class TestPCAInspectorSummary:
         # Act & Assert - should not raise
         result = inspector.summary()
         assert isinstance(result, InspectorSummary)
-        assert result.nr_samples is not None
-        assert len(result.nr_samples) == 3  # train, test, val
+        assert result.n_samples is not None
+        assert len(result.n_samples) == 3  # train, test, val
 
     def test_summary_output_format(self, fitted_pca, dummy_data_loader):
         """Test that summary returns dictionary with expected keys."""
@@ -438,9 +438,9 @@ class TestPCAInspectorSummary:
         assert isinstance(result, InspectorSummary)
         assert result.model_type is not None
         assert result.has_preprocessing is not None
-        assert result.nr_features is not None
-        assert result.nr_components is not None
-        assert result.nr_samples is not None
+        assert result.n_features is not None
+        assert result.n_components is not None
+        assert result.n_samples is not None
         assert result.explained_variance_ratio is not None
         assert result.cumulative_variance is not None
         assert result.pc_variances is not None
@@ -468,7 +468,7 @@ class TestPCAInspectorSummary:
         summary = inspector.summary()
 
         # Assert
-        assert summary.nr_components == 2
+        assert summary.n_components == 2
         assert isinstance(summary.hotelling_t2_limit, float)
         assert isinstance(summary.q_residuals_limit, float)
 
@@ -898,7 +898,7 @@ class TestPCAInspectorEdgeCases:
         inspector = PCAInspector(model=pca, X_train=X, y_train=y)
 
         # Act & Assert - should not raise
-        assert inspector.nr_components == 1
+        assert inspector.n_components == 1
         scores = inspector.get_scores("train")
         assert scores.shape == (100, 1)
 
@@ -911,8 +911,8 @@ class TestPCAInspectorEdgeCases:
         inspector = PCAInspector(model=pca, X_train=X)
 
         # Act & Assert
-        assert inspector.nr_features == 100
-        assert inspector.nr_components == 5
+        assert inspector.n_features == 100
+        assert inspector.n_components == 5
         loadings = inspector.get_loadings()
         assert loadings.shape == (100, 5)
 
@@ -925,7 +925,7 @@ class TestPCAInspectorEdgeCases:
         inspector = PCAInspector(model=pca, X_train=X)
 
         # Act & Assert
-        assert inspector.nr_samples["train"] == 5
+        assert inspector.n_samples["train"] == 5
         scores = inspector.get_scores("train")
         assert scores.shape == (5, 2)
 

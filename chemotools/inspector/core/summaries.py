@@ -15,8 +15,8 @@ class InspectorSummary:
 
     model_type: str
     has_preprocessing: bool
-    nr_features: int
-    nr_samples: Dict[str, int]
+    n_features: int
+    n_samples: Dict[str, int]
     preprocessing_steps: List[Dict[str, Any]]
 
     def to_dict(self):
@@ -25,7 +25,7 @@ class InspectorSummary:
 
 @dataclass(kw_only=True)
 class LatentSummary:
-    nr_components: int
+    n_components: int
     hotelling_t2_limit: float
     q_residuals_limit: float
 

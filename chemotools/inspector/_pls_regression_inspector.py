@@ -94,11 +94,11 @@ class PLSRegressionInspector(
         The PLS estimator
     transformer : Pipeline or None
         Preprocessing pipeline before PLS (if model was a Pipeline)
-    nr_components : int
+    n_components : int
         Number of latent variables
-    nr_features : int
+    n_features : int
         Number of features in original data
-    nr_samples : dict
+    n_samples : dict
         Number of samples in each dataset
     x_axis : ndarray
         Feature names/indices
@@ -492,9 +492,9 @@ class PLSRegressionInspector(
         # ------------------------------------------------------------------
         # Generate "smart" defaults based on number of components
         if components_scores is None:
-            components_scores = get_default_scores_components(self.nr_components)
+            components_scores = get_default_scores_components(self.n_components)
         if loadings_components is None:
-            loadings_components = get_default_loadings_components(self.nr_components)
+            loadings_components = get_default_loadings_components(self.n_components)
 
         # Handle configuration
         config = plot_config or InspectorPlotConfig()

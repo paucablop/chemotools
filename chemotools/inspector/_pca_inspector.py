@@ -68,11 +68,11 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         The PCA estimator
     transformer : Pipeline or None
         Preprocessing pipeline before PCA (if model was a Pipeline)
-    nr_components : int
+    n_components : int
         Number of principal components
-    nr_features : int
+    n_features : int
         Number of features in original data
-    nr_samples : dict
+    n_samples : dict
         Number of samples in each dataset
     x_axis : ndarray
         Feature names/indices
@@ -166,26 +166,26 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         n_90 = (
             np.argmax(cumsum >= 0.90) + 1
             if np.any(cumsum >= 0.90)
-            else self.nr_components
+            else self.n_components
         )
         n_95 = (
             np.argmax(cumsum >= 0.95) + 1
             if np.any(cumsum >= 0.95)
-            else self.nr_components
+            else self.n_components
         )
         n_99 = (
             np.argmax(cumsum >= 0.99) + 1
             if np.any(cumsum >= 0.99)
-            else self.nr_components
+            else self.n_components
         )
 
         # Build PC variances dictionary
         pc_variances = {
             "PC1": float(explained_var[0] * 100),
         }
-        if self.nr_components > 1:
+        if self.n_components > 1:
             pc_variances["PC2"] = float(explained_var[1] * 100)
-        if self.nr_components > 2:
+        if self.n_components > 2:
             pc_variances["PC3"] = float(explained_var[2] * 100)
 
         base_summary = self._base_summary()
@@ -400,9 +400,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         # Generate smart defaults based on number of components
         if components_scores is None:
-            components_scores = get_default_scores_components(self.nr_components)
+            components_scores = get_default_scores_components(self.n_components)
         if loadings_components is None:
-            loadings_components = get_default_loadings_components(self.nr_components)
+            loadings_components = get_default_loadings_components(self.n_components)
 
         # Handle configuration
         config = plot_config or InspectorPlotConfig()

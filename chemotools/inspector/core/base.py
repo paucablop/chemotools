@@ -399,12 +399,12 @@ class _BaseInspector(ABC):
         return self.transformer_
 
     @property
-    def nr_features(self) -> int:
+    def n_features(self) -> int:
         """Return the number of features in original data."""
         return self.n_features_in_
 
     @property
-    def nr_samples(self) -> Dict[str, int]:
+    def n_samples(self) -> Dict[str, int]:
         """Return the number of samples in each dataset."""
         return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
 
@@ -423,8 +423,8 @@ class _BaseInspector(ABC):
         return InspectorSummary(
             model_type=self.model.__class__.__name__,
             has_preprocessing=self.transformer is not None,
-            nr_features=self.n_features_in_,
-            nr_samples={name: ds.n_samples for name, ds in self.datasets_.items()},
+            n_features=self.n_features_in_,
+            n_samples={name: ds.n_samples for name, ds in self.datasets_.items()},
             preprocessing_steps=self._get_preprocessing_steps(),
         )
 

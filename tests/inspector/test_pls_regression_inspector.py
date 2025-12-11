@@ -92,8 +92,8 @@ class TestInitialization:
         )
 
         # Assert
-        assert inspector.nr_samples == {"train": 50, "test": 20, "val": 20}
-        assert inspector.nr_components == 3
+        assert inspector.n_samples == {"train": 50, "test": 20, "val": 20}
+        assert inspector.n_components == 3
         assert inspector.transformer is None
 
     def test_init_with_pipeline(self, fitted_pipeline, regression_data):
@@ -189,7 +189,7 @@ class TestSummary:
         summary = inspector.summary()
 
         # Assert
-        assert summary.nr_components == 3
+        assert summary.n_components == 3
         assert isinstance(summary.hotelling_t2_limit, float)
         assert isinstance(summary.q_residuals_limit, float)
 
