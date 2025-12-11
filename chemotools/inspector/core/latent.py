@@ -139,7 +139,25 @@ class LatentVariableMixin:
         variance_threshold: float = 0.95,
         figsize: Tuple[float, float] = (8, 4),
     ) -> Optional["Figure"]:
-        """Create explained-variance plot for latent components, if available."""
+        """Create explained-variance plot for latent components.
+
+        Parameters
+        ----------
+        variance_threshold : float, default=0.95
+            Cumulative variance threshold to highlight on the plot.
+        figsize : tuple, default=(8, 4)
+            Figure dimensions (width, height) in inches.
+
+        Returns
+        -------
+        Figure or None
+            Matplotlib figure, or None if variance info unavailable.
+
+        Examples
+        --------
+        >>> fig = inspector.create_latent_variance_figure()
+        >>> fig = inspector.create_latent_variance_figure(variance_threshold=0.99)
+        """
 
         variance = self.get_latent_explained_variance()
         if variance is None:
@@ -156,7 +174,27 @@ class LatentVariableMixin:
         xlabel: Optional[str] = None,
         figsize: Tuple[float, float] = (8, 4),
     ) -> "Figure":
-        """Create loadings-style plot for the latent variables."""
+        """Create loadings plot for the latent variables.
+
+        Parameters
+        ----------
+        loadings_components : int or sequence of int, default=0
+            Component index(es) to plot.
+        xlabel : str, optional
+            Label for x-axis. Auto-detected if not provided.
+        figsize : tuple, default=(8, 4)
+            Figure dimensions (width, height) in inches.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with loadings plot.
+
+        Examples
+        --------
+        >>> fig = inspector.create_latent_loadings_figure()  # first component
+        >>> fig = inspector.create_latent_loadings_figure([0, 1, 2])  # multiple
+        """
 
         loadings = self.get_latent_loadings()
         feature_names = self._get_latent_feature_names()
@@ -183,7 +221,34 @@ class LatentVariableMixin:
         figsize: Tuple[float, float] = (8, 6),
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> Dict[str, "Figure"]:
-        """Generate per-component latent scores plots for requested datasets."""
+        """Generate scores plots for the specified component pairs.
+
+        Parameters
+        ----------
+        dataset : str or list of str, default='train'
+            Dataset(s) to plot.
+        components : tuple or list of tuples, default=(0, 1)
+            Component pair(s) to plot, e.g., (0, 1) or [(0, 1), (1, 2)].
+        color_by : str or dict, optional
+            How to color points ('y', 'sample_index', or custom dict).
+        annotate_by : str or dict, optional
+            Labels for annotating individual points.
+        figsize : tuple, default=(8, 6)
+            Figure dimensions (width, height) in inches.
+        color_mode : {'continuous', 'categorical'}, optional
+            Coloring mode for points.
+
+        Returns
+        -------
+        dict of Figure
+            Dictionary with keys like 'scores_1', 'scores_2', etc.
+
+        Examples
+        --------
+        >>> figs = inspector.create_latent_scores_figures()
+        >>> figs = inspector.create_latent_scores_figures(components=[(0, 1), (1, 2)])
+        >>> figs = inspector.create_latent_scores_figures(["train", "test"])
+        """
 
         dataset_names = list(normalize_datasets(dataset))
         if not dataset_names:
@@ -268,7 +333,34 @@ class LatentVariableMixin:
         hotelling_detector: Optional[HotellingT2] = None,
         q_residuals_detector: Optional[QResiduals] = None,
     ) -> "Figure":
-        """Create Hotelling T² vs Q residuals plot for the provided datasets."""
+        """Create Hotelling T² vs Q residuals plot.
+
+        Parameters
+        ----------
+        dataset : str or list of str
+            Dataset(s) to plot.
+        color_by : str or dict
+            How to color points ('y', 'sample_index', or custom dict).
+        figsize : tuple
+            Figure dimensions (width, height) in inches.
+        annotate_by : str or dict, optional
+            Labels for annotating individual points.
+        color_mode : {'continuous', 'categorical'}, optional
+            Coloring mode for points.
+        hotelling_detector : HotellingT2, optional
+            Pre-fitted detector; auto-fitted on train data if not provided.
+        q_residuals_detector : QResiduals, optional
+            Pre-fitted detector; auto-fitted on train data if not provided.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with distance plot.
+
+        Examples
+        --------
+        >>> fig = inspector.create_latent_distance_figure("train", color_by="y", figsize=(8, 6))
+        """
 
         dataset_names = list(normalize_datasets(dataset))
         datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]] = {}

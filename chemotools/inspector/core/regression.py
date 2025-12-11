@@ -180,19 +180,67 @@ class RegressionMixin:
     # Public API
     # ------------------------------------------------------------------
     def regression_rmse(self, dataset: str) -> float:
-        """Return RMSE for the specified dataset, computing it on demand."""
+        """Return RMSE for the specified dataset.
+
+        Parameters
+        ----------
+        dataset : str
+            Dataset name ('train', 'test', or 'val').
+
+        Returns
+        -------
+        float
+            Root mean squared error.
+
+        Examples
+        --------
+        >>> inspector.regression_rmse("train")
+        0.523
+        """
         if dataset not in self._rmse_cache:
             self._calculate_rmse(dataset)
         return self._rmse_cache[dataset]
 
     def regression_r2(self, dataset: str) -> float:
-        """Return R² score for the specified dataset, computing it on demand."""
+        """Return R² score for the specified dataset.
+
+        Parameters
+        ----------
+        dataset : str
+            Dataset name ('train', 'test', or 'val').
+
+        Returns
+        -------
+        float
+            Coefficient of determination.
+
+        Examples
+        --------
+        >>> inspector.regression_r2("train")
+        0.95
+        """
         if dataset not in self._r2_cache:
             self._calculate_r2(dataset)
         return self._r2_cache[dataset]
 
     def regression_bias(self, dataset: str) -> float:
-        """Return prediction bias (mean error) for the specified dataset."""
+        """Return prediction bias (mean error) for the specified dataset.
+
+        Parameters
+        ----------
+        dataset : str
+            Dataset name ('train', 'test', or 'val').
+
+        Returns
+        -------
+        float
+            Mean prediction error (y_pred - y_true).
+
+        Examples
+        --------
+        >>> inspector.regression_bias("test")
+        -0.012
+        """
         if dataset not in self._bias_cache:
             self._calculate_bias(dataset)
         return self._bias_cache[dataset]
@@ -236,7 +284,31 @@ class RegressionMixin:
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> "Figure":
-        """Create predicted vs actual plot."""
+        """Create predicted vs actual plot.
+
+        Parameters
+        ----------
+        dataset : str or list of str, default='train'
+            Dataset(s) to plot.
+        color_by : str or dict, default='y'
+            How to color points ('y', 'sample_index', or custom dict).
+        figsize : tuple, default=(6, 6)
+            Figure dimensions (width, height) in inches.
+        annotate_by : str or dict, optional
+            Labels for annotating individual points.
+        color_mode : {'continuous', 'categorical'}, optional
+            Coloring mode for points.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with predicted vs actual scatter plot.
+
+        Examples
+        --------
+        >>> fig = inspector.create_predicted_vs_actual_plot()
+        >>> fig = inspector.create_predicted_vs_actual_plot(["train", "test"])
+        """
         datasets_data = self._get_datasets_data(dataset)
         return _regression_plots.create_predicted_vs_actual_plot(
             datasets_data=datasets_data,
@@ -254,7 +326,31 @@ class RegressionMixin:
         annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
     ) -> "Figure":
-        """Create residuals plot."""
+        """Create residuals plot.
+
+        Parameters
+        ----------
+        dataset : str or list of str, default='train'
+            Dataset(s) to plot.
+        color_by : str or dict, default='y'
+            How to color points ('y', 'sample_index', or custom dict).
+        figsize : tuple, default=(8, 4)
+            Figure dimensions (width, height) in inches.
+        annotate_by : str or dict, optional
+            Labels for annotating individual points.
+        color_mode : {'continuous', 'categorical'}, optional
+            Coloring mode for points.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with residuals vs predicted plot.
+
+        Examples
+        --------
+        >>> fig = inspector.create_residuals_plot()
+        >>> fig = inspector.create_residuals_plot("test", color_by="sample_index")
+        """
         datasets_data = self._get_datasets_data(dataset)
         return _regression_plots.create_y_residual_plot(
             datasets_data=datasets_data,
@@ -269,7 +365,24 @@ class RegressionMixin:
         dataset: Union[str, Sequence[str]] = "train",
         figsize: Tuple[float, float] = (6, 6),
     ) -> "Figure":
-        """Create Q-Q plot."""
+        """Create Q-Q plot for residual normality assessment.
+
+        Parameters
+        ----------
+        dataset : str or list of str, default='train'
+            Dataset(s) to plot.
+        figsize : tuple, default=(6, 6)
+            Figure dimensions (width, height) in inches.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with Q-Q plot.
+
+        Examples
+        --------
+        >>> fig = inspector.create_qq_plot()
+        """
         datasets_data = self._get_datasets_data(dataset)
         inspector = self._regression_inspector()
         return _regression_plots.create_qq_plot(
@@ -283,7 +396,24 @@ class RegressionMixin:
         dataset: Union[str, Sequence[str]] = "train",
         figsize: Tuple[float, float] = (8, 4),
     ) -> "Figure":
-        """Create residual distribution plot."""
+        """Create residual distribution histogram.
+
+        Parameters
+        ----------
+        dataset : str or list of str, default='train'
+            Dataset(s) to plot.
+        figsize : tuple, default=(8, 4)
+            Figure dimensions (width, height) in inches.
+
+        Returns
+        -------
+        Figure
+            Matplotlib figure with residual histogram.
+
+        Examples
+        --------
+        >>> fig = inspector.create_residual_distribution_plot()
+        """
         datasets_data = self._get_datasets_data(dataset)
         return _regression_plots.create_residual_distribution_plot(
             datasets_data=datasets_data,
