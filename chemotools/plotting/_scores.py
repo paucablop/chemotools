@@ -235,8 +235,10 @@ class ScoresPlot(BasePlot, ColoringMixin):
         # Add colorbar for continuous data
         self._add_colorbar_if_needed(ax)
 
-        # Add legend
-        ax.legend()
+        # Add legend only if there are labeled artists
+        handles, _ = ax.get_legend_handles_labels()
+        if handles:
+            ax.legend()
 
         return fig, ax
 

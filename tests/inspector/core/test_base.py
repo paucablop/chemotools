@@ -538,7 +538,8 @@ class TestInspectorStateErrors:
     def test_prepare_labels_length_mismatch(self):
         """Test ValueError when sample labels length does not match data length."""
         # Arrange
-        X = np.zeros((5, 2))
+        rng = np.random.default_rng(42)
+        X = rng.random((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
 
@@ -573,7 +574,8 @@ class TestInspectorStateErrors:
             # No n_components attribute
 
         model = MockEstimator()
-        X = np.zeros((5, 2))
+        rng = np.random.default_rng(42)
+        X = rng.random((5, 2))
         model.fit(X)
 
         # Patch _validate_and_extract_model to bypass type checks
@@ -599,7 +601,8 @@ class TestInspectorStateErrors:
     def test_get_dataset_errors(self):
         """Test get_dataset raises appropriate errors."""
         # Arrange
-        X = np.zeros((5, 2))
+        rng = np.random.default_rng(42)
+        X = rng.random((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
         state = InspectorState(
@@ -625,6 +628,102 @@ class TestInspectorStateErrors:
         # Test invalid dataset name
         with pytest.raises(ValueError, match="Invalid dataset 'invalid'"):
             state.get_dataset("invalid")
+
+    def test_nan_in_X_train_raises_error(self):
+        """Test ValueError when X_train contains NaN values."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_valid = rng.random((5, 2))
+        model = PCA(n_components=2)
+        model.fit(X_valid)
+
+        X_with_nan = rng.random((5, 2))
+        X_with_nan[2, 1] = np.nan
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Input X_train contains NaN"):
+            InspectorState(
+                model=model,
+                X_train=X_with_nan,
+                y_train=None,
+                X_test=None,
+                y_test=None,
+                X_val=None,
+                y_val=None,
+                supervised=False,
+            )
+
+    def test_inf_in_X_train_raises_error(self):
+        """Test ValueError when X_train contains Inf values."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_valid = rng.random((5, 2))
+        model = PCA(n_components=2)
+        model.fit(X_valid)
+
+        X_with_inf = rng.random((5, 2))
+        X_with_inf[1, 0] = np.inf
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Input X_train contains infinity"):
+            InspectorState(
+                model=model,
+                X_train=X_with_inf,
+                y_train=None,
+                X_test=None,
+                y_test=None,
+                X_val=None,
+                y_val=None,
+                supervised=False,
+            )
+
+    def test_nan_in_X_test_raises_error(self):
+        """Test ValueError when X_test contains NaN values."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_train = rng.random((5, 2))
+        model = PCA(n_components=2)
+        model.fit(X_train)
+
+        X_test_with_nan = rng.random((3, 2))
+        X_test_with_nan[0, 0] = np.nan
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Input X_test contains NaN"):
+            InspectorState(
+                model=model,
+                X_train=X_train,
+                y_train=None,
+                X_test=X_test_with_nan,
+                y_test=None,
+                X_val=None,
+                y_val=None,
+                supervised=False,
+            )
+
+    def test_nan_in_y_train_raises_error(self):
+        """Test ValueError when y_train contains NaN values."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_train = rng.random((5, 2))
+        model = PCA(n_components=2)
+        model.fit(X_train)
+
+        y_with_nan = rng.random(5)
+        y_with_nan[2] = np.nan
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Input target contains NaN"):
+            InspectorState(
+                model=model,
+                X_train=X_train,
+                y_train=y_with_nan,
+                X_test=None,
+                y_test=None,
+                X_val=None,
+                y_val=None,
+                supervised=False,
+            )
 
 
 class TestFeatureSelection:
@@ -705,7 +804,8 @@ class TestBaseInspectorMethods:
     def test_get_preprocessing_steps_none(self):
         """Test _get_preprocessing_steps returns empty list when no transformer."""
         # Arrange
-        X = np.zeros((5, 2))
+        rng = np.random.default_rng(42)
+        X = rng.random((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
         inspector = ConcreteInspector(model=model, X_train=X)
@@ -719,7 +819,8 @@ class TestBaseInspectorMethods:
     def test_get_preprocessed_feature_names_with_names_no_mask(self):
         """Test _get_preprocessed_feature_names returns feature names when provided."""
         # Arrange
-        X = np.zeros((5, 2))
+        rng = np.random.default_rng(42)
+        X = rng.random((5, 2))
         model = PCA(n_components=2)
         model.fit(X)
         feature_names = ["f1", "f2"]
