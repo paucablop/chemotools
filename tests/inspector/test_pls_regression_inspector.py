@@ -496,7 +496,7 @@ class TestPLSSpecificDiagnostics:
         stats = inspector._get_regression_stats("train", 0, leverage_detector)
 
         # Assert
-        expected_keys = {"X", "y", "y_true", "y_pred", "studentized", "leverages"}
+        expected_keys = {"X", "y_true", "y_pred", "studentized", "leverages"}
         assert set(stats.keys()) == expected_keys
 
     def test_get_regression_stats_values_have_correct_shapes(
@@ -514,7 +514,6 @@ class TestPLSSpecificDiagnostics:
 
         # Assert
         assert stats["X"].shape[0] == n_samples
-        assert len(stats["y"]) == n_samples
         assert len(stats["y_true"]) == n_samples
         assert len(stats["y_pred"]) == n_samples
         assert len(stats["studentized"]) == n_samples
@@ -535,7 +534,7 @@ class TestPLSSpecificDiagnostics:
 
         # Assert
         assert stats["X"].shape[0] == len(X_test)
-        assert len(stats["y"]) == len(y_test)
+        assert len(stats["y_true"]) == len(y_test)
 
 
 class TestPLSRegressionInspectorFigureCleanup:

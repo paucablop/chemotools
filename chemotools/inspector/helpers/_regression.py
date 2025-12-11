@@ -65,10 +65,11 @@ def create_predicted_vs_actual_plot(
         dataset_name, data = list(datasets_data.items())[0]
         y_true = data["y_true"]
         y_pred = data["y_pred"]
-        y = data.get("y")
         X = data.get("X")
 
-        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
+        color_values = prepare_color_values(
+            color_by, dataset_name, y_true, y_true.shape[0]
+        )
 
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -81,7 +82,7 @@ def create_predicted_vs_actual_plot(
         pred_actual_plot.render(ax=ax)
 
         # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        labels = prepare_annotations(annotate_by, dataset_name, X, y_true)
         if labels is not None:
             annotate_points(
                 ax,
@@ -108,7 +109,6 @@ def create_predicted_vs_actual_plot(
     for i, (dataset_name, data) in enumerate(datasets_data.items()):
         y_true = data["y_true"]
         y_pred = data["y_pred"]
-        y = data.get("y")
         X = data.get("X")
 
         color = DATASET_COLORS.get(dataset_name, "gray")
@@ -127,7 +127,7 @@ def create_predicted_vs_actual_plot(
         pred_actual_plot.render(ax=ax)
 
         # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        labels = prepare_annotations(annotate_by, dataset_name, X, y_true)
         if labels is not None:
             annotate_points(
                 ax,
@@ -188,10 +188,11 @@ def create_y_residual_plot(
         dataset_name, data = list(datasets_data.items())[0]
         y_true = data["y_true"]
         y_pred = data["y_pred"]
-        y = data.get("y")
         X = data.get("X")
 
-        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
+        color_values = prepare_color_values(
+            color_by, dataset_name, y_true, y_true.shape[0]
+        )
         residuals = y_true - y_pred
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -206,7 +207,7 @@ def create_y_residual_plot(
         residuals_plot.render(ax=ax)
 
         # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        labels = prepare_annotations(annotate_by, dataset_name, X, y_true)
         if labels is not None:
             annotate_points(
                 ax,
@@ -239,10 +240,11 @@ def create_y_residual_plot(
     for ax, (dataset_name, data) in zip(axes, datasets_data.items()):
         y_true = data["y_true"]
         y_pred = data["y_pred"]
-        y = data.get("y")
         X = data.get("X")
 
-        color_values = prepare_color_values(color_by, dataset_name, y, y_true.shape[0])
+        color_values = prepare_color_values(
+            color_by, dataset_name, y_true, y_true.shape[0]
+        )
         residuals = y_true - y_pred
 
         residuals_plot = YResidualsPlot(
@@ -255,7 +257,7 @@ def create_y_residual_plot(
         residuals_plot.render(ax=ax)
 
         # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
+        labels = prepare_annotations(annotate_by, dataset_name, X, y_true)
         if labels is not None:
             annotate_points(
                 ax,
@@ -420,7 +422,6 @@ def create_regression_distances_plot(
     y_true: np.ndarray,
     leverage_detector,
     student_detector,
-    y: Optional[np.ndarray] = None,
     color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     figsize: Tuple[float, float] = (10, 6),
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
@@ -436,13 +437,11 @@ def create_regression_distances_plot(
     X : np.ndarray
         Training data features.
     y_true : np.ndarray
-        True target values.
+        True target values (used for coloring and annotations).
     leverage_detector : Leverage
         Fitted leverage detector.
     student_detector : StudentizedResiduals
         Fitted studentized residuals detector.
-    y : np.ndarray, optional
-        Target values for coloring (if different from y_true or for multi-output).
     color_by : str or dict, optional
         Coloring specification.
     figsize : Tuple[float, float]
@@ -467,7 +466,9 @@ def create_regression_distances_plot(
     # This plot is specifically for training data diagnostics
     dataset_name = "train"
 
-    color_values = prepare_color_values(color_by, dataset_name, y, leverages.shape[0])
+    color_values = prepare_color_values(
+        color_by, dataset_name, y_true, leverages.shape[0]
+    )
 
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -482,7 +483,7 @@ def create_regression_distances_plot(
     distances_plot.render(ax=ax)
 
     # Add annotations if requested
-    labels = prepare_annotations(annotate_by, dataset_name, X, y)
+    labels = prepare_annotations(annotate_by, dataset_name, X, y_true)
     if labels is not None:
         annotate_points(
             ax,

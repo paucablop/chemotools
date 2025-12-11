@@ -275,7 +275,6 @@ class PLSRegressionInspector(
 
         return {
             "X": X,
-            "y": y_true_sliced,
             "y_true": y_true_sliced,
             "y_pred": y_pred_sliced,
             "studentized": studentized,
@@ -827,7 +826,6 @@ class PLSRegressionInspector(
         figures["distances_leverage_studentized"] = create_regression_distances_plot(
             X=train_stats["X"],
             y_true=train_stats["y_true"],
-            y=train_stats.get("y"),
             leverage_detector=leverage_detector,
             student_detector=student_detector,
             color_by=separated_color_by,

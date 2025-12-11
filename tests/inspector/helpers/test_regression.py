@@ -326,7 +326,6 @@ class TestCreateRegressionDistancesPlot:
         # Arrange
         leverage_detector, student_detector = sample_detectors
         X = sample_regression_data["X"]
-        y = sample_regression_data["y"]
         y_true = sample_regression_data["y_true"]
 
         color_by = None
@@ -336,7 +335,6 @@ class TestCreateRegressionDistancesPlot:
         fig = create_regression_distances_plot(
             X=X,
             y_true=y_true,
-            y=y,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
             color_by=color_by,
@@ -355,7 +353,6 @@ class TestCreateRegressionDistancesPlot:
         # Arrange
         leverage_detector, student_detector = sample_detectors
         X = sample_regression_data["X"]
-        y = sample_regression_data["y"]
         y_true = sample_regression_data["y_true"]
 
         color_by = None
@@ -365,7 +362,6 @@ class TestCreateRegressionDistancesPlot:
         fig = create_regression_distances_plot(
             X=X,
             y_true=y_true,
-            y=y,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
             color_by=color_by,
