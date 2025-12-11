@@ -311,7 +311,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
         ] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
-        color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        color_mode: Literal["continuous", "categorical"] = "continuous",
         **kwargs,
     ) -> Dict[str, Figure]:
         """Create all diagnostic plots for the PCA model.
@@ -393,6 +393,12 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         >>> figs['scores_1'].savefig('scores_pc1_pc2.png')
         >>> figs['loadings'].savefig('loadings.png')
         """
+        # Validate color_mode
+        if color_mode not in ["continuous", "categorical"]:
+            raise ValueError(
+                f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
+            )
+
         # Generate smart defaults based on number of components
         if components_scores is None:
             components_scores = get_default_scores_components(self.nr_components)

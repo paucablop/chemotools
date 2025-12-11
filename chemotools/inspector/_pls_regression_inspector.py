@@ -404,7 +404,7 @@ class PLSRegressionInspector(
             Union[str, Dict[str, np.ndarray], Sequence, np.ndarray]
         ] = None,
         plot_config: Optional[InspectorPlotConfig] = None,
-        color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        color_mode: Literal["continuous", "categorical"] = "continuous",
         target_index: int = 0,
         **kwargs,
     ) -> Dict[str, matplotlib.figure.Figure]:
@@ -481,7 +481,7 @@ class PLSRegressionInspector(
             )
 
         # Validate color_mode
-        if color_mode is not None and color_mode not in ["continuous", "categorical"]:
+        if color_mode not in ["continuous", "categorical"]:
             raise ValueError(
                 f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
             )
@@ -524,9 +524,6 @@ class PLSRegressionInspector(
         separated_color_by = color_by
         if separated_color_by is None:
             separated_color_by = "y"
-
-        # Resolve color_mode for helpers that require a non-None value
-        effective_color_mode = color_mode if color_mode is not None else "continuous"
 
         xlabel = get_xlabel_for_features(self.feature_names is not None)
         preprocessed_x_axis = self._get_preprocessed_x_axis()
@@ -662,7 +659,7 @@ class PLSRegressionInspector(
             annotate_by=annotate_by,
             figsize=config.scores_figsize,
             component_label=self.component_label,
-            color_mode=effective_color_mode,
+            color_mode=color_mode,
         )
         figures.update(x_y_scores_figures)
 
@@ -724,7 +721,7 @@ class PLSRegressionInspector(
             figsize=config.distances_figsize,
             q_residuals_detector=q_detector,
             annotate_by=annotate_by,
-            color_mode=effective_color_mode,
+            color_mode=color_mode,
         )
 
         # Leverage vs Studentized residuals
@@ -743,7 +740,7 @@ class PLSRegressionInspector(
             color_by=color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
-            color_mode=effective_color_mode,
+            color_mode=color_mode,
         )
 
         # ------------------------------------------------------------------
