@@ -664,19 +664,23 @@ class PLSRegressionInspector(
         figures.update(x_y_scores_figures)
 
         # ------------------------------------------------------------------
-        # Distance plots (Hotelling T², Q residuals, leverage, studentized)
+        # Latent Variable Distances (Hotelling T² vs Q residuals)
         # ------------------------------------------------------------------
         # Fit detectors once on training data for consistent limits and efficiency
         X_train, y_train_full = self._get_raw_data("train")
+
         # Validated in __init__, but needed for type narrowing :/
         assert y_train_full is not None, "y_train is required for PLS inspection"
 
+        # Fit the Hotelling T²
         hotelling_detector = HotellingT2(self.model, confidence=self.confidence)
         hotelling_detector.fit(X_train)
 
+        # Fit the Q residuals
         q_detector = QResiduals(self.model, confidence=self.confidence)
         q_detector.fit(X_train)
 
+        # Q residuals vs Hotelling T² plot
         figures["distances_hotelling_q"] = self.create_latent_distance_figure(
             dataset=dataset,
             color_by=color_by,
@@ -687,20 +691,18 @@ class PLSRegressionInspector(
             q_residuals_detector=q_detector,
         )
 
-        # Prepare leverage and studentized detectors
+        # ------------------------------------------------------------------
+        # Regression Diagnostics Setup
+        # ------------------------------------------------------------------
+        # Prepare leverage detector (needed for stats)
         leverage_detector = Leverage(self.model, confidence=self.confidence)
         leverage_detector.fit(X_train)
 
-        # Calculate studentized residuals for training data to determine limit
-        # We use the helper to get training stats, which includes studentized residuals
+        # Calculate stats (needed for all regression plots)
+        # We always calculate train stats to determine limits (e.g. studentized)
         train_stats = self._get_regression_stats(
             "train", target_index, leverage_detector
         )
-        studentized_train = train_stats["studentized"]
-        student_limit = np.percentile(np.abs(studentized_train), self.confidence * 100)
-
-        student_detector = StudentizedResiduals(self.model, confidence=self.confidence)
-        student_detector.critical_value_ = student_limit
 
         # Prepare data for regression diagnostics
         datasets_data: Dict[str, Dict[str, Any]] = {}
@@ -712,25 +714,21 @@ class PLSRegressionInspector(
                     ds, target_index, leverage_detector
                 )
 
-        # Q residuals vs Y residuals
-        figures["distances_q_y_residuals"] = _latent_plots.create_q_vs_y_residuals_plot(
-            datasets_data=datasets_data,
-            model=self.model,
-            confidence=self.confidence,
-            color_by=color_by,
-            figsize=config.distances_figsize,
-            q_residuals_detector=q_detector,
-            annotate_by=annotate_by,
-            color_mode=color_mode,
-        )
+        # ------------------------------------------------------------------
+        # Regression Distances: Leverage vs Studentized
+        # ------------------------------------------------------------------
+        # Calculate studentized residuals for training data to determine limit
+        studentized_train = train_stats["studentized"]
+        student_limit = np.percentile(np.abs(studentized_train), self.confidence * 100)
 
-        # Leverage vs Studentized residuals
+        student_detector = StudentizedResiduals(self.model, confidence=self.confidence)
+        student_detector.critical_value_ = student_limit
+
         # Always plot training data for this diagnostic plot
         if "train" in datasets_data:
             train_data_for_plot = {"train": datasets_data["train"]}
         else:
             # Reuses the same logic, no duplication
-            # We already calculated train_stats above for the limit
             train_data_for_plot = {"train": train_stats}
 
         figures["distances_leverage_studentized"] = create_regression_distances_plot(
@@ -739,6 +737,20 @@ class PLSRegressionInspector(
             student_detector=student_detector,
             color_by=color_by,
             figsize=config.distances_figsize,
+            annotate_by=annotate_by,
+            color_mode=color_mode,
+        )
+
+        # ------------------------------------------------------------------
+        # Regression Distances: Q vs Y residuals
+        # ------------------------------------------------------------------
+        figures["distances_q_y_residuals"] = _latent_plots.create_q_vs_y_residuals_plot(
+            datasets_data=datasets_data,
+            model=self.model,
+            confidence=self.confidence,
+            color_by=color_by,
+            figsize=config.distances_figsize,
+            q_residuals_detector=q_detector,
             annotate_by=annotate_by,
             color_mode=color_mode,
         )
