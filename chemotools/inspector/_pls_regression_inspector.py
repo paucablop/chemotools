@@ -726,17 +726,14 @@ class PLSRegressionInspector(
         student_detector.critical_value_ = student_limit
 
         # Always plot training data for this diagnostic plot
-        if "train" in datasets_data:
-            train_data_for_plot = {"train": datasets_data["train"]}
-        else:
-            # Reuses the same logic, no duplication
-            train_data_for_plot = {"train": train_stats}
-
+        # We extract the training data directly from train_stats
         figures["distances_leverage_studentized"] = create_regression_distances_plot(
-            datasets_data=train_data_for_plot,
+            X=train_stats["X"],
+            y_true=train_stats["y_true"],
+            y=train_stats.get("y"),
             leverage_detector=leverage_detector,
             student_detector=student_detector,
-            color_by=color_by,
+            color_by=separated_color_by,
             figsize=config.distances_figsize,
             annotate_by=annotate_by,
             color_mode=color_mode,

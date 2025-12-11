@@ -416,32 +416,37 @@ def create_residual_distribution_plot(
 
 
 def create_regression_distances_plot(
-    datasets_data: Dict[str, Dict[str, np.ndarray]],
+    X: np.ndarray,
+    y_true: np.ndarray,
     leverage_detector,
     student_detector,
-    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
-    figsize: Tuple[float, float],
+    y: Optional[np.ndarray] = None,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
+    figsize: Tuple[float, float] = (10, 6),
     annotate_by: Optional[Union[str, Dict[str, np.ndarray]]] = None,
     color_mode: Literal["continuous", "categorical"] = "continuous",
 ) -> Figure:
-    """Create regression diagnostic distances plot for one or multiple datasets.
+    """Create regression diagnostic distances plot for training data.
 
     Creates a plot of Leverage vs Studentized Residuals with confidence limits.
     This helps identify influential points and outliers in regression models.
-    Handles both single and multi-dataset cases internally.
 
     Parameters
     ----------
-    datasets_data : Dict[str, Dict[str, np.ndarray]]
-        Dictionary mapping dataset names to dicts with 'X', 'y', 'y_true', 'y_pred' keys
+    X : np.ndarray
+        Training data features.
+    y_true : np.ndarray
+        True target values.
     leverage_detector : Leverage
-        Fitted leverage detector
+        Fitted leverage detector.
     student_detector : StudentizedResiduals
-        Fitted studentized residuals detector
+        Fitted studentized residuals detector.
+    y : np.ndarray, optional
+        Target values for coloring (if different from y_true or for multi-output).
     color_by : str or dict, optional
-        Coloring specification
+        Coloring specification.
     figsize : Tuple[float, float]
-        Figure size
+        Figure size.
     annotate_by : str or dict, optional
         Annotations for plot points.
     color_mode : Literal["continuous", "categorical"], default="continuous"
@@ -450,128 +455,45 @@ def create_regression_distances_plot(
     Returns
     -------
     Figure
-        Matplotlib figure with regression distances plot
+        Matplotlib figure with regression distances plot.
     """
-    n_datasets = len(datasets_data)
-
     # Get confidence limits from detectors
     leverage_limit = leverage_detector.critical_value_
     student_limit = student_detector.critical_value_
 
-    if n_datasets == 1:
-        # Single dataset - single plot with optional y-coloring
-        dataset_name, data = list(datasets_data.items())[0]
-        X = data["X"]
-        y = data.get("y")
-        y_true = data["y_true"]
+    leverages = leverage_detector.predict_residuals(X)
+    studentized = student_detector.predict_residuals(X, y_true)
 
-        leverages = leverage_detector.predict_residuals(X)
-        studentized = student_detector.predict_residuals(X, y_true)
+    # This plot is specifically for training data diagnostics
+    dataset_name = "train"
 
-        color_values = prepare_color_values(
-            color_by, dataset_name, y, leverages.shape[0]
-        )
+    color_values = prepare_color_values(color_by, dataset_name, y, leverages.shape[0])
 
-        fig, ax = plt.subplots(figsize=figsize)
-
-        # Create distances plot
-        distances_plot = DistancesPlot(
-            y=studentized,
-            x=leverages,
-            color_by=color_values,
-            confidence_lines=(leverage_limit, student_limit),
-            color_mode=color_mode,
-        )
-        distances_plot.render(ax=ax)
-
-        # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
-        if labels is not None:
-            annotate_points(
-                ax,
-                leverages,
-                studentized,
-                labels,
-                fontsize=8,
-                alpha=0.7,
-                xytext=(3, 3),
-                textcoords="offset points",
-            )
-
-        if student_limit is not None:
-            negative_limit = -abs(student_limit)
-            ax.axhline(
-                y=negative_limit,
-                color="red",
-                linestyle="--",
-                linewidth=1,
-                alpha=0.7,
-            )
-
-        ax.set_xlabel("Leverage", fontsize=10)
-        ax.set_ylabel("Studentized Residuals", fontsize=10)
-        ax.set_title(
-            f"Regression Distances: Leverage vs Studentized Residuals ({dataset_name})",
-            fontsize=12,
-            fontweight="bold",
-        )
-        ax.grid(alpha=0.3)
-        plt.tight_layout()
-
-        return fig
-
-    # Multiple datasets - overlay on single plot, color by dataset
     fig, ax = plt.subplots(figsize=figsize)
 
-    # Plot each dataset
-    for i, (dataset_name, data) in enumerate(datasets_data.items()):
-        X = data["X"]
-        y_true = data["y_true"]
-        y = data.get("y")
+    # Create distances plot
+    distances_plot = DistancesPlot(
+        y=studentized,
+        x=leverages,
+        color_by=color_values,
+        confidence_lines=(leverage_limit, student_limit),
+        color_mode=color_mode,
+    )
+    distances_plot.render(ax=ax)
 
-        # Use pre-calculated values if available, otherwise calculate them
-        if "leverages" in data:
-            leverages = data["leverages"]
-        else:
-            leverages = leverage_detector.predict_residuals(X)
-
-        if "studentized" in data:
-            studentized = data["studentized"]
-        else:
-            studentized = student_detector.predict_residuals(X, y_true)
-
-        color = DATASET_COLORS.get(dataset_name, "gray")
-        marker = DATASET_MARKERS.get(dataset_name, "o")
-
-        # Create distances plot
-        # Add confidence lines only for the first dataset (or training set)
-        # Here we just add them once for simplicity
-        should_add_lines = i == 0
-        confidence_lines = (leverage_limit, student_limit) if should_add_lines else None
-
-        distances_plot = DistancesPlot(
-            y=studentized,
-            x=leverages,
-            label=dataset_name.capitalize(),
-            color=color,
-            marker=marker,
-            confidence_lines=confidence_lines,
+    # Add annotations if requested
+    labels = prepare_annotations(annotate_by, dataset_name, X, y)
+    if labels is not None:
+        annotate_points(
+            ax,
+            leverages,
+            studentized,
+            labels,
+            fontsize=8,
+            alpha=0.7,
+            xytext=(3, 3),
+            textcoords="offset points",
         )
-        distances_plot.render(ax=ax)
-
-        # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, X, y)
-        if labels is not None:
-            annotate_points(
-                ax,
-                leverages,
-                studentized,
-                labels,
-                fontsize=8,
-                alpha=0.7,
-                xytext=(3, 3),
-                textcoords="offset points",
-            )
 
     if student_limit is not None:
         negative_limit = -abs(student_limit)
@@ -590,7 +512,6 @@ def create_regression_distances_plot(
         fontsize=12,
         fontweight="bold",
     )
-    ax.legend(loc="best")
     ax.grid(alpha=0.3)
     plt.tight_layout()
 

@@ -325,20 +325,18 @@ class TestCreateRegressionDistancesPlot:
         """Test regression distances plot for single dataset."""
         # Arrange
         leverage_detector, student_detector = sample_detectors
-        datasets_data = {
-            "train": {
-                "X": sample_regression_data["X"],
-                "y": sample_regression_data["y"],
-                "y_true": sample_regression_data["y_true"],
-                "y_pred": sample_regression_data["y_pred"],
-            }
-        }
+        X = sample_regression_data["X"]
+        y = sample_regression_data["y"]
+        y_true = sample_regression_data["y_true"]
+
         color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_regression_distances_plot(
-            datasets_data=datasets_data,
+            X=X,
+            y_true=y_true,
+            y=y,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
             color_by=color_by,
@@ -352,61 +350,22 @@ class TestCreateRegressionDistancesPlot:
         # Cleanup
         plt.close(fig)
 
-    def test_multi_dataset(self, sample_regression_data, sample_detectors):
-        """Test regression distances plot for multiple datasets."""
-        # Arrange
-        leverage_detector, student_detector = sample_detectors
-        datasets_data = {
-            "train": {
-                "X": sample_regression_data["X"],
-                "y": sample_regression_data["y"],
-                "y_true": sample_regression_data["y_true"],
-                "y_pred": sample_regression_data["y_pred"],
-            },
-            "test": {
-                "X": sample_regression_data["X"][:30],
-                "y": sample_regression_data["y"][:30],
-                "y_true": sample_regression_data["y_true"][:30],
-                "y_pred": sample_regression_data["y_pred"][:30],
-            },
-        }
-        color_by = None
-        figsize = (6, 6)
-
-        # Act
-        fig = create_regression_distances_plot(
-            datasets_data=datasets_data,
-            leverage_detector=leverage_detector,
-            student_detector=student_detector,
-            color_by=color_by,
-            figsize=figsize,
-        )
-
-        # Assert
-        assert fig is not None
-        assert len(fig.axes) == 1  # Overlaid on same axes
-
-        # Cleanup
-        plt.close(fig)
-
     def test_uses_distances_plot_class(self, sample_regression_data, sample_detectors):
         """Test that the function uses DistancesPlot class."""
         # Arrange
         leverage_detector, student_detector = sample_detectors
-        datasets_data = {
-            "train": {
-                "X": sample_regression_data["X"],
-                "y": sample_regression_data["y"],
-                "y_true": sample_regression_data["y_true"],
-                "y_pred": sample_regression_data["y_pred"],
-            }
-        }
+        X = sample_regression_data["X"]
+        y = sample_regression_data["y"]
+        y_true = sample_regression_data["y_true"]
+
         color_by = None
         figsize = (6, 6)
 
         # Act
         fig = create_regression_distances_plot(
-            datasets_data=datasets_data,
+            X=X,
+            y_true=y_true,
+            y=y,
             leverage_detector=leverage_detector,
             student_detector=student_detector,
             color_by=color_by,
