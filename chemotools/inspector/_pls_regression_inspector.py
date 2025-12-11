@@ -187,6 +187,100 @@ class PLSRegressionInspector(
 
         self._x_scores_cache: Dict[str, np.ndarray] = {}
         self._y_scores_cache: Dict[str, np.ndarray] = {}
+        self._leverage_detector: Optional[Leverage] = None
+        self._studentized_detector: Optional[StudentizedResiduals] = None
+
+    # ==================================================================================
+    # Properties (PLS-specific)
+    # ==================================================================================
+
+    @property
+    def leverage_detector(self) -> Leverage:
+        """Return a fitted leverage detector cached for reuse."""
+        if self._leverage_detector is None:
+            detector = Leverage(self.model, confidence=self.confidence)
+            X_train, y_train = self._get_raw_data("train")
+            detector.fit(X_train, y_train)
+            self._leverage_detector = detector
+        return self._leverage_detector
+
+    @property
+    def studentized_detector(self) -> StudentizedResiduals:
+        """Return a fitted studentized residuals detector cached for reuse."""
+        if self._studentized_detector is None:
+            detector = StudentizedResiduals(self.model, confidence=self.confidence)
+            X_train, y_train = self._get_raw_data("train")
+            detector.fit(X_train, y_train)
+            self._studentized_detector = detector
+        return self._studentized_detector
+
+    # ==================================================================================
+    # Private Methods (PLS-specific)
+    # ==================================================================================
+
+    def _get_regression_stats(
+        self,
+        dataset: str,
+        target_index: int,
+        leverage_detector: Leverage,
+    ) -> Dict[str, Any]:
+        """Calculate regression statistics for a single dataset.
+
+        This method computes leverage and studentized residuals which require
+        the latent space representation from PLS, making it PLS-specific.
+
+        Parameters
+        ----------
+        dataset : str
+            Dataset name ('train', 'test', or 'val')
+        target_index : int
+            Index of the target variable for multi-target PLS
+        leverage_detector : Leverage
+            Fitted leverage detector
+
+        Returns
+        -------
+        dict
+            Dictionary containing X, y, y_true, y_pred, studentized residuals,
+            and leverages for the specified dataset
+        """
+        from chemotools.outliers._studentized_residuals import (
+            calculate_studentized_residuals,
+        )
+
+        X, y_true = self._get_raw_data(dataset)
+        assert y_true is not None, f"y data is required for dataset {dataset}"
+        y_pred = self._get_predictions(dataset)
+
+        # Slice Y data for the specific target
+        if y_true.ndim > 1:
+            y_true_sliced = y_true[:, target_index]
+        else:
+            y_true_sliced = y_true
+
+        if y_pred.ndim > 1:
+            y_pred_sliced = y_pred[:, target_index]
+        else:
+            y_pred_sliced = y_pred
+
+        # Calculate studentized residuals for the specific target
+        y_res = y_true_sliced - y_pred_sliced
+        if y_res.ndim == 1:
+            y_res = y_res.reshape(-1, 1)
+
+        studentized = calculate_studentized_residuals(
+            self.estimator, self._get_preprocessed_data(dataset), y_res
+        )
+        leverages = leverage_detector.predict_residuals(X)
+
+        return {
+            "X": X,
+            "y": y_true_sliced,
+            "y_true": y_true_sliced,
+            "y_pred": y_pred_sliced,
+            "studentized": studentized,
+            "leverages": leverages,
+        }
 
     # ==================================================================================
     # Public Methods

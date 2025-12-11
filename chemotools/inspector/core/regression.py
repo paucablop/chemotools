@@ -7,8 +7,6 @@ from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING, Union, Sequence
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 
-from chemotools.outliers import Leverage, StudentizedResiduals
-from chemotools.outliers._studentized_residuals import calculate_studentized_residuals
 from chemotools.inspector.helpers import _regression as _regression_plots
 from .utils import normalize_datasets
 from .summaries import RegressionMetrics, RegressionSummary
@@ -57,8 +55,6 @@ class RegressionMixin:
         self._rmse_cache: Dict[str, float] = {}
         self._r2_cache: Dict[str, float] = {}
         self._bias_cache: Dict[str, float] = {}
-        self._leverage_detector: Optional[Leverage] = None
-        self._studentized_detector: Optional[StudentizedResiduals] = None
 
     # ------------------------------------------------------------------
     # Properties
@@ -92,30 +88,6 @@ class RegressionMixin:
     def R2_val(self) -> Optional[float]:
         """Return R² score on validation data, or ``None`` when unavailable."""
         return self._optional_r2("val")
-
-    @property
-    def leverage_detector(self) -> Leverage:
-        """Return a fitted leverage detector cached for reuse."""
-        if self._leverage_detector is None:
-            inspector = self._regression_inspector()
-            detector = Leverage(inspector.model, confidence=inspector.confidence)
-            X_train, y_train = self._get_regression_raw_data("train")
-            detector.fit(X_train, y_train)
-            self._leverage_detector = detector
-        return self._leverage_detector
-
-    @property
-    def studentized_detector(self) -> StudentizedResiduals:
-        """Return a fitted studentized residuals detector cached for reuse."""
-        if self._studentized_detector is None:
-            inspector = self._regression_inspector()
-            detector = StudentizedResiduals(
-                inspector.model, confidence=inspector.confidence
-            )
-            X_train, y_train = self._get_regression_raw_data("train")
-            detector.fit(X_train, y_train)
-            self._studentized_detector = detector
-        return self._studentized_detector
 
     # ------------------------------------------------------------------
     # Private methods
@@ -317,46 +289,3 @@ class RegressionMixin:
             datasets_data=datasets_data,
             figsize=figsize,
         )
-
-    def _get_regression_stats(
-        self,
-        dataset: str,
-        target_index: int,
-        leverage_detector: Leverage,
-    ) -> Dict[str, Any]:
-        """Calculate regression statistics for a single dataset."""
-        inspector = self._regression_inspector()
-        X, y_true = inspector._get_raw_data(dataset)
-        # Validated in __init__, but needed for type narrowing :/
-        assert y_true is not None, f"y data is required for dataset {dataset}"
-        y_pred = inspector._get_predictions(dataset)
-
-        # Slice Y data for the specific target
-        if y_true.ndim > 1:
-            y_true_sliced = y_true[:, target_index]
-        else:
-            y_true_sliced = y_true
-
-        if y_pred.ndim > 1:
-            y_pred_sliced = y_pred[:, target_index]
-        else:
-            y_pred_sliced = y_pred
-
-        # Calculate studentized residuals for the specific target
-        y_res = y_true_sliced - y_pred_sliced
-        if y_res.ndim == 1:
-            y_res = y_res.reshape(-1, 1)
-
-        studentized = calculate_studentized_residuals(
-            inspector.estimator, inspector._get_preprocessed_data(dataset), y_res
-        )
-        leverages = leverage_detector.predict_residuals(X)
-
-        return {
-            "X": X,
-            "y": y_true_sliced,
-            "y_true": y_true_sliced,
-            "y_pred": y_pred_sliced,
-            "studentized": studentized,
-            "leverages": leverages,
-        }

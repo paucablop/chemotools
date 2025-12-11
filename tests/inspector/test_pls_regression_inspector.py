@@ -423,6 +423,121 @@ class TestRegressionDiagnostics:
             plt.close(fig)
 
 
+class TestPLSSpecificDiagnostics:
+    """Test PLS-specific diagnostics: leverage and studentized residuals."""
+
+    def test_leverage_detector_cached(self, fitted_pls, regression_data):
+        """Test that leverage detector is created once and cached."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        detector1 = inspector.leverage_detector
+        detector2 = inspector.leverage_detector
+
+        # Assert
+        assert detector1 is detector2
+
+    def test_studentized_detector_cached(self, fitted_pls, regression_data):
+        """Test that studentized residuals detector is created once and cached."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        detector1 = inspector.studentized_detector
+        detector2 = inspector.studentized_detector
+
+        # Assert
+        assert detector1 is detector2
+
+    def test_leverage_detector_fitted_on_training_data(
+        self, fitted_pls, regression_data
+    ):
+        """Test that leverage detector is fitted on training data."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        detector = inspector.leverage_detector
+        leverages = detector.predict_residuals(X_train)
+
+        # Assert
+        assert len(leverages) == len(X_train)
+        assert all(lev >= 0 for lev in leverages)  # Leverage is non-negative
+
+    def test_studentized_detector_fitted_on_training_data(
+        self, fitted_pls, regression_data
+    ):
+        """Test that studentized residuals detector is fitted on training data."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        detector = inspector.studentized_detector
+        studentized = detector.predict_residuals(X_train, y_train)
+
+        # Assert
+        assert len(studentized) == len(X_train)
+
+    def test_get_regression_stats_returns_expected_keys(
+        self, fitted_pls, regression_data
+    ):
+        """Test that _get_regression_stats returns all expected keys."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+        leverage_detector = inspector.leverage_detector
+
+        # Act
+        stats = inspector._get_regression_stats("train", 0, leverage_detector)
+
+        # Assert
+        expected_keys = {"X", "y", "y_true", "y_pred", "studentized", "leverages"}
+        assert set(stats.keys()) == expected_keys
+
+    def test_get_regression_stats_values_have_correct_shapes(
+        self, fitted_pls, regression_data
+    ):
+        """Test that _get_regression_stats returns arrays with correct shapes."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+        leverage_detector = inspector.leverage_detector
+        n_samples = len(X_train)
+
+        # Act
+        stats = inspector._get_regression_stats("train", 0, leverage_detector)
+
+        # Assert
+        assert stats["X"].shape[0] == n_samples
+        assert len(stats["y"]) == n_samples
+        assert len(stats["y_true"]) == n_samples
+        assert len(stats["y_pred"]) == n_samples
+        assert len(stats["studentized"]) == n_samples
+        assert len(stats["leverages"]) == n_samples
+
+    def test_get_regression_stats_for_test_dataset(self, fitted_pls, regression_data):
+        """Test that _get_regression_stats works for test dataset."""
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        X_test, y_test = regression_data["test"]
+        inspector = PLSRegressionInspector(
+            fitted_pls, X_train, y_train, X_test=X_test, y_test=y_test
+        )
+        leverage_detector = inspector.leverage_detector
+
+        # Act
+        stats = inspector._get_regression_stats("test", 0, leverage_detector)
+
+        # Assert
+        assert stats["X"].shape[0] == len(X_test)
+        assert len(stats["y"]) == len(y_test)
+
+
 class TestPLSRegressionInspectorFigureCleanup:
     """Test automatic figure cleanup in PLSRegressionInspector."""
 

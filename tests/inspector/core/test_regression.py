@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 from unittest.mock import MagicMock
-from numpy.testing import assert_allclose
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from matplotlib.figure import Figure
@@ -110,62 +109,6 @@ def test_predictions_are_cached(regression_setup):
     assert second_call_count == 1
 
 
-def test_detectors_are_cached(monkeypatch, regression_setup):
-    """Test that outlier detectors (Leverage, StudentizedResiduals) are created once and cached."""
-    # Arrange
-    inspector, raw_data, _ = regression_setup
-    X_train, y_train = raw_data["train"]
-
-    class FakeLeverage:
-        def __init__(self, model, confidence):
-            self.model = model
-            self.confidence = confidence
-            self.fit_calls = 0
-            self.fitted_with = None
-
-        def fit(self, X, y):
-            self.fit_calls += 1
-            self.fitted_with = (X, y)
-            return self
-
-    class FakeStudentized:
-        def __init__(self, model, confidence):
-            self.model = model
-            self.confidence = confidence
-            self.fit_calls = 0
-            self.fitted_with = None
-
-        def fit(self, X, y):
-            self.fit_calls += 1
-            self.fitted_with = (X, y)
-            return self
-
-    monkeypatch.setattr(
-        "chemotools.inspector.core.regression.Leverage",
-        FakeLeverage,
-    )
-    monkeypatch.setattr(
-        "chemotools.inspector.core.regression.StudentizedResiduals",
-        FakeStudentized,
-    )
-
-    # Act
-    leverage = inspector.leverage_detector
-    student = inspector.studentized_detector
-    leverage_again = inspector.leverage_detector
-    student_again = inspector.studentized_detector
-
-    # Assert
-    assert leverage.fit_calls == 1
-    assert student.fit_calls == 1
-    assert_allclose(leverage.fitted_with[0], X_train)
-    assert_allclose(leverage.fitted_with[1], y_train)
-    assert_allclose(student.fitted_with[0], X_train)
-    assert_allclose(student.fitted_with[1], y_train)
-    assert leverage_again is leverage
-    assert student_again is student
-
-
 def test_get_regression_raw_data_raises_value_error_when_y_is_none():
     # Arrange
     X = np.array([[1.0]])
@@ -231,35 +174,3 @@ def test_plotting_methods_smoke_test(regression_setup):
     assert isinstance(fig2, Figure)
     assert isinstance(fig3, Figure)
     assert isinstance(fig4, Figure)
-
-
-def test_get_regression_stats(regression_setup):
-    # Arrange
-    inspector, raw_data, _ = regression_setup
-    X_train, y_train = raw_data["train"]
-    dataset = "train"
-    target_index = 0
-
-    # Mock leverage detector
-    leverage_detector = MagicMock()
-    expected_leverages = np.array([0.1, 0.2, 0.3, 0.4])
-    leverage_detector.predict_residuals.return_value = expected_leverages
-
-    # Act
-    stats = inspector._get_regression_stats(dataset, target_index, leverage_detector)
-
-    # Assert
-    assert "X" in stats
-    assert "y" in stats
-    assert "y_true" in stats
-    assert "y_pred" in stats
-    assert "studentized" in stats
-    assert "leverages" in stats
-
-    assert_allclose(stats["X"], X_train)
-    assert_allclose(stats["y"], y_train)
-    assert_allclose(stats["leverages"], expected_leverages)
-
-    # Check studentized residuals calculation (indirectly via shape/type)
-    assert isinstance(stats["studentized"], np.ndarray)
-    assert len(stats["studentized"]) == len(y_train)
