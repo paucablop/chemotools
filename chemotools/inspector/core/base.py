@@ -30,38 +30,30 @@ from .utils import normalize_datasets
 ModelTypes = Union[_BasePCA, _PLS, Pipeline]
 
 
-@dataclass
+@dataclass(frozen=True)
 class InspectorDataset:
-    """Immutable container for a single dataset split used by inspectors."""
+    """Immutable container for a single dataset split used by inspectors.
+
+    This is a frozen dataclass, meaning instances cannot be modified after creation.
+    Use direct attribute access (e.g., ``dataset.X``, ``dataset.y``) to retrieve data.
+
+    Attributes
+    ----------
+    X : np.ndarray
+        Feature matrix of shape (n_samples, n_features).
+    y : np.ndarray, optional
+        Target values of shape (n_samples,) or (n_samples, n_targets).
+    labels : np.ndarray, optional
+        Sample labels for annotation purposes.
+    """
 
     X: np.ndarray
     y: Optional[np.ndarray] = None
     labels: Optional[np.ndarray] = None
 
-    def __getitem__(self, key: str):
-        if key == "X":
-            return self.X
-        if key == "y":
-            return self.y
-        if key == "labels":
-            return self.labels
-        raise KeyError(key)
-
-    def __contains__(self, key: object) -> bool:
-        return key in {"X", "y", "labels"}
-
-    def keys(self) -> Tuple[str, str, str]:
-        return ("X", "y", "labels")
-
-    def items(self):
-        for key in self.keys():
-            yield key, self[key]
-
-    def __iter__(self):
-        return iter(self.keys())
-
     @property
     def n_samples(self) -> int:
+        """Return the number of samples in the dataset."""
         return self.X.shape[0]
 
 

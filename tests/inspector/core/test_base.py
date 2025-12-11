@@ -48,7 +48,7 @@ class TestBaseInspectorInitialization:
         assert inspector.n_components_ == 2
         assert inspector.n_features_in_ == 3
         assert "train" in inspector.datasets_
-        assert np.array_equal(inspector.datasets_["train"]["X"], X)
+        assert np.array_equal(inspector.datasets_["train"].X, X)
 
     def test_init_with_fitted_pls(self, fitted_pls, dummy_data_loader):
         """Test initialization with fitted PLS model."""
@@ -63,8 +63,8 @@ class TestBaseInspectorInitialization:
         assert inspector.transformer_ is None
         assert inspector.n_components_ == 2
         assert inspector.n_features_in_ == 3
-        assert np.array_equal(inspector.datasets_["train"]["X"], X)
-        assert np.array_equal(inspector.datasets_["train"]["y"], y)
+        assert np.array_equal(inspector.datasets_["train"].X, X)
+        assert np.array_equal(inspector.datasets_["train"].y, y)
 
     def test_init_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
         """Test initialization with fitted pipeline."""
@@ -93,8 +93,8 @@ class TestBaseInspectorInitialization:
         # Assert
         assert "train" in inspector.datasets_
         assert "test" in inspector.datasets_
-        assert np.array_equal(inspector.datasets_["train"]["X"], X_train)
-        assert np.array_equal(inspector.datasets_["test"]["X"], X_test)
+        assert np.array_equal(inspector.datasets_["train"].X, X_train)
+        assert np.array_equal(inspector.datasets_["test"].X, X_test)
 
     def test_init_with_validation_data(self, fitted_pca, dummy_data_loader):
         """Test initialization with validation data."""
@@ -108,8 +108,8 @@ class TestBaseInspectorInitialization:
         # Assert
         assert "train" in inspector.datasets_
         assert "val" in inspector.datasets_
-        assert np.array_equal(inspector.datasets_["train"]["X"], X_train)
-        assert np.array_equal(inspector.datasets_["val"]["X"], X_val)
+        assert np.array_equal(inspector.datasets_["train"].X, X_train)
+        assert np.array_equal(inspector.datasets_["val"].X, X_val)
 
     def test_init_with_all_datasets(self, fitted_pls, dummy_data_loader):
         """Test initialization with all dataset splits."""
@@ -133,9 +133,9 @@ class TestBaseInspectorInitialization:
         assert "train" in inspector.datasets_
         assert "test" in inspector.datasets_
         assert "val" in inspector.datasets_
-        assert np.array_equal(inspector.datasets_["train"]["X"], X_train)
-        assert np.array_equal(inspector.datasets_["test"]["X"], X_test)
-        assert np.array_equal(inspector.datasets_["val"]["X"], X_val)
+        assert np.array_equal(inspector.datasets_["train"].X, X_train)
+        assert np.array_equal(inspector.datasets_["test"].X, X_test)
+        assert np.array_equal(inspector.datasets_["val"].X, X_val)
 
     def test_init_with_feature_names(self, fitted_pca, dummy_data_loader):
         """Test initialization with feature names."""
@@ -452,8 +452,10 @@ class TestBaseInspectorProperties:
         # Assert
         assert isinstance(inspector.datasets_, dict)
         assert "train" in inspector.datasets_
-        assert "X" in inspector.datasets_["train"]
-        assert "y" in inspector.datasets_["train"]
+        assert hasattr(inspector.datasets_["train"], "X")
+        assert hasattr(inspector.datasets_["train"], "y")
+        assert np.array_equal(inspector.datasets_["train"].X, X)
+        assert np.array_equal(inspector.datasets_["train"].y, y)
 
     def test_estimator_attribute(self, fitted_pca, dummy_data_loader):
         """Test estimator_ attribute."""
@@ -492,8 +494,8 @@ class TestBaseInspectorProperties:
 class TestInspectorDataset:
     """Tests for InspectorDataset class."""
 
-    def test_dataset_operations(self):
-        """Test basic dataset operations: keys, items, iter, n_samples."""
+    def test_dataset_attributes(self):
+        """Test basic dataset attribute access and n_samples property."""
         # Arrange
         X = np.array([[1, 2], [3, 4]])
         y = np.array([0, 1])
@@ -501,35 +503,34 @@ class TestInspectorDataset:
         dataset = InspectorDataset(X=X, y=y, labels=labels)
 
         # Act & Assert
-        # Test keys
-        assert dataset.keys() == ("X", "y", "labels")
-
-        # Test __contains__
-        assert "X" in dataset
-        assert "y" in dataset
-        assert "labels" in dataset
-        assert "invalid" not in dataset
-
-        # Test items and __iter__
-        items = dict(dataset.items())
-        assert np.array_equal(items["X"], X)
-        assert np.array_equal(items["y"], y)
-        assert np.array_equal(items["labels"], labels)
-
-        keys = list(dataset)
-        assert keys == ["X", "y", "labels"]
+        # Test direct attribute access
+        assert np.array_equal(dataset.X, X)
+        assert np.array_equal(dataset.y, y)
+        assert np.array_equal(dataset.labels, labels)
 
         # Test n_samples
         assert dataset.n_samples == 2
 
-    def test_getitem_invalid_key(self):
-        """Test __getitem__ raises KeyError for invalid key."""
+    def test_dataset_defaults(self):
+        """Test that y and labels default to None."""
         # Arrange
-        dataset = InspectorDataset(X=np.array([[1]]))
+        X = np.array([[1, 2], [3, 4]])
+        dataset = InspectorDataset(X=X)
 
         # Act & Assert
-        with pytest.raises(KeyError):
-            _ = dataset["invalid_key"]
+        assert np.array_equal(dataset.X, X)
+        assert dataset.y is None
+        assert dataset.labels is None
+
+    def test_dataset_is_frozen(self):
+        """Test that InspectorDataset is immutable (frozen dataclass)."""
+        # Arrange
+        X = np.array([[1, 2], [3, 4]])
+        dataset = InspectorDataset(X=X)
+
+        # Act & Assert
+        with pytest.raises(AttributeError, match="cannot assign"):
+            dataset.X = np.array([[5, 6]])
 
 
 class TestInspectorStateErrors:
