@@ -34,12 +34,16 @@ class SpectraPlot(BasePlot, ColoringMixin):
         Labels for each spectrum (used for legend).
     color_by : np.ndarray, optional
         Reference vector for coloring spectra. Can be:
+
         - Categorical (class labels): uses discrete colormap
         - Continuous (numeric values): uses continuous colormap
+
     colormap : str, optional
         Colormap name. Colorblind-friendly defaults:
+
         - "tab10" for categorical data (default)
         - "shap" for continuous data
+
         Other options: "plasma", "cividis", "coolwarm"
     color_mode : str, optional
         Explicitly specify coloring mode ("continuous" or "categorical").

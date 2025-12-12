@@ -19,6 +19,13 @@ For detailed documentation with examples and visual guides, see the :doc:`Method
    Smooth <smooth>
    Utilities <utils>
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Visualization & Inspection
+
+   Plotting <plotting>
+   Inspector <inspector>
+
 Quick Import Reference
 ----------------------
 
@@ -30,6 +37,8 @@ All classes can be imported directly from their respective modules:
    from chemotools.augmentation import AddNoise, BaselineShift
    from chemotools.scale import MinMaxScaler, NormScaler
    from chemotools.outliers import HotellingT2, Leverage
+   from chemotools.plotting import SpectraPlot, ScoresPlot
+   from chemotools.inspector import PCAInspector, PLSRegressionInspector
    # ... and so on
 
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"POT-Creation-Date: 2025-12-12 05:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -17,19 +17,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: ../../source/index.rst:7
 msgid "User Guide"
 msgstr "ユーザーガイド"
 
 #: ../../source/index.rst:7
-msgid "Methods"
-msgstr "手法"
-
-#: ../../source/index.rst:7
 msgid "Explore"
 msgstr "探索"
+
+#: ../../source/index.rst:7
+msgid "Methods"
+msgstr "手法"
 
 #: ../../source/index.rst:7
 msgid "Learn"
@@ -67,20 +67,25 @@ msgstr "ダウンロード数"
 msgid "DOI"
 msgstr "DOI"
 
-#: ../../source/index.rst:47
+#: ../../source/index.rst:44
+#, fuzzy
+msgid "CodeFactor"
+msgstr "コードカバレッジ"
+
+#: ../../source/index.rst:51
 msgid "Welcome to chemotools"
 msgstr "chemotoolsへようこそ"
 
-#: ../../source/index.rst:50
+#: ../../source/index.rst:54
 msgid ""
 "``chemotools`` is a **Python package for spectral analysis**, designed to"
 " integrate natively with the widely adopted ``scikit-learn`` API and the "
 "broader **Python machine learning ecosystem**."
 msgstr ""
-"``chemotools`` はスペクトル解析のためのPythonパッケージであり、広く採用されている ``scikit-learn`` APIおよび"
-"より広範なPython機械学習エコシステムとネイティブに統合するように設計されています。"
+"``chemotools`` はスペクトル解析のためのPythonパッケージであり、広く採用されている ``scikit-learn`` "
+"APIおよびより広範なPython機械学習エコシステムとネイティブに統合するように設計されています。"
 
-#: ../../source/index.rst:52
+#: ../../source/index.rst:56
 msgid ""
 "Developed after years of applying **spectroscopy** across industries, its"
 " mission is to empower **scientists and engineers** with the tools needed"
@@ -89,28 +94,27 @@ msgid ""
 "**development and deployment** of models, making it easier to "
 "**standardize workflows** and **scale chemometric solutions**."
 msgstr ""
-"さまざまな業界で長年にわたり分光法を適用してきた経験から開発されたこのツールは、"
-"科学者やエンジニアが本番環境対応のケモメトリクスモデルを構築するために必要なツールを提供することを使命としています。"
-"``chemotools`` は、モデルの開発とデプロイメントを効率化する直感的で柔軟な環境を提供し、"
-"ワークフローの標準化とケモメトリクスソリューションのスケール化を容易にします。"
+"さまざまな業界で長年にわたり分光法を適用してきた経験から開発されたこのツールは、科学者やエンジニアが本番環境対応のケモメトリクスモデルを構築するために必要なツールを提供することを使命としています。``chemotools``"
+" "
+"は、モデルの開発とデプロイメントを効率化する直感的で柔軟な環境を提供し、ワークフローの標準化とケモメトリクスソリューションのスケール化を容易にします。"
 
-#: ../../source/index.rst:54
+#: ../../source/index.rst:58
 msgid "chemotools workflow"
 msgstr "chemotoolsワークフロー"
 
-#: ../../source/index.rst:61
+#: ../../source/index.rst:65
 msgid "Start exploring"
 msgstr "探索を始める"
 
-#: ../../source/index.rst:70
+#: ../../source/index.rst:74
 msgid "Discover the environment"
 msgstr "環境を探索"
 
-#: ../../source/index.rst:81
+#: ../../source/index.rst:85
 msgid "Chemometrics tutorials"
 msgstr "ケモメトリクスのチュートリアル"
 
-#: ../../source/index.rst:92
+#: ../../source/index.rst:96
 msgid "Check out our Webinar"
 msgstr "ウェビナーをチェック"
 

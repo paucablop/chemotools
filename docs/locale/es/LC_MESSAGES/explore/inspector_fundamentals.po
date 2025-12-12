@@ -1,0 +1,675 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/inspector_fundamentals.rst:4
+msgid "Inspecting your models"
+msgstr "Inspeccionando tus modelos"
+
+#: ../../source/explore/inspector_fundamentals.rst:6
+msgid ""
+"The ``chemotools.inspector`` module provides a unified interface for "
+"model diagnostics. Instead of manually creating separate plots for "
+"scores, loadings, and outliers, the **Inspector** generates a complete "
+"diagnostic suite with a single method call."
+msgstr ""
+"El módulo ``chemotools.inspector`` proporciona una interfaz unificada "
+"para el diagnóstico de modelos. En lugar de crear manualmente gráficos "
+"separados para puntuaciones, cargas y valores atípicos, el **Inspector** "
+"genera un conjunto completo de diagnósticos con una sola llamada de "
+"método."
+
+#: ../../source/explore/inspector_fundamentals.rst:8
+msgid ""
+"All inspectors share the same API, making it intuitive to use across "
+"different model types (PCA, PLS, etc.). The inspectors support multiple "
+"datasets (training, test, validation) and offer extensive customization "
+"options for coloring, annotations, and component selection. An abstract "
+"overview of the inspectors is shown in the Figure below."
+msgstr ""
+"Todos los inspectores comparten la misma API, lo que hace intuitivo su "
+"uso con diferentes tipos de modelos (PCA, PLS, etc.). Los inspectores "
+"soportan múltiples conjuntos de datos (entrenamiento, prueba, validación)"
+" y ofrecen amplias opciones de personalización para colores, anotaciones "
+"y selección de componentes. Una visión general abstracta de los "
+"inspectores se muestra en la Figura a continuación."
+
+#: ../../source/explore/inspector_fundamentals.rst:13
+msgid ""
+"The inspector module is experimental and under active development. The "
+"API may change in future versions. We welcome your feedback! Please "
+"report issues or suggestions at: "
+"https://github.com/paucablop/chemotools/issues"
+msgstr ""
+"El módulo inspector es experimental y está en desarrollo activo. La API "
+"puede cambiar en versiones futuras. ¡Agradecemos tus comentarios! Por "
+"favor reporta problemas o sugerencias en: "
+"https://github.com/paucablop/chemotools/issues"
+
+#: ../../source/explore/inspector_fundamentals.rst:17
+msgid "Why use the Inspector?"
+msgstr "¿Por qué usar el Inspector?"
+
+#: ../../source/explore/inspector_fundamentals.rst:19
+msgid ""
+"Reduce boilerplate code, make your model flows more readable and ensure "
+"to fully understand your models:"
+msgstr ""
+"Reduce el código repetitivo, haz tus flujos de modelos más legibles y "
+"asegúrate de comprender completamente tus modelos:"
+
+#: ../../source/explore/inspector_fundamentals.rst:21
+msgid ""
+"**One-Liner Diagnostics**: Generate all standard plots (Scores, Loadings,"
+" Variance, Outliers) with ``.inspect()``."
+msgstr ""
+"**Diagnósticos en una línea**: Genera todos los gráficos estándar "
+"(Puntuaciones, Cargas, Varianza, Valores atípicos) con ``.inspect()``."
+
+#: ../../source/explore/inspector_fundamentals.rst:22
+msgid "**Unified Interface**: Consistent API for PCA and PLS models."
+msgstr "**Interfaz unificada**: API consistente para modelos PCA y PLS."
+
+#: ../../source/explore/inspector_fundamentals.rst:23
+msgid ""
+"**Multi-Dataset Support**: Easily compare Training, Test, and Validation "
+"sets on the same plots."
+msgstr ""
+"**Soporte multi-conjunto de datos**: Compara fácilmente conjuntos de "
+"Entrenamiento, Prueba y Validación en los mismos gráficos."
+
+#: ../../source/explore/inspector_fundamentals.rst:24
+msgid ""
+"**Spectra Comparison**: Compare raw vs preprocessed spectra with "
+"``.inspect_spectra()``."
+msgstr ""
+"**Comparación de espectros**: Compara espectros crudos vs preprocesados "
+"con ``.inspect_spectra()``."
+
+#: ../../source/explore/inspector_fundamentals.rst:25
+msgid ""
+"**Data Access**: Extract scores, loadings, and coefficients for custom "
+"analysis."
+msgstr ""
+"**Acceso a datos**: Extrae puntuaciones, cargas y coeficientes para "
+"análisis personalizados."
+
+#: ../../source/explore/inspector_fundamentals.rst:26
+msgid ""
+"**Interactive & Publication Ready**: Returns standard matplotlib figures "
+"that can be further customized."
+msgstr ""
+"**Interactivo y listo para publicación**: Devuelve figuras matplotlib "
+"estándar que pueden personalizarse aún más."
+
+#: ../../source/explore/inspector_fundamentals.rst:30
+msgid "Basic Usage"
+msgstr "Uso básico"
+
+#: ../../source/explore/inspector_fundamentals.rst:32
+msgid "Currently, ``chemotools`` supports inspectors for:"
+msgstr "Actualmente, ``chemotools`` soporta inspectores para:"
+
+#: ../../source/explore/inspector_fundamentals.rst:34
+msgid "**PCA**: ``PCAInspector``"
+msgstr "**PCA**: ``PCAInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:35
+msgid "**PLS Regression**: ``PLSRegressionInspector``"
+msgstr "**Regresión PLS**: ``PLSRegressionInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:37
+msgid ""
+"For the example, let's load some data and train a PCA and a PLS "
+"regression model."
+msgstr ""
+"Para el ejemplo, carguemos algunos datos y entrenemos un modelo PCA y un "
+"modelo de regresión PLS."
+
+#: ../../source/explore/inspector_fundamentals.rst:73
+msgid ""
+"Now that we have trained the models, we can inspect them using "
+"``inspector``. The core of the module is the ``.inspect()`` method, "
+"shared by all inspectors."
+msgstr ""
+"Ahora que hemos entrenado los modelos, podemos inspeccionarlos usando "
+"``inspector``. El núcleo del módulo es el método ``.inspect()``, "
+"compartido por todos los inspectores."
+
+#: ../../source/explore/inspector_fundamentals.rst:76
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects, allowing you to save or modify them"
+" individually."
+msgstr ""
+"El método ``inspect()`` devuelve un diccionario de objetos "
+"``matplotlib.figure.Figure``, permitiéndote guardarlos o modificarlos "
+"individualmente."
+
+#: ../../source/explore/inspector_fundamentals.rst:80
+msgid "Inspecting PCA Models"
+msgstr "Inspeccionando modelos PCA"
+
+#: ../../source/explore/inspector_fundamentals.rst:82
+msgid "First we take a look at the PCA model."
+msgstr "Primero echamos un vistazo al modelo PCA."
+
+#: ../../source/explore/inspector_fundamentals.rst:90
+msgid "This single command generates and displays several key diagnostic plots:"
+msgstr "Este único comando genera y muestra varios gráficos de diagnóstico clave:"
+
+#: ../../source/explore/inspector_fundamentals.rst:92
+msgid "**Explained Variance**: Helps you decide if you have enough components."
+msgstr ""
+"**Varianza explicada**: Te ayuda a decidir si tienes suficientes "
+"componentes."
+
+#: ../../source/explore/inspector_fundamentals.rst:93
+msgid "**Scores Plot**: Visualizes the sample space (PC1 vs PC2, PC2 vs PC3)."
+msgstr ""
+"**Gráfico de puntuaciones**: Visualiza el espacio de muestras (PC1 vs "
+"PC2, PC2 vs PC3)."
+
+#: ../../source/explore/inspector_fundamentals.rst:94
+msgid ""
+"**Loadings Plot**: Visualizes the feature space (what the model is "
+"looking at)."
+msgstr ""
+"**Gráfico de cargas**: Visualiza el espacio de características (lo que el"
+" modelo está observando)."
+
+#: ../../source/explore/inspector_fundamentals.rst:95
+#: ../../source/explore/inspector_fundamentals.rst:118
+msgid "**Outlier Detection**: Hotelling's T² vs Q-Residuals plot."
+msgstr ""
+"**Detección de valores atípicos**: Gráfico de T² de Hotelling vs Residuos"
+" Q."
+
+#: ../../source/explore/inspector_fundamentals.rst:101
+msgid "Inspecting PLS Regression Models"
+msgstr "Inspeccionando modelos de regresión PLS"
+
+#: ../../source/explore/inspector_fundamentals.rst:103
+msgid ""
+"The PLS Regression inspector shares the same API as the PCAInspector, "
+"making it easy to switch between them."
+msgstr ""
+"El inspector de regresión PLS comparte la misma API que PCAInspector, lo "
+"que facilita cambiar entre ellos."
+
+#: ../../source/explore/inspector_fundamentals.rst:111
+msgid "This command generates diagnostic plots tailored for PLS regression:"
+msgstr "Este comando genera gráficos de diagnóstico adaptados para regresión PLS:"
+
+#: ../../source/explore/inspector_fundamentals.rst:113
+msgid "**Explained Variance**: For both X-space and Y-space."
+msgstr "**Varianza explicada**: Para el espacio X y el espacio Y."
+
+#: ../../source/explore/inspector_fundamentals.rst:114
+msgid "**Scores Plot**: Visualizes the sample space (LV1 vs LV2)."
+msgstr ""
+"**Gráfico de puntuaciones**: Visualiza el espacio de muestras (LV1 vs "
+"LV2)."
+
+#: ../../source/explore/inspector_fundamentals.rst:115
+msgid "**X-Scores vs Y-Scores**: Correlation between latent variables."
+msgstr ""
+"**Puntuaciones X vs Puntuaciones Y**: Correlación entre variables "
+"latentes."
+
+#: ../../source/explore/inspector_fundamentals.rst:116
+msgid "**Loadings Plots**: X-loadings, X-weights, and X-rotations."
+msgstr "**Gráficos de cargas**: Cargas X, pesos X y rotaciones X."
+
+#: ../../source/explore/inspector_fundamentals.rst:117
+msgid "**Regression Coefficients**: Feature importance for prediction."
+msgstr ""
+"**Coeficientes de regresión**: Importancia de características para "
+"predicción."
+
+#: ../../source/explore/inspector_fundamentals.rst:119
+msgid "**Leverage vs Studentized Residuals**: Influential observation detection."
+msgstr ""
+"**Apalancamiento vs Residuos Studentizados**: Detección de observaciones "
+"influyentes."
+
+#: ../../source/explore/inspector_fundamentals.rst:120
+msgid "**Q-Residuals vs Y-Residuals**: Combined model fit diagnostics."
+msgstr ""
+"**Residuos Q vs Residuos Y**: Diagnósticos combinados de ajuste del "
+"modelo."
+
+#: ../../source/explore/inspector_fundamentals.rst:121
+msgid "**Predicted vs Actual**: Assess regression performance."
+msgstr "**Predicho vs Real**: Evalúa el rendimiento de la regresión."
+
+#: ../../source/explore/inspector_fundamentals.rst:122
+msgid "**Y Residuals Plot**: Identify patterns in prediction errors."
+msgstr ""
+"**Gráfico de residuos Y**: Identifica patrones en los errores de "
+"predicción."
+
+#: ../../source/explore/inspector_fundamentals.rst:123
+msgid "**Q-Q Plot**: Check normality of residuals."
+msgstr "**Gráfico Q-Q**: Verifica la normalidad de los residuos."
+
+#: ../../source/explore/inspector_fundamentals.rst:124
+msgid "**Residual Distribution**: Histogram of prediction errors."
+msgstr "**Distribución de residuos**: Histograma de errores de predicción."
+
+#: ../../source/explore/inspector_fundamentals.rst:130
+msgid "Inspecting Spectra"
+msgstr "Inspeccionando espectros"
+
+#: ../../source/explore/inspector_fundamentals.rst:132
+msgid ""
+"When your model includes preprocessing steps (e.g., a sklearn Pipeline), "
+"you can compare the raw and preprocessed spectra using the "
+"``.inspect_spectra()`` method:"
+msgstr ""
+"Cuando tu modelo incluye pasos de preprocesamiento (ej., un Pipeline de "
+"sklearn), puedes comparar los espectros crudos y preprocesados usando el "
+"método ``.inspect_spectra()``:"
+
+#: ../../source/explore/inspector_fundamentals.rst:139
+msgid "This generates two plots:"
+msgstr "Esto genera dos gráficos:"
+
+#: ../../source/explore/inspector_fundamentals.rst:141
+msgid "**Raw Spectra**: Original input data before any transformations."
+msgstr ""
+"**Espectros crudos**: Datos de entrada originales antes de cualquier "
+"transformación."
+
+#: ../../source/explore/inspector_fundamentals.rst:142
+msgid ""
+"**Preprocessed Spectra**: Data after all preprocessing steps (before the "
+"model)."
+msgstr ""
+"**Espectros preprocesados**: Datos después de todos los pasos de "
+"preprocesamiento (antes del modelo)."
+
+#: ../../source/explore/inspector_fundamentals.rst:144
+msgid ""
+"This is particularly useful in spectroscopy workflows to verify that "
+"preprocessing steps (baseline correction, derivatives, normalization) are"
+" working as expected."
+msgstr ""
+"Esto es particularmente útil en flujos de trabajo de espectroscopía para "
+"verificar que los pasos de preprocesamiento (corrección de línea base, "
+"derivadas, normalización) están funcionando como se esperaba."
+
+#: ../../source/explore/inspector_fundamentals.rst:147
+msgid ""
+"The ``inspect_spectra()`` method is only available when the model is a "
+"Pipeline with preprocessing steps. It is also automatically called by "
+"``.inspect()`` when preprocessing exists."
+msgstr ""
+"El método ``inspect_spectra()`` solo está disponible cuando el modelo es "
+"un Pipeline con pasos de preprocesamiento. También es llamado "
+"automáticamente por ``.inspect()`` cuando existe preprocesamiento."
+
+#: ../../source/explore/inspector_fundamentals.rst:151
+msgid "Customizing the Inspection"
+msgstr "Personalizando la inspección"
+
+#: ../../source/explore/inspector_fundamentals.rst:153
+msgid ""
+"The ``inspect()`` method is highly customizable. You can control which "
+"components to plot, how to color the samples, and which datasets to "
+"include."
+msgstr ""
+"El método ``inspect()`` es altamente personalizable. Puedes controlar qué"
+" componentes graficar, cómo colorear las muestras y qué conjuntos de "
+"datos incluir."
+
+#: ../../source/explore/inspector_fundamentals.rst:157
+msgid "Selecting Components"
+msgstr "Seleccionando componentes"
+
+#: ../../source/explore/inspector_fundamentals.rst:159
+msgid ""
+"You can specify which components to visualize in the scores and loadings "
+"plots."
+msgstr ""
+"Puedes especificar qué componentes visualizar en los gráficos de "
+"puntuaciones y cargas."
+
+#: ../../source/explore/inspector_fundamentals.rst:169
+msgid "The ``components_scores`` parameter accepts:"
+msgstr "El parámetro ``components_scores`` acepta:"
+
+#: ../../source/explore/inspector_fundamentals.rst:171
+msgid "**int**: Plot first N components against sample index"
+msgstr "**int**: Grafica los primeros N componentes contra el índice de muestra"
+
+#: ../../source/explore/inspector_fundamentals.rst:172
+msgid "**tuple (i, j)**: Plot component i vs component j"
+msgstr "**tuple (i, j)**: Grafica el componente i vs el componente j"
+
+#: ../../source/explore/inspector_fundamentals.rst:173
+msgid "**list**: Multiple specifications, e.g., ``[(0, 1), (1, 2)]``"
+msgstr "**list**: Múltiples especificaciones, ej., ``[(0, 1), (1, 2)]``"
+
+#: ../../source/explore/inspector_fundamentals.rst:177
+msgid "Coloring and Annotations"
+msgstr "Colores y anotaciones"
+
+#: ../../source/explore/inspector_fundamentals.rst:179
+msgid ""
+"By default, plots are colored by the target variable ``y`` (if provided)."
+" You can customize this behavior using the ``color_by`` and "
+"``annotate_by`` parameters."
+msgstr ""
+"Por defecto, los gráficos se colorean según la variable objetivo ``y`` "
+"(si se proporciona). Puedes personalizar este comportamiento usando los "
+"parámetros ``color_by`` y ``annotate_by``."
+
+#: ../../source/explore/inspector_fundamentals.rst:186
+msgid "Both parameters accept:"
+msgstr "Ambos parámetros aceptan:"
+
+#: ../../source/explore/inspector_fundamentals.rst:188
+msgid "``'y'``: Color/annotate by the target variable."
+msgstr "``'y'``: Colorear/anotar por la variable objetivo."
+
+#: ../../source/explore/inspector_fundamentals.rst:189
+msgid "``'sample_index'``: Color/annotate by sample indices."
+msgstr "``'sample_index'``: Colorear/anotar por índices de muestra."
+
+#: ../../source/explore/inspector_fundamentals.rst:190
+msgid "**array-like**: Custom values of the same length as the number of samples."
+msgstr ""
+"**array-like**: Valores personalizados de la misma longitud que el número"
+" de muestras."
+
+#: ../../source/explore/inspector_fundamentals.rst:191
+#, python-brace-format
+msgid ""
+"**dict**: Map dataset names to arrays for multi-dataset plots, e.g., "
+"``{'train': array1, 'test': array2}``."
+msgstr ""
+"**dict**: Mapea nombres de conjuntos de datos a arrays para gráficos "
+"multi-conjunto, ej., ``{'train': array1, 'test': array2}``."
+
+#: ../../source/explore/inspector_fundamentals.rst:197
+msgid "Color Mode"
+msgstr "Modo de color"
+
+#: ../../source/explore/inspector_fundamentals.rst:199
+msgid "The ``color_mode`` parameter controls how colors are applied:"
+msgstr "El parámetro ``color_mode`` controla cómo se aplican los colores:"
+
+#: ../../source/explore/inspector_fundamentals.rst:211
+msgid "Comparing Datasets"
+msgstr "Comparando conjuntos de datos"
+
+#: ../../source/explore/inspector_fundamentals.rst:213
+msgid ""
+"Another useful feature is the ability to overlay multiple datasets. This "
+"is critical to check how well the model generalizes to unseen data."
+msgstr ""
+"Otra característica útil es la capacidad de superponer múltiples "
+"conjuntos de datos. Esto es crítico para verificar qué tan bien "
+"generaliza el modelo a datos no vistos."
+
+#: ../../source/explore/inspector_fundamentals.rst:232
+msgid ""
+"This will produce plots where training, test, and validation samples are "
+"visualized together, making it easy to spot domain shifts or overfitting."
+msgstr ""
+"Esto producirá gráficos donde las muestras de entrenamiento, prueba y "
+"validación se visualizan juntas, facilitando detectar cambios de dominio "
+"o sobreajuste."
+
+#: ../../source/explore/inspector_fundamentals.rst:238
+msgid "Multi-Output PLS"
+msgstr "PLS multi-salida"
+
+#: ../../source/explore/inspector_fundamentals.rst:240
+msgid ""
+"For multi-output PLS models (multiple target variables), use the "
+"``target_index`` parameter to select which target to inspect:"
+msgstr ""
+"Para modelos PLS multi-salida (múltiples variables objetivo), usa el "
+"parámetro ``target_index`` para seleccionar qué objetivo inspeccionar:"
+
+#: ../../source/explore/inspector_fundamentals.rst:249
+msgid "Plot Configuration"
+msgstr "Configuración de gráficos"
+
+#: ../../source/explore/inspector_fundamentals.rst:251
+msgid ""
+"For fine-grained control over figure sizes, use the ``plot_config`` "
+"parameter or pass size arguments directly:"
+msgstr ""
+"Para un control detallado sobre los tamaños de figura, usa el parámetro "
+"``plot_config`` o pasa argumentos de tamaño directamente:"
+
+#: ../../source/explore/inspector_fundamentals.rst:270
+msgid "Working with Figures"
+msgstr "Trabajando con figuras"
+
+#: ../../source/explore/inspector_fundamentals.rst:272
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects. This allows you to access "
+"individual plots, customize them further, or save them to files."
+msgstr ""
+"El método ``inspect()`` devuelve un diccionario de objetos "
+"``matplotlib.figure.Figure``. Esto te permite acceder a gráficos "
+"individuales, personalizarlos aún más o guardarlos en archivos."
+
+#: ../../source/explore/inspector_fundamentals.rst:276
+msgid "Accessing Individual Plots"
+msgstr "Accediendo a gráficos individuales"
+
+#: ../../source/explore/inspector_fundamentals.rst:278
+msgid "Each figure in the returned dictionary has a descriptive key:"
+msgstr "Cada figura en el diccionario devuelto tiene una clave descriptiva:"
+
+#: ../../source/explore/inspector_fundamentals.rst:295
+msgid "Available figure keys depend on the inspector type:"
+msgstr "Las claves de figura disponibles dependen del tipo de inspector:"
+
+#: ../../source/explore/inspector_fundamentals.rst:297
+msgid "**PCAInspector:**"
+msgstr "**PCAInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:299
+msgid "``variance``: Explained variance plot"
+msgstr "``variance``: Gráfico de varianza explicada"
+
+#: ../../source/explore/inspector_fundamentals.rst:300
+msgid "``loadings``: Loadings plot"
+msgstr "``loadings``: Gráfico de cargas"
+
+#: ../../source/explore/inspector_fundamentals.rst:301
+msgid "``scores_1``, ``scores_2``, ...: Scores plots"
+msgstr "``scores_1``, ``scores_2``, ...: Gráficos de puntuaciones"
+
+#: ../../source/explore/inspector_fundamentals.rst:302
+msgid "``distances``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances``: T² de Hotelling vs Residuos Q"
+
+#: ../../source/explore/inspector_fundamentals.rst:304
+msgid "**PLSRegressionInspector:**"
+msgstr "**PLSRegressionInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:306
+msgid "``variance_x``, ``variance_y``: Explained variance plots"
+msgstr "``variance_x``, ``variance_y``: Gráficos de varianza explicada"
+
+#: ../../source/explore/inspector_fundamentals.rst:307
+msgid ""
+"``loadings_x``, ``loadings_weights``, ``loadings_rotations``: Loadings "
+"plots"
+msgstr ""
+
+#: ../../source/explore/inspector_fundamentals.rst:308
+msgid "``regression_coefficients``: Coefficient plot"
+msgstr ""
+
+#: ../../source/explore/inspector_fundamentals.rst:309
+msgid "``scores_1``, ``scores_2``, ...: X-scores plots"
+msgstr "``scores_1``, ``scores_2``, ...: Gráficos de puntuaciones X"
+
+#: ../../source/explore/inspector_fundamentals.rst:310
+msgid "``x_vs_y_scores_1``, ``x_vs_y_scores_2``, ...: X vs Y scores plots"
+msgstr ""
+"``x_vs_y_scores_1``, ``x_vs_y_scores_2``, ...: Gráficos de puntuaciones X"
+" vs Y"
+
+#: ../../source/explore/inspector_fundamentals.rst:311
+msgid "``distances_hotelling_q``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances_hotelling_q``: T² de Hotelling vs residuos Q"
+
+#: ../../source/explore/inspector_fundamentals.rst:312
+msgid "``distances_leverage_studentized``: Leverage vs Studentized Residuals"
+msgstr "``distances_leverage_studentized``: Apalancamiento vs residuos tipificados"
+
+#: ../../source/explore/inspector_fundamentals.rst:313
+msgid "``distances_q_y_residuals``: Q-Residuals vs Y-Residuals"
+msgstr "``distances_q_y_residuals``: Residuos Q vs residuos Y"
+
+#: ../../source/explore/inspector_fundamentals.rst:314
+msgid "``predicted_vs_actual``: Predicted vs Actual plot"
+msgstr "``predicted_vs_actual``: Gráfico de predicción vs valor real"
+
+#: ../../source/explore/inspector_fundamentals.rst:315
+msgid "``residuals``: Y-Residuals plot"
+msgstr "``residuals``: Gráfico de residuos Y"
+
+#: ../../source/explore/inspector_fundamentals.rst:316
+msgid "``qq_plot``: Q-Q plot"
+msgstr "``qq_plot``: Gráfico Q-Q"
+
+#: ../../source/explore/inspector_fundamentals.rst:317
+msgid "``residual_distribution``: Residual histogram"
+msgstr "``residual_distribution``: Histograma de residuos"
+
+#: ../../source/explore/inspector_fundamentals.rst:318
+msgid ""
+"``raw_spectra``, ``preprocessed_spectra``: Spectra plots (if "
+"preprocessing exists)"
+msgstr ""
+"``raw_spectra``, ``preprocessed_spectra``: Gráficos de espectros (si "
+"existe preprocesamiento)"
+
+#: ../../source/explore/inspector_fundamentals.rst:322
+msgid "Saving Figures"
+msgstr "Guardar figuras"
+
+#: ../../source/explore/inspector_fundamentals.rst:324
+msgid "You can save individual figures or all figures at once:"
+msgstr "Puede guardar figuras individuales o todas las figuras a la vez:"
+
+#: ../../source/explore/inspector_fundamentals.rst:345
+msgid "Customizing Figures"
+msgstr "Personalización de figuras"
+
+#: ../../source/explore/inspector_fundamentals.rst:347
+msgid ""
+"Since the figures are standard matplotlib objects, you can modify them "
+"after creation:"
+msgstr ""
+"Dado que las figuras son objetos estándar de matplotlib, puede "
+"modificarlas después de crearlas:"
+
+#: ../../source/explore/inspector_fundamentals.rst:369
+msgid "Accessing Model Data"
+msgstr "Acceso a los datos del modelo"
+
+#: ../../source/explore/inspector_fundamentals.rst:371
+msgid ""
+"Beyond plotting, the inspectors provide methods to extract underlying "
+"data for custom analysis."
+msgstr ""
+"Además de la generación de gráficos, los inspectores proporcionan métodos"
+" para extraer datos subyacentes para análisis personalizados."
+
+#: ../../source/explore/inspector_fundamentals.rst:375
+msgid "PCA Inspector"
+msgstr "Inspector de PCA"
+
+#: ../../source/explore/inspector_fundamentals.rst:393
+msgid "PLS Regression Inspector"
+msgstr "Inspector de regresión PLS"
+
+#: ../../source/explore/inspector_fundamentals.rst:417
+msgid "Model Summaries"
+msgstr "Resúmenes del modelo"
+
+#: ../../source/explore/inspector_fundamentals.rst:419
+msgid ""
+"The inspectors provide summary statistics of the models via the "
+"``.summary()`` method. This returns a dataclass object with a "
+"``.to_dict()`` method for easy conversion to dictionaries."
+msgstr ""
+"Los inspectores proporcionan estadísticas resumidas de los modelos "
+"mediante el método ``.summary()``. Este devuelve un objeto dataclass con "
+"un método ``.to_dict()`` para facilitar su conversión a diccionarios."
+
+#: ../../source/explore/inspector_fundamentals.rst:423
+msgid "Model Summary"
+msgstr "Resumen del modelo"
+
+#: ../../source/explore/inspector_fundamentals.rst:438
+msgid "The ``.to_dict()`` method returns:"
+msgstr "El método ``.to_dict()`` devuelve:"
+
+#: ../../source/explore/inspector_fundamentals.rst:461
+msgid "Regression Metrics"
+msgstr "Métricas de regresión"
+
+#: ../../source/explore/inspector_fundamentals.rst:463
+msgid ""
+"For PLS regression models, you can access the regression metrics directly"
+" from the summary object:"
+msgstr ""
+"Para modelos de regresión PLS, puede acceder directamente a las métricas "
+"de regresión desde el objeto de resumen:"
+
+#: ../../source/explore/inspector_fundamentals.rst:474
+msgid ""
+"The ``.metrics`` property provides a structure optimized for "
+"``pandas.DataFrame``:"
+msgstr ""
+"La propiedad ``.metrics`` proporciona una estructura optimizada para "
+"``pandas.DataFrame``:"
+
+#: ../../source/explore/inspector_fundamentals.rst:488
+msgid "See Also"
+msgstr "Véase también"
+
+#: ../../source/explore/inspector_fundamentals.rst:490
+msgid ""
+":ref:`plotting_fundamentals`: For lower-level control over individual "
+"plots."
+msgstr ""
+":ref:`plotting_fundamentals`: Para un control de bajo nivel sobre "
+"gráficos individuales."
+
+#: ../../source/explore/inspector_fundamentals.rst:491
+msgid ":doc:`/methods/outliers`: For details on the outlier detection statistics."
+msgstr ""
+":doc:`/methods/outliers`: Para detalles sobre las estadísticas de "
+"detección de valores atípicos."
+

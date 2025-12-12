@@ -59,9 +59,10 @@ class PLSRegressionInspector(
     to customize, save, and interact with individually.
 
     The inspector provides convenience methods that create multiple independent plots:
-    - inspect(): Creates all diagnostic plots (scores, loadings, explained variance,
-        regression diagnostics, and distance plots)
-    - inspect_spectra(): Creates raw and preprocessed spectra plots (if preprocessing exists)
+
+    - ``inspect()``: Creates all diagnostic plots (scores, loadings, explained variance,
+      regression diagnostics, and distance plots)
+    - ``inspect_spectra()``: Creates raw and preprocessed spectra plots (if preprocessing exists)
 
     Parameters
     ----------
@@ -515,27 +516,35 @@ class PLSRegressionInspector(
             Dataset(s) to visualize. Can be 'train', 'test', 'val', or a list.
         components_scores : int, tuple, or sequence, optional
             Components to plot for scores.
+
             - If int: plots first N components against sample index
             - If tuple (i, j): plots component i vs j
             - If sequence: plots multiple specifications
             - If None: defaults to (0, 1) and (1, 2) if enough components exist
+
         loadings_components : int or sequence of int, optional
             Components to plot for loadings.
+
             - If int: plots first N components
             - If sequence: plots specified components
             - If None: defaults to first 3 components
+
         variance_threshold : float, default=0.95
             Cumulative variance threshold for variance plots
         color_by : str or dict, optional
             Coloring specification.
+
             - "y": Color by target values (default for single dataset)
             - "sample_index": Color by sample index
             - dict: Dictionary mapping dataset names to color arrays
             - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
+
         annotate_by : str or dict, optional
             Annotations for plot points.
+
             - "sample_index": Annotate with sample indices
             - dict: Dictionary mapping dataset names to annotation arrays
+
         plot_config : InspectorPlotConfig, optional
             Configuration for plot sizes and styles
         color_mode : str, optional
@@ -549,14 +558,15 @@ class PLSRegressionInspector(
         -------
         dict
             Dictionary of matplotlib Figures with keys:
-                        - 'scores_1', 'scores_2', ...: Scores plots
-                        - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...: X-scores vs Y-scores plots (training set only)
-                        - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
-                        - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
-                        - 'variance_x', 'variance_y': Explained variance plots (when available)
-                        - 'distances_hotelling_q', 'distances_q_y_residuals', 'distances_leverage_studentized': Distance diagnostics
-                        - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
-                        - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
+
+            - 'scores_1', 'scores_2', ...: Scores plots
+            - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...: X-scores vs Y-scores plots (training set only)
+            - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
+            - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
+            - 'variance_x', 'variance_y': Explained variance plots (when available)
+            - 'distances_hotelling_q', 'distances_q_y_residuals', 'distances_leverage_studentized': Distance diagnostics
+            - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
+            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
         """
         # ------------------------------------------------------------------
         # Input Validation

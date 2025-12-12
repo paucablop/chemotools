@@ -73,6 +73,18 @@ BUTTON_TRANSLATIONS = {
             "translation": "持久化您的模型",
             "url": "persist.html",
         },
+        "Plotting fundamentals": {
+            "translation": "绘图基础",
+            "url": "plotting_fundamentals.html",
+        },
+        "Inspecting your models": {
+            "translation": "检查您的模型",
+            "url": "inspector_fundamentals.html",
+        },
+        "Sampling with Astartes": {
+            "translation": "使用 Astartes 采样",
+            "url": "astartes.html",
+        },
         # _methods/index page
         "Augmentation": {
             "translation": "数据增强",
@@ -144,6 +156,18 @@ BUTTON_TRANSLATIONS = {
             "translation": "Persistiendo tus modelos",
             "url": "persist.html",
         },
+        "Plotting fundamentals": {
+            "translation": "Fundamentos de gráficos",
+            "url": "plotting_fundamentals.html",
+        },
+        "Inspecting your models": {
+            "translation": "Inspeccionando tus modelos",
+            "url": "inspector_fundamentals.html",
+        },
+        "Sampling with Astartes": {
+            "translation": "Muestreo con Astartes",
+            "url": "astartes.html",
+        },
         # methods/index page
         "Augmentation": {
             "translation": "Aumento de datos",
@@ -214,6 +238,18 @@ BUTTON_TRANSLATIONS = {
         "Persisting your models": {
             "translation": "モデルの永続化",
             "url": "persist.html",
+        },
+        "Plotting fundamentals": {
+            "translation": "プロットの基礎",
+            "url": "plotting_fundamentals.html",
+        },
+        "Inspecting your models": {
+            "translation": "モデルの検査",
+            "url": "inspector_fundamentals.html",
+        },
+        "Sampling with Astartes": {
+            "translation": "Astartesによるサンプリング",
+            "url": "astartes.html",
         },
         # methods/index page
         "Augmentation": {

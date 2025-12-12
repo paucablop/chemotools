@@ -1,0 +1,276 @@
+#: ../../source/explore/plotting_fundamentals.rst:4
+msgid "Plotting Fundamentals"
+msgstr "Fundamentos de graficación"
+
+#: ../../source/explore/plotting_fundamentals.rst:6
+msgid ""
+"The ``chemotools.plotting`` module is designed to make visualizing "
+"spectroscopic data and chemometric models **fast**, **intuitive** and "
+"**publication-ready**. Instead of writing boilerplate ``matplotlib`` "
+"code, you can generate standard chemometric plots with just a few lines."
+msgstr "El módulo ``chemotools.plotting`` está diseñado para hacer que la visualización de datos espectroscópicos y modelos quimiométricos sea **rápida**, **intuitiva** y **lista para publicación**. En lugar de escribir código repetitivo de ``matplotlib``, puede generar gráficos quimiométricos estándar con solo unas pocas líneas."
+
+#: ../../source/explore/plotting_fundamentals.rst:9
+msgid ""
+"The plotting module is experimental and under active development. The API"
+" may change in future versions. We welcome your feedback! Please report "
+"issues or suggestions at: https://github.com/paucablop/chemotools/issues"
+msgstr "El módulo de graficación es experimental y está en desarrollo activo. La API puede cambiar en versiones futuras. Agradecemos sus comentarios. Informe problemas o sugerencias en: https://github.com/paucablop/chemotools/issues"
+
+#: ../../source/explore/plotting_fundamentals.rst:12
+msgid "Why specialized plotting?"
+msgstr "¿Por qué una graficación especializada?"
+
+#: ../../source/explore/plotting_fundamentals.rst:14
+msgid ""
+"Visualizing high-dimensional spectral data and chemometric models often "
+"requires repetitive and verbose plotting code. ``chemotools`` simplifies "
+"this by providing:"
+msgstr "Visualizar datos espectrales de alta dimensión y modelos quimiométricos suele requerir código de graficación repetitivo y extenso. ``chemotools`` simplifica esto proporcionando:"
+
+#: ../../source/explore/plotting_fundamentals.rst:16
+msgid ""
+"**Domain-specific plots**: Spectra, scores, loadings, and outlier plots "
+"out of the box."
+msgstr "**Gráficos específicos del dominio**: Espectros, puntuaciones, cargas y gráficos de valores atípicos listos para usar."
+
+#: ../../source/explore/plotting_fundamentals.rst:17
+msgid ""
+"**Interactive exploration**: Quick ``show()`` method for immediate "
+"feedback."
+msgstr "**Exploración interactiva**: Método rápido ``show()`` para retroalimentación inmediata."
+
+#: ../../source/explore/plotting_fundamentals.rst:18
+msgid ""
+"**Publication quality**: Clean, standardized aesthetics that look good in"
+" papers."
+msgstr "**Calidad de publicación**: Estética limpia y estandarizada que luce bien en artículos científicos."
+
+#: ../../source/explore/plotting_fundamentals.rst:21
+msgid "Design Philosophy"
+msgstr "Filosofía de diseño"
+
+#: ../../source/explore/plotting_fundamentals.rst:23
+msgid ""
+"The plotting module is built around a consistent **Display Protocol** "
+"designed to balance ease of use with flexibility."
+msgstr "El módulo de graficación está construido alrededor de un **Protocolo de Visualización** consistente, diseñado para equilibrar facilidad de uso y flexibilidad."
+
+#: ../../source/explore/plotting_fundamentals.rst:25
+msgid ""
+"**Object-Oriented**: Each plot type (e.g., ``SpectraPlot``, "
+"``ScoresPlot``) is a class that holds your data and configuration."
+msgstr "**Orientado a objetos**: Cada tipo de gráfico (por ejemplo, ``SpectraPlot``, ``ScoresPlot``) es una clase que contiene sus datos y configuración."
+
+#: ../../source/explore/plotting_fundamentals.rst:26
+msgid "**Two Modes of Operation**:"
+msgstr "**Dos modos de operación**:"
+
+#: ../../source/explore/plotting_fundamentals.rst:28
+msgid "``show()``: Creates a new figure instantly. Perfect for quick exploration."
+msgstr "``show()``: Crea una nueva figura al instante. Perfecto para exploración rápida."
+
+#: ../../source/explore/plotting_fundamentals.rst:30
+msgid ""
+"``render(ax)``: Draws the plot onto an existing matplotlib axis. Designed"
+" for building advanced, multi-panel figures and dashboards."
+msgstr "``render(ax)``: Dibuja el gráfico en un eje existente de matplotlib. Diseñado para construir figuras avanzadas multipanel y tableros."
+
+#: ../../source/explore/plotting_fundamentals.rst:32
+msgid ""
+"**Matplotlib Integration**: All plots return standard "
+"``matplotlib.axes.Axes`` objects, allowing you to add custom annotations,"
+" lines, or styling using familiar matplotlib commands."
+msgstr "**Integración con Matplotlib**: Todos los gráficos devuelven objetos estándar ``matplotlib.axes.Axes``, permitiéndole añadir anotaciones, líneas o estilos personalizados usando comandos conocidos de matplotlib."
+
+#: ../../source/explore/plotting_fundamentals.rst:34
+msgid "An overview of the plotting architecture is shown below:"
+msgstr "A continuación se muestra una vista general de la arquitectura de graficación:"
+
+#: ../../source/explore/plotting_fundamentals.rst:40
+msgid ""
+"Since ``chemotools`` plotting is built on top of ``matplotlib``, you can "
+"use all your favorite ``matplotlib`` commands to further customize the "
+"plots returned by ``render()`` or ``show()``."
+msgstr "Dado que la graficación de ``chemotools`` está construida sobre ``matplotlib``, puede usar todos sus comandos favoritos de ``matplotlib`` para personalizar los gráficos generados por ``render()`` o ``show()``."
+
+#: ../../source/explore/plotting_fundamentals.rst:43
+msgid "Visualizing Spectra"
+msgstr "Visualización de espectros"
+
+#: ../../source/explore/plotting_fundamentals.rst:45
+msgid ""
+"The ``SpectraPlot`` is your primary tool for exploratory data analysis. "
+"It offers flexible ways to visualize your spectral data."
+msgstr "``SpectraPlot`` es su herramienta principal para el análisis exploratorio de datos. Ofrece formas flexibles de visualizar datos espectrales."
+
+#: ../../source/explore/plotting_fundamentals.rst:47
+msgid ""
+"For this example, we will use the fermentation dataset from "
+"``chemotools``."
+msgstr "Para este ejemplo, usaremos el conjunto de datos de fermentación de ``chemotools``."
+
+#: ../../source/explore/plotting_fundamentals.rst:65
+msgid "**1. Quick Visualization**"
+msgstr "**1. Visualización rápida**"
+
+#: ../../source/explore/plotting_fundamentals.rst:67
+msgid ""
+"To quickly inspect your data, simply pass the wavenumbers and the spectra"
+" matrix. This plots all spectra in a single color."
+msgstr "Para inspeccionar rápidamente sus datos, simplemente proporcione los números de onda y la matriz de espectros. Esto grafica todos los espectros en un solo color."
+
+#: ../../source/explore/plotting_fundamentals.rst:80
+msgid ""
+"During exploration, you might want to inspect a specific region of the "
+"spectra. You can do this by specifying ``xlim`` in the ``show()`` method "
+"(see below)."
+msgstr "Durante la exploración, puede que desee inspeccionar una región específica del espectro. Puede hacerlo especificando ``xlim`` en el método ``show()`` (ver más adelante)."
+
+#: ../../source/explore/plotting_fundamentals.rst:90
+msgid ""
+"The ``SpectraPlot`` automatically handles y-axis scaling based on the "
+"data range. You can also manually set ``ylim`` to focus on specific "
+"features."
+msgstr "``SpectraPlot`` gestiona automáticamente la escala del eje y en función del rango de datos. También puede establecer manualmente ``ylim`` para centrarse en características específicas."
+
+#: ../../source/explore/plotting_fundamentals.rst:92
+msgid "**2. Coloring by Continuous Variable**"
+msgstr "**2. Coloreo por variable continua**"
+
+#: ../../source/explore/plotting_fundamentals.rst:94
+msgid ""
+"You can color spectra based on a continuous target variable (like glucose"
+" concentration) to visualize correlations."
+msgstr "Puede colorear los espectros según una variable continua objetivo (como la concentración de glucosa) para visualizar correlaciones."
+
+#: ../../source/explore/plotting_fundamentals.rst:106
+msgid "**3. Coloring by Categorical Variable**"
+msgstr "**3. Coloreo por variable categórica**"
+
+#: ../../source/explore/plotting_fundamentals.rst:108
+msgid ""
+"If you have categorical data (e.g., batches, experimental conditions), "
+"you can color by groups."
+msgstr "Si dispone de datos categóricos (por ejemplo, lotes o condiciones experimentales), puede colorear por grupos."
+
+#: ../../source/explore/plotting_fundamentals.rst:122
+msgid "Analyzing Models"
+msgstr "Análisis de modelos"
+
+#: ../../source/explore/plotting_fundamentals.rst:124
+msgid ""
+"After fitting a chemometric model (like PCA or PLS), visualizing the "
+"results is crucial for interpretation. For this section, we will use a "
+"toy PCA model fitted with the fermentation data from ``chemotools``."
+msgstr "Después de ajustar un modelo quimiométrico (como PCA o PLS), visualizar los resultados es crucial para su interpretación. Para esta sección, utilizaremos un modelo PCA de ejemplo ajustado con los datos de fermentación de ``chemotools``."
+
+#: ../../source/explore/plotting_fundamentals.rst:135
+msgid "**Explained Variance: Choosing Components**"
+msgstr "**Varianza explicada: selección de componentes**"
+
+#: ../../source/explore/plotting_fundamentals.rst:137
+msgid ""
+"Before analyzing scores and loadings, it is often useful to check how "
+"much variance each component explains. The ``ExplainedVariancePlot`` "
+"helps you decide the optimal number of components."
+msgstr "Antes de analizar las puntuaciones y las cargas, suele ser útil comprobar cuánta varianza explica cada componente. ``ExplainedVariancePlot`` le ayuda a decidir el número óptimo de componentes."
+
+#: ../../source/explore/plotting_fundamentals.rst:149
+msgid "**Scores: The Sample Space**"
+msgstr "**Puntuaciones: el espacio de muestras**"
+
+#: ../../source/explore/plotting_fundamentals.rst:151
+msgid ""
+"Use ``ScoresPlot`` to visualize how samples relate to each other. This is"
+" essential for identifying clusters, trends, or outliers. The "
+"``ScoresPlot`` is highly flexible and can be used to create composite "
+"figures to show different aspects of your model, such as confidence "
+"ellipses and sample annotations."
+msgstr "Utilice ``ScoresPlot`` para visualizar cómo se relacionan entre sí las muestras. Esto es esencial para identificar agrupamientos, tendencias o valores atípicos. ``ScoresPlot`` es altamente flexible y puede utilizarse para crear figuras compuestas que muestren distintos aspectos de su modelo, como elipses de confianza y anotaciones de muestras."
+
+#: ../../source/explore/plotting_fundamentals.rst:180
+msgid ""
+"Since we are composing two plots into a single figure, we used the "
+"``render(ax=...)`` method to draw each plot onto specific axes. This "
+"allows for precise control over layout and styling."
+msgstr "Como estamos componiendo dos gráficos en una sola figura, utilizamos el método ``render(ax=...)`` para dibujar cada gráfico en ejes específicos. Esto permite un control preciso sobre el diseño y el estilo."
+
+#: ../../source/explore/plotting_fundamentals.rst:182
+msgid "**Loadings: The Feature Space**"
+msgstr "**Cargas: el espacio de características**"
+
+#: ../../source/explore/plotting_fundamentals.rst:184
+msgid ""
+"Use ``LoadingsPlot`` to understand which spectral features contribute "
+"most to the model."
+msgstr "Utilice ``LoadingsPlot`` para entender qué características espectrales contribuyen más al modelo."
+
+#: ../../source/explore/plotting_fundamentals.rst:198
+msgid "**Outlier Detection**"
+msgstr "**Detección de valores atípicos**"
+
+#: ../../source/explore/plotting_fundamentals.rst:200
+msgid ""
+"Use ``DistancesPlot`` to identify samples that don't fit the model well, "
+"using metrics like Hotelling's T² and Q-residuals. See "
+":doc:`/methods/outliers` for more details on calculating these "
+"statistics."
+msgstr "Use ``DistancesPlot`` para identificar muestras que no se ajustan bien al modelo, utilizando métricas como T² de Hotelling y residuos Q. Consulte :doc:`/methods/outliers` para más detalles sobre el cálculo de estas estadísticas."
+
+#: ../../source/explore/plotting_fundamentals.rst:210
+msgid "Now, we are ready to visualize the results."
+msgstr "Ahora estamos listos para visualizar los resultados."
+
+#: ../../source/explore/plotting_fundamentals.rst:228
+msgid "Evaluating Predictions"
+msgstr "Evaluación de predicciones"
+
+#: ../../source/explore/plotting_fundamentals.rst:230
+msgid ""
+"For regression models, the ``PredictedVsActualPlot`` provides a standard "
+"way to assess model performance."
+msgstr "Para modelos de regresión, ``PredictedVsActualPlot`` proporciona una forma estándar de evaluar el rendimiento del modelo."
+
+#: ../../source/explore/plotting_fundamentals.rst:243
+msgid "Creating Composite Figures"
+msgstr "Creación de figuras compuestas"
+
+#: ../../source/explore/plotting_fundamentals.rst:245
+msgid ""
+"All plotting classes support a ``render(ax=...)`` method, allowing you to"
+" place plots onto existing matplotlib axes. This is powerful for creating"
+" dashboards or comparison figures."
+msgstr "Todas las clases de graficación admiten el método ``render(ax=...)``, que permite colocar gráficos en ejes existentes de matplotlib. Esto es muy útil para crear paneles o figuras comparativas."
+
+#: ../../source/explore/plotting_fundamentals.rst:266
+msgid "Other Available Plots"
+msgstr "Otros gráficos disponibles"
+
+#: ../../source/explore/plotting_fundamentals.rst:268
+msgid ""
+"The ``chemotools.plotting`` module includes other specialized plots not "
+"covered in this guide:"
+msgstr "El módulo ``chemotools.plotting`` incluye otros gráficos especializados no cubiertos en esta guía:"
+
+#: ../../source/explore/plotting_fundamentals.rst:270
+msgid ""
+"``FeatureSelectionPlot``: Visualize feature importance and selection "
+"results."
+msgstr "``FeatureSelectionPlot``: Visualiza la importancia de características y los resultados de selección."
+
+#: ../../source/explore/plotting_fundamentals.rst:271
+msgid "``QQPlot``: Check for normality of residuals."
+msgstr "``QQPlot``: Comprueba la normalidad de los residuos."
+
+#: ../../source/explore/plotting_fundamentals.rst:272
+msgid "``ResidualDistributionPlot``: Analyze the distribution of model residuals."
+msgstr "``ResidualDistributionPlot``: Analiza la distribución de los residuos del modelo."
+
+#: ../../source/explore/plotting_fundamentals.rst:273
+msgid "``YResidualsPlot``: Plot residuals against predicted values."
+msgstr "``YResidualsPlot``: Grafica los residuos frente a los valores predichos."
+
+#: ../../source/explore/plotting_fundamentals.rst:275
+msgid "Check the API reference for more details on these classes."
+msgstr "Consulte la referencia de la API para más detalles sobre estas clases."

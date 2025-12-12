@@ -1,0 +1,591 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/inspector_fundamentals.rst:4
+msgid "Inspecting your models"
+msgstr "モデルを検査する"
+
+#: ../../source/explore/inspector_fundamentals.rst:6
+msgid ""
+"The ``chemotools.inspector`` module provides a unified interface for "
+"model diagnostics. Instead of manually creating separate plots for "
+"scores, loadings, and outliers, the **Inspector** generates a complete "
+"diagnostic suite with a single method call."
+msgstr ""
+"``chemotools.inspector`` "
+"モジュールは、モデル診断のための統一インターフェースを提供します。スコア、ロードings、外れ値などのプロットを手動で作成する代わりに、**Inspector**"
+" が単一のメソッド呼び出しで完全な診断スイートを生成します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:8
+msgid ""
+"All inspectors share the same API, making it intuitive to use across "
+"different model types (PCA, PLS, etc.). The inspectors support multiple "
+"datasets (training, test, validation) and offer extensive customization "
+"options for coloring, annotations, and component selection. An abstract "
+"overview of the inspectors is shown in the Figure below."
+msgstr ""
+"すべてのインスペクターは同じ API を共有しており、異なるモデルタイプ（PCA、PLS "
+"など）間で直感的に使用できます。インスペクターは複数のデータセット（学習、テスト、検証）をサポートし、色付け、注釈、コンポーネント選択に関する幅広いカスタマイズを提供します。以下の図はインスペクターの概要を示しています。"
+
+#: ../../source/explore/inspector_fundamentals.rst:13
+msgid ""
+"The inspector module is experimental and under active development. The "
+"API may change in future versions. We welcome your feedback! Please "
+"report issues or suggestions at: "
+"https://github.com/paucablop/chemotools/issues"
+msgstr ""
+"inspector モジュールは実験的で、現在も開発が進行中です。API "
+"は将来のバージョンで変更される可能性があります。フィードバックを歓迎します。問題や提案は以下までお寄せください: "
+"https://github.com/paucablop/chemotools/issues"
+
+#: ../../source/explore/inspector_fundamentals.rst:17
+msgid "Why use the Inspector?"
+msgstr "Inspector を使用する理由"
+
+#: ../../source/explore/inspector_fundamentals.rst:19
+msgid ""
+"Reduce boilerplate code, make your model flows more readable and ensure "
+"to fully understand your models:"
+msgstr "定型コードを削減し、モデルフローをより読みやすくし、モデルを十分に理解できるようにします:"
+
+#: ../../source/explore/inspector_fundamentals.rst:21
+msgid ""
+"**One-Liner Diagnostics**: Generate all standard plots (Scores, Loadings,"
+" Variance, Outliers) with ``.inspect()``."
+msgstr "**ワンライナー診断**: ``.inspect()`` により、すべての標準プロット（スコア、ロードings、分散、外れ値）を生成します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:22
+msgid "**Unified Interface**: Consistent API for PCA and PLS models."
+msgstr "**統一インターフェース**: PCA と PLS モデルに対して一貫した API。"
+
+#: ../../source/explore/inspector_fundamentals.rst:23
+msgid ""
+"**Multi-Dataset Support**: Easily compare Training, Test, and Validation "
+"sets on the same plots."
+msgstr "**マルチデータセット対応**: 学習、テスト、検証データを同じプロット上で簡単に比較可能。"
+
+#: ../../source/explore/inspector_fundamentals.rst:24
+msgid ""
+"**Spectra Comparison**: Compare raw vs preprocessed spectra with "
+"``.inspect_spectra()``."
+msgstr "**スペクトル比較**: ``.inspect_spectra()`` により、生データと前処理済スペクトルを比較できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:25
+msgid ""
+"**Data Access**: Extract scores, loadings, and coefficients for custom "
+"analysis."
+msgstr "**データアクセス**: カスタム分析のためにスコア、ロードings、係数を抽出可能。"
+
+#: ../../source/explore/inspector_fundamentals.rst:26
+msgid ""
+"**Interactive & Publication Ready**: Returns standard matplotlib figures "
+"that can be further customized."
+msgstr "**インタラクティブ & 出版品質**: カスタマイズ可能な標準 matplotlib 図を返します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:30
+msgid "Basic Usage"
+msgstr "基本的な使用方法"
+
+#: ../../source/explore/inspector_fundamentals.rst:32
+msgid "Currently, ``chemotools`` supports inspectors for:"
+msgstr "現時点で ``chemotools`` がサポートするインスペクターは以下の通りです:"
+
+#: ../../source/explore/inspector_fundamentals.rst:34
+msgid "**PCA**: ``PCAInspector``"
+msgstr "**PCA**: ``PCAInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:35
+msgid "**PLS Regression**: ``PLSRegressionInspector``"
+msgstr "**PLS 回帰**: ``PLSRegressionInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:37
+msgid ""
+"For the example, let's load some data and train a PCA and a PLS "
+"regression model."
+msgstr "例として、いくつかのデータを読み込み、PCA と PLS 回帰モデルを学習させます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:73
+msgid ""
+"Now that we have trained the models, we can inspect them using "
+"``inspector``. The core of the module is the ``.inspect()`` method, "
+"shared by all inspectors."
+msgstr ""
+"モデルを学習させたので、``inspector`` を使って検査できます。モジュールの中心となるのは、すべてのインスペクターで共有されている "
+"``.inspect()`` メソッドです。"
+
+#: ../../source/explore/inspector_fundamentals.rst:76
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects, allowing you to save or modify them"
+" individually."
+msgstr ""
+"``inspect()`` メソッドは ``matplotlib.figure.Figure`` "
+"オブジェクトの辞書を返すため、各図を個別に保存・変更できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:80
+msgid "Inspecting PCA Models"
+msgstr "PCA モデルの検査"
+
+#: ../../source/explore/inspector_fundamentals.rst:82
+msgid "First we take a look at the PCA model."
+msgstr "まず PCA モデルを確認します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:90
+msgid "This single command generates and displays several key diagnostic plots:"
+msgstr "この一つのコマンドで、いくつかの重要な診断プロットが生成され、表示されます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:92
+msgid "**Explained Variance**: Helps you decide if you have enough components."
+msgstr "**寄与率**: コンポーネント数が十分か判断する助けとなります。"
+
+#: ../../source/explore/inspector_fundamentals.rst:93
+msgid "**Scores Plot**: Visualizes the sample space (PC1 vs PC2, PC2 vs PC3)."
+msgstr "**スコアプロット**: サンプル空間を可視化します（PC1 vs PC2、PC2 vs PC3）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:94
+msgid ""
+"**Loadings Plot**: Visualizes the feature space (what the model is "
+"looking at)."
+msgstr "**ロードings プロット**: 特徴空間（モデルが注目している特徴）を可視化します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:95
+#: ../../source/explore/inspector_fundamentals.rst:118
+msgid "**Outlier Detection**: Hotelling's T² vs Q-Residuals plot."
+msgstr "**外れ値検出**: Hotelling の T² と Q 残差のプロット。"
+
+#: ../../source/explore/inspector_fundamentals.rst:101
+msgid "Inspecting PLS Regression Models"
+msgstr "PLS 回帰モデルの検査"
+
+#: ../../source/explore/inspector_fundamentals.rst:103
+msgid ""
+"The PLS Regression inspector shares the same API as the PCAInspector, "
+"making it easy to switch between them."
+msgstr "PLS 回帰インスペクターは PCAInspector と同じ API を共有しており、両者を簡単に切り替えることができます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:111
+msgid "This command generates diagnostic plots tailored for PLS regression:"
+msgstr "このコマンドは PLS 回帰に特化した診断プロットを生成します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:113
+msgid "**Explained Variance**: For both X-space and Y-space."
+msgstr "**寄与率**: X 空間および Y 空間に対する寄与率。"
+
+#: ../../source/explore/inspector_fundamentals.rst:114
+msgid "**Scores Plot**: Visualizes the sample space (LV1 vs LV2)."
+msgstr "**スコアプロット**: サンプル空間を可視化します（LV1 vs LV2）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:115
+msgid "**X-Scores vs Y-Scores**: Correlation between latent variables."
+msgstr "**X スコア vs Y スコア**: 潜在変数間の相関を示します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:116
+msgid "**Loadings Plots**: X-loadings, X-weights, and X-rotations."
+msgstr "**ロードings プロット**: X ロードings、X 重み、X 回転を表示します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:117
+msgid "**Regression Coefficients**: Feature importance for prediction."
+msgstr "**回帰係数**: 予測における特徴量の重要度を示します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:119
+msgid "**Leverage vs Studentized Residuals**: Influential observation detection."
+msgstr "**レバレッジ vs 学生化残差**: 影響力の大きいサンプルの検出。"
+
+#: ../../source/explore/inspector_fundamentals.rst:120
+msgid "**Q-Residuals vs Y-Residuals**: Combined model fit diagnostics."
+msgstr "**Q 残差 vs Y 残差**: モデル適合性の複合診断。"
+
+#: ../../source/explore/inspector_fundamentals.rst:121
+msgid "**Predicted vs Actual**: Assess regression performance."
+msgstr "**予測値 vs 実測値**: 回帰性能の評価。"
+
+#: ../../source/explore/inspector_fundamentals.rst:122
+msgid "**Y Residuals Plot**: Identify patterns in prediction errors."
+msgstr "**Y 残差プロット**: 予測誤差のパターンを確認。"
+
+#: ../../source/explore/inspector_fundamentals.rst:123
+msgid "**Q-Q Plot**: Check normality of residuals."
+msgstr "**Q-Q プロット**: 残差の正規性を確認。"
+
+#: ../../source/explore/inspector_fundamentals.rst:124
+msgid "**Residual Distribution**: Histogram of prediction errors."
+msgstr "**残差分布**: 予測誤差のヒストグラム。"
+
+#: ../../source/explore/inspector_fundamentals.rst:130
+msgid "Inspecting Spectra"
+msgstr "スペクトルの検査"
+
+#: ../../source/explore/inspector_fundamentals.rst:132
+msgid ""
+"When your model includes preprocessing steps (e.g., a sklearn Pipeline), "
+"you can compare the raw and preprocessed spectra using the "
+"``.inspect_spectra()`` method:"
+msgstr ""
+"モデルに前処理ステップ（例: sklearn Pipeline）が含まれている場合、``.inspect_spectra()`` "
+"メソッドを使用して生スペクトルと前処理後スペクトルを比較できます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:139
+msgid "This generates two plots:"
+msgstr "これにより 2 つのプロットが生成されます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:141
+msgid "**Raw Spectra**: Original input data before any transformations."
+msgstr "**生スペクトル**: 変換前の元データ。"
+
+#: ../../source/explore/inspector_fundamentals.rst:142
+msgid ""
+"**Preprocessed Spectra**: Data after all preprocessing steps (before the "
+"model)."
+msgstr "**前処理後スペクトル**: すべての前処理ステップ後（モデル適用前）のデータ。"
+
+#: ../../source/explore/inspector_fundamentals.rst:144
+msgid ""
+"This is particularly useful in spectroscopy workflows to verify that "
+"preprocessing steps (baseline correction, derivatives, normalization) are"
+" working as expected."
+msgstr "これは、前処理ステップ（ベースライン補正、微分、正規化など）が期待通りに機能しているかを確認するため、分光分析ワークフローで特に有用です。"
+
+#: ../../source/explore/inspector_fundamentals.rst:147
+msgid ""
+"The ``inspect_spectra()`` method is only available when the model is a "
+"Pipeline with preprocessing steps. It is also automatically called by "
+"``.inspect()`` when preprocessing exists."
+msgstr ""
+"``inspect_spectra()`` メソッドは、前処理ステップを含む Pipeline "
+"モデルでのみ利用可能です。また、前処理が存在する場合は ``.inspect()`` によって自動的に呼び出されます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:151
+msgid "Customizing the Inspection"
+msgstr "検査のカスタマイズ"
+
+#: ../../source/explore/inspector_fundamentals.rst:153
+msgid ""
+"The ``inspect()`` method is highly customizable. You can control which "
+"components to plot, how to color the samples, and which datasets to "
+"include."
+msgstr ""
+"``inspect()`` "
+"メソッドは高いカスタマイズ性を備えており、プロットするコンポーネント、サンプルの色付け、含めるデータセットなどを指定できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:157
+msgid "Selecting Components"
+msgstr "コンポーネントの選択"
+
+#: ../../source/explore/inspector_fundamentals.rst:159
+msgid ""
+"You can specify which components to visualize in the scores and loadings "
+"plots."
+msgstr "スコアプロットおよびロードings プロットで可視化するコンポーネントを指定できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:169
+msgid "The ``components_scores`` parameter accepts:"
+msgstr "``components_scores`` パラメータは以下を受け付けます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:171
+msgid "**int**: Plot first N components against sample index"
+msgstr "**int**: 最初の N 個のコンポーネントをサンプルインデックスに対してプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:172
+msgid "**tuple (i, j)**: Plot component i vs component j"
+msgstr "**tuple (i, j)**: コンポーネント i とコンポーネント j のプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:173
+msgid "**list**: Multiple specifications, e.g., ``[(0, 1), (1, 2)]``"
+msgstr "**list**: 複数指定、例: ``[(0, 1), (1, 2)]``"
+
+#: ../../source/explore/inspector_fundamentals.rst:177
+msgid "Coloring and Annotations"
+msgstr "色付けと注釈"
+
+#: ../../source/explore/inspector_fundamentals.rst:179
+msgid ""
+"By default, plots are colored by the target variable ``y`` (if provided)."
+" You can customize this behavior using the ``color_by`` and "
+"``annotate_by`` parameters."
+msgstr ""
+"デフォルトでは、プロットはターゲット変数 ``y`` に基づいて色付けされます（提供されている場合）。``color_by`` および "
+"``annotate_by`` パラメータを使用して、この動作をカスタマイズできます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:186
+msgid "Both parameters accept:"
+msgstr "両パラメータは以下を受け付けます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:188
+msgid "``'y'``: Color/annotate by the target variable."
+msgstr "``'y'``: ターゲット変数による色付けまたは注釈。"
+
+#: ../../source/explore/inspector_fundamentals.rst:189
+msgid "``'sample_index'``: Color/annotate by sample indices."
+msgstr "``'sample_index'``: サンプルインデックスによる色付けまたは注釈。"
+
+#: ../../source/explore/inspector_fundamentals.rst:190
+msgid "**array-like**: Custom values of the same length as the number of samples."
+msgstr "**array-like**: サンプル数と同じ長さのカスタム値。"
+
+#: ../../source/explore/inspector_fundamentals.rst:191
+#, python-brace-format
+msgid ""
+"**dict**: Map dataset names to arrays for multi-dataset plots, e.g., "
+"``{'train': array1, 'test': array2}``."
+msgstr ""
+"**dict**: データセット名を配列にマッピングしてマルチデータセットプロットを作成、例: ``{'train': array1, "
+"'test': array2}``。"
+
+#: ../../source/explore/inspector_fundamentals.rst:197
+msgid "Color Mode"
+msgstr "カラーモード"
+
+#: ../../source/explore/inspector_fundamentals.rst:199
+msgid "The ``color_mode`` parameter controls how colors are applied:"
+msgstr "``color_mode`` パラメータは色の適用方法を制御します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:211
+msgid "Comparing Datasets"
+msgstr "データセットの比較"
+
+#: ../../source/explore/inspector_fundamentals.rst:213
+msgid ""
+"Another useful feature is the ability to overlay multiple datasets. This "
+"is critical to check how well the model generalizes to unseen data."
+msgstr "別の有用な機能として、複数のデータセットを重ねて表示できる点があります。これはモデルが未知データにどの程度一般化するか確認する上で重要です。"
+
+#: ../../source/explore/inspector_fundamentals.rst:232
+msgid ""
+"This will produce plots where training, test, and validation samples are "
+"visualized together, making it easy to spot domain shifts or overfitting."
+msgstr "これにより、学習・テスト・検証サンプルが同一プロット上に可視化され、ドメインシフトや過学習を容易に見つけられます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:238
+msgid "Multi-Output PLS"
+msgstr "マルチ出力 PLS"
+
+#: ../../source/explore/inspector_fundamentals.rst:240
+msgid ""
+"For multi-output PLS models (multiple target variables), use the "
+"``target_index`` parameter to select which target to inspect:"
+msgstr "マルチ出力 PLS モデル（複数の目的変数）では、``target_index`` パラメータを使用して検査するターゲットを選択します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:249
+msgid "Plot Configuration"
+msgstr "プロット設定"
+
+#: ../../source/explore/inspector_fundamentals.rst:251
+msgid ""
+"For fine-grained control over figure sizes, use the ``plot_config`` "
+"parameter or pass size arguments directly:"
+msgstr "図のサイズを細かく制御するには、``plot_config`` パラメータを使用するか、サイズ引数を直接渡します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:270
+msgid "Working with Figures"
+msgstr "図の操作"
+
+#: ../../source/explore/inspector_fundamentals.rst:272
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects. This allows you to access "
+"individual plots, customize them further, or save them to files."
+msgstr ""
+"``inspect()`` メソッドは ``matplotlib.figure.Figure`` "
+"オブジェクトの辞書を返します。これにより、個々のプロットへアクセスし、さらにカスタマイズしたり、ファイルとして保存できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:276
+msgid "Accessing Individual Plots"
+msgstr "個別プロットへのアクセス"
+
+#: ../../source/explore/inspector_fundamentals.rst:278
+msgid "Each figure in the returned dictionary has a descriptive key:"
+msgstr "返された辞書内の各図は記述的なキーを持ちます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:295
+msgid "Available figure keys depend on the inspector type:"
+msgstr "利用可能な図のキーはインスペクターの種類に依存します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:297
+msgid "**PCAInspector:**"
+msgstr "**PCAInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:299
+msgid "``variance``: Explained variance plot"
+msgstr "``variance``: 寄与率プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:300
+msgid "``loadings``: Loadings plot"
+msgstr "``loadings``: ローディングプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:301
+#, fuzzy
+msgid "``scores_1``, ``scores_2``, ...: Scores plots"
+msgstr "``scores_1, scores_2, ...``: スコアプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:302
+msgid "``distances``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances``: Hotelling の T² 対 Q 残差"
+
+#: ../../source/explore/inspector_fundamentals.rst:304
+msgid "**PLSRegressionInspector:**"
+msgstr "**PLSRegressionInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:306
+msgid "``variance_x``, ``variance_y``: Explained variance plots"
+msgstr "``variance_x``, ``variance_y``: 寄与率プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:307
+#, fuzzy
+msgid ""
+"``loadings_x``, ``loadings_weights``, ``loadings_rotations``: Loadings "
+"plots"
+msgstr "``loadings_x, loadings_weights, loadings_rotations``: ローディングプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:308
+msgid "``regression_coefficients``: Coefficient plot"
+msgstr "``regression_coefficients``: 回帰係数プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:309
+#, fuzzy
+msgid "``scores_1``, ``scores_2``, ...: X-scores plots"
+msgstr "``scores_1, scores_2, ...``: X スコアプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:310
+#, fuzzy
+msgid "``x_vs_y_scores_1``, ``x_vs_y_scores_2``, ...: X vs Y scores plots"
+msgstr "``x_vs_y_scores_1, x_vs_y_scores_2, ...``: X 対 Y スコアプロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:311
+msgid "``distances_hotelling_q``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances_hotelling_q``: Hotelling の T² 対 Q 残差"
+
+#: ../../source/explore/inspector_fundamentals.rst:312
+msgid "``distances_leverage_studentized``: Leverage vs Studentized Residuals"
+msgstr "``distances_leverage_studentized``: てこ比 対 学生化残差"
+
+#: ../../source/explore/inspector_fundamentals.rst:313
+msgid "``distances_q_y_residuals``: Q-Residuals vs Y-Residuals"
+msgstr "``distances_q_y_residuals``: Q 残差 対 Y 残差"
+
+#: ../../source/explore/inspector_fundamentals.rst:314
+msgid "``predicted_vs_actual``: Predicted vs Actual plot"
+msgstr "``predicted_vs_actual``: 予測値 対 実測値プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:315
+msgid "``residuals``: Y-Residuals plot"
+msgstr "``residuals``: Y 残差プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:316
+msgid "``qq_plot``: Q-Q plot"
+msgstr "``qq_plot``: Q-Q プロット"
+
+#: ../../source/explore/inspector_fundamentals.rst:317
+msgid "``residual_distribution``: Residual histogram"
+msgstr "``residual_distribution``: 残差ヒストグラム"
+
+#: ../../source/explore/inspector_fundamentals.rst:318
+msgid ""
+"``raw_spectra``, ``preprocessed_spectra``: Spectra plots (if "
+"preprocessing exists)"
+msgstr "``raw_spectra``, ``preprocessed_spectra``: スペクトルプロット（前処理がある場合）"
+
+#: ../../source/explore/inspector_fundamentals.rst:322
+msgid "Saving Figures"
+msgstr "図の保存"
+
+#: ../../source/explore/inspector_fundamentals.rst:324
+msgid "You can save individual figures or all figures at once:"
+msgstr "個別の図、またはすべての図を一括で保存できます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:345
+msgid "Customizing Figures"
+msgstr "図のカスタマイズ"
+
+#: ../../source/explore/inspector_fundamentals.rst:347
+msgid ""
+"Since the figures are standard matplotlib objects, you can modify them "
+"after creation:"
+msgstr "図は標準の matplotlib オブジェクトのため、作成後に自由に変更できます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:369
+msgid "Accessing Model Data"
+msgstr "モデルデータへのアクセス"
+
+#: ../../source/explore/inspector_fundamentals.rst:371
+msgid ""
+"Beyond plotting, the inspectors provide methods to extract underlying "
+"data for custom analysis."
+msgstr "プロット以外にも、インスペクターは基礎データを抽出してカスタム分析に利用するためのメソッドを提供します。"
+
+#: ../../source/explore/inspector_fundamentals.rst:375
+msgid "PCA Inspector"
+msgstr "PCA インスペクター"
+
+#: ../../source/explore/inspector_fundamentals.rst:393
+msgid "PLS Regression Inspector"
+msgstr "PLS 回帰インスペクター"
+
+#: ../../source/explore/inspector_fundamentals.rst:417
+msgid "Model Summaries"
+msgstr "モデル概要"
+
+#: ../../source/explore/inspector_fundamentals.rst:419
+msgid ""
+"The inspectors provide summary statistics of the models via the "
+"``.summary()`` method. This returns a dataclass object with a "
+"``.to_dict()`` method for easy conversion to dictionaries."
+msgstr ""
+"インスペクターは ``.summary()`` メソッドを通じてモデルの要約統計量を提供します。これは dataclass "
+"オブジェクトを返し、``.to_dict()`` メソッドにより辞書へ容易に変換できます。"
+
+#: ../../source/explore/inspector_fundamentals.rst:423
+msgid "Model Summary"
+msgstr "モデルの要約"
+
+#: ../../source/explore/inspector_fundamentals.rst:438
+msgid "The ``.to_dict()`` method returns:"
+msgstr "``.to_dict()`` メソッドは以下を返します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:461
+msgid "Regression Metrics"
+msgstr "回帰指標"
+
+#: ../../source/explore/inspector_fundamentals.rst:463
+msgid ""
+"For PLS regression models, you can access the regression metrics directly"
+" from the summary object:"
+msgstr "PLS 回帰モデルでは、サマリーオブジェクトから回帰指標へ直接アクセスできます:"
+
+#: ../../source/explore/inspector_fundamentals.rst:474
+msgid ""
+"The ``.metrics`` property provides a structure optimized for "
+"``pandas.DataFrame``:"
+msgstr "``.metrics`` プロパティは ``pandas.DataFrame`` に最適化された構造を提供します:"
+
+#: ../../source/explore/inspector_fundamentals.rst:488
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/explore/inspector_fundamentals.rst:490
+msgid ""
+":ref:`plotting_fundamentals`: For lower-level control over individual "
+"plots."
+msgstr ":ref:`plotting_fundamentals`: 個々のプロットをより低レベルで制御するための情報。"
+
+#: ../../source/explore/inspector_fundamentals.rst:491
+msgid ":doc:`/methods/outliers`: For details on the outlier detection statistics."
+msgstr ":doc:`/methods/outliers`: 外れ値検出統計の詳細。"
+

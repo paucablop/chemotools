@@ -1,0 +1,563 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-12 05:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/inspector_fundamentals.rst:4
+msgid "Inspecting your models"
+msgstr "检查您的模型"
+
+#: ../../source/explore/inspector_fundamentals.rst:6
+msgid ""
+"The ``chemotools.inspector`` module provides a unified interface for "
+"model diagnostics. Instead of manually creating separate plots for "
+"scores, loadings, and outliers, the **Inspector** generates a complete "
+"diagnostic suite with a single method call."
+msgstr ""
+"``chemotools.inspector`` 模块为模型诊断提供了一个统一的接口。无需手动为得分、载荷和离群值分别创建图表，**Inspector（检查器）** 只需一次方法调用即可生成完整的诊断套件。"
+
+#: ../../source/explore/inspector_fundamentals.rst:8
+msgid ""
+"All inspectors share the same API, making it intuitive to use across "
+"different model types (PCA, PLS, etc.). The inspectors support multiple "
+"datasets (training, test, validation) and offer extensive customization "
+"options for coloring, annotations, and component selection. An abstract "
+"overview of the inspectors is shown in the Figure below."
+msgstr ""
+"所有检查器共享相同的 API，使得在不同模型类型（PCA、PLS 等）间使用变得直观。检查器支持多个数据集（训练集、测试集、验证集），并提供广泛的着色、注释和成分选择等自定义选项。下图展示了检查器的抽象概述。"
+
+#: ../../source/explore/inspector_fundamentals.rst:13
+msgid ""
+"The inspector module is experimental and under active development. The "
+"API may change in future versions. We welcome your feedback! Please "
+"report issues or suggestions at: "
+"https://github.com/paucablop/chemotools/issues"
+msgstr ""
+"检查器模块目前处于实验阶段，正在积极开发中。其 API 可能在未来的版本中发生变化。我们欢迎您的反馈！请在此报告问题或建议：https://github.com/paucablop/chemotools/issues"
+
+#: ../../source/explore/inspector_fundamentals.rst:17
+msgid "Why use the Inspector?"
+msgstr "为何使用检查器？"
+
+#: ../../source/explore/inspector_fundamentals.rst:19
+msgid ""
+"Reduce boilerplate code, make your model flows more readable and ensure "
+"to fully understand your models:"
+msgstr "减少样板代码，使您的模型流程更具可读性，并确保能完全理解您的模型："
+
+#: ../../source/explore/inspector_fundamentals.rst:21
+msgid ""
+"**One-Liner Diagnostics**: Generate all standard plots (Scores, Loadings,"
+" Variance, Outliers) with ``.inspect()``."
+msgstr "**单行诊断**：使用 ``.inspect()`` 生成所有标准图表（得分、载荷、方差、离群值）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:22
+msgid "**Unified Interface**: Consistent API for PCA and PLS models."
+msgstr "**统一接口**：为 PCA 和 PLS 模型提供一致的 API。"
+
+#: ../../source/explore/inspector_fundamentals.rst:23
+msgid ""
+"**Multi-Dataset Support**: Easily compare Training, Test, and Validation "
+"sets on the same plots."
+msgstr "**多数据集支持**：可在同一图表中轻松比较训练集、测试集和验证集。"
+
+#: ../../source/explore/inspector_fundamentals.rst:24
+msgid ""
+"**Spectra Comparison**: Compare raw vs preprocessed spectra with "
+"``.inspect_spectra()``."
+msgstr "**光谱比较**：使用 ``.inspect_spectra()`` 比较原始光谱与预处理后的光谱。"
+
+#: ../../source/explore/inspector_fundamentals.rst:25
+msgid ""
+"**Data Access**: Extract scores, loadings, and coefficients for custom "
+"analysis."
+msgstr "**数据访问**：提取得分、载荷和系数以进行自定义分析。"
+
+#: ../../source/explore/inspector_fundamentals.rst:26
+msgid ""
+"**Interactive & Publication Ready**: Returns standard matplotlib figures "
+"that can be further customized."
+msgstr "**交互式且适合发表**：返回标准的 matplotlib 图形，可进行进一步自定义。"
+
+#: ../../source/explore/inspector_fundamentals.rst:30
+msgid "Basic Usage"
+msgstr "基本用法"
+
+#: ../../source/explore/inspector_fundamentals.rst:32
+msgid "Currently, ``chemotools`` supports inspectors for:"
+msgstr "目前，``chemotools`` 支持以下模型的检查器："
+
+#: ../../source/explore/inspector_fundamentals.rst:34
+msgid "**PCA**: ``PCAInspector``"
+msgstr "**PCA**：``PCAInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:35
+msgid "**PLS Regression**: ``PLSRegressionInspector``"
+msgstr "**PLS 回归**：``PLSRegressionInspector``"
+
+#: ../../source/explore/inspector_fundamentals.rst:37
+msgid ""
+"For the example, let's load some data and train a PCA and a PLS "
+"regression model."
+msgstr "在本示例中，让我们加载一些数据并训练一个 PCA 和一个 PLS 回归模型。"
+
+#: ../../source/explore/inspector_fundamentals.rst:73
+msgid ""
+"Now that we have trained the models, we can inspect them using "
+"``inspector``. The core of the module is the ``.inspect()`` method, "
+"shared by all inspectors."
+msgstr "现在我们已经训练好模型，可以使用 ``inspector`` 来检查它们。该模块的核心是 ``.inspect()`` 方法，所有检查器都共享此方法。"
+
+#: ../../source/explore/inspector_fundamentals.rst:76
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects, allowing you to save or modify them"
+" individually."
+msgstr "``inspect()`` 方法返回一个包含 ``matplotlib.figure.Figure`` 对象的字典，允许您单独保存或修改它们。"
+
+#: ../../source/explore/inspector_fundamentals.rst:80
+msgid "Inspecting PCA Models"
+msgstr "检查 PCA 模型"
+
+#: ../../source/explore/inspector_fundamentals.rst:82
+msgid "First we take a look at the PCA model."
+msgstr "首先我们看一下 PCA 模型。"
+
+#: ../../source/explore/inspector_fundamentals.rst:90
+msgid "This single command generates and displays several key diagnostic plots:"
+msgstr "这一条命令生成并显示几个关键的诊断图表："
+
+#: ../../source/explore/inspector_fundamentals.rst:92
+msgid "**Explained Variance**: Helps you decide if you have enough components."
+msgstr "**解释方差**：帮助您决定是否拥有足够的成分。"
+
+#: ../../source/explore/inspector_fundamentals.rst:93
+msgid "**Scores Plot**: Visualizes the sample space (PC1 vs PC2, PC2 vs PC3)."
+msgstr "**得分图**：可视化样本空间（PC1 对 PC2，PC2 对 PC3）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:94
+msgid ""
+"**Loadings Plot**: Visualizes the feature space (what the model is "
+"looking at)."
+msgstr "**载荷图**：可视化特征空间（模型正在观察的内容）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:95
+#: ../../source/explore/inspector_fundamentals.rst:118
+msgid "**Outlier Detection**: Hotelling's T² vs Q-Residuals plot."
+msgstr "**离群值检测**：霍特林 T² 与 Q 残差图。"
+
+#: ../../source/explore/inspector_fundamentals.rst:101
+msgid "Inspecting PLS Regression Models"
+msgstr "检查 PLS 回归模型"
+
+#: ../../source/explore/inspector_fundamentals.rst:103
+msgid ""
+"The PLS Regression inspector shares the same API as the PCAInspector, "
+"making it easy to switch between them."
+msgstr "PLS 回归检查器与 PCAInspector 共享相同的 API，使得在它们之间切换很容易。"
+
+#: ../../source/explore/inspector_fundamentals.rst:111
+msgid "This command generates diagnostic plots tailored for PLS regression:"
+msgstr "此命令生成专为 PLS 回归定制的诊断图表："
+
+#: ../../source/explore/inspector_fundamentals.rst:113
+msgid "**Explained Variance**: For both X-space and Y-space."
+msgstr "**解释方差**：针对 X 空间和 Y 空间。"
+
+#: ../../source/explore/inspector_fundamentals.rst:114
+msgid "**Scores Plot**: Visualizes the sample space (LV1 vs LV2)."
+msgstr "**得分图**：可视化样本空间（LV1 对 LV2）。"
+
+#: ../../source/explore/inspector_fundamentals.rst:115
+msgid "**X-Scores vs Y-Scores**: Correlation between latent variables."
+msgstr "**X 得分与 Y 得分**：潜在变量之间的相关性。"
+
+#: ../../source/explore/inspector_fundamentals.rst:116
+msgid "**Loadings Plots**: X-loadings, X-weights, and X-rotations."
+msgstr "**载荷图**：X 载荷、X 权重和 X 旋转。"
+
+#: ../../source/explore/inspector_fundamentals.rst:117
+msgid "**Regression Coefficients**: Feature importance for prediction."
+msgstr "**回归系数**：预测的特征重要性。"
+
+#: ../../source/explore/inspector_fundamentals.rst:119
+msgid "**Leverage vs Studentized Residuals**: Influential observation detection."
+msgstr "**杠杆与学生化残差**：有影响力的观测点检测。"
+
+#: ../../source/explore/inspector_fundamentals.rst:120
+msgid "**Q-Residuals vs Y-Residuals**: Combined model fit diagnostics."
+msgstr "**Q 残差与 Y 残差**：组合模型拟合诊断。"
+
+#: ../../source/explore/inspector_fundamentals.rst:121
+msgid "**Predicted vs Actual**: Assess regression performance."
+msgstr "**预测值与实际值**：评估回归性能。"
+
+#: ../../source/explore/inspector_fundamentals.rst:122
+msgid "**Y Residuals Plot**: Identify patterns in prediction errors."
+msgstr "**Y 残差图**：识别预测误差中的模式。"
+
+#: ../../source/explore/inspector_fundamentals.rst:123
+msgid "**Q-Q Plot**: Check normality of residuals."
+msgstr "**Q-Q 图**：检查残差的正态性。"
+
+#: ../../source/explore/inspector_fundamentals.rst:124
+msgid "**Residual Distribution**: Histogram of prediction errors."
+msgstr "**残差分布**：预测误差的直方图。"
+
+#: ../../source/explore/inspector_fundamentals.rst:130
+msgid "Inspecting Spectra"
+msgstr "检查光谱"
+
+#: ../../source/explore/inspector_fundamentals.rst:132
+msgid ""
+"When your model includes preprocessing steps (e.g., a sklearn Pipeline), "
+"you can compare the raw and preprocessed spectra using the "
+"``.inspect_spectra()`` method:"
+msgstr "当您的模型包含预处理步骤（例如 ``sklearn`` ``Pipeline``）时，您可以使用 ``.inspect_spectra()`` 方法比较原始光谱和预处理后的光谱："
+
+#: ../../source/explore/inspector_fundamentals.rst:139
+msgid "This generates two plots:"
+msgstr "这会生成两个图表："
+
+#: ../../source/explore/inspector_fundamentals.rst:141
+msgid "**Raw Spectra**: Original input data before any transformations."
+msgstr "**原始光谱**：任何变换前的原始输入数据。"
+
+#: ../../source/explore/inspector_fundamentals.rst:142
+msgid ""
+"**Preprocessed Spectra**: Data after all preprocessing steps (before the "
+"model)."
+msgstr "**预处理后的光谱**：所有预处理步骤之后（模型之前）的数据。"
+
+#: ../../source/explore/inspector_fundamentals.rst:144
+msgid ""
+"This is particularly useful in spectroscopy workflows to verify that "
+"preprocessing steps (baseline correction, derivatives, normalization) are"
+" working as expected."
+msgstr "这在光谱学工作流程中尤其有用，可验证预处理步骤（基线校正、导数、归一化）是否按预期工作。"
+
+#: ../../source/explore/inspector_fundamentals.rst:147
+msgid ""
+"The ``inspect_spectra()`` method is only available when the model is a "
+"Pipeline with preprocessing steps. It is also automatically called by "
+"``.inspect()`` when preprocessing exists."
+msgstr "``inspect_spectra()`` 方法仅在模型是包含预处理步骤的 Pipeline 时才可用。当存在预处理时，``.inspect()`` 也会自动调用它。"
+
+#: ../../source/explore/inspector_fundamentals.rst:151
+msgid "Customizing the Inspection"
+msgstr "自定义检查"
+
+#: ../../source/explore/inspector_fundamentals.rst:153
+msgid ""
+"The ``inspect()`` method is highly customizable. You can control which "
+"components to plot, how to color the samples, and which datasets to "
+"include."
+msgstr "``inspect()`` 方法具有高度可定制性。您可以控制绘制哪些成分、如何为样本着色以及包含哪些数据集。"
+
+#: ../../source/explore/inspector_fundamentals.rst:157
+msgid "Selecting Components"
+msgstr "选择成分"
+
+#: ../../source/explore/inspector_fundamentals.rst:159
+msgid ""
+"You can specify which components to visualize in the scores and loadings "
+"plots."
+msgstr "您可以指定在得分图和载荷图中可视化哪些成分。"
+
+#: ../../source/explore/inspector_fundamentals.rst:169
+msgid "The ``components_scores`` parameter accepts:"
+msgstr "``components_scores`` 参数接受："
+
+#: ../../source/explore/inspector_fundamentals.rst:171
+msgid "**int**: Plot first N components against sample index"
+msgstr "**int**：绘制前 N 个成分与样本索引的关系图"
+
+#: ../../source/explore/inspector_fundamentals.rst:172
+msgid "**tuple (i, j)**: Plot component i vs component j"
+msgstr "**tuple (i, j)**：绘制成分 i 对成分 j 的关系图"
+
+#: ../../source/explore/inspector_fundamentals.rst:173
+msgid "**list**: Multiple specifications, e.g., ``[(0, 1), (1, 2)]``"
+msgstr "**list**：多个规格，例如 ``[(0, 1), (1, 2)]``"
+
+#: ../../source/explore/inspector_fundamentals.rst:177
+msgid "Coloring and Annotations"
+msgstr "着色与注释"
+
+#: ../../source/explore/inspector_fundamentals.rst:179
+msgid ""
+"By default, plots are colored by the target variable ``y`` (if provided)."
+" You can customize this behavior using the ``color_by`` and "
+"``annotate_by`` parameters."
+msgstr "默认情况下，图表根据目标变量 ``y`` （如果提供）进行着色。您可以使用 ``color_by`` 和 ``annotate_by`` 参数来自定义此行为。"
+
+#: ../../source/explore/inspector_fundamentals.rst:186
+msgid "Both parameters accept:"
+msgstr "这两个参数都接受："
+
+#: ../../source/explore/inspector_fundamentals.rst:188
+msgid "``'y'``: Color/annotate by the target variable."
+msgstr "``'y'``：根据目标变量着色/注释。"
+
+#: ../../source/explore/inspector_fundamentals.rst:189
+msgid "``'sample_index'``: Color/annotate by sample indices."
+msgstr "``'sample_index'``：根据样本索引着色/注释。"
+
+#: ../../source/explore/inspector_fundamentals.rst:190
+msgid "**array-like**: Custom values of the same length as the number of samples."
+msgstr "**array-like**：与样本数量长度相同的自定义值。"
+
+#: ../../source/explore/inspector_fundamentals.rst:191
+#, python-brace-format
+msgid ""
+"**dict**: Map dataset names to arrays for multi-dataset plots, e.g., "
+"``{'train': array1, 'test': array2}``."
+msgstr "**dict**：将数据集名称映射到数组以用于多数据集绘图，例如 ``{'train': array1, 'test': array2}``。"
+
+#: ../../source/explore/inspector_fundamentals.rst:197
+msgid "Color Mode"
+msgstr "颜色模式"
+
+#: ../../source/explore/inspector_fundamentals.rst:199
+msgid "The ``color_mode`` parameter controls how colors are applied:"
+msgstr "``color_mode`` 参数控制颜色的应用方式："
+
+#: ../../source/explore/inspector_fundamentals.rst:211
+msgid "Comparing Datasets"
+msgstr "比较数据集"
+
+#: ../../source/explore/inspector_fundamentals.rst:213
+msgid ""
+"Another useful feature is the ability to overlay multiple datasets. This "
+"is critical to check how well the model generalizes to unseen data."
+msgstr "另一个有用的功能是能够叠加多个数据集。这对于检查模型对未见数据的泛化能力至关重要。"
+
+#: ../../source/explore/inspector_fundamentals.rst:232
+msgid ""
+"This will produce plots where training, test, and validation samples are "
+"visualized together, making it easy to spot domain shifts or overfitting."
+msgstr "这将生成将训练、测试和验证样本一起可视化的图表，使得很容易发现域偏移或过拟合。"
+
+#: ../../source/explore/inspector_fundamentals.rst:238
+msgid "Multi-Output PLS"
+msgstr "多输出 PLS"
+
+#: ../../source/explore/inspector_fundamentals.rst:240
+msgid ""
+"For multi-output PLS models (multiple target variables), use the "
+"``target_index`` parameter to select which target to inspect:"
+msgstr "对于多输出 PLS 模型（多个目标变量），使用 ``target_index`` 参数选择要检查的目标："
+
+#: ../../source/explore/inspector_fundamentals.rst:249
+msgid "Plot Configuration"
+msgstr "绘图配置"
+
+#: ../../source/explore/inspector_fundamentals.rst:251
+msgid ""
+"For fine-grained control over figure sizes, use the ``plot_config`` "
+"parameter or pass size arguments directly:"
+msgstr "要精细控制图形大小，请使用 ``plot_config`` 参数或直接传递尺寸参数："
+
+#: ../../source/explore/inspector_fundamentals.rst:270
+msgid "Working with Figures"
+msgstr "处理图形"
+
+#: ../../source/explore/inspector_fundamentals.rst:272
+msgid ""
+"The ``inspect()`` method returns a dictionary of "
+"``matplotlib.figure.Figure`` objects. This allows you to access "
+"individual plots, customize them further, or save them to files."
+msgstr "``inspect()`` 方法返回一个包含 ``matplotlib.figure.Figure`` 对象的字典。这允许您访问单个图表、进一步自定义它们或将它们保存到文件。"
+
+#: ../../source/explore/inspector_fundamentals.rst:276
+msgid "Accessing Individual Plots"
+msgstr "访问单个图表"
+
+#: ../../source/explore/inspector_fundamentals.rst:278
+msgid "Each figure in the returned dictionary has a descriptive key:"
+msgstr "返回字典中的每个图形都有一个描述性键名："
+
+#: ../../source/explore/inspector_fundamentals.rst:295
+msgid "Available figure keys depend on the inspector type:"
+msgstr "可用的图形键名取决于检查器类型："
+
+#: ../../source/explore/inspector_fundamentals.rst:297
+msgid "**PCAInspector:**"
+msgstr "**PCAInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:299
+msgid "``variance``: Explained variance plot"
+msgstr "``variance``：解释方差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:300
+msgid "``loadings``: Loadings plot"
+msgstr "``loadings``：载荷图"
+
+#: ../../source/explore/inspector_fundamentals.rst:301
+msgid "``scores_1``, ``scores_2``, ...: Scores plots"
+msgstr "``scores_1``, ``scores_2``, ...：得分图"
+
+#: ../../source/explore/inspector_fundamentals.rst:302
+msgid "``distances``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances``：霍特林 T² 与 Q 残差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:304
+msgid "**PLSRegressionInspector:**"
+msgstr "**PLSRegressionInspector:**"
+
+#: ../../source/explore/inspector_fundamentals.rst:306
+msgid "``variance_x``, ``variance_y``: Explained variance plots"
+msgstr "``variance_x``, ``variance_y``：解释方差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:307
+msgid ""
+"``loadings_x``, ``loadings_weights``, ``loadings_rotations``: Loadings "
+"plots"
+msgstr "``loadings_x``, ``loadings_weights``, ``loadings_rotations``：载荷图"
+
+#: ../../source/explore/inspector_fundamentals.rst:308
+msgid "``regression_coefficients``: Coefficient plot"
+msgstr "``regression_coefficients``：系数图"
+
+#: ../../source/explore/inspector_fundamentals.rst:309
+msgid "``scores_1``, ``scores_2``, ...: X-scores plots"
+msgstr "``scores_1``, ``scores_2``, ...：X 得分图"
+
+#: ../../source/explore/inspector_fundamentals.rst:310
+msgid "``x_vs_y_scores_1``, ``x_vs_y_scores_2``, ...: X vs Y scores plots"
+msgstr "``x_vs_y_scores_1``, ``x_vs_y_scores_2``, ...：X 与 Y 得分图"
+
+#: ../../source/explore/inspector_fundamentals.rst:311
+msgid "``distances_hotelling_q``: Hotelling's T² vs Q-Residuals"
+msgstr "``distances_hotelling_q``：霍特林 T² 与 Q 残差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:312
+msgid "``distances_leverage_studentized``: Leverage vs Studentized Residuals"
+msgstr "``distances_leverage_studentized``：杠杆与学生化残差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:313
+msgid "``distances_q_y_residuals``: Q-Residuals vs Y-Residuals"
+msgstr "``distances_q_y_residuals``：Q 残差与 Y 残差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:314
+msgid "``predicted_vs_actual``: Predicted vs Actual plot"
+msgstr "``predicted_vs_actual``：预测值与实际值图"
+
+#: ../../source/explore/inspector_fundamentals.rst:315
+msgid "``residuals``: Y-Residuals plot"
+msgstr "``residuals``：Y 残差图"
+
+#: ../../source/explore/inspector_fundamentals.rst:316
+msgid "``qq_plot``: Q-Q plot"
+msgstr "``qq_plot``：Q-Q 图"
+
+#: ../../source/explore/inspector_fundamentals.rst:317
+msgid "``residual_distribution``: Residual histogram"
+msgstr "``residual_distribution``：残差直方图"
+
+#: ../../source/explore/inspector_fundamentals.rst:318
+msgid ""
+"``raw_spectra``, ``preprocessed_spectra``: Spectra plots (if "
+"preprocessing exists)"
+msgstr "``raw_spectra``, ``preprocessed_spectra``：光谱图（如果存在预处理）"
+
+#: ../../source/explore/inspector_fundamentals.rst:322
+msgid "Saving Figures"
+msgstr "保存图形"
+
+#: ../../source/explore/inspector_fundamentals.rst:324
+msgid "You can save individual figures or all figures at once:"
+msgstr "您可以保存单个图形或一次性保存所有图形："
+
+#: ../../source/explore/inspector_fundamentals.rst:345
+msgid "Customizing Figures"
+msgstr "自定义图形"
+
+#: ../../source/explore/inspector_fundamentals.rst:347
+msgid ""
+"Since the figures are standard matplotlib objects, you can modify them "
+"after creation:"
+msgstr "由于这些图形是标准的 matplotlib 对象，您可以在创建后修改它们："
+
+#: ../../source/explore/inspector_fundamentals.rst:369
+msgid "Accessing Model Data"
+msgstr "访问模型数据"
+
+#: ../../source/explore/inspector_fundamentals.rst:371
+msgid ""
+"Beyond plotting, the inspectors provide methods to extract underlying "
+"data for custom analysis."
+msgstr "除了绘图，检查器还提供了提取底层数据以进行自定义分析的方法。"
+
+#: ../../source/explore/inspector_fundamentals.rst:375
+msgid "PCA Inspector"
+msgstr "PCA 检查器"
+
+#: ../../source/explore/inspector_fundamentals.rst:393
+msgid "PLS Regression Inspector"
+msgstr "PLS 回归检查器"
+
+#: ../../source/explore/inspector_fundamentals.rst:417
+msgid "Model Summaries"
+msgstr "模型摘要"
+
+#: ../../source/explore/inspector_fundamentals.rst:419
+msgid ""
+"The inspectors provide summary statistics of the models via the "
+"``.summary()`` method. This returns a dataclass object with a "
+"``.to_dict()`` method for easy conversion to dictionaries."
+msgstr "检查器通过 ``.summary()`` 方法提供模型的汇总统计信息。这会返回一个数据类对象，其中包含 ``.to_dict()`` 方法，便于转换为字典。"
+
+#: ../../source/explore/inspector_fundamentals.rst:423
+msgid "Model Summary"
+msgstr "模型摘要"
+
+#: ../../source/explore/inspector_fundamentals.rst:438
+msgid "The ``.to_dict()`` method returns:"
+msgstr "``.to_dict()`` 方法返回："
+
+#: ../../source/explore/inspector_fundamentals.rst:461
+msgid "Regression Metrics"
+msgstr "回归指标"
+
+#: ../../source/explore/inspector_fundamentals.rst:463
+msgid ""
+"For PLS regression models, you can access the regression metrics directly"
+" from the summary object:"
+msgstr "对于 PLS 回归模型，您可以直接从摘要对象访问回归指标："
+
+#: ../../source/explore/inspector_fundamentals.rst:474
+msgid ""
+"The ``.metrics`` property provides a structure optimized for "
+"``pandas.DataFrame``:"
+msgstr "``.metrics`` 属性提供了一个针对 ``pandas.DataFrame`` 优化的结构："
+
+#: ../../source/explore/inspector_fundamentals.rst:488
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/explore/inspector_fundamentals.rst:490
+msgid ""
+":ref:`plotting_fundamentals`: For lower-level control over individual "
+"plots."
+msgstr ":ref:`plotting_fundamentals`：用于对单个图表进行更低级别的控制。"
+
+#: ../../source/explore/inspector_fundamentals.rst:491
+msgid ":doc:`/methods/outliers`: For details on the outlier detection statistics."
+msgstr ":doc:`/methods/outliers`：关于离群值检测统计的详细信息。"

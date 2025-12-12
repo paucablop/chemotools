@@ -34,8 +34,9 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     to customize, save, and interact with individually.
 
     The inspector provides convenience methods that create multiple independent plots:
-    - inspect(): Creates all diagnostic plots (scores, loadings, explained variance)
-    - inspect_spectra(): Creates raw and preprocessed spectra plots (if preprocessing exists)
+
+    - ``inspect()``: Creates all diagnostic plots (scores, loadings, explained variance)
+    - ``inspect_spectra()``: Creates raw and preprocessed spectra plots (if preprocessing exists)
 
     Parameters
     ----------
@@ -326,28 +327,36 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             Dataset(s) to visualize. Can be 'train', 'test', 'val', or a list.
         components_scores : int, tuple, or sequence, optional
             Components to plot for scores.
+
             - Int: Creates one 1D scatter plot (e.g., 0 for PC1 vs sample index)
             - Single tuple (x, y): Creates one 2D scatter plot (e.g., (0, 1) for PC1 vs PC2)
             - Sequence: Creates multiple plots (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
+
         loadings_components : int, sequence of int, or None, optional
             Which components to show in loadings plot. If None (default), automatically
             selects all available components:
+
             - 1 component: 0
             - 2+ components: [0, 1, ..., n_components-1] (all components)
+
         variance_threshold : float, default=0.95
             Threshold line for explained variance plot
         color_by : str or dict, optional
             Coloring specification:
+
             - 'y': Color by y values (if available)
             - 'sample_index': Color by sample index
             - dict: Map dataset names to color arrays
             - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
+
         annotate_by : str or dict, optional
             Annotations for score plot points. Can be:
+
             - 'sample_index': Annotate with sample indices (0, 1, 2, ...)
             - 'y': Annotate with y values (only for single dataset)
             - dict: Dictionary mapping dataset names to annotation arrays
               e.g., {'train': ['A', 'B', 'C'], 'test': ['D', 'E']}
+
             If None (default), no annotations are added.
         plot_config : InspectorPlotConfig, optional
             Configuration object for plot sizes and styles. If None, defaults are used.
@@ -359,19 +368,20 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
         Returns
         -------
-                figures : dict
-                        Dictionary containing all created figures with keys:
-                        - 'scores_1', 'scores_2', ...: Combined scores plots (95% confidence ellipses)
-                        - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
-                            (only when multiple datasets are provided); each plot uses a dedicated dataset colour
-                        - 'loadings': Loadings plot
-                        - 'variance': Explained variance plot
-                        - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
-                        - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+        figures : dict
+            Dictionary containing all created figures with keys:
 
-                        Combined scores plots render all requested datasets on shared axes, coloured by
-                        dataset. The number of 'scores_N*' entries depends on the ``components_scores``
-                        parameter.
+            - 'scores_1', 'scores_2', ...: Combined scores plots (95% confidence ellipses)
+            - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
+              (only when multiple datasets are provided); each plot uses a dedicated dataset colour
+            - 'loadings': Loadings plot
+            - 'variance': Explained variance plot
+            - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
+            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+
+            Combined scores plots render all requested datasets on shared axes, coloured by
+            dataset. The number of 'scores_N*' entries depends on the ``components_scores``
+            parameter.
 
         Examples
         --------

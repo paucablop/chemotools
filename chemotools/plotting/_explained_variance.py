@@ -1,6 +1,6 @@
 """Explained Variance plot for PCA/PLS model diagnostics."""
 
-from typing import Optional, Any
+from typing import Any, Optional, Tuple
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -110,6 +110,53 @@ class ExplainedVariancePlot(BasePlot):
             "xlabel": "Component",
             "ylabel": "Explained Variance Ratio",
         }
+
+    def show(
+        self,
+        *,
+        figsize: Optional[Tuple[float, float]] = None,
+        title: Optional[str] = None,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[Tuple[float, float]] = None,
+        ylim: Optional[Tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> Figure:
+        """Create and return a complete figure with the explained variance plot.
+
+        This method handles figure creation and then delegates to `render()`.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float], optional
+            Figure size in inches (width, height).
+        title : str, optional
+            Figure title.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
+        xlim : tuple[float, float], optional
+            X-axis limits as (xmin, xmax).
+        ylim : tuple[float, float], optional
+            Y-axis limits as (ymin, ymax).
+        **kwargs : Any
+            Additional keyword arguments passed to the render() method.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
     def render(
         self,

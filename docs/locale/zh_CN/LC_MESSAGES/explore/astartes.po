@@ -1,0 +1,86 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-12 05:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/astartes.rst:4
+msgid "Sampling with Astartes"
+msgstr ""
+
+#: ../../source/explore/astartes.rst:6
+msgid ""
+"**Chemotools** focuses on preprocessing and modeling spectral data, but "
+"robust model validation starts with how you split your data. This is "
+"where **Astartes** comes in."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:8
+msgid ""
+"`Astartes <https://github.com/JacksonBurns/astartes>`_ is a Python "
+"library for rigorous dataset splitting (sampling). It serves as a drop-in"
+" replacement for ``sklearn.model_selection.train_test_split`` but offers "
+"\"rational\" sampling algorithms like **Kennard-Stone** and **SPXY**, "
+"which are essential in chemometrics."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:11
+msgid "Synergy with Chemotools"
+msgstr ""
+
+#: ../../source/explore/astartes.rst:13
+msgid ""
+"While ``chemotools`` provides the transformers to clean your spectra, "
+"``astartes`` ensures your training set is statistically representative of"
+" your domain."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:15
+msgid ""
+"**Chemotools**: Preprocessing (Smoothing, Baseline correction, "
+"Derivatives)."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:16
+msgid "**Astartes**: Calibration set selection (Kennard-Stone, SPXY)."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:18
+msgid ""
+"Using them together allows you to build robust chemometric pipelines that"
+" are validated on rigorously selected data."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:21
+msgid "Example: Kennard-Stone Splitting"
+msgstr ""
+
+#: ../../source/explore/astartes.rst:23
+msgid ""
+"Here is how you can use ``astartes`` to split your data using the "
+"Kennard-Stone algorithm before processing it with ``chemotools``."
+msgstr ""
+
+#: ../../source/explore/astartes.rst:56
+msgid "Installation"
+msgstr ""
+
+#: ../../source/explore/astartes.rst:58
+msgid "You can install astartes via pip:"
+msgstr ""
+

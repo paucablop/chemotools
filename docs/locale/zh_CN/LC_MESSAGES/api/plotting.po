@@ -1,0 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/api/plotting.rst:2
+msgid "chemotools.plotting"
+msgstr ""
+
+#: ../../source/api/plotting.rst:6
+msgid ""
+"Plotting utilities for creating publication-quality visualizations of "
+"spectral data and model diagnostics. These classes follow a consistent "
+"API pattern and can be composed together for complex visualizations."
+msgstr ""
+
+#: ../../source/api/plotting.rst:8
+msgid "**Import from this module:**"
+msgstr ""
+
+#: ../../source/api/plotting.rst:26
+msgid "Available Classes"
+msgstr ""
+
+#: ../../source/api/plotting.rst:28
+msgid "**Spectral Visualization**"
+msgstr ""
+
+#: ../../source/api/plotting.rst:34 ../../source/api/plotting.rst:47
+#: ../../source/api/plotting.rst:64
+msgid "Class"
+msgstr ""
+
+#: ../../source/api/plotting.rst:35 ../../source/api/plotting.rst:48
+#: ../../source/api/plotting.rst:65
+msgid "Description"
+msgstr ""
+
+#: ../../source/api/plotting.rst:36
+msgid ":doc:`SpectraPlot </methods/generated/chemotools.plotting.SpectraPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:37
+msgid "Plot spectral data with categorical or continuous coloring"
+msgstr ""
+
+#: ../../source/api/plotting.rst:38
+msgid ""
+":doc:`FeatureSelectionPlot "
+"</methods/generated/chemotools.plotting.FeatureSelectionPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:39
+msgid "Visualize feature selection on spectral data"
+msgstr ""
+
+#: ../../source/api/plotting.rst:41
+msgid "**Model Diagnostics**"
+msgstr ""
+
+#: ../../source/api/plotting.rst:49
+msgid ":doc:`ScoresPlot </methods/generated/chemotools.plotting.ScoresPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:50
+msgid "Scatter plot of model scores (latent space projections)"
+msgstr ""
+
+#: ../../source/api/plotting.rst:51
+msgid ":doc:`LoadingsPlot </methods/generated/chemotools.plotting.LoadingsPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:52
+msgid "Line plot of model loadings (feature weights)"
+msgstr ""
+
+#: ../../source/api/plotting.rst:53
+msgid ""
+":doc:`ExplainedVariancePlot "
+"</methods/generated/chemotools.plotting.ExplainedVariancePlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:54
+msgid "Bar plot of explained variance by component"
+msgstr ""
+
+#: ../../source/api/plotting.rst:55
+msgid ""
+":doc:`DistancesPlot "
+"</methods/generated/chemotools.plotting.DistancesPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:56
+msgid "Scatter plot for outlier detection (Q residuals, Hotelling's T²)"
+msgstr ""
+
+#: ../../source/api/plotting.rst:58
+msgid "**Regression Diagnostics**"
+msgstr ""
+
+#: ../../source/api/plotting.rst:66
+msgid ""
+":doc:`PredictedVsActualPlot "
+"</methods/generated/chemotools.plotting.PredictedVsActualPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:67
+msgid "Scatter plot of predicted vs actual values"
+msgstr ""
+
+#: ../../source/api/plotting.rst:68
+msgid ""
+":doc:`YResidualsPlot "
+"</methods/generated/chemotools.plotting.YResidualsPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:69
+msgid "Plot of Y residuals for homoscedasticity analysis"
+msgstr ""
+
+#: ../../source/api/plotting.rst:70
+msgid ":doc:`QQPlot </methods/generated/chemotools.plotting.QQPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:71
+msgid "Q-Q plot for assessing normality of residuals"
+msgstr ""
+
+#: ../../source/api/plotting.rst:72
+msgid ""
+":doc:`ResidualDistributionPlot "
+"</methods/generated/chemotools.plotting.ResidualDistributionPlot>`"
+msgstr ""
+
+#: ../../source/api/plotting.rst:73
+msgid "Histogram of residuals with normal distribution overlay"
+msgstr ""
+
+#: ../../source/api/plotting.rst:76
+msgid "See Also"
+msgstr ""
+
+#: ../../source/api/plotting.rst:78
+msgid ""
+":doc:`Plotting Methods Overview </methods/plotting>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+

@@ -1,0 +1,38 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/plotting.rst:5
+msgid "API Modules"
+msgstr ""
+
+#: ../../source/methods/plotting.rst:2
+msgid "Plotting"
+msgstr ""
+
+#: ../../source/methods/plotting.rst:3
+msgid ""
+"Visualize your spectral data, model diagnostics, and results with a "
+"consistent, composable plotting API. The plotting module provides "
+"reusable plot classes that follow a unified design pattern, making it "
+"easy to create publication-quality figures for scores, loadings, spectra,"
+" and regression diagnostics."
+msgstr ""
+

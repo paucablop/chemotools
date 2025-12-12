@@ -1,6 +1,6 @@
 """Scores plot for visualizing model projections and latent space."""
 
-from typing import Literal, Optional, Any
+from typing import Literal, Optional, Any, Tuple
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -29,8 +29,10 @@ class ScoresPlot(BasePlot, ColoringMixin):
         Uses 0-based indexing (e.g., (0, 1) plots PC1 vs PC2).
     color_by : np.ndarray, optional
         Values for coloring samples. Can be either:
+
         - Continuous (numeric): shows colorbar (e.g., concentration, temperature)
         - Categorical (strings/classes): shows legend with discrete colors
+
     annotations : list[str], optional
         Labels for annotating individual points.
     label : str, optional
@@ -39,13 +41,20 @@ class ScoresPlot(BasePlot, ColoringMixin):
         Color for all points when color_by is None (default: auto-assigned).
     colormap : str, optional
         Colormap name. Colorblind-friendly defaults:
+
         - "tab10" for categorical data
         - "viridis" for continuous data
+
     confidence_ellipse : bool or float, optional
         Whether to draw a confidence ellipse around the data.
+
         - If True: draws 95% confidence ellipse
         - If float: draws ellipse at specified confidence level (e.g., 0.90, 0.99)
         - If False or None: no ellipse (default)
+
+    color_mode : {"continuous", "categorical"}, optional
+        Explicitly specify coloring mode. If None (default), automatically
+        detects based on dtype and unique values of color_by.
 
     Raises
     ------
@@ -174,6 +183,53 @@ class ScoresPlot(BasePlot, ColoringMixin):
             "xlabel": f"PC{comp1 + 1}",
             "ylabel": f"PC{comp2 + 1}",
         }
+
+    def show(
+        self,
+        *,
+        figsize: Optional[Tuple[float, float]] = None,
+        title: Optional[str] = None,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[Tuple[float, float]] = None,
+        ylim: Optional[Tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> Figure:
+        """Create and return a complete figure with the scores plot.
+
+        This method handles figure creation and then delegates to `render()`.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float], optional
+            Figure size in inches (width, height).
+        title : str, optional
+            Figure title.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
+        xlim : tuple[float, float], optional
+            X-axis limits as (xmin, xmax).
+        ylim : tuple[float, float], optional
+            Y-axis limits as (ymin, ymax).
+        **kwargs : Any
+            Additional keyword arguments passed to the render() method.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
     def render(
         self,

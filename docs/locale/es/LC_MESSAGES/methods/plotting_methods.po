@@ -1,0 +1,113 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/plotting_methods.rst:2
+msgid "Plotting Classes"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`SpectraPlot <chemotools.plotting.SpectraPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Plot class for visualizing spectral data."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`ScoresPlot <chemotools.plotting.ScoresPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Simple, composable scores plot for a single dataset."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`LoadingsPlot <chemotools.plotting.LoadingsPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Loadings plot implementing Display protocol for model inspection."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`DistancesPlot <chemotools.plotting.DistancesPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Simple, composable distances plot for a single dataset."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`ExplainedVariancePlot "
+"<chemotools.plotting.ExplainedVariancePlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Visualize explained variance by component with cumulative variance."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`FeatureSelectionPlot <chemotools.plotting.FeatureSelectionPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Plot class for visualizing feature selection on spectral data."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`PredictedVsActualPlot "
+"<chemotools.plotting.PredictedVsActualPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Scatter plot of predicted vs actual values to assess regression fit."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`YResidualsPlot <chemotools.plotting.YResidualsPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Plot of residuals to assess homoscedasticity and model fit quality."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ":py:obj:`QQPlot <chemotools.plotting.QQPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ""
+"Quantile-Quantile plot to assess if residuals follow a normal "
+"distribution."
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid ""
+":py:obj:`ResidualDistributionPlot "
+"<chemotools.plotting.ResidualDistributionPlot>`"
+msgstr ""
+
+#: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
+msgid "Histogram plot of residuals to assess normality and distribution shape."
+msgstr ""
+

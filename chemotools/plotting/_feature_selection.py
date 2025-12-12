@@ -2,9 +2,11 @@
 The :mod:`chemotools.plotting._feature_selection` module implements the FeatureSelectionPlot class.
 """
 
-from typing import Any
+from typing import Any, Optional
+
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._spectra import SpectraPlot
 from chemotools.plotting._utils import validate_data
@@ -56,6 +58,97 @@ class FeatureSelectionPlot(SpectraPlot):
 
         self.selection_color = selection_color
         self.selection_alpha = selection_alpha
+
+    def show(
+        self,
+        figsize=(12, 4),
+        title=None,
+        xlabel="X-axis",
+        ylabel="Y-axis",
+        xlim=None,
+        ylim=None,
+        **kwargs,
+    ) -> Figure:
+        """Show the spectra plot with given figure size and labels. The
+        excluded features are highlighted with red bars.
+
+        Parameters
+        ----------
+        figsize : tuple, optional
+            Figure size as (width, height) in inches. Default is (12, 4).
+        title : str, optional
+            Title for the plot. If None, a default title is generated.
+        xlabel : str, optional
+            X-axis label. Default is "X-axis".
+        ylabel : str, optional
+            Y-axis label. Default is "Y-axis".
+        xlim : tuple, optional
+            X-axis limits as (xmin, xmax). Default is None (auto).
+        ylim : tuple, optional
+            Y-axis limits as (ymin, ymax). Default is None (auto).
+        **kwargs : Any
+            Additional keyword arguments passed to the plot function.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
+
+    def render(
+        self,
+        ax: Optional[Axes] = None,
+        *,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[tuple[float, float]] = None,
+        ylim: Optional[tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> tuple[Figure, Axes]:
+        """Render the plot on the given axes or create new ones.
+
+        Parameters
+        ----------
+        ax : Axes, optional
+            Matplotlib axes to plot on. If None, creates new figure and axes.
+        xlabel : str, optional
+            X-axis label. Default is "X-axis".
+        ylabel : str, optional
+            Y-axis label. Default is "Y-axis".
+        xlim : tuple[float, float], optional
+            X-axis limits as (xmin, xmax). When set without ylim, the y-axis
+            automatically scales to fit the data within the x-range.
+        ylim : tuple[float, float], optional
+            Y-axis limits as (ymin, ymax). When provided, disables automatic y-scaling.
+        **kwargs : Any
+            Additional keyword arguments passed to the plot function.
+
+        Returns
+        -------
+        fig : Figure
+            The matplotlib Figure object.
+        ax : Axes
+            The matplotlib Axes object with the rendered plot.
+        """
+        fig, ax = super().render(
+            ax=ax,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
+
+        return fig, ax
 
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Render the plot with feature selection highlights.

@@ -1,6 +1,6 @@
 """Predicted vs Actual plot for regression model evaluation."""
 
-from typing import Literal, Optional, Any
+from typing import Literal, Optional, Any, Tuple
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -28,20 +28,27 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         Ignored if y_true/y_pred are 1D.
     color_by : np.ndarray, optional
         Values for coloring samples. Can be either:
+
         - Continuous (numeric): shows colorbar
         - Categorical (strings/classes): shows legend with discrete colors
+
     label : str, optional
         Legend label for this dataset (default: None).
     color : str, optional
         Color for all points when color_by is None (default: auto-assigned).
     colormap : str, optional
         Colormap name. Colorblind-friendly defaults:
+
         - "tab10" for categorical data
         - "viridis" for continuous data
+
     marker : str, optional
         Marker style for scatter points (default: "o"). Examples: "o", "s", "^", "v", "D".
     add_ideal_line : bool, optional
         Whether to add diagonal y=x line showing ideal predictions (default: True).
+    color_mode : {"continuous", "categorical"}, optional
+        Explicitly specify coloring mode. If None (default), automatically
+        detects based on dtype and unique values of color_by.
 
     Raises
     ------
@@ -165,6 +172,53 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
             "ylabel": "Predicted",
             "title": default_title,
         }
+
+    def show(
+        self,
+        *,
+        figsize: Optional[Tuple[float, float]] = None,
+        title: Optional[str] = None,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[Tuple[float, float]] = None,
+        ylim: Optional[Tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> Figure:
+        """Create and return a complete figure with the predicted vs axtual plot.
+
+        This method handles figure creation and then delegates to `render()`.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float], optional
+            Figure size in inches (width, height).
+        title : str, optional
+            Figure title.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
+        xlim : tuple[float, float], optional
+            X-axis limits as (xmin, xmax).
+        ylim : tuple[float, float], optional
+            Y-axis limits as (ymin, ymax).
+        **kwargs : Any
+            Additional keyword arguments passed to the render() method.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
     def render(
         self,

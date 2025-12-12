@@ -15,3 +15,5 @@ Available pages
     preprocessing
     feature_selection
     outliers
+    plotting
+    inspector

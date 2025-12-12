@@ -1,6 +1,6 @@
 """Y residuals plot for regression diagnostics and homoscedasticity analysis."""
 
-from typing import Optional, Any, Literal
+from typing import Optional, Any, Literal, Tuple
 import numpy as np
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
@@ -35,25 +35,34 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         Ignored if residuals is 1D.
     color_by : np.ndarray, optional
         Values for coloring samples. Can be either:
+
         - Continuous (numeric): shows colorbar
         - Categorical (strings/classes): shows legend with discrete colors
+
     annotations : list[str], optional
         Labels for annotating individual points.
     label : str, optional
         Legend label for this dataset (default: "Residuals").
     color : str, optional
-        Color for all points when color_by is None (default: auto-assigned).
+        Color for all points when color_by is None (default: "steelblue").
     colormap : str, optional
         Colormap name. Colorblind-friendly defaults:
+
         - "tab10" for categorical data
         - "viridis" for continuous data
+
     add_zero_line : bool, optional
         Whether to add a horizontal line at y=0 (default: True).
     add_confidence_band : bool or float, optional
         Whether to add confidence bands (±n*std) around zero.
+
         - If True: uses ±2*std (95% for normal distribution)
         - If float: uses ±value*std
         - If False or None: no bands (default: None)
+
+    color_mode : {"continuous", "categorical"}, optional
+        Explicitly specify coloring mode. If None (default), automatically
+        detects based on dtype and unique values of color_by.
 
     Raises
     ------
@@ -90,6 +99,9 @@ class YResidualsPlot(BasePlot, ColoringMixin):
 
     >>> fig, ax = plt.subplots()
     >>> YResidualsPlot(train_residuals, label="Train", color="blue").render(ax)
+    >>> YResidualsPlot(test_residuals, label="Test", color="red").render(ax)
+    >>> ax.legend()
+    >>> plt.show()
     """
 
     def __init__(
@@ -176,6 +188,53 @@ class YResidualsPlot(BasePlot, ColoringMixin):
             "ylabel": "Residuals",
             "title": default_title,
         }
+
+    def show(
+        self,
+        *,
+        figsize: Optional[Tuple[float, float]] = None,
+        title: Optional[str] = None,
+        xlabel: Optional[str] = None,
+        ylabel: Optional[str] = None,
+        xlim: Optional[Tuple[float, float]] = None,
+        ylim: Optional[Tuple[float, float]] = None,
+        **kwargs: Any,
+    ) -> Figure:
+        """Create and return a complete figure with the y-residuals plot.
+
+        This method handles figure creation and then delegates to `render()`.
+
+        Parameters
+        ----------
+        figsize : tuple[float, float], optional
+            Figure size in inches (width, height).
+        title : str, optional
+            Figure title.
+        xlabel : str, optional
+            Custom x-axis label. If None, uses existing label or default.
+        ylabel : str, optional
+            Custom y-axis label. If None, uses existing label or default.
+        xlim : tuple[float, float], optional
+            X-axis limits as (xmin, xmax).
+        ylim : tuple[float, float], optional
+            Y-axis limits as (ymin, ymax).
+        **kwargs : Any
+            Additional keyword arguments passed to the render() method.
+
+        Returns
+        -------
+        Figure
+            The matplotlib Figure object containing the plot.
+        """
+        return super().show(
+            figsize=figsize,
+            title=title,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            xlim=xlim,
+            ylim=ylim,
+            **kwargs,
+        )
 
     def render(
         self,

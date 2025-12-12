@@ -70,3 +70,31 @@ Methods
          :click-parent:
 
          **Outliers**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/methods/plotting.png
+      :text-align: center
+
+      Create publication-quality visualizations for spectral data and model diagnostics.
+
+      .. button-ref:: plotting
+         :ref-type: doc
+         :expand:
+         :color: secondary
+         :click-parent:
+
+         **Plotting**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/methods/inspector.png
+      :text-align: center
+
+      Interactively explore and diagnose your PCA and PLS models with comprehensive visualizations.
+
+      .. button-ref:: inspector
+         :ref-type: doc
+         :expand:
+         :color: secondary
+         :click-parent:
+
+         **Inspector**

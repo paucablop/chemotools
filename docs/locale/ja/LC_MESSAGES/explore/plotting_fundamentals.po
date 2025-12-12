@@ -1,0 +1,337 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-12 05:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/plotting_fundamentals.rst:4
+msgid "Plotting Fundamentals"
+msgstr "プロットの基礎"
+
+#: ../../source/explore/plotting_fundamentals.rst:6
+msgid ""
+"The ``chemotools.plotting`` module is designed to make visualizing "
+"spectroscopic data and chemometric models **fast**, **intuitive** and "
+"**publication-ready**. Instead of writing boilerplate ``matplotlib`` "
+"code, you can generate standard chemometric plots with just a few lines."
+msgstr ""
+"``chemotools.plotting`` モジュールは、分光データおよびケモメトリックモデルの可視化を、**高速**、**直感的**、かつ**出版レベル**にするために設計されています。"
+" 標準的なケモメトリックプロットを、冗長な ``matplotlib`` コードを書く代わりに、数行で生成できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:9
+msgid ""
+"The plotting module is experimental and under active development. The API"
+" may change in future versions. We welcome your feedback! Please report "
+"issues or suggestions at: https://github.com/paucablop/chemotools/issues"
+msgstr ""
+"このプロットモジュールは実験的であり、現在も積極的に開発が進められています。API は将来のバージョンで変更される可能性があります。"
+" フィードバックを歓迎します。問題や提案は次のリンクから報告してください: https://github.com/paucablop/chemotools/issues"
+
+#: ../../source/explore/plotting_fundamentals.rst:12
+msgid "Why specialized plotting?"
+msgstr "なぜ専用のプロットが必要なのか"
+
+#: ../../source/explore/plotting_fundamentals.rst:14
+msgid ""
+"Visualizing high-dimensional spectral data and chemometric models often "
+"requires repetitive and verbose plotting code. ``chemotools`` simplifies "
+"this by providing:"
+msgstr ""
+"高次元のスペクトルデータやケモメトリックモデルを可視化するには、繰り返し記述される冗長なプロットコードが必要になることが多くあります。"
+" ``chemotools`` は次の機能を提供することでこれを簡素化します:"
+
+#: ../../source/explore/plotting_fundamentals.rst:16
+msgid ""
+"**Domain-specific plots**: Spectra, scores, loadings, and outlier plots "
+"out of the box."
+msgstr ""
+"**ドメイン特化プロット**: スペクトル、スコア、ローディング、外れ値プロットをすぐに利用できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:17
+msgid ""
+"**Interactive exploration**: Quick ``show()`` method for immediate "
+"feedback."
+msgstr ""
+"**インタラクティブ探索**: ``show()`` メソッドにより即時フィードバックが得られます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:18
+msgid ""
+"**Publication quality**: Clean, standardized aesthetics that look good in"
+" papers."
+msgstr ""
+"**出版品質**: 論文にも適したクリーンで標準化されたデザイン。"
+
+#: ../../source/explore/plotting_fundamentals.rst:21
+msgid "Design Philosophy"
+msgstr "設計理念"
+
+#: ../../source/explore/plotting_fundamentals.rst:23
+msgid ""
+"The plotting module is built around a consistent **Display Protocol** "
+"designed to balance ease of use with flexibility."
+msgstr ""
+"このプロットモジュールは、使いやすさと柔軟性のバランスを取るために設計された、一貫した **表示プロトコル** を中心に構築されています。"
+
+#: ../../source/explore/plotting_fundamentals.rst:25
+msgid ""
+"**Object-Oriented**: Each plot type (e.g., ``SpectraPlot``, "
+"``ScoresPlot``) is a class that holds your data and configuration."
+msgstr ""
+"**オブジェクト指向**: 各プロットタイプ（例: ``SpectraPlot``、``ScoresPlot``）はデータと設定を保持するクラスです。"
+
+#: ../../source/explore/plotting_fundamentals.rst:26
+msgid "**Two Modes of Operation**:"
+msgstr "**2 つの操作モード**:"
+
+#: ../../source/explore/plotting_fundamentals.rst:28
+msgid "``show()``: Creates a new figure instantly. Perfect for quick exploration."
+msgstr ""
+"``show()``: 新しい図を即座に作成します。迅速な探索に最適です。"
+
+#: ../../source/explore/plotting_fundamentals.rst:30
+msgid ""
+"``render(ax)``: Draws the plot onto an existing matplotlib axis. Designed"
+" for building advanced, multi-panel figures and dashboards."
+msgstr ""
+"``render(ax)``: 既存の matplotlib 軸にプロットを描画します。高度なマルチパネル図やダッシュボードを作成するために設計されています。"
+
+#: ../../source/explore/plotting_fundamentals.rst:32
+msgid ""
+"**Matplotlib Integration**: All plots return standard "
+"``matplotlib.axes.Axes`` objects, allowing you to add custom annotations,"
+" lines, or styling using familiar matplotlib commands."
+msgstr ""
+"**matplotlib との統合**: すべてのプロットは標準の ``matplotlib.axes.Axes`` オブジェクトを返すため、"
+" 注釈・ライン・スタイルの追加などを、通常の matplotlib コマンドで行えます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:34
+msgid "An overview of the plotting architecture is shown below:"
+msgstr "プロットアーキテクチャの概要は以下のとおりです:"
+
+#: ../../source/explore/plotting_fundamentals.rst:40
+msgid ""
+"Since ``chemotools`` plotting is built on top of ``matplotlib``, you can "
+"use all your favorite ``matplotlib`` commands to further customize the "
+"plots returned by ``render()`` or ``show()``."
+msgstr ""
+"``chemotools`` のプロットは ``matplotlib`` 上に構築されているため、``render()`` や ``show()`` が返すプロットを、"
+" 好みの ``matplotlib`` コマンドで自由にカスタマイズできます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:43
+msgid "Visualizing Spectra"
+msgstr "スペクトルの可視化"
+
+#: ../../source/explore/plotting_fundamentals.rst:45
+msgid ""
+"The ``SpectraPlot`` is your primary tool for exploratory data analysis. "
+"It offers flexible ways to visualize your spectral data."
+msgstr ""
+"``SpectraPlot`` は探索的データ解析のための主要なツールであり、スペクトルデータを柔軟に可視化できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:47
+msgid ""
+"For this example, we will use the fermentation dataset from "
+"``chemotools``."
+msgstr ""
+"この例では、``chemotools`` に含まれる発酵データセットを使用します。"
+
+#: ../../source/explore/plotting_fundamentals.rst:65
+msgid "**1. Quick Visualization**"
+msgstr "**1. クイック可視化**"
+
+#: ../../source/explore/plotting_fundamentals.rst:67
+msgid ""
+"To quickly inspect your data, simply pass the wavenumbers and the spectra"
+" matrix. This plots all spectra in a single color."
+msgstr ""
+"データを素早く確認するには、波数とスペクトル行列を渡すだけです。すべてのスペクトルが単一の色でプロットされます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:80
+msgid ""
+"During exploration, you might want to inspect a specific region of the "
+"spectra. You can do this by specifying ``xlim`` in the ``show()`` method "
+"(see below)."
+msgstr ""
+"探索中に、スペクトルの特定領域を確認したい場合があります。これは ``show()`` メソッドで ``xlim`` を指定することで可能です（下記参照）。"
+
+#: ../../source/explore/plotting_fundamentals.rst:90
+msgid ""
+"The ``SpectraPlot`` automatically handles y-axis scaling based on the "
+"data range. You can also manually set ``ylim`` to focus on specific "
+"features."
+msgstr ""
+"``SpectraPlot`` はデータ範囲に基づいて y 軸スケールを自動調整します。特定の特徴に焦点を当てたい場合、``ylim`` を手動で設定できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:92
+msgid "**2. Coloring by Continuous Variable**"
+msgstr "**2. 連続変数による着色**"
+
+#: ../../source/explore/plotting_fundamentals.rst:94
+msgid ""
+"You can color spectra based on a continuous target variable (like glucose"
+" concentration) to visualize correlations."
+msgstr ""
+"連続ターゲット変数（例: グルコース濃度）に基づきスペクトルを着色し、相関を視覚化できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:106
+msgid "**3. Coloring by Categorical Variable**"
+msgstr "**3. カテゴリ変数による着色**"
+
+#: ../../source/explore/plotting_fundamentals.rst:108
+msgid ""
+"If you have categorical data (e.g., batches, experimental conditions), "
+"you can color by groups."
+msgstr ""
+"カテゴリデータ（例: バッチ、実験条件）がある場合、グループごとに着色できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:122
+msgid "Analyzing Models"
+msgstr "モデルの解析"
+
+#: ../../source/explore/plotting_fundamentals.rst:124
+msgid ""
+"After fitting a chemometric model (like PCA or PLS), visualizing the "
+"results is crucial for interpretation. For this section, we will use a "
+"toy PCA model fitted with the fermentation data from ``chemotools``."
+msgstr ""
+"PCA や PLS のようなケモメトリックモデルを適合した後、その結果を可視化することは解釈に不可欠です。"
+" このセクションでは、``chemotools`` の発酵データを使用して適合した簡易 PCA モデルを使用します。"
+
+#: ../../source/explore/plotting_fundamentals.rst:135
+msgid "**Explained Variance: Choosing Components**"
+msgstr "**寄与率: コンポーネントの選択**"
+
+#: ../../source/explore/plotting_fundamentals.rst:137
+msgid ""
+"Before analyzing scores and loadings, it is often useful to check how "
+"much variance each component explains. The ``ExplainedVariancePlot`` "
+"helps you decide the optimal number of components."
+msgstr ""
+"スコアやローディングを解析する前に、各コンポーネントがどれだけの分散を説明するかを確認することが有用です。"
+" ``ExplainedVariancePlot`` は最適なコンポーネント数を決定するのに役立ちます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:149
+msgid "**Scores: The Sample Space**"
+msgstr "**スコア: サンプル空間**"
+
+#: ../../source/explore/plotting_fundamentals.rst:151
+msgid ""
+"Use ``ScoresPlot`` to visualize how samples relate to each other. This is"
+" essential for identifying clusters, trends, or outliers. The "
+"``ScoresPlot`` is highly flexible and can be used to create composite "
+"figures to show different aspects of your model, such as confidence "
+"ellipses and sample annotations."
+msgstr ""
+"``ScoresPlot`` を使用すると、サンプル間の関係を視覚化できます。これはクラスタ、トレンド、外れ値を特定するために重要です。"
+" ``ScoresPlot`` は非常に柔軟で、信頼楕円やサンプル注釈などモデルのさまざまな側面を示す複合図の作成にも利用できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:180
+msgid ""
+"Since we are composing two plots into a single figure, we used the "
+"``render(ax=...)`` method to draw each plot onto specific axes. This "
+"allows for precise control over layout and styling."
+msgstr ""
+"2 つのプロットを 1 つの図にまとめるために、``render(ax=...)`` メソッドを使用してそれぞれを特定の軸に描画しました。"
+" これによりレイアウトやスタイルを正確に制御できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:182
+msgid "**Loadings: The Feature Space**"
+msgstr "**ローディング: 特徴空間**"
+
+#: ../../source/explore/plotting_fundamentals.rst:184
+msgid ""
+"Use ``LoadingsPlot`` to understand which spectral features contribute "
+"most to the model."
+msgstr ""
+"``LoadingsPlot`` を使用すると、モデルに最も寄与するスペクトル特徴を理解できます。"
+
+#: ../../source/explore/plotting_fundamentals.rst:198
+msgid "**Outlier Detection**"
+msgstr "**外れ値検出**"
+
+#: ../../source/explore/plotting_fundamentals.rst:200
+msgid ""
+"Use ``DistancesPlot`` to identify samples that don't fit the model well, "
+"using metrics like Hotelling's T² and Q-residuals. See "
+":doc:`/methods/outliers` for more details on calculating these "
+"statistics."
+msgstr ""
+"Hotelling の T² や Q 残差などの指標を用いて、モデルに適合しないサンプルを特定するには ``DistancesPlot`` を使用します。"
+" これらの統計量の計算方法については :doc:`/methods/outliers` を参照してください。"
+
+#: ../../source/explore/plotting_fundamentals.rst:210
+msgid "Now, we are ready to visualize the results."
+msgstr "これで結果を可視化する準備が整いました。"
+
+#: ../../source/explore/plotting_fundamentals.rst:228
+msgid "Evaluating Predictions"
+msgstr "予測の評価"
+
+#: ../../source/explore/plotting_fundamentals.rst:230
+msgid ""
+"For regression models, the ``PredictedVsActualPlot`` provides a standard "
+"way to assess model performance."
+msgstr ""
+"回帰モデルでは、``PredictedVsActualPlot`` がモデル性能を評価する標準的な手段となります。"
+
+#: ../../source/explore/plotting_fundamentals.rst:243
+msgid "Creating Composite Figures"
+msgstr "複合図の作成"
+
+#: ../../source/explore/plotting_fundamentals.rst:245
+msgid ""
+"All plotting classes support a ``render(ax=...)`` method, allowing you to"
+" place plots onto existing matplotlib axes. This is powerful for creating"
+" dashboards or comparison figures."
+msgstr ""
+"すべてのプロットクラスは ``render(ax=...)`` メソッドをサポートしており、既存の matplotlib 軸にプロットを配置できます。"
+" これはダッシュボードや比較図の作成に非常に有用です。"
+
+#: ../../source/explore/plotting_fundamentals.rst:266
+msgid "Other Available Plots"
+msgstr "その他の利用可能なプロット"
+
+#: ../../source/explore/plotting_fundamentals.rst:268
+msgid ""
+"The ``chemotools.plotting`` module includes other specialized plots not "
+"covered in this guide:"
+msgstr ""
+"``chemotools.plotting`` モジュールには、このガイドで扱っていない専用プロットも含まれています:"
+
+#: ../../source/explore/plotting_fundamentals.rst:270
+msgid ""
+"``FeatureSelectionPlot``: Visualize feature importance and selection "
+"results."
+msgstr ""
+"``FeatureSelectionPlot``: 特徴量の重要度および選択結果を可視化します。"
+
+#: ../../source/explore/plotting_fundamentals.rst:271
+msgid "``QQPlot``: Check for normality of residuals."
+msgstr "``QQPlot``: 残差の正規性を確認します。"
+
+#: ../../source/explore/plotting_fundamentals.rst:272
+msgid "``ResidualDistributionPlot``: Analyze the distribution of model residuals."
+msgstr "``ResidualDistributionPlot``: モデル残差の分布を解析します。"
+
+#: ../../source/explore/plotting_fundamentals.rst:273
+msgid "``YResidualsPlot``: Plot residuals against predicted values."
+msgstr "``YResidualsPlot``: 残差を予測値に対してプロットします。"
+
+#: ../../source/explore/plotting_fundamentals.rst:275
+msgid "Check the API reference for more details on these classes."
+msgstr "これらのクラスの詳細については API リファレンスを参照してください。"
