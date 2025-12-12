@@ -102,6 +102,14 @@ BUTTON_TRANSLATIONS = {
             "translation": "异常值检测",
             "url": "outliers.html",
         },
+        "Plotting": {
+            "translation": "绘图",
+            "url": "plotting.html",
+        },
+        "Inspector": {
+            "translation": "检查器",
+            "url": "inspector.html",
+        },
     },
     "es": {
         # Main index page
@@ -185,6 +193,14 @@ BUTTON_TRANSLATIONS = {
             "translation": "Valores atípicos",
             "url": "outliers.html",
         },
+        "Plotting": {
+            "translation": "Gráficos",
+            "url": "plotting.html",
+        },
+        "Inspector": {
+            "translation": "Inspector",
+            "url": "inspector.html",
+        },
     },
     "ja": {
         # Main index page
@@ -267,6 +283,14 @@ BUTTON_TRANSLATIONS = {
         "Outliers": {
             "translation": "外れ値検出",
             "url": "outliers.html",
+        },
+        "Plotting": {
+            "translation": "プロット",
+            "url": "plotting.html",
+        },
+        "Inspector": {
+            "translation": "インスペクター",
+            "url": "inspector.html",
         },
     },
 }

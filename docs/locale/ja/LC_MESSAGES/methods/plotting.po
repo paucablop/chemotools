@@ -21,11 +21,11 @@ msgstr ""
 
 #: ../../source/methods/plotting.rst:5
 msgid "API Modules"
-msgstr ""
+msgstr "API モジュール"
 
 #: ../../source/methods/plotting.rst:2
 msgid "Plotting"
-msgstr ""
+msgstr "プロット"
 
 #: ../../source/methods/plotting.rst:3
 msgid ""
@@ -35,4 +35,4 @@ msgid ""
 "easy to create publication-quality figures for scores, loadings, spectra,"
 " and regression diagnostics."
 msgstr ""
-
+"一貫性があり構成可能なプロットAPIを使用して、スペクトルデータ、モデル診断、結果を可視化します。プロットモジュールは、統一されたデザインパターンに従う再利用可能なプロットクラスを提供し、スコア、ローディング、スペクトル、回帰診断のための出版品質の図を簡単に作成できるようにします。"

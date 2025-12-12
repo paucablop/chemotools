@@ -21,11 +21,11 @@ msgstr ""
 
 #: ../../source/methods/plotting.rst:5
 msgid "API Modules"
-msgstr ""
+msgstr "API 模块"
 
 #: ../../source/methods/plotting.rst:2
 msgid "Plotting"
-msgstr ""
+msgstr "绘图"
 
 #: ../../source/methods/plotting.rst:3
 msgid ""
@@ -35,4 +35,7 @@ msgid ""
 "easy to create publication-quality figures for scores, loadings, spectra,"
 " and regression diagnostics."
 msgstr ""
+"通过一个一致、可组合的绘图API，可视化您的光谱数据、模型诊断和结果。该绘图模块提供遵循统一设计模式的可重用绘图类，使您可以轻松创建用于得分、载荷、光谱和回归诊断的发表质量图形。"
+
+
 

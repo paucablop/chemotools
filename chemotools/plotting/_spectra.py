@@ -99,8 +99,8 @@ class SpectraPlot(BasePlot, ColoringMixin):
     Creating subplots:
 
     >>> fig, axes = plt.subplots(2, 1)
-    >>> plotter1.render(ax=axes[0])
-    >>> plotter2.render(ax=axes[1])
+    >>> plotter.render(ax=axes[0])
+    >>> plotter.render(ax=axes[1])
     >>> plt.tight_layout()
     """
 

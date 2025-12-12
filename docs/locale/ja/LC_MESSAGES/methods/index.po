@@ -67,17 +67,16 @@ msgstr ""
 msgid ""
 "Create publication-quality visualizations for spectral data and model "
 "diagnostics."
-msgstr ""
+msgstr "スペクトルデータとモデル診断のために、出版物品質の可視化を作成します。"
 
 #: ../../source/methods/index.rst:80
 msgid "Plotting"
 msgstr ""
 
-#: ../../source/methods/index.rst:92
 msgid ""
 "Interactively explore and diagnose your PCA and PLS models with "
 "comprehensive visualizations."
-msgstr ""
+msgstr "包括的な可視化により、PCAおよびPLSモデルを対話的に探索・診断します。"
 
 #: ../../source/methods/index.rst:94
 msgid "Inspector"

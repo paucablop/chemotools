@@ -98,7 +98,7 @@ class DistancesPlot(BasePlot, ColoringMixin):
 
     >>> plot = DistancesPlot(
     ...     y=q_residuals,
-    ...     x=t2_values,
+    ...     x=t2_residuals,
     ...     color_by=classes,
     ...     confidence_lines=(12.5, 5.2),
     ... )
@@ -119,7 +119,7 @@ class DistancesPlot(BasePlot, ColoringMixin):
 
     >>> plot = DistancesPlot(
     ...     y=q_residuals,
-    ...     x=t2_values,
+    ...     x=t2_residuals,
     ...     confidence_lines=(9.35, 12.0),
     ... )
     >>> fig = plot.show(

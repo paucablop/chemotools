@@ -67,7 +67,7 @@ msgstr ""
 msgid ""
 "Create publication-quality visualizations for spectral data and model "
 "diagnostics."
-msgstr ""
+msgstr "为光谱数据和模型诊断创建达到出版质量的图表。"
 
 #: ../../source/methods/index.rst:80
 msgid "Plotting"
@@ -77,7 +77,7 @@ msgstr ""
 msgid ""
 "Interactively explore and diagnose your PCA and PLS models with "
 "comprehensive visualizations."
-msgstr ""
+msgstr "通过全面的可视化图表，交互式地探索和诊断您的PCA与PLS模型。"
 
 #: ../../source/methods/index.rst:94
 msgid "Inspector"

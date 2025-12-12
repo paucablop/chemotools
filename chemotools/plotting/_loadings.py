@@ -45,15 +45,15 @@ class LoadingsPlot(BasePlot):
     Basic usage with single component:
 
     >>> loadings = model.components_.T  # Shape: (n_features, n_components)
-    >>> wavelengths = np.linspace(400, 2500, n_features)
-    >>> plot = LoadingsPlot(loadings, feature_names=wavelengths, components=0)
+    >>> wavenumbers = np.linspace(400, 2500, n_features)
+    >>> plot = LoadingsPlot(loadings, feature_names=wavenumbers, components=0)
     >>> fig = plot.show(title="PC1 Loadings")
 
     Plot multiple components overlaid:
 
     >>> plot = LoadingsPlot(
     ...     loadings,
-    ...     feature_names=wavelengths,
+    ...     feature_names=wavenumbers,
     ...     components=[0, 1, 2],  # Plot PC1, PC2, PC3 together
     ... )
     >>> fig = plot.show(
@@ -85,8 +85,8 @@ class LoadingsPlot(BasePlot):
     >>> fig, axes = plt.subplots(2, 1, figsize=(12, 8))
     >>> plot1 = LoadingsPlot(loadings, feature_names=wavelengths, components=[0, 1])
     >>> plot1.render(ax=axes[0])
-    >>> plot2 = LoadingsPlot(loadings, feature_names=wavelengths, components=[2, 3])
-    >>> plot2.render(ax=axes[1])
+    >>> plot2 = LoadingsPlot(loadings, feature_names=wavelengths, components=[0, 1])
+    >>> plot2.render(ax=axes[1], xlim=(2800, 3000))
     >>> plt.tight_layout()
 
     Custom styling:

@@ -21,23 +21,21 @@ msgstr ""
 
 #: ../../source/methods/inspector_methods.rst:2
 msgid "Inspector Classes"
-msgstr ""
+msgstr "检查器类"
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
-msgid ":py:obj:`PCAInspector <chemotools.inspector.PCAInspector>`"
+msgid ":py:obj:PCAInspector <chemotools.inspector.PCAInspector>"
 msgstr ""
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
 msgid "Inspector for PCA model diagnostics and visualization."
-msgstr ""
+msgstr "用于PCA模型诊断与可视化的检查器。"
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
 msgid ""
-":py:obj:`PLSRegressionInspector "
-"<chemotools.inspector.PLSRegressionInspector>`"
+":py:obj:PLSRegressionInspector " "<chemotools.inspector.PLSRegressionInspector>"
 msgstr ""
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
 msgid "Inspector for PLS Regression model diagnostics and visualization."
-msgstr ""
-
+msgstr "用于PLS回归模型诊断与可视化的检查器。"

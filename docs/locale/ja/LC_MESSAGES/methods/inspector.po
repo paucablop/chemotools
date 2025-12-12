@@ -21,11 +21,11 @@ msgstr ""
 
 #: ../../source/methods/inspector.rst:9
 msgid "API Modules"
-msgstr ""
+msgstr "API モジュール"
 
 #: ../../source/methods/inspector.rst:2
 msgid "Inspector"
-msgstr ""
+msgstr "インスペクタ"
 
 #: ../../source/methods/inspector.rst:3
 msgid ""
@@ -34,11 +34,13 @@ msgid ""
 "comprehensive diagnostic visualizations, including scores plots, "
 "loadings, explained variance, outlier detection, and regression "
 "diagnostics."
-msgstr ""
+msgstr "インスペクタモジュールを使用して、PCAおよびPLSモデルを対話的に探索・診断します。インスペクタは、スコアプロット、ローディング、説明分散、外れ値検出、回帰診断などの包括的な診断可視化を作成するための統一インターフェースを提供します。"
 
 #: ../../source/methods/inspector.rst:7
 msgid ""
 "The inspector module is experimental and under active development. The "
 "API may change in future versions."
-msgstr ""
+msgstr "インスペクタモジュールは実験的であり、現在も積極的に開発中です。APIは将来のバージョンで変更される可能性があります。"
+
+
 

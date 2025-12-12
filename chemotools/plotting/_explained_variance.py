@@ -46,7 +46,7 @@ class ExplainedVariancePlot(BasePlot):
     >>> pca = PCA(n_components=10)
     >>> pca.fit(X)
     >>> plot = ExplainedVariancePlot(pca.explained_variance_ratio_)
-    >>> plot.show(title="PCA Explained Variance")
+    >>> fig = plot.show(title="PCA Explained Variance")
 
     **Example 2: PLS - Now just as simple!**
 
@@ -58,10 +58,10 @@ class ExplainedVariancePlot(BasePlot):
     >>>
     >>> # Variance ratios automatically available!
     >>> plot_x = ExplainedVariancePlot(pls.explained_x_variance_ratio_)
-    >>> plot_x.show(title="PLS Explained Variance in X-space")
+    >>> fig = plot_x.show(title="PLS Explained Variance in X-space")
     >>>
     >>> plot_y = ExplainedVariancePlot(pls.explained_y_variance_ratio_)
-    >>> plot_y.show(title="PLS Explained Variance in Y-space")
+    >>> fig = plot_y.show(title="PLS Explained Variance in Y-space")
 
     **Example 3: Side-by-side PLS comparison**
 
@@ -77,7 +77,7 @@ class ExplainedVariancePlot(BasePlot):
     **Example 4: Custom threshold and labels**
 
     >>> plot = ExplainedVariancePlot(pca.explained_variance_ratio_, threshold=0.90)
-    >>> plot.show(xlabel="PC Number", ylabel="Variance Explained")
+    >>> fig = plot.show(xlabel="PC Number", ylabel="Variance Explained")
     """
 
     def __init__(

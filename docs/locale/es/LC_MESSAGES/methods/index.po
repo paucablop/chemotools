@@ -53,7 +53,7 @@ msgid ""
 "of your model."
 msgstr ""
 "Selecciona las características químicamente más relevantes para mejorar "
-"el rendimiento de tu modelo."
+" tu modelo."
 
 #: ../../source/methods/index.rst:52
 msgid "Feature selection"
@@ -75,7 +75,7 @@ msgstr "Valores atípicos"
 msgid ""
 "Create publication-quality visualizations for spectral data and model "
 "diagnostics."
-msgstr ""
+msgstr "Crea visualizaciones y gráficas con calidad the publicacion."
 
 #: ../../source/methods/index.rst:80
 msgid "Plotting"
@@ -85,7 +85,7 @@ msgstr ""
 msgid ""
 "Interactively explore and diagnose your PCA and PLS models with "
 "comprehensive visualizations."
-msgstr ""
+msgstr "Explora y diagnistica tus modelos PCA y PLS con visualizaciones."
 
 #: ../../source/methods/index.rst:94
 msgid "Inspector"
