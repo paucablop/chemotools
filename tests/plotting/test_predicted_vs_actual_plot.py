@@ -69,7 +69,7 @@ def test_render_continuous_color_by_adds_colorbar():
 
     # Assert
     assert len(fig.axes) == 2  # scatter axis + colorbar axis
-    assert fig.axes[1].get_ylabel() == "Color By"
+    assert fig.axes[1].get_ylabel() == "Value"
 
     # Cleanup
     plt.close(fig)

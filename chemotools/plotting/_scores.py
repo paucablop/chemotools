@@ -55,6 +55,9 @@ class ScoresPlot(BasePlot, ColoringMixin):
     color_mode : {"continuous", "categorical"}, optional
         Explicitly specify coloring mode. If None (default), automatically
         detects based on dtype and unique values of color_by.
+    colorbar_label : str, optional
+        Label for the colorbar when using continuous coloring.
+        Default is "Value". Only applies when color_by is continuous.
 
     Raises
     ------
@@ -122,6 +125,7 @@ class ScoresPlot(BasePlot, ColoringMixin):
         colormap: Optional[str] = None,
         confidence_ellipse: Optional[bool | float] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        colorbar_label: str = "Value",
     ):
         self.scores = validate_data(scores, name="scores", ensure_2d=True)
         self.components = components
@@ -147,7 +151,9 @@ class ScoresPlot(BasePlot, ColoringMixin):
             )
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap, color_mode=color_mode)
+        self._init_coloring(
+            color_by, colormap, color_mode=color_mode, colorbar_label=colorbar_label
+        )
 
     def _validate_components(self) -> None:
         """Validate that component indices are valid.

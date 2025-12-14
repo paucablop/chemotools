@@ -63,6 +63,9 @@ class YResidualsPlot(BasePlot, ColoringMixin):
     color_mode : {"continuous", "categorical"}, optional
         Explicitly specify coloring mode. If None (default), automatically
         detects based on dtype and unique values of color_by.
+    colorbar_label : str, optional
+        Label for the colorbar when using continuous coloring.
+        Default is "Value". Only applies when color_by is continuous.
 
     Raises
     ------
@@ -118,6 +121,7 @@ class YResidualsPlot(BasePlot, ColoringMixin):
         add_zero_line: bool = True,
         add_confidence_band: Optional[bool | float] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        colorbar_label: str = "Value",
     ):
         self.residuals = validate_data(residuals, name="residuals", ensure_2d=False)
 
@@ -146,7 +150,9 @@ class YResidualsPlot(BasePlot, ColoringMixin):
             )
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap, color_mode=color_mode)
+        self._init_coloring(
+            color_by, colormap, color_mode=color_mode, colorbar_label=colorbar_label
+        )
 
     def _validate_residuals(self) -> None:
         """Validate residuals shape and target index."""

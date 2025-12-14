@@ -60,6 +60,9 @@ class DistancesPlot(BasePlot, ColoringMixin):
     color_mode : {"continuous", "categorical"}, optional
         Explicitly specify coloring mode. If None (default), automatically
         detects based on dtype and unique values of color_by.
+    colorbar_label : str, optional
+        Label for the colorbar when using continuous coloring.
+        Default is "Value". Only applies when color_by is continuous.
 
     Raises
     ------
@@ -142,6 +145,7 @@ class DistancesPlot(BasePlot, ColoringMixin):
         marker: str = "o",
         confidence_lines: Optional[bool | tuple[float | None, float | None]] = None,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        colorbar_label: str = "Value",
     ):
         self.annotations = annotations
         self.label = label
@@ -174,7 +178,9 @@ class DistancesPlot(BasePlot, ColoringMixin):
         self._init_from_xy(x, y)
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap, color_mode=color_mode)
+        self._init_coloring(
+            color_by, colormap, color_mode=color_mode, colorbar_label=colorbar_label
+        )
 
         self._validate_color_and_annotations()
 

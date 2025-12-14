@@ -49,6 +49,9 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
     color_mode : {"continuous", "categorical"}, optional
         Explicitly specify coloring mode. If None (default), automatically
         detects based on dtype and unique values of color_by.
+    colorbar_label : str, optional
+        Label for the colorbar when using continuous coloring.
+        Default is "Value". Only applies when color_by is continuous.
 
     Raises
     ------
@@ -99,7 +102,9 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         marker: str = "o",
         add_ideal_line: bool = True,
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
+        colorbar_label: str = "Value",
     ):
+        self.colorbar_label = colorbar_label
         self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
         self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
         self.target_index = target_index
@@ -151,7 +156,12 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
             self.y_pred_1d = self.y_pred
 
         # Initialize coloring
-        self._init_coloring(color_by, colormap, colorbar_label="Color By")
+        self._init_coloring(
+            color_by,
+            colormap,
+            color_mode=color_mode,
+            colorbar_label=self.colorbar_label,
+        )
 
     def _validate_inputs(self) -> None:
         """Validate y_true and y_pred arrays."""
