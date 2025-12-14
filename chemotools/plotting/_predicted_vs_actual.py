@@ -104,7 +104,7 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         color_mode: Optional[Literal["continuous", "categorical"]] = None,
         colorbar_label: str = "Value",
     ):
-        self.colorbar_label = colorbar_label
+        # Validate and store input data
         self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
         self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
         self.target_index = target_index
@@ -112,31 +112,16 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         self.color = color
         self.marker = marker
         self.add_ideal_line = add_ideal_line
+        self.colorbar_label = colorbar_label
 
         # Validate shapes match
         if self.y_true.shape != self.y_pred.shape:
             raise ValueError(
-                f"y_true and y_pred must have same shape, got {self.y_true.shape} and {self.y_pred.shape}"
+                f"y_true and y_pred must have same shape. "
+                f"Got y_true: {self.y_true.shape}, y_pred: {self.y_pred.shape}"
             )
 
-        if color_by is not None:
-            color_by = validate_data(
-                color_by, name="color_by", ensure_2d=False, numeric=False
-            )
-
-        # Initialize coloring
-        self._init_coloring(color_by, colormap, color_mode=color_mode)
-        self.y_true = validate_data(y_true, name="y_true", ensure_2d=False)
-        self.y_pred = validate_data(y_pred, name="y_pred", ensure_2d=False)
-        self.target_index = target_index
-        self.label = label
-        self.color = color
-        self.marker = marker
-        self.add_ideal_line = add_ideal_line
-
-        # Validate inputs
-        self._validate_inputs()
-
+        # Validate color_by if provided
         if color_by is not None:
             color_by = validate_data(
                 color_by, name="color_by", ensure_2d=False, numeric=False
@@ -151,7 +136,7 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
                 )
             self.y_true_1d = self.y_true[:, target_index]
             self.y_pred_1d = self.y_pred[:, target_index]
-        elif self.y_true.ndim == 1:
+        else:
             self.y_true_1d = self.y_true
             self.y_pred_1d = self.y_pred
 
@@ -162,14 +147,6 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
             color_mode=color_mode,
             colorbar_label=self.colorbar_label,
         )
-
-    def _validate_inputs(self) -> None:
-        """Validate y_true and y_pred arrays."""
-        if self.y_true.shape != self.y_pred.shape:
-            raise ValueError(
-                f"y_true and y_pred must have same shape. "
-                f"Got y_true: {self.y_true.shape}, y_pred: {self.y_pred.shape}"
-            )
 
     def _get_default_labels(self) -> dict[str, str]:
         if self.y_true.ndim == 2:
