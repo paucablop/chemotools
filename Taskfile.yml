@@ -16,7 +16,6 @@ tasks:
       - "{{.UV}} pip install .[dev]"
     sources:
       - pyproject.toml
-      - uv.lock
     generates:
       - .venv
 

@@ -153,4 +153,5 @@ generated/
 docs/source/api/generated/
 docs/source/generated/
 
-
+# uv lock file (regenerated per Python version)
+uv.lock
