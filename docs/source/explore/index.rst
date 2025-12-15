@@ -101,7 +101,7 @@ Discover the environment
             **Plotting fundamentals**
 
    .. grid-item-card::
-      :img-top: ../_static/images/explore/inspector.png
+      :img-top: ../_static/images/explore/inspector_explore.png
       :text-align: center
 
       .. button-ref:: ./inspector_fundamentals
