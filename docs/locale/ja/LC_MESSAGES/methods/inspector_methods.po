@@ -24,7 +24,7 @@ msgid "Inspector Classes"
 msgstr "インスペクタクラス"
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
-msgid ":py:obj:PCAInspector <chemotools.inspector.PCAInspector>"
+msgid ":py:obj:`PCAInspector <chemotools.inspector.PCAInspector>`"
 msgstr ""
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
@@ -33,9 +33,19 @@ msgstr "PCAモデルの診断と可視化を行うインスペクタ。"
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
 msgid ""
-":py:obj:PLSRegressionInspector " "<chemotools.inspector.PLSRegressionInspector>"
+":py:obj:`PLSRegressionInspector "
+"<chemotools.inspector.PLSRegressionInspector>`"
 msgstr ""
 
 #: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
 msgid "Inspector for PLS Regression model diagnostics and visualization."
 msgstr "PLS回帰モデルの診断と可視化を行うインスペクタ。"
+
+#~ msgid ":py:obj:PCAInspector <chemotools.inspector.PCAInspector>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":py:obj:PLSRegressionInspector \" "
+#~ "\"<chemotools.inspector.PLSRegressionInspector>"
+#~ msgstr ""
+

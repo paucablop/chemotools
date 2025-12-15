@@ -21,7 +21,7 @@ msgstr ""
 
 #: ../../source/explore/plotting_fundamentals.rst:4
 msgid "Plotting Fundamentals"
-msgstr ""
+msgstr "绘图基础"
 
 #: ../../source/explore/plotting_fundamentals.rst:6
 msgid ""
@@ -30,6 +30,7 @@ msgid ""
 "**publication-ready**. Instead of writing boilerplate ``matplotlib`` "
 "code, you can generate standard chemometric plots with just a few lines."
 msgstr ""
+"``chemotools.plotting`` 模块旨在使光谱数据和化学计量学模型的可视化变得**快速**、**直观**且**达到发表质量**。无需编写样板式的 ``matplotlib`` 代码，仅用几行即可生成标准的化学计量学图表。"
 
 #: ../../source/explore/plotting_fundamentals.rst:9
 msgid ""
@@ -37,10 +38,11 @@ msgid ""
 " may change in future versions. We welcome your feedback! Please report "
 "issues or suggestions at: https://github.com/paucablop/chemotools/issues"
 msgstr ""
+"该绘图模块是实验性的，且正在积极开发中。其API可能在未来的版本中发生变化。我们欢迎您的反馈！请在此处报告问题或建议：https://github.com/paucablop/chemotools/issues"
 
 #: ../../source/explore/plotting_fundamentals.rst:12
 msgid "Why specialized plotting?"
-msgstr ""
+msgstr "为什么需要专门的绘图工具？"
 
 #: ../../source/explore/plotting_fundamentals.rst:14
 msgid ""
@@ -48,158 +50,159 @@ msgid ""
 "requires repetitive and verbose plotting code. ``chemotools`` simplifies "
 "this by providing:"
 msgstr ""
+"可视化高维光谱数据和化学计量学模型通常需要重复且冗长的绘图代码。``chemotools`` 通过提供以下功能来简化这一过程："
 
 #: ../../source/explore/plotting_fundamentals.rst:16
 msgid ""
 "**Domain-specific plots**: Spectra, scores, loadings, and outlier plots "
 "out of the box."
-msgstr ""
+msgstr "**领域专用图表**：开箱即用的光谱图、得分图、载荷图和异常值图。"
 
 #: ../../source/explore/plotting_fundamentals.rst:17
 msgid ""
 "**Interactive exploration**: Quick ``show()`` method for immediate "
 "feedback."
-msgstr ""
+msgstr "**交互式探索**：用于即时反馈的快速 ``show()`` 方法。"
 
 #: ../../source/explore/plotting_fundamentals.rst:18
 msgid ""
 "**Publication quality**: Clean, standardized aesthetics that look good in"
 " papers."
-msgstr ""
+msgstr "**发表质量**：干净、标准化的美学设计，适合用于论文。"
 
 #: ../../source/explore/plotting_fundamentals.rst:21
 msgid "Design Philosophy"
-msgstr ""
+msgstr "设计理念"
 
 #: ../../source/explore/plotting_fundamentals.rst:23
 msgid ""
 "The plotting module is built around a consistent **Display Protocol** "
 "designed to balance ease of use with flexibility."
-msgstr ""
+msgstr "绘图模块围绕一个一致的**显示协议（Display Protocol）**构建，旨在平衡易用性与灵活性。"
 
 #: ../../source/explore/plotting_fundamentals.rst:25
 msgid ""
 "**Object-Oriented**: Each plot type (e.g., ``SpectraPlot``, "
 "``ScoresPlot``) is a class that holds your data and configuration."
-msgstr ""
+msgstr "**面向对象**：每种图表类型（例如，``SpectraPlot``、``ScoresPlot``）都是一个保存数据和配置的类。"
 
 #: ../../source/explore/plotting_fundamentals.rst:26
 msgid "**Two Modes of Operation**:"
-msgstr ""
+msgstr "**两种操作模式**："
 
 #: ../../source/explore/plotting_fundamentals.rst:28
 msgid "``show()``: Creates a new figure instantly. Perfect for quick exploration."
-msgstr ""
+msgstr "``show()``：即时创建一个新图形。非常适合快速探索。"
 
 #: ../../source/explore/plotting_fundamentals.rst:30
 msgid ""
 "``render(ax)``: Draws the plot onto an existing matplotlib axis. Designed"
 " for building advanced, multi-panel figures and dashboards."
-msgstr ""
+msgstr "``render(ax)``：将图表绘制到现有的matplotlib坐标轴上。专为构建高级、多面板图形和仪表板而设计。"
 
 #: ../../source/explore/plotting_fundamentals.rst:32
 msgid ""
 "**Matplotlib Integration**: All plots return standard "
 "``matplotlib.axes.Axes`` objects, allowing you to add custom annotations,"
 " lines, or styling using familiar matplotlib commands."
-msgstr ""
+msgstr "**Matplotlib集成**：所有图表都返回标准的 ``matplotlib.axes.Axes`` 对象，允许您使用熟悉的matplotlib命令添加自定义注释、线条或样式。"
 
 #: ../../source/explore/plotting_fundamentals.rst:34
 msgid "An overview of the plotting architecture is shown below:"
-msgstr ""
+msgstr "绘图架构概述如下："
 
 #: ../../source/explore/plotting_fundamentals.rst:40
 msgid ""
 "Since ``chemotools`` plotting is built on top of ``matplotlib``, you can "
 "use all your favorite ``matplotlib`` commands to further customize the "
 "plots returned by ``render()`` or ``show()``."
-msgstr ""
+msgstr "由于 ``chemotools`` 绘图建立在 ``matplotlib`` 之上，您可以使用所有喜欢的 ``matplotlib`` 命令来进一步自定义 ``render()`` 或 ``show()`` 返回的图表。"
 
 #: ../../source/explore/plotting_fundamentals.rst:43
 msgid "Visualizing Spectra"
-msgstr ""
+msgstr "可视化光谱"
 
 #: ../../source/explore/plotting_fundamentals.rst:45
 msgid ""
 "The ``SpectraPlot`` is your primary tool for exploratory data analysis. "
 "It offers flexible ways to visualize your spectral data."
-msgstr ""
+msgstr "``SpectraPlot`` 是您进行探索性数据分析的主要工具。它提供了灵活的方式来可视化您的光谱数据。"
 
 #: ../../source/explore/plotting_fundamentals.rst:47
 msgid ""
 "For this example, we will use the fermentation dataset from "
 "``chemotools``."
-msgstr ""
+msgstr "在此示例中，我们将使用来自 ``chemotools`` 的发酵数据集。"
 
 #: ../../source/explore/plotting_fundamentals.rst:65
 msgid "**1. Quick Visualization**"
-msgstr ""
+msgstr "**1. 快速可视化**"
 
 #: ../../source/explore/plotting_fundamentals.rst:67
 msgid ""
 "To quickly inspect your data, simply pass the wavenumbers and the spectra"
 " matrix. This plots all spectra in a single color."
-msgstr ""
+msgstr "要快速检查您的数据，只需传入波数和光谱矩阵。这将以单一颜色绘制所有光谱。"
 
 #: ../../source/explore/plotting_fundamentals.rst:80
 msgid ""
 "During exploration, you might want to inspect a specific region of the "
 "spectra. You can do this by specifying ``xlim`` in the ``show()`` method "
 "(see below)."
-msgstr ""
+msgstr "在探索过程中，您可能希望检查光谱的特定区域。您可以通过在 ``show()`` 方法中指定 ``xlim`` 来实现（见下文）。"
 
 #: ../../source/explore/plotting_fundamentals.rst:90
 msgid ""
 "The ``SpectraPlot`` automatically handles y-axis scaling based on the "
 "data range. You can also manually set ``ylim`` to focus on specific "
 "features."
-msgstr ""
+msgstr "``SpectraPlot`` 会根据数据范围自动处理y轴缩放。您也可以手动设置 ``ylim`` 以聚焦于特定特征。"
 
 #: ../../source/explore/plotting_fundamentals.rst:92
 msgid "**2. Coloring by Continuous Variable**"
-msgstr ""
+msgstr "**2. 按连续变量着色**"
 
 #: ../../source/explore/plotting_fundamentals.rst:94
 msgid ""
 "You can color spectra based on a continuous target variable (like glucose"
 " concentration) to visualize correlations."
-msgstr ""
+msgstr "您可以根据连续目标变量（如葡萄糖浓度）为光谱着色，以可视化相关性。"
 
 #: ../../source/explore/plotting_fundamentals.rst:106
 msgid "**3. Coloring by Categorical Variable**"
-msgstr ""
+msgstr "**3. 按分类变量着色**"
 
 #: ../../source/explore/plotting_fundamentals.rst:108
 msgid ""
 "If you have categorical data (e.g., batches, experimental conditions), "
 "you can color by groups."
-msgstr ""
+msgstr "如果您有分类数据（例如，批次、实验条件），可以按组着色。"
 
 #: ../../source/explore/plotting_fundamentals.rst:122
 msgid "Analyzing Models"
-msgstr ""
+msgstr "分析模型"
 
 #: ../../source/explore/plotting_fundamentals.rst:124
 msgid ""
 "After fitting a chemometric model (like PCA or PLS), visualizing the "
 "results is crucial for interpretation. For this section, we will use a "
 "toy PCA model fitted with the fermentation data from ``chemotools``."
-msgstr ""
+msgstr "拟合化学计量学模型（如PCA或PLS）后，可视化结果对于解释至关重要。在本节中，我们将使用一个基于 ``chemotools`` 发酵数据拟合的简单PCA模型。"
 
 #: ../../source/explore/plotting_fundamentals.rst:135
 msgid "**Explained Variance: Choosing Components**"
-msgstr ""
+msgstr "**解释方差：选择成分**"
 
 #: ../../source/explore/plotting_fundamentals.rst:137
 msgid ""
 "Before analyzing scores and loadings, it is often useful to check how "
 "much variance each component explains. The ``ExplainedVariancePlot`` "
 "helps you decide the optimal number of components."
-msgstr ""
+msgstr "在分析得分和载荷之前，检查每个成分解释了多少方差通常很有用。``ExplainedVariancePlot`` 帮助您决定最佳成分数量。"
 
 #: ../../source/explore/plotting_fundamentals.rst:149
 msgid "**Scores: The Sample Space**"
-msgstr ""
+msgstr "**得分：样本空间**"
 
 #: ../../source/explore/plotting_fundamentals.rst:151
 msgid ""
@@ -208,28 +211,28 @@ msgid ""
 "``ScoresPlot`` is highly flexible and can be used to create composite "
 "figures to show different aspects of your model, such as confidence "
 "ellipses and sample annotations."
-msgstr ""
+msgstr "使用 ``ScoresPlot`` 可视化样本之间的相互关系。这对于识别聚类、趋势或异常值至关重要。``ScoresPlot`` 高度灵活，可用于创建复合图形以显示模型的不同方面，例如置信椭圆和样本注释。"
 
 #: ../../source/explore/plotting_fundamentals.rst:180
 msgid ""
 "Since we are composing two plots into a single figure, we used the "
 "``render(ax=...)`` method to draw each plot onto specific axes. This "
 "allows for precise control over layout and styling."
-msgstr ""
+msgstr "由于我们将两个图表组合到一个图形中，我们使用 ``render(ax=...)`` 方法将每个图表绘制到特定的坐标轴上。这样可以精确控制布局和样式。"
 
 #: ../../source/explore/plotting_fundamentals.rst:182
 msgid "**Loadings: The Feature Space**"
-msgstr ""
+msgstr "**载荷：特征空间**"
 
 #: ../../source/explore/plotting_fundamentals.rst:184
 msgid ""
 "Use ``LoadingsPlot`` to understand which spectral features contribute "
 "most to the model."
-msgstr ""
+msgstr "使用 ``LoadingsPlot`` 来理解哪些光谱特征对模型的贡献最大。"
 
 #: ../../source/explore/plotting_fundamentals.rst:198
 msgid "**Outlier Detection**"
-msgstr ""
+msgstr "**异常值检测**"
 
 #: ../../source/explore/plotting_fundamentals.rst:200
 msgid ""
@@ -237,62 +240,61 @@ msgid ""
 "using metrics like Hotelling's T² and Q-residuals. See "
 ":doc:`/methods/outliers` for more details on calculating these "
 "statistics."
-msgstr ""
+msgstr "使用 ``DistancesPlot`` 来识别与模型拟合不佳的样本，使用诸如Hotelling's T²和Q残差等指标。有关计算这些统计量的更多详细信息，请参见 :doc:`/methods/outliers`。"
 
 #: ../../source/explore/plotting_fundamentals.rst:210
 msgid "Now, we are ready to visualize the results."
-msgstr ""
+msgstr "现在，我们准备可视化结果。"
 
 #: ../../source/explore/plotting_fundamentals.rst:228
 msgid "Evaluating Predictions"
-msgstr ""
+msgstr "评估预测"
 
 #: ../../source/explore/plotting_fundamentals.rst:230
 msgid ""
 "For regression models, the ``PredictedVsActualPlot`` provides a standard "
 "way to assess model performance."
-msgstr ""
+msgstr "对于回归模型，``PredictedVsActualPlot`` 提供了一种评估模型性能的标准方法。"
 
 #: ../../source/explore/plotting_fundamentals.rst:243
 msgid "Creating Composite Figures"
-msgstr ""
+msgstr "创建复合图形"
 
 #: ../../source/explore/plotting_fundamentals.rst:245
 msgid ""
 "All plotting classes support a ``render(ax=...)`` method, allowing you to"
 " place plots onto existing matplotlib axes. This is powerful for creating"
 " dashboards or comparison figures."
-msgstr ""
+msgstr "所有绘图类都支持 ``render(ax=...)`` 方法，允许您将图表放置在现有的matplotlib坐标轴上。这对于创建仪表板或对比图形非常强大。"
 
 #: ../../source/explore/plotting_fundamentals.rst:266
 msgid "Other Available Plots"
-msgstr ""
+msgstr "其他可用图表"
 
 #: ../../source/explore/plotting_fundamentals.rst:268
 msgid ""
 "The ``chemotools.plotting`` module includes other specialized plots not "
 "covered in this guide:"
-msgstr ""
+msgstr "``chemotools.plotting`` 模块包含本指南未涵盖的其他专业图表："
 
 #: ../../source/explore/plotting_fundamentals.rst:270
 msgid ""
 "``FeatureSelectionPlot``: Visualize feature importance and selection "
 "results."
-msgstr ""
+msgstr "``FeatureSelectionPlot``：可视化特征重要性和选择结果。"
 
 #: ../../source/explore/plotting_fundamentals.rst:271
 msgid "``QQPlot``: Check for normality of residuals."
-msgstr ""
+msgstr "``QQPlot``：检查残差的正态性。"
 
 #: ../../source/explore/plotting_fundamentals.rst:272
 msgid "``ResidualDistributionPlot``: Analyze the distribution of model residuals."
-msgstr ""
+msgstr "``ResidualDistributionPlot``：分析模型残差的分布。"
 
 #: ../../source/explore/plotting_fundamentals.rst:273
 msgid "``YResidualsPlot``: Plot residuals against predicted values."
-msgstr ""
+msgstr "``YResidualsPlot``：绘制残差与预测值的图表。"
 
 #: ../../source/explore/plotting_fundamentals.rst:275
 msgid "Check the API reference for more details on these classes."
-msgstr ""
-
+msgstr "查看API参考以获取有关这些类的更多详细信息。"

@@ -24,7 +24,7 @@ msgid "Plotting Classes"
 msgstr "绘图类"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:SpectraPlot <chemotools.plotting.SpectraPlot>"
+msgid ":py:obj:`SpectraPlot <chemotools.plotting.SpectraPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -32,7 +32,7 @@ msgid "Plot class for visualizing spectral data."
 msgstr "用于可视化光谱数据的绘图类。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:ScoresPlot <chemotools.plotting.ScoresPlot>"
+msgid ":py:obj:`ScoresPlot <chemotools.plotting.ScoresPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -40,7 +40,7 @@ msgid "Simple, composable scores plot for a single dataset."
 msgstr "用于单个数据集的简单、可组合得分图。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:LoadingsPlot <chemotools.plotting.LoadingsPlot>"
+msgid ":py:obj:`LoadingsPlot <chemotools.plotting.LoadingsPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -48,7 +48,7 @@ msgid "Loadings plot implementing Display protocol for model inspection."
 msgstr "实现Display协议用于模型检查的载荷图。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:DistancesPlot <chemotools.plotting.DistancesPlot>"
+msgid ":py:obj:`DistancesPlot <chemotools.plotting.DistancesPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -57,7 +57,8 @@ msgstr "用于单个数据集的简单、可组合距离图。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
 msgid ""
-":py:obj:ExplainedVariancePlot " "<chemotools.plotting.ExplainedVariancePlot>"
+":py:obj:`ExplainedVariancePlot "
+"<chemotools.plotting.ExplainedVariancePlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -65,7 +66,7 @@ msgid "Visualize explained variance by component with cumulative variance."
 msgstr "按成分可视化解释方差，并包含累计方差。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:FeatureSelectionPlot <chemotools.plotting.FeatureSelectionPlot>"
+msgid ":py:obj:`FeatureSelectionPlot <chemotools.plotting.FeatureSelectionPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -74,7 +75,8 @@ msgstr "用于可视化光谱数据特征选择的绘图类。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
 msgid ""
-":py:obj:PredictedVsActualPlot " "<chemotools.plotting.PredictedVsActualPlot>"
+":py:obj:`PredictedVsActualPlot "
+"<chemotools.plotting.PredictedVsActualPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -82,7 +84,7 @@ msgid "Scatter plot of predicted vs actual values to assess regression fit."
 msgstr "用于评估回归拟合效果的预测值 vs 实际值散点图。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:YResidualsPlot <chemotools.plotting.YResidualsPlot>"
+msgid ":py:obj:`YResidualsPlot <chemotools.plotting.YResidualsPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -90,7 +92,7 @@ msgid "Plot of residuals to assess homoscedasticity and model fit quality."
 msgstr "用于评估同方差性和模型拟合质量的残差图。"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
-msgid ":py:obj:QQPlot <chemotools.plotting.QQPlot>"
+msgid ":py:obj:`QQPlot <chemotools.plotting.QQPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
@@ -101,9 +103,47 @@ msgstr "用于评估残差是否服从正态分布的分位数-分位数（Q-Q�
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
 msgid ""
-":py:obj:ResidualDistributionPlot " "<chemotools.plotting.ResidualDistributionPlot>"
+":py:obj:`ResidualDistributionPlot "
+"<chemotools.plotting.ResidualDistributionPlot>`"
 msgstr ""
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1
 msgid "Histogram plot of residuals to assess normality and distribution shape."
 msgstr "用于评估正态性和分布形状的残差直方图。"
+
+#~ msgid ":py:obj:SpectraPlot <chemotools.plotting.SpectraPlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:ScoresPlot <chemotools.plotting.ScoresPlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:LoadingsPlot <chemotools.plotting.LoadingsPlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:DistancesPlot <chemotools.plotting.DistancesPlot>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":py:obj:ExplainedVariancePlot \" "
+#~ "\"<chemotools.plotting.ExplainedVariancePlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:FeatureSelectionPlot <chemotools.plotting.FeatureSelectionPlot>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":py:obj:PredictedVsActualPlot \" "
+#~ "\"<chemotools.plotting.PredictedVsActualPlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:YResidualsPlot <chemotools.plotting.YResidualsPlot>"
+#~ msgstr ""
+
+#~ msgid ":py:obj:QQPlot <chemotools.plotting.QQPlot>"
+#~ msgstr ""
+
+#~ msgid ""
+#~ ":py:obj:ResidualDistributionPlot \" "
+#~ "\"<chemotools.plotting.ResidualDistributionPlot>"
+#~ msgstr ""
+

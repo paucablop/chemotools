@@ -193,7 +193,7 @@ Use ``LoadingsPlot`` to understand which spectral features contribute most to th
     plot = LoadingsPlot(loadings, feature_names=wavenumbers, components=0)
     fig = plot.show(title="PC1 Loadings", ylabel="Loading Coefficient")
 
-.. image:: ../_static/images/plotting/loadings_example.png
+.. image:: ../_static/images/explore/plotting/loadings_example.png
 
 **Outlier Detection**
 
@@ -215,14 +215,21 @@ Now, we are ready to visualize the results.
 
     # Plot T² vs Q-residuals
     plot = DistancesPlot(
-        x=hotelling.predict_residuals(X),
-        y=q_residuals.predict_residuals(X),
+        x=hotelling.predict_residuals(X_cut),
+        y=q_residuals.predict_residuals(X_cut),
         confidence_lines=(hotelling.critical_value_, q_residuals.critical_value_),
         color_by=y,
-    )
-    fig = plot.show(xlabel="Hotelling's T²", ylabel="Q Residuals")
+    ).render(ax=ax[0],xlabel="Hotelling's T²", ylabel="Q Residuals")
 
-.. image:: ../_static/images/plotting/outliers_example.png
+    plot = DistancesPlot(
+        x=hotelling.predict_residuals(X_cut),
+        y=q_residuals.predict_residuals(X_cut),
+        confidence_lines=(hotelling.critical_value_, q_residuals.critical_value_),
+        color_by=measuring_date,
+        annotations=temperatures,
+    ).render(ax=ax[1],xlabel="Hotelling's T²", ylabel="Q Residuals")
+
+.. image:: ../_static/images/explore/plotting/outliers_example.png
 
 Evaluating Predictions
 ----------------------
@@ -231,13 +238,20 @@ For regression models, the ``PredictedVsActualPlot`` provides a standard way to 
 
 .. code-block:: python
 
-    from chemotools.plotting import PredictedVsActualPlot
-    
-    # Assume y_pred comes from a PLS model
-    # plot = PredictedVsActualPlot(y_true=y_test, y_pred=y_pred)
-    # fig = plot.show(title="Prediction Performance")
+    from chemotools.plotting import PredictedVsActualPlot, YResidualsPlot
+    y_residuals = y_test - y_pred
 
-.. image:: ../_static/images/plotting/predictions_example.png
+    # Assume y_pred comes from a PLS model
+    fig, ax = plt.subplots(1, 2, figsize=(12, 5))
+    PredictedVsActualPlot(y_true=y_test, y_pred=y_pred).render(
+        ax=ax[0], xlabel="Actual (g/L)", ylabel="Predicted (g/L)"
+    )
+    YResidualsPlot(residuals=y_residuals, add_confidence_band=True).render(
+        ax=ax[1], xlabel="Sample Index", ylabel="Residuals (g/L)"
+    )
+
+
+.. image:: ../_static/images/explore/plotting/predictions_example.png
 
 Creating Composite Figures
 --------------------------

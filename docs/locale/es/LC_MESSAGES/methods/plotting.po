@@ -21,18 +21,14 @@ msgstr ""
 
 #: ../../source/methods/plotting.rst:5
 msgid "API Modules"
-msgstr ""
+msgstr "Módulos de API"
 
 #: ../../source/methods/plotting.rst:2
 msgid "Plotting"
-msgstr ""
+msgstr "Gráficas"
 
 #: ../../source/methods/plotting.rst:3
 msgid ""
-"Visualize your spectral data, model diagnostics, and results with a "
-"consistent, composable plotting API. The plotting module provides "
-"reusable plot classes that follow a unified design pattern, making it "
-"easy to create publication-quality figures for scores, loadings, spectra,"
-" and regression diagnostics."
+"Visualice sus datos espectrales, diagnósticos de modelos y resultados con una API de graficación consistente y componible. El módulo de graficación proporciona clases de gráficos reutilizables que siguen un patrón de diseño unificado, facilitando la creación de figuras de calidad de publicación para puntuaciones, cargas, espectros y diagnósticos de regresión."
 msgstr ""
 

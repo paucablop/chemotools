@@ -8,12 +8,12 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 05:37+0800\n"
+"POT-Creation-Date: 2025-12-15 05:16+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -21,66 +21,255 @@ msgstr ""
 
 #: ../../source/explore/astartes.rst:4
 msgid "Sampling with Astartes"
-msgstr ""
+msgstr "Muestreo con Astartes"
 
 #: ../../source/explore/astartes.rst:6
 msgid ""
-"**Chemotools** focuses on preprocessing and modeling spectral data, but "
-"robust model validation starts with how you split your data. This is "
-"where **Astartes** comes in."
+"If you've ever wondered whether a random train/test split is really the "
+"best approach for spectroscopic data, you're not alone. Random splits can"
+" leave gaps in your calibration set or, worse, put very similar samples "
+"in both sets—leading to overly optimistic error estimates."
 msgstr ""
+"Si alguna vez te has preguntado si una división aleatoria entrenamiento/prueba es realmente el mejor enfoque para datos espectroscópicos, no estás solo. Las divisiones aleatorias pueden dejar huecos en tu conjunto de calibración o, peor aún, colocar muestras muy similares en ambos conjuntos, lo que conduce a estimaciones de error excesivamente optimistas."
 
 #: ../../source/explore/astartes.rst:8
 msgid ""
-"`Astartes <https://github.com/JacksonBurns/astartes>`_ is a Python "
-"library for rigorous dataset splitting (sampling). It serves as a drop-in"
-" replacement for ``sklearn.model_selection.train_test_split`` but offers "
-"\"rational\" sampling algorithms like **Kennard-Stone** and **SPXY**, "
-"which are essential in chemometrics."
+"`Astartes <https://github.com/JacksonBurns/astartes>`_ solves this "
+"problem. It's a Python library that works as a drop-in replacement for "
+"``sklearn.model_selection.train_test_split``, but with access to sampling"
+" algorithms that actually make sense for chemometrics: **Kennard-Stone**,"
+" **SPXY**, and others."
 msgstr ""
+"`Astartes <https://github.com/JacksonBurns/astartes>`_ resuelve este problema. Es una biblioteca de Python que funciona como un reemplazo directo de ``sklearn.model_selection.train_test_split``, pero con acceso a algoritmos de muestreo que realmente tienen sentido para la quimiometría: **Kennard-Stone**, **SPXY** y otros."
 
 #: ../../source/explore/astartes.rst:11
-msgid "Synergy with Chemotools"
-msgstr ""
+msgid "Why does this matter?"
+msgstr "¿Por qué es importante esto?"
 
 #: ../../source/explore/astartes.rst:13
 msgid ""
-"While ``chemotools`` provides the transformers to clean your spectra, "
-"``astartes`` ensures your training set is statistically representative of"
-" your domain."
+"Kennard-Stone, for instance, picks samples that maximize the coverage of "
+"your spectral space. Instead of hoping that a random draw gives you a "
+"representative calibration set, you *guarantee* it. This reduces the risk"
+" of extrapolation when predicting new samples."
 msgstr ""
+"Kennard-Stone, por ejemplo, selecciona muestras que maximizan la cobertura de tu espacio espectral. En lugar de esperar que un sorteo aleatorio te dé un conjunto de calibración representativo, lo *garantizas*. Esto reduce el riesgo de extrapolación al predecir nuevas muestras."
 
 #: ../../source/explore/astartes.rst:15
 msgid ""
-"**Chemotools**: Preprocessing (Smoothing, Baseline correction, "
-"Derivatives)."
+"SPXY goes a step further by considering both the spectra (X) and the "
+"reference values (y) when selecting samples—useful when your y-values "
+"span a wide range."
 msgstr ""
-
-#: ../../source/explore/astartes.rst:16
-msgid "**Astartes**: Calibration set selection (Kennard-Stone, SPXY)."
-msgstr ""
+"SPXY va un paso más allá al considerar tanto los espectros (X) como los valores de referencia (y) al seleccionar muestras, lo cual es útil cuando tus valores y abarcan un amplio rango."
 
 #: ../../source/explore/astartes.rst:18
-msgid ""
-"Using them together allows you to build robust chemometric pipelines that"
-" are validated on rigorously selected data."
-msgstr ""
+msgid "Available Samplers"
+msgstr "Muestreadores Disponibles"
 
-#: ../../source/explore/astartes.rst:21
-msgid "Example: Kennard-Stone Splitting"
+#: ../../source/explore/astartes.rst:20
+msgid "Astartes groups its samplers into two categories:"
+msgstr "Astartes agrupa sus muestreadores en dos categorías:"
+
+#: ../../source/explore/astartes.rst:22
+msgid ""
+"**Interpolative**: samples are chosen to ensure coverage *within* the "
+"data space. Good for building general-purpose models."
 msgstr ""
+"**Interpolativo**: las muestras se eligen para garantizar cobertura *dentro* del espacio de datos. Bueno para construir modelos de propósito general."
 
 #: ../../source/explore/astartes.rst:23
 msgid ""
-"Here is how you can use ``astartes`` to split your data using the "
-"Kennard-Stone algorithm before processing it with ``chemotools``."
+"**Extrapolative**: samples are grouped into clusters, and entire clusters"
+" are held out. This tests how well the model generalizes to *unseen "
+"regions*."
 msgstr ""
+"**Extrapolativo**: las muestras se agrupan en clústeres y se excluyen clústeres enteros. Esto prueba qué tan bien el modelo generaliza a *regiones no vistas*."
 
-#: ../../source/explore/astartes.rst:56
-msgid "Installation"
-msgstr ""
+#: ../../source/explore/astartes.rst:25
+msgid "Here are some of the most useful samplers for spectroscopic data:"
+msgstr "Aquí hay algunos de los muestreadores más útiles para datos espectroscópicos:"
+
+#: ../../source/explore/astartes.rst:31
+msgid "Sampler"
+msgstr "Muestreador"
+
+#: ../../source/explore/astartes.rst:32
+msgid "Type"
+msgstr "Tipo"
+
+#: ../../source/explore/astartes.rst:33
+msgid "When to use it"
+msgstr "Cuándo usarlo"
+
+#: ../../source/explore/astartes.rst:34
+msgid "``random``"
+msgstr "``random``"
+
+#: ../../source/explore/astartes.rst:35 ../../source/explore/astartes.rst:38
+#: ../../source/explore/astartes.rst:41
+msgid "Interpolative"
+msgstr "Interpolativo"
+
+#: ../../source/explore/astartes.rst:36
+msgid "Baseline comparison. Same as sklearn's default."
+msgstr "Comparación de referencia. Igual que el valor predeterminado de sklearn."
+
+#: ../../source/explore/astartes.rst:37
+msgid "``kennard_stone``"
+msgstr "``kennard_stone``"
+
+#: ../../source/explore/astartes.rst:39
+msgid ""
+"The go-to for spectroscopy. Picks samples that maximize coverage of the "
+"X-space."
+msgstr "El estándar para espectroscopía. Selecciona muestras que maximizan la cobertura del espacio X."
+
+#: ../../source/explore/astartes.rst:40
+msgid "``spxy``"
+msgstr "``spxy``"
+
+#: ../../source/explore/astartes.rst:42
+msgid ""
+"Like Kennard-Stone, but also considers the y-values. Great for "
+"calibration transfer."
+msgstr "Similar a Kennard-Stone, pero también considera los valores y. Excelente para transferencia de calibración."
+
+#: ../../source/explore/astartes.rst:43
+msgid "``kmeans``"
+msgstr "``kmeans``"
+
+#: ../../source/explore/astartes.rst:44 ../../source/explore/astartes.rst:47
+msgid "Extrapolative"
+msgstr "Extrapolativo"
+
+#: ../../source/explore/astartes.rst:45
+msgid ""
+"Clusters samples, then holds out entire clusters. Tests generalization to"
+" new regions."
+msgstr "Agrupa muestras, luego excluye clústeres completos. Prueba la generalización a nuevas regiones."
+
+#: ../../source/explore/astartes.rst:46
+msgid "``sphere_exclusion``"
+msgstr "``sphere_exclusion``"
+
+#: ../../source/explore/astartes.rst:48
+msgid ""
+"Excludes samples within a distance cutoff. Useful for testing robustness "
+"to gaps in the data."
+msgstr "Excluye muestras dentro de un umbral de distancia. Útil para probar la robustez ante huecos en los datos."
+
+#: ../../source/explore/astartes.rst:50
+msgid ""
+"For the full list (including molecule-specific samplers like Scaffold), "
+"check the `Astartes GitHub page <https://github.com/JacksonBurns/astartes"
+"#implemented-sampling-algorithms>`_."
+msgstr "Para la lista completa (incluyendo muestreadores específicos de moléculas como Scaffold), consulta la `página de GitHub de Astartes <https://github.com/JacksonBurns/astartes#implemented-sampling-algorithms>`_."
+
+#: ../../source/explore/astartes.rst:53
+msgid "Pairing with Chemotools"
+msgstr "Combinación con Chemotools"
+
+#: ../../source/explore/astartes.rst:55
+msgid "The two libraries complement each other nicely:"
+msgstr "Las dos bibliotecas se complementan muy bien:"
+
+#: ../../source/explore/astartes.rst:57
+msgid ""
+"**Chemotools** handles the spectral preprocessing (smoothing, baseline "
+"correction, derivatives, etc.)."
+msgstr "**Chemotools** maneja el preprocesamiento espectral (suavizado, corrección de línea base, derivadas, etc.)."
 
 #: ../../source/explore/astartes.rst:58
-msgid "You can install astartes via pip:"
-msgstr ""
+msgid "**Astartes** handles the sample selection before you even start modeling."
+msgstr "**Astartes** maneja la selección de muestras incluso antes de que comiences a modelar."
 
+#: ../../source/explore/astartes.rst:60
+msgid "Together, they give you a clean, well-validated pipeline."
+msgstr "Juntas, te proporcionan una tubería limpia y bien validada."
+
+#: ../../source/explore/astartes.rst:63
+msgid "Example: Kennard-Stone Splitting"
+msgstr "Ejemplo: División con Kennard-Stone"
+
+#: ../../source/explore/astartes.rst:65
+msgid ""
+"Here's a quick example. We load some spectra, split them with Kennard-"
+"Stone, and then run them through a preprocessing pipeline:"
+msgstr "Aquí tienes un ejemplo rápido. Cargamos algunos espectros, los dividimos con Kennard-Stone y luego los procesamos a través de una tubería de preprocesamiento:"
+
+#: ../../source/explore/astartes.rst:95
+msgid ""
+"If you want to include the y-values in the selection logic, just swap in "
+"``sampler='spxy'``."
+msgstr "Si quieres incluir los valores y en la lógica de selección, simplemente cambia a ``sampler='spxy'``."
+
+#: ../../source/explore/astartes.rst:98
+msgid "Installation"
+msgstr "Instalación"
+
+#: ../../source/explore/astartes.rst:100
+msgid ""
+"Astartes is not a dependency of chemotools, so you'll need to install it "
+"separately:"
+msgstr "Astartes no es una dependencia de chemotools, por lo que necesitarás instalarlo por separado:"
+
+#: ../../source/explore/astartes.rst:106
+msgid ""
+"For more details, check out the `Astartes documentation "
+"<https://astartes.readthedocs.io/>`_."
+msgstr "Para más detalles, consulta la `documentación de Astartes <https://astartes.readthedocs.io/>`_."
+
+#~ msgid ""
+#~ "**Chemotools** focuses on preprocessing and"
+#~ " modeling spectral data, but robust "
+#~ "model validation starts with how you "
+#~ "split your data. This is where "
+#~ "**Astartes** comes in."
+#~ msgstr "**Chemotools** se centra en el preprocesamiento y modelado de datos espectrales, pero la validación robusta del modelo comienza con cómo divides tus datos. Aquí es donde entra **Astartes**."
+
+#~ msgid ""
+#~ "`Astartes <https://github.com/JacksonBurns/astartes>`_ is"
+#~ " a Python library for rigorous "
+#~ "dataset splitting (sampling). It serves "
+#~ "as a drop-in replacement for "
+#~ "``sklearn.model_selection.train_test_split`` but offers"
+#~ " \"rational\" sampling algorithms like "
+#~ "**Kennard-Stone** and **SPXY**, which are"
+#~ " essential in chemometrics."
+#~ msgstr "`Astartes <https://github.com/JacksonBurns/astartes>`_ es una biblioteca de Python para la división rigurosa de conjuntos de datos (muestreo). Sirve como un reemplazo directo de ``sklearn.model_selection.train_test_split`` pero ofrece algoritmos de muestreo \"racionales\" como **Kennard-Stone** y **SPXY**, que son esenciales en quimiometría."
+
+#~ msgid "Synergy with Chemotools"
+#~ msgstr "Sinergia con Chemotools"
+
+#~ msgid ""
+#~ "While ``chemotools`` provides the transformers"
+#~ " to clean your spectra, ``astartes`` "
+#~ "ensures your training set is "
+#~ "statistically representative of your domain."
+#~ msgstr "Mientras que ``chemotools`` proporciona los transformadores para limpiar tus espectros, ``astartes`` asegura que tu conjunto de entrenamiento sea estadísticamente representativo de tu dominio."
+
+#~ msgid ""
+#~ "**Chemotools**: Preprocessing (Smoothing, Baseline"
+#~ " correction, Derivatives)."
+#~ msgstr "**Chemotools**: Preprocesamiento (Suavizado, Corrección de línea base, Derivadas)."
+
+#~ msgid "**Astartes**: Calibration set selection (Kennard-Stone, SPXY)."
+#~ msgstr "**Astartes**: Selección del conjunto de calibración (Kennard-Stone, SPXY)."
+
+#~ msgid ""
+#~ "Using them together allows you to "
+#~ "build robust chemometric pipelines that "
+#~ "are validated on rigorously selected "
+#~ "data."
+#~ msgstr "Usarlos juntos te permite construir tuberías quimiométricas robustas que están validadas en datos rigurosamente seleccionados."
+
+#~ msgid ""
+#~ "Here is how you can use "
+#~ "``astartes`` to split your data using"
+#~ " the Kennard-Stone algorithm before "
+#~ "processing it with ``chemotools``."
+#~ msgstr "Aquí te mostramos cómo puedes usar ``astartes`` para dividir tus datos usando el algoritmo Kennard-Stone antes de procesarlos con ``chemotools``."
+
+#~ msgid "You can install astartes via pip:"
+#~ msgstr "Puedes instalar astartes mediante pip:"
