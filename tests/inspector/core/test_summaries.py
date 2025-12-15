@@ -47,7 +47,6 @@ class TestPredictionSummary:
 
     def test_regression_summary_bias_calculation(self):
         """Test that bias is calculated correctly."""
-        # Arrangeession_summary_bias_calculation(self):
         # Arrange
         X = np.array([[1, 2], [3, 4], [5, 6]])
         y = np.array([1, 2, 3])
@@ -72,7 +71,6 @@ class TestPredictionSummary:
 
     def test_regression_summary_metrics_structure(self):
         """Test that metrics property returns dictionary suitable for DataFrame."""
-        # Arrangeession_summary_metrics_structure(self):
         # Arrange
         X_train = np.random.rand(10, 5)
         y_train = np.random.rand(10)
