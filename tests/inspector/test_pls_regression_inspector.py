@@ -1,6 +1,7 @@
 import numpy as np
 import pytest
 import matplotlib.pyplot as plt
+from sklearn.base import is_regressor
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -106,7 +107,7 @@ class TestInitialization:
 
         # Assert
         assert inspector.transformer is not None
-        assert inspector.estimator._estimator_type == "regressor"
+        assert is_regressor(inspector.estimator)
 
     def test_missing_targets_raises(self, fitted_pls, regression_data):
         """Test that missing target variables raise appropriate errors."""
