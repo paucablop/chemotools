@@ -46,7 +46,7 @@ docs = [
     "beautifulsoup4>=4.12.0",
 ]
 docs-dev = [
-    "sphinx-autobuild>=2024.10.3,<2025",
+    "sphinx-autobuild>=2024.10.3,<2026",
 ]
 
 [build-system]
