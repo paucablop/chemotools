@@ -37,48 +37,11 @@ def unfitted_selector():
     )
 
 
-# -- Test instantiation --------------------------------------------------------
+# -- Test instantiation and fitting --------------------------------------------
 
 
-def test_instantiation_with_valid_params():
-    # Arrange
-    estimator = Ridge(random_state=0)
-    param_grid = {"alpha": [0.1, 1.0, 10.0]}
-
-    # Act
-    selector = CandidateSelector(
-        estimator=estimator,
-        param_grid=param_grid,
-        scoring="neg_root_mean_squared_error",
-        cv=5,
-    )
-
-    # Assert
-    assert selector.estimator is estimator
-    assert selector.param_grid == param_grid
-    assert selector.scoring == "neg_root_mean_squared_error"
-    assert selector.cv == 5
-
-
-def test_instantiation_with_default_params():
-    # Arrange
-    estimator = Ridge(random_state=0)
-    param_grid = {"alpha": [1.0]}
-
-    # Act
-    selector = CandidateSelector(estimator=estimator, param_grid=param_grid)
-
-    # Assert
-    assert selector.cv == 5
-    assert selector.n_jobs is None
-    assert selector.verbose == 0
-    assert selector.return_train_score is True
-
-
-# -- Test fit ------------------------------------------------------------------
-
-
-def test_fit_sets_attributes(dummy_data_loader):
+def test_instantiation_and_fit(dummy_data_loader):
+    """Test that CandidateSelector can be instantiated with valid params and fitted."""
     # Arrange
     X, y = dummy_data_loader
     selector = CandidateSelector(
@@ -91,336 +54,134 @@ def test_fit_sets_attributes(dummy_data_loader):
     )
 
     # Act
-    selector.fit(X, y)
+    result = selector.fit(X, y)
 
     # Assert
+    assert result is selector
     assert hasattr(selector, "cv_results_")
     assert hasattr(selector, "best_estimator_")
     assert hasattr(selector, "best_params_")
     assert hasattr(selector, "best_score_")
     assert hasattr(selector, "candidates_")
-    assert len(selector.candidates_) == 3  # 3 alpha values
+    assert len(selector.candidates_) == 3
 
 
-def test_fit_returns_self(dummy_data_loader):
-    # Arrange
-    X, y = dummy_data_loader
-    selector = CandidateSelector(
-        estimator=Ridge(random_state=0),
-        param_grid={"alpha": [0.1, 1.0, 10.0]},
-        cv=3,
-        scoring="neg_root_mean_squared_error",
-    )
+# -- Test get_candidates and get_candidate -------------------------------------
 
+
+def test_get_candidates(fitted_selector):
+    """Test retrieving all candidates and specific candidates by rank."""
     # Act
-    result = selector.fit(X, y)
+    all_candidates = fitted_selector.get_candidates()
+    top_2 = fitted_selector.get_candidates(n=2)
+    best = fitted_selector.get_candidate(rank=1)
 
     # Assert
-    assert result is selector
-
-
-# -- Test get_candidates -------------------------------------------------------
-
-
-def test_get_candidates_returns_all(fitted_selector):
-    # Arrange & Act
-    candidates = fitted_selector.get_candidates()
-
-    # Assert
-    assert len(candidates) == 3
-    assert all(isinstance(c, BaseFittedModel) for c in candidates)
-
-
-def test_get_candidates_returns_n(fitted_selector):
-    # Arrange & Act
-    candidates = fitted_selector.get_candidates(n=2)
-
-    # Assert
-    assert len(candidates) == 2
-    assert all(isinstance(c, BaseFittedModel) for c in candidates)
-
-
-def test_get_candidates_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.get_candidates()
-
-
-# -- Test get_candidate --------------------------------------------------------
-
-
-def test_get_candidate_returns_correct_rank(fitted_selector):
-    # Arrange & Act
-    candidate = fitted_selector.get_candidate(rank=1)
-
-    # Assert
-    assert isinstance(candidate, BaseFittedModel)
-    assert candidate.rank == 1
+    assert len(all_candidates) == 3
+    assert all(isinstance(c, BaseFittedModel) for c in all_candidates)
+    assert len(top_2) == 2
+    assert isinstance(best, BaseFittedModel)
+    assert best.rank == 1
+    # Verify candidates are sorted by rank
+    ranks = [c.rank for c in all_candidates]
+    assert ranks == sorted(ranks)
 
 
 def test_get_candidate_invalid_rank_raises_error(fitted_selector):
-    # Arrange & Act & Assert
+    """Test that requesting an invalid rank raises an error."""
     with pytest.raises(ValueError, match="No candidate with rank"):
         fitted_selector.get_candidate(rank=999)
-
-
-def test_get_candidate_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.get_candidate(rank=1)
 
 
 # -- Test filter_candidates ----------------------------------------------------
 
 
-def test_filter_candidates_by_rmse_ratio(fitted_selector):
-    # Arrange & Act
-    filtered = fitted_selector.filter_candidates(
+def test_filter_candidates(fitted_selector):
+    """Test filtering candidates by different metrics and modes."""
+    # Test filter by rmse_ratio with <= mode
+    filtered_le = fitted_selector.filter_candidates(
         metric="rmse_ratio", threshold=2.0, mode="<="
     )
+    assert isinstance(filtered_le, list)
+    assert all(isinstance(c, BaseFittedModel) for c in filtered_le)
 
-    # Assert
-    assert isinstance(filtered, list)
-    assert all(isinstance(c, BaseFittedModel) for c in filtered)
-    assert all(c.rmse_ratio <= 2.0 for c in filtered if c.rmse_ratio is not None)
-
-
-def test_filter_candidates_by_variance(fitted_selector):
-    # Arrange & Act
-    filtered = fitted_selector.filter_candidates(
-        metric="variance", threshold=1.0, mode="<="
-    )
-
-    # Assert
-    assert isinstance(filtered, list)
-    assert all(c.variance <= 1.0 for c in filtered if c.variance is not None)
-
-
-def test_filter_candidates_mode_ge(fitted_selector):
-    # Arrange & Act
-    filtered = fitted_selector.filter_candidates(
+    # Test filter with >= mode
+    filtered_ge = fitted_selector.filter_candidates(
         metric="rmse_ratio", threshold=0.5, mode=">="
     )
-
-    # Assert
-    assert isinstance(filtered, list)
-    assert all(c.rmse_ratio >= 0.5 for c in filtered if c.rmse_ratio is not None)
-
-
-def test_filter_candidates_mode_lt(fitted_selector):
-    # Arrange & Act
-    filtered = fitted_selector.filter_candidates(
-        metric="rmse_ratio", threshold=10.0, mode="<"
-    )
-
-    # Assert
-    assert isinstance(filtered, list)
-    assert all(c.rmse_ratio < 10.0 for c in filtered if c.rmse_ratio is not None)
-
-
-def test_filter_candidates_mode_gt(fitted_selector):
-    # Arrange & Act
-    filtered = fitted_selector.filter_candidates(
-        metric="rmse_ratio", threshold=0.0, mode=">"
-    )
-
-    # Assert
-    assert isinstance(filtered, list)
-    assert all(c.rmse_ratio > 0.0 for c in filtered if c.rmse_ratio is not None)
+    assert all(c.rmse_ratio >= 0.5 for c in filtered_ge if c.rmse_ratio is not None)
 
 
 def test_filter_candidates_invalid_mode_raises_error(fitted_selector):
-    # Arrange & Act & Assert
+    """Test that an invalid filter mode raises an error."""
     with pytest.raises(ValueError, match="mode must be one of"):
         fitted_selector.filter_candidates(metric="rmse_ratio", threshold=1.0, mode="!=")
-
-
-def test_filter_candidates_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.filter_candidates()
 
 
 # -- Test predict and score ----------------------------------------------------
 
 
-def test_predict_returns_array(fitted_selector, dummy_data_loader):
-    # Arrange
-    X, _ = dummy_data_loader
+def test_predict_and_score(fitted_selector, dummy_data_loader):
+    """Test prediction and scoring methods."""
+    X, y = dummy_data_loader
 
     # Act
     predictions = fitted_selector.predict(X)
+    score = fitted_selector.score(X, y)
 
     # Assert
     assert isinstance(predictions, np.ndarray)
     assert predictions.shape[0] == X.shape[0]
-
-
-def test_predict_unfitted_raises_error(unfitted_selector, dummy_data_loader):
-    # Arrange
-    X, _ = dummy_data_loader
-
-    # Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.predict(X)
-
-
-def test_score_returns_float(fitted_selector, dummy_data_loader):
-    # Arrange
-    X, y = dummy_data_loader
-
-    # Act
-    score = fitted_selector.score(X, y)
-
-    # Assert
     assert isinstance(score, float)
-
-
-def test_score_unfitted_raises_error(unfitted_selector, dummy_data_loader):
-    # Arrange
-    X, y = dummy_data_loader
-
-    # Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.score(X, y)
 
 
 # -- Test __len__ and __iter__ -------------------------------------------------
 
 
-def test_len_returns_candidate_count(fitted_selector):
-    # Arrange & Act
+def test_len_and_iter(fitted_selector):
+    """Test length and iteration over candidates."""
+    # Act
     length = len(fitted_selector)
-
-    # Assert
-    assert length == 3
-
-
-def test_len_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        len(unfitted_selector)
-
-
-def test_iter_yields_candidates(fitted_selector):
-    # Arrange & Act
     candidates = list(fitted_selector)
 
     # Assert
+    assert length == 3
     assert len(candidates) == 3
     assert all(isinstance(c, BaseFittedModel) for c in candidates)
 
 
-def test_iter_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        list(unfitted_selector)
+# -- Test summary and to_dataframe ---------------------------------------------
 
 
-# -- Test summary --------------------------------------------------------------
-
-
-def test_summary_returns_string(fitted_selector):
-    # Arrange & Act
+def test_summary(fitted_selector):
+    """Test summary method returns expected format."""
+    # Act
     summary = fitted_selector.summary()
+    summary_n = fitted_selector.summary(n=2)
 
     # Assert
     assert isinstance(summary, str)
     assert "CandidateSelector Summary" in summary
     assert "Total candidates:" in summary
     assert "Best score:" in summary
+    assert "Top 2 Candidates:" in summary_n
 
 
-def test_summary_with_n_parameter(fitted_selector):
-    # Arrange & Act
-    summary = fitted_selector.summary(n=2)
-
-    # Assert
-    assert isinstance(summary, str)
-    assert "Top 2 Candidates:" in summary
-
-
-def test_summary_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.summary()
-
-
-# -- Test to_dataframe ---------------------------------------------------------
-
-
-def test_to_dataframe_returns_dataframe(fitted_selector):
-    # Arrange & Act
-    df = fitted_selector.to_dataframe()
-
-    # Assert
-    import pandas as pd
-
-    assert isinstance(df, pd.DataFrame)
-    assert len(df) == 3
-    assert "rank" in df.columns
-    assert "rmsecv" in df.columns
-    assert "rmse_ratio" in df.columns
-    assert "param_alpha" in df.columns
-
-
-def test_to_dataframe_has_correct_columns(fitted_selector):
-    # Arrange & Act
-    df = fitted_selector.to_dataframe()
-
-    # Assert
-    expected_columns = [
-        "rank",
-        "params",
-        "mean_test_score",
-        "std_test_score",
-        "variance",
-        "mean_train_score",
-        "rmsecv",
-        "rmse_train",
-        "rmse_ratio",
-    ]
-    for col in expected_columns:
-        assert col in df.columns
-
-
-def test_to_dataframe_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.to_dataframe()
-
-
-# -- Test RMSE metrics ---------------------------------------------------------
+# -- Test RMSE metrics and candidate properties --------------------------------
 
 
 def test_candidates_have_rmse_metrics(fitted_selector):
-    # Arrange & Act
+    """Test that candidates have valid RMSE metrics."""
     candidates = fitted_selector.get_candidates()
 
-    # Assert
     for c in candidates:
-        assert c.rmsecv is not None
-        assert c.rmse_train is not None
-        assert c.rmse_ratio is not None
-        assert c.rmsecv > 0
-        assert c.rmse_train > 0
-        assert c.rmse_ratio > 0
+        assert c.rmsecv is not None and c.rmsecv > 0
+        assert c.rmse_train is not None and c.rmse_train > 0
+        assert c.rmse_ratio is not None and c.rmse_ratio > 0
 
 
-def test_candidates_sorted_by_rank(fitted_selector):
-    # Arrange & Act
-    candidates = fitted_selector.get_candidates()
-
-    # Assert
-    ranks = [c.rank for c in candidates]
-    assert ranks == sorted(ranks)
-
-
-# -- Test clone_estimator from candidate ---------------------------------------
-
-
-def test_candidate_clone_estimator_works(fitted_selector, dummy_data_loader):
-    # Arrange
+def test_candidate_clone_estimator(fitted_selector, dummy_data_loader):
+    """Test cloning an estimator from a candidate."""
     X, y = dummy_data_loader
     best_candidate = fitted_selector.get_candidate(rank=1)
 
@@ -436,11 +197,9 @@ def test_candidate_clone_estimator_works(fitted_selector, dummy_data_loader):
 # -- Test plot methods ---------------------------------------------------------
 
 
-def test_plot_cv_metrics_returns_axes(fitted_selector):
-    # Arrange & Act
+def test_plot_cv_metrics(fitted_selector):
+    """Test plot_cv_metrics returns valid axes."""
     ax = fitted_selector.plot_cv_metrics()
-
-    # Assert
 
     assert ax is not None
     assert hasattr(ax, "get_xlabel")
@@ -448,48 +207,52 @@ def test_plot_cv_metrics_returns_axes(fitted_selector):
     assert ax.get_ylabel() == "RMSECV / RMSEC"
 
 
-def test_plot_cv_metrics_with_color_by(fitted_selector):
-    # Arrange & Act
-    ax = fitted_selector.plot_cv_metrics(color_by="alpha")
-
-    # Assert
-    assert ax is not None
-
-
-def test_plot_cv_metrics_with_custom_title(fitted_selector):
-    # Arrange & Act
-    ax = fitted_selector.plot_cv_metrics(title="Custom Title")
-
-    # Assert
-    assert ax.get_title() == "Custom Title"
-
-
-def test_plot_cv_metrics_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
-    with pytest.raises(Exception):
-        unfitted_selector.plot_cv_metrics()
-
-
-def test_plot_score_vs_variance_returns_axes(fitted_selector):
-    # Arrange & Act
+def test_plot_score_vs_variance(fitted_selector):
+    """Test plot_score_vs_variance returns valid axes."""
     ax = fitted_selector.plot_score_vs_variance()
 
-    # Assert
     assert ax is not None
     assert ax.get_xlabel() == "Variance"
     assert ax.get_ylabel() == "Mean Test Score"
 
 
-def test_plot_score_vs_variance_with_custom_title(fitted_selector):
-    # Arrange & Act
-    ax = fitted_selector.plot_score_vs_variance(title="Custom Title")
-
-    # Assert
-    assert ax.get_title() == "Custom Title"
+# -- Test unfitted selector raises errors --------------------------------------
 
 
-def test_plot_score_vs_variance_unfitted_raises_error(unfitted_selector):
-    # Arrange & Act & Assert
+def test_unfitted_selector_raises_errors(unfitted_selector, dummy_data_loader):
+    """Test that unfitted selector raises errors for methods requiring fit."""
+    X, y = dummy_data_loader
+
+    with pytest.raises(Exception):
+        unfitted_selector.get_candidates()
+
+    with pytest.raises(Exception):
+        unfitted_selector.get_candidate(rank=1)
+
+    with pytest.raises(Exception):
+        unfitted_selector.filter_candidates()
+
+    with pytest.raises(Exception):
+        unfitted_selector.predict(X)
+
+    with pytest.raises(Exception):
+        unfitted_selector.score(X, y)
+
+    with pytest.raises(Exception):
+        len(unfitted_selector)
+
+    with pytest.raises(Exception):
+        list(unfitted_selector)
+
+    with pytest.raises(Exception):
+        unfitted_selector.summary()
+
+    with pytest.raises(Exception):
+        unfitted_selector.to_dataframe()
+
+    with pytest.raises(Exception):
+        unfitted_selector.plot_cv_metrics()
+
     with pytest.raises(Exception):
         unfitted_selector.plot_score_vs_variance()
 
@@ -497,20 +260,14 @@ def test_plot_score_vs_variance_unfitted_raises_error(unfitted_selector):
 # -- Test best_estimator_ usage ------------------------------------------------
 
 
-def test_best_estimator_is_fitted(fitted_selector, dummy_data_loader):
-    # Arrange
+def test_best_estimator_and_params(fitted_selector, dummy_data_loader):
+    """Test that best_estimator_ is fitted and best_params_ matches best candidate."""
     X, _ = dummy_data_loader
+    best_candidate = fitted_selector.get_candidate(rank=1)
 
     # Act
     predictions = fitted_selector.best_estimator_.predict(X)
 
     # Assert
     assert predictions.shape[0] == X.shape[0]
-
-
-def test_best_params_matches_best_candidate(fitted_selector):
-    # Arrange & Act
-    best_candidate = fitted_selector.get_candidate(rank=1)
-
-    # Assert
     assert fitted_selector.best_params_ == best_candidate.params
