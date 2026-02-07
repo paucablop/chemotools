@@ -38,20 +38,26 @@ jobs:
           sudo apt-get install -y pandoc
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.13'
       
       - name: Install uv
-        run: |
-          python -m pip install --upgrade pip
-          pip install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Task (taskfile.dev)
         uses: arduino/setup-task@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Sync dependencies (all groups)
-        run: uv sync --all-groups
+      - name: Print versions
+        run: |
+          python --version
+          uv --version
+          task --version
+
+      - name: Install dependencies
+        run: task install
 
       - name: Build documentation
         run: |

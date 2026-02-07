@@ -6,11 +6,31 @@ vars:
   SPHINX_SOURCE: docs/source
   SPHINX_BUILD: docs/_build
   API_OUT: docs/source/api/generated
+  # Cross-platform helpers
+  VENV_BIN: '{{if eq OS "windows"}}Scripts{{else}}bin{{end}}'
+  PYTHON: '{{if eq OS "windows"}}python{{else}}python3{{end}}'
 
 tasks:
+# 📋 Default task lists all available tasks
+  default:
+      desc: List all available tasks
+      silent: true
+      cmds:
+        - task --list
+
+  # ⬇️  Bootstrap — ensure uv is available
+  ensure:uv:
+    desc: Install uv if it is not already on the PATH
+    internal: true
+    status:
+      - '{{if eq OS "windows"}}where uv{{else}}command -v uv{{end}}'
+    cmds:
+      - '{{if eq OS "windows"}}powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"{{else}}curl -LsSf https://astral.sh/uv/install.sh | sh{{end}}'
+
   # 🛠️ Environment
   install:
     desc: Install all dependencies
+    deps: [ensure:uv]
     cmds:
       - "{{.UV}} sync --all-groups"
       - "{{.UV}} pip install .[dev]"
@@ -29,11 +49,11 @@ tasks:
   install:release:sbom:
       desc: Create a clean venv with the built package for SBOM generation
       cmds:
-        - rm -rf .venv-release
+        - '{{if eq OS "windows"}}if exist .venv-release rd /s /q .venv-release{{else}}rm -rf .venv-release{{end}}'
         - "{{.UV}} venv .venv-release --seed"
-        - .venv-release/bin/pip install --no-cache-dir dist/*.whl
+        - .venv-release/{{.VENV_BIN}}/pip install --no-cache-dir dist/*.whl
         - echo "Release venv created at .venv-release"
-        - .venv-release/bin/pip list
+        - .venv-release/{{.VENV_BIN}}/pip list
       sources:
         - dist/*.whl
       generates:
@@ -49,11 +69,9 @@ tasks:
   clean:
     desc: Clean up build artifacts and caches
     cmds:
-      - rm -rf .venv
-      - rm -rf .pytest_cache htmlcov .mypy_cache .ruff_cache
-      - rm -rf dist build *.egg-info
-      - find . -type d -name "__pycache__" -exec rm -rf {} +
-      - find . -type f -name "*.py[co]" -delete
+      - '{{if eq OS "windows"}}for %d in (.venv .pytest_cache htmlcov .mypy_cache .ruff_cache dist build) do if exist %d rd /s /q %d{{else}}rm -rf .venv .pytest_cache htmlcov .mypy_cache .ruff_cache dist build *.egg-info{{end}}'
+      - '{{if eq OS "windows"}}for /r %d in (__pycache__) do @if exist "%d" rd /s /q "%d"{{else}}find . -type d -name "__pycache__" -exec rm -rf {} +{{end}}'
+      - '{{if eq OS "windows"}}del /s /q *.pyc *.pyo 2>nul{{else}}find . -type f -name "*.py[co]" -delete{{end}}'
 
   # 🧹 Code quality
   format:
@@ -126,25 +144,25 @@ tasks:
   docs:html:
     desc: Build English HTML documentation
     cmds:
-      - uv run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -j auto
+      - "{{.UV}} run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -j auto"
 
   docs:html-es:
     desc: Build Spanish HTML documentation with button translation fix
     cmds:
-      - uv run sphinx-build -b html -D language=es -D html_theme_options.switcher.version_match=es {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/es -j auto
-      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/es es
+      - "{{.UV}} run sphinx-build -b html -D language=es -D html_theme_options.switcher.version_match=es {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/es -j auto"
+      - "{{.UV}} run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/es es"
 
   docs:html-zh:
     desc: Build Chinese HTML documentation with button translation fix
     cmds:
-      - uv run sphinx-build -b html -D language=zh_CN -D html_theme_options.switcher.version_match=zh_CN {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/zh_CN -j auto
-      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/zh_CN zh_CN
+      - "{{.UV}} run sphinx-build -b html -D language=zh_CN -D html_theme_options.switcher.version_match=zh_CN {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/zh_CN -j auto"
+      - "{{.UV}} run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/zh_CN zh_CN"
 
   docs:html-ja:
     desc: Build Japanese HTML documentation with button translation fix
     cmds:
-      - uv run sphinx-build -b html -D language=ja -D html_theme_options.switcher.version_match=ja {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/ja -j auto
-      - uv run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/ja ja
+      - "{{.UV}} run sphinx-build -b html -D language=ja -D html_theme_options.switcher.version_match=ja {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html/ja -j auto"
+      - "{{.UV}} run python docs/fix_translated_buttons.py {{.SPHINX_BUILD}}/html/ja ja"
 
   docs:html-all:
     desc: Build all language variants (en, es, zh_CN, ja)
@@ -157,49 +175,49 @@ tasks:
   docs:gettext:
     desc: Extract gettext catalogs
     cmds:
-      - uv run sphinx-build -b gettext {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/gettext -j auto
+      - "{{.UV}} run sphinx-build -b gettext {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/gettext -j auto"
 
   docs:update-translations:
     desc: Update .po files for es, zh_CN, and ja
     deps: [docs:gettext]
     cmds:
-      - uv run sphinx-intl update -p {{.SPHINX_BUILD}}/gettext -d docs/locale -l es -l zh_CN -l ja
+      - "{{.UV}} run sphinx-intl update -p {{.SPHINX_BUILD}}/gettext -d docs/locale -l es -l zh_CN -l ja"
 
   docs:check:
     desc: Build English docs treating warnings as errors (CI quality gate)
     cmds:
-      - uv run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -W -j auto
+      - "{{.UV}} run sphinx-build -b html {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html -W -j auto"
 
   serve:
     desc: Live-reload English docs on port 8003 (avoiding port conflicts)
     cmds:
-      - uv run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore "{{.SPHINX_BUILD}}/*" --ignore "{{.API_OUT}}/*" --port 8003
+      - "{{.UV}} run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore '{{.SPHINX_BUILD}}/*' --ignore '{{.API_OUT}}/*' --port 8003"
 
   serve:en:
     desc: Live-reload English docs on port 8003 (avoiding port conflicts)
     cmds:
-      - uv run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore "{{.SPHINX_BUILD}}/*" --ignore "{{.API_OUT}}/*" --port 8003
+      - "{{.UV}} run sphinx-autobuild {{.SPHINX_SOURCE}} {{.SPHINX_BUILD}}/html --watch chemotools --ignore '{{.SPHINX_BUILD}}/*' --ignore '{{.API_OUT}}/*' --port 8003"
 
   serve:zh:
     desc: Serve Chinese docs locally
     cmds:
       - task: docs:html-zh
       - echo "Chinese docs available at http://localhost:8001"
-      - cd {{.SPHINX_BUILD}}/html/zh_CN && python3 -m http.server 8001
+      - cd {{.SPHINX_BUILD}}/html/zh_CN && {{.PYTHON}} -m http.server 8001
 
   serve:es:
     desc: Serve Spanish docs locally  
     cmds:
       - task: docs:html-es
       - echo "Spanish docs available at http://localhost:8002"
-      - cd {{.SPHINX_BUILD}}/html/es && python3 -m http.server 8002
+      - cd {{.SPHINX_BUILD}}/html/es && {{.PYTHON}} -m http.server 8002
 
   serve:ja:
     desc: Serve Japanese docs locally
     cmds:
       - task: docs:html-ja
       - echo "Japanese docs available at http://localhost:8004"
-      - cd {{.SPHINX_BUILD}}/html/ja && python3 -m http.server 8004
+      - cd {{.SPHINX_BUILD}}/html/ja && {{.PYTHON}} -m http.server 8004
 
   docs:clean:
     desc: Remove build artifacts and generated API stubs
