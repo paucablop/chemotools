@@ -230,14 +230,14 @@ class ExplainedVariancePlot(BasePlot):
             "color": "#008BFB",
             "edgecolor": "#008BFB",
         }
-        bar_defaults.update(bar_kwargs)  # type: ignore[arg-type]
+        bar_defaults.update(bar_kwargs)
 
         # Bar plot for individual variance
         ax.bar(
             components,
             self.explained_variance_ratio,
             label="Individual",
-            **bar_defaults,  # type: ignore[arg-type]
+            **bar_defaults,
         )
 
         # Default line plot settings
@@ -248,14 +248,14 @@ class ExplainedVariancePlot(BasePlot):
             "linewidth": 1,
             "markersize": 2,
         }
-        line_defaults.update(line_kwargs)  # type: ignore[arg-type]
+        line_defaults.update(line_kwargs)
 
         # Line plot for cumulative variance
         ax.plot(
             components,
             self.cumulative_variance,
             label="Cumulative",
-            **line_defaults,  # type: ignore[arg-type]
+            **line_defaults,
         )
 
         # Add threshold line if specified
@@ -265,11 +265,11 @@ class ExplainedVariancePlot(BasePlot):
                 "linestyle": "--",
                 "alpha": 0.5,
             }
-            threshold_defaults.update(threshold_kwargs)  # type: ignore[arg-type]
+            threshold_defaults.update(threshold_kwargs)
             ax.axhline(
                 y=self.threshold,
                 label=f"{self.threshold * 100:.0f}% Threshold",
-                **threshold_defaults,  # type: ignore[arg-type]
+                **threshold_defaults,
             )
 
         # Grid for better readability
