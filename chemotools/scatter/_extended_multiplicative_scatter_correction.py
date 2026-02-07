@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.scatter._extended_multiplicative_scatter_correction` module
+implements an Extended Multiplicative Scatter Correction transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from typing import Literal, Optional
 from numbers import Integral
@@ -13,13 +21,16 @@ class ExtendedMultiplicativeScatterCorrection(
 ):
     """Extended Multiplicative Scatter Correction (EMSC).
 
-    EMSC extends MSC by adding a polynomial baseline to the regression model.
-    This accounts for non-linear scatter effects and baseline shifts.
+    EMSC is a preprocessing technique used to remove non-linear scatter effects
+    and baseline shifts from spectral data. It fits a model consisting of a
+    polynomial baseline, a reference spectrum, and optional interference
+    spectra to each sample.
 
     Parameters
     ----------
     method : {"mean", "median"}, default="mean"
-        The statistic used to calculate the reference spectrum if `reference` is None.
+        The statistic used to calculate the reference spectrum if `reference`
+        is None.
 
     order : int, default=2
         The order of the polynomial baseline. 0 is a constant offset,
@@ -28,28 +39,51 @@ class ExtendedMultiplicativeScatterCorrection(
     reference : array-like of shape (n_features,), default=None
         A custom reference spectrum. If provided, `method` is ignored.
 
+    interferences : array-like of shape (n_interferences, n_features), default=None
+        Known spectra of chemical interferents (e.g., water, CO2) to be
+        mathematically removed from the signal.
+
     weights : array-like of shape (n_features,), default=None
-        Wavelength weights for Weighted EMSC (WEMSC).
+        Wavelength weights for Weighted EMSC. Useful for de-emphasizing
+        noisy regions of the spectrum.
 
     Attributes
     ----------
     reference_ : ndarray of shape (n_features,)
-        The reference spectrum used.
+        The reference spectrum used for the correction.
 
     weights_ : ndarray of shape (n_features,)
-        The weights vector used (defaults to ones).
+        The actual weights applied during fitting.
 
-    A_ : ndarray of shape (n_features, order + 2)
-        The design matrix containing polynomial terms and the reference spectrum.
+    A_ : ndarray of shape (n_features, n_components)
+        The design matrix used for regression.
 
-    pinv_A_ : ndarray of shape (order + 2, n_features)
-        The precomputed weighted pseudo-inverse of the design matrix.
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+    Notes
+    -----
+    The model for each spectrum $x$ is:
+
+    $$x = \sum_{i=0}^{order} c_i \lambda^i + m \cdot x_{ref} + \sum g_j \cdot z_j + \epsilon$$
+
+    The corrected spectrum is calculated by removing the polynomial baseline
+    and the interferences, then normalizing by the scaling factor $m$:
+
+    $$x_{corr} = \frac{x - (\sum c_i \lambda^i + \sum g_j \cdot z_j)}{m}$$
+
+    References
+    ----------
+    .. [1] Nils Kristian Afseth, Achim Kohler. "Extended multiplicative signal
+       correction in vibrational spectroscopy, a tutorial,"
+       Chemometrics and Intelligent Laboratory Systems, 2012.
     """
 
     _parameter_constraints: dict = {
         "method": [StrOptions({"mean", "median"})],
         "order": [Interval(Integral, 0, None, closed="left")],
         "reference": ["array-like", None],
+        "interferences": ["array-like", None],
         "weights": ["array-like", None],
     }
 
@@ -58,19 +92,35 @@ class ExtendedMultiplicativeScatterCorrection(
         method: Literal["mean", "median"] = "mean",
         order: int = 2,
         reference: Optional[np.ndarray] = None,
+        interferences: Optional[np.ndarray] = None,
         weights: Optional[np.ndarray] = None,
     ):
         self.method = method
         self.order = order
         self.reference = reference
+        self.interferences = interferences
         self.weights = weights
 
     def fit(self, X, y=None):
+        """Fit the EMSC model.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The training data.
+        y : None
+            Ignored.
+
+        Returns
+        -------
+        self : object
+            Fitted transformer.
+        """
         self._validate_params()
         X = validate_data(self, X, reset=True, dtype=np.float64)
         n_features = X.shape[1]
 
-        # 1. Resolve Reference
+        # 1. Resolve Reference Spectrum
         if self.reference is not None:
             self.reference_ = check_array(self.reference, ensure_2d=False)
             check_consistent_length(self.reference_, X.T)
@@ -80,44 +130,64 @@ class ExtendedMultiplicativeScatterCorrection(
             self.reference_ = np.median(X, axis=0)
 
         # 2. Resolve Weights
-        if self.weights is not None:
-            self.weights_ = check_array(self.weights, ensure_2d=False)
-            check_consistent_length(self.weights_, X.T)
-        else:
-            self.weights_ = np.ones(n_features)
+        self.weights_ = (
+            check_array(self.weights, ensure_2d=False)
+            if self.weights is not None
+            else np.ones(n_features)
+        )
+        check_consistent_length(self.weights_, X.T)
 
-        # 3. Build Design Matrix A: [1, x, x^2, ..., reference]
-        # Using a vandermonde matrix for the polynomial terms
-        x_indices = np.linspace(0, 1, n_features)
+        # 3. Build Design Matrix A
+        # Polynomial part
+        x_indices = np.linspace(-1, 1, n_features)  # Normalized indices for stability
         poly_terms = np.vander(x_indices, N=self.order + 1, increasing=True)
+
+        # Signal part (Reference)
         self.A_ = np.column_stack([poly_terms, self.reference_])
 
-        # 4. Precompute Weighted Pseudo-inverse for WLS
-        # (A.T @ W @ A)^-1 @ A.T @ W
-        W = np.diag(self.weights_)
-        WA = W @ self.A_
-        self.pinv_A_ = np.linalg.pinv(WA.T @ WA) @ WA.T
+        # Orthogonal Subspace (Interferences)
+        if self.interferences is not None:
+            interf = check_array(self.interferences, ensure_2d=True)
+            if interf.shape[1] != n_features:
+                raise ValueError("Interference spectra must match X feature count.")
+            self.A_ = np.column_stack([self.A_, interf.T])
 
         return self
 
     def transform(self, X):
+        """Apply EMSC correction to X.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Data to transform.
+
+        Returns
+        -------
+        X_corr : ndarray of shape (n_samples, n_features)
+            Corrected spectra.
+        """
         check_is_fitted(self)
         X = validate_data(self, X, reset=False, dtype=np.float64)
 
-        # Vectorized Solve: Regress all spectra at once
-        # coeffs shape: (order + 2, n_samples)
+        # Apply weights to A and X for Weighted Least Squares
+        W = self.weights_[:, np.newaxis]
+        WA = self.A_ * W
         WX = (X * self.weights_).T
-        coeffs = self.pinv_A_ @ WX
 
-        # Extract parameters
-        # m is the last coefficient (scaling for the reference)
-        # poly_coeffs are everything before that
-        m = coeffs[-1, :].reshape(-1, 1)
-        poly_coeffs = coeffs[:-1, :]
+        # Solve regression: WA @ coeffs = WX
+        # lstsq is more robust than inv() or pinv() for singular matrices
+        coeffs, _, _, _ = np.linalg.lstsq(WA, WX, rcond=None)
 
-        # Calculate the baseline: A_poly @ poly_coeffs
-        # A_poly is A_ without the last (reference) column
-        baseline = (self.A_[:, :-1] @ poly_coeffs).T
+        # Partition coefficients
+        n_poly = self.order + 1
+        m = coeffs[n_poly, :].reshape(-1, 1)  # Scaling factor for reference
 
-        # Corrected spectrum: (Original - Baseline) / Scaling
-        return (X - baseline) / m
+        # Calculate the "Noise" (Polynomials + Interferences)
+        # We zero out the 'm' coefficient to reconstruct only the noise
+        noise_coeffs = coeffs.copy()
+        noise_coeffs[n_poly, :] = 0
+        noise_contribution = (self.A_ @ noise_coeffs).T
+
+        # Final correction: (Original - Baseline - Interferences) / Scaling
+        return (X - noise_contribution) / m
