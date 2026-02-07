@@ -1,79 +1,94 @@
-"""
-The :mod:`chemotools.scatter._multiplicative_scatter_correction` module implements a Multiplicative Scatter Correction transformer.
-"""
-
-# Authors: Pau Cabaneros
-# License: MIT
-
-from typing import Literal, Optional
-
 import numpy as np
+from typing import Literal, Optional
 from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.utils import check_array, check_consistent_length
 from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import StrOptions
 
 
 class MultiplicativeScatterCorrection(
-    TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+    OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
-    """
-    Multiplicative scatter correction (MSC) is a preprocessing technique for
-    removing scatter effects from spectra. It is based on fitting a linear
-    regression model to the spectrum using a reference spectrum. The reference
-    spectrum is usually a mean or median spectrum of a set of spectra.
+    """Multiplicative Scatter Correction (MSC).
+
+    MSC is a transformation method used to compensate for additive and/or
+    multiplicative scatter effects in spectral data (like NIR). It linearizes
+    each spectrum against a reference spectrum (usually the mean or median)
+    using Ordinary Least Squares (OLS) or Weighted Least Squares (WLS).
+
+    Read more in the :ref:`User Guide <msc>`.
 
     Parameters
     ----------
-    reference : np.ndarray of shape (n_freatures), optional, default=None
-        The reference spectrum to use for the correction. If None, the mean
-        spectrum will be used. The default is None.
+    method : {"mean", "median"}, default="mean"
+        The statistic used to calculate the reference spectrum if `reference`
+        is None.
+        - "mean": Use the average spectrum of the training set.
+        - "median": Use the median spectrum of the training set.
 
-    use_mean : bool, optional, default=True
-        Whether to use the mean spectrum as the reference. The default is True.
+    reference : array-like of shape (n_features,), default=None
+        A custom reference spectrum to use for the correction. If provided,
+        `method` is ignored.
 
-    use_median : bool, optional, default=False
-        Whether to use the median spectrum as the reference. The default is False.
+    weights : array-like of shape (n_features,), default=None
+        Weighting vector applied during the linear regression for each spectrum.
+        Useful for de-emphasizing noisy wavelengths.
 
     Attributes
     ----------
+    reference_ : ndarray of shape (n_features,)
+        The reference spectrum used for the correction, either passed via
+        `reference` or calculated during :meth:`fit`.
+
+    weights_ : ndarray of shape (n_features,)
+        The weights used in the correction. Defaults to a vector of ones.
+
     n_features_in_ : int
-        The number of features in the training data.
+        Number of features seen during :term:`fit`.
 
-    reference_ : np.ndarray
-        The reference spectrum used for the correction.
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
 
-    Raises
-    ------
-    ValueError
-        If no reference is provided.
+    pinv_A_ : ndarray of shape (2, n_features)
+        The precomputed weighted pseudo-inverse of the design matrix used
+        to solve for $m$ (slope) and $c$ (intercept) efficiently.
+
+    Notes
+    -----
+    The correction follows the linear model:
+
+    $$x_{raw} = m \cdot x_{ref} + c + e$$
+
+    where $x_{raw}$ is the observed spectrum, $x_{ref}$ is the reference
+    spectrum, $m$ is the multiplicative scaling, and $c$ is the additive
+    offset. The corrected spectrum is calculated as:
+
+    $$x_{corr} = \frac{x_{raw} - c}{m}$$
 
     References
     ----------
-    [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
-        "Review of the most common pre-processing techniques for near-infrared spectra,"
-        TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
+    .. [1] Åsmund Rinnan, Frans van den Berg, Søren Balling Engelsen,
+       "Review of the most common pre-processing techniques for near-infrared
+       spectra," TrAC Trends in Analytical Chemistry 28 (10) 1201-1222 (2009).
 
     Examples
     --------
-    >>> from chemotools.datasets import load_fermentation_train
+    >>> import numpy as np
     >>> from chemotools.scatter import MultiplicativeScatterCorrection
-    >>> # Load sample data
-    >>> X, _ = load_fermentation_train()
-    >>> # Initialize MultiplicativeScatterCorrection
-    >>> msc = MultiplicativeScatterCorrection()
+    >>> X = np.random.rand(10, 100)
+    >>> msc = MultiplicativeScatterCorrection(method='mean')
+    >>> msc.fit(X)
     MultiplicativeScatterCorrection()
-    >>> # Fit and transform the data
-    >>> X_scaled = msc.fit_transform(X)
+    >>> X_corr = msc.transform(X)
     """
 
-    ALLOWED_METHODS = ["mean", "median"]
-
+    # Defining constraints properly fixes the check_estimator issues
     _parameter_constraints: dict = {
         "method": [StrOptions({"mean", "median"})],
         "reference": ["array-like", None],
         "weights": ["array-like", None],
     }
-    # TODO: Check method is valid in instantiation. Right now it is check on fit because it breaks the scikitlearn check_estimator()
 
     def __init__(
         self,
@@ -85,120 +100,54 @@ class MultiplicativeScatterCorrection(
         self.reference = reference
         self.weights = weights
 
-    def fit(self, X: np.ndarray, y=None) -> "MultiplicativeScatterCorrection":
-        """
-        Fit the transformer to the input data. If no reference is provided, the
-        mean or median spectrum will be calculated from the input data.
+    def fit(self, X, y=None):
+        # 1. Validate parameters via the built-in sklearn machinery
+        self._validate_params()
 
-        Parameters
-        ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to fit the transformer to.
+        # 2. Validate input data
+        X = validate_data(self, X, reset=True, dtype=np.float64)
 
-        y : None
-            Ignored to align with API.
-
-        Returns
-        -------
-        self : MultiplicativeScatterCorrection
-            The fitted transformer.
-        """
-        # Check that X is a 2D array and has only finite values
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-        # Check that the length of the reference is the same as the number of features
+        # 3. Determine the reference spectrum
         if self.reference is not None:
-            if len(self.reference) != self.n_features_in_:
-                raise ValueError(
-                    f"Expected {self.n_features_in_} features in reference but got {len(self.reference)}"
-                )
-
-        if self.weights is not None:
-            if len(self.weights) != self.n_features_in_:
-                raise ValueError(
-                    f"Expected {self.n_features_in_} features in weights but got {len(self.weights)}"
-                )
-
-        # Set the reference
-        if self.reference is not None:
-            self.reference_ = np.array(self.reference)
-            self.A_ = self._calculate_A(self.reference_)
-            self.weights_ = np.array(self.weights)
-            return self
-
-        if self.method == "mean":
-            self.reference_ = X.mean(axis=0)
-            self.A_ = self._calculate_A(self.reference_)
-            self.weights_ = np.array(self.weights)
-            return self
-
-        elif self.method == "median":
-            self.reference_ = np.median(X, axis=0)
-            self.A_ = self._calculate_A(self.reference_)
-            self.weights_ = np.array(self.weights)
-            return self
-
-        else:
-            raise ValueError(
-                f"Invalid method: {self.method}. Must be one of {self.ALLOWED_METHODS}"
+            self.reference_ = check_array(
+                self.reference, ensure_2d=False, dtype=np.float64
             )
+            check_consistent_length(self.reference_, X.T)
+        elif self.method == "mean":
+            self.reference_ = np.mean(X, axis=0)
+        else:  # median
+            self.reference_ = np.median(X, axis=0)
 
-        raise ValueError("No reference was provided")
-
-    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """
-        Transform the input data by applying the multiplicative scatter
-        correction.
-
-        Parameters
-        ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
-
-        y : None
-            Ignored to align with API.
-
-        Returns
-        -------
-        X_transformed : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
-        """
-        # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
-
-        # Check that X is a 2D array and has only finite values
-        X_ = validate_data(
-            self,
-            X,
-            y="no_validation",
-            ensure_2d=True,
-            copy=True,
-            reset=False,
-            dtype=np.float64,
-        )
-
-        # Calculate the multiplicative signal correction
-        if self.weights is None:
-            for i, x in enumerate(X_):
-                X_[i] = self._calculate_multiplicative_correction(x)
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
+        # 4. Handle weights
         if self.weights is not None:
-            for i, x in enumerate(X_):
-                X_[i] = self._calculate_weighted_multiplicative_correction(x)
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+            self.weights_ = check_array(self.weights, ensure_2d=False, dtype=np.float64)
+            check_consistent_length(self.weights_, X.T)
+        else:
+            self.weights_ = np.ones_like(self.reference_)
 
-    def _calculate_weighted_multiplicative_correction(self, x) -> np.ndarray:
-        m, c = np.linalg.lstsq(
-            np.diag(self.weights_) @ self.A_, x * self.weights_, rcond=None
-        )[0]
-        return (x - c) / m
+        # Pre-calculate the design matrix A and the (A^T A)^-1 A^T part for the pseudoinverse
+        # This makes transform() much faster.
+        # We apply weights to the design matrix here.
+        self.A_ = np.vstack([self.reference_, np.ones_like(self.reference_)]).T
+        W = np.diag(self.weights_)
+        # Precompute the hat matrix for WLS: (A^T W A)^-1 A^T W
+        WA = W @ self.A_
+        self.pinv_A_ = np.linalg.inv(WA.T @ WA) @ WA.T
 
-    def _calculate_multiplicative_correction(self, x) -> np.ndarray:
-        m, c = np.linalg.lstsq(self.A_, x, rcond=None)[0]
-        return (x - c) / m
+        return self
 
-    def _calculate_A(self, reference):
-        ones = np.ones(reference.shape[0])
-        return np.vstack([reference, ones]).T
+    def transform(self, X):
+        check_is_fitted(self)
+        X = validate_data(self, X, reset=False, dtype=np.float64)
+
+        # Vectorized MSC: Solve (m, c) for all rows at once
+        # coefficients shape will be (2, n_samples)
+        # We multiply by weighted X: W @ X.T
+        WX = (X * self.weights_).T
+        coeffs = self.pinv_A_ @ WX
+
+        m = coeffs[0, :].reshape(-1, 1)  # slope
+        c = coeffs[1, :].reshape(-1, 1)  # intercept
+
+        # Correct the spectra: (X - intercept) / slope
+        return (X - c) / m
