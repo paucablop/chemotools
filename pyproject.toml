@@ -3,7 +3,7 @@ name = "chemotools"
 version = "0.2.5"
 description = "chemotools: A Python Package that Integrates Chemometrics and scikit-learn"
 authors = [{ name = "Pau Cabaneros" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
