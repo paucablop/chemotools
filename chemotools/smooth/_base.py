@@ -5,7 +5,7 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
 import logging
-from typing import Callable, Literal, Optional
+from typing import Callable, Literal, Optional, Self
 
 import numpy as np
 
@@ -41,7 +41,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         self.weights = weights
         self.solver_type = solver_type
 
-    def fit(self, X: np.ndarray, y=None) -> "_BaseWhittaker":
+    def fit(self, X: np.ndarray, y=None) -> Self:
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
         self.DtD_ = self._precompute_DtD(X.shape[1])
         solver = whittaker_solver_dispatch(self.solver_type)
@@ -60,7 +60,7 @@ class _BaseWhittaker(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         y=None,
         nr_iterations: int = 1,
         solver: Callable = whittaker_smooth_banded,
-    ) -> "_BaseWhittaker":
+    ) -> Self:
         """Subclasses can extend fitting logic here."""
         ...
 
@@ -125,7 +125,7 @@ class _BaseFIRFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
         self.axis = axis
 
     # sklearn API
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "_BaseFIRFilter":
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
