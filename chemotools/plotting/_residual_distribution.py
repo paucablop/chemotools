@@ -257,7 +257,7 @@ class ResidualDistributionPlot(BasePlot):
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Internal method to render the plot on given axes."""
         # Create histogram
-        hist_kwargs = {
+        hist_kwargs: dict[str, Any] = {
             "bins": kwargs.get("bins", self.bins),
             "density": self.density,
             "alpha": self.alpha,

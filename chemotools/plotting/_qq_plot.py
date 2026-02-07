@@ -253,7 +253,7 @@ class QQPlot(BasePlot):
     def _render_plot(self, ax: Axes, **kwargs: Any) -> None:
         """Internal method to render the plot on given axes."""
         # Create scatter plot of theoretical vs sample quantiles
-        scatter_kwargs = {
+        scatter_kwargs: dict[str, Any] = {
             "alpha": kwargs.get("alpha", 0.7),
             "s": kwargs.get("s", 50),
             "edgecolors": kwargs.get("edgecolors", "black"),
