@@ -7,7 +7,7 @@ from tests.conftest import _DummyModelResiduals
 # Invalid model type
 def test_invalid_model_raises_error():
     # Arrange & Act & Assert
-    with pytest.raises(ValueError, match=".*not a valid model.*"):
+    with pytest.raises(TypeError, match=".*1 is not an estimator instance.*"):
         _DummyModelResiduals(1, confidence=0.95)
 
 
@@ -55,7 +55,10 @@ def test_unfitted_pipeline_raises_error(unfitted_pipeline):
 
 def test_pipeline_with_invalid_model_raises_error(invalid_pipeline):
     # Arrange & Act & Assert
-    with pytest.raises(ValueError, match=".*not a valid model.*"):
+    with pytest.raises(
+        TypeError,
+        match=".*Model must be _BasePCA, _PLS, or a Pipeline ending with one of these types.*",
+    ):
         _DummyModelResiduals(invalid_pipeline, confidence=0.95)
 
 

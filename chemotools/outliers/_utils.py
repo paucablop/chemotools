@@ -1,9 +1,9 @@
 import numpy as np
 
-from ._base import ModelTypes
+from chemotools._types import EstimatorType
 
 
-def calculate_decoded_spectrum(X: np.ndarray, estimator: ModelTypes):
+def calculate_decoded_spectrum(X: np.ndarray, estimator: EstimatorType):
     """
     Calculate the decoded spectrum for a given transformed (preprocessed!!) spectrum and estimator from the latent space.
 
@@ -12,7 +12,7 @@ def calculate_decoded_spectrum(X: np.ndarray, estimator: ModelTypes):
     spectrum : np.ndarray
         The transformed spectrum data.
 
-    estimator : ModelTypes
+    estimator : EstimatorType
         The fitted PCA or PLS model.
 
     Returns
@@ -27,7 +27,7 @@ def calculate_decoded_spectrum(X: np.ndarray, estimator: ModelTypes):
     return estimator.inverse_transform(X_transformed)
 
 
-def calculate_residual_spectrum(X: np.ndarray, estimator: ModelTypes):
+def calculate_residual_spectrum(X: np.ndarray, estimator: EstimatorType):
     """
     Calculate the residual spectrum for a given transformed (preprocessed!!) spectrum and estimator.
 
@@ -36,7 +36,7 @@ def calculate_residual_spectrum(X: np.ndarray, estimator: ModelTypes):
     spectrum : np.ndarray
         The transformed spectrum data.
 
-    estimator : ModelTypes
+    estimator : EstimatorType
         The fitted PCA or PLS model.
 
     Returns

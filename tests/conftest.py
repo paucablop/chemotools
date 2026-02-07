@@ -89,7 +89,7 @@ def unfitted_pipeline():
 @pytest.fixture
 def invalid_pipeline(dummy_data_loader):
     X, _ = dummy_data_loader
-    return make_pipeline(StandardScaler(), StandardScaler())
+    return make_pipeline(StandardScaler(), StandardScaler()).fit(X)
 
 
 @pytest.fixture

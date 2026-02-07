@@ -23,11 +23,13 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 from sklearn.utils import check_array
 
+from chemotools._types import ModelInput
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
 from .summaries import InspectorSummary
 from .utils import normalize_datasets
 
-ModelTypes = Union[_BasePCA, _PLS, Pipeline]
+# Backward-compatible alias – existing consumers import this name.
+ModelTypes = ModelInput
 
 
 @dataclass(frozen=True)
