@@ -178,12 +178,6 @@ class MultiplicativeScatterCorrection(
             dtype=np.float64,
         )
 
-        # Check that the number of features is the same as the fitted data
-        if X_.shape[1] != self.n_features_in_:
-            raise ValueError(
-                f"Expected {self.n_features_in_} features but got {X_.shape[1]}"
-            )
-
         # Calculate the multiplicative signal correction
         if self.weights is None:
             for i, x in enumerate(X_):
