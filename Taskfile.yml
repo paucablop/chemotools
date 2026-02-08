@@ -97,7 +97,7 @@ tasks:
   type-check:
     desc: Run MyPy type checks
     cmds:
-      - "{{.UV}} run mypy ."
+      - "{{.UV}} run ty check ./chemotools"
 
   # 🧪 Testing
   test:
