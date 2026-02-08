@@ -282,20 +282,3 @@ class PLSRegression(_SklearnPLSRegression):
             y_var_ratios.append((y_var_before - y_var_after) / y_total_var)
 
         return np.array(X_var_ratios), np.array(y_var_ratios)
-
-    def __repr__(self):
-        """Enhanced repr showing variance info if fitted."""
-        base_repr = super().__repr__()
-
-        # Add variance info if model is fitted
-        if hasattr(self, "explained_x_variance_ratio_"):
-            total_x = self.explained_x_variance_ratio_.sum() * 100
-            total_y = self.explained_y_variance_ratio_.sum() * 100
-            variance_info = (
-                f"\n  X-space variance explained: {total_x:.1f}%"
-                f"\n  Y-space variance explained: {total_y:.1f}%"
-            )
-            # Insert before the closing parenthesis
-            base_repr = base_repr.rstrip(")") + "," + variance_info + "\n)"
-
-        return base_repr
