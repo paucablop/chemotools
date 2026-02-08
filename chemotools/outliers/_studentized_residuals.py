@@ -90,6 +90,8 @@ class StudentizedResiduals(_ModelResidualsBase):
         "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
     """
 
+    estimator_: _PLS
+
     _parameter_constraints: dict = {
         "model": [Pipeline, ModelTypes],
         "confidence": [Interval(Real, 0, 1, closed="both")],
@@ -98,7 +100,9 @@ class StudentizedResiduals(_ModelResidualsBase):
     def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
         super().__init__(model, confidence)
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "StudentizedResiduals":
+    def fit(
+        self, X: np.ndarray, y: Optional[np.ndarray] = None
+    ) -> "StudentizedResiduals":
         """
         Fit the model to the input data.
 
@@ -231,13 +235,13 @@ class StudentizedResiduals(_ModelResidualsBase):
 
 
 def calculate_studentized_residuals(
-    model: ModelTypes, X: np.ndarray, y_residuals: np.ndarray
+    model: _PLS, X: np.ndarray, y_residuals: np.ndarray
 ) -> np.ndarray:
     """Calculate the studentized residuals of the model predictions.
 
     Parameters
     ----------
-    model : ModelTypes
+    model : _PLS
         A fitted model
 
     X : array-like of shape (n_samples, n_features)

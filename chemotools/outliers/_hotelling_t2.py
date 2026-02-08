@@ -165,11 +165,11 @@ class HotellingT2(_ModelResidualsBase):
         # Calculate the Hotelling's T-squared statistics
         if isinstance(self.estimator_, _BasePCA):
             # For PCA-like models
-            variances = self.estimator_.explained_variance_
+            variances = self.estimator_.explained_variance_  # type: ignore[unresolved-attribute]
 
         if isinstance(self.estimator_, _PLS):
             # For PLS-like models
-            variances = np.var(self.estimator_.x_scores_, axis=0)
+            variances = np.var(self.estimator_.x_scores_, axis=0)  # type: ignore[unresolved-attribute]
 
         # Equivalent to X @ model.components_.T for _BasePCA and X @ model.x_rotations_ for _PLS
         X_transformed = self.estimator_.transform(X)

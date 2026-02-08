@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Self
 
 import numpy as np
 
@@ -57,6 +57,10 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         )
         self.confidence = _validate_confidence(confidence)
 
+    @abstractmethod
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
+        """Fit the model to the input data."""
+
     def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Identify outliers in the input data.
 
@@ -74,7 +78,7 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
             Returns -1 for outliers and 1 for inliers
         """
         residuals = self.predict_residuals(X, y, validate=True)
-        return np.where(residuals > self.critical_value_, -1, 1)
+        return np.where(residuals > self.critical_value_, -1, 1)  # type: ignore[unresolved-attribute]
 
     def fit_predict_residuals(
         self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
