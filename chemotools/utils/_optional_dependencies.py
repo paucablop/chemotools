@@ -1,4 +1,7 @@
-def check_optional_dependency(package_name: str, caller_name: str) -> object:
+from typing import Any
+
+
+def check_optional_dependency(package_name: str, caller_name: str) -> Any:
     """
     Check if an optional dependency is installed and import it.
     Raise ImportError with detailed error message if a package is not installed.
