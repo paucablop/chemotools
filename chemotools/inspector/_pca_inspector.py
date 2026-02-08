@@ -125,6 +125,10 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
     component_label = "PC"
 
+    # Narrow from base-class broad types — this inspector is PCA-only.
+    _model: Union[_BasePCA, Pipeline]
+    estimator_: _BasePCA
+
     def __init__(
         self,
         model: Union[_BasePCA, Pipeline],
@@ -151,6 +155,20 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         )
 
         self._scores_cache: Dict[str, np.ndarray] = {}
+
+    # ==================================================================================
+    # Properties (PCA-specific)
+    # ==================================================================================
+
+    @property
+    def model(self) -> Union[_BasePCA, Pipeline]:
+        """Return the original PCA model or Pipeline."""
+        return self._model
+
+    @property
+    def estimator(self) -> _BasePCA:
+        """Return the underlying PCA estimator."""
+        return self.estimator_
 
     # ==================================================================================
     # Public Methods
@@ -282,7 +300,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         loadings : ndarray of shape (n_features, n_components_selected)
             PCA loadings (components transposed)
         """
-        loadings = self.estimator.components_.T
+        loadings = self.estimator.components_.T  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
         return select_components(loadings, components)
 
     # ------------------------------------------------------------------
@@ -296,7 +314,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         explained_variance_ratio : ndarray of shape (n_components,)
             Explained variance ratio
         """
-        return self.estimator.explained_variance_ratio_
+        return self.estimator.explained_variance_ratio_  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
 
     # ------------------------------------------------------------------
     # Main inspection method

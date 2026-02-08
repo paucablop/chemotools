@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, cast
 
 import numpy as np
 
@@ -39,11 +39,15 @@ class _PLSFeatureSelectorBase(ABC, BaseEstimator, SelectorMixin):
         The boolean mask indicating which features are selected.
     """
 
+    # Narrow from EstimatorType — this base enforces PLS-only via allowed_types.
+    estimator_: _PLS
+
     def __init__(
         self,
         model: Union[_PLS, Pipeline],
     ) -> None:
-        self.estimator_, _ = validate_and_extract_model(model, allowed_types=(_PLS,))
+        estimator, _ = validate_and_extract_model(model, allowed_types=(_PLS,))
+        self.estimator_ = cast(_PLS, estimator)
 
     @abstractmethod
     def _calculate_features(self, X: np.ndarray) -> np.ndarray:

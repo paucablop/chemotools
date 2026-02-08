@@ -166,6 +166,10 @@ class PLSRegressionInspector(
 
     component_label = "LV"
 
+    # Narrow from base-class broad types — this inspector is PLS-only.
+    _model: Union[_PLS, Pipeline]
+    estimator_: _PLS
+
     def __init__(
         self,
         model: Union[_PLS, Pipeline],
@@ -199,6 +203,16 @@ class PLSRegressionInspector(
     # ==================================================================================
     # Properties (PLS-specific)
     # ==================================================================================
+
+    @property
+    def model(self) -> Union[_PLS, Pipeline]:
+        """Return the original PLS model or Pipeline."""
+        return self._model
+
+    @property
+    def estimator(self) -> _PLS:
+        """Return the underlying PLS estimator."""
+        return self.estimator_
 
     @property
     def leverage_detector(self) -> Leverage:
@@ -436,7 +450,7 @@ class PLSRegressionInspector(
             Explained variance ratio in X-space, or None if not available
         """
         if hasattr(self.estimator, "explained_x_variance_ratio_"):
-            return self.estimator.explained_x_variance_ratio_
+            return np.asarray(self.estimator.explained_x_variance_ratio_)
         return None
 
     def get_explained_y_variance_ratio(self) -> Optional[np.ndarray]:
@@ -448,7 +462,7 @@ class PLSRegressionInspector(
             Explained variance ratio in Y-space, or None if not available
         """
         if hasattr(self.estimator, "explained_y_variance_ratio_"):
-            return self.estimator.explained_y_variance_ratio_
+            return np.asarray(self.estimator.explained_y_variance_ratio_)
         return None
 
     # ------------------------------------------------------------------

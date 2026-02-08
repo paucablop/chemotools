@@ -5,7 +5,9 @@ from __future__ import annotations
 from typing import Any, Dict, Optional, Tuple, TYPE_CHECKING, Union, Sequence
 
 import numpy as np
+from sklearn.cross_decomposition._pls import _PLS
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.pipeline import Pipeline
 
 from chemotools.inspector.helpers import _regression as _regression_plots
 from .utils import normalize_datasets
@@ -15,13 +17,11 @@ if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol, Literal
     from matplotlib.figure import Figure
 
-    from chemotools.inspector.core.base import ModelTypes
-
     class _RegressionInspectorProto(Protocol):
         datasets_: Dict[str, Any]
 
         @property
-        def model(self) -> ModelTypes:  # pragma: no cover
+        def model(self) -> Union[_PLS, Pipeline]:  # pragma: no cover
             ...
 
         @property

@@ -234,10 +234,16 @@ class _BaseInspector(ABC):
 
     def _resolve_n_components(self) -> int:
         """Resolve the number of components from the estimator."""
-        if hasattr(self.estimator_, "n_components_"):
-            return int(self.estimator_.n_components_)
-        if hasattr(self.estimator_, "n_components"):
-            return int(self.estimator_.n_components)
+        # Try n_components_ (standard for fitted sklearn models)
+        n_comp = getattr(
+            self.estimator_,
+            "n_components_",
+            getattr(self.estimator_, "n_components", None),
+        )
+
+        if n_comp is not None:
+            return int(n_comp)
+
         raise AttributeError("Cannot determine number of components for estimator")
 
     # -------------------------------------------------------------------------
