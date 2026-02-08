@@ -153,7 +153,7 @@ def normalize_components(components_input: ComponentsInput) -> List[ComponentSpe
         return [pair]
     else:
         # Sequence of components/pairs like ((0, 1), (1, 2)) or [0, 1, (0, 1)]
-        return list(components_input)  # type: ignore[return-value]
+        return list(components_input)
 
 
 def get_default_scores_components(
