@@ -1,5 +1,5 @@
 import os
-from typing import Tuple
+from typing import Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,6 +32,9 @@ class _DummyModelResiduals(_ModelResidualsBase):
 
     def __init__(self, model, confidence):
         super().__init__(model, confidence)
+
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "_DummyModelResiduals":
+        return self
 
     def predict_residuals(self):
         return np.zeros(10)
