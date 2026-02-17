@@ -107,7 +107,7 @@ class DModX(_ModelResidualsBase):
 
         # Set degrees of freedom adjustment for mean centering
         self.A0_ = 1 if self.mean_centered else 0
-        
+
         # Calculate degrees of freedom terms
         # K - A (Variables - Components)
         dof_vars = self.n_features_in_ - self.n_components_
@@ -119,26 +119,26 @@ class DModX(_ModelResidualsBase):
 
         # 2. Denominator DoF: Degrees of freedom for the pooled model variance
         # CORRECTION: We must multiply samples DoF by variable DoF
-        dof_den = dof_samples  * dof_vars
+        dof_den = dof_samples * dof_vars
 
         # Compute the critical value using F-distribution
         f_quantile = f_distribution.ppf(self.confidence_, dof_num, dof_den)
         self.critical_value_ = np.sqrt(f_quantile)
 
     def _compute_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
-            """Calculate normalized DModX statistics for input data."""
-            residuals = calculate_residual_spectrum(X, self.estimator_)
-            sample_sse = np.sum(residuals**2, axis=1)
-            
-            dof_vars = self.n_features_in_ - self.n_components_
-            dof_samples = self.n_samples_ - self.n_components_ - self.A0_
+        """Calculate normalized DModX statistics for input data."""
+        residuals = calculate_residual_spectrum(X, self.estimator_)
+        sample_sse = np.sum(residuals**2, axis=1)
 
-            # Variance of the specific sample (s_i^2)
-            sample_variance = sample_sse / dof_vars
+        dof_vars = self.n_features_in_ - self.n_components_
+        dof_samples = self.n_samples_ - self.n_components_ - self.A0_
 
-            # Pooled variance of the model (s_0^2)
-            # CORRECTION: Ensure this matches the dof_den logic above
-            model_variance = self.train_sse_ / (dof_samples * dof_vars)
+        # Variance of the specific sample (s_i^2)
+        sample_variance = sample_sse / dof_vars
 
-            # The DModX statistic is the ratio of standard deviations
-            return np.sqrt(sample_variance / model_variance)
+        # Pooled variance of the model (s_0^2)
+        # CORRECTION: Ensure this matches the dof_den logic above
+        model_variance = self.train_sse_ / (dof_samples * dof_vars)
+
+        # The DModX statistic is the ratio of standard deviations
+        return np.sqrt(sample_variance / model_variance)
