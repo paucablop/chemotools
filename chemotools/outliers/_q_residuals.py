@@ -126,6 +126,10 @@ class QResiduals(_ModelResidualsBase):
         self : object
             Fitted instance of QResiduals.
         """
+        # fit the model
+        super().fit(X, y)
+
+        # Validate the input data
         X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
 
         if self.transformer_:

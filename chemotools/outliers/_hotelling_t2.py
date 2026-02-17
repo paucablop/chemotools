@@ -106,6 +106,10 @@ class HotellingT2(_ModelResidualsBase):
         self : HotellingT2
             Fitted estimator with the critical threshold computed
         """
+        # Fit the model
+        super().fit(X, y)
+
+        # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )

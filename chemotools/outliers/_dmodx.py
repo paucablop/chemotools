@@ -119,6 +119,10 @@ class DModX(_ModelResidualsBase):
         self : DModX
             Fitted estimator with computed training residuals and critical value.
         """
+        # Fit the model
+        (super().fit(X, y),)
+
+        # Validate the input data
         X_validated = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
@@ -220,5 +224,5 @@ class DModX(_ModelResidualsBase):
         dof_num = self.n_features_in_ - self.n_components_
         dof_den = self.n_samples_ - self.n_components_ - self.A0_
 
-        f_quantile = f_distribution.ppf(self.confidence, dof_num, dof_den)
+        f_quantile = f_distribution.ppf(self.confidence_, dof_num, dof_den)
         return np.sqrt(f_quantile)

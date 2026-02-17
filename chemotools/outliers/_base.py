@@ -51,15 +51,21 @@ class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
         model: ModelInput,
         confidence: float,
     ) -> None:
-        self.estimator_, self.transformer_ = validate_and_extract_model(model)
+        self.model = model
+        self.confidence = confidence
+
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
+        """Fit the model to the input data."""
+        # Validate and extract the model and its parameters
+        self.estimator_, self.transformer_ = validate_and_extract_model(self.model)
         self.n_features_in_, self.n_components_, self.n_samples_ = get_model_parameters(
             self.estimator_
         )
-        self.confidence = _validate_confidence(confidence)
 
-    @abstractmethod
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
-        """Fit the model to the input data."""
+        # Validate confidence level
+        self.confidence_ = _validate_confidence(self.confidence)
+
+        return self
 
     def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
         """Identify outliers in the input data.

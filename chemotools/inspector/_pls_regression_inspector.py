@@ -821,8 +821,9 @@ class PLSRegressionInspector(
         # Regression Diagnostics Setup
         # ------------------------------------------------------------------
         # Prepare leverage detector (needed for stats)
-        leverage_detector = Leverage(self.model, confidence=self.confidence)
-        leverage_detector.fit(X_train)
+        leverage_detector = Leverage(self.model, confidence=self.confidence).fit(
+            X_train
+        )
 
         # Calculate stats (needed for all regression plots)
         # We always calculate train stats to determine limits (e.g. studentized)
@@ -847,7 +848,9 @@ class PLSRegressionInspector(
         studentized_train = train_stats["studentized"]
         student_limit = np.percentile(np.abs(studentized_train), self.confidence * 100)
 
-        student_detector = StudentizedResiduals(self.model, confidence=self.confidence)
+        student_detector = StudentizedResiduals(
+            self.model, confidence=self.confidence
+        ).fit(X_train, y_train_full)
         student_detector.critical_value_ = student_limit
 
         # Always plot training data for this diagnostic plot

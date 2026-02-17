@@ -100,6 +100,10 @@ class Leverage(_ModelResidualsBase):
         self : Leverage
             Fitted estimator with the critical threshold computed
         """
+        # Fit the model
+        super().fit(X, y)
+
+        # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
@@ -163,7 +167,7 @@ class Leverage(_ModelResidualsBase):
         leverage = calculate_leverage(X, self.estimator_)
 
         # Calculate the critical value
-        return np.percentile(leverage, self.confidence * 100)
+        return np.percentile(leverage, self.confidence_ * 100)
 
 
 def calculate_leverage(X: np.ndarray, model: ModelTypes) -> np.ndarray:

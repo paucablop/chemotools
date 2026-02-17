@@ -119,6 +119,9 @@ class StudentizedResiduals(_ModelResidualsBase):
         self : StudentizedResiduals
             Fitted estimator with the critical threshold computed
         """
+        # Fit the model
+        super().fit(X, y)
+
         # Validate the input data
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -231,7 +234,7 @@ class StudentizedResiduals(_ModelResidualsBase):
             The calculated critical value for outlier detection
         """
 
-        return np.percentile(X, self.confidence * 100) if X is not None else 0.0
+        return np.percentile(X, self.confidence_ * 100) if X is not None else 0.0
 
 
 def calculate_studentized_residuals(

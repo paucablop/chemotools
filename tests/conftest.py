@@ -34,6 +34,7 @@ class _DummyModelResiduals(_ModelResidualsBase):
         super().__init__(model, confidence)
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "_DummyModelResiduals":
+        super().fit(X, y)
         return self
 
     def predict_residuals(self):
