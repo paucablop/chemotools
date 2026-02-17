@@ -73,7 +73,7 @@ def compute_DtD_sparse(N: int) -> sp.csc_matrix:
     if N < 3:
         return sp.csc_matrix((N, N))
     D = sp.diags([1, -2, 1], [0, 1, 2], shape=(N - 2, N), format="csc")
-    return D.T @ D
+    return sp.csc_matrix(D.T @ D)
 
 
 def whittaker_smooth_banded(x, w, lam, DtD_ab):
