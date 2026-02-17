@@ -65,6 +65,9 @@ filterwarnings = "always"
 
 # Recommended Basic Ruff Config
 [tool.ruff]
+extend-exclude = ["chemotools/_version.py"]
+
+[tool.ruff.format]
 exclude = ["chemotools/_version.py"]
 
 [tool.ruff.lint]
