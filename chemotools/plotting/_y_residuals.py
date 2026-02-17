@@ -1,15 +1,16 @@
 """Y residuals plot for regression diagnostics and homoscedasticity analysis."""
 
-from typing import Optional, Any, Literal, Tuple
+from typing import Any, Literal, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
     annotate_points,
-    validate_data,
     scatter_with_colormap,
+    validate_data,
 )
 
 

@@ -8,19 +8,21 @@ plot objects from the chemotools.plotting module for consistent rendering.
 """
 
 from __future__ import annotations
-from typing import Dict, Tuple, TYPE_CHECKING, Optional, Union, Literal
-import numpy as np
+
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 from chemotools.plotting import (
-    YResidualsPlot,
+    DistancesPlot,
+    PredictedVsActualPlot,
     QQPlot,
     ResidualDistributionPlot,
-    PredictedVsActualPlot,
-    DistancesPlot,
+    YResidualsPlot,
 )
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._utils import annotate_points

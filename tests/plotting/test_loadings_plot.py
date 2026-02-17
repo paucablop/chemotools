@@ -1,13 +1,13 @@
 """Tests for LoadingsPlot class."""
 
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
+import pytest
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
-from chemotools.plotting._loadings import LoadingsPlot
 from chemotools.plotting import is_displayable
+from chemotools.plotting._loadings import LoadingsPlot
 
 
 class TestLoadingsPlotBasics:

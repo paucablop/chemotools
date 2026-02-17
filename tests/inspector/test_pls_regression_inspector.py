@@ -1,6 +1,6 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
 from sklearn.base import is_regressor
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
@@ -75,7 +75,8 @@ def fitted_pls_multi(multi_target_regression_data):
 
 class TestInitialization:
     def test_init_with_all_datasets(self, fitted_pls, regression_data):
-        """Test PLSRegressionInspector initialization with train, test, and validation datasets."""
+        """Test PLSRegressionInspector initialization with
+        train, test, and validation datasets."""
         # Arrange
         X_train, y_train = regression_data["train"]
         X_test, y_test = regression_data["test"]
@@ -132,7 +133,8 @@ class TestInitialization:
 
 class TestSummary:
     def test_summary_contains_metrics(self, fitted_pls, regression_data):
-        """Test that summary contains expected regression metrics and model information."""
+        """Test that summary contains expected regression
+        metrics and model information."""
         # Arrange
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
@@ -197,7 +199,8 @@ class TestSummary:
 
 class TestInspectFigures:
     def test_inspect_single_dataset(self, fitted_pls, regression_data):
-        """Test that inspect() generates all expected diagnostic figures for a single dataset."""
+        """Test that inspect() generates all expected diagnostic
+        figures for a single dataset."""
         # Arrange
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
@@ -606,7 +609,8 @@ class TestPLSRegressionInspectorFigureCleanup:
 
 class TestAdditionalCoverage:
     def test_detector_limits_cached(self, fitted_pls, regression_data, monkeypatch):
-        """Test that Hotelling T2 and Q-residuals limits are computed once and cached."""
+        """Test that Hotelling T2 and Q-residuals limits
+        are computed once and cached."""
         # Arrange
         X_train, y_train = regression_data["train"]
         hot_calls = []
@@ -897,7 +901,8 @@ class TestValidationPropagation:
 
 
 def test_inspect_single_dataset_raw_array_arguments(fitted_pls, regression_data):
-    """Test that raw arrays can be passed for color_by/annotate_by when inspecting a single dataset."""
+    """Test that raw arrays can be passed for
+    color_by/annotate_by when inspecting a single dataset."""
     # Arrange
     X_train, y_train = regression_data["train"]
     inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)

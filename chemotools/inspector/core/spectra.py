@@ -2,15 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Dict, Optional, Sequence, Tuple, TYPE_CHECKING, Union, Literal
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
 from chemotools.inspector.helpers._spectra import (
-    create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
+    create_spectra_plots_single_dataset,
 )
-from .utils import normalize_datasets, get_xlabel_for_features
+
+from .utils import get_xlabel_for_features, normalize_datasets
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol

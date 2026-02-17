@@ -7,18 +7,18 @@ objects (i.e. estimators, displays, functions) from the `chemotools` package.
 
 import inspect
 import pkgutil
+import sys
 from importlib import import_module
 from operator import itemgetter
 from pathlib import Path
-import sys
 
 from sklearn.base import (
     BaseEstimator,
     ClassifierMixin,
     ClusterMixin,
+    OutlierMixin,
     RegressorMixin,
     TransformerMixin,
-    OutlierMixin,
 )
 from sklearn.feature_selection import SelectorMixin
 from sklearn.utils._testing import ignore_warnings
@@ -35,7 +35,8 @@ def all_estimators(type_filter=None):
 
     Parameters
     ----------
-    type_filter : {"classifier", "regressor", "cluster", "transformer", "selector", "outlier"} \
+    type_filter : {"classifier", "regressor", "cluster", \
+            "transformer", "selector", "outlier"} \
             or list of such str, default=None
         Which kind of estimators should be returned. If None, no filter is
         applied and all estimators are returned.  Possible values are

@@ -25,19 +25,23 @@ class PLSRegression(_SklearnPLSRegression):
     Following the PLSRegression implemented in scikit-learn [1] and [2], this
     extension uses the x_scores_ (t) to asymmetrically deflate the Y matrix.
 
-    In PLS, the latent score vector t (from X) is used to model Y via its loading vector c:
+    In PLS, the latent score vector t (from X) is used to
+    model Y via its loading vector c:
         Y_hat = t @ c.T
 
     Deflation removes the part of Y explained by the current component:
         Y_new = Y - Y_hat
 
-    This process is repeated for each component, using the corresponding t and c vectors.
-    Note: Unlike PCA, deflation in PLS is asymmetric—Y is deflated using t-scores derived from X.
+    This process is repeated for each component, using the
+    corresponding t and c vectors.
+    Note: Unlike PCA, deflation in PLS is asymmetric—Y is
+    deflated using t-scores derived from X.
 
     Parameters
     ----------
     n_components : int, default=2
-        Number of components to keep. Should be in [1, min(n_samples, n_features, n_targets)].
+        Number of components to keep. Should be in
+        [1, min(n_samples, n_features, n_targets)].
     scale : bool, default=True
         Whether to scale X and Y.
     max_iter : int, default=500
@@ -45,7 +49,8 @@ class PLSRegression(_SklearnPLSRegression):
     tol : float, default=1e-06
         Tolerance used as convergence criteria in the power method.
     copy : bool, default=True
-        Whether to copy X and Y in fit before applying centering, and potentially scaling.
+        Whether to copy X and Y in fit before applying
+        centering, and potentially scaling.
 
     Attributes
     ----------
@@ -69,10 +74,16 @@ class PLSRegression(_SklearnPLSRegression):
         https://scikit-learn.org/stable/modules/generated/sklearn.cross_decomposition.PLSRegression.html
 
     .. [2] Wegelin, J. A. (2000).
-        A Survey of Partial Least Squares (PLS) Methods, with Emphasis on the Two-Block Case. Technical Report No. 371, Department of Statistics, University of Washington, Seattle, WA
+        A Survey of Partial Least Squares (PLS) Methods,
+        with Emphasis on the Two-Block Case.
+        Technical Report No. 371, Department of Statistics,
+        University of Washington, Seattle, WA
 
     .. [3] Abdi, H. (2003).
-        Partial Least Squares (PLS) Regression. In Lewis-Beck M., Bryman A., Futing T. (Eds.), Encyclopedia of Social Sciences Research Methods. Thousand Oaks (CA): Sage.
+        Partial Least Squares (PLS) Regression.
+        In Lewis-Beck M., Bryman A., Futing T. (Eds.),
+        Encyclopedia of Social Sciences Research Methods.
+        Thousand Oaks (CA): Sage.
 
     Examples
     --------
@@ -90,7 +101,9 @@ class PLSRegression(_SklearnPLSRegression):
     >>> pls.fit(X, y)
     >>>
     >>> # Variance ratios are automatically available!
-    >>> print(f"LV1 explains {pls.explained_y_variance_ratio_[0]*100:.1f}% of Y variance")
+    >>> print(
+    ...     f"LV1 explains {pls.explained_y_variance_ratio_[0]*100:.1f}%"
+    ... )
     >>> print(f"Total Y variance: {pls.explained_y_variance_ratio_.sum()*100:.1f}%")
     >>>
     >>> # Use with plotting
@@ -102,9 +115,12 @@ class PLSRegression(_SklearnPLSRegression):
     -----
     **Variance Calculation:**
 
-    - **X-space variance** is calculated using sequential deflation and will sum to ~1.0 (100%)
-    - **Y-space variance** is calculated using sequential deflation but may not sum to 1.0
-      due to asymmetric deflation (Y deflated with X-scores). The sum depends on X-Y correlation.
+    - **X-space variance** is calculated using sequential
+      deflation and will sum to ~1.0 (100%)
+    - **Y-space variance** is calculated using sequential
+      deflation but may not sum to 1.0 due to asymmetric
+      deflation (Y deflated with X-scores). The sum depends
+      on X-Y correlation.
     - For each component, variance explained = variance reduction after deflation
     - This follows the standard PLS variance decomposition methodology (Wegelin, 2000)
 
@@ -233,7 +249,8 @@ class PLSRegression(_SklearnPLSRegression):
         y_array = np.asarray(y, dtype=float)
         y = np.atleast_2d(y_array).T if y_array.ndim == 1 else y_array
 
-        # Center X and Y (PLS already centers data, but we need the original centered versions)
+        # Center X and Y (PLS already centers data, but we
+        # need the original centered versions)
         X_centered = X - X.mean(axis=0)
         y_centered = y - y.mean(axis=0)
 

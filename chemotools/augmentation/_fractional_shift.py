@@ -1,6 +1,8 @@
 """
-The :mod:`chemotools.augmentation._fractional_shift` module implements the FractionalShift
-transformer to shift signals by a random fractional amount using cubic spline interpolation.
+The :mod:`chemotools.augmentation._fractional_shift` module
+implements the FractionalShift transformer to shift signals
+by a random fractional amount using cubic spline
+interpolation.
 """
 
 # Authors: Pau Cabaneros
@@ -9,12 +11,12 @@ transformer to shift signals by a random fractional amount using cubic spline in
 from typing import Literal, Optional
 
 import numpy as np
-from scipy.interpolate import CubicSpline
 from scipy import stats
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from scipy.interpolate import CubicSpline
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import Interval, Real, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -27,7 +29,8 @@ class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Maximum absolute shift applied to each signal.
         A random shift is drawn uniformly from [-shift, +shift].
 
-    padding_mode : {'zeros', 'constant', 'wrap', 'extend', 'mirror', 'linear'}, default='linear'
+    padding_mode : {'zeros', 'constant', 'wrap', 'extend',
+        'mirror', 'linear'}, default='linear'
         Padding strategy for extrapolated values.
 
     pad_value : float, default=0.0

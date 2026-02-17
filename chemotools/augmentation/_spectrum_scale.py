@@ -9,10 +9,10 @@ transformer to scale spectral data by a random factor.
 from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import Interval, Real
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class SpectrumScale(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

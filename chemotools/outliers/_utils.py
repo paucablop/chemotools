@@ -5,7 +5,8 @@ from chemotools._types import EstimatorType
 
 def calculate_decoded_spectrum(X: np.ndarray, estimator: EstimatorType):
     """
-    Calculate the decoded spectrum for a given transformed (preprocessed!!) spectrum and estimator from the latent space.
+    Calculate the decoded spectrum for a given transformed
+    (preprocessed!!) spectrum and estimator from the latent space.
 
     Parameters
     ----------
@@ -29,7 +30,8 @@ def calculate_decoded_spectrum(X: np.ndarray, estimator: EstimatorType):
 
 def calculate_residual_spectrum(X: np.ndarray, estimator: EstimatorType):
     """
-    Calculate the residual spectrum for a given transformed (preprocessed!!) spectrum and estimator.
+    Calculate the residual spectrum for a given transformed
+    (preprocessed!!) spectrum and estimator.
 
     Parameters
     ----------

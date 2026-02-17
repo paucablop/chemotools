@@ -1,15 +1,17 @@
 # _base.py
-# Authors: Niklas Zell <nik.zoe@web.de>, Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>, Pau Cabaneros
+# Authors: Niklas Zell <nik.zoe@web.de>,
+#          Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>,
+#          Pau Cabaneros
 # License: MIT
 
 from __future__ import annotations
-from abc import ABC, abstractmethod
+
 import logging
+from abc import ABC, abstractmethod
 from typing import Callable, Literal, Optional, Self
 
 import numpy as np
-
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools.utils._linear_algebra import (
@@ -108,7 +110,8 @@ class _BaseFIRFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator, ABC)
     window_size : int, odd >= 3
         Number of taps in the FIR kernel.
     mode : {"mirror","constant","nearest","wrap","interp"}, default="interp"
-        Boundary handling. "interp" = linear extrapolation (recommended for MS).  # Schmid et al.
+        Boundary handling. "interp" = linear extrapolation
+        (recommended for MS).  # Schmid et al.
     axis : int, default=1
         Axis along which to smooth for 2D inputs (rows × features). Use 1 to
         smooth along feature axis for each row.

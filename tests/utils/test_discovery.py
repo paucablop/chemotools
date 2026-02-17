@@ -1,5 +1,6 @@
 import pytest
-from chemotools.utils.discovery import all_estimators, all_displays, all_functions
+
+from chemotools.utils.discovery import all_displays, all_estimators, all_functions
 
 
 def test_all_estimators_returns_list_of_tuples():

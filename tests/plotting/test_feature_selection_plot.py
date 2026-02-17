@@ -1,8 +1,8 @@
 """Tests for FeatureSelectionPlot class."""
 
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pytest
 from matplotlib.patches import Polygon, Rectangle
 
 from chemotools.plotting import FeatureSelectionPlot
@@ -75,8 +75,10 @@ class TestFeatureSelectionPlot:
                 and p.get_label() == "Excluded Features"
             ]
 
-        # We expect at least one span to have the label "Excluded Features"
-        # (The implementation only labels the first one to avoid duplicate legend entries)
+        # We expect at least one span to have the label
+        # "Excluded Features"
+        # (The implementation only labels the first one
+        # to avoid duplicate legend entries)
         assert len(spans) > 0
 
         # Check color and alpha of the first span found

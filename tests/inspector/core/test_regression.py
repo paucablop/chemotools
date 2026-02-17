@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
-from unittest.mock import MagicMock
+from matplotlib.figure import Figure
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
-from matplotlib.figure import Figure
 
 from chemotools.inspector.core.regression import RegressionMixin
 
@@ -137,7 +138,8 @@ def test_calculate_bias_handles_shape_mismatch():
     inspector = DummyInspector(model=estimator, raw_data=raw_data)
 
     # Act
-    # This will trigger _calculate_bias -> _get_predictions (returns 1D) -> mismatch with y_true (2D)
+    # This will trigger _calculate_bias -> _get_predictions
+    # (returns 1D) -> mismatch with y_true (2D)
     bias = inspector.regression_bias("train")
 
     # Assert

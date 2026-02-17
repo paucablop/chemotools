@@ -1,10 +1,8 @@
 import numpy as np
 import pytest
-
 from sklearn.exceptions import NotFittedError
 
 from chemotools.feature_selection import SRSelector
-
 
 # Test compliance with scikit-learn
 # TODO: Design test for SRSelector

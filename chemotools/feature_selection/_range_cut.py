@@ -9,8 +9,8 @@ from typing import Optional
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
+from sklearn.utils._param_validation import Integral, Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
-from sklearn.utils._param_validation import Interval, Integral
 
 
 class RangeCut(SelectorMixin, BaseEstimator):

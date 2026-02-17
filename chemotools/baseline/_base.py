@@ -18,15 +18,20 @@ class _BaselineWhittakerMixin:
 
     Helper methods provided
     -----------------------
-    - `_compute_warmstart_weights(X, solver)`: Computes initial weights from first spectrum.
-    - `_apply_baseline_correction(X, solver)`: Applies baseline correction using warm-start.
+    - `_compute_warmstart_weights(X, solver)`: Computes initial
+      weights from first spectrum.
+    - `_apply_baseline_correction(X, solver)`: Applies baseline
+      correction using warm-start.
 
     Requirements
     ------------
     Subclasses must provide:
-    - a `_calculate_baseline(x, w, max_iter, solver)` method returning (baseline, weights).
-    - a `_solve_whittaker(x, w, solver)` method (provided by `_BaseWhittaker`).
-    - a `w_init_` attribute set during fit (typically from `_compute_warmstart_weights`).
+    - a `_calculate_baseline(x, w, max_iter, solver)` method
+      returning (baseline, weights).
+    - a `_solve_whittaker(x, w, solver)` method (provided by
+      `_BaseWhittaker`).
+    - a `w_init_` attribute set during fit (typically from
+      `_compute_warmstart_weights`).
 
     Parameters
     ----------

@@ -1,26 +1,28 @@
 """Distances plot for visualizing diagnostic measures and outlier detection."""
 
-from typing import Optional, Any, Tuple, Literal
+from typing import Any, Literal, Optional, Tuple
 
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    annotate_points,
     add_confidence_lines,
-    validate_data,
+    annotate_points,
     scatter_with_colormap,
+    validate_data,
 )
 
 
 class DistancesPlot(BasePlot, ColoringMixin):
     """Simple, composable distances plot for a single dataset.
 
-    This class creates scatter plots of distance measures (e.g., Q residuals, Hotelling's T²)
-    for outlier detection. Supports plotting one distance vs another or distance vs sample index.
-    Multiple datasets can be overlaid by using the render() method on shared axes.
+    This class creates scatter plots of distance measures
+    (e.g., Q residuals, Hotelling's T²) for outlier detection.
+    Supports plotting one distance vs another or distance
+    vs sample index. Multiple datasets can be overlaid by
+    using the render() method on shared axes.
 
     Parameters
     ----------
@@ -48,7 +50,8 @@ class DistancesPlot(BasePlot, ColoringMixin):
         - "viridis" for continuous data
 
     marker : str, optional
-        Marker style for scatter points (default: "o"). Examples: "o", "s", "^", "v", "D".
+        Marker style for scatter points (default: "o").
+        Examples: "o", "s", "^", "v", "D".
     confidence_lines : bool or tuple[float | None, float | None], optional
         Whether to draw confidence/threshold lines.
 
@@ -110,7 +113,10 @@ class DistancesPlot(BasePlot, ColoringMixin):
     **With annotations for outliers:**
 
     >>> outliers = [5, 23, 47]
-    >>> annotations = [f"S{i}" if i in outliers else "" for i in range(len(q_residuals))]
+    >>> annotations = [
+    ...     f"S{i}" if i in outliers else ""
+    ...     for i in range(len(q_residuals))
+    ... ]
     >>> plot = DistancesPlot(
     ...     y=q_residuals,
     ...     annotations=annotations,

@@ -1,9 +1,10 @@
 """Q-Q plot for assessing normality of residuals."""
 
-from typing import Optional, Any, Tuple
+from typing import Any, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from scipy import stats
 
 from chemotools.plotting._base import BasePlot
@@ -77,7 +78,10 @@ class QQPlot(BasePlot):
     **With outlier annotations:**
 
     >>> outlier_indices = [5, 23, 47]
-    >>> annotations = [f"S{i}" if i in outlier_indices else "" for i in range(len(residuals))]
+    >>> annotations = [
+    ...     f"S{i}" if i in outlier_indices else ""
+    ...     for i in range(len(residuals))
+    ... ]
     >>> plot = QQPlot(residuals, annotations=annotations)
     >>> fig = plot.show(title="Q-Q Plot with Outliers")
 
@@ -138,7 +142,9 @@ class QQPlot(BasePlot):
     def _calculate_qq_data(self) -> None:
         """Calculate theoretical and sample quantiles for Q-Q plot."""
         # Use scipy.stats.probplot to get the Q-Q plot data
-        # probplot returns ((theoretical_quantiles, ordered_values), (slope, intercept, r))
+        # probplot returns
+        # ((theoretical_quantiles, ordered_values),
+        #  (slope, intercept, r))
         (
             (self.theoretical_quantiles, self.sample_quantiles),
             (

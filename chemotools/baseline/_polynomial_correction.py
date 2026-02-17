@@ -6,19 +6,20 @@ a polynomial baseline correction transformer.
 # Author: Pau Cabaneros
 # License: MIT
 
-from typing import Optional
 from numbers import Integral
+from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    A transformer that subtracts a polynomial baseline from the input data. The polynomial is
-    fitted to the points in the spectrum specified by the indices parameter.
+    A transformer that subtracts a polynomial baseline from
+    the input data. The polynomial is fitted to the points in
+    the spectrum specified by the indices parameter.
 
     Parameters
     ----------
@@ -26,8 +27,10 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
         The order of the polynomial to fit to the baseline. Defaults to 1.
 
     indices : list, optional, default=None
-        The indices of the points in the spectrum to fit the polynomial to. Defaults to None,
-        which fits the polynomial to all points in the spectrum (equivalent to detrend).
+        The indices of the points in the spectrum to fit the
+        polynomial to. Defaults to None, which fits the
+        polynomial to all points in the spectrum (equivalent
+        to detrend).
 
     Attributes
     ----------
@@ -45,7 +48,9 @@ class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
-    >>> transformer = PolynomialCorrection(order=2, indices=[0, 100, 200, 300, 400, 500])
+    >>> transformer = PolynomialCorrection(
+    ...     order=2, indices=[0, 100, 200, 300, 400, 500]
+    ... )
     PolynomialCorrection()
     >>> transformer.fit(X)
     >>> # Generate baseline-corrected data

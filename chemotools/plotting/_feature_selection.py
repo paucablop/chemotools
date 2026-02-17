@@ -1,5 +1,6 @@
 """
-The :mod:`chemotools.plotting._feature_selection` module implements the FeatureSelectionPlot class.
+The :mod:`chemotools.plotting._feature_selection` module
+implements the FeatureSelectionPlot class.
 """
 
 from typing import Any, Optional
@@ -53,7 +54,8 @@ class FeatureSelectionPlot(SpectraPlot):
 
         if len(self.support) != len(self.x):
             raise ValueError(
-                f"Support mask length ({len(self.support)}) must match x length ({len(self.x)})"
+                f"Support mask length ({len(self.support)}) "
+                f"must match x length ({len(self.x)})"
             )
 
         self.selection_color = selection_color

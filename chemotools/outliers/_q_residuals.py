@@ -13,7 +13,7 @@ from scipy.stats import chi2, norm
 from sklearn.pipeline import Pipeline
 from sklearn.utils._param_validation import StrOptions
 
-from ._base import _ModelResidualsBase, ModelTypes
+from ._base import ModelTypes, _ModelResidualsBase
 from ._utils import calculate_residual_spectrum
 
 
@@ -32,12 +32,14 @@ class QResiduals(_ModelResidualsBase):
     method : str, default="jackson-mudholkar"
         The method used to compute the confidence threshold for Q residuals.
         Options:
-        - "chi-square" : Uses the first two moments of the residual eigenvalues
-        (mean and variance) to compute a moment-matched chi-square threshold for Q residuals [1, 3].
-        - "jackson-mudholkar" : Uses the first three moments of the residual eigenvalues
-        to calculate an analytical threshold based on Jackson & Mudholkar’s approximation [2, 3].
-        - "percentile" : Uses the empirical percentile of the observed Q residuals to set
-        a non-parametric threshold.
+        - "chi-square" : Uses the first two moments of the residual
+        eigenvalues (mean and variance) to compute a moment-matched
+        chi-square threshold for Q residuals [1, 3].
+        - "jackson-mudholkar" : Uses the first three moments of the
+        residual eigenvalues to calculate an analytical threshold
+        based on Jackson & Mudholkar's approximation [2, 3].
+        - "percentile" : Uses the empirical percentile of the
+        observed Q residuals to set a non-parametric threshold.
 
     Attributes
     ----------
@@ -77,8 +79,10 @@ class QResiduals(_ModelResidualsBase):
     References
     ----------
     [1] Box, G. E. P. (1954).
-        Some theorems on quadratic forms applied in the study of analysis of variance problems, I.
-        Effect of inequality of variance in the one-way classification.
+        Some theorems on quadratic forms applied in the study
+        of analysis of variance problems, I.
+        Effect of inequality of variance in the one-way
+        classification.
         Annals of Mathematical Statistics, 25(2), 290–302.
     [2] Jackson, J. E., & Mudholkar, G. S. (1979).
         Control procedures for residuals associated with principal component analysis.
@@ -130,8 +134,10 @@ class QResiduals(_ModelResidualsBase):
             self.critical_value_ = np.percentile(q_values, self.confidence * 100)
             return
 
-        # For statistical methods, we need the eigenvalues of the residual covariance matrix
-        # This represents the variance remaining in each 'unused' dimension
+        # For statistical methods, we need the eigenvalues of the
+        # residual covariance matrix.
+        # This represents the variance remaining in each 'unused'
+        # dimension
         theta1, theta2, theta3 = self._calculate_thetas(residuals)
 
         if self.method == "chi-square":

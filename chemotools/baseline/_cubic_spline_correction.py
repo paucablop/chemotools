@@ -10,7 +10,7 @@ from typing import Optional
 
 import numpy as np
 from scipy.interpolate import CubicSpline
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 

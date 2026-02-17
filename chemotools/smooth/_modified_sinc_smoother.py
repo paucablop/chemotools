@@ -1,21 +1,26 @@
 """
-The :mod:chemotools.smooth._modified_sinc_smoother module implements the Modified Sinc Filter (MSF) transformation.
+The :mod:chemotools.smooth._modified_sinc_smoother module
+implements the Modified Sinc Filter (MSF) transformation.
 """
 
 # Authors: Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>
 # License: MIT
 
 from __future__ import annotations
+
 from typing import Literal, Optional
+
 import numpy as np
-from sklearn.utils._param_validation import Integral, Interval, StrOptions, Real
+from sklearn.utils._param_validation import Integral, Interval, Real, StrOptions
 
 from ._base import _BaseFIRFilter
 
 
 class ModifiedSincFilter(_BaseFIRFilter):
     """
-    Modified Sinc smoothing (MS) for denoising while preserving peak positions based on the paper "Why and How Savitzky–Golay Filters Should Be Replaced."
+    Modified Sinc smoothing (MS) for denoising while preserving
+    peak positions based on the paper "Why and How
+    Savitzky–Golay Filters Should Be Replaced."
 
     The Modified Sinc smoother is a linear-phase FIR filter: the signal is
     convolved with a fixed, symmetric kernel. The kernel is built from:
@@ -60,7 +65,8 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
     References
     ----------
-    [1] Schmid, M.; Rath, D.; Diebold, U. "Why and How Savitzky–Golay Filters Should Be Replaced."
+    [1] Schmid, M.; Rath, D.; Diebold, U.
+    "Why and How Savitzky–Golay Filters Should Be Replaced."
     ACS measurement science Au 2022, 2 (2), 185-196.
 
     Examples
@@ -164,7 +170,8 @@ class ModifiedSincFilter(_BaseFIRFilter):
         i = np.arange(-m, m + 1, dtype=np.float64)
         x = i / (m + 1) if m >= 0 else np.array([0.0])
 
-        # ---- 2) Eq. 3: modified sinc core (note that numpy's sinc uses sin(pi*u)/(pi*u)) ----
+        # ---- 2) Eq. 3: modified sinc core ----
+        # (note that numpy's sinc uses sin(pi*u)/(pi*u))
         core = np.sinc(0.5 * (self.n + 4) * x)
 
         # ---- 3) Eq. 4: window with w(0)=1, w(1)=0, w'(1)=0 ----

@@ -1,13 +1,12 @@
 """Tests for inspector utility functions."""
 
+import numpy as np
 import pytest
 
-import numpy as np
-
 from chemotools.inspector.core.utils import (
-    normalize_datasets,
-    normalize_components,
     get_xlabel_for_features,
+    normalize_components,
+    normalize_datasets,
     prepare_annotations,
     select_components,
 )
@@ -108,7 +107,8 @@ class TestSelectComponents:
             select_components(matrix, -1)
 
     def test_raises_index_error_for_out_of_bounds_in_list(self):
-        """Test that IndexError is raised when any component in list is out of bounds."""
+        """Test that IndexError is raised when any component
+        in list is out of bounds."""
         # Arrange
         matrix = np.array([[1, 2, 3], [4, 5, 6]])  # 3 components (0, 1, 2)
 

@@ -6,9 +6,11 @@ decomposition models (IR, Raman, NMR, etc.).
 """
 
 from __future__ import annotations
-from typing import Dict, Optional, Tuple, TYPE_CHECKING, Literal, Union
-import numpy as np
+
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure

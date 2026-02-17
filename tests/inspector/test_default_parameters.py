@@ -2,8 +2,8 @@
 
 import numpy as np
 import pytest
-from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -26,7 +26,8 @@ class TestPCAInspectorDefaultParameters:
 
     @pytest.mark.parametrize("n_components", [1, 2, 3, 5, 10])
     def test_inspect_with_default_parameters(self, sample_data, n_components):
-        """Test that inspect() works with default parameters for various component counts."""
+        """Test that inspect() works with default parameters
+        for various component counts."""
         X, y = sample_data
 
         model = make_pipeline(StandardScaler(), PCA(n_components=n_components))
@@ -88,7 +89,8 @@ class TestPLSRegressionInspectorDefaultParameters:
 
     @pytest.mark.parametrize("n_components", [1, 2, 3, 5, 10])
     def test_inspect_with_default_parameters(self, sample_data, n_components):
-        """Test that inspect() works with default parameters for various component counts."""
+        """Test that inspect() works with default parameters
+        for various component counts."""
         X, y = sample_data
 
         model = make_pipeline(

@@ -2,7 +2,6 @@ import numpy as np
 
 from chemotools.feature_selection import VIPSelector
 
-
 # Test compliance with scikit-learn
 # TODO: Design test for VIPSelector
 

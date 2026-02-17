@@ -14,7 +14,7 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
-from ._base import _ModelResidualsBase, ModelTypes
+from ._base import ModelTypes, _ModelResidualsBase
 
 
 class HotellingT2(_ModelResidualsBase):
@@ -53,7 +53,8 @@ class HotellingT2(_ModelResidualsBase):
     ----------
     [1] Johan A. Westerhuis, Stephen P. Gurden, Age K. Smilde
         Generalized contribution plots in multivariate statistical process
-        monitoring  Chemometrics and Intelligent Laboratory Systems 51 2000 95–114 (2001).
+        monitoring  Chemometrics and Intelligent Laboratory
+        Systems 51 2000 95–114 (2001).
 
     Examples
     --------

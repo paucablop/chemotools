@@ -1,4 +1,5 @@
 import pytest
+
 from chemotools.utils._linear_algebra import whittaker_solver_dispatch
 
 

@@ -1,18 +1,19 @@
+from unittest import mock
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-from unittest import mock
-from sklearn.decomposition import PCA
-from sklearn.cross_decomposition import PLSRegression
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
-from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.base import BaseEstimator
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.feature_selection._base import SelectorMixin
-import matplotlib.pyplot as plt
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from chemotools.inspector.core.base import (
-    _BaseInspector,
     InspectorDataset,
+    _BaseInspector,
 )
 
 

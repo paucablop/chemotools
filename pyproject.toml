@@ -1,13 +1,12 @@
 [project]
 name = "chemotools"
-version = "0.2.5"
+dynamic = ["version"]
 description = "chemotools: A Python Package that Integrates Chemometrics and scikit-learn"
 authors = [{ name = "Pau Cabaneros" }]
 requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "License :: OSI Approved :: MIT License",
@@ -17,7 +16,8 @@ readme = "README.md"
 license = "MIT"
 dependencies = [
     "matplotlib>=3.10.7",
-    "numpy>=2.0.0,<3",
+    # numpy < 3 is risky if ecosystem hasn't caught up, but good for future-proofing
+    "numpy>=2.0.0,<3", 
     "scikit-learn>=1.4.0,<2",
     "scipy>=1.11.0,<2",
 ]
@@ -39,7 +39,6 @@ docs = [
     "sphinx-copybutton",
     "nbsphinx",
     "ipykernel",
-    "chemotools",
     "sphinx-design",
     "sphinxcontrib-youtube",
     "sphinx-intl>=2.3.2",
@@ -50,18 +49,20 @@ docs-dev = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+# Added hatch-vcs to handle dynamic versioning via build backend
+requires = ["hatchling", "hatch-vcs"] 
 build-backend = "hatchling.build"
 
-[tool.poetry-dynamic-versioning]
-enable = true
+# Configuration for Hatch to read git tags
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "chemotools/_version.py"
 
 [tool.pytest.ini_options]
 filterwarnings = "always"
 
-[[tool.mypy.overrides]]
-module = ["sklearn", "sklearn.*", "setuptools", "setuptools.*"]
-ignore_missing_imports = true
-
-
-
+# Recommended Basic Ruff Config
+[tool.ruff.lint]
+select = ["E", "F", "I"] # Defaults + Isort

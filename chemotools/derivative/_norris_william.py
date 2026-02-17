@@ -7,11 +7,12 @@ transformer to calculate the Norris-Williams derivative of spectral data.
 # License: MIT
 
 from numbers import Integral
+
 import numpy as np
 from scipy.ndimage import convolve1d
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -21,10 +22,12 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     Parameters
     ----------
     window_size : int, optional, default=5
-        The size of the window to use for the derivative calculation. Must be odd. Default is 5.
+        The size of the window to use for the derivative
+        calculation. Must be odd. Default is 5.
 
     gap_size : int, optional, default=3
-        The size of the gap to use for the derivative calculation. Must be odd. Default is 3.
+        The size of the gap to use for the derivative
+        calculation. Must be odd. Default is 3.
 
     derivative_order : int, optional, default=1
         The order of the derivative to calculate. Can be 1 or 2. Default is 1.

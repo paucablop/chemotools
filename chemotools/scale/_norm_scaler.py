@@ -6,10 +6,11 @@ The :mod:`chemotools.scale._norm_scaler` module implements a L-norm Scaler trans
 # License: MIT
 
 from numbers import Integral
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

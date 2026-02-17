@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from abc import ABC
 from dataclasses import dataclass
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     Iterable,
@@ -10,11 +12,9 @@ from typing import (
     Sequence,
     Tuple,
     Union,
-    TYPE_CHECKING,
 )
 
 import numpy as np
-from abc import ABC
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
@@ -24,9 +24,10 @@ if TYPE_CHECKING:
 from sklearn.utils import check_array
 
 from chemotools._types import ModelInput
-from .validation import _validate_and_extract_model, _validate_datasets_consistency
+
 from .summaries import InspectorSummary
 from .utils import normalize_datasets
+from .validation import _validate_and_extract_model, _validate_datasets_consistency
 
 # Backward-compatible alias – existing consumers import this name.
 ModelTypes = ModelInput
@@ -378,8 +379,11 @@ class _BaseInspector(ABC):
         tuple
             A tuple containing:
             - datasets (List[str]): The list of dataset names to inspect.
-            - color_by (Optional[Union[str, Dict[str, Any]]]): The normalized color_by configuration.
-            - annotate_by (Optional[Union[str, Dict[str, Any]]]): The normalized annotate_by configuration.
+            - color_by (Optional[Union[str, Dict[str, Any]]]):
+              The normalized color_by configuration.
+            - annotate_by
+              (Optional[Union[str, Dict[str, Any]]]):
+              The normalized annotate_by configuration.
         """
         datasets = normalize_datasets(dataset)
         use_suffix = len(datasets) > 1
@@ -389,7 +393,9 @@ class _BaseInspector(ABC):
             if not isinstance(color_by, (str, dict)):
                 if use_suffix:
                     raise ValueError(
-                        "When inspecting multiple datasets, color_by must be a string or a dictionary."
+                        "When inspecting multiple datasets, "
+                        "color_by must be a string "
+                        "or a dictionary."
                     )
                 color_by = {datasets[0]: color_by}
 
@@ -398,7 +404,9 @@ class _BaseInspector(ABC):
             if not isinstance(annotate_by, (str, dict)):
                 if use_suffix:
                     raise ValueError(
-                        "When inspecting multiple datasets, annotate_by must be a string or a dictionary."
+                        "When inspecting multiple datasets, "
+                        "annotate_by must be a string "
+                        "or a dictionary."
                     )
                 annotate_by = {datasets[0]: annotate_by}
 

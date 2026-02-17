@@ -90,7 +90,8 @@ def test_create_latent_scores_single_dataset():
 
 
 def test_create_latent_scores_multi_dataset():
-    """Test latent scores figure creation for multiple datasets with confidence ellipse."""
+    """Test latent scores figure creation for multiple
+    datasets with confidence ellipse."""
     # Arrange
     inspector = DummyLatentInspector()
 
@@ -124,7 +125,8 @@ def test_create_latent_scores_multi_dataset():
 
 
 def test_create_latent_distance_runs_with_monkeypatched_detectors(monkeypatch):
-    """Test latent distance figure with mocked Hotelling T2 and Q-residuals detectors."""
+    """Test latent distance figure with mocked Hotelling T2
+    and Q-residuals detectors."""
     # Arrange
     inspector = DummyLatentInspector()
     hot_instances = []

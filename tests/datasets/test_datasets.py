@@ -1,11 +1,11 @@
 import pytest
-from chemotools.utils._optional_dependencies import check_optional_dependency
 
 from chemotools.datasets import (
     load_coffee,
     load_fermentation_test,
     load_fermentation_train,
 )
+from chemotools.utils._optional_dependencies import check_optional_dependency
 
 
 @pytest.fixture(scope="module")

@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Optional, Self
 
 import numpy as np
-
 from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA

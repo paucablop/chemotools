@@ -1,11 +1,11 @@
 """Comprehensive test suite for PCAInspector class."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
 
 from chemotools.inspector import PCAInspector
 from chemotools.inspector.core.summaries import InspectorSummary

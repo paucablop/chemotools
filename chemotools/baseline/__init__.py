@@ -8,7 +8,6 @@ from ._non_negative import NonNegative
 from ._polynomial_correction import PolynomialCorrection
 from ._subtract_reference import SubtractReference
 
-
 __all__ = [
     "AirPls",
     "ArPls",

@@ -1,4 +1,5 @@
 import pytest
+
 from chemotools.utils._optional_dependencies import check_optional_dependency
 
 

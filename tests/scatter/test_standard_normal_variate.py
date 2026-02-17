@@ -1,6 +1,5 @@
-import pytest
-
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.scatter import StandardNormalVariate
@@ -34,6 +33,7 @@ def test_snv_flat_signal_warns():
     # Act & Assert
     with pytest.warns(
         UserWarning,
-        match="Standard deviation is zero in SNV. This indicates a flat signal and will result in NaNs.",
+        match="Standard deviation is zero in SNV. This indicates a flat signal and will"
+        " result in NaNs.",
     ):
         snv.transform(X)

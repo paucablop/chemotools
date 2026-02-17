@@ -1,17 +1,20 @@
 """
-The :mod:`chemotools.smooth._whittaker_smooth` module implements the Whittaker smoothing algorithm.
+The :mod:`chemotools.smooth._whittaker_smooth` module implements
+the Whittaker smoothing algorithm.
 """
 
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
 from typing import Callable, Literal
+
 import numpy as np
-from sklearn.utils._param_validation import Interval, StrOptions, Real
+from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from chemotools.utils._linear_algebra import (
     whittaker_smooth_banded,
 )
+
 from ._base import _BaseWhittaker
 
 

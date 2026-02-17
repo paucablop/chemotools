@@ -1,5 +1,3 @@
-from ._base import load_coffee
-from ._base import load_fermentation_train
-from ._base import load_fermentation_test
+from ._base import load_coffee, load_fermentation_test, load_fermentation_train
 
 __all__ = ["load_coffee", "load_fermentation_train", "load_fermentation_test"]

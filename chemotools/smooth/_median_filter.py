@@ -1,18 +1,19 @@
 """
-The :mod:`chemotools.smooth._median_filter` module implements the Median Filter (MD) transformation.
+The :mod:`chemotools.smooth._median_filter` module implements
+the Median Filter (MD) transformation.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Literal
 from numbers import Integral
+from typing import Literal
 
 import numpy as np
 from scipy.ndimage import median_filter
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

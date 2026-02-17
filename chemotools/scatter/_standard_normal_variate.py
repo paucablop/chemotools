@@ -1,13 +1,15 @@
 """
-The :mod:`chemotools.scatter._standard_normal_variate` module implements the Standard Normal Variate (SNV) transformation.
+The :mod:`chemotools.scatter._standard_normal_variate` module
+implements the Standard Normal Variate (SNV) transformation.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
 import warnings
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
@@ -23,7 +25,8 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
     Raises
     ------
     UserWarning
-        If the standard deviation of a spectrum is zero (spectrum is flat), a warning is raised
+        If the standard deviation of a spectrum is zero
+        (spectrum is flat), a warning is raised
         indicating that the result will contain NaNs.
 
     References
@@ -111,7 +114,9 @@ class StandardNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimato
         std = x.std()
         if std == 0:
             warnings.warn(
-                "Standard deviation is zero in SNV. This indicates a flat signal and will result in NaNs.",
+                "Standard deviation is zero in SNV. "
+                "This indicates a flat signal and will "
+                "result in NaNs.",
                 UserWarning,
                 stacklevel=2,
             )

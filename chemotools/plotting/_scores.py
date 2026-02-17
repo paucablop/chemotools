@@ -1,16 +1,17 @@
 """Scores plot for visualizing model projections and latent space."""
 
-from typing import Literal, Optional, Any, Tuple
+from typing import Any, Literal, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    annotate_points,
     add_confidence_ellipse,
-    validate_data,
+    annotate_points,
     scatter_with_colormap,
+    validate_data,
 )
 
 
@@ -256,9 +257,11 @@ class ScoresPlot(BasePlot, ColoringMixin):
         ax : Axes, optional
             Matplotlib axes to plot on. If None, creates new figure and axes.
         xlabel : str, optional
-            Custom x-axis label. If None, uses existing label or defaults to "PC{comp1+1}".
+            Custom x-axis label. If None, uses existing label
+            or defaults to "PC{comp1+1}".
         ylabel : str, optional
-            Custom y-axis label. If None, uses existing label or defaults to "PC{comp2+1}".
+            Custom y-axis label. If None, uses existing label
+            or defaults to "PC{comp2+1}".
         xlim : tuple[float, float], optional
             X-axis limits as (xmin, xmax).
         ylim : tuple[float, float], optional

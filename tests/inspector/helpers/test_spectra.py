@@ -1,12 +1,12 @@
 """Tests for spectra plot creation functions."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
 
 from chemotools.inspector.helpers._spectra import (
-    create_spectra_plots_single_dataset,
     create_spectra_plots_multi_dataset,
+    create_spectra_plots_single_dataset,
 )
 
 

@@ -1,9 +1,10 @@
 """Residual distribution plot for visualizing residual histograms and normality."""
 
-from typing import Optional, Any, Tuple
+from typing import Any, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from scipy import stats
 
 from chemotools.plotting._base import BasePlot
@@ -81,7 +82,9 @@ class ResidualDistributionPlot(BasePlot):
 
     **Count histogram instead of density:**
 
-    >>> plot = ResidualDistributionPlot(residuals, density=False, add_normal_curve=False)
+    >>> plot = ResidualDistributionPlot(
+    ...     residuals, density=False, add_normal_curve=False
+    ... )
     >>> fig = plot.show(title="Residual Counts", ylabel="Count")
 
     Notes

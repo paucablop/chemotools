@@ -1,22 +1,26 @@
 """
-The :mod:`chemotools.baseline._air_pls` module implements the Adaptive Iteratively Reweighted
-Penalized Least Squares (AirPLS) baseline correction algorithm
+The :mod:`chemotools.baseline._air_pls` module implements the
+Adaptive Iteratively Reweighted Penalized Least Squares
+(AirPLS) baseline correction algorithm
 """
 
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
 from typing import Callable, Literal, Optional
+
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
-from ._base import _BaselineWhittakerMixin
 from chemotools.smooth._base import _BaseWhittaker
+
+from ._base import _BaselineWhittakerMixin
 
 
 class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
     """
-    Adaptive Iteratively Reweighted Penalized Least Squares (AirPls) baseline correction.
+    Adaptive Iteratively Reweighted Penalized Least Squares
+    (AirPls) baseline correction.
 
     AirPls is a widely used algorithm for removing baselines from spectroscopic
     signals. It iteratively reweights residuals to suppress positive deviations
@@ -58,8 +62,10 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         The precomputed banded representation of :math:`D^T D` for the
         second-order difference operator.
 
-        * Stored as a banded representation (``solveh_banded`` format) if ``solver_type='banded'``
-        * Stored as a ``scipy.sparse`` CSC matrix if ``solver_type='sparse'``
+        * Stored as a banded representation (``solveh_banded``
+          format) if ``solver_type='banded'``
+        * Stored as a ``scipy.sparse`` CSC matrix if
+          ``solver_type='sparse'``
 
     self.w_init_ : np.ndarray
         The weights set for warm-starting.

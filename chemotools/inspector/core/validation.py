@@ -1,9 +1,8 @@
-from typing import Union, Tuple, Optional
+from typing import Optional, Tuple, Union
 
 import numpy as np
-
-from sklearn.decomposition._base import _BasePCA
 from sklearn.cross_decomposition._pls import _PLS
+from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
 from chemotools._validation import validate_and_extract_model as _canonical_validate

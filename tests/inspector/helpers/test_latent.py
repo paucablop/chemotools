@@ -1,18 +1,18 @@
 """Tests for core plot creation functions."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.decomposition import PCA
 
 from chemotools.inspector.helpers._latent import (
+    create_loadings_plot,
     create_model_distances_plot,
     create_q_vs_y_residuals_plot,
-    create_variance_plot,
-    create_loadings_plot,
-    create_scores_plot_single_dataset,
     create_scores_plot_multi_dataset,
+    create_scores_plot_single_dataset,
+    create_variance_plot,
 )
 
 
@@ -228,7 +228,8 @@ class TestCreateScoresPlotSingleDataset:
 
         # Assert
         assert fig is not None
-        # Should have 2 axes (main plot + colorbar) because color_by="y" and y is numeric
+        # Should have 2 axes (main plot + colorbar)
+        # because color_by="y" and y is numeric
         assert len(fig.axes) == 2
 
         # Cleanup
@@ -642,7 +643,8 @@ class TestCreateModelDistancesPlot:
 
         # Assert
         assert fig is not None
-        # Should have 2 axes (main plot + colorbar) because color_by="y" and y is numeric
+        # Should have 2 axes (main plot + colorbar)
+        # because color_by="y" and y is numeric
         assert len(fig.axes) == 2
 
         # Cleanup

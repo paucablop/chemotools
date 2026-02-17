@@ -5,7 +5,9 @@ used across all inspector types (PCA, PLS, ICA, etc.).
 """
 
 from __future__ import annotations
-from typing import List, Union, Tuple, Sequence, Optional, Dict
+
+from typing import Dict, List, Optional, Sequence, Tuple, Union
+
 import numpy as np
 
 # ==============================================================================
@@ -159,7 +161,8 @@ def normalize_components(components_input: ComponentsInput) -> List[ComponentSpe
 def get_default_scores_components(
     n_components: int,
 ) -> Union[int, Tuple[int, int], Tuple[Tuple[int, int], ...]]:
-    """Generate sensible default component pairs for scores plots based on available components.
+    """Generate sensible default component pairs for scores
+    plots based on available components.
 
     Parameters
     ----------
@@ -194,7 +197,8 @@ def get_default_scores_components(
 
 
 def get_default_loadings_components(n_components: int) -> Union[int, List[int]]:
-    """Generate sensible default components for loadings plots based on available components.
+    """Generate sensible default components for loadings
+    plots based on available components.
 
     Parameters
     ----------

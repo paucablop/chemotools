@@ -3,24 +3,24 @@
 import warnings
 
 from chemotools.plotting._base import BasePlot, Display, is_displayable
+from chemotools.plotting._distances import DistancesPlot
+from chemotools.plotting._explained_variance import ExplainedVariancePlot
+from chemotools.plotting._feature_selection import FeatureSelectionPlot
+from chemotools.plotting._loadings import LoadingsPlot
+from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot
+from chemotools.plotting._qq_plot import QQPlot
+from chemotools.plotting._residual_distribution import ResidualDistributionPlot
+from chemotools.plotting._scores import ScoresPlot
+from chemotools.plotting._spectra import SpectraPlot
+from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
 from chemotools.plotting._utils import (
-    setup_figure,
-    get_colors_from_labels,
     add_confidence_ellipse,
     annotate_points,
     calculate_ylim_for_xlim,
+    get_colors_from_labels,
+    setup_figure,
 )
-from chemotools.plotting._spectra import SpectraPlot
-from chemotools.plotting._feature_selection import FeatureSelectionPlot
-from chemotools.plotting._scores import ScoresPlot
-from chemotools.plotting._loadings import LoadingsPlot
-from chemotools.plotting._distances import DistancesPlot
-from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
-from chemotools.plotting._explained_variance import ExplainedVariancePlot
 from chemotools.plotting._y_residuals import YResidualsPlot
-from chemotools.plotting._qq_plot import QQPlot
-from chemotools.plotting._residual_distribution import ResidualDistributionPlot
-from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot
 
 __all__ = [
     # Protocols

@@ -1,19 +1,19 @@
 """Tests for plotting utilities."""
 
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pytest
 from matplotlib.axes import Axes
 
 from chemotools.plotting._utils import (
-    setup_figure,
-    get_colors_from_labels,
+    add_colorbar,
     add_confidence_ellipse,
     annotate_points,
     detect_categorical,
+    get_colors_from_labels,
     get_default_colormap,
-    add_colorbar,
     scatter_with_colormap,
+    setup_figure,
 )
 
 

@@ -1,12 +1,13 @@
 """Predicted vs Actual plot for regression model evaluation."""
 
-from typing import Literal, Optional, Any, Tuple
+from typing import Any, Literal, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
-from chemotools.plotting._utils import validate_data, scatter_with_colormap
+from chemotools.plotting._utils import scatter_with_colormap, validate_data
 
 
 class PredictedVsActualPlot(BasePlot, ColoringMixin):
@@ -43,7 +44,8 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
         - "viridis" for continuous data
 
     marker : str, optional
-        Marker style for scatter points (default: "o"). Examples: "o", "s", "^", "v", "D".
+        Marker style for scatter points (default: "o").
+        Examples: "o", "s", "^", "v", "D".
     add_ideal_line : bool, optional
         Whether to add diagonal y=x line showing ideal predictions (default: True).
     color_mode : {"continuous", "categorical"}, optional
@@ -74,8 +76,12 @@ class PredictedVsActualPlot(BasePlot, ColoringMixin):
     **Multiple models compared:**
 
     >>> fig, ax = plt.subplots()
-    >>> PredictedVsActualPlot(y_true, y_pred_model1, label="Model 1", color="blue").render(ax)
-    >>> PredictedVsActualPlot(y_true, y_pred_model2, label="Model 2", color="red").render(ax)
+    >>> PredictedVsActualPlot(
+    ...     y_true, y_pred_model1, label="Model 1", color="blue"
+    ... ).render(ax)
+    >>> PredictedVsActualPlot(
+    ...     y_true, y_pred_model2, label="Model 2", color="red"
+    ... ).render(ax)
     >>> ax.legend()
     >>> plt.show()
 

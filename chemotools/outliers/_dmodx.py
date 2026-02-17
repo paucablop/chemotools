@@ -1,5 +1,6 @@
 """
-The :mod:`chemotools.outliers._dmodx` module implements the Distance to Model (DModX) outlier detection algorithm.
+The :mod:`chemotools.outliers._dmodx` module implements
+the Distance to Model (DModX) outlier detection algorithm.
 """
 
 # Authors: Pau Cabaneros
@@ -11,7 +12,7 @@ import numpy as np
 from scipy.stats import f as f_distribution
 from sklearn.pipeline import Pipeline
 
-from ._base import _ModelResidualsBase, ModelTypes
+from ._base import ModelTypes, _ModelResidualsBase
 from ._utils import calculate_residual_spectrum
 
 
@@ -53,7 +54,8 @@ class DModX(_ModelResidualsBase):
         The calculated critical value for outlier detection
 
     train_sse_: float
-        The training sum of squared errors (SSE) for the model normalized by degrees of freedom
+        The training sum of squared errors (SSE) for the
+        model normalized by degrees of freedom
 
     A0_ : int
         Adjustment factor for degrees of freedom based on mean centering

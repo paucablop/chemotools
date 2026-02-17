@@ -11,7 +11,7 @@ from typing import Optional, Union
 import numpy as np
 from sklearn.pipeline import Pipeline
 
-from ._base import _ModelResidualsBase, ModelTypes
+from ._base import ModelTypes, _ModelResidualsBase
 
 
 class Leverage(_ModelResidualsBase):

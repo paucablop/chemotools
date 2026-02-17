@@ -1,21 +1,22 @@
 """Base classes and mixins for chemotools plotting."""
 
-from typing import Optional, Any, Tuple, Protocol, runtime_checkable, Literal
 from abc import ABC, abstractmethod
-import numpy as np
+from typing import Any, Literal, Optional, Protocol, Tuple, runtime_checkable
+
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._utils import (
+    add_colorbar,
+    apply_limits,
+    detect_categorical,
+    ensure_axes,
+    get_default_colormap,
+    set_default_axis_labels,
     setup_figure,
     split_figure_plot_kwargs,
-    ensure_axes,
-    apply_limits,
-    set_default_axis_labels,
-    detect_categorical,
-    get_default_colormap,
-    add_colorbar,
 )
 
 
@@ -104,8 +105,10 @@ class Display(Protocol):
         Returns
         -------
         Any
-            Typically returns tuple[Figure, Axes] or just Axes, depending on implementation.
-            Implementations may vary in their return type based on specific needs.
+            Typically returns tuple[Figure, Axes] or just Axes,
+            depending on implementation.
+            Implementations may vary in their return type based
+            on specific needs.
 
         Examples
         --------

@@ -1,18 +1,20 @@
 """PLS Regression Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
+
 from dataclasses import asdict
 from typing import (
+    TYPE_CHECKING,
+    Any,
     Dict,
+    List,
+    Literal,
     Optional,
     Sequence,
     Tuple,
     Union,
-    Any,
-    TYPE_CHECKING,
-    Literal,
-    List,
 )
+
 import numpy as np
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
@@ -20,26 +22,26 @@ from sklearn.pipeline import Pipeline
 if TYPE_CHECKING:
     import matplotlib.figure
 
-from chemotools.outliers import QResiduals, HotellingT2, Leverage, StudentizedResiduals
+from chemotools.outliers import HotellingT2, Leverage, QResiduals, StudentizedResiduals
 
-from .core.base import _BaseInspector, InspectorPlotConfig
+from .core.base import InspectorPlotConfig, _BaseInspector
 from .core.latent import LatentVariableMixin
 from .core.regression import RegressionMixin
 from .core.spectra import SpectraMixin
 from .core.summaries import PLSRegressionSummary
 from .core.utils import (
-    get_xlabel_for_features,
-    get_default_scores_components,
     get_default_loadings_components,
+    get_default_scores_components,
+    get_xlabel_for_features,
     select_components,
 )
 from .helpers import _latent as _latent_plots
 from .helpers._regression import (
     create_predicted_vs_actual_plot,
-    create_y_residual_plot,
     create_qq_plot,
-    create_residual_distribution_plot,
     create_regression_distances_plot,
+    create_residual_distribution_plot,
+    create_y_residual_plot,
 )
 
 SummaryStep = Dict[str, Union[int, str]]
@@ -62,7 +64,8 @@ class PLSRegressionInspector(
 
     - ``inspect()``: Creates all diagnostic plots (scores, loadings, explained variance,
       regression diagnostics, and distance plots)
-    - ``inspect_spectra()``: Creates raw and preprocessed spectra plots (if preprocessing exists)
+    - ``inspect_spectra()``: Creates raw and preprocessed
+      spectra plots (if preprocessing exists)
 
     Parameters
     ----------
@@ -551,7 +554,8 @@ class PLSRegressionInspector(
             - "y": Color by target values (default for single dataset)
             - "sample_index": Color by sample index
             - dict: Dictionary mapping dataset names to color arrays
-            - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
+            - None: Color by dataset (for multi-dataset
+              plots) or 'y' (for single dataset)
 
         annotate_by : str or dict, optional
             Annotations for plot points.
@@ -574,13 +578,25 @@ class PLSRegressionInspector(
             Dictionary of matplotlib Figures with keys:
 
             - 'scores_1', 'scores_2', ...: Scores plots
-            - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...: X-scores vs Y-scores plots (training set only)
-            - 'loadings_x', 'loadings_weights', 'loadings_rotations': X-related loadings plots
-            - 'regression_coefficients': Regression coefficient traces (one per target when multi-output)
-            - 'variance_x', 'variance_y': Explained variance plots (when available)
-            - 'distances_hotelling_q', 'distances_q_y_residuals', 'distances_leverage_studentized': Distance diagnostics
-            - 'predicted_vs_actual', 'residuals', 'qq_plot', 'residual_distribution': Regression diagnostics
-            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (when preprocessing exists)
+            - 'x_vs_y_scores_1', 'x_vs_y_scores_2', ...:
+              X-scores vs Y-scores plots
+              (training set only)
+            - 'loadings_x', 'loadings_weights',
+              'loadings_rotations': X-related loadings
+            - 'regression_coefficients': Regression
+              coefficient traces
+              (one per target when multi-output)
+            - 'variance_x', 'variance_y': Explained
+              variance plots (when available)
+            - 'distances_hotelling_q',
+              'distances_q_y_residuals',
+              'distances_leverage_studentized':
+              Distance diagnostics
+            - 'predicted_vs_actual', 'residuals',
+              'qq_plot', 'residual_distribution':
+              Regression diagnostics
+            - 'raw_spectra', 'preprocessed_spectra':
+              Spectra plots (when preprocessing exists)
         """
         # ------------------------------------------------------------------
         # Input Validation
@@ -606,7 +622,8 @@ class PLSRegressionInspector(
         # Validate color_mode
         if color_mode not in ["continuous", "categorical"]:
             raise ValueError(
-                f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
+                f"color_mode must be either 'continuous' "
+                f"or 'categorical', got '{color_mode}'"
             )
 
         # Close previous figures to prevent memory leaks

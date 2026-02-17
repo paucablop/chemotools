@@ -6,14 +6,14 @@ transformer to calculate the Savitzky-Golay derivative of spectral data.
 # Author: Pau Cabaneros
 # License: MIT
 
-from typing import Literal
 from numbers import Integral
+from typing import Literal
 
 import numpy as np
 from scipy.signal import savgol_filter
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -23,8 +23,8 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     Parameters
     ----------
     window_size : int, optional, default=3
-        The size of the window to use for the derivative calculation. Must be odd. Default
-        is 3.
+        The size of the window to use for the derivative
+        calculation. Must be odd. Default is 3.
 
     polynomial_order : int, optional, default=1
         The order of the polynomial to use for the derivative calculation. Must be less

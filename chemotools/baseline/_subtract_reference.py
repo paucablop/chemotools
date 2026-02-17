@@ -9,7 +9,7 @@ a reference spectrum subtraction transformer.
 from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
@@ -20,8 +20,8 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     Parameters
     ----------
     reference : np.ndarray, optional, default=None
-        The reference spectrum to subtract from the input data. If None, the original spectrum
-        is returned.
+        The reference spectrum to subtract from the input
+        data. If None, the original spectrum is returned.
 
     Attributes
     ----------
@@ -29,7 +29,8 @@ class SubtractReference(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The number of features in the input data.
 
     reference_ : np.ndarray
-        The reference spectrum to subtract from the input data if the reference parameter is not None.
+        The reference spectrum to subtract from the input
+        data if the reference parameter is not None.
 
     Examples
     --------

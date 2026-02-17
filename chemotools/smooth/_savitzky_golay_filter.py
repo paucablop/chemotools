@@ -1,15 +1,17 @@
 """
-The :mod:`chemotools.smooth._savitzky_golay_filter` module implements the Savitzky-Golay Filter (SGF) transformation.
+The :mod:`chemotools.smooth._savitzky_golay_filter` module
+implements the Savitzky-Golay Filter (SGF) transformation.
 """
 
 # Authors: Nusret Emirhan Salli <nusret.emirhan.salli@gmail.com>, Pau Cabaneros
 # License: MIT
 
-from typing import Literal, Optional
 from numbers import Integral
+from typing import Literal, Optional
 
 import numpy as np
 from sklearn.utils._param_validation import Interval, StrOptions
+
 from ._base import _BaseFIRFilter
 
 
@@ -20,8 +22,8 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
     Parameters
     ----------
     window_size : int, optional
-        The size of the window to use for the Savitzky-Golay filter. Must be odd. Default
-        is 3.
+        The size of the window to use for the Savitzky-Golay
+        filter. Must be odd. Default is 3.
 
     polynomial_order : int, optional
         The order of the polynomial to use for the Savitzky-Golay filter. Must be less
@@ -165,9 +167,12 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         Apply Savitzky-Golay filter with scipy-compatible interp mode.
 
         Replicates scipy's _fit_edges_polyfit behavior:
-        1. Fit polynomial to first window_size points, evaluate at first half_window positions
-        2. Apply standard convolution to ALL positions (with padding)
-        3. Replace first half_window and last half_window positions with polynomial values
+        1. Fit polynomial to first window_size points,
+        evaluate at first half_window positions
+        2. Apply standard convolution to ALL positions
+        (with padding)
+        3. Replace first half_window and last half_window
+        positions with polynomial values
         """
         m = self._half_
         n = len(x)
@@ -178,7 +183,8 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
             x_padded = np.pad(x, (m, m), mode="edge")
             return np.convolve(x_padded, self.kernel_, mode="valid")
 
-        # Apply standard convolution to entire signal (with edge padding for the convolution itself)
+        # Apply standard convolution to entire signal
+        # (with edge padding for the convolution itself)
         x_padded = np.pad(x, (m, m), mode="edge")
         result = np.convolve(x_padded, self.kernel_, mode="valid")
 

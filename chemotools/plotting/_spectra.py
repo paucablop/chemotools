@@ -1,19 +1,21 @@
 """
-The :mod:`chemotools.plotting._spectra` module implements the SpectraPlot class for visualizing spectral data.
+The :mod:`chemotools.plotting._spectra` module implements the
+SpectraPlot class for visualizing spectral data.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Literal, Optional, Any, Sequence
+from typing import Any, Literal, Optional, Sequence
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot, ColoringMixin
 from chemotools.plotting._utils import (
-    get_colors_from_labels,
     calculate_ylim_for_xlim,
+    get_colors_from_labels,
     validate_data,
 )
 
@@ -59,7 +61,11 @@ class SpectraPlot(BasePlot, ColoringMixin):
     >>> x = np.linspace(400, 2500, 100)
     >>> y = np.random.randn(5, 100)
     >>> plotter = SpectraPlot(x, y)
-    >>> fig = plotter.show(title="NIR Spectra", xlabel="Wavelength (nm)", ylabel="Absorbance")
+    >>> fig = plotter.show(
+    ...     title="NIR Spectra",
+    ...     xlabel="Wavelength (nm)",
+    ...     ylabel="Absorbance",
+    ... )
 
     With categorical coloring:
 
@@ -83,8 +89,10 @@ class SpectraPlot(BasePlot, ColoringMixin):
 
     Override categorical detection for small numeric datasets:
 
-    >>> levels = np.array([1, 2, 3, 4])  # 4 unique values - might be detected as categorical
-    >>> plotter = SpectraPlot(x, y, color_by=levels, color_mode="continuous")
+    >>> levels = np.array([1, 2, 3, 4])  # 4 unique values
+    >>> plotter = SpectraPlot(
+    ...     x, y, color_by=levels, color_mode="continuous"
+    ... )
     >>> fig = plotter.show(title="4 Concentration Levels")
 
     With custom axis labels:
@@ -309,7 +317,8 @@ class SpectraPlot(BasePlot, ColoringMixin):
             import matplotlib.colors as mcolors
 
             norm = mcolors.Normalize(vmin=self.color_by.min(), vmax=self.color_by.max())
-            # Ensure we have a valid colormap (should not be None here, but be defensive)
+            # Ensure we have a valid colormap
+            # (should not be None here, but be defensive)
             colormap_name = self.colormap if self.colormap is not None else "viridis"
             cmap = mpl.colormaps.get_cmap(colormap_name)
 

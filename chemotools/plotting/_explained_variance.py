@@ -1,9 +1,10 @@
 """Explained Variance plot for PCA/PLS model diagnostics."""
 
 from typing import Any, Optional, Tuple
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import validate_data
@@ -95,7 +96,8 @@ class ExplainedVariancePlot(BasePlot):
 
         if self.explained_variance_ratio.ndim != 1:
             raise ValueError(
-                f"explained_variance_ratio must be 1D, got shape {self.explained_variance_ratio.shape}"
+                f"explained_variance_ratio must be 1D, "
+                f"got shape {self.explained_variance_ratio.shape}"
             )
 
         # Validate threshold if provided

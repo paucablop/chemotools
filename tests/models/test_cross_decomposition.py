@@ -1,7 +1,7 @@
 """Tests for enhanced PLSRegression with automatic variance calculation."""
 
-import pytest
 import numpy as np
+import pytest
 from sklearn.cross_decomposition import PLSRegression as SklearnPLSRegression
 from sklearn.utils.estimator_checks import check_estimator
 

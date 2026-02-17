@@ -1,9 +1,10 @@
 """Loadings plot for visualizing model feature weights."""
 
-from typing import Optional, Any
+from typing import Any, Optional
+
 import numpy as np
-from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting._base import BasePlot
 from chemotools.plotting._utils import (
@@ -121,7 +122,8 @@ class LoadingsPlot(BasePlot):
             if comp < 0 or comp >= self.n_components:
                 raise ValueError(
                     f"Component index {comp} is out of bounds. "
-                    f"loadings has {self.n_components} components (valid range: 0-{self.n_components - 1})"
+                    f"loadings has {self.n_components} components "
+                    f"(valid range: 0-{self.n_components - 1})"
                 )
 
         # Set up feature names/values for x-axis

@@ -1,10 +1,10 @@
 """Tests for ExplainedVariancePlot class."""
 
-import pytest
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
+import pytest
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting import ExplainedVariancePlot, is_displayable
 

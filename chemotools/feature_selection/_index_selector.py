@@ -1,16 +1,17 @@
 """
-The :mod:`chemotools.feature_selection._index_selector` module implements the IndexSelector
-to select specific features from spectral data based on indices or wavenumbers.
+The :mod:`chemotools.feature_selection._index_selector` module
+implements the IndexSelector to select specific features from
+spectral data based on indices or wavenumbers.
 """
 
 # Author: Pau Cabaneros
 # License: MIT
 
 from typing import Optional, Union
+
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
-
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 

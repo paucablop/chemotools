@@ -1,12 +1,14 @@
 """Core plotting utilities for chemotools visualizations."""
 
-from typing import Optional, Union, Iterable, cast, Any
 import inspect
-import numpy as np
-from sklearn.utils import check_array
+from typing import Any, Iterable, Optional, Union, cast
+
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
+from sklearn.utils import check_array
+
 from chemotools.plotting._styles import CUSTOM_CMAP
 
 # Register custom colormaps
@@ -381,8 +383,8 @@ def add_colorbar(
     --------
     >>> add_colorbar(ax, concentrations, 'viridis', 'Concentration (mg/L)')
     """
-    from matplotlib import cm
     import matplotlib.colors as mcolors
+    from matplotlib import cm
 
     norm = mcolors.Normalize(vmin=color_by.min(), vmax=color_by.max())
     sm = cm.ScalarMappable(cmap=colormap, norm=norm)

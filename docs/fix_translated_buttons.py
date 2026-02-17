@@ -15,8 +15,8 @@ Example:
 
 import sys
 from pathlib import Path
-from bs4 import BeautifulSoup
 
+from bs4 import BeautifulSoup
 
 # Mapping of English button text to translations and their target URLs
 BUTTON_TRANSLATIONS = {
@@ -300,12 +300,28 @@ def create_button_html(text, url, is_external=False):
     """Create the proper HTML structure for a sphinx-design button."""
     if is_external:
         # External link (button-link)
-        classes = "sd-sphinx-override sd-btn sd-text-wrap sd-btn-secondary sd-stretched-link reference external"
-        return f'<span class="sd-d-grid"><a class="{classes}" href="{url}"><span>{text}</span></a></span>'
+        classes = (
+            "sd-sphinx-override sd-btn sd-text-wrap "
+            "sd-btn-secondary sd-stretched-link "
+            "reference external"
+        )
+        return (
+            f'<span class="sd-d-grid">'
+            f'<a class="{classes}" href="{url}">'
+            f"<span>{text}</span></a></span>"
+        )
     else:
         # Internal link (button-ref)
-        classes = "sd-sphinx-override sd-btn sd-text-wrap sd-btn-secondary sd-stretched-link reference internal"
-        return f'<span class="sd-d-grid"><a class="{classes}" href="{url}"><span class="doc">{text}</span></a></span>'
+        classes = (
+            "sd-sphinx-override sd-btn sd-text-wrap "
+            "sd-btn-secondary sd-stretched-link "
+            "reference internal"
+        )
+        return (
+            f'<span class="sd-d-grid">'
+            f'<a class="{classes}" href="{url}">'
+            f'<span class="doc">{text}</span></a></span>'
+        )
 
 
 def fix_buttons_in_html(html_path, language):
@@ -342,7 +358,9 @@ def fix_buttons_in_html(html_path, language):
 
                     modified = True
                     print(
-                        f"  ✓ Translated button: '{english_text}' -> '{translated_text}'"
+                        f"  ✓ Translated button:"
+                        f" '{english_text}'"
+                        f" -> '{translated_text}'"
                     )
         else:
             # Case 2: Plain text that should be a button

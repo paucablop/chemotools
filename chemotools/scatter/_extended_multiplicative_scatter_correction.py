@@ -6,14 +6,14 @@ implements an Extended Multiplicative Scatter Correction transformer.
 # Authors: Pau Cabaneros
 # License: MIT
 
-import numpy as np
-from typing import Literal, Optional
 from numbers import Integral
+from typing import Literal, Optional
 
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+import numpy as np
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_array, check_consistent_length
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class ExtendedMultiplicativeScatterCorrection(
@@ -65,7 +65,10 @@ class ExtendedMultiplicativeScatterCorrection(
     -----
     The model for each spectrum $x$ is:
 
-    $$x = \sum_{i=0}^{order} c_i \lambda^i + m \cdot x_{ref} + \sum g_j \cdot z_j + \epsilon$$
+    $$
+    x = \sum_{i=0}^{order} c_i \lambda^i
+    + m \cdot x_{ref} + \sum g_j \cdot z_j + \epsilon
+    $$
 
     The corrected spectrum is calculated by removing the polynomial baseline
     and the interferences, then normalizing by the scaling factor $m$:

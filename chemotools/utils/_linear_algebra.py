@@ -4,8 +4,8 @@
 from typing import Literal
 
 import numpy as np
-from scipy.linalg import solveh_banded
 import scipy.sparse as sp
+from scipy.linalg import solveh_banded
 from scipy.sparse.linalg import splu
 
 

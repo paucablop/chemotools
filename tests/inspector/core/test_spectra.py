@@ -1,8 +1,8 @@
 """Tests for SpectraMixin."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import matplotlib.pyplot as plt
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -62,7 +62,10 @@ class _DummyInspectorBase:
         return self._preprocessed_feature_names
 
     def _get_preprocessed_x_axis(self):
-        """Get x_axis after feature selection (delegates to _get_preprocessed_feature_names)."""
+        """Get x_axis after feature selection.
+
+        Delegates to _get_preprocessed_feature_names.
+        """
         return self._get_preprocessed_feature_names()
 
 

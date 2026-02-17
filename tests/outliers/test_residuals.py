@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
-
 from sklearn.decomposition import PCA
-
 
 from chemotools.outliers import (
     DModX,
@@ -14,7 +12,10 @@ from chemotools.outliers import (
 # Test functionality
 # Parametrized test
 @pytest.mark.parametrize(
-    "model_class, kwargs, n_components, expected_critical_value, expected_prediction_inlier, expected_prediction_outlier",
+    "model_class, kwargs, n_components, "
+    "expected_critical_value, "
+    "expected_prediction_inlier, "
+    "expected_prediction_outlier",
     [
         # DModX with different PCA components
         (
@@ -70,7 +71,8 @@ def test_outlier_detection_models(
     expected_prediction_inlier,
     expected_prediction_outlier,
 ):
-    """Test different outlier detection models with various PCA components and outlier test methods."""
+    """Test different outlier detection models with various
+    PCA components and outlier test methods."""
 
     # Arrange
     X, _ = dummy_data_loader  # Load dummy data
@@ -95,7 +97,8 @@ def test_outlier_detection_models(
         "Confidence value should match input"
     )
     assert np.isclose(model.critical_value_, expected_critical_value), (
-        f"Critical value mismatch for {model_class.__name__} with {n_components} components"
+        f"Critical value mismatch for "
+        f"{model_class.__name__} with {n_components} components"
     )
     assert model.n_features_in_ == 3, "Number of input features should be 3"
     assert model.n_components_ == n_components, (

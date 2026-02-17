@@ -1,9 +1,9 @@
-import pytest
-from chemotools.utils._optional_dependencies import check_optional_dependency
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.feature_selection import IndexSelector
+from chemotools.utils._optional_dependencies import check_optional_dependency
 
 
 @pytest.fixture(scope="module")

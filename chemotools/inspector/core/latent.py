@@ -2,25 +2,27 @@
 
 from __future__ import annotations
 
-from typing import Dict, Literal, Optional, Sequence, Tuple, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
 from chemotools.inspector.helpers import _latent as _latent_plots
-from chemotools.plotting._styles import DATASET_COLORS
 from chemotools.outliers import HotellingT2, QResiduals
+from chemotools.plotting._styles import DATASET_COLORS
+
+from .summaries import LatentSummary
 from .utils import (
     ComponentSpec,
+    get_xlabel_for_features,
     normalize_components,
     normalize_datasets,
-    get_xlabel_for_features,
 )
-from .summaries import LatentSummary
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
 
     from matplotlib.figure import Figure
+
     from chemotools.inspector.core.base import ModelTypes
 
     class _LatentInspectorProto(Protocol):
@@ -263,7 +265,8 @@ class LatentVariableMixin:
         if multi_dataset:
             datasets_data = self._prepare_scores_datasets(dataset_names)
 
-            # Get training scores for confidence ellipse reference (even if train not requested)
+            # Get training scores for confidence ellipse
+            # reference (even if train not requested)
             train_scores_for_ellipse = self.get_latent_scores("train")
 
             # Get confidence level from inspector
@@ -359,7 +362,9 @@ class LatentVariableMixin:
 
         Examples
         --------
-        >>> fig = inspector.create_latent_distance_figure("train", color_by="y", figsize=(8, 6))
+        >>> fig = inspector.create_latent_distance_figure(
+        ...     "train", color_by="y", figsize=(8, 6)
+        ... )
         """
 
         dataset_names = list(normalize_datasets(dataset))

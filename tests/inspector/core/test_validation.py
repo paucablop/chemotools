@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 from sklearn.decomposition import PCA
+from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from sklearn.exceptions import NotFittedError
 
 from chemotools.inspector.core.validation import (
     _validate_and_extract_model,

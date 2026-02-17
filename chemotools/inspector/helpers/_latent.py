@@ -6,28 +6,30 @@ decomposition methods.
 """
 
 from __future__ import annotations
-from typing import Dict, Union, Optional, Tuple, Sequence, TYPE_CHECKING, Literal
-import numpy as np
+
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
+from chemotools.outliers import HotellingT2, QResiduals
 from chemotools.plotting import (
     DistancesPlot,
     ExplainedVariancePlot,
     LoadingsPlot,
     ScoresPlot,
 )
-from chemotools.plotting._utils import annotate_points
 from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
-from chemotools.outliers import HotellingT2, QResiduals
+from chemotools.plotting._utils import annotate_points
 
 from ..core.utils import (
     ComponentSpec,
+    normalize_components,
     prepare_annotations,
     prepare_color_values,
-    normalize_components,
 )
 
 
@@ -286,7 +288,8 @@ def create_scores_plot_single_dataset(
         ax.set_xlabel(xlabel_text, fontsize=10)
         ax.set_ylabel(f"{component_label}{component_spec + 1}{var_label}", fontsize=10)
         ax.set_title(
-            f"Scores: {component_label}{component_spec + 1} ({dataset_name.capitalize()})",
+            f"Scores: {component_label}{component_spec + 1}"
+            f" ({dataset_name.capitalize()})",
             fontsize=12,
             fontweight="bold",
         )
@@ -360,7 +363,11 @@ def create_scores_plot_single_dataset(
             f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
         )
         ax.set_title(
-            f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1} ({dataset_name.capitalize()})",
+            f"Scores: {component_label}"
+            f"{components_pair[0] + 1} vs "
+            f"{component_label}"
+            f"{components_pair[1] + 1}"
+            f" ({dataset_name.capitalize()})",
             fontsize=12,
             fontweight="bold",
         )
@@ -547,7 +554,8 @@ def create_scores_plot_multi_dataset(
                 colormap=None,
                 confidence_ellipse=confidence,
             )
-            # Render only the ellipse (we'll plot points separately below if train is in datasets)
+            # Render only the ellipse (we'll plot points
+            # separately below if train is in datasets)
             ellipse_plot.render(ax)
             # Remove the scatter points from this plot (keep only ellipse)
             from matplotlib.collections import PathCollection
@@ -609,7 +617,10 @@ def create_scores_plot_multi_dataset(
             f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
         )
         ax.set_title(
-            f"Scores: {component_label}{components_pair[0] + 1} vs {component_label}{components_pair[1] + 1}",
+            f"Scores: {component_label}"
+            f"{components_pair[0] + 1} vs "
+            f"{component_label}"
+            f"{components_pair[1] + 1}",
             fontsize=12,
             fontweight="bold",
         )
@@ -706,7 +717,8 @@ def create_model_distances_plot(
 
         if train_X is None:
             raise ValueError(
-                "X data is required for detector fitting when detectors are not supplied"
+                "X data is required for detector fitting "
+                "when detectors are not supplied"
             )
 
         hotelling_detector = HotellingT2(model, confidence=confidence)
@@ -896,7 +908,8 @@ def create_q_vs_y_residuals_plot(
 
         if train_X is None:
             raise ValueError(
-                "X data is required for detector fitting when detectors are not supplied"
+                "X data is required for detector fitting "
+                "when detectors are not supplied"
             )
 
         q_residuals_detector = QResiduals(model, confidence=confidence)
@@ -1112,7 +1125,11 @@ def create_x_vs_y_scores_plots(
             ax.set_xlabel(f"X-{component_label}{component_spec[0] + 1}", fontsize=10)
             ax.set_ylabel(f"Y-{component_label}{component_spec[1] + 1}", fontsize=10)
             ax.set_title(
-                f"X-scores vs Y-scores: {component_label}{component_spec[0] + 1} vs {component_label}{component_spec[1] + 1}",
+                f"X-scores vs Y-scores: "
+                f"{component_label}"
+                f"{component_spec[0] + 1} vs "
+                f"{component_label}"
+                f"{component_spec[1] + 1}",
                 fontsize=12,
                 fontweight="bold",
             )

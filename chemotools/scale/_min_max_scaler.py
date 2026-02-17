@@ -1,20 +1,22 @@
 """
-The :mod:`chemotools.scale._min_max_scaler` module implements a Min-Max Scaler transformer.
+The :mod:`chemotools.scale._min_max_scaler` module implements
+a Min-Max Scaler transformer.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    A transformer that scales the input data by subtracting the minimum and dividing by
-    the difference between the maximum and the minimum. When the use_min parameter is False,
-    the data is scaled by the maximum.
+    A transformer that scales the input data by subtracting
+    the minimum and dividing by the difference between the
+    maximum and the minimum. When the use_min parameter is
+    False, the data is scaled by the maximum.
 
     Parameters
     ----------

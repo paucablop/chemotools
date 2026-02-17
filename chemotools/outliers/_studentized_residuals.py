@@ -1,6 +1,6 @@
 """
-The :mod:`chemotools.outliers._studentized_residuals` module implements the Studentized Residuals
-outlier detection algorithm.
+The :mod:`chemotools.outliers._studentized_residuals` module
+implements the Studentized Residuals outlier detection algorithm.
 """
 
 # Authors: Pau Cabaneros
@@ -51,8 +51,9 @@ class StudentizedResiduals(_ModelResidualsBase):
     Methods
     -------
     fit(X, y=None)
-        Fit the Studentized Residuals model by computing residuals from the training set.
-        Calculates the critical threshold based on the chosen method.
+        Fit the Studentized Residuals model by computing
+        residuals from the training set. Calculates the critical
+        threshold based on the chosen method.
 
     predict(X, y=None)
         Identify outliers in the input data based on Studentized Residuals threshold.

@@ -5,13 +5,13 @@ The :mod:`chemotools.scale._point_scaler` module implements a Point Scaler trans
 # Authors: Pau Cabaneros
 # License: MIT
 
-from typing import Optional
 from numbers import Integral
+from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -35,7 +35,8 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         The number of features in the input data.
 
     point_index_ : int
-        The index of the point to scale the data by. It is 0 if the wavenumbers are not provided.
+        The index of the point to scale the data by. It is 0
+        if the wavenumbers are not provided.
 
     Examples
     --------

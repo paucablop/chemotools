@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Union, cast
 
 import numpy as np
-
 from sklearn.base import BaseEstimator
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.feature_selection._base import SelectorMixin

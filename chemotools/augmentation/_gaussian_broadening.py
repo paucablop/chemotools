@@ -1,6 +1,7 @@
 """
-The :mod:`chemotools.augmentation._gaussian_broadening` module implements the GaussianBroadening
-transformer to broaden peaks in spectral data using Gaussian convolution.
+The :mod:`chemotools.augmentation._gaussian_broadening` module
+implements the GaussianBroadening transformer to broaden
+peaks in spectral data using Gaussian convolution.
 """
 
 # Authors: Pau Cabaneros
@@ -10,10 +11,10 @@ from typing import Literal, Optional
 
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import Interval, Real, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

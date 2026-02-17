@@ -9,12 +9,12 @@ transformer to randomly shift spectral data along the index axis.
 from typing import Literal, Optional
 
 import numpy as np
-from scipy.signal import convolve
 from scipy import stats
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+from scipy.signal import convolve
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import Interval, Real, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -28,7 +28,8 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         Maximum number of indices by which the data is randomly shifted.
         The actual shift is a random integer between -shift and shift (inclusive).
 
-    padding_mode : {'zeros', 'constant', 'wrap', 'extend', 'mirror', 'linear'}, default='linear'
+    padding_mode : {'zeros', 'constant', 'wrap', 'extend',
+        'mirror', 'linear'}, default='linear'
         Specifies how to handle padding when shifting the data:
             - 'zeros': Pads with zeros.
             - 'constant': Pads with a constant value defined by `pad_value`.
@@ -240,5 +241,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         else:
             raise ValueError(
-                f"Unknown padding mode: {self.padding_mode}. Please choose from 'zeros', 'constant', 'wrap', 'extend', 'mirror', or 'linear'."
+                f"Unknown padding mode: {self.padding_mode}. "
+                "Please choose from 'zeros', 'constant', "
+                "'wrap', 'extend', 'mirror', or 'linear'."
             )

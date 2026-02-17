@@ -6,13 +6,13 @@ a constant baseline correction transformer.
 # Author: Pau Cabaneros
 # License: MIT
 
-from typing import Optional
 from numbers import Integral
+from typing import Optional
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -35,7 +35,8 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
     Attributes
     ----------
     start_index_ : int
-        The index of the start of the range. It is 0 if the wavenumbers are not provided.
+        The index of the start of the range. It is 0 if the
+        wavenumbers are not provided.
 
     end_index_ : int
         The index of the end of the range. It is 1 if the wavenumbers are not provided.

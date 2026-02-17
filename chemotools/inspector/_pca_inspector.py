@@ -1,26 +1,28 @@
 """PCA Inspector for model diagnostics and visualization."""
 
 from __future__ import annotations
+
 from dataclasses import asdict
-from typing import Dict, Optional, Sequence, Tuple, Union, TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Union
+
 import numpy as np
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
-from chemotools.outliers import QResiduals, HotellingT2
+from chemotools.outliers import HotellingT2, QResiduals
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 
 
-from .core.base import _BaseInspector, InspectorPlotConfig
+from .core.base import InspectorPlotConfig, _BaseInspector
 from .core.latent import LatentVariableMixin
 from .core.spectra import SpectraMixin
 from .core.summaries import PCASummary
 from .core.utils import (
-    get_xlabel_for_features,
-    get_default_scores_components,
     get_default_loadings_components,
+    get_default_scores_components,
+    get_xlabel_for_features,
     select_components,
 )
 
@@ -35,8 +37,10 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
     The inspector provides convenience methods that create multiple independent plots:
 
-    - ``inspect()``: Creates all diagnostic plots (scores, loadings, explained variance)
-    - ``inspect_spectra()``: Creates raw and preprocessed spectra plots (if preprocessing exists)
+    - ``inspect()``: Creates all diagnostic plots
+      (scores, loadings, explained variance)
+    - ``inspect_spectra()``: Creates raw and preprocessed
+      spectra plots (if preprocessing exists)
 
     Parameters
     ----------
@@ -347,8 +351,10 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             Components to plot for scores.
 
             - Int: Creates one 1D scatter plot (e.g., 0 for PC1 vs sample index)
-            - Single tuple (x, y): Creates one 2D scatter plot (e.g., (0, 1) for PC1 vs PC2)
-            - Sequence: Creates multiple plots (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
+            - Single tuple (x, y): Creates one 2D scatter
+              plot (e.g., (0, 1) for PC1 vs PC2)
+            - Sequence: Creates multiple plots
+              (e.g., ((0, 1), (1, 2), 0) or [0, 1, (0, 1)])
 
         loadings_components : int, sequence of int, or None, optional
             Which components to show in loadings plot. If None (default), automatically
@@ -365,7 +371,8 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             - 'y': Color by y values (if available)
             - 'sample_index': Color by sample index
             - dict: Map dataset names to color arrays
-            - None: Color by dataset (for multi-dataset plots) or 'y' (for single dataset)
+            - None: Color by dataset (for multi-dataset
+              plots) or 'y' (for single dataset)
 
         annotate_by : str or dict, optional
             Annotations for score plot points. Can be:
@@ -389,22 +396,28 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         figures : dict
             Dictionary containing all created figures with keys:
 
-            - 'scores_1', 'scores_2', ...: Combined scores plots (95% confidence ellipses)
-            - 'scores_1_train', 'scores_1_test', ...: Dataset-specific copies of each scores plot
-              (only when multiple datasets are provided); each plot uses a dedicated dataset colour
+            - 'scores_1', 'scores_2', ...: Combined scores
+              plots (95% confidence ellipses)
+            - 'scores_1_train', 'scores_1_test', ...:
+              Dataset-specific copies of each scores plot
+              (only when multiple datasets are provided);
+              each plot uses a dedicated dataset colour
             - 'loadings': Loadings plot
             - 'variance': Explained variance plot
             - 'distances': Diagnostic distances plot (Hotelling's T² vs Q residuals)
-            - 'raw_spectra', 'preprocessed_spectra': Spectra plots (if preprocessing exists)
+            - 'raw_spectra', 'preprocessed_spectra':
+              Spectra plots (if preprocessing exists)
 
-            Combined scores plots render all requested datasets on shared axes, coloured by
-            dataset. The number of 'scores_N*' entries depends on the ``components_scores``
-            parameter.
+            Combined scores plots render all requested
+            datasets on shared axes, coloured by dataset.
+            The number of 'scores_N*' entries depends on
+            the ``components_scores`` parameter.
 
         Examples
         --------
         >>> inspector = PCAInspector(pca, X_train, y_train)
-        >>> # Default: 2 scores plots + loadings + variance + spectra (if preprocessing exists)
+        >>> # Default: 2 scores plots + loadings + variance
+        >>> # + spectra (if preprocessing exists)
         >>> figs = inspector.inspect()
         >>> # Multiple datasets for comparison
         >>> inspector.X_test = X_test
@@ -431,7 +444,8 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         # Validate color_mode
         if color_mode not in ["continuous", "categorical"]:
             raise ValueError(
-                f"color_mode must be either 'continuous' or 'categorical', got '{color_mode}'"
+                f"color_mode must be either 'continuous' "
+                f"or 'categorical', got '{color_mode}'"
             )
 
         # Close previous figures to prevent memory leaks

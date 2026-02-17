@@ -1,12 +1,13 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 
 from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot
 
 
 def test_show_multitarget_sets_defaults_and_limits():
-    """Test that show method sets default labels and applies custom limits for multi-target data."""
+    """Test that show method sets default labels and applies
+    custom limits for multi-target data."""
     # Arrange
     base = np.linspace(0.0, 1.0, 20)
     y_true = np.column_stack([base, base + 1.0])
@@ -28,7 +29,8 @@ def test_show_multitarget_sets_defaults_and_limits():
 
 
 def test_render_with_existing_axes_and_label_omits_ideal_line():
-    """Test that render uses existing axes, displays label legend, and omits ideal line when requested."""
+    """Test that render uses existing axes, displays label
+    legend, and omits ideal line when requested."""
     # Arrange
     y_true = np.linspace(0.0, 1.0, 8)
     y_pred = y_true + 0.1

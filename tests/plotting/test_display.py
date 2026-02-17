@@ -1,9 +1,9 @@
 """Tests for Display protocol and implementations."""
 
-import pytest
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
+import pytest
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 from chemotools.plotting import Display, is_displayable
 

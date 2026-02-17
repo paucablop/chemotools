@@ -1,16 +1,18 @@
 """
-The :mod:`chemotools.smooth._mean_filter` module implements the Mean Filter (MF) transformation.
+The :mod:`chemotools.smooth._mean_filter` module implements
+the Mean Filter (MF) transformation.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
 from numbers import Integral
+
 import numpy as np
 from scipy.ndimage import uniform_filter1d
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

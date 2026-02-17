@@ -79,8 +79,9 @@ autodoc_default_options = {
 autodoc_member_order = "bysource"
 autoclass_content = "both"
 autosummary_generate = True  # generate stub pages automatically
-# NOTE: imported members can include objects without a proper __file__ leading to
-# None source paths in gettext aggregation (Sphinx relpath NoneType error). Disable for now.
+# NOTE: imported members can include objects without a proper __file__
+# leading to None source paths in gettext aggregation
+# (Sphinx relpath NoneType error). Disable for now.
 # autosummary_imported_members = True
 
 # -- Options for HTML output -------------------------------------------------
@@ -143,7 +144,8 @@ nitpicky = False
 # Exclude autosummary per-method/attribute pages (keep class pages)
 exclude_patterns = [
     "_methods/generated/*.*.*.*.rst",
-    "api/generated/chemotools.outliers.rst",  # keep excluded due to earlier duplicate method issues
+    # keep excluded due to earlier duplicate method issues
+    "api/generated/chemotools.outliers.rst",
 ]
 
 
@@ -156,7 +158,8 @@ exclude_patterns = [
 def _patch_gettext_relpath(app):  # pragma: no cover - build system hook
     try:
         from sphinx.builders.gettext import GettextRenderer, SphinxRenderer
-        from sphinx.util.osutil import canon_path, relpath as sphinx_relpath
+        from sphinx.util.osutil import canon_path
+        from sphinx.util.osutil import relpath as sphinx_relpath
     except Exception:
         return
     if getattr(GettextRenderer, "_chemotools_safe", False):

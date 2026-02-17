@@ -1,15 +1,17 @@
 """
-The :mod:`chemotools.scatter._robust_normal_variate` module implements the Robust Normal Variate (RNV) transformation.
+The :mod:`chemotools.scatter._robust_normal_variate` module
+implements the Robust Normal Variate (RNV) transformation.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
 
 import warnings
+
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, Real
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):

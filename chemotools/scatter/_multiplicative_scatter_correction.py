@@ -1,9 +1,10 @@
-import numpy as np
 from typing import Literal, Optional
-from sklearn.base import BaseEstimator, TransformerMixin, OneToOneFeatureMixin
+
+import numpy as np
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils import check_array, check_consistent_length
-from sklearn.utils.validation import check_is_fitted, validate_data
 from sklearn.utils._param_validation import StrOptions
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class MultiplicativeScatterCorrection(
@@ -125,7 +126,8 @@ class MultiplicativeScatterCorrection(
         else:
             self.weights_ = np.ones_like(self.reference_)
 
-        # Pre-calculate the design matrix A and the (A^T A)^-1 A^T part for the pseudoinverse
+        # Pre-calculate the design matrix A and the
+        # (A^T A)^-1 A^T part for the pseudoinverse
         # This makes transform() much faster.
         # We apply weights to the design matrix here.
         self.A_ = np.vstack([self.reference_, np.ones_like(self.reference_)]).T

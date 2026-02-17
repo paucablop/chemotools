@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.cross_decomposition import PLSRegression
+
 from chemotools.inspector import PLSRegressionInspector
 from chemotools.inspector.core.summaries import RegressionSummary
 

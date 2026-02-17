@@ -91,7 +91,10 @@ def test_pipeline_with_invalid_model_raises_error(invalid_pipeline, dummy_data_l
     # Act & Assert
     with pytest.raises(
         TypeError,
-        match=".*Model must be _BasePCA, _PLS, or a Pipeline ending with one of these types.*",
+        match=(
+            ".*Model must be _BasePCA, _PLS, or a Pipeline"
+            " ending with one of these types.*"
+        ),
     ):
         _DummyModelResiduals(invalid_pipeline, confidence=0.95).fit(X, y)
 

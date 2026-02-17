@@ -1,17 +1,18 @@
 """
-The :mod:`chemotools.feature_selection._sr_selector` module implements the Selectivity Ratio (SR)
-feature selector for PLS regression models.
+The :mod:`chemotools.feature_selection._sr_selector` module
+implements the Selectivity Ratio (SR) feature selector for
+PLS regression models.
 """
 
 # Author: Pau Cabaneros
 # License: MIT
 
 import numpy as np
-from sklearn.utils.validation import validate_data
 from sklearn.pipeline import Pipeline
 from sklearn.utils._param_validation import Interval, Real
+from sklearn.utils.validation import validate_data
 
-from ._base import _PLSFeatureSelectorBase, ModelTypes
+from ._base import ModelTypes, _PLSFeatureSelectorBase
 
 
 class SRSelector(_PLSFeatureSelectorBase):
