@@ -64,5 +64,8 @@ version-file = "chemotools/_version.py"
 filterwarnings = "always"
 
 # Recommended Basic Ruff Config
+[tool.ruff]
+exclude = ["chemotools/_version.py"]
+
 [tool.ruff.lint]
 select = ["E", "F", "I"] # Defaults + Isort
