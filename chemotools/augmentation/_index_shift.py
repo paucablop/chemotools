@@ -215,24 +215,26 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
             return result
 
         elif self.padding_mode == "linear":
-            # Get points for linear regression
+            # Get points for linear regression (need at least 2 points)
             if pad_left:
-                points = x[: pad_length + 1]  # Take first pad_length+1 points
+                n_fit = max(pad_length + 1, 2)
+                points = x[:n_fit]
                 x_coords = np.arange(len(points))
-                slope, intercept, *_ = stats.linregress(x_coords, points)
+                reg = stats.linregress(x_coords, points)
 
                 # Generate new points using linear regression
                 new_x = np.arange(-pad_length, 0)
-                extrapolated = slope * new_x + intercept
+                extrapolated = reg.slope * new_x + reg.intercept
                 result[:pad_length] = extrapolated
             else:
-                points = x[-pad_length - 1 :]  # Take last pad_length+1 points
+                n_fit = max(pad_length + 1, 2)
+                points = x[-n_fit:]
                 x_coords = np.arange(len(points))
-                slope, intercept, *_ = stats.linregress(x_coords, points)
+                reg = stats.linregress(x_coords, points)
 
                 # Generate new points using linear regression
                 new_x = np.arange(len(points), len(points) + pad_length)
-                extrapolated = slope * new_x + intercept
+                extrapolated = reg.slope * new_x + reg.intercept
                 result[-pad_length:] = extrapolated
             return result
 

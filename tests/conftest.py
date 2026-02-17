@@ -33,15 +33,11 @@ class _DummyModelResiduals(_ModelResidualsBase):
     def __init__(self, model, confidence):
         super().__init__(model, confidence)
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray]) -> "_DummyModelResiduals":
-        super().fit(X, y)
-        return self
+    def _fit_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> None:
+        self.critical_value_ = 1.96
 
-    def predict_residuals(self):
-        return np.zeros(10)
-
-    def _calculate_critical_value(self):
-        return 1.96
+    def _compute_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
+        return np.zeros(X.shape[0])
 
 
 @pytest.fixture

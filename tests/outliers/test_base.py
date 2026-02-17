@@ -10,7 +10,7 @@ def test_invalid_model_raises_error(dummy_data_loader):
     X, y = dummy_data_loader
 
     # Act & Assert
-    with pytest.raises(TypeError, match=".*1 is not an estimator instance.*"):
+    with pytest.raises((TypeError, ValueError)):
         _DummyModelResiduals(1, confidence=0.95).fit(X, y)
 
 
@@ -102,7 +102,7 @@ def test_invalid_confidence_raises_error(fitted_pca, dummy_data_loader):
     X, y = dummy_data_loader
 
     # Act & Assert
-    with pytest.raises(ValueError, match="Confidence must be between 0 and 1"):
+    with pytest.raises(ValueError, match="confidence"):
         _DummyModelResiduals(fitted_pca, confidence=1.5).fit(X, y)  # Out of bounds
-    with pytest.raises(ValueError, match="Confidence must be between 0 and 1"):
+    with pytest.raises(ValueError, match="confidence"):
         _DummyModelResiduals(fitted_pca, confidence=-0.5).fit(X, y)  # Out of bounds

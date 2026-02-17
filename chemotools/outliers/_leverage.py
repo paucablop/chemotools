@@ -7,12 +7,9 @@ outlier detection algorithm.
 # License: MIT
 
 from typing import Optional, Union
+
 import numpy as np
-
 from sklearn.pipeline import Pipeline
-from sklearn.utils.validation import validate_data, check_is_fitted
-from sklearn.utils._param_validation import Interval, Real
-
 
 from ._base import _ModelResidualsBase, ModelTypes
 
@@ -72,102 +69,19 @@ class Leverage(_ModelResidualsBase):
     >>> residuals = leverage.predict_residuals(X)
     """
 
-    _parameter_constraints: dict = {
-        "model": [Pipeline, ModelTypes],
-        "confidence": [Interval(Real, 0, 1, closed="both")],
-    }
-
     def __init__(
         self, model: Union[ModelTypes, Pipeline], confidence: float = 0.95
     ) -> None:
-        model, confidence = model, confidence
         super().__init__(model, confidence)
 
-    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> "Leverage":
-        """
-        Fit the model to the input data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        y : array-like of shape (n_samples,), default=None
-            Target data
-
-        Returns
-        -------
-        self : Leverage
-            Fitted estimator with the critical threshold computed
-        """
-        # Fit the model
-        super().fit(X, y)
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        if self.transformer_:
-            X = self.transformer_.fit_transform(X)
-
-        # Compute the critical threshold
-        self.critical_value_ = self._calculate_critical_value(X)
-
-        return self
-
-    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
-        """Calculate Leverage for training data on the model.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        Returns
-        -------
-        ndarray of shape (n_samples,)
-            Bool with samples with a leverage above the critical value
-        """
-        return super().predict(X, y)
-
-    def predict_residuals(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None, validate: bool = True
-    ) -> np.ndarray:
-        """Calculate the leverage of the samples.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        Returns
-        -------
-        np.ndarray
-            Leverage of the samples
-        """
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        if validate:
-            X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
-
-        # Apply preprocessing if available
-        if self.transformer_:
-            X = self.transformer_.transform(X)
-
-        # Calculate the leverage
-        return calculate_leverage(X, self.estimator_)
-
-    def _calculate_critical_value(self, X: np.ndarray) -> float:
-        """Calculate the critical value for outlier detection using the percentile outlier method."""
-
-        # Calculate the leverage of the samples
+    def _fit_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> None:
+        """Calculate the critical value for leverage using the percentile method."""
         leverage = calculate_leverage(X, self.estimator_)
+        self.critical_value_ = np.percentile(leverage, self.confidence_ * 100)
 
-        # Calculate the critical value
-        return np.percentile(leverage, self.confidence_ * 100)
+    def _compute_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
+        """Calculate the leverage of the samples."""
+        return calculate_leverage(X, self.estimator_)
 
 
 def calculate_leverage(X: np.ndarray, model: ModelTypes) -> np.ndarray:

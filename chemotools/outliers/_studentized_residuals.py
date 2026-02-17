@@ -7,14 +7,12 @@ outlier detection algorithm.
 # License: MIT
 
 from typing import Optional, Union
-import numpy as np
 
+import numpy as np
 from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
-from sklearn.utils.validation import validate_data, check_is_fitted
-from sklearn.utils._param_validation import Interval, Real
 
-from ._base import _ModelResidualsBase, ModelTypes
+from ._base import _ModelResidualsBase
 from ._leverage import calculate_leverage
 
 
@@ -92,119 +90,30 @@ class StudentizedResiduals(_ModelResidualsBase):
 
     estimator_: _PLS
 
-    _parameter_constraints: dict = {
-        "model": [Pipeline, ModelTypes],
-        "confidence": [Interval(Real, 0, 1, closed="both")],
-    }
-
     def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
         super().__init__(model, confidence)
 
-    def fit(
-        self, X: np.ndarray, y: Optional[np.ndarray] = None
-    ) -> "StudentizedResiduals":
-        """
-        Fit the model to the input data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        y : array-like of shape (n_samples,)
-            Target data
-
-        Returns
-        -------
-        self : StudentizedResiduals
-            Fitted estimator with the critical threshold computed
-        """
-        # Fit the model
-        super().fit(X, y)
-
-        # Validate the input data
-        X = validate_data(
-            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
-        )
-
-        # Preprocess the data
-        if self.transformer_:
-            X = self.transformer_.transform(X)
-
-        if y is None:
-            raise ValueError("y cannot be None when fitting studentized residuals")
-
-        y_arr = np.asarray(y)
-        if y_arr.ndim == 1:
-            y_arr = y_arr.reshape(-1, 1)
-
-        predictions = np.asarray(self.estimator_.predict(X))
-        if predictions.ndim == 1:
-            predictions = predictions.reshape(-1, 1)
-        y_residuals = y_arr - predictions
-        y_residuals = (
-            y_residuals.reshape(-1, 1) if y_residuals.ndim == 1 else y_residuals
-        )
-
-        # Calculate the studentized residuals
+    def _fit_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> None:
+        """Compute studentized residuals from training data and set critical value."""
+        y_residuals = self._prepare_y_residuals(X, y)
         studentized_residuals = calculate_studentized_residuals(
             self.estimator_, X, y_residuals
         )
+        self.critical_value_ = np.percentile(
+            studentized_residuals, self.confidence_ * 100
+        )
 
-        # Calculate the critical threshold
-        self.critical_value_ = self._calculate_critical_value(studentized_residuals)
+    def _compute_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
+        """Calculate the studentized residuals of the model predictions."""
+        y_residuals = self._prepare_y_residuals(X, y)
+        return calculate_studentized_residuals(self.estimator_, X, y_residuals)
 
-        return self
-
-    def predict(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
-        """Calculate studentized residuals in the model predictions. and return a boolean array indicating outliers.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        y : array-like of shape (n_samples,)
-            Target data
-
-        Returns
-        -------
-        ndarray of shape (n_samples,)
-            Studentized residuals of the predictions
-        """
-        return super().predict(X, y)
-
-    def predict_residuals(
-        self, X: np.ndarray, y: Optional[np.ndarray], validate: bool = True
+    def _prepare_y_residuals(
+        self, X: np.ndarray, y: Optional[np.ndarray]
     ) -> np.ndarray:
-        """Calculate the studentized residuals of the model predictions.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input data
-
-        y : array-like of shape (n_samples,)
-            Target values
-
-        Returns
-        -------
-        ndarray of shape (n_samples,)
-            Studentized residuals of the model predictions
-        """
-        # Check the estimator has been fitted
-        check_is_fitted(self, ["critical_value_"])
-
-        # Validate the input data
-        if validate:
-            X = validate_data(self, X, ensure_2d=True, dtype=np.float64)
-
-        # Apply preprocessing if available
-        if self.transformer_:
-            X = self.transformer_.transform(X)
-
+        """Compute prediction residuals from y, raising if y is None."""
         if y is None:
-            raise ValueError("y cannot be None when computing studentized residuals")
+            raise ValueError("y cannot be None for studentized residuals")
 
         y_arr = np.asarray(y)
         if y_arr.ndim == 1:
@@ -213,28 +122,9 @@ class StudentizedResiduals(_ModelResidualsBase):
         predictions = np.asarray(self.estimator_.predict(X))
         if predictions.ndim == 1:
             predictions = predictions.reshape(-1, 1)
+
         y_residuals = y_arr - predictions
-        y_residuals = (
-            y_residuals.reshape(-1, 1) if y_residuals.ndim == 1 else y_residuals
-        )
-
-        return calculate_studentized_residuals(self.estimator_, X, y_residuals)
-
-    def _calculate_critical_value(self, X: np.ndarray) -> float:
-        """Calculate the critical value for outlier detection.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples,)
-            Studentized residuals
-
-        Returns
-        -------
-        float
-            The calculated critical value for outlier detection
-        """
-
-        return np.percentile(X, self.confidence_ * 100) if X is not None else 0.0
+        return y_residuals.reshape(-1, 1) if y_residuals.ndim == 1 else y_residuals
 
 
 def calculate_studentized_residuals(
