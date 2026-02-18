@@ -302,5 +302,5 @@ class ResidualDistributionPlot(BasePlot):
                 fontsize=10,
                 verticalalignment="top",
                 horizontalalignment="right",
-                bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.5),
+                bbox={"boxstyle": "round", "facecolor": "wheat", "alpha": 0.5},
             )

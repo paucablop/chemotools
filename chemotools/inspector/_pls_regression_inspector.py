@@ -506,7 +506,7 @@ class PLSRegressionInspector(
     # ------------------------------------------------------------------
     # Main inspection method
     # ------------------------------------------------------------------
-    def inspect(
+    def inspect(  # noqa: C901 — sequential orchestrator; splitting adds indirection without clarity
         self,
         dataset: Union[str, Sequence[str]] = "train",
         components_scores: Optional[

@@ -150,7 +150,7 @@ class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _shift_signal(self, x: np.ndarray):
+    def _shift_signal(self, x: np.ndarray):  # noqa: C901 — awaiting for refactoring
         """
         Shifts a discrete signal using convolution with a Dirac delta kernel.
 

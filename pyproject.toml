@@ -71,4 +71,4 @@ extend-exclude = ["chemotools/_version.py"]
 exclude = ["chemotools/_version.py"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I"] # Defaults + Isort
+select = ["C", "E", "F", "I"] # Defaults + I sort + C complexity 

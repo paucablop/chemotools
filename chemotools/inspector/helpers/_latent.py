@@ -11,8 +11,10 @@ from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Unio
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.collections import PathCollection
 
 if TYPE_CHECKING:
+    from matplotlib.axes import Axes
     from matplotlib.figure import Figure
 
 from chemotools.outliers import HotellingT2, QResiduals
@@ -31,6 +33,446 @@ from ..core.utils import (
     prepare_annotations,
     prepare_color_values,
 )
+
+# ---------------------------------------------------------------------------
+# Private helpers to reduce cyclomatic complexity of public functions
+# ---------------------------------------------------------------------------
+
+
+def _validate_component_spec(component_spec: ComponentSpec, n_components: int) -> None:
+    """Raise ``ValueError`` if component indices are invalid."""
+    indices = (component_spec,) if isinstance(component_spec, int) else component_spec
+    for idx in indices:
+        if idx < 0 or idx >= n_components:
+            raise ValueError(
+                f"Component index {idx} is invalid. "
+                f"Valid range: 0-{n_components - 1} "
+                f"(have {n_components} components)"
+            )
+    if not isinstance(component_spec, int) and component_spec[0] == component_spec[1]:
+        raise ValueError(
+            f"Component indices must be different, got both as {component_spec[0]}"
+        )
+
+
+def _draw_confidence_ellipse(
+    ax: Axes,
+    scores: np.ndarray,
+    components_pair: Tuple[int, int],
+    confidence: float,
+) -> None:
+    """Draw a confidence ellipse on *ax* without leaving scatter points behind."""
+    ellipse_plot = ScoresPlot(
+        scores=scores,
+        components=components_pair,
+        color_by=None,
+        label="",
+        color="red",
+        colormap=None,
+        confidence_ellipse=confidence,
+    )
+    ellipse_plot.render(ax)
+    # Remove the scatter points that ScoresPlot renders alongside the ellipse
+    for collection in ax.collections:
+        if isinstance(collection, PathCollection):
+            collection.remove()
+            break
+
+
+def _resolve_training_entry(
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    dataset_items: list,
+    training_dataset: str,
+) -> Tuple[Dict[str, Optional[np.ndarray]], str]:
+    """Return ``(train_entry, training_dataset_lower)`` from *datasets_data*.
+
+    Falls back to the first dataset when *training_dataset* is absent.
+    """
+    if training_dataset in datasets_data:
+        return datasets_data[training_dataset], training_dataset.lower()
+
+    first_name, first_entry = dataset_items[0]
+    return first_entry, first_name.lower()
+
+
+def _ensure_detectors(
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    dataset_items: list,
+    model,
+    confidence: float,
+    training_dataset: str,
+    *,
+    hotelling_detector: Optional[HotellingT2] = None,
+    q_residuals_detector: Optional[QResiduals] = None,
+) -> Tuple[HotellingT2, QResiduals, str]:
+    """Return ``(hotelling, q_residuals, training_dataset_lower)``.
+
+    Detectors are fitted on the training data when not already provided.
+    """
+    training_dataset_lower = training_dataset.lower()
+
+    if hotelling_detector is not None and q_residuals_detector is not None:
+        return hotelling_detector, q_residuals_detector, training_dataset_lower
+
+    train_entry, training_dataset_lower = _resolve_training_entry(
+        datasets_data, dataset_items, training_dataset
+    )
+    train_X = train_entry.get("X")
+    if train_X is None:
+        raise ValueError(
+            "X data is required for detector fitting when detectors are not supplied"
+        )
+
+    if hotelling_detector is None:
+        hotelling_detector = HotellingT2(model, confidence=confidence)
+        hotelling_detector.fit(train_X)
+    if q_residuals_detector is None:
+        q_residuals_detector = QResiduals(model, confidence=confidence)
+        q_residuals_detector.fit(train_X)
+
+    return hotelling_detector, q_residuals_detector, training_dataset_lower
+
+
+def _ensure_q_detector(
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    dataset_items: list,
+    model,
+    confidence: float,
+    training_dataset: str,
+    q_residuals_detector: Optional[QResiduals] = None,
+) -> Tuple[QResiduals, str]:
+    """Return ``(q_residuals_detector, training_dataset_lower)``.
+
+    The detector is fitted on the training data when not already provided.
+    """
+    training_dataset_lower = training_dataset.lower()
+
+    if q_residuals_detector is not None:
+        return q_residuals_detector, training_dataset_lower
+
+    train_entry, training_dataset_lower = _resolve_training_entry(
+        datasets_data, dataset_items, training_dataset
+    )
+    train_X = train_entry.get("X")
+    if train_X is None:
+        raise ValueError(
+            "X data is required for detector fitting when detectors are not supplied"
+        )
+
+    q_residuals_detector = QResiduals(model, confidence=confidence)
+    q_residuals_detector.fit(train_X)
+    return q_residuals_detector, training_dataset_lower
+
+
+def _compute_y_residuals(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
+    """Compute per-sample Y residuals (L2 norm for multi-target)."""
+    y_true_arr = np.atleast_2d(np.asarray(y_true))
+    y_pred_arr = np.atleast_2d(np.asarray(y_pred))
+
+    # atleast_2d may add the extra dim in axis-0; ensure shape (n, targets)
+    if y_true_arr.shape[0] == 1 and y_true_arr.shape[1] != 1:
+        y_true_arr = y_true_arr.T
+    if y_pred_arr.shape[0] == 1 and y_pred_arr.shape[1] != 1:
+        y_pred_arr = y_pred_arr.T
+
+    residuals_matrix = y_true_arr - y_pred_arr
+    if residuals_matrix.shape[1] == 1:
+        return residuals_matrix.ravel()
+    return np.linalg.norm(residuals_matrix, axis=1)
+
+
+def _render_scores_1d(
+    ax: Axes,
+    component: int,
+    scores: np.ndarray,
+    y: Optional[np.ndarray],
+    explained_var: np.ndarray,
+    dataset_name: str,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    component_label: str,
+    dataset_color: Optional[str],
+    color_mode: Optional[Literal["continuous", "categorical"]],
+) -> None:
+    """Render a 1-D scores plot (single component vs sample index / colour)."""
+    color_values = prepare_color_values(color_by, dataset_name, y, scores.shape[0])
+
+    pc_scores = scores[:, component]
+    var_pct = explained_var[component] * 100
+    var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
+
+    if color_values is not None:
+        x_values = color_values
+        xlabel_text = "Color Value"
+        if color_by == "y":
+            xlabel_text = "y-value"
+        elif color_by == "sample_index":
+            xlabel_text = "Sample Index"
+    else:
+        x_values = np.arange(len(pc_scores))
+        xlabel_text = "Sample Index"
+
+    scores_for_plot = np.column_stack([x_values, pc_scores])
+
+    scores_plot = ScoresPlot(
+        scores=scores_for_plot,
+        components=(0, 1),
+        color_by=color_values,
+        label=dataset_name.capitalize(),
+        color=dataset_color if color_values is None else None,
+        colormap=None,
+        confidence_ellipse=None,
+        color_mode=color_mode,
+    )
+    scores_plot.render(ax)
+
+    ax.set_xlabel(xlabel_text, fontsize=10)
+    ax.set_ylabel(f"{component_label}{component + 1}{var_label}", fontsize=10)
+    ax.set_title(
+        f"Scores: {component_label}{component + 1} ({dataset_name.capitalize()})",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.grid(alpha=0.3)
+
+
+def _render_scores_2d(
+    ax: Axes,
+    components_pair: Tuple[int, int],
+    scores: np.ndarray,
+    y: Optional[np.ndarray],
+    explained_var: np.ndarray,
+    dataset_name: str,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    component_label: str,
+    dataset_color: Optional[str],
+    confidence: float,
+    train_scores_for_ellipse: Optional[np.ndarray],
+    color_mode: Optional[Literal["continuous", "categorical"]],
+) -> None:
+    """Render a 2-D scores scatter plot with optional confidence ellipse."""
+    color_values = prepare_color_values(color_by, dataset_name, y, scores.shape[0])
+
+    var_x = explained_var[components_pair[0]] * 100
+    var_y = explained_var[components_pair[1]] * 100
+    var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
+    var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
+
+    # Determine which scores to use for the confidence ellipse
+    ellipse_scores = train_scores_for_ellipse
+    if ellipse_scores is None and dataset_name.lower() == "train":
+        ellipse_scores = scores
+
+    if ellipse_scores is not None:
+        _draw_confidence_ellipse(ax, ellipse_scores, components_pair, confidence)
+
+    # Render actual dataset points (without ellipse — already drawn above)
+    scores_plot = ScoresPlot(
+        scores=scores,
+        components=components_pair,
+        color_by=color_values,
+        label=dataset_name.capitalize(),
+        color=dataset_color if color_values is None else None,
+        colormap=None,
+        confidence_ellipse=None,
+        color_mode=color_mode,
+    )
+    scores_plot.render(ax=ax)
+
+    # Annotations
+    labels = prepare_annotations(annotate_by, dataset_name, scores, y)
+    if labels is not None:
+        annotate_points(
+            ax,
+            scores[:, components_pair[0]],
+            scores[:, components_pair[1]],
+            labels,
+            fontsize=8,
+            alpha=0.7,
+            xytext=(3, 3),
+            textcoords="offset points",
+        )
+
+    ax.set_xlabel(
+        f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
+    )
+    ax.set_ylabel(
+        f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
+    )
+    ax.set_title(
+        f"Scores: {component_label}"
+        f"{components_pair[0] + 1} vs "
+        f"{component_label}"
+        f"{components_pair[1] + 1}"
+        f" ({dataset_name.capitalize()})",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.grid(alpha=0.3)
+
+
+def _decorate_distances_plot(
+    ax: Axes,
+    title_prefix: str,
+    multi_dataset: bool,
+    dataset_items: list,
+) -> None:
+    """Apply shared title / legend / grid decorations for distance plots."""
+    if multi_dataset:
+        ax.set_title(title_prefix, fontsize=12, fontweight="bold")
+        ax.legend(loc="best")
+    else:
+        dataset_name = dataset_items[0][0].capitalize()
+        ax.set_title(
+            f"{title_prefix} ({dataset_name})",
+            fontsize=12,
+            fontweight="bold",
+        )
+    ax.grid(alpha=0.3)
+
+
+def _render_multi_scores_1d(
+    ax: Axes,
+    component: int,
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    explained_var: np.ndarray,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    component_label: str,
+    color_mode: Optional[Literal["continuous", "categorical"]],
+) -> None:
+    """Render 1-D scores for multiple datasets on *ax*."""
+    var_pct = explained_var[component] * 100
+    var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
+    ylabel_text = f"{component_label}{component + 1}{var_label}"
+    xlabel_text = "Sample Index"
+
+    for ds_name, data in datasets_data.items():
+        scores = data["scores"]
+        y = data["y"]
+        assert scores is not None, f"Scores data is required for dataset {ds_name}"
+
+        pc_scores = scores[:, component]
+        marker = DATASET_MARKERS.get(ds_name, "o")
+        color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
+
+        if color_values is not None:
+            x_values = color_values
+            xlabel_for_dataset = "Color Value"
+            if color_by == "y":
+                xlabel_for_dataset = "y-value"
+                xlabel_text = "y-value"
+            elif color_by == "sample_index":
+                xlabel_for_dataset = "Sample Index"
+        else:
+            x_values = np.arange(pc_scores.shape[0])
+            xlabel_for_dataset = "Sample Index"
+
+        scores_for_plot = np.column_stack([x_values, pc_scores])
+        plot = ScoresPlot(
+            scores=scores_for_plot,
+            components=(0, 1),
+            color_by=color_values,
+            label=ds_name.capitalize(),
+            color=DATASET_COLORS.get(ds_name) if color_values is None else None,
+            confidence_ellipse=None,
+            color_mode=color_mode,
+        )
+        plot.render(
+            ax=ax,
+            xlabel=xlabel_for_dataset,
+            ylabel=ylabel_text,
+            marker=marker,
+            s=50,
+        )
+
+    ax.set_xlabel(xlabel_text, fontsize=10)
+    ax.set_ylabel(ylabel_text, fontsize=10)
+    ax.set_title(
+        f"Scores: {component_label}{component + 1}",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.grid(alpha=0.3)
+    ax.legend(loc="best")
+
+
+def _render_multi_scores_2d(
+    ax: Axes,
+    components_pair: Tuple[int, int],
+    datasets_data: Dict[str, Dict[str, Optional[np.ndarray]]],
+    explained_var: np.ndarray,
+    color_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    annotate_by: Optional[Union[str, Dict[str, np.ndarray]]],
+    component_label: str,
+    train_scores_for_ellipse: Optional[np.ndarray],
+    confidence: float,
+    color_mode: Optional[Literal["continuous", "categorical"]],
+) -> None:
+    """Render 2-D scores scatter for multiple datasets on *ax*."""
+    var_x = explained_var[components_pair[0]] * 100
+    var_y = explained_var[components_pair[1]] * 100
+    var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
+    var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
+
+    # Draw training confidence ellipse as reference
+    ellipse_scores = train_scores_for_ellipse
+    if ellipse_scores is None and "train" in datasets_data:
+        ellipse_scores = datasets_data["train"]["scores"]
+
+    if ellipse_scores is not None:
+        _draw_confidence_ellipse(ax, ellipse_scores, components_pair, confidence)
+
+    # Compose multiple datasets on same axes
+    for ds_name, data in datasets_data.items():
+        scores = data["scores"]
+        y = data["y"]
+        assert scores is not None, f"Scores data is required for dataset {ds_name}"
+
+        color = DATASET_COLORS.get(ds_name, "grey")
+        marker = DATASET_MARKERS.get(ds_name, "grey")
+        color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
+
+        plot = ScoresPlot(
+            scores=scores,
+            components=components_pair,
+            color_by=color_values,
+            label=ds_name.capitalize(),
+            color=color if color_values is None else None,
+            colormap=None,
+            confidence_ellipse=None,
+            color_mode=color_mode,
+        )
+        plot.render(ax, marker=marker)
+
+        labels = prepare_annotations(annotate_by, ds_name, scores, y)
+        if labels is not None:
+            annotate_points(
+                ax,
+                scores[:, components_pair[0]],
+                scores[:, components_pair[1]],
+                labels,
+                fontsize=8,
+                alpha=0.7,
+                xytext=(3, 3),
+                textcoords="offset points",
+            )
+
+    ax.set_xlabel(
+        f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
+    )
+    ax.set_ylabel(
+        f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
+    )
+    ax.set_title(
+        f"Scores: {component_label}"
+        f"{components_pair[0] + 1} vs "
+        f"{component_label}"
+        f"{components_pair[1] + 1}",
+        fontsize=12,
+        fontweight="bold",
+    )
+    ax.grid(alpha=0.3)
+    ax.legend(loc="best")
 
 
 def create_variance_plot(
@@ -221,157 +663,37 @@ def create_scores_plot_single_dataset(
     """
     fig, ax = plt.subplots(figsize=figsize)
 
-    # Get number of available components
-    n_components = scores.shape[1]
-
-    # Validate component indices
-    if isinstance(component_spec, int):
-        if component_spec < 0 or component_spec >= n_components:
-            raise ValueError(
-                f"Component index {component_spec} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-    else:
-        comp_x, comp_y = component_spec
-        if comp_x < 0 or comp_x >= n_components:
-            raise ValueError(
-                f"Component index {comp_x} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-        if comp_y < 0 or comp_y >= n_components:
-            raise ValueError(
-                f"Component index {comp_y} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-        if comp_x == comp_y:
-            raise ValueError(
-                f"Component indices must be different, got both as {comp_x}"
-            )
-
-    # Prepare color values
-    color_values = prepare_color_values(color_by, dataset_name, y, scores.shape[0])
+    _validate_component_spec(component_spec, scores.shape[1])
 
     if isinstance(component_spec, int):
-        # 1D plot: Single component vs sample index or y-value
-        pc_scores = scores[:, component_spec]
-        var_pct = explained_var[component_spec] * 100
-        var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
-
-        if color_values is not None:
-            x_values = color_values
-            xlabel_text = "Color Value"
-            if color_by == "y":
-                xlabel_text = "y-value"
-            elif color_by == "sample_index":
-                xlabel_text = "Sample Index"
-        else:
-            x_values = np.arange(len(pc_scores))
-            xlabel_text = "Sample Index"
-
-        # Create synthetic 2D data for ScoresPlot (x_values, pc_scores)
-        scores_for_plot = np.column_stack([x_values, pc_scores])
-
-        # Create and render ScoresPlot
-        scores_plot = ScoresPlot(
-            scores=scores_for_plot,
-            components=(0, 1),
-            color_by=color_values,
-            label=dataset_name.capitalize(),
-            color=dataset_color if color_values is None else None,
-            colormap=None,
-            confidence_ellipse=None,
-            color_mode=color_mode,
+        _render_scores_1d(
+            ax,
+            component_spec,
+            scores,
+            y,
+            explained_var,
+            dataset_name,
+            color_by,
+            component_label,
+            dataset_color,
+            color_mode,
         )
-        scores_plot.render(ax)
-
-        # Apply decorations
-        ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(f"{component_label}{component_spec + 1}{var_label}", fontsize=10)
-        ax.set_title(
-            f"Scores: {component_label}{component_spec + 1}"
-            f" ({dataset_name.capitalize()})",
-            fontsize=12,
-            fontweight="bold",
-        )
-        ax.grid(alpha=0.3)
     else:
-        # 2D plot: Component pair scatter plot
-        components_pair = component_spec
-        var_x = explained_var[components_pair[0]] * 100
-        var_y = explained_var[components_pair[1]] * 100
-        var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
-        var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
-
-        # Determine which scores to use for the confidence ellipse
-        ellipse_scores = train_scores_for_ellipse
-        if ellipse_scores is None and dataset_name.lower() == "train":
-            ellipse_scores = scores
-
-        # First: Draw training confidence ellipse as reference (if available)
-        if ellipse_scores is not None:
-            ellipse_plot = ScoresPlot(
-                scores=ellipse_scores,
-                components=components_pair,
-                color_by=None,
-                label="",  # Empty label - won't show in legend
-                color="red",  # Use red color for training ellipse visibility
-                colormap=None,
-                confidence_ellipse=confidence,
-            )
-            # Render only the ellipse
-            ellipse_plot.render(ax)
-            # Remove the scatter points from this plot (keep only ellipse)
-            from matplotlib.collections import PathCollection
-
-            for collection in ax.collections:
-                if isinstance(collection, PathCollection):
-                    collection.remove()
-                    break
-
-        # Create and render ScoresPlot for the actual dataset (without ellipse)
-        scores_plot = ScoresPlot(
-            scores=scores,
-            components=components_pair,
-            color_by=color_values,
-            label=dataset_name.capitalize(),
-            color=dataset_color if color_values is None else None,
-            colormap=None,
-            confidence_ellipse=None,  # Ellipse already drawn above
-            color_mode=color_mode,
+        _render_scores_2d(
+            ax,
+            component_spec,
+            scores,
+            y,
+            explained_var,
+            dataset_name,
+            color_by,
+            annotate_by,
+            component_label,
+            dataset_color,
+            confidence,
+            train_scores_for_ellipse,
+            color_mode,
         )
-        scores_plot.render(ax=ax)
-
-        # Add annotations if requested
-        labels = prepare_annotations(annotate_by, dataset_name, scores, y)
-        if labels is not None:
-            annotate_points(
-                ax,
-                scores[:, components_pair[0]],
-                scores[:, components_pair[1]],
-                labels,
-                fontsize=8,
-                alpha=0.7,
-                xytext=(3, 3),
-                textcoords="offset points",
-            )
-
-        # Apply decorations with variance percentages
-        ax.set_xlabel(
-            f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
-        )
-        ax.set_ylabel(
-            f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
-        )
-        ax.set_title(
-            f"Scores: {component_label}"
-            f"{components_pair[0] + 1} vs "
-            f"{component_label}"
-            f"{components_pair[1] + 1}"
-            f" ({dataset_name.capitalize()})",
-            fontsize=12,
-            fontweight="bold",
-        )
-        ax.grid(alpha=0.3)
 
     plt.tight_layout()
     return fig
@@ -442,190 +764,32 @@ def create_scores_plot_multi_dataset(
     first_dataset_scores = next(iter(datasets_data.values()))["scores"]
     if first_dataset_scores is None:
         raise ValueError("At least one dataset must have scores data")
-    n_components = first_dataset_scores.shape[1]
 
-    # Validate component indices
-    if isinstance(component_spec, int):
-        if component_spec < 0 or component_spec >= n_components:
-            raise ValueError(
-                f"Component index {component_spec} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-    else:
-        comp_x, comp_y = component_spec
-        if comp_x < 0 or comp_x >= n_components:
-            raise ValueError(
-                f"Component index {comp_x} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-        if comp_y < 0 or comp_y >= n_components:
-            raise ValueError(
-                f"Component index {comp_y} is invalid. "
-                f"Valid range: 0-{n_components - 1} (have {n_components} components)"
-            )
-        if comp_x == comp_y:
-            raise ValueError(
-                f"Component indices must be different, got both as {comp_x}"
-            )
+    _validate_component_spec(component_spec, first_dataset_scores.shape[1])
 
     if isinstance(component_spec, int):
-        # 1D plot: Single component vs sample index or y-value
-        var_pct = explained_var[component_spec] * 100
-        var_label = f" ({var_pct:.1f}%)" if not np.isnan(var_pct) else ""
-        ylabel_text = f"{component_label}{component_spec + 1}{var_label}"
-        xlabel_text = "Sample Index"
-
-        for ds_name, data in datasets_data.items():
-            scores = data["scores"]
-            y = data["y"]
-
-            # Scores should always be present
-            assert scores is not None, f"Scores data is required for dataset {ds_name}"
-
-            pc_scores = scores[:, component_spec]
-            marker = DATASET_MARKERS.get(ds_name, "o")
-
-            # Prepare color values
-            color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
-
-            if color_values is not None:
-                x_values = color_values
-                xlabel_for_dataset = "Color Value"
-                if color_by == "y":
-                    xlabel_for_dataset = "y-value"
-                    xlabel_text = "y-value"
-                elif color_by == "sample_index":
-                    xlabel_for_dataset = "Sample Index"
-            else:
-                x_values = np.arange(pc_scores.shape[0])
-                xlabel_for_dataset = "Sample Index"
-
-            scores_for_plot = np.column_stack([x_values, pc_scores])
-
-            plot = ScoresPlot(
-                scores=scores_for_plot,
-                components=(0, 1),
-                color_by=color_values,
-                label=ds_name.capitalize(),
-                color=DATASET_COLORS.get(ds_name) if color_values is None else None,
-                confidence_ellipse=None,
-                color_mode=color_mode,
-            )
-            plot.render(
-                ax=ax,
-                xlabel=xlabel_for_dataset,
-                ylabel=ylabel_text,
-                marker=marker,
-                s=50,
-            )
-
-        # Apply decorations
-        ax.set_xlabel(xlabel_text, fontsize=10)
-        ax.set_ylabel(ylabel_text, fontsize=10)
-        ax.set_title(
-            f"Scores: {component_label}{component_spec + 1}",
-            fontsize=12,
-            fontweight="bold",
+        _render_multi_scores_1d(
+            ax,
+            component_spec,
+            datasets_data,
+            explained_var,
+            color_by,
+            component_label,
+            color_mode,
         )
-        ax.grid(alpha=0.3)
-        ax.legend(loc="best")
     else:
-        # 2D plot: Component pair scatter plot
-        components_pair = component_spec
-        var_x = explained_var[components_pair[0]] * 100
-        var_y = explained_var[components_pair[1]] * 100
-        var_x_label = f" ({var_x:.1f}%)" if not np.isnan(var_x) else ""
-        var_y_label = f" ({var_y:.1f}%)" if not np.isnan(var_y) else ""
-
-        # First pass: Draw training confidence ellipse as reference
-        # Use train_scores_for_ellipse if provided, otherwise check datasets_data
-        ellipse_scores = train_scores_for_ellipse
-        if ellipse_scores is None and "train" in datasets_data:
-            ellipse_scores = datasets_data["train"]["scores"]
-
-        if ellipse_scores is not None:
-            # Draw only the confidence ellipse for training (invisible points)
-            ellipse_plot = ScoresPlot(
-                scores=ellipse_scores,
-                components=components_pair,
-                color_by=None,
-                label="",  # Empty label - won't show in legend
-                color="red",  # Use red color for training ellipse visibility
-                colormap=None,
-                confidence_ellipse=confidence,
-            )
-            # Render only the ellipse (we'll plot points
-            # separately below if train is in datasets)
-            ellipse_plot.render(ax)
-            # Remove the scatter points from this plot (keep only ellipse)
-            from matplotlib.collections import PathCollection
-
-            for collection in ax.collections:
-                if isinstance(collection, PathCollection):
-                    collection.remove()
-                    break
-
-        # Second pass: Compose multiple datasets on same axes
-        for ds_name, data in datasets_data.items():
-            scores = data["scores"]
-            y = data["y"]
-
-            # Scores should always be present
-            assert scores is not None, f"Scores data is required for dataset {ds_name}"
-
-            color = DATASET_COLORS.get(ds_name, "grey")
-            marker = DATASET_MARKERS.get(ds_name, "grey")
-
-            # Prepare color values
-            color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
-
-            # Don't draw ellipse again (already drawn above)
-            ellipse = None
-
-            # Create and render ScoresPlot for this dataset
-            plot = ScoresPlot(
-                scores=scores,
-                components=components_pair,
-                color_by=color_values,
-                label=ds_name.capitalize(),
-                color=color if color_values is None else None,
-                colormap=None,
-                confidence_ellipse=ellipse,
-                color_mode=color_mode,
-            )
-            plot.render(ax, marker=marker)
-
-            # Add annotations if requested
-            labels = prepare_annotations(annotate_by, ds_name, scores, y)
-            if labels is not None:
-                annotate_points(
-                    ax,
-                    scores[:, components_pair[0]],
-                    scores[:, components_pair[1]],
-                    labels,
-                    fontsize=8,
-                    alpha=0.7,
-                    xytext=(3, 3),
-                    textcoords="offset points",
-                )
-
-        # Apply decorations with variance percentages
-        ax.set_xlabel(
-            f"{component_label}{components_pair[0] + 1}{var_x_label}", fontsize=10
+        _render_multi_scores_2d(
+            ax,
+            component_spec,
+            datasets_data,
+            explained_var,
+            color_by,
+            annotate_by,
+            component_label,
+            train_scores_for_ellipse,
+            confidence,
+            color_mode,
         )
-        ax.set_ylabel(
-            f"{component_label}{components_pair[1] + 1}{var_y_label}", fontsize=10
-        )
-        ax.set_title(
-            f"Scores: {component_label}"
-            f"{components_pair[0] + 1} vs "
-            f"{component_label}"
-            f"{components_pair[1] + 1}",
-            fontsize=12,
-            fontweight="bold",
-        )
-        ax.grid(alpha=0.3)
-        ax.legend(loc="best")
 
     plt.tight_layout()
     return fig
@@ -699,33 +863,17 @@ def create_model_distances_plot(
     dataset_items = list(datasets_data.items())
     multi_dataset = len(dataset_items) > 1
 
-    training_dataset_lower = training_dataset.lower()
-
-    if hotelling_detector is None or q_residuals_detector is None:
-        if not dataset_items:
-            raise ValueError("datasets_data must contain at least one dataset")
-
-        if training_dataset in datasets_data:
-            train_entry = datasets_data[training_dataset]
-        else:
-            # Fallback to first dataset while preserving its name for limit drawing
-            first_name, first_entry = dataset_items[0]
-            training_dataset_lower = first_name.lower()
-            train_entry = first_entry
-
-        train_X = train_entry.get("X")
-
-        if train_X is None:
-            raise ValueError(
-                "X data is required for detector fitting "
-                "when detectors are not supplied"
-            )
-
-        hotelling_detector = HotellingT2(model, confidence=confidence)
-        hotelling_detector.fit(train_X)
-
-        q_residuals_detector = QResiduals(model, confidence=confidence)
-        q_residuals_detector.fit(train_X)
+    hotelling_detector, q_residuals_detector, training_dataset_lower = (
+        _ensure_detectors(
+            datasets_data,
+            dataset_items,
+            model,
+            confidence,
+            training_dataset,
+            hotelling_detector=hotelling_detector,
+            q_residuals_detector=q_residuals_detector,
+        )
+    )
 
     for ds_name, data in dataset_items:
         X = data.get("X")
@@ -737,13 +885,10 @@ def create_model_distances_plot(
         t2 = hotelling_detector.predict_residuals(X)
         q = q_residuals_detector.predict_residuals(X)
 
-        # Prepare color values
         color_values = prepare_color_values(color_by, ds_name, y, X.shape[0])
 
         if multi_dataset:
-            dataset_color = DATASET_COLORS.get(
-                ds_name,
-            )
+            dataset_color = DATASET_COLORS.get(ds_name)
             marker = DATASET_MARKERS.get(ds_name, "o")
         else:
             dataset_color = None
@@ -775,7 +920,6 @@ def create_model_distances_plot(
         )
         dist_plot.render(ax)
 
-        # Add annotations if requested
         labels = prepare_annotations(annotate_by, ds_name, X, y)
         if labels is not None:
             annotate_points(
@@ -791,20 +935,12 @@ def create_model_distances_plot(
 
     ax.set_xlabel("Hotelling's T²", fontsize=10)
     ax.set_ylabel("Q Residuals", fontsize=10)
-
-    title_prefix = "Model Distances: Hotelling's T² vs Q Residuals"
-    if multi_dataset:
-        ax.set_title(title_prefix, fontsize=12, fontweight="bold")
-        ax.legend(loc="best")
-    else:
-        dataset_name = dataset_items[0][0].capitalize()
-        ax.set_title(
-            f"{title_prefix} ({dataset_name})",
-            fontsize=12,
-            fontweight="bold",
-        )
-
-    ax.grid(alpha=0.3)
+    _decorate_distances_plot(
+        ax,
+        "Model Distances: Hotelling's T² vs Q Residuals",
+        multi_dataset,
+        dataset_items,
+    )
     plt.tight_layout()
     return fig
 
@@ -889,33 +1025,15 @@ def create_q_vs_y_residuals_plot(
     dataset_items = list(datasets_data.items())
     multi_dataset = len(dataset_items) > 1
 
-    training_dataset_lower = training_dataset.lower()
+    q_residuals_detector, training_dataset_lower = _ensure_q_detector(
+        datasets_data,
+        dataset_items,
+        model,
+        confidence,
+        training_dataset,
+        q_residuals_detector=q_residuals_detector,
+    )
 
-    # Fit Q residuals detector if not provided
-    if q_residuals_detector is None:
-        if not dataset_items:
-            raise ValueError("datasets_data must contain at least one dataset")
-
-        if training_dataset in datasets_data:
-            train_entry = datasets_data[training_dataset]
-        else:
-            # Fallback to first dataset while preserving its name for limit drawing
-            first_name, first_entry = dataset_items[0]
-            training_dataset_lower = first_name.lower()
-            train_entry = first_entry
-
-        train_X = train_entry.get("X")
-
-        if train_X is None:
-            raise ValueError(
-                "X data is required for detector fitting "
-                "when detectors are not supplied"
-            )
-
-        q_residuals_detector = QResiduals(model, confidence=confidence)
-        q_residuals_detector.fit(train_X)
-
-    # Plot each dataset
     for ds_name, data in dataset_items:
         X = data.get("X")
         y = data.get("y")
@@ -930,25 +1048,7 @@ def create_q_vs_y_residuals_plot(
             raise ValueError(f"y_pred data is required for dataset '{ds_name}'")
 
         q = q_residuals_detector.predict_residuals(X)
-
-        # Calculate Y residuals as simple difference
-        # Handle both single-target and multi-target regression
-        y_true_arr = np.asarray(y_true)
-        y_pred_arr = np.asarray(y_pred)
-
-        if y_true_arr.ndim == 1:
-            y_true_arr = y_true_arr.reshape(-1, 1)
-        if y_pred_arr.ndim == 1:
-            y_pred_arr = y_pred_arr.reshape(-1, 1)
-
-        # For multi-target, use L2 norm of residuals across targets
-        residuals_matrix = y_true_arr - y_pred_arr
-        if residuals_matrix.shape[1] == 1:
-            # Single target: just flatten
-            y_residuals = residuals_matrix.ravel()
-        else:
-            # Multi-target: compute L2 norm across targets
-            y_residuals = np.linalg.norm(residuals_matrix, axis=1)
+        y_residuals = _compute_y_residuals(y_true, y_pred)
 
         # When multiple datasets, always color by dataset, not by y values
         if multi_dataset:
@@ -956,7 +1056,6 @@ def create_q_vs_y_residuals_plot(
             dataset_color = DATASET_COLORS.get(ds_name)
             marker = DATASET_MARKERS.get(ds_name, "o")
         else:
-            # Single dataset: respect color_by parameter
             color_values = prepare_color_values(color_by, ds_name, y, q.shape[0])
             dataset_color = None
             marker = "o"
@@ -968,15 +1067,15 @@ def create_q_vs_y_residuals_plot(
         confidence_lines = (
             (
                 None,  # No confidence limit for Y residuals (x-axis)
-                q_residuals_detector.critical_value_,  # Q residuals limit (y-axis)
+                q_residuals_detector.critical_value_,
             )
             if should_draw_limits
             else None
         )
 
         dist_plot = DistancesPlot(
-            y=q,  # Q residuals on y-axis
-            x=y_residuals,  # Y residuals on x-axis
+            y=q,
+            x=y_residuals,
             color_by=color_values,
             label=ds_name.capitalize(),
             color=dataset_color,
@@ -987,7 +1086,6 @@ def create_q_vs_y_residuals_plot(
         )
         dist_plot.render(ax)
 
-        # Add annotations if requested
         labels = prepare_annotations(annotate_by, ds_name, X, y)
         if labels is not None:
             annotate_points(
@@ -1001,32 +1099,15 @@ def create_q_vs_y_residuals_plot(
                 textcoords="offset points",
             )
 
-    # Add zero line for Y residuals (vertical now since Y residuals are on x-axis)
-    ax.axvline(
-        x=0,
-        color="black",
-        linestyle="-",
-        linewidth=1,
-        alpha=0.5,
-        zorder=1,
-    )
-
+    ax.axvline(x=0, color="black", linestyle="-", linewidth=1, alpha=0.5, zorder=1)
     ax.set_xlabel("Y Residuals (Prediction Error)", fontsize=10)
     ax.set_ylabel("Q Residuals (SPE)", fontsize=10)
-
-    title_prefix = "Regression Distances: Q Residuals vs Y Residuals"
-    if multi_dataset:
-        ax.set_title(title_prefix, fontsize=12, fontweight="bold")
-        ax.legend(loc="best")
-    else:
-        dataset_name = dataset_items[0][0].capitalize()
-        ax.set_title(
-            f"{title_prefix} ({dataset_name})",
-            fontsize=12,
-            fontweight="bold",
-        )
-
-    ax.grid(alpha=0.3)
+    _decorate_distances_plot(
+        ax,
+        "Regression Distances: Q Residuals vs Y Residuals",
+        multi_dataset,
+        dataset_items,
+    )
     plt.tight_layout()
     return fig
 

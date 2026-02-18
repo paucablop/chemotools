@@ -31,6 +31,20 @@ def _validate_and_extract_model(
     return _canonical_validate(model)
 
 
+def _validate_sample_length(name: str, y: Optional[np.ndarray], expected: int) -> None:
+    """
+    Validate that y has the expected number of samples."""
+    if y is None:
+        return
+    y_arr = np.asarray(y)
+    actual = y_arr.shape[0] if y_arr.ndim > 0 else 1
+    if actual != expected:
+        raise ValueError(
+            f"{name} must have the same number of samples as its X data. "
+            f"Got {actual} vs {expected}."
+        )
+
+
 def _validate_datasets_consistency(
     X_train: np.ndarray,
     y_train: Optional[np.ndarray],
@@ -43,19 +57,6 @@ def _validate_datasets_consistency(
     """Validate that datasets have consistent shapes."""
     n_features = X_train.shape[1]
     n_train = X_train.shape[0]
-
-    def _validate_sample_length(
-        name: str, y: Optional[np.ndarray], expected: int
-    ) -> None:
-        if y is None:
-            return
-        y_arr = np.asarray(y)
-        actual = y_arr.shape[0] if y_arr.ndim > 0 else 1
-        if actual != expected:
-            raise ValueError(
-                f"{name} must have the same number of samples as its X data. "
-                f"Got {actual} vs {expected}."
-            )
 
     if X_test is not None and X_test.shape[1] != n_features:
         raise ValueError("X_test must have same number of features as X_train")
