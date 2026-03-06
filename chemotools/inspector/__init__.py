@@ -20,7 +20,7 @@ warnings.warn(
     "The inspector module is experimental and under active development. "
     "The API may change in future versions. We welcome your feedback! "
     "Please report issues or suggestions at: "
-    "https://github.com/paucablop/chemotools/issues/208",
+    "https://github.com/paucablop/chemotools/issues",
     FutureWarning,
     stacklevel=2,
 )
