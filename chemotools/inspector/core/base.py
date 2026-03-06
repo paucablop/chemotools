@@ -86,7 +86,7 @@ class _BaseInspector(ABC):
         X_val: Optional[np.ndarray] = None,
         y_val: Optional[np.ndarray] = None,
         supervised: bool = False,
-        feature_names: Optional[Sequence] = None,
+        feature_names: Optional[np.ndarray] = None,
         sample_labels: Optional[Dict[str, Sequence]] = None,
         confidence: float = 0.95,
     ) -> None:

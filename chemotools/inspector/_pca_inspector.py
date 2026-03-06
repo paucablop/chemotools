@@ -142,7 +142,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         y_test: Optional[np.ndarray] = None,
         X_val: Optional[np.ndarray] = None,
         y_val: Optional[np.ndarray] = None,
-        x_axis: Optional[Sequence] = None,
+        x_axis: Optional[np.ndarray] = None,
         confidence: float = 0.95,
     ):
         super().__init__(
