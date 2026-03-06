@@ -133,7 +133,6 @@ def test_range_cut_with_x_axis_and_wavenumbers_raises_error(spectrum):
         range_cut.fit(spectrum)
 
     # Assert
-    assert (
-        "Only one of `x_axis` or deprecated `wavenumbers` can be provided"
-        in str(exc_info.value)
+    assert "Only one of `x_axis` or deprecated `wavenumbers` can be provided" in str(
+        exc_info.value
     )
