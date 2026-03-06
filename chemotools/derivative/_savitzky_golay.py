@@ -15,6 +15,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
@@ -22,16 +28,25 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    window_size : int, optional, default=3
+    window_length : int, optional, default=3
         The size of the window to use for the derivative
         calculation. Must be odd. Default is 3.
 
-    polynomial_order : int, optional, default=1
+    polyorder : int, optional, default=1
         The order of the polynomial to use for the derivative calculation. Must be less
-        than window_size. Default is 1.
+        than ``window_length``. Default is 1.
 
-    derivative_order : int, optional, default=1
+    deriv : int, optional, default=1
         The order of the derivative to calculate. Default is 1.
+
+    window_size : int, optional
+        Deprecated alias for ``window_length``.
+
+    polynomial_order : int, optional
+        Deprecated alias for ``polyorder``.
+
+    derivate_order : int, optional
+        Deprecated alias for ``deriv``.
 
     mode : str, optional, default="nearest"
         The mode to use for the derivative calculation. Can be "nearest", "constant",
@@ -55,7 +70,7 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
     >>> # Instantiate the transformer
-    >>> transformer = SavitzkyGolay(window_size=3, polynomial_order=1)
+    >>> transformer = SavitzkyGolay(window_length=3, polyorder=1)
     SavitzkyGolay()
     >>> transformer.fit(X)
     >>> # Calculate Savitzky-Golay derivative
@@ -63,21 +78,37 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "window_size": [Interval(Integral, 3, None, closed="left")],
-        "polynomial_order": [Interval(Integral, 0, None, closed="left")],
-        "derivative_order": [Interval(Integral, 0, None, closed="left")],
-        "mode": [
-            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
+        "window_length": [Interval(Integral, 3, None, closed="left")],
+        "polyorder": [Interval(Integral, 0, None, closed="left")],
+        "deriv": [Interval(Integral, 0, None, closed="left")],
+        "window_size": [
+            Interval(Integral, 3, None, closed="left"),
+            deprecated_parameter_constraint(),
         ],
+        "polynomial_order": [
+            Interval(Integral, 0, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
+        "derivate_order": [
+            Interval(Integral, 0, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
+        "mode": [StrOptions({"nearest", "constant", "wrap", "mirror", "interp"})],
     }
 
     def __init__(
         self,
-        window_size: int = 3,
-        polynomial_order: int = 1,
-        derivate_order: int = 1,
+        window_length: int = 3,
+        polyorder: int = 1,
+        deriv: int = 1,
         mode: Literal["mirror", "constant", "nearest", "wrap", "interp"] = "nearest",
+        window_size=DEPRECATED_PARAMETER,
+        polynomial_order=DEPRECATED_PARAMETER,
+        derivate_order=DEPRECATED_PARAMETER,
     ) -> None:
+        self.window_length = window_length
+        self.polyorder = polyorder
+        self.deriv = deriv
         self.window_size = window_size
         self.polynomial_order = polynomial_order
         self.derivate_order = derivate_order
@@ -104,6 +135,29 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
+
+        self.window_length_ = resolve_renamed_parameter(
+            new_name="window_length",
+            new_value=self.window_length,
+            new_default=3,
+            old_name="window_size",
+            old_value=self.window_size,
+        )
+        self.polyorder_ = resolve_renamed_parameter(
+            new_name="polyorder",
+            new_value=self.polyorder,
+            new_default=1,
+            old_name="polynomial_order",
+            old_value=self.polynomial_order,
+        )
+        self.deriv_ = resolve_renamed_parameter(
+            new_name="deriv",
+            new_value=self.deriv,
+            new_default=1,
+            old_name="derivate_order",
+            old_value=self.derivate_order,
+        )
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -141,9 +195,9 @@ class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         for i, x in enumerate(X_):
             X_[i] = savgol_filter(
                 x,
-                self.window_size,
-                self.polynomial_order,
-                deriv=self.derivate_order,
+                self.window_length_,
+                self.polyorder_,
+                deriv=self.deriv_,
                 axis=0,
                 mode=self.mode,
             )

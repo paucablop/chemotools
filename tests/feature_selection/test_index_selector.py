@@ -59,7 +59,7 @@ def test_index_selector_with_wavenumbers():
 
     # Act
     select_features = IndexSelector(
-        features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
+        features=np.array([1, 2, 3, 8, 9, 10]), x_axis=wavenumbers
     )
     spectrum_corrected = select_features.fit_transform(spectrum)
 
@@ -77,7 +77,7 @@ def test_index_selector_with_wavenumbers_and_dataframe(pd):
 
     # Act
     select_features = IndexSelector(
-        features=np.array([1, 2, 3, 8, 9, 10]), wavenumbers=wavenumbers
+        features=np.array([1, 2, 3, 8, 9, 10]), x_axis=wavenumbers
     ).set_output(transform="pandas")
 
     spectrum_corrected = select_features.fit_transform(spectrum)
@@ -85,3 +85,33 @@ def test_index_selector_with_wavenumbers_and_dataframe(pd):
     # Assert
     assert isinstance(spectrum_corrected, pd.DataFrame)
     assert np.allclose(spectrum_corrected.values[0], expected, atol=1e-8)
+
+
+# --- Deprecation tests ---
+def test_index_selector_wavenumbers_deprecated():
+    """Using the old `wavenumbers` parameter emits a FutureWarning."""
+    # Arrange
+    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    spectrum = np.array([[10.0, 12.0, 14.0, 16.0, 14.0]])
+    sel = IndexSelector(features=np.array([1, 2, 3]), wavenumbers=wavenumbers)
+
+    # Act
+    with pytest.warns(FutureWarning, match="wavenumbers"):
+        sel.fit(spectrum)
+
+
+def test_index_selector_wavenumbers_conflict():
+    """Passing both `x_axis` and `wavenumbers` raises ValueError."""
+    # Arrange
+    wavenumbers = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+    spectrum = np.array([[10.0, 12.0, 14.0, 16.0, 14.0]])
+    sel = IndexSelector(
+        features=np.array([1, 2, 3]), x_axis=wavenumbers, wavenumbers=wavenumbers
+    )
+
+    # Act
+    with pytest.raises(ValueError) as exc_info:
+        sel.fit(spectrum)
+
+    # Assert
+    assert "Only one of" in str(exc_info.value)

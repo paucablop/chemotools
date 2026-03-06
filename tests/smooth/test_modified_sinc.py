@@ -16,7 +16,7 @@ def test_compliance_modified_sinc():
 # Test functionality
 def test_ms_kernel_properties_default():
     # Arrange
-    ms = ModifiedSincFilter(window_size=21, n=6, alpha=3.0, mode="interp")
+    ms = ModifiedSincFilter(window_length=21, n=6, alpha=3.0, mode="interp")
     # fit on any numeric 2D data to set up internal attributes
     X = np.zeros((1, 21), dtype=np.float64)
 
@@ -35,8 +35,8 @@ def test_ms_kernel_properties_default():
 def test_ms_kernel_changes_with_params():
     # Arrange
     X = np.zeros((1, 21))
-    ms1 = ModifiedSincFilter(window_size=21, n=6, alpha=2.0, mode="interp")
-    ms2 = ModifiedSincFilter(window_size=21, n=6, alpha=4.0, mode="interp")
+    ms1 = ModifiedSincFilter(window_length=21, n=6, alpha=2.0, mode="interp")
+    ms2 = ModifiedSincFilter(window_length=21, n=6, alpha=4.0, mode="interp")
 
     # Act
     ms1.fit(X)
@@ -59,7 +59,7 @@ def test_ms_kernel_changes_with_params():
 def test_ms_constant_preservation_all_modes(mode):
     # Arrange
     nine = 9
-    ms = ModifiedSincFilter(window_size=nine, n=6, alpha=3.0, mode=mode)
+    ms = ModifiedSincFilter(window_length=nine, n=6, alpha=3.0, mode=mode)
     X = np.full((1, nine), 2.5, dtype=np.float64)
 
     # Act
@@ -77,7 +77,7 @@ def test_ms_impulse_equals_kernel_all_modes(mode):
     # Arrange
     m = 4
     L = 2 * m + 1
-    ms = ModifiedSincFilter(window_size=L, n=6, alpha=3.0, mode=mode)
+    ms = ModifiedSincFilter(window_length=L, n=6, alpha=3.0, mode=mode)
     X = np.zeros((1, L), dtype=np.float64)
     X[0, m] = 1.0  # centered delta
 
@@ -95,7 +95,7 @@ def test_ms_linear_ramp_preservation_interp_only():
     # Arrange
     nine = 9
     X = np.arange(nine, dtype=np.float64)[None, :]  # shape (1, 9)
-    ms_interp = ModifiedSincFilter(window_size=nine, n=6, alpha=3.0, mode="interp")
+    ms_interp = ModifiedSincFilter(window_length=nine, n=6, alpha=3.0, mode="interp")
 
     # Act
     Y_interp = ms_interp.fit_transform(X)
@@ -112,8 +112,8 @@ def test_ms_axis_behavior_rows_vs_columns():
     n_rows = 4
     n_cols = 21
     X = rng.normal(size=(n_rows, n_cols)).astype(np.float64)
-    ms_row = ModifiedSincFilter(window_size=21, n=6, alpha=3.0, mode="interp", axis=1)
-    ms_col = ModifiedSincFilter(window_size=21, n=6, alpha=3.0, mode="interp", axis=0)
+    ms_row = ModifiedSincFilter(window_length=21, n=6, alpha=3.0, mode="interp", axis=1)
+    ms_col = ModifiedSincFilter(window_length=21, n=6, alpha=3.0, mode="interp", axis=0)
 
     # Act
     Y_row = ms_row.fit_transform(X)
@@ -133,7 +133,7 @@ def test_kappa_corrections_applied(n):
     """Test that kappa corrections are properly applied for n=6,8,10."""
     # Arrange
     window_size = n * 4 + 1  # Ensure large enough window
-    ms = ModifiedSincFilter(window_size=window_size, n=n, alpha=3.0)
+    ms = ModifiedSincFilter(window_length=window_size, n=n, alpha=3.0)
     X = np.zeros((1, window_size), dtype=np.float64)
 
     # Act
@@ -146,3 +146,32 @@ def test_kappa_corrections_applied(n):
     # Verify symmetry and DC preservation
     assert np.allclose(ms.kernel_, ms.kernel_[::-1], atol=1e-12)
     assert np.isclose(ms.kernel_.sum(), 1.0, atol=1e-12)
+
+
+# --- Deprecation tests ---
+def test_ms_window_size_deprecated():
+    """Using the old `window_size` parameter emits a FutureWarning."""
+    # Arrange
+    ms = ModifiedSincFilter(window_size=21, n=6, alpha=3.0)
+    X = np.zeros((1, 21), dtype=np.float64)
+
+    # Act
+    with pytest.warns(FutureWarning, match="window_size"):
+        ms.fit(X)
+
+    # Assert
+    assert ms.window_length_ == 21
+
+
+def test_ms_window_size_conflict():
+    """Passing both `window_length` and `window_size` raises ValueError."""
+    # Arrange
+    ms = ModifiedSincFilter(window_length=9, window_size=9)
+    X = np.zeros((1, 9), dtype=np.float64)
+
+    # Act
+    with pytest.raises(ValueError) as exc_info:
+        ms.fit(X)
+
+    # Assert
+    assert "Only one of" in str(exc_info.value)

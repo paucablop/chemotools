@@ -36,7 +36,7 @@ def test_functionality_savitzky_golay_filter(mode, x_name, x):
     # Act
     expected = savgol_filter(x, window_length=3, polyorder=1, mode=mode)
     smoothed = SavitzkyGolayFilter(
-        window_size=3, polynomial_order=1, mode=mode
+        window_length=3, polyorder=1, mode=mode
     ).fit_transform(x.reshape(1, -1))[0]
 
     # Assert

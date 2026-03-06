@@ -14,6 +14,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
@@ -29,8 +35,11 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
     end : int, optional, default=1
         The index of the last feature to use for the baseline correction.
 
-    wavenumbers : np.ndarray, optional, default=None
-        The wavenumbers corresponding to each feature in the input data.
+    x_axis : np.ndarray, optional, default=None
+        The x-axis values corresponding to each feature in the input data.
+
+    wavenumbers : np.ndarray, optional
+        Deprecated alias for ``x_axis``.
 
     Attributes
     ----------
@@ -57,17 +66,20 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
     _parameter_constraints: dict = {
         "start": [Interval(Integral, 0, None, closed="left")],
         "end": [Interval(Integral, 0, None, closed="left")],
-        "wavenumbers": ["array-like", None],
+        "x_axis": ["array-like", None],
+        "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
     def __init__(
         self,
         start: int = 0,
         end: int = 1,
-        wavenumbers: Optional[np.ndarray] = None,
+        x_axis: Optional[np.ndarray] = None,
+        wavenumbers=DEPRECATED_PARAMETER,
     ) -> None:
         self.start = start
         self.end = end
+        self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "ConstantBaselineCorrection":
@@ -92,13 +104,15 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
+        axis_values = self._resolve_x_axis()
+
         # Set the start and end indices
-        if self.wavenumbers is None:
+        if axis_values is None:
             self.start_index_ = self.start
             self.end_index_ = self.end
         else:
-            self.start_index_ = self._find_index(self.start)
-            self.end_index_ = self._find_index(self.end)
+            self.start_index_ = self._find_index(self.start, axis_values)
+            self.end_index_ = self._find_index(self.end, axis_values)
 
         return self
 
@@ -139,6 +153,15 @@ class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEst
             X_[i, :] = x - mean_baseline
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _find_index(self, target: float) -> int:
-        wavenumbers = np.array(self.wavenumbers)
+    def _find_index(self, target: float, axis_values) -> int:
+        wavenumbers = np.array(axis_values)
         return np.argmin(np.abs(wavenumbers - target)).astype(int)
+
+    def _resolve_x_axis(self):
+        return resolve_renamed_parameter(
+            new_name="x_axis",
+            new_value=self.x_axis,
+            new_default=None,
+            old_name="wavenumbers",
+            old_value=self.wavenumbers,
+        )

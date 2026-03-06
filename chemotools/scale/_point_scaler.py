@@ -13,6 +13,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
@@ -22,12 +28,14 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     Parameters
     ----------
     point : int, optional, default=0
-        The point to scale the data by. It can be an index or a wavenumber.
+        The point to scale the data by. It can be an index or an x-axis value.
 
-    wavenumber : array-like, optional, default=None
-        The wavenumbers of the input data. If not provided, the indices will be used
-        instead. Default is None. If provided, the wavenumbers must be provided in
-        ascending order.
+    x_axis : array-like, optional, default=None
+        The x-axis values of the input data. If not provided, the indices will be used
+        instead. Default is None. If provided, the values must be in ascending order.
+
+    wavenumbers : array-like, optional
+        Deprecated alias for ``x_axis``.
 
     Attributes
     ----------
@@ -53,11 +61,18 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     _parameter_constraints: dict = {
         "point": [Interval(Integral, 0, None, closed="left")],
-        "wavenumbers": ["array-like", None],
+        "x_axis": ["array-like", None],
+        "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
-    def __init__(self, point: int = 0, wavenumbers: Optional[np.ndarray] = None):
+    def __init__(
+        self,
+        point: int = 0,
+        x_axis: Optional[np.ndarray] = None,
+        wavenumbers=DEPRECATED_PARAMETER,
+    ):
         self.point = point
+        self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "PointScaler":
@@ -81,11 +96,14 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
+
+        axis_values = self._resolve_x_axis()
+
         # Set the point index
-        if self.wavenumbers is None:
+        if axis_values is None:
             self.point_index_ = self.point
         else:
-            self.point_index_ = self._find_index(self.point)
+            self.point_index_ = self._find_index(self.point, axis_values)
 
         return self
 
@@ -126,6 +144,15 @@ class PointScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_
 
-    def _find_index(self, target: float) -> int:
-        wavenumbers = np.array(self.wavenumbers)
+    def _find_index(self, target: float, axis_values) -> int:
+        wavenumbers = np.array(axis_values)
         return int(np.argmin(np.abs(wavenumbers - target)))
+
+    def _resolve_x_axis(self):
+        return resolve_renamed_parameter(
+            new_name="x_axis",
+            new_value=self.x_axis,
+            new_default=None,
+            old_name="wavenumbers",
+            old_value=self.wavenumbers,
+        )

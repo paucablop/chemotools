@@ -1,7 +1,7 @@
 """
 The :mod:`chemotools.feature_selection._range_cut` module implements the RangeCut
 to select specific features from spectral data based on start and end indices or
-wavenumbers.
+x-axis values.
 """
 
 from typing import Optional
@@ -12,28 +12,36 @@ from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils._param_validation import Integral, Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class RangeCut(SelectorMixin, BaseEstimator):
-    """Select a contiguous spectral region by index or by wavenumber.
+    """Select a contiguous spectral region by index or by x-axis value.
 
     The range can be specified in two ways:
 
     * By integer indices (``start`` and ``end``)
-    * By wavenumber values (``start`` and ``end`` interpreted against the
-        provided ``wavenumbers`` array)
+    * By x-axis values (``start`` and ``end`` interpreted against the provided
+        ``x_axis`` array)
 
-    If ``wavenumbers`` is supplied, the closest indices to the given start / end
-    wavenumber values are located. Otherwise numeric ``start`` / ``end`` are
-    treated directly as indices. Wavenumbers must be in ascending order.
+    If ``x_axis`` is supplied, the closest indices to the given start / end
+    x-axis values are located. Otherwise numeric ``start`` / ``end`` are
+    treated directly as indices. X-axis values must be in ascending order.
 
     Parameters
     ----------
     start : int, default=0
-        Index or wavenumber of the start of the range.
+        Index or x-axis value of the start of the range.
     end : int, default=-1
-        Index or wavenumber of the end of the range.
+        Index or x-axis value of the end of the range.
+    x_axis : array-like, optional
+        X-axis values corresponding to columns. Must be ascending if provided.
     wavenumbers : array-like, optional
-        Wavenumbers corresponding to columns. Must be ascending if provided.
+        Deprecated alias for ``x_axis``. Use ``x_axis`` instead.
 
     Attributes
     ----------
@@ -41,8 +49,10 @@ class RangeCut(SelectorMixin, BaseEstimator):
         Resolved start index.
     end_index_ : int
         Resolved end index.
+    x_axis_ : array-like or None
+        Selected x-axis values (if provided), else ``None``.
     wavenumbers_ : array-like or None
-        Selected wavenumbers (if provided), else ``None``.
+        Deprecated alias for ``x_axis_``.
 
     Examples
     --------
@@ -50,9 +60,9 @@ class RangeCut(SelectorMixin, BaseEstimator):
     >>> from chemotools.datasets import load_fermentation_train
     >>> X, _ = load_fermentation_train()
     >>> wavenumbers = X.columns.values
-    >>> rc = RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
+    >>> rc = RangeCut(start=1000, end=2000, x_axis=wavenumbers)
     >>> rc.fit(X)
-    RangeCut(start=1000, end=2000, wavenumbers=wavenumbers)
+    RangeCut(start=1000, end=2000, x_axis=wavenumbers)
     >>> X_cut = rc.transform(X)
     >>> X_cut.shape
     (21, 616)
@@ -61,17 +71,20 @@ class RangeCut(SelectorMixin, BaseEstimator):
     _parameter_constraints: dict = {
         "start": Interval(Integral, 0, None, closed="left"),
         "end": [Integral],
-        "wavenumbers": ["array-like", None],
+        "x_axis": ["array-like", None],
+        "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
     def __init__(
         self,
         start: int = 0,
         end: int = -1,
-        wavenumbers: Optional[np.ndarray] = None,
+        x_axis: Optional[np.ndarray] = None,
+        wavenumbers=DEPRECATED_PARAMETER,
     ):
         self.start = start
         self.end = end
+        self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "RangeCut":
@@ -95,15 +108,21 @@ class RangeCut(SelectorMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
+
+        axis_values = self._resolve_x_axis()
+
         # Set the start and end indices
-        if self.wavenumbers is None:
+        if axis_values is None:
             self.start_index_ = self.start
             self.end_index_ = self.end
+            self.x_axis_ = None
             self.wavenumbers_ = None
         else:
-            self.start_index_ = self._find_index(self.start)
-            self.end_index_ = self._find_index(self.end)
-            self.wavenumbers_ = self.wavenumbers[self.start_index_ : self.end_index_]
+            axis = np.asarray(axis_values)
+            self.start_index_ = self._find_index(self.start, axis)
+            self.end_index_ = self._find_index(self.end, axis)
+            self.x_axis_ = axis_values[self.start_index_ : self.end_index_]
+            self.wavenumbers_ = self.x_axis_
 
         return self
 
@@ -125,6 +144,14 @@ class RangeCut(SelectorMixin, BaseEstimator):
 
         return mask
 
-    def _find_index(self, target: float) -> int:
-        wavenumbers = np.array(self.wavenumbers)
-        return int(np.argmin(np.abs(wavenumbers - target)))
+    def _resolve_x_axis(self):
+        return resolve_renamed_parameter(
+            new_name="x_axis",
+            new_value=self.x_axis,
+            new_default=None,
+            old_name="wavenumbers",
+            old_value=self.wavenumbers,
+        )
+
+    def _find_index(self, target: float, axis: np.ndarray) -> int:
+        return int(np.argmin(np.abs(axis - target)))

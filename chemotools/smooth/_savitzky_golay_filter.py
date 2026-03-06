@@ -12,6 +12,12 @@ from typing import Literal, Optional
 import numpy as np
 from sklearn.utils._param_validation import Interval, StrOptions
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 from ._base import _BaseFIRFilter
 
 
@@ -21,13 +27,19 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
 
     Parameters
     ----------
-    window_size : int, optional
+    window_length : int, optional
         The size of the window to use for the Savitzky-Golay
         filter. Must be odd. Default is 3.
 
-    polynomial_order : int, optional
+    polyorder : int, optional
         The order of the polynomial to use for the Savitzky-Golay filter. Must be less
-        than window_size. Default is 1.
+        than ``window_length``. Default is 1.
+
+    window_size : int, optional
+        Deprecated alias for ``window_length``.
+
+    polynomial_order : int, optional
+        Deprecated alias for ``polyorder``.
 
     mode : str, optional
         The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
@@ -53,20 +65,33 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
     """
 
     _parameter_constraints: dict = {
-        "window_size": [Interval(Integral, 1, None, closed="left")],
-        "polynomial_order": [Interval(Integral, 0, None, closed="left")],
+        "window_length": [Interval(Integral, 1, None, closed="left")],
+        "polyorder": [Interval(Integral, 0, None, closed="left")],
+        "window_size": [
+            Interval(Integral, 1, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
+        "polynomial_order": [
+            Interval(Integral, 0, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
         "mode": [StrOptions({"mirror", "constant", "nearest", "wrap", "interp"})],
         "axis": [Interval(Integral, 0, None, closed="left")],
     }
 
     def __init__(
         self,
-        window_size: int = 3,
-        polynomial_order: int = 1,
+        window_length: int = 3,
+        polyorder: int = 1,
         mode: Literal["mirror", "constant", "nearest", "wrap", "interp"] = "nearest",
         axis: int = 1,
+        window_size=DEPRECATED_PARAMETER,
+        polynomial_order=DEPRECATED_PARAMETER,
     ) -> None:
-        super().__init__(window_size=window_size, mode=mode, axis=axis)
+        super().__init__(
+            window_length=window_length, mode=mode, axis=axis, window_size=window_size
+        )
+        self.polyorder = polyorder
         self.polynomial_order = polynomial_order
 
     def fit(
@@ -88,6 +113,13 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         self : SavitzkyGolayFilter
             The fitted transformer.
         """
+        self.polyorder_ = resolve_renamed_parameter(
+            new_name="polyorder",
+            new_value=self.polyorder,
+            new_default=1,
+            old_name="polynomial_order",
+            old_value=self.polynomial_order,
+        )
         return super().fit(X, y)
 
     def transform(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
@@ -110,23 +142,23 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         return super().transform(X, y)
 
     def _compute_kernel(self) -> np.ndarray:
-        if self.polynomial_order >= self.window_size:
-            raise ValueError("polynomial_order must be < window_size.")
+        if self.polyorder_ >= self.window_length_:
+            raise ValueError("polyorder must be < window_length.")
         # Prefer SciPy's reference coefficients in convolution form
         try:
             from scipy.signal import savgol_coeffs
 
             k = np.asarray(
                 savgol_coeffs(
-                    self.window_size, self.polynomial_order, deriv=0, use="conv"
+                    self.window_length_, self.polyorder_, deriv=0, use="conv"
                 ),
                 dtype=np.float64,
             )
         except Exception:
             # Robust LS fallback (intercept row of (A^T A)^{-1} A^T)
-            m = (self.window_size - 1) // 2
+            m = (self.window_length_ - 1) // 2
             i = np.arange(-m, m + 1, dtype=np.float64)
-            A = np.vander(i, N=self.polynomial_order + 1, increasing=True)
+            A = np.vander(i, N=self.polyorder_ + 1, increasing=True)
             ATA_inv = np.linalg.pinv(A.T @ A)
             k = (ATA_inv @ A.T)[0, :]
             k = 0.5 * (k + k[::-1])
@@ -144,7 +176,7 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         int
             The polynomial order used in the Savitzky-Golay filter.
         """
-        return self.polynomial_order
+        return self.polyorder_
 
     def _apply_filter_1d(self, x: np.ndarray) -> np.ndarray:
         """
@@ -167,7 +199,7 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         Apply Savitzky-Golay filter with scipy-compatible interp mode.
 
         Replicates scipy's _fit_edges_polyfit behavior:
-        1. Fit polynomial to first window_size points,
+        1. Fit polynomial to first window_length points,
         evaluate at first half_window positions
         2. Apply standard convolution to ALL positions
         (with padding)
@@ -176,7 +208,7 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         """
         m = self._half_
         n = len(x)
-        window_len = self.window_size
+        window_len = self.window_length_
 
         if n < window_len:
             # Signal too short for interp mode, fall back to edge padding
@@ -195,7 +227,7 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         poly_left = np.polyfit(
             np.arange(window_len, dtype=np.float64),
             x_left_window,
-            self.polynomial_order,
+            self.polyorder_,
         )
         indices_left = np.arange(m, dtype=np.float64)
         result[:m] = np.polyval(poly_left, indices_left)
@@ -205,7 +237,7 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         poly_right = np.polyfit(
             np.arange(window_len, dtype=np.float64),
             x_right_window,
-            self.polynomial_order,
+            self.polyorder_,
         )
         # Evaluate at the last m positions: [window_len-m, ..., window_len-1]
         indices_right = np.arange(window_len - m, window_len, dtype=np.float64)

@@ -13,6 +13,11 @@ from typing import Literal, Optional
 import numpy as np
 from sklearn.utils._param_validation import Integral, Interval, Real, StrOptions
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+)
+
 from ._base import _BaseFIRFilter
 
 
@@ -32,7 +37,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
 
     Parameters
     ----------
-    window_size : int, default=21
+    window_length : int, default=21
         Odd number of taps (2*m + 1). Larger values give stronger smoothing.
 
     n : int, default=6
@@ -54,6 +59,9 @@ class ModifiedSincFilter(_BaseFIRFilter):
     axis : int, default=1
         Axis along which to smooth for 2D inputs (rows x features). Use 1 to
         smooth within each row.
+
+    window_size : int, optional
+        Deprecated alias for ``window_length``.
 
     Methods
     -------
@@ -83,24 +91,31 @@ class ModifiedSincFilter(_BaseFIRFilter):
     """
 
     _parameter_constraints: dict = {
-        "window_size": [Interval(Integral, 1, None, closed="left")],
+        "window_length": [Interval(Integral, 1, None, closed="left")],
         "n": [Interval(Integral, 2, None, closed="left")],
         "alpha": [Interval(Real, 0, None, closed="neither")],
         "use_corrections": ["boolean"],
         "mode": [StrOptions({"mirror", "constant", "nearest", "wrap", "interp"})],
         "axis": [Interval(Integral, 0, None, closed="left")],
+        "window_size": [
+            Interval(Integral, 1, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
     }
 
     def __init__(
         self,
-        window_size: int = 21,
+        window_length: int = 21,
         n: int = 6,
         alpha: float = 4.0,
         use_corrections: bool = True,
         mode: Literal["mirror", "constant", "nearest", "wrap", "interp"] = "interp",
         axis: int = 1,
+        window_size=DEPRECATED_PARAMETER,
     ) -> None:
-        super().__init__(window_size=window_size, mode=mode, axis=axis)
+        super().__init__(
+            window_length=window_length, mode=mode, axis=axis, window_size=window_size
+        )
         self.n = n
         self.alpha = alpha
         self.use_corrections = use_corrections
@@ -166,7 +181,7 @@ class ModifiedSincFilter(_BaseFIRFilter):
             raise ValueError("alpha must be positive.")
 
         # ---- 1) Eq. 5: index -> normalized coordinate in [-1, 1] ----
-        m = (self.window_size - 1) // 2
+        m = (self.window_length_ - 1) // 2
         i = np.arange(-m, m + 1, dtype=np.float64)
         x = i / (m + 1) if m >= 0 else np.array([0.0])
 

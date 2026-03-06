@@ -14,6 +14,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
@@ -21,12 +27,15 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Parameters
     ----------
-    window_size : int, optional, default=3
+    window_length : int, optional, default=3
         The size of the window to use for the mean filter. Must be odd. Default is 3.
 
     mode : str, optional, default="nearest"
         The mode to use for the mean filter. Can be "nearest", "constant", "reflect",
         "wrap", "mirror" or "interp". Default is "nearest".
+
+    window_size : int, optional
+        Deprecated alias for ``window_length``.
 
     Attributes
     ----------
@@ -47,13 +56,20 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "window_size": [Interval(Integral, 3, None, closed="left")],
+        "window_length": [Interval(Integral, 3, None, closed="left")],
         "mode": [
             StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
         ],
+        "window_size": [
+            Interval(Integral, 3, None, closed="left"),
+            deprecated_parameter_constraint(),
+        ],
     }
 
-    def __init__(self, window_size: int = 3, mode="nearest") -> None:
+    def __init__(
+        self, window_length: int = 3, mode="nearest", window_size=DEPRECATED_PARAMETER
+    ) -> None:
+        self.window_length = window_length
         self.window_size = window_size
         self.mode = mode
 
@@ -78,6 +94,15 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
+
+        self.window_length_ = resolve_renamed_parameter(
+            new_name="window_length",
+            new_value=self.window_length,
+            new_default=3,
+            old_name="window_size",
+            old_value=self.window_size,
+        )
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -113,5 +138,5 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
         # Mean filter the data
         for i, x in enumerate(X_):
-            X_[i] = uniform_filter1d(x, size=self.window_size, mode=self.mode)
+            X_[i] = uniform_filter1d(x, size=self.window_length_, mode=self.mode)
         return X_.reshape(-1, 1) if X_.ndim == 1 else X_

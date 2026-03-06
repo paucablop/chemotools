@@ -14,6 +14,12 @@ from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
+    deprecated_parameter_constraint,
+    resolve_renamed_parameter,
+)
+
 
 class IndexSelector(SelectorMixin, BaseEstimator):
     """
@@ -30,10 +36,12 @@ class IndexSelector(SelectorMixin, BaseEstimator):
     features : narray-like, optional, default=None
         The index of the features to select. Default is None.
 
-    wavenumbers : array-like, optional, default=None
-        The wavenumbers of the input data. If not provided, the indices will be used
-        instead. Default is None. If provided, the wavenumbers must be provided in
-        ascending order.
+    x_axis : array-like, optional, default=None
+        The x-axis values of the input data. If not provided, the indices will be used
+        instead. Default is None. If provided, the values must be in ascending order.
+
+    wavenumbers : array-like, optional
+        Deprecated alias for ``x_axis``.
 
     Attributes
     ----------
@@ -66,15 +74,18 @@ class IndexSelector(SelectorMixin, BaseEstimator):
 
     _parameter_constraints: dict = {
         "features": ["array-like", None],
-        "wavenumbers": ["array-like", None],
+        "x_axis": ["array-like", None],
+        "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
     def __init__(
         self,
         features: Optional[np.ndarray] = None,
-        wavenumbers: Optional[np.ndarray] = None,
+        x_axis: Optional[np.ndarray] = None,
+        wavenumbers=DEPRECATED_PARAMETER,
     ):
         self.features = features
+        self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "IndexSelector":
@@ -101,17 +112,19 @@ class IndexSelector(SelectorMixin, BaseEstimator):
         # Set the fitted attribute to True
         self._is_fitted = True
 
+        axis_values = self._resolve_x_axis()
+
         # Set the start and end indices
         if self.features is None:
             self.features_index_ = self.features
             return self
 
-        elif self.wavenumbers is None:
+        elif axis_values is None:
             self.features_index_ = self.features
             return self
 
         else:
-            self.features_index_ = self._find_indices(self.features)
+            self.features_index_ = self._find_indices(self.features, axis_values)
             return self
 
     def _get_support_mask(self):
@@ -132,11 +145,22 @@ class IndexSelector(SelectorMixin, BaseEstimator):
 
         return mask
 
-    def _find_index(self, target: Union[float, int]) -> int:
-        if self.wavenumbers is None:
+    def _find_index(self, target: Union[float, int], axis_values) -> int:
+        if axis_values is None:
             return int(target)
-        wavenumbers = np.array(self.wavenumbers)
+        wavenumbers = np.array(axis_values)
         return int(np.argmin(np.abs(wavenumbers - target)))
 
-    def _find_indices(self, features: np.ndarray) -> np.ndarray:
-        return np.array([self._find_index(feature) for feature in features])
+    def _find_indices(self, features: np.ndarray, axis_values) -> np.ndarray:
+        return np.array(
+            [self._find_index(feature, axis_values) for feature in features]
+        )
+
+    def _resolve_x_axis(self):
+        return resolve_renamed_parameter(
+            new_name="x_axis",
+            new_value=self.x_axis,
+            new_default=None,
+            old_name="wavenumbers",
+            old_value=self.wavenumbers,
+        )
