@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Literal, Optional, Self
+from typing import TYPE_CHECKING, Callable, Literal, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 from chemotools.utils._linear_algebra import (
     compute_DtD_banded,

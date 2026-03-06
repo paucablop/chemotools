@@ -68,8 +68,19 @@ You can get started quickly by using the predefined [Taskfile](./Taskfile.yml), 
 ```bash
 task install     # install all dependencies
 task check       # run formatting, linting, typing, and tests
+task test        # quick test run in the current environment
+task test:matrix # run the nox compatibility matrix locally
 task coverage    # run tests with coverage reporting
 task build       # build the package for distribution
+```
+
+For compatibility testing across supported Python versions, use [`nox`](https://nox.thea.codes/):
+
+```bash
+uv run nox --list               # show available sessions
+uv run nox -s tests-3.12       # run tests on a specific Python version
+uv run nox -s tests-min-sklearn-3.10
+uv run nox -s tests-min-sklearn-3.12
 ```
 
 ## Contributing

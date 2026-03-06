@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Optional, Self
+from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, OutlierMixin
@@ -8,6 +10,9 @@ from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import check_is_fitted, validate_data
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 from chemotools._types import EstimatorType, ModelInput
 from chemotools._validation import get_model_parameters, validate_and_extract_model

@@ -6,6 +6,8 @@ vars:
   SPHINX_SOURCE: docs/source
   SPHINX_BUILD: docs/_build
   API_OUT: docs/source/api/generated
+  NOX_TEST_SESSIONS: 'tests-3.10 tests-3.11 tests-3.12 tests-3.13 tests-3.14'
+  NOX_MIN_SKLEARN_SESSIONS: 'tests-min-sklearn-3.10 tests-min-sklearn-3.11 tests-min-sklearn-3.12'
   # Cross-platform helpers
   VENV_BIN: '{{if eq OS "windows"}}Scripts{{else}}bin{{end}}'
   PYTHON: '{{if eq OS "windows"}}python{{else}}python3{{end}}'
@@ -101,9 +103,25 @@ tasks:
 
   # 🧪 Testing
   test:
-    desc: Run tests with pytest
+    desc: Run tests with pytest in the current environment
     cmds:
       - "{{.UV}} run pytest -rs tests/"
+
+  test:quick:
+    desc: Run tests with pytest in the current environment
+    cmds:
+      - task: test
+
+  nox:list:
+    desc: List available nox sessions
+    cmds:
+      - "{{.UV}} run nox --list"
+
+  test:matrix:
+    desc: Run the nox compatibility test matrix locally
+    cmds:
+      - "{{.UV}} run nox -s {{.NOX_TEST_SESSIONS}}"
+      - "{{.UV}} run nox -s {{.NOX_MIN_SKLEARN_SESSIONS}}"
 
   coverage:
     desc: Run tests with coverage report
@@ -132,6 +150,14 @@ tasks:
       - task: lint
       - task: type-check
       - task: test
+
+  check:matrix:
+    desc: Run quality checks plus the nox compatibility matrix
+    cmds:
+      - task: format-check
+      - task: lint
+      - task: type-check
+      - task: test:matrix
 
   setup:
     desc: Set up development environment (install + checks)

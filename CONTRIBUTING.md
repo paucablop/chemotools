@@ -44,9 +44,20 @@ When contributing, please keep in mind:
    ```bash
    task install     # install dependencies
    task check       # run formatting, linting, typing, tests
+    task test        # quick test run in the current environment
+    task test:matrix # run the nox compatibility matrix locally
    task coverage    # run tests with coverage
    task build       # build the package
    ```
+
+  For compatibility checks across supported Python versions and dependency floors, use `nox`:
+
+  ```bash
+  uv run nox --list
+  uv run nox -s tests-3.12
+  uv run nox -s tests-min-sklearn-3.10
+  uv run nox -s tests-min-sklearn-3.12
+  ```
 
 4. **Open a Pull Request (PR)**
 
