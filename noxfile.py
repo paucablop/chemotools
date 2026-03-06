@@ -6,8 +6,8 @@ import nox
 
 SUPPORTED_PYTHONS = ("3.10", "3.11", "3.12", "3.13", "3.14")
 MINIMUM_SKLEARN_PYTHONS = ("3.10", "3.11", "3.12")
-MINIMUM_SKLEARN = "1.4.*"
-LATEST_SKLEARN = "scikit-learn>=1.4.0,<2"
+MINIMUM_SKLEARN = "1.6.*"
+LATEST_SKLEARN = "scikit-learn>=1.6.0,<2"
 
 TEST_DEPENDENCIES = ("pytest>=8.3.0", "pytest-cov>=6.3.0")
 
