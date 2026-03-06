@@ -155,7 +155,7 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def _smoothing_kernel(self):
         return np.ones(self.window_size) / self.window_size
 
-    def _first_derivaive_kernel(self):
+    def _first_derivative_kernel(self):
         array = np.zeros(self.gap_size)
         array[0] = 1 / (self.gap_size)
         array[-1] = -1 / (self.gap_size)
@@ -171,9 +171,9 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     def _spectrum_first_derivative(self, X):
         # Apply filter of data
         smoothing_kernel = self._smoothing_kernel()
-        first_derivative_kenel = self._first_derivaive_kernel()
+        first_derivative_kernel = self._first_derivative_kernel()
         smoothed = convolve1d(X, smoothing_kernel, mode=self.mode)
-        derivative = convolve1d(smoothed, first_derivative_kenel, mode=self.mode)
+        derivative = convolve1d(smoothed, first_derivative_kernel, mode=self.mode)
         return derivative
 
     def _spectrum_second_derivative(self, X):

@@ -7,7 +7,8 @@ pre-commit:
     format-check:
       run: task format
       glob: "**/*.py"
-    
+    typos:
+      run: task spelling ./chemotools
 
 
 commit-msg:
