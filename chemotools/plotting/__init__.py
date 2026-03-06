@@ -2,25 +2,35 @@
 
 import warnings
 
-from chemotools.plotting._base import BasePlot, Display, is_displayable
-from chemotools.plotting._distances import DistancesPlot
-from chemotools.plotting._explained_variance import ExplainedVariancePlot
-from chemotools.plotting._feature_selection import FeatureSelectionPlot
-from chemotools.plotting._loadings import LoadingsPlot
-from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot
-from chemotools.plotting._qq_plot import QQPlot
-from chemotools.plotting._residual_distribution import ResidualDistributionPlot
-from chemotools.plotting._scores import ScoresPlot
-from chemotools.plotting._spectra import SpectraPlot
-from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS
-from chemotools.plotting._utils import (
+from chemotools._optional import import_optional_dependency
+
+import_optional_dependency(
+    "matplotlib",
+    caller_name="chemotools.plotting",
+    extra_name="viz",
+)
+
+from chemotools.plotting._base import BasePlot, Display, is_displayable  # noqa: E402
+from chemotools.plotting._distances import DistancesPlot  # noqa: E402
+from chemotools.plotting._explained_variance import ExplainedVariancePlot  # noqa: E402
+from chemotools.plotting._feature_selection import FeatureSelectionPlot  # noqa: E402
+from chemotools.plotting._loadings import LoadingsPlot  # noqa: E402
+from chemotools.plotting._predicted_vs_actual import PredictedVsActualPlot  # noqa: E402
+from chemotools.plotting._qq_plot import QQPlot  # noqa: E402
+from chemotools.plotting._residual_distribution import (  # noqa: E402
+    ResidualDistributionPlot,
+)
+from chemotools.plotting._scores import ScoresPlot  # noqa: E402
+from chemotools.plotting._spectra import SpectraPlot  # noqa: E402
+from chemotools.plotting._styles import DATASET_COLORS, DATASET_MARKERS  # noqa: E402
+from chemotools.plotting._utils import (  # noqa: E402
     add_confidence_ellipse,
     annotate_points,
     calculate_ylim_for_xlim,
     get_colors_from_labels,
     setup_figure,
 )
-from chemotools.plotting._y_residuals import YResidualsPlot
+from chemotools.plotting._y_residuals import YResidualsPlot  # noqa: E402
 
 __all__ = [
     # Protocols

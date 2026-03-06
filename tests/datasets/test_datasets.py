@@ -1,18 +1,20 @@
 import pytest
 
+from chemotools._optional import import_optional_dependency
 from chemotools.datasets import (
     load_coffee,
     load_fermentation_test,
     load_fermentation_train,
 )
-from chemotools.utils._optional_dependencies import check_optional_dependency
 
 
 @pytest.fixture(scope="module")
 def pd():
     """Fixture for optional pandas dependency."""
     try:
-        return check_optional_dependency("pandas", "tests (pandas-dependent)")
+        return import_optional_dependency(
+            "pandas", caller_name="tests (pandas-dependent)"
+        )
     except ImportError:
         pytest.skip("pandas is not installed, skipping pandas-dependent tests")
 
@@ -21,7 +23,9 @@ def pd():
 def pl():
     """Fixture for optional polars dependency."""
     try:
-        return check_optional_dependency("polars", "tests (polars-dependent)")
+        return import_optional_dependency(
+            "polars", caller_name="tests (polars-dependent)"
+        )
     except ImportError:
         pytest.skip("polars is not installed, skipping polars-dependent tests")
 

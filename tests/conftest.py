@@ -1,7 +1,6 @@
 import os
 from typing import Optional, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.cross_decomposition import PLSRegression
@@ -11,14 +10,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
 from chemotools.outliers._base import _ModelResidualsBase
-
-
-@pytest.fixture(autouse=True)
-def close_figures():
-    """Automatically close all matplotlib figures after each test."""
-    yield
-    plt.close("all")
-
 
 test_directory = os.path.dirname(os.path.abspath(__file__))
 

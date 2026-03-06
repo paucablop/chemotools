@@ -24,16 +24,25 @@ nox.options.sessions = ("lint", "type-check", "tests")
 nox.options.reuse_existing_virtualenvs = True
 
 
-def install_project(session: nox.Session, *extra_dependencies: str) -> None:
+def install_project(
+    session: nox.Session, *extra_dependencies: str, extras: tuple[str, ...] = ()
+) -> None:
     """Install the project in editable mode plus any extra tooling."""
-    session.install("-e", ".", *extra_dependencies)
+    package_spec = "."
+    if extras:
+        joined_extras = ",".join(extras)
+        package_spec = f".[{joined_extras}]"
+    session.install("-e", package_spec, *extra_dependencies)
 
 
 def install_test_dependencies(
-    session: nox.Session, *, sklearn_requirement: str | None = None
+    session: nox.Session,
+    *,
+    sklearn_requirement: str | None = None,
+    extras: tuple[str, ...] = (),
 ) -> None:
     """Install the project test dependencies with an optional sklearn override."""
-    install_project(session, *TEST_DEPENDENCIES)
+    install_project(session, *TEST_DEPENDENCIES, extras=extras)
     if sklearn_requirement is not None:
         session.install("--upgrade", sklearn_requirement)
 
@@ -49,21 +58,38 @@ def lint(session: nox.Session) -> None:
 @nox.session(name="type-check")
 def type_check(session: nox.Session) -> None:
     """Run static type checks."""
-    install_project(session, *TYPECHECK_DEPENDENCIES)
+    install_project(session, *TYPECHECK_DEPENDENCIES, extras=("viz",))
     session.run("ty", "check", "./chemotools")
 
 
 @nox.session(python=SUPPORTED_PYTHONS)
 def tests(session: nox.Session) -> None:
     """Run the test suite with the default dependency set."""
-    install_test_dependencies(session, sklearn_requirement=LATEST_SKLEARN)
+    install_test_dependencies(
+        session, sklearn_requirement=LATEST_SKLEARN, extras=("viz",)
+    )
     session.run("pytest", "-rs", *(session.posargs or ["tests/"]))
+
+
+@nox.session(name="tests-core")
+def tests_core(session: nox.Session) -> None:
+    """Run the core test suite without optional visualization dependencies."""
+    install_test_dependencies(session, sklearn_requirement=LATEST_SKLEARN)
+    session.run(
+        "pytest",
+        "-rs",
+        "--ignore=tests/plotting",
+        "--ignore=tests/inspector",
+        *(session.posargs or ["tests/"]),
+    )
 
 
 @nox.session(name="tests-min-sklearn", python=MINIMUM_SKLEARN_PYTHONS)
 def tests_min_sklearn(session: nox.Session) -> None:
     """Run tests against the minimum supported scikit-learn version."""
     install_test_dependencies(
-        session, sklearn_requirement=f"scikit-learn=={MINIMUM_SKLEARN}"
+        session,
+        sklearn_requirement=f"scikit-learn=={MINIMUM_SKLEARN}",
+        extras=("viz",),
     )
     session.run("pytest", "-rs", *(session.posargs or ["tests/"]))

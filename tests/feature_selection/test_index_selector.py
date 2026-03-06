@@ -2,15 +2,17 @@ import numpy as np
 import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
+from chemotools._optional import import_optional_dependency
 from chemotools.feature_selection import IndexSelector
-from chemotools.utils._optional_dependencies import check_optional_dependency
 
 
 @pytest.fixture(scope="module")
 def pd():
     """Fixture for optional pandas dependency."""
     try:
-        return check_optional_dependency("pandas", "tests (pandas-dependent)")
+        return import_optional_dependency(
+            "pandas", caller_name="tests (pandas-dependent)"
+        )
     except ImportError:
         pytest.skip("pandas is not installed, skipping pandas-dependent tests")
 

@@ -1,6 +1,6 @@
 import os
 
-from chemotools.utils._optional_dependencies import check_optional_dependency
+from chemotools._optional import import_optional_dependency
 
 PACKAGE_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,14 +39,14 @@ def load_fermentation_train(set_output="pandas"):
     lignocellulose ethanol fermentations.
     """
     if set_output == "pandas":  # pragma: no cover
-        pd = check_optional_dependency("pandas", "load_fermentation_train")
+        pd = import_optional_dependency("pandas", caller_name="load_fermentation_train")
         train_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/train_spectra.csv")
         train_spectra.columns = train_spectra.columns.astype(float)
         train_hplc = pd.read_csv(PACKAGE_DIRECTORY + "/data/train_hplc.csv")
         return train_spectra, train_hplc
 
     if set_output == "polars":  # pragma: no cover
-        pl = check_optional_dependency("polars", "load_fermentation_train")
+        pl = import_optional_dependency("polars", caller_name="load_fermentation_train")
         train_spectra = pl.read_csv(PACKAGE_DIRECTORY + "/data/train_spectra.csv")
         train_hplc = pl.read_csv(PACKAGE_DIRECTORY + "/data/train_hplc.csv")
         return train_spectra, train_hplc
@@ -90,7 +90,7 @@ def load_fermentation_test(set_output="pandas"):
     lignocellulose ethanol fermentations.
     """
     if set_output == "pandas":  # pragma: no cover
-        pd = check_optional_dependency("pandas", "load_fermentation_test")
+        pd = import_optional_dependency("pandas", caller_name="load_fermentation_test")
         fermentation_spectra = pd.read_csv(
             PACKAGE_DIRECTORY + "/data/fermentation_spectra.csv"
         )
@@ -101,7 +101,7 @@ def load_fermentation_test(set_output="pandas"):
         return fermentation_spectra, fermentation_hplc
 
     if set_output == "polars":  # pragma: no cover
-        pl = check_optional_dependency("polars", "load_fermentation_test")
+        pl = import_optional_dependency("polars", caller_name="load_fermentation_test")
         fermentation_spectra = pl.read_csv(
             PACKAGE_DIRECTORY + "/data/fermentation_spectra.csv"
         )
@@ -141,13 +141,13 @@ def load_coffee(set_output="pandas"):
         labels.
     """
     if set_output == "pandas":  # pragma: no cover
-        pd = check_optional_dependency("pandas", "load_coffee")
+        pd = import_optional_dependency("pandas", caller_name="load_coffee")
         coffee_spectra = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pd.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels
 
     if set_output == "polars":  # pragma: no cover
-        pl = check_optional_dependency("polars", "load_coffee")
+        pl = import_optional_dependency("polars", caller_name="load_coffee")
         coffee_spectra = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_spectra.csv")
         coffee_labels = pl.read_csv(PACKAGE_DIRECTORY + "/data/coffee_labels.csv")
         return coffee_spectra, coffee_labels

@@ -2,8 +2,16 @@
 
 import warnings
 
-from ._pca_inspector import PCAInspector
-from ._pls_regression_inspector import PLSRegressionInspector
+from chemotools._optional import import_optional_dependency
+
+import_optional_dependency(
+    "matplotlib",
+    caller_name="chemotools.inspector",
+    extra_name="viz",
+)
+
+from ._pca_inspector import PCAInspector  # noqa: E402
+from ._pls_regression_inspector import PLSRegressionInspector  # noqa: E402
 
 __all__ = ["PCAInspector", "PLSRegressionInspector"]
 
