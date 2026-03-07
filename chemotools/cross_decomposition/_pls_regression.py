@@ -1,7 +1,7 @@
-"""Enhanced PLS regression with automatic explained variance calculation.
-
-This module extends sklearn's PLSRegression with chemometrics-specific features,
-particularly automatic calculation of explained variance ratios for both X and Y spaces.
+"""
+The module :mod:`chemotools.cross_decomposition._pls_regression` implements an enhanced
+version of PLS regression with automatic explained variance calculation for both X and
+Y spaces. This extension of sklearn's PLSRegression.
 """
 
 import numpy as np
