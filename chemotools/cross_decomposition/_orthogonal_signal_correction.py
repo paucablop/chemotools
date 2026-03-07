@@ -150,7 +150,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         self.projection_matrix_ = W @ pinv(P.T @ W) @ P.T
         return self
 
-    def transform(self, X: np.ndarray, y = None, copy: bool = True):
+    def transform(self, X: np.ndarray, y=None, copy: bool = True):
         """Apply dimensionality reduction to X.
 
         Projects X onto the latent components found during fitting.
