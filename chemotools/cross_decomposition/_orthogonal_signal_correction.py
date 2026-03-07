@@ -13,7 +13,7 @@ from scipy.linalg import pinv, svd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils._param_validation import Interval, StrOptions
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
@@ -131,7 +131,9 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             Fitted OSC model with calculated orthogonal components.
         """
         # Check that X is a 2D array and has only finite values
-        X, y = self.validate_data(X, y=y, ensure_2d=True, reset=True, dtype=np.float64)  # type: ignore[unresolved-attribute]
+        self._validate_params()
+        X, y = validate_data(self, X, y=y, ensure_2d=True, reset=True, dtype=np.float64)
+        y = np.asarray(y, dtype=np.float64)
 
         # Center the data
         self.mean_X_ = np.mean(X, axis=0)
@@ -141,13 +143,13 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         # Call parent fit method
         if self.method == "wold":
-            self.scores_, self.weights_, self.loadings_ = self._wold_method(
-                X_centered, y_centered
+            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+                self._wold_method(X_centered, y_centered)
             )
 
         # Calculate the projection matrix for transforming new data
-        W, P = self.weights_, self.loadings_
-        self.projection_matrix_ = W @ pinv(P.T @ W) @ P.T
+        # W, P = self.weights_, self.loadings_
+        # self.projection_matrix_ = W @ pinv(P.T @ W) @ P.T
         return self
 
     def transform(self, X: np.ndarray, y=None, copy: bool = True):
@@ -175,8 +177,14 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         check_is_fitted(self, "n_features_in_")
 
         # Validate input data
-        X = self.validate_data(  # type: ignore[unresolved-attribute]
-            X, y="no_validation", ensure_2d=True, copy=copy, dtype=np.float64
+        X = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            reset=False,
+            copy=copy,
+            dtype=np.float64,
         )
 
         Xc = X - self.mean_X_
@@ -188,7 +196,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     def _wold_method(
         self, X: np.ndarray, y: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int]:
         """Calculate orthogonal components using Wold's method."""
         # Calculate the first singular vectors of X
         Xk = X.copy()
@@ -202,6 +210,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         # Precompute the projection matrix part
         y_pinv = pinv(y)
+        n_iter_ = 0
 
         scores_ = np.zeros((n_samples, self.n_components))
         weights_ = np.zeros((n_features, self.n_components))
@@ -233,7 +242,9 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
                 t_star = t_new_star
 
-            if iteration == self.max_iter:
+            n_iter_ = max(n_iter_, iteration + 1)
+
+            if iteration == self.max_iter - 1:
                 warnings.warn(
                     f"Wold method did not converge after {self.max_iter} iterations.",
                     ConvergenceWarning,
@@ -248,9 +259,9 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             loadings_[:, k] = p.flatten()
 
             # Deflate Xk by removing the contribution of the orthogonal component
-            Xk -= t_star @ p.T
+            Xk -= np.outer(t_star, p)
 
-        return scores_, weights_, loadings_
+        return scores_, weights_, loadings_, n_iter_
 
     def _sjoblom_method(self, X: np.ndarray, y: np.ndarray):
         """Calculate orthogonal components using Sjöblom's method."""
