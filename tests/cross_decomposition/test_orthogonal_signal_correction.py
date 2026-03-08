@@ -46,6 +46,7 @@ def _make_osc_dataset(
 
     return X, y, y_multi, nuisance_vector
 
+
 # Test compliance with scikit-learn
 
 
