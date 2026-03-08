@@ -44,6 +44,7 @@ def _make_epo_dataset(
 
     return X, X_external, nuisance_vector
 
+
 # Test compliance with scikit-learn
 
 
