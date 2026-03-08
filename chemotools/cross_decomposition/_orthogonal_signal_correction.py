@@ -439,27 +439,38 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         y = y.reshape(-1, 1) if y.ndim == 1 else y
 
-        # Calculate the residual matrix M (Equation -2 in Fearn's pape r [3])
+        n_samples, n_features = X.shape
+
+        scores = np.zeros((n_samples, self.n_components))
+        weights = np.zeros((n_features, self.n_components))
+        loadings = np.zeros((n_features, self.n_components))
+        n_iter = np.ones(self.n_components, dtype=int)  # Non-iterative per component
+
+        # Calculate the residual matrix M (Equation -2 in Fearn's paper [3])
         Id = np.eye(X.shape[1])
         M = Id - X.T @ y @ pinv(y.T @ X @ X.T @ y) @ y.T @ X
 
         # Calculate the matrix Z (Equation -1 in Fearn's paper [3])
         Z = X @ M
 
-        # Calculate the first singular vectors of Z (Equation 1 in Fearn's paper)
-        _, S, Vt = svd(Z, full_matrices=False)
-        w = Vt.T[:, self.n_components - 1]
+        # Calculate the leading right singular vectors of Z (Equation 1 in Fearn's
+        # paper). Use the first n_components vectors as orthogonal weights.
+        _, _, Vt = svd(Z, full_matrices=False)
+        weights = Vt.T[:, : self.n_components]
 
-        # Calculate the scores t (Equation 2 in Fearn's paper)
-        t = X @ w
+        weight_norms = np.linalg.norm(weights, axis=0)
+        if np.any(np.isclose(weight_norms, 0.0)):
+            raise ValueError("Fearn method encountered a zero-norm weight vector.")
+        weights /= weight_norms
 
-        # Calculate the loadings p (Equation in between 2 and 3 in Fearn's paper)
-        p = X.T @ t / (t.T @ t)
+        # Calculate the scores T (Equation 2 in Fearn's paper)
+        scores = X @ weights
 
-        # Store the scores, weights and loadings
-        scores = t.reshape(-1, 1)
-        weights = w.reshape(-1, 1)
-        loadings = p.reshape(-1, 1)
-        n_iter = np.array([1])  # Fearn's method is non-iterative
+        score_gram = scores.T @ scores
+        if np.any(np.isclose(np.diag(score_gram), 0.0)):
+            raise ValueError("Fearn method encountered a zero-norm score vector.")
+
+        # Calculate the loadings P from the projected scores.
+        loadings = X.T @ scores @ pinv(score_gram)
 
         return scores, weights, loadings, n_iter
