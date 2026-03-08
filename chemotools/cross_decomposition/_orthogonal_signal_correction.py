@@ -29,6 +29,12 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         - 'sjoblom': Method by Sjöblom et al. (1998) [2]_
         - 'fearn': Method by Fearn (2000) [3]_
 
+    max_iter : int, default=500
+        Maximum number of iterations for the component calculation algorithms.
+
+    tol : float, default=1e-06
+        Tolerance for convergence in the iterative algorithms.
+
     copy : bool, default=True
         Whether to copy X and Y in fit before applying centering.
 
@@ -36,16 +42,25 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
     ----------
     mean_X_ : ndarray of shape (n_features,)
         The mean of the features in the training data.
+
     mean_y_ : float or ndarray of shape (n_targets,)
         The mean of the target variable(s) in the training data.
+
     scores_ : ndarray of shape (n_samples, n_components)
         The scores of the orthogonal components.
+
     weights_ : ndarray of shape (n_features, n_components)
         The weights of the orthogonal components.
+
     loadings_ : ndarray of shape (n_features, n_components)
         The loadings of the orthogonal components.
+
     projection_matrix_ : ndarray of shape (n_features, n_features)
         The projection matrix used to remove orthogonal variation from new data.
+
+    n_iter_ : ndarray of shape (n_components,)
+        The number of iterations taken for each component to converge.
+
 
     References
     ----------
@@ -138,6 +153,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             y=y,
             ensure_2d=True,
             reset=True,
+            copy=self.copy,
             dtype=np.float64,
             multi_output=True,
         )
@@ -156,8 +172,8 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             )
 
         if self.method == "sjoblom":
-            self.scores_, self.weights_, self.loadings_ = self._sjoblom_method(
-                X_centered, y_centered
+            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+                self._sjoblom_method(X_centered, y_centered)
             )
 
         # Calculate the projection matrix for transforming new data
@@ -165,7 +181,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         # self.projection_matrix_ = W @ pinv(P.T @ W) @ P.T
         return self
 
-    def transform(self, X: np.ndarray, y=None, copy: bool = True):
+    def transform(self, X: np.ndarray, y=None):
         """Apply dimensionality reduction to X.
 
         Projects X onto the latent components found during fitting.
@@ -177,9 +193,6 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         y : None
             Ignored to align with API.
-
-        copy : bool, default=True
-            Whether to copy X and Y, or perform in-place normalization.
 
         Returns
         -------
@@ -196,7 +209,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             y="no_validation",
             ensure_2d=True,
             reset=False,
-            copy=copy,
+            copy=self.copy,
             dtype=np.float64,
         )
 
@@ -209,7 +222,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     def _wold_method(
         self, X: np.ndarray, y: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate orthogonal components using Wold's method."""
         # Initialize variables
         Xk = X.copy()
@@ -222,11 +235,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         # Precompute the projection matrix part
         y_pinv = pinv(y)
-        n_iter = 0
 
         scores = np.zeros((n_samples, self.n_components))
         weights = np.zeros((n_features, self.n_components))
         loadings = np.zeros((n_features, self.n_components))
+        n_iter = np.zeros(self.n_components, dtype=int)
 
         for k in range(self.n_components):
             # Calculate the first singular vectors of Xk
@@ -238,8 +251,19 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
             for iteration in range(self.max_iter):
                 # Weight calculation (NIPALS step)
-                w = Xk.T @ t_star / (t_star.T @ t_star)
-                w /= np.linalg.norm(w)
+                t_star_norm_sq = t_star.T @ t_star
+                if np.isclose(t_star_norm_sq, 0.0):
+                    raise ValueError(
+                        "Wold method encountered a zero-norm orthogonal "
+                        "score vector."
+                    )
+                w = Xk.T @ t_star / t_star_norm_sq
+                w_norm = np.linalg.norm(w)
+                if np.isclose(w_norm, 0.0):
+                    raise ValueError(
+                        "Wold method encountered a zero-norm weight vector."
+                    )
+                w /= w_norm
 
                 # Recalculate the scores using w
                 t_new = Xk @ w
@@ -247,14 +271,29 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
                 # Vectorized convergence check
                 if (
-                    np.linalg.norm(t_new_star - t_star) / np.linalg.norm(t_star)
+                    np.linalg.norm(t_new_star - t_star)
+                    / max(np.linalg.norm(t_star), np.finfo(float).eps)
                     < self.tol
                 ):
+                    t_star = t_new_star
                     break
-
                 t_star = t_new_star
 
-            n_iter = max(n_iter, iteration + 1)
+            # Update w for the final iteration
+            t_star_norm_sq = t_star.T @ t_star
+            if np.isclose(t_star_norm_sq, 0.0):
+                raise ValueError(
+                    "Wold method encountered a zero-norm orthogonal "
+                    "score vector after convergence."
+                )
+            w = Xk.T @ t_star / t_star_norm_sq
+            w_norm = np.linalg.norm(w)
+            if np.isclose(w_norm, 0.0):
+                raise ValueError(
+                    "Wold method encountered a zero-norm weight vector "
+                    "after convergence."
+                )
+            w /= w_norm
 
             if iteration == self.max_iter - 1:
                 warnings.warn(
@@ -263,7 +302,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                 )
 
             # Calculate the loadings p
-            p = Xk.T @ t_star / (t_star.T @ t_star)
+            p = Xk.T @ t_star / t_star_norm_sq
 
             # Store the scores, weights and loadings
             scores[:, k] = t_star.flatten()
@@ -273,9 +312,14 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             # Deflate Xk by removing the contribution of the orthogonal component
             Xk -= np.outer(t_star, p)
 
+            # Update iteration count
+            n_iter[k] = iteration + 1
+
         return scores, weights, loadings, n_iter
 
-    def _sjoblom_method(self, X: np.ndarray, y: np.ndarray):
+    def _sjoblom_method(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate orthogonal components using Sjöblom's method."""
         # Initialize variables
         Xk = X.copy()
@@ -290,6 +334,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         scores = np.zeros((n_samples, self.n_components))
         weights = np.zeros((n_features, self.n_components))
         loadings = np.zeros((n_features, self.n_components))
+        n_iter = np.zeros(self.n_components, dtype=int)
 
         for k in range(self.n_components):
             # Calculate the first singular vectors of Xk
@@ -325,17 +370,29 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                 w /= w_norm
 
                 # Calculate t new from w (Equation 9 in Sjöblom et al.)
-                t_new_star = Xk @ w
+                t_new = Xk @ w
 
                 # Vectorized convergence check
                 if (
-                    np.linalg.norm(t_new_star - t_star)
-                    / max(np.linalg.norm(t_star), np.finfo(float).eps)
+                    np.linalg.norm(t_new - t)
+                    / max(np.linalg.norm(t), np.finfo(float).eps)
                     < self.tol
                 ):
                     break
 
-                t = t_new_star
+                t = t_new
+
+            # Update t_star for the final iteration
+            t_mean = np.mean(t)
+            t_centered = t - t_mean
+            t_star = t_centered - y @ (y_pinv @ t_centered) + t_mean
+
+            if iteration == self.max_iter - 1:
+                warnings.warn(
+                    f"Sjöblom method did not converge after {self.max_iter} "
+                    f"iterations.",
+                    ConvergenceWarning,
+                )
 
             # Calculate PLS regression between X and t_star (text after
             # Equation 9 in Sjöblom et al.). Treat t_star as a single-response
@@ -392,7 +449,10 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             # Deflate Xk by removing the contribution of the orthogonal component
             Xk -= np.outer(t_star_star, p_star)
 
-        return scores, weights, loadings
+            # Update iteration count
+            n_iter[k] = iteration + 1
+
+        return scores, weights, loadings, n_iter
 
     def _fearn_method(self, X: np.ndarray, y: np.ndarray):
         """Calculate orthogonal components using Fearn's method."""
