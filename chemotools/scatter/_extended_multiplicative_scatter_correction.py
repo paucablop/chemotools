@@ -65,15 +65,16 @@ class ExtendedMultiplicativeScatterCorrection(
     -----
     The model for each spectrum $x$ is:
 
-    $$
-    x = \sum_{i=0}^{order} c_i \lambda^i
-    + m \cdot x_{ref} + \sum g_j \cdot z_j + \epsilon
-    $$
+    .. math::
+        x = \sum_{i=0}^{order} c_i \lambda^i
+        + m \cdot x_{ref} + \sum g_j \cdot z_j + \epsilon
+
 
     The corrected spectrum is calculated by removing the polynomial baseline
     and the interferences, then normalizing by the scaling factor $m$:
 
-    $$x_{corr} = \frac{x - (\sum c_i \lambda^i + \sum g_j \cdot z_j)}{m}$$
+    .. math::
+        x_{corr} = \\frac{x - (\sum c_i \lambda^i + \sum g_j \cdot z_j)}{m}
 
     References
     ----------

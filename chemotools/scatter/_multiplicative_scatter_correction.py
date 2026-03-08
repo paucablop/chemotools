@@ -59,13 +59,15 @@ class MultiplicativeScatterCorrection(
     -----
     The correction follows the linear model:
 
-    $$x_{raw} = m \cdot x_{ref} + c + e$$
+    .. math::
+        x_{raw} = m \cdot x_{ref} + c + e
 
     where $x_{raw}$ is the observed spectrum, $x_{ref}$ is the reference
     spectrum, $m$ is the multiplicative scaling, and $c$ is the additive
     offset. The corrected spectrum is calculated as:
 
-    $$x_{corr} = \frac{x_{raw} - c}{m}$$
+    .. math::
+        x_{corr} = \\frac{x_{raw} - c}{m}
 
     References
     ----------
