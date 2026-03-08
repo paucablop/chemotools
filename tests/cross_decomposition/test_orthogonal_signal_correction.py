@@ -402,3 +402,16 @@ def test_fearn_raises_for_zero_norm_score_vector():
     # Act / Assert
     with pytest.raises(ValueError, match="zero-norm score vector"):
         transformer._fearn_method(X, y)
+
+
+def test_raises_error_for_invalid_method():
+    """Raise when an invalid method name is provided."""
+    # Arrange
+    X, y, _, _ = _make_osc_dataset()
+    transformer = OrthogonalSignalCorrection(method="invalid_method", n_components=1)
+
+    # Act / Assert
+    with pytest.raises(
+        ValueError, match="The 'method' parameter of OrthogonalSignalCorrection"
+    ):
+        transformer.fit(X, y)

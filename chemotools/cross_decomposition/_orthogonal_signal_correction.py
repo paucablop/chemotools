@@ -18,6 +18,7 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
     """
+    A transformer that removes variation in X that is orthogonal to the target y.
 
     Parameters
     ----------
@@ -222,7 +223,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         X_centered = X - self.mean_X_
         y_centered = y - self.mean_y_
 
-        # Call parent fit method
+        # Dispatch to the selected OSC method
         if self.method == "wold":
             self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
                 self._wold_method(X_centered, y_centered)
@@ -241,7 +242,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X: np.ndarray, y=None):
-        """Apply dimensionality reduction to X.
+        """Apply orthogonal signal correction to X.
 
         Projects X onto the latent components found during fitting.
 
@@ -255,7 +256,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
         Returns
         -------
-        X_transformed : ndarray of shape (n_samples, n_components)
+        X_transformed : ndarray of shape (n_samples, n_features)
             X transformed with removed orthogonal variation.
         """
         # Check that the estimator is fitted
@@ -336,6 +337,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                     t_star = t_new_star
                     break
                 t_star = t_new_star
+            else:
+                warnings.warn(
+                    f"Wold method did not converge after {self.max_iter} iterations.",
+                    ConvergenceWarning,
+                )
 
             # Update w for the final iteration
             t_star_norm_sq = t_star.T @ t_star
@@ -352,12 +358,6 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                     "after convergence."
                 )
             w /= w_norm
-
-            if iteration == self.max_iter - 1:
-                warnings.warn(
-                    f"Wold method did not converge after {self.max_iter} iterations.",
-                    ConvergenceWarning,
-                )
 
             # Calculate the loadings p
             p = Xk.T @ t_star / t_star_norm_sq
@@ -439,18 +439,17 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                     break
 
                 t = t_new
-
-            # Update t_star for the final iteration
-            t_mean = np.mean(t)
-            t_centered = t - t_mean
-            t_star = t_centered - y @ (y_pinv @ t_centered) + t_mean
-
-            if iteration == self.max_iter - 1:
+            else:
                 warnings.warn(
                     f"Sjöblom method did not converge after {self.max_iter} "
                     f"iterations.",
                     ConvergenceWarning,
                 )
+
+            # Update t_star for the final iteration
+            t_mean = np.mean(t)
+            t_centered = t - t_mean
+            t_star = t_centered - y @ (y_pinv @ t_centered) + t_mean
 
             # Calculate PLS regression between X and t_star (text after
             # Equation 9 in Sjöblom et al.). Treat t_star as a single-response

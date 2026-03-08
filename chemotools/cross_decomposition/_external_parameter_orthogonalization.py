@@ -14,7 +14,8 @@ from sklearn.utils.validation import check_array, check_is_fitted, validate_data
 
 
 class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
-    """Remove variation linked to external nuisance parameters.
+    """
+    A transformer that removes variation linked to external nuisance parameters.
 
     Parameters
     ----------
@@ -42,7 +43,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
 
     References
     ----------
-    .. [1] Jean-Michel Roger*, Fabien Chauchard, Ve ́ronique Bellon-Maurel (2003),
+    .. [1] Jean-Michel Roger, Fabien Chauchard, Veronique Bellon-Maurel (2003),
         EPO–PLS external parameter orthogonalisation of PLS application to
         temperature-independent measurement of sugar content of intact fruits,
         Chemometrics and Intelligent Laboratory Systems,
@@ -70,7 +71,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
     >>> sample_ids = np.array([0, 0, 1, 1, 2, 2])
     >>> epo = ExternalParameterOrthogonalization(n_components=1)
     >>> epo.fit(X, X_external=X_external, sample_ids=sample_ids)
-    ExternalParameterOrthogonalization()
+    ExternalParameterOrthogonalization(n_components=1)
 
     Notes
     -----
@@ -151,11 +152,6 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
         self : ExternalParameterOrthogonalization
             Fitted estimator storing the projection matrix in `P_epo_`.
 
-        Raises
-        ------
-        ValueError
-            If `X_external` is not provided.
-
         Notes
         -----
         The nuisance variation matrix $D$ is constructed as either centered
@@ -164,6 +160,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
         directions, and the projection matrix is then defined as
         $P = I - VV^T$.
         """
+        self._validate_params()
         # 1. Check that X is a 2D array and has only finite values
         X = validate_data(self, X, dtype=np.float64)
         self.mean_X_ = np.mean(X, axis=0)

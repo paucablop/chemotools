@@ -1,4 +1,4 @@
-"""Tests for enhanced PLSRegression with automatic variance calculation."""
+"""Tests for the chemotools.models backward-compatibility layer."""
 
 import importlib
 import sys
