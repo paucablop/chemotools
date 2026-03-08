@@ -254,8 +254,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                 t_star_norm_sq = t_star.T @ t_star
                 if np.isclose(t_star_norm_sq, 0.0):
                     raise ValueError(
-                        "Wold method encountered a zero-norm orthogonal "
-                        "score vector."
+                        "Wold method encountered a zero-norm orthogonal score vector."
                     )
                 w = Xk.T @ t_star / t_star_norm_sq
                 w_norm = np.linalg.norm(w)
