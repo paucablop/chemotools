@@ -180,6 +180,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                 self._sjoblom_method(X_centered, y_centered)
             )
 
+        if self.method == "fearn":
+            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+                self._fearn_method(X_centered, y_centered)
+            )
+
         return self
 
     def transform(self, X: np.ndarray, y=None):
@@ -428,5 +433,33 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     def _fearn_method(self, X: np.ndarray, y: np.ndarray):
         """Calculate orthogonal components using Fearn's method."""
-        # Placeholder for Fearn's method implementation
-        pass
+        # Initialize variables
+        X = X.copy()
+        y = np.asarray(y)
+
+        y = y.reshape(-1, 1) if y.ndim == 1 else y
+
+        # Calculate the residual matrix M (Equation -2 in Fearn's pape r [3])
+        Id = np.eye(X.shape[1])
+        M = Id - X.T @ y @ pinv(y.T @ X @ X.T @ y) @ y.T @ X
+
+        # Calculate the matrix Z (Equation -1 in Fearn's paper [3])
+        Z = X @ M
+
+        # Calculate the first singular vectors of Z (Equation 1 in Fearn's paper)
+        _, S, Vt = svd(Z, full_matrices=False)
+        w = Vt.T[:, self.n_components - 1]
+
+        # Calculate the scores t (Equation 2 in Fearn's paper)
+        t = X @ w
+
+        # Calculate the loadings p (Equation in between 2 and 3 in Fearn's paper)
+        p = X.T @ t / (t.T @ t)
+
+        # Store the scores, weights and loadings
+        scores = t.reshape(-1, 1)
+        weights = w.reshape(-1, 1)
+        loadings = p.reshape(-1, 1)
+        n_iter = np.array([1])  # Fearn's method is non-iterative
+
+        return scores, weights, loadings, n_iter
