@@ -6,13 +6,23 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.cross_decomposition import OrthogonalSignalCorrection
 
-
 # Test compliance with scikit-learn
+
+
 def test_compliance_osc():
     # Arrange
     transformer = OrthogonalSignalCorrection()
+
     # Act & Assert
-    check_estimator(transformer)
+    # n_iter_ is per-component (array), but sklearn's check_transformer_n_iter
+    # only handles this for its own hardcoded CROSS_DECOMPOSITION list.
+    check_estimator(
+        transformer,
+        expected_failed_checks={
+            "check_transformer_n_iter": "n_iter_ is stored per component (array) "
+            "instead of scalar"
+        },
+    )
 
 
 @pytest.mark.parametrize(

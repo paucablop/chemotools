@@ -55,9 +55,6 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
     loadings_ : ndarray of shape (n_features, n_components)
         The loadings of the orthogonal components.
 
-    projection_matrix_ : ndarray of shape (n_features, n_features)
-        The projection matrix used to remove orthogonal variation from new data.
-
     n_iter_ : ndarray of shape (n_components,)
         The number of iterations taken for each component to converge.
 
@@ -159,6 +156,13 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         )
         y = np.asarray(y, dtype=np.float64)
 
+        n_samples = X.shape[0]
+        if n_samples < 2:
+            raise ValueError(
+                "n_samples=1 is not enough for orthogonal signal correction. "
+                "At least 2 samples are required."
+            )
+
         # Center the data
         self.mean_X_ = np.mean(X, axis=0)
         self.mean_y_ = np.mean(y, axis=0) if y.ndim == 2 else np.mean(y)
@@ -176,9 +180,6 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
                 self._sjoblom_method(X_centered, y_centered)
             )
 
-        # Calculate the projection matrix for transforming new data
-        # W, P = self.weights_, self.loadings_
-        # self.projection_matrix_ = W @ pinv(P.T @ W) @ P.T
         return self
 
     def transform(self, X: np.ndarray, y=None):
@@ -397,36 +398,8 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             # Equation 9 in Sjöblom et al.). Treat t_star as a single-response
             # column vector to keep the SVD shapes explicit.
             # Calculate first singular vectors of X.T @ t_star
-            t_star_column = t_star[:, np.newaxis]
-            C = Xk.T @ t_star_column
-            U, _, Vt = svd(C, full_matrices=False)
-
-            # Calculate the x weights
-            x_weights = U[:, 0]
-
-            # Calculate the y weights
-            y_weights = Vt.T[:, 0]
-
-            # Calculate the regression vector
-            x_rotations_ = np.dot(
-                x_weights[:, np.newaxis],
-                pinv(
-                    np.dot(x_weights[np.newaxis, :], x_weights[:, np.newaxis]),
-                    check_finite=False,
-                ),
-            )
-            y_rotations_ = np.dot(
-                y_weights[:, np.newaxis],
-                pinv(
-                    np.dot(y_weights[np.newaxis, :], y_weights[:, np.newaxis]),
-                    check_finite=False,
-                ),
-            )
-
-            coef = np.dot(x_rotations_, y_rotations_.T).ravel()
-
-            # The new weights are the regression vector (Equation 10 in Sjöblom et al.)
-            w_star = coef
+            w_star = Xk.T @ t_star
+            w_star /= np.linalg.norm(w_star)  # Normalize w_star to unit length
 
             # Calculate the scores t_star_star using the new weights (Equation
             # 11 in Sjöblom et al.)
