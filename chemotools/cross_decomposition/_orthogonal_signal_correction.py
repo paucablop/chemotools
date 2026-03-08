@@ -132,7 +132,15 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         """
         # Check that X is a 2D array and has only finite values
         self._validate_params()
-        X, y = validate_data(self, X, y=y, ensure_2d=True, reset=True, dtype=np.float64)
+        X, y = validate_data(
+            self,
+            X,
+            y=y,
+            ensure_2d=True,
+            reset=True,
+            dtype=np.float64,
+            multi_output=True,
+        )
         y = np.asarray(y, dtype=np.float64)
 
         # Center the data
@@ -145,6 +153,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         if self.method == "wold":
             self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
                 self._wold_method(X_centered, y_centered)
+            )
+
+        if self.method == "sjoblom":
+            self.scores_, self.weights_, self.loadings_ = self._sjoblom_method(
+                X_centered, y_centered
             )
 
         # Calculate the projection matrix for transforming new data
@@ -198,23 +211,22 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         self, X: np.ndarray, y: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, int]:
         """Calculate orthogonal components using Wold's method."""
-        # Calculate the first singular vectors of X
+        # Initialize variables
         Xk = X.copy()
         y = np.asarray(y)
 
-        if y.ndim == 1:
-            y = y.reshape(-1, 1)
+        y = y.reshape(-1, 1) if y.ndim == 1 else y
 
         # Get the features and components
         n_samples, n_features = X.shape
 
         # Precompute the projection matrix part
         y_pinv = pinv(y)
-        n_iter_ = 0
+        n_iter = 0
 
-        scores_ = np.zeros((n_samples, self.n_components))
-        weights_ = np.zeros((n_features, self.n_components))
-        loadings_ = np.zeros((n_features, self.n_components))
+        scores = np.zeros((n_samples, self.n_components))
+        weights = np.zeros((n_features, self.n_components))
+        loadings = np.zeros((n_features, self.n_components))
 
         for k in range(self.n_components):
             # Calculate the first singular vectors of Xk
@@ -242,7 +254,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
                 t_star = t_new_star
 
-            n_iter_ = max(n_iter_, iteration + 1)
+            n_iter = max(n_iter, iteration + 1)
 
             if iteration == self.max_iter - 1:
                 warnings.warn(
@@ -254,19 +266,133 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             p = Xk.T @ t_star / (t_star.T @ t_star)
 
             # Store the scores, weights and loadings
-            scores_[:, k] = t_star.flatten()
-            weights_[:, k] = w.flatten()
-            loadings_[:, k] = p.flatten()
+            scores[:, k] = t_star.flatten()
+            weights[:, k] = w.flatten()
+            loadings[:, k] = p.flatten()
 
             # Deflate Xk by removing the contribution of the orthogonal component
             Xk -= np.outer(t_star, p)
 
-        return scores_, weights_, loadings_, n_iter_
+        return scores, weights, loadings, n_iter
 
     def _sjoblom_method(self, X: np.ndarray, y: np.ndarray):
         """Calculate orthogonal components using Sjöblom's method."""
-        # Placeholder for Sjöblom's method implementation
-        pass
+        # Initialize variables
+        Xk = X.copy()
+        y = np.asarray(y)
+
+        y = y.reshape(-1, 1) if y.ndim == 1 else y
+        y_pinv = pinv(y)
+
+        # Get the features and components
+        n_samples, n_features = X.shape
+
+        scores = np.zeros((n_samples, self.n_components))
+        weights = np.zeros((n_features, self.n_components))
+        loadings = np.zeros((n_features, self.n_components))
+
+        for k in range(self.n_components):
+            # Calculate the first singular vectors of Xk
+            _, _, Vt = svd(Xk, full_matrices=False)
+            t = Xk @ Vt.T[:, 0]
+
+            for iteration in range(self.max_iter):
+                # Center the scores (Equation 4 in Sjöblom et al.)
+                t_mean = np.mean(t)
+                t_centered = t - t_mean
+
+                # Orthogonalize with respect to y (Equations 5 and 6 in Sjöblom
+                # et al.). Keep the score vector as a 1D array of shape
+                # (n_samples,) throughout the iteration.
+                t_star = t_centered - y @ (y_pinv @ t_centered) + t_mean
+
+                # Calculate loading vector w and scale (Equations 7 and 8 in
+                # Sjöblom et al.). This keeps w in feature space with shape
+                # (n_features,).
+                t_star_norm_sq = t_star @ t_star
+                if np.isclose(t_star_norm_sq, 0.0):
+                    raise ValueError(
+                        "Sjöblom method encountered a zero-norm orthogonal "
+                        "score vector."
+                    )
+
+                w = Xk.T @ t_star / t_star_norm_sq
+                w_norm = np.linalg.norm(w)
+                if np.isclose(w_norm, 0.0):
+                    raise ValueError(
+                        "Sjöblom method encountered a zero-norm weight vector."
+                    )
+                w /= w_norm
+
+                # Calculate t new from w (Equation 9 in Sjöblom et al.)
+                t_new_star = Xk @ w
+
+                # Vectorized convergence check
+                if (
+                    np.linalg.norm(t_new_star - t_star)
+                    / max(np.linalg.norm(t_star), np.finfo(float).eps)
+                    < self.tol
+                ):
+                    break
+
+                t = t_new_star
+
+            # Calculate PLS regression between X and t_star (text after
+            # Equation 9 in Sjöblom et al.). Treat t_star as a single-response
+            # column vector to keep the SVD shapes explicit.
+            # Calculate first singular vectors of X.T @ t_star
+            t_star_column = t_star[:, np.newaxis]
+            C = Xk.T @ t_star_column
+            U, _, Vt = svd(C, full_matrices=False)
+
+            # Calculate the x weights
+            x_weights = U[:, 0]
+
+            # Calculate the y weights
+            y_weights = Vt.T[:, 0]
+
+            # Calculate the regression vector
+            x_rotations_ = np.dot(
+                x_weights[:, np.newaxis],
+                pinv(
+                    np.dot(x_weights[np.newaxis, :], x_weights[:, np.newaxis]),
+                    check_finite=False,
+                ),
+            )
+            y_rotations_ = np.dot(
+                y_weights[:, np.newaxis],
+                pinv(
+                    np.dot(y_weights[np.newaxis, :], y_weights[:, np.newaxis]),
+                    check_finite=False,
+                ),
+            )
+
+            coef = np.dot(x_rotations_, y_rotations_.T).ravel()
+
+            # The new weights are the regression vector (Equation 10 in Sjöblom et al.)
+            w_star = coef
+
+            # Calculate the scores t_star_star using the new weights (Equation
+            # 11 in Sjöblom et al.)
+            t_star_star = Xk @ w_star
+
+            # Calculate the x loadings p_star (Equation 12 in Sjöblom et al.)
+            t_star_star_norm_sq = t_star_star @ t_star_star
+            if np.isclose(t_star_star_norm_sq, 0.0):
+                raise ValueError(
+                    "Sjöblom method encountered a zero-norm final score vector."
+                )
+            p_star = Xk.T @ t_star_star / t_star_star_norm_sq
+
+            # Store the scores, weights and loadings
+            scores[:, k] = t_star_star.flatten()
+            weights[:, k] = w_star.flatten()
+            loadings[:, k] = p_star.flatten()
+
+            # Deflate Xk by removing the contribution of the orthogonal component
+            Xk -= np.outer(t_star_star, p_star)
+
+        return scores, weights, loadings
 
     def _fearn_method(self, X: np.ndarray, y: np.ndarray):
         """Calculate orthogonal components using Fearn's method."""
