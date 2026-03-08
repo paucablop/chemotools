@@ -169,7 +169,10 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
         self.mean_X_ = np.mean(X, axis=0)
 
         if X_external is None:
-            raise ValueError("X_external is required to define the nuisance subspace.")
+            # No nuisance subspace: identity projection (no correction)
+            self.P_epo_ = np.eye(X.shape[1])
+            self.n_features_in_ = X.shape[1]
+            return self
 
         X_ext = check_array(X_external, dtype=np.float64)
 
