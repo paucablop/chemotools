@@ -4,53 +4,40 @@ implements the External Parameter Orthogonalization (EPO) technique for preproce
 spectral data by removing variations orthogonal to the external parameters.
 """
 
-from numbers import Integral, Real
-from typing import Literal
+from numbers import Integral
+from typing import Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._param_validation import Interval, StrOptions
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_array, check_is_fitted, validate_data
 
 
 class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
-    """
+    """Remove variation linked to external nuisance parameters.
 
     Parameters
     ----------
     n_components : int, default=2
         Number of orthogonal components to remove. Must be a positive integer.
 
-
-
-    max_iter : int, default=500
-        Maximum number of iterations for the component calculation algorithms.
-
-    tol : float, default=1e-06
-        Tolerance for convergence in the iterative algorithms.
-
     copy : bool, default=True
-        Whether to copy X and Y in fit before applying centering.
+        Placeholder argument kept for API compatibility with scikit-learn style
+        estimators. Input validation currently relies on the default behavior of
+        the underlying validation utilities.
 
     Attributes
     ----------
     mean_X_ : ndarray of shape (n_features,)
-        The mean of the features in the training data.
+        Mean spectrum computed from the calibration data passed to `fit()`.
 
-    mean_y_ : float or ndarray of shape (n_targets,)
-        The mean of the target variable(s) in the training data.
+    P_epo_ : ndarray of shape (n_features, n_features)
+        Orthogonal projection matrix used to suppress nuisance variation.
+        Applying `X_centered @ P_epo_` removes the subspace spanned by the first
+        `n_components` singular vectors of the external variation matrix.
 
-    scores_ : ndarray of shape (n_samples, n_components)
-        The scores of the orthogonal components.
-
-    weights_ : ndarray of shape (n_features, n_components)
-        The weights of the orthogonal components.
-
-    loadings_ : ndarray of shape (n_features, n_components)
-        The loadings of the orthogonal components.
-
-    n_iter_ : ndarray of shape (n_components,)
-        The number of iterations taken for each component to converge.
+    n_features_in_ : int
+        Number of features seen during `fit()`.
 
 
     References
@@ -64,32 +51,58 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    **Basic usage with automatic variance calculation**
     >>> import numpy as np
+    >>> from chemotools.cross_decomposition import (
+    ...     ExternalParameterOrthogonalization,
+    ... )
+    >>> rng = np.random.default_rng(0)
+    >>> X = rng.normal(size=(6, 4))
+    >>> X_external = X + 0.2 * rng.normal(size=(6, 4))
+    >>> epo = ExternalParameterOrthogonalization(n_components=1)
+    >>> X_epo = epo.fit_transform(X, X_external=X_external)
+    >>> X_epo.shape
+    (6, 4)
+
+    Repeated measurements of the same physical sample can be grouped through
+    `sample_ids` so that the nuisance subspace is estimated from within-sample
+    differences only.
+
+    >>> sample_ids = np.array([0, 0, 1, 1, 2, 2])
+    >>> epo = ExternalParameterOrthogonalization(n_components=1)
+    >>> epo.fit(X, X_external=X_external, sample_ids=sample_ids)
+    ExternalParameterOrthogonalization()
 
     Notes
     -----
+    EPO is commonly used when spectral measurements are affected by known
+    nuisance sources such as temperature, instrument transfer, humidity, or
+    acquisition conditions. The nuisance structure is estimated from
+    `X_external`, then projected out from `X`.
+
+    If `sample_ids` are provided, the difference matrix is built from deviations
+    around the mean spectrum of each repeated sample. This isolates variation due
+    to the external condition while suppressing the underlying chemical signal.
+
+    The transformer preserves the original number of features. It performs signal
+    correction, not dimensionality reduction.
 
 
     See Also
     --------
+    chemotools.cross_decomposition.OrthogonalSignalCorrection : Remove variation
+        orthogonal to a supervised target.
+    sklearn.pipeline.make_pipeline : Compose EPO with downstream estimators.
 
     """
 
     _parameter_constraints: dict = {
         "n_components": [Interval(Integral, 1, None, closed="left")],
-        "method": [StrOptions({"wold", "sjoblom", "fearn"})],
-        "max_iter": [Interval(Integral, 1, None, closed="left")],
-        "tol": [Interval(Real, 0, None, closed="left")],
         "copy": ["boolean"],
     }
 
     def __init__(
         self,
         n_components: int = 2,
-        method: Literal["wold", "sjoblom", "fearn"] = "wold",
-        max_iter: int = 500,
-        tol: float = 1e-06,
         copy: bool = True,
     ):
         """Initialize the External Parameter Orthogonalization (EPO) transformer.
@@ -102,50 +115,153 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
             Whether to copy X and Y in fit before applying centering.
         """
         self.n_components = n_components
-        self.method = method
-        self.max_iter = max_iter
-        self.tol = tol
         self.copy = copy
 
+    def fit(
+        self,
+        X: np.ndarray,
+        y=None,
+        X_external: Optional[np.ndarray] = None,
+        sample_ids: Optional[np.ndarray] = None,
+    ):
+        """Fit the EPO projection from calibration and nuisance spectra.
 
-def fit(
-    self, X: np.ndarray, y: np.ndarray, X_external: np.ndarray
-) -> "ExternalParameterOrthogonalization":
-    self._validate_params()
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Calibration spectra that will later be corrected by the learned EPO
+            projection.
 
-    # Validate X and X_external
-    X, y = validate_data(
-        self, X, y, ensure_2d=True, copy=self.copy, dtype=np.float64, multi_output=True
-    )
-    X_ext = validate_data(
-        self, X_external, ensure_2d=True, copy=False, dtype=np.float64
-    )
+        y : None, default=None
+            Ignored. Present for scikit-learn API compatibility.
 
-    if X_ext.shape[1] != X.shape[1]:
-        raise ValueError("X_external must have the same number of features as X.")
+        X_external : array-like of shape (n_samples, n_features)
+            Spectra describing the nuisance variation to remove. These may be the
+            same samples measured under perturbed external conditions, transfer
+            standards, or any dataset representative of the unwanted subspace.
 
-    # 1. Center the external variation matrix
-    # Note: Roger et al. often use SVD on the raw difference matrix D,
-    # but centering is fine if X_external represents the variation.
-    self.mean_X_ = np.mean(X, axis=0)
-    X_ext_centered = X_ext - np.mean(X_ext, axis=0)
+        sample_ids : array-like of shape (n_samples,), default=None
+            Optional identifiers linking repeated measurements of the same sample.
+            When provided, the nuisance difference matrix is computed within each
+            sample group, which helps isolate external variation from chemical
+            differences between samples.
 
-    # 2. SVD to find the nuisance subspace
-    _, _, Vt = np.linalg.svd(X_ext_centered, full_matrices=False)
+        Returns
+        -------
+        self : ExternalParameterOrthogonalization
+            Fitted estimator storing the projection matrix in `P_epo_`.
 
-    # 3. V contains the principal directions of the nuisance variation
-    V = Vt[: self.n_components, :].T
+        Raises
+        ------
+        ValueError
+            If `X_external` is not provided.
 
-    # 4. P = I - V(V^T V)^-1 V^T. Since V is orthonormal from SVD, V^T V = I
-    identity = np.eye(X.shape[1])
-    self.P_epo_ = identity - (V @ V.T)
+        Notes
+        -----
+        The nuisance variation matrix $D$ is constructed as either centered
+        `X_external` or within-group deviations when `sample_ids` are available.
+        A singular value decomposition of $D$ yields the dominant nuisance
+        directions, and the projection matrix is then defined as
+        $P = I - VV^T$.
+        """
+        # 1. Check that X is a 2D array and has only finite values
+        X = validate_data(self, X, dtype=np.float64)
+        self.mean_X_ = np.mean(X, axis=0)
 
-    return self
+        if X_external is None:
+            raise ValueError("X_external is required to define the nuisance subspace.")
 
+        X_ext = check_array(X_external, dtype=np.float64)
 
-def transform(self, X: np.ndarray):
-    check_is_fitted(self)
-    X = validate_data(self, X, reset=False)
+        # 2. Construct the Variation Matrix D
+        if sample_ids is not None:
+            # Case A: labels are available, isolate within-sample variation
+            D = self._build_difference_matrix(X_ext, sample_ids)
+        else:
+            # Case B: No labels. treat the whole X_ext cloud as the noise
+            # distribution.
+            # Centering identifies the 'directions of maximum interference'.
+            D = X_ext - np.mean(X_ext, axis=0)
 
-    # Correct Mathematical Projection: (X - mu) @ P
-    return (X - self.mean_X_) @ self.P_epo_
+        # 3. SVD on the Variation Matrix
+        # We perform SVD on D to find the loadings (Vt) of the nuisance.
+        _, _, Vt = np.linalg.svd(D, full_matrices=False)
+
+        # 4. Define the projection operator
+        # V are the first k components that span the 'bad' subspace
+        V = Vt[: self.n_components, :].T
+
+        # P = I - V * V^T
+        self.P_epo_ = np.eye(X.shape[1]) - (V @ V.T)
+
+        self.n_features_in_ = X.shape[1]
+        return self
+
+    def transform(self, X: np.ndarray):
+        """Project spectra onto the subspace orthogonal to nuisance variation.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Spectra to correct.
+
+        Returns
+        -------
+        ndarray of shape (n_samples, n_features)
+            Corrected spectra after centering with `mean_X_` and projection with
+            `P_epo_`.
+        """
+        check_is_fitted(self)
+        X = validate_data(self, X, reset=False)
+
+        # 1. Center the new data using the TRAINING mean
+        X_centered = X - self.mean_X_
+
+        # 2. Project into the orthogonal space
+        # X_corr = (X - mu) @ (I - VV^T)
+        return X_centered @ self.P_epo_
+
+    def _build_difference_matrix(
+        self, X_ext: np.ndarray, sample_ids: np.ndarray
+    ) -> np.ndarray:
+        """Build the nuisance variation matrix from grouped repeated spectra.
+
+        Parameters
+        ----------
+        X_ext : array-like of shape (n_samples, n_features)
+            External-condition spectra used to characterize nuisance variation.
+
+        sample_ids : array-like of shape (n_samples,)
+            Group labels identifying repeated measurements of the same sample.
+
+        Returns
+        -------
+        ndarray of shape (n_effective_samples, n_features)
+            Difference matrix containing centered within-sample deviations. Rows
+            corresponding to singleton groups are removed because they do not
+            contribute to within-sample variation.
+        """
+        X_ext = check_array(X_ext)
+        sample_ids = np.asarray(sample_ids)
+
+        # D will store the 'within-sample' variation
+        D = np.zeros_like(X_ext)
+
+        unique_ids = np.unique(sample_ids)
+        for s_id in unique_ids:
+            # Find all measurements of this specific sample
+            mask = sample_ids == s_id
+            X_sample = X_ext[mask]
+
+            if X_sample.shape[0] < 2:
+                # We need at least two measurements to see 'variation'
+                continue
+
+            # Subtract the sample's own mean from its measurements
+            # This cancels out the chemical signal (the sample's identity)
+            # leaving only the variation (Temperature, Humidity, etc.)
+            D[mask] = X_sample - np.mean(X_sample, axis=0)
+
+        # Remove rows that didn't have pairs (all zeros)
+        D = D[~np.all(D == 0, axis=1)]
+        return D

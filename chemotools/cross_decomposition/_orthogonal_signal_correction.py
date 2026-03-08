@@ -142,8 +142,8 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     See Also
     --------
-        chemotools.cross_decomposition.PLSRegression : Partial least-squares
-                regression estimator for supervised modelling.
+        chemotools.cross_decomposition.ExternalParameterOrthogonalization : Remove
+            variation linked to external nuisance parameters.
         sklearn.pipeline.make_pipeline : Build preprocessing and modelling pipelines.
 
     """
