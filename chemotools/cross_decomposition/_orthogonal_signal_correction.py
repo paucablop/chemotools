@@ -23,6 +23,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
     ----------
     n_components : int, default=2
         Number of orthogonal components to remove. Must be a positive integer.
+
     method : {'wold', 'sjoblom', 'fearn'}, default='wold'
         Method for calculating orthogonal components:
         - 'wold': Original method by Wold et al. (1998) [1]_
@@ -83,15 +84,67 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    **Basic usage with automatic variance calculation**
+        Fit and apply OSC to remove variation in `X` that is orthogonal to `y`.
+
     >>> import numpy as np
+        >>> from chemotools.cross_decomposition import OrthogonalSignalCorrection
+        >>> rng = np.random.default_rng(0)
+        >>> X = rng.normal(size=(8, 5))
+        >>> y = np.linspace(0, 1, 8)
+        >>> osc = OrthogonalSignalCorrection(n_components=1, method="wold")
+        >>> X_osc = osc.fit_transform(X, y)
+        >>> X_osc.shape
+        (8, 5)
+
+        Multivariate targets are also supported.
+
+        >>> y_multi = np.column_stack([y, y**2])
+        >>> osc = OrthogonalSignalCorrection(n_components=2, method="fearn")
+        >>> osc.fit(X, y_multi)
+        OrthogonalSignalCorrection(method='fearn')
+
+        The transformer can be used inside a scikit-learn pipeline.
+
+        >>> from sklearn.pipeline import make_pipeline
+        >>> from sklearn.cross_decomposition import PLSRegression
+        >>> pipe = make_pipeline(
+        ...     OrthogonalSignalCorrection(n_components=1, method="sjoblom"),
+        ...     PLSRegression(n_components=2),
+        ... )
+        >>> pipe.fit(X, y)
+        Pipeline(steps=[('orthogonalsignalcorrection',
+                         OrthogonalSignalCorrection(
+                             method='sjoblom', n_components=1
+                         )),
+                                        ('plsregression', PLSRegression())])
 
     Notes
     -----
+        OSC is a supervised preprocessing method: it removes components from `X`
+        that are orthogonal to the provided target `y`. Because of this, the target
+        used during `fit()` must be representative of the calibration problem.
+
+        The transformed data keep the same shape as the input data. This estimator
+        is therefore intended for signal correction rather than classical dimension
+        reduction.
+
+        The available methods differ in how orthogonal components are estimated:
+
+        - `wold` and `sjoblom` use iterative updates and may emit
+            `ConvergenceWarning` if `max_iter` is reached before convergence.
+        - `fearn` uses a direct SVD-based formulation and does not require an
+            iterative loop.
+
+        In practice, a small number of components is usually preferred. Removing too
+        many orthogonal components may discard structured variation that is still
+        useful for the downstream model.
 
 
     See Also
     --------
+        chemotools.cross_decomposition.PLSRegression : Partial least-squares
+                regression estimator for supervised modelling.
+        sklearn.pipeline.make_pipeline : Build preprocessing and modelling pipelines.
 
     """
 
