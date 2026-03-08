@@ -88,36 +88,36 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         Fit and apply OSC to remove variation in `X` that is orthogonal to `y`.
 
     >>> import numpy as np
-        >>> from chemotools.cross_decomposition import OrthogonalSignalCorrection
-        >>> rng = np.random.default_rng(0)
-        >>> X = rng.normal(size=(8, 5))
-        >>> y = np.linspace(0, 1, 8)
-        >>> osc = OrthogonalSignalCorrection(n_components=1, method="wold")
-        >>> X_osc = osc.fit_transform(X, y)
-        >>> X_osc.shape
-        (8, 5)
+    >>> from chemotools.cross_decomposition import OrthogonalSignalCorrection
+    >>> rng = np.random.default_rng(0)
+    >>> X = rng.normal(size=(8, 5))
+    >>> y = np.linspace(0, 1, 8)
+    >>> osc = OrthogonalSignalCorrection(n_components=1, method="wold")
+    >>> X_osc = osc.fit_transform(X, y)
+    >>> X_osc.shape
+    (8, 5)
 
-        Multivariate targets are also supported.
+    Multivariate targets are also supported.
 
-        >>> y_multi = np.column_stack([y, y**2])
-        >>> osc = OrthogonalSignalCorrection(n_components=2, method="fearn")
-        >>> osc.fit(X, y_multi)
-        OrthogonalSignalCorrection(method='fearn')
+    >>> y_multi = np.column_stack([y, y**2])
+    >>> osc = OrthogonalSignalCorrection(n_components=2, method="fearn")
+    >>> osc.fit(X, y_multi)
+    OrthogonalSignalCorrection(method='fearn')
 
-        The transformer can be used inside a scikit-learn pipeline.
+    The transformer can be used inside a scikit-learn pipeline.
 
-        >>> from sklearn.pipeline import make_pipeline
-        >>> from sklearn.cross_decomposition import PLSRegression
-        >>> pipe = make_pipeline(
-        ...     OrthogonalSignalCorrection(n_components=1, method="sjoblom"),
-        ...     PLSRegression(n_components=2),
-        ... )
-        >>> pipe.fit(X, y)
-        Pipeline(steps=[('orthogonalsignalcorrection',
-                         OrthogonalSignalCorrection(
-                             method='sjoblom', n_components=1
-                         )),
-                                        ('plsregression', PLSRegression())])
+    >>> from sklearn.pipeline import make_pipeline
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> pipe = make_pipeline(
+    ...     OrthogonalSignalCorrection(n_components=1, method="sjoblom"),
+    ...     PLSRegression(n_components=2),
+    ... )
+    >>> pipe.fit(X, y)
+    Pipeline(steps=[('orthogonalsignalcorrection',
+                     OrthogonalSignalCorrection(
+                         method='sjoblom', n_components=1
+                     )),
+                    ('plsregression', PLSRegression())])
 
     Notes
     -----
