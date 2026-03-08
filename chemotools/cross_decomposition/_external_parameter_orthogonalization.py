@@ -219,49 +219,37 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
 
         # 2. Project into the orthogonal space
         # X_corr = (X - mu) @ (I - VV^T)
-        return X_centered @ self.P_epo_
+        return X_centered @ self.P_epo_ + self.mean_X_
 
     def _build_difference_matrix(
         self, X_ext: np.ndarray, sample_ids: np.ndarray
     ) -> np.ndarray:
-        """Build the nuisance variation matrix from grouped repeated spectra.
-
-        Parameters
-        ----------
-        X_ext : array-like of shape (n_samples, n_features)
-            External-condition spectra used to characterize nuisance variation.
-
-        sample_ids : array-like of shape (n_samples,)
-            Group labels identifying repeated measurements of the same sample.
-
-        Returns
-        -------
-        ndarray of shape (n_effective_samples, n_features)
-            Difference matrix containing centered within-sample deviations. Rows
-            corresponding to singleton groups are removed because they do not
-            contribute to within-sample variation.
-        """
-        X_ext = check_array(X_ext)
+        """Build the nuisance variation matrix."""
+        X_ext = check_array(X_ext, dtype=np.float64)
         sample_ids = np.asarray(sample_ids)
 
-        # D will store the 'within-sample' variation
-        D = np.zeros_like(X_ext)
+        # 1. Map each unique sample ID to a contiguous integer index (0, 1, 2...)
+        # inverse_indices has the same shape as sample_ids
+        unique_ids, inverse_indices = np.unique(sample_ids, return_inverse=True)
 
-        unique_ids = np.unique(sample_ids)
-        for s_id in unique_ids:
-            # Find all measurements of this specific sample
-            mask = sample_ids == s_id
-            X_sample = X_ext[mask]
+        # 2. Count the number of replicates per sample ID
+        counts = np.bincount(inverse_indices)
 
-            if X_sample.shape[0] < 2:
-                # We need at least two measurements to see 'variation'
-                continue
+        # 3. Sum the spectra for each unique sample ID
+        group_sums = np.zeros((len(unique_ids), X_ext.shape[1]), dtype=X_ext.dtype)
+        np.add.at(group_sums, inverse_indices, X_ext)
 
-            # Subtract the sample's own mean from its measurements
-            # This cancels out the chemical signal (the sample's identity)
-            # leaving only the variation (Temperature, Humidity, etc.)
-            D[mask] = X_sample - np.mean(X_sample, axis=0)
+        # 4. Calculate the mean spectrum for each group
+        # Adding a small epsilon prevents division by zero if a group is empty
+        # though np.unique guarantees no empty groups here.
+        group_means = group_sums / counts[:, np.newaxis]
 
-        # Remove rows that didn't have pairs (all zeros)
-        D = D[~np.all(D == 0, axis=1)]
-        return D
+        # 5. Broadcast the group means back to the original X_ext shape and subtract
+        # This is the mathematical equivalent of: D_i = X_i - mean(X_group)
+        D = X_ext - group_means[inverse_indices]
+
+        # 6. Filter out singleton groups (where count < 2)
+        # We broadcast the counts array back to the original shape to create a mask
+        valid_mask = counts[inverse_indices] >= 2
+        
+        return D[valid_mask]
