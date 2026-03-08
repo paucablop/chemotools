@@ -251,5 +251,5 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
         # 6. Filter out singleton groups (where count < 2)
         # We broadcast the counts array back to the original shape to create a mask
         valid_mask = counts[inverse_indices] >= 2
-        
+
         return D[valid_mask]
