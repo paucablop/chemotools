@@ -6,8 +6,8 @@ Preprocess your data to remove noise and enhance the chemical information contai
     :maxdepth: 3
     :caption: API Modules
 
-
     baseline
+    cross_decomposition
     derivative
     scale
     scatter
