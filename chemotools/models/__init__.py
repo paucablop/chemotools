@@ -3,8 +3,9 @@
 import warnings
 
 from chemotools.models._cross_decomposition import PLSRegression
+from ._principal_component_regression import PrincipalComponentRegression
 
-__all__ = ["PLSRegression"]
+__all__ = ["PLSRegression", "PrincipalComponentRegression"]
 
 # Show deprecation notice on module import
 warnings.warn(
