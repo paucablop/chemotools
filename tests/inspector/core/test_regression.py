@@ -20,6 +20,10 @@ class _CountingModel:
 
 
 class _DummyInspectorBase:
+    model: object
+    confidence: float
+    estimator: object
+
     def __init__(self, *, model, raw_data, estimator=None, confidence=0.95, **kwargs):
         self.model = model
         self.estimator = estimator

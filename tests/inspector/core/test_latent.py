@@ -22,6 +22,8 @@ class _DummyDetector:
 
 class DummyLatentInspector(LatentVariableMixin):
     component_label = "LV"
+    model: PCA
+    confidence: float
 
     def __init__(self):
         self.confidence = 0.95
