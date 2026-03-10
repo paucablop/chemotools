@@ -449,7 +449,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
             )
 
         # Close previous figures to prevent memory leaks
-        self._cleanup_previous_figures()
+        self.close_figures()
 
         # ------------------------------------------------------------------
         # Configs

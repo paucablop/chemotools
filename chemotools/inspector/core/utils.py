@@ -25,6 +25,28 @@ DatasetInput = Union[str, Sequence[str]]
 
 
 # ==============================================================================
+# Mixin helpers
+# ==============================================================================
+
+
+def has_member(cls: type, name: str) -> bool:
+    """Return True if *cls* or any base defines *name*.
+
+    Checks class dicts (methods, properties, descriptors),
+    ``__annotations__`` and ``__static_attributes__`` (Python 3.12+)
+    for attributes set in ``__init__``.
+    """
+    for klass in cls.__mro__:
+        if name in vars(klass):
+            return True
+        if name in getattr(klass, "__annotations__", {}):
+            return True
+        if name in getattr(klass, "__static_attributes__", ()):
+            return True
+    return False
+
+
+# ==============================================================================
 # Array manipulation utilities
 # ==============================================================================
 

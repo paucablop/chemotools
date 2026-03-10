@@ -6,7 +6,6 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
-    Iterable,
     List,
     Optional,
     Sequence,
@@ -28,9 +27,6 @@ from chemotools._types import ModelInput
 from .summaries import InspectorSummary
 from .utils import normalize_datasets
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
-
-# Backward-compatible alias – existing consumers import this name.
-ModelTypes = ModelInput
 
 
 @dataclass(frozen=True)
@@ -175,13 +171,6 @@ class _DataHoldingBase:
                 f"Invalid dataset '{name}'. Available options: {available}."
             ) from exc
 
-    def _iter_datasets(
-        self, names: Iterable[str]
-    ) -> Iterable[Tuple[str, InspectorDataset]]:
-        """Iterate over datasets by name."""
-        for name in names:
-            yield name, self._get_dataset(name)
-
     def _get_raw_data(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """Get raw X and y for a dataset."""
         dataset = self._get_dataset(name)
@@ -244,10 +233,6 @@ class _DataHoldingBase:
         self._tracked_figures.extend(figures.values())
         return figures
 
-    def _cleanup_previous_figures(self) -> None:
-        """Close previously tracked figures to prevent memory leaks."""
-        self.close_figures()
-
 
 class _BaseInspector(_DataHoldingBase, ABC):
     """Base class for estimator-backed inspectors (PCA, PLS).
@@ -259,7 +244,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
     def __init__(
         self,
         *,
-        model: ModelTypes,
+        model: ModelInput,
         X_train: np.ndarray,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[np.ndarray] = None,
@@ -278,7 +263,57 @@ class _BaseInspector(_DataHoldingBase, ABC):
         # Validate and extract model components
         estimator, transformer = _validate_and_extract_model(model)
 
-        # Validate and normalize input arrays
+        # Store model components
+        self._model: ModelInput = model
+        self.estimator_: Union[_BasePCA, _PLS] = estimator
+        self.transformer_: Optional[Pipeline] = transformer
+
+        # Build and validate datasets
+        X_train_arr, datasets = self._build_datasets(
+            X_train=X_train,
+            y_train=y_train,
+            X_test=X_test,
+            y_test=y_test,
+            X_val=X_val,
+            y_val=y_val,
+            supervised=supervised,
+            sample_labels=sample_labels,
+        )
+
+        # Initialise data-holding base
+        super().__init__(
+            datasets=datasets,
+            n_features_in=X_train_arr.shape[1],
+            feature_names=feature_names,
+        )
+
+        # Store dimensions (estimator-specific)
+        self.n_components_: int = self._resolve_n_components()
+
+    @staticmethod
+    def _build_datasets(
+        *,
+        X_train: np.ndarray,
+        y_train: Optional[np.ndarray] = None,
+        X_test: Optional[np.ndarray] = None,
+        y_test: Optional[np.ndarray] = None,
+        X_val: Optional[np.ndarray] = None,
+        y_val: Optional[np.ndarray] = None,
+        supervised: bool = False,
+        sample_labels: Optional[Dict[str, Sequence]] = None,
+    ) -> Tuple[np.ndarray, Dict[str, InspectorDataset]]:
+        """Validate inputs and build the datasets dictionary.
+
+        Returns
+        -------
+        X_train : np.ndarray
+            The validated training feature matrix.
+        datasets : dict of str to InspectorDataset
+            Validated datasets keyed by ``'train'``, ``'test'``, ``'val'``.
+        """
+        normalize = _DataHoldingBase._normalize_target_array
+        prepare = _DataHoldingBase._prepare_labels
+
         X_train = check_array(
             X_train,
             dtype="numeric",
@@ -286,7 +321,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
             ensure_all_finite=True,
             input_name="X_train",
         )
-        y_train_arr = self._normalize_target_array(y_train)
+        y_train_arr = normalize(y_train)
         X_test_arr = (
             check_array(
                 X_test,
@@ -298,7 +333,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
             if X_test is not None
             else None
         )
-        y_test_arr = self._normalize_target_array(y_test)
+        y_test_arr = normalize(y_test)
         X_val_arr = (
             check_array(
                 X_val,
@@ -310,9 +345,8 @@ class _BaseInspector(_DataHoldingBase, ABC):
             if X_val is not None
             else None
         )
-        y_val_arr = self._normalize_target_array(y_val)
+        y_val_arr = normalize(y_val)
 
-        # Validate dataset consistency
         _validate_datasets_consistency(
             X_train,
             y_train_arr,
@@ -323,17 +357,11 @@ class _BaseInspector(_DataHoldingBase, ABC):
             supervised=supervised,
         )
 
-        # Store model components
-        self._model: ModelTypes = model
-        self.estimator_: Union[_BasePCA, _PLS] = estimator
-        self.transformer_: Optional[Pipeline] = transformer
-
-        # Build datasets dictionary
         datasets: Dict[str, InspectorDataset] = {
             "train": InspectorDataset(
                 X=X_train,
                 y=y_train_arr,
-                labels=self._prepare_labels("train", X_train.shape[0], sample_labels),
+                labels=prepare("train", X_train.shape[0], sample_labels),
             )
         }
 
@@ -341,25 +369,17 @@ class _BaseInspector(_DataHoldingBase, ABC):
             datasets["test"] = InspectorDataset(
                 X=X_test_arr,
                 y=y_test_arr,
-                labels=self._prepare_labels("test", X_test_arr.shape[0], sample_labels),
+                labels=prepare("test", X_test_arr.shape[0], sample_labels),
             )
 
         if X_val_arr is not None:
             datasets["val"] = InspectorDataset(
                 X=X_val_arr,
                 y=y_val_arr,
-                labels=self._prepare_labels("val", X_val_arr.shape[0], sample_labels),
+                labels=prepare("val", X_val_arr.shape[0], sample_labels),
             )
 
-        # Initialise data-holding base
-        super().__init__(
-            datasets=datasets,
-            n_features_in=X_train.shape[1],
-            feature_names=feature_names,
-        )
-
-        # Store dimensions (estimator-specific)
-        self.n_components_: int = self._resolve_n_components()
+        return X_train, datasets
 
     def _resolve_n_components(self) -> int:
         """Resolve the number of components from the estimator."""
@@ -429,13 +449,6 @@ class _BaseInspector(_DataHoldingBase, ABC):
             selector is present, returns the original x_axis.
         """
         return self._get_preprocessed_feature_names()
-
-    def _transform_data(self, X: np.ndarray) -> np.ndarray:
-        """Transform data through the preprocessing pipeline."""
-        X_array = np.asarray(X)
-        if self.transformer_ is None:
-            return X_array
-        return self.transformer_.transform(X_array)
 
     # -------------------------------------------------------------------------
     # Configuration helpers
@@ -518,7 +531,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
     # Properties
     # -------------------------------------------------------------------------
     @property
-    def model(self) -> ModelTypes:
+    def model(self) -> ModelInput:
         """Return the original model."""
         return self._model
 

@@ -12,7 +12,7 @@ from sklearn.pipeline import Pipeline
 from chemotools.inspector.helpers import _regression as _regression_plots
 
 from .summaries import RegressionMetrics, RegressionSummary
-from .utils import normalize_datasets
+from .utils import has_member, normalize_datasets
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Literal, Protocol
@@ -50,6 +50,29 @@ if TYPE_CHECKING:  # pragma: no cover
 
 class RegressionMixin:
     """Provide regression diagnostics independent of latent-space plotting."""
+
+    _regression_required_members = (
+        "model",
+        "confidence",
+        "_get_raw_data",
+        "estimator",
+        "_get_preprocessed_data",
+    )
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        if getattr(cls, "__abstractmethods__", None):
+            return
+        missing = [
+            name
+            for name in RegressionMixin._regression_required_members
+            if not has_member(cls, name)
+        ]
+        if missing:
+            raise TypeError(
+                f"{cls.__name__} uses RegressionMixin but is missing "
+                f"required members: {', '.join(missing)}"
+            )
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

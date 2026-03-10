@@ -319,12 +319,7 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
         selection), the returned array will reflect the new dimensionality.
         """
         X_prep = self._get_preprocessed_data("train")
-        n_out = X_prep.shape[1]
-        if n_out == self.n_features_in_ and self.feature_names is not None:
-            return self.feature_names.copy()
-        if n_out == self.n_features_in_:
-            return self._x_axis.copy()
-        return np.arange(n_out)
+        return self._x_axis_for_n_features(X_prep.shape[1])
 
     # ------------------------------------------------------------------
     # Core API
@@ -418,7 +413,7 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
         >>> figures['raw'].savefig('raw_spectra.png')
         >>> figures['step_1_standardscaler'].savefig('after_scaling.png')
         """
-        self._cleanup_previous_figures()
+        self.close_figures()
 
         datasets = normalize_datasets(dataset)
         is_multi = len(datasets) > 1
@@ -470,7 +465,7 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
             # Cumulative step label for the title/key
             latest_step_type = type(_step_transformer).__name__
             fig_key = f"step_{step_idx}_{step_name}"
-            title = f"After {latest_step_type}"
+            title = f"Step {step_idx}: after {latest_step_type}"
 
             if is_multi:
                 step_x_axis = self._resolve_step_x_axis(cumulative[datasets[0]])
@@ -552,17 +547,20 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
     # Private helpers
     # ------------------------------------------------------------------
     def _resolve_step_x_axis(self, X_step: np.ndarray) -> np.ndarray:
-        """Return the appropriate x-axis for a transformed array.
+        """Return the appropriate x-axis for a transformed array."""
+        return self._x_axis_for_n_features(X_step.shape[1])
+
+    def _x_axis_for_n_features(self, n_features_out: int) -> np.ndarray:
+        """Return the appropriate x-axis for a given output dimensionality.
 
         If the number of features is unchanged and feature names were
         provided, use them.  Otherwise fall back to integer indices.
         """
-        n_out = X_step.shape[1]
-        if n_out == self.n_features_in_ and self.feature_names is not None:
+        if n_features_out == self.n_features_in_ and self.feature_names is not None:
             return self.feature_names.copy()
-        if n_out == self.n_features_in_:
+        if n_features_out == self.n_features_in_:
             return self._x_axis.copy()
-        return np.arange(n_out)
+        return np.arange(n_features_out)
 
     def _plot_multi_dataset_step(
         self,

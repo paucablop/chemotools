@@ -35,7 +35,8 @@ from .core.utils import (
     get_xlabel_for_features,
     select_components,
 )
-from .helpers import _latent as _latent_plots
+from .helpers._distances import create_q_vs_y_residuals_plot
+from .helpers._loadings_variance import create_loadings_plot, create_variance_plot
 from .helpers._regression import (
     create_predicted_vs_actual_plot,
     create_qq_plot,
@@ -43,6 +44,7 @@ from .helpers._regression import (
     create_residual_distribution_plot,
     create_y_residual_plot,
 )
+from .helpers._scores import create_x_vs_y_scores_plots
 
 SummaryStep = Dict[str, Union[int, str]]
 SummaryValue = Union[
@@ -627,7 +629,7 @@ class PLSRegressionInspector(
             )
 
         # Close previous figures to prevent memory leaks
-        self._cleanup_previous_figures()
+        self.close_figures()
 
         # ------------------------------------------------------------------
         # Configs
@@ -691,7 +693,7 @@ class PLSRegressionInspector(
         # Y-space variance
         y_var = self.get_explained_y_variance_ratio()
         if y_var is not None:
-            variance_y_fig = _latent_plots.create_variance_plot(
+            variance_y_fig = create_variance_plot(
                 explained_variance_ratio=y_var,
                 variance_threshold=variance_threshold,
                 figsize=config.variance_figsize,
@@ -712,7 +714,7 @@ class PLSRegressionInspector(
         loadings_x_fig.axes[0].set_title("X-Loadings", fontsize=12, fontweight="bold")
         figures["loadings_x"] = loadings_x_fig
 
-        figures["loadings_weights"] = _latent_plots.create_loadings_plot(
+        figures["loadings_weights"] = create_loadings_plot(
             loadings=self.get_x_weights(),
             feature_names=preprocessed_x_axis,
             loadings_components=loadings_components,
@@ -724,7 +726,7 @@ class PLSRegressionInspector(
             "X-Weights", fontsize=12, fontweight="bold"
         )
 
-        figures["loadings_rotations"] = _latent_plots.create_loadings_plot(
+        figures["loadings_rotations"] = create_loadings_plot(
             loadings=self.get_x_rotations(),
             feature_names=preprocessed_x_axis,
             loadings_components=loadings_components,
@@ -750,7 +752,7 @@ class PLSRegressionInspector(
             coef_components = list(range(coef.shape[1]))
             component_label = "Target "
 
-        coef_fig = _latent_plots.create_loadings_plot(
+        coef_fig = create_loadings_plot(
             loadings=coef_matrix,
             feature_names=preprocessed_x_axis,
             loadings_components=coef_components,
@@ -793,7 +795,7 @@ class PLSRegressionInspector(
         if y_train.ndim > 1:
             y_train = y_train[:, target_index]
 
-        x_y_scores_figures = _latent_plots.create_x_vs_y_scores_plots(
+        x_y_scores_figures = create_x_vs_y_scores_plots(
             x_scores=x_scores,
             y_scores=y_scores,
             y_train=y_train,
@@ -886,7 +888,7 @@ class PLSRegressionInspector(
         # ------------------------------------------------------------------
         # Regression Distances: Q vs Y residuals
         # ------------------------------------------------------------------
-        figures["distances_q_y_residuals"] = _latent_plots.create_q_vs_y_residuals_plot(
+        figures["distances_q_y_residuals"] = create_q_vs_y_residuals_plot(
             datasets_data=datasets_data,
             model=self.model,
             confidence=self.confidence,

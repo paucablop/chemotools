@@ -6,7 +6,15 @@ from typing import TYPE_CHECKING, Dict, Literal, Optional, Sequence, Tuple, Unio
 
 import numpy as np
 
-from chemotools.inspector.helpers import _latent as _latent_plots
+from chemotools.inspector.helpers._distances import create_model_distances_plot
+from chemotools.inspector.helpers._loadings_variance import (
+    create_loadings_plot,
+    create_variance_plot,
+)
+from chemotools.inspector.helpers._scores import (
+    create_scores_plot_multi_dataset,
+    create_scores_plot_single_dataset,
+)
 from chemotools.outliers import HotellingT2, QResiduals
 from chemotools.plotting._styles import DATASET_COLORS
 
@@ -14,6 +22,7 @@ from .summaries import LatentSummary
 from .utils import (
     ComponentSpec,
     get_xlabel_for_features,
+    has_member,
     normalize_components,
     normalize_datasets,
 )
@@ -23,11 +32,11 @@ if TYPE_CHECKING:  # pragma: no cover
 
     from matplotlib.figure import Figure
 
-    from chemotools.inspector.core.base import ModelTypes
+    from chemotools._types import ModelInput
 
     class _LatentInspectorProto(Protocol):
         @property
-        def model(self) -> ModelTypes:  # pragma: no cover
+        def model(self) -> ModelInput:  # pragma: no cover
             ...
 
         @property
@@ -44,6 +53,28 @@ if TYPE_CHECKING:  # pragma: no cover
 
 class LatentVariableMixin:
     """Mixin providing reusable helpers for latent-space visualisations."""
+
+    _latent_required_members = (
+        "model",
+        "confidence",
+        "_get_raw_data",
+        "_get_preprocessed_feature_names",
+    )
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        if getattr(cls, "__abstractmethods__", None):
+            return
+        missing = [
+            name
+            for name in LatentVariableMixin._latent_required_members
+            if not has_member(cls, name)
+        ]
+        if missing:
+            raise TypeError(
+                f"{cls.__name__} uses LatentVariableMixin but is missing "
+                f"required members: {', '.join(missing)}"
+            )
 
     component_label: str = "LV"
 
@@ -164,7 +195,7 @@ class LatentVariableMixin:
         variance = self.get_latent_explained_variance()
         if variance is None:
             return None
-        return _latent_plots.create_variance_plot(
+        return create_variance_plot(
             explained_variance_ratio=variance,
             variance_threshold=variance_threshold,
             figsize=figsize,
@@ -204,7 +235,7 @@ class LatentVariableMixin:
         if xlabel is None:
             xlabel = get_xlabel_for_features(feature_names is not None)
 
-        return _latent_plots.create_loadings_plot(
+        return create_loadings_plot(
             loadings=loadings,
             feature_names=feature_names,
             loadings_components=loadings_components,
@@ -274,7 +305,7 @@ class LatentVariableMixin:
             confidence_level = inspector.confidence
 
             for idx, component_spec in enumerate(components_list, start=1):
-                fig = _latent_plots.create_scores_plot_multi_dataset(
+                fig = create_scores_plot_multi_dataset(
                     component_spec=component_spec,
                     datasets_data=datasets_data,
                     explained_var=explained_var,
@@ -306,7 +337,7 @@ class LatentVariableMixin:
                     pass
 
             for idx, component_spec in enumerate(components_list, start=1):
-                fig = _latent_plots.create_scores_plot_single_dataset(
+                fig = create_scores_plot_single_dataset(
                     component_spec=component_spec,
                     scores=scores,
                     y=y,
@@ -391,7 +422,7 @@ class LatentVariableMixin:
                 )
                 q_residuals_detector.fit(train_X)
 
-        return _latent_plots.create_model_distances_plot(
+        return create_model_distances_plot(
             datasets_data=datasets_data,
             model=inspector.model,
             confidence=inspector.confidence,

@@ -11,7 +11,7 @@ from chemotools.inspector.helpers._spectra import (
     create_spectra_plots_single_dataset,
 )
 
-from .utils import get_xlabel_for_features, normalize_datasets
+from .utils import get_xlabel_for_features, has_member, normalize_datasets
 
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Protocol
@@ -61,6 +61,30 @@ class SpectraMixin:
     - `_get_preprocessed_data(dataset)` method
     - `_get_preprocessed_x_axis()` method
     """
+
+    _spectra_required_members = (
+        "transformer",
+        "x_axis",
+        "_get_raw_data",
+        "_get_preprocessed_data",
+        "_get_preprocessed_x_axis",
+    )
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        # Skip abstract classes — only enforce on concrete leaves
+        if getattr(cls, "__abstractmethods__", None):
+            return
+        missing = [
+            name
+            for name in SpectraMixin._spectra_required_members
+            if not has_member(cls, name)
+        ]
+        if missing:
+            raise TypeError(
+                f"{cls.__name__} uses SpectraMixin but is missing "
+                f"required members: {', '.join(missing)}"
+            )
 
     # ------------------------------------------------------------------
     # Private methods

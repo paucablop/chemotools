@@ -280,37 +280,6 @@ class TestBaseInspectorGetNComponents:
         assert inspector.n_components_ == 3
 
 
-class TestBaseInspectorTransformData:
-    """Test _transform_data method."""
-
-    def test_transform_without_pipeline(self, fitted_pca, dummy_data_loader):
-        """Test transform without preprocessing pipeline."""
-        # Arrange
-        X, _ = dummy_data_loader
-        inspector = ConcreteInspector(model=fitted_pca, X_train=X)
-
-        # Act
-        X_transformed = inspector._transform_data(X)
-
-        # Assert
-        assert np.array_equal(X_transformed, X)
-
-    def test_transform_with_pipeline(self, fitted_pipeline_pca, dummy_data_loader):
-        """Test transform with preprocessing pipeline."""
-        # Arrange
-        X, _ = dummy_data_loader
-        inspector = ConcreteInspector(model=fitted_pipeline_pca, X_train=X)
-
-        # Act
-        X_transformed = inspector._transform_data(X)
-
-        # Assert
-        # Should be scaled (mean ~0, std ~1)
-        assert not np.array_equal(X_transformed, X)
-        assert np.allclose(np.mean(X_transformed, axis=0), 0, atol=1e-10)
-        assert np.allclose(np.std(X_transformed, axis=0), 1, atol=1e-10)
-
-
 class TestBaseInspectorPlotScores:
     """Test plot_scores method."""
 
@@ -786,7 +755,7 @@ class TestBaseInspectorFigureManagement:
     def test_cleanup_previous_figures_clears_old_figures(
         self, fitted_pca, dummy_data_loader
     ):
-        """Test that _cleanup_previous_figures closes existing tracked figures."""
+        """Test that close_figures closes existing tracked figures."""
         # Arrange
         X, _ = dummy_data_loader
         inspector = ConcreteInspector(model=fitted_pca, X_train=X)
@@ -795,7 +764,7 @@ class TestBaseInspectorFigureManagement:
         old_fig_num = fig1.number
 
         # Act
-        inspector._cleanup_previous_figures()
+        inspector.close_figures()
 
         # Assert
         assert inspector._tracked_figures == []
