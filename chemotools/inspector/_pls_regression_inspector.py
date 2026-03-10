@@ -934,15 +934,14 @@ class PLSRegressionInspector(
         )
 
         # ------------------------------------------------------------------
-        # Spectra plots (if preprocessing exists)
+        # Spectra plots
         # ------------------------------------------------------------------
-        if self.transformer is not None:
-            spectra_figs = self.inspect_spectra(
-                dataset=datasets if use_suffix else datasets[0],
-                color_by=color_by,
-                figsize=config.spectra_figsize,
-                color_mode=color_mode,
-            )
-            figures.update(spectra_figs)
+        spectra_figs = self.inspect_spectra(
+            dataset=datasets if use_suffix else datasets[0],
+            color_by=color_by,
+            figsize=config.spectra_figsize,
+            color_mode=color_mode,
+        )
+        figures.update(spectra_figs)
 
         return self._track_figures(figures)

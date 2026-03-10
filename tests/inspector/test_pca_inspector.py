@@ -15,12 +15,7 @@ class TestPCAInspectorInitialization:
     """Test PCAInspector initialization."""
 
     def test_init_with_fitted_pca_only_train(self, fitted_pca, dummy_data_loader):
-        """Test initi        # Assert
-        assert len(figures) == 4  # 1 scores + loadings + variance + distances
-        assert "scores_1" in figures
-        assert "loadings" in figures
-        assert "variance" in figures
-        assert "distances" in figurestion with only training data."""
+        """Test initialization with only training data."""
         # Arrange
         X, y = dummy_data_loader
 
@@ -508,12 +503,13 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        # Single scores plot + loadings + variance + distances
-        assert len(figures) == 4
+        # Single scores plot + loadings + variance + distances + raw_spectra
+        assert len(figures) == 5
         assert "scores_1" in figures
         assert "loadings" in figures
         assert "variance" in figures
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_single_2d_scores_plot(self, fitted_pca, dummy_data_loader):
         """Test inspect with single 2D scores plot."""
@@ -527,11 +523,14 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        assert len(figures) == 4  # 1 scores + loadings + variance + distances
+        assert (
+            len(figures) == 5
+        )  # 1 scores + loadings + variance + distances + raw_spectra
         assert "scores_1" in figures
         assert "loadings" in figures
         assert "variance" in figures
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_single_1d_scores_plot(self, fitted_pca, dummy_data_loader):
         """Test inspect with single 1D scores plot."""
@@ -543,9 +542,12 @@ class TestPCAInspectorInspect:
         figures = inspector.inspect(components_scores=0, loadings_components=[0, 1])
 
         # Assert
-        assert len(figures) == 4  # 1 scores + loadings + variance + distances
+        assert (
+            len(figures) == 5
+        )  # 1 scores + loadings + variance + distances + raw_spectra
         assert "scores_1" in figures
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_multiple_mixed_scores_plots(self, fitted_pca, dummy_data_loader):
         """Test inspect with mixed 1D and 2D scores plots."""
@@ -560,7 +562,9 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        assert len(figures) == 6  # 3 scores + loadings + variance + distances
+        assert (
+            len(figures) == 7
+        )  # 3 scores + loadings + variance + distances + raw_spectra
         assert "scores_1" in figures
         assert "scores_2" in figures
         assert "scores_3" in figures
@@ -596,8 +600,9 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        assert len(figures) == 4
+        assert len(figures) == 5
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_without_y_values(self, fitted_pca, dummy_data_loader):
         """Test inspect works without y values."""
@@ -611,8 +616,9 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        assert len(figures) == 4
+        assert len(figures) == 5
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_custom_figsize(self, fitted_pca, dummy_data_loader):
         """Test inspect with custom figure sizes."""
@@ -650,8 +656,10 @@ class TestPCAInspectorInspect:
         assert "raw_spectra" in figures
         assert "preprocessed_spectra" in figures
 
-    def test_inspect_without_spectra_no_pipeline(self, fitted_pca, dummy_data_loader):
-        """Test inspect without spectra when no pipeline."""
+    def test_inspect_without_pipeline_has_raw_spectra_only(
+        self, fitted_pca, dummy_data_loader
+    ):
+        """Test inspect shows raw spectra but no preprocessed when no pipeline."""
         # Arrange
         X, y = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
@@ -661,8 +669,8 @@ class TestPCAInspectorInspect:
             components_scores=(0, 1), loadings_components=[0, 1]
         )
 
-        # Assert - no spectra plots should be created without preprocessing
-        assert "raw_spectra" not in figures
+        # Assert - raw spectra always present, preprocessed only with pipeline
+        assert "raw_spectra" in figures
         assert "preprocessed_spectra" not in figures
 
     def test_inspect_test_dataset(self, fitted_pca, dummy_data_loader):
@@ -687,8 +695,9 @@ class TestPCAInspectorInspect:
         )
 
         # Assert
-        assert len(figures) == 4
+        assert len(figures) == 5
         assert "distances" in figures
+        assert "raw_spectra" in figures
 
     def test_inspect_multi_dataset_returns_dataset_specific_scores(
         self, fitted_pca, dummy_data_loader
