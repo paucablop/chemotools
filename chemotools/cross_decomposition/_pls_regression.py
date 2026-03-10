@@ -4,6 +4,9 @@ version of PLS regression with automatic explained variance calculation for both
 Y spaces. This extension of sklearn's PLSRegression.
 """
 
+# Author: Pau Cabaneros
+# License: MIT
+
 import numpy as np
 from sklearn.cross_decomposition import PLSRegression as _SklearnPLSRegression
 

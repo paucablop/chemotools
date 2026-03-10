@@ -138,10 +138,10 @@ class TestSpectraMixinInspectSpectra:
         for fig in figures.values():
             plt.close(fig)
 
-    def test_inspect_spectra_without_transformer_raises_error(
+    def test_inspect_spectra_without_transformer_returns_raw_only(
         self, sample_spectra_data
     ):
-        """Test that inspect_spectra raises ValueError when no transformer exists."""
+        """Test that inspect_spectra returns only raw spectra when no transformer."""
         # Arrange
         inspector = DummySpectraInspector(
             raw_data=sample_spectra_data["raw_data"],
@@ -153,11 +153,17 @@ class TestSpectraMixinInspectSpectra:
             transformer=None,  # No transformer
         )
 
-        # Act & Assert
-        with pytest.raises(
-            ValueError, match="Spectra inspection requires a preprocessing pipeline"
-        ):
-            inspector.inspect_spectra()
+        # Act
+        figures = inspector.inspect_spectra()
+
+        # Assert
+        assert isinstance(figures, dict)
+        assert "raw_spectra" in figures
+        assert "preprocessed_spectra" not in figures
+
+        # Cleanup
+        for fig in figures.values():
+            plt.close(fig)
 
     def test_inspect_spectra_single_dataset(self, sample_spectra_data):
         """Test inspect_spectra with a single dataset."""

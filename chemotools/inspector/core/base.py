@@ -72,8 +72,189 @@ class InspectorPlotConfig:
     regression_figsize: Tuple[float, float] = (8, 6)
 
 
-class _BaseInspector(ABC):
-    """Base class encapsulating shared inspector responsibilities."""
+class _DataHoldingBase:
+    """Lightweight base providing dataset storage, feature-axis management,
+    preprocessed-data caching, and figure lifecycle.
+
+    This class holds the shared "data management" responsibilities that are
+    common to **all** inspectors (including ``PreprocessingInspector``).
+    Estimator/model-specific logic lives in :class:`_BaseInspector`, which
+    extends this class.
+    """
+
+    # -------------------------------------------------------------------------
+    # Initialisation
+    # -------------------------------------------------------------------------
+    def __init__(
+        self,
+        *,
+        datasets: Dict[str, InspectorDataset],
+        n_features_in: int,
+        feature_names: Optional[np.ndarray] = None,
+    ) -> None:
+        self.datasets_: Dict[str, InspectorDataset] = datasets
+        self.n_features_in_: int = n_features_in
+
+        # Process feature names
+        self.feature_names: Optional[np.ndarray] = None
+        if feature_names is not None:
+            feature_array = np.asarray(feature_names)
+            if feature_array.shape[0] != self.n_features_in_:
+                raise ValueError(
+                    "x_axis length must match number of features. "
+                    f"Got {feature_array.shape[0]} vs {self.n_features_in_}."
+                )
+            self.feature_names = feature_array
+
+        # Set up x_axis for plotting
+        if self.feature_names is not None:
+            self._x_axis = np.array(self.feature_names, copy=True)
+        else:
+            self._x_axis = np.arange(self.n_features_in_)
+
+        # Caches
+        self._preprocessed_cache: Dict[str, np.ndarray] = {}
+
+        # Figure tracking for automatic cleanup
+        self._tracked_figures: List["Figure"] = []
+
+    # -------------------------------------------------------------------------
+    # Input normalization helpers
+    # -------------------------------------------------------------------------
+    @staticmethod
+    def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
+        """Normalize target array to 1D if needed."""
+        if target is None:
+            return None
+        arr = check_array(
+            target,
+            dtype=None,
+            ensure_2d=False,
+            ensure_all_finite=True,
+            input_name="target",
+        )
+        if arr.ndim == 2 and arr.shape[1] == 1:
+            return arr.ravel()
+        return arr
+
+    @staticmethod
+    def _prepare_labels(
+        dataset_name: str,
+        expected_len: int,
+        sample_labels: Optional[Dict[str, Sequence]],
+    ) -> Optional[np.ndarray]:
+        """Prepare and validate sample labels for a dataset."""
+        if not sample_labels or dataset_name not in sample_labels:
+            return None
+        labels = np.asarray(sample_labels[dataset_name])
+        if labels.shape[0] != expected_len:
+            raise ValueError(
+                f"Sample labels for '{dataset_name}' must have length {expected_len}. "
+                f"Got {labels.shape[0]}."
+            )
+        return labels
+
+    # -------------------------------------------------------------------------
+    # Dataset access methods
+    # -------------------------------------------------------------------------
+    def _get_dataset(self, name: str) -> InspectorDataset:
+        """Get a dataset by name with helpful error messages."""
+        try:
+            return self.datasets_[name]
+        except KeyError as exc:
+            available = ", ".join(self.datasets_.keys())
+            if name == "test":
+                raise ValueError(
+                    "Test data not provided. Initialize with X_test/y_test."
+                ) from exc
+            if name == "val":
+                raise ValueError(
+                    "Validation data not provided. Initialize with X_val/y_val."
+                ) from exc
+            raise ValueError(
+                f"Invalid dataset '{name}'. Available options: {available}."
+            ) from exc
+
+    def _iter_datasets(
+        self, names: Iterable[str]
+    ) -> Iterable[Tuple[str, InspectorDataset]]:
+        """Iterate over datasets by name."""
+        for name in names:
+            yield name, self._get_dataset(name)
+
+    def _get_raw_data(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+        """Get raw X and y for a dataset."""
+        dataset = self._get_dataset(name)
+        return dataset.X, dataset.y
+
+    # -------------------------------------------------------------------------
+    # Properties
+    # -------------------------------------------------------------------------
+    @property
+    def n_features(self) -> int:
+        """Return the number of features in original data."""
+        return self.n_features_in_
+
+    @property
+    def n_samples(self) -> Dict[str, int]:
+        """Return the number of samples in each dataset."""
+        return {name: dataset.n_samples for name, dataset in self.datasets_.items()}
+
+    @property
+    def x_axis(self) -> np.ndarray:
+        """Return the feature names/indices."""
+        return self._x_axis
+
+    # -------------------------------------------------------------------------
+    # Figure Management
+    # -------------------------------------------------------------------------
+    def close_figures(self) -> None:
+        """Close all figures created by this inspector.
+
+        This method closes all matplotlib figures that were created by previous
+        calls to `inspect()` or `inspect_spectra()`. Use this to free memory
+        when you're done with the plots.
+
+        Examples
+        --------
+        >>> inspector = PCAInspector(model, X_train)
+        >>> figures = inspector.inspect()
+        >>> # ... work with figures ...
+        >>> inspector.close_figures()  # Free memory
+        """
+        import matplotlib.pyplot as plt
+
+        for fig in self._tracked_figures:
+            plt.close(fig)
+        self._tracked_figures.clear()
+
+    def _track_figures(self, figures: Dict[str, "Figure"]) -> Dict[str, "Figure"]:
+        """Track figures for later cleanup and return them.
+
+        Parameters
+        ----------
+        figures : dict
+            Dictionary of figure name to Figure object
+
+        Returns
+        -------
+        dict
+            The same dictionary (for chaining)
+        """
+        self._tracked_figures.extend(figures.values())
+        return figures
+
+    def _cleanup_previous_figures(self) -> None:
+        """Close previously tracked figures to prevent memory leaks."""
+        self.close_figures()
+
+
+class _BaseInspector(_DataHoldingBase, ABC):
+    """Base class for estimator-backed inspectors (PCA, PLS).
+
+    Extends :class:`_DataHoldingBase` with estimator/model extraction,
+    component resolution, confidence level, and transformer management.
+    """
 
     def __init__(
         self,
@@ -148,7 +329,7 @@ class _BaseInspector(ABC):
         self.transformer_: Optional[Pipeline] = transformer
 
         # Build datasets dictionary
-        self.datasets_: Dict[str, InspectorDataset] = {
+        datasets: Dict[str, InspectorDataset] = {
             "train": InspectorDataset(
                 X=X_train,
                 y=y_train_arr,
@@ -157,81 +338,28 @@ class _BaseInspector(ABC):
         }
 
         if X_test_arr is not None:
-            self.datasets_["test"] = InspectorDataset(
+            datasets["test"] = InspectorDataset(
                 X=X_test_arr,
                 y=y_test_arr,
                 labels=self._prepare_labels("test", X_test_arr.shape[0], sample_labels),
             )
 
         if X_val_arr is not None:
-            self.datasets_["val"] = InspectorDataset(
+            datasets["val"] = InspectorDataset(
                 X=X_val_arr,
                 y=y_val_arr,
                 labels=self._prepare_labels("val", X_val_arr.shape[0], sample_labels),
             )
 
-        # Store dimensions
-        self.n_features_in_: int = X_train.shape[1]
-        self.n_components_: int = self._resolve_n_components()
-
-        # Process feature names
-        self.feature_names: Optional[np.ndarray] = None
-        if feature_names is not None:
-            feature_array = np.asarray(feature_names)
-            if feature_array.shape[0] != self.n_features_in_:
-                raise ValueError(
-                    "x_axis length must match number of features. "
-                    f"Got {feature_array.shape[0]} vs {self.n_features_in_}."
-                )
-            self.feature_names = feature_array
-
-        # Set up x_axis for plotting
-        if self.feature_names is not None:
-            self._x_axis = np.array(self.feature_names, copy=True)
-        else:
-            self._x_axis = np.arange(self.n_features_in_)
-
-        # Caches
-        self._preprocessed_cache: Dict[str, np.ndarray] = {}
-
-        # Figure tracking for automatic cleanup
-        self._tracked_figures: List["Figure"] = []
-
-    # -------------------------------------------------------------------------
-    # Input normalization helpers
-    # -------------------------------------------------------------------------
-    @staticmethod
-    def _normalize_target_array(target: Optional[np.ndarray]) -> Optional[np.ndarray]:
-        """Normalize target array to 1D if needed."""
-        if target is None:
-            return None
-        arr = check_array(
-            target,
-            dtype=None,
-            ensure_2d=False,
-            ensure_all_finite=True,
-            input_name="target",
+        # Initialise data-holding base
+        super().__init__(
+            datasets=datasets,
+            n_features_in=X_train.shape[1],
+            feature_names=feature_names,
         )
-        if arr.ndim == 2 and arr.shape[1] == 1:
-            return arr.ravel()
-        return arr
 
-    @staticmethod
-    def _prepare_labels(
-        dataset_name: str,
-        expected_len: int,
-        sample_labels: Optional[Dict[str, Sequence]],
-    ) -> Optional[np.ndarray]:
-        """Prepare and validate sample labels for a dataset."""
-        if not sample_labels or dataset_name not in sample_labels:
-            return None
-        labels = np.asarray(sample_labels[dataset_name])
-        if labels.shape[0] != expected_len:
-            raise ValueError(
-                f"Sample labels for '{dataset_name}' must have length {expected_len}. "
-                f"Got {labels.shape[0]}."
-            )
-        return labels
+        # Store dimensions (estimator-specific)
+        self.n_components_: int = self._resolve_n_components()
 
     def _resolve_n_components(self) -> int:
         """Resolve the number of components from the estimator."""
@@ -248,38 +376,8 @@ class _BaseInspector(ABC):
         raise AttributeError("Cannot determine number of components for estimator")
 
     # -------------------------------------------------------------------------
-    # Dataset access methods
+    # Preprocessed data access (estimator-backed inspectors)
     # -------------------------------------------------------------------------
-    def _get_dataset(self, name: str) -> InspectorDataset:
-        """Get a dataset by name with helpful error messages."""
-        try:
-            return self.datasets_[name]
-        except KeyError as exc:
-            available = ", ".join(self.datasets_.keys())
-            if name == "test":
-                raise ValueError(
-                    "Test data not provided. Initialize with X_test/y_test."
-                ) from exc
-            if name == "val":
-                raise ValueError(
-                    "Validation data not provided. Initialize with X_val/y_val."
-                ) from exc
-            raise ValueError(
-                f"Invalid dataset '{name}'. Available options: {available}."
-            ) from exc
-
-    def _iter_datasets(
-        self, names: Iterable[str]
-    ) -> Iterable[Tuple[str, InspectorDataset]]:
-        """Iterate over datasets by name."""
-        for name in names:
-            yield name, self._get_dataset(name)
-
-    def _get_raw_data(self, name: str) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        """Get raw X and y for a dataset."""
-        dataset = self._get_dataset(name)
-        return dataset.X, dataset.y
-
     def _get_preprocessed_data(self, name: str) -> np.ndarray:
         """Get preprocessed X for a dataset (cached)."""
         if name in self._preprocessed_cache:
@@ -435,67 +533,9 @@ class _BaseInspector(ABC):
         return self.transformer_
 
     @property
-    def n_features(self) -> int:
-        """Return the number of features in original data."""
-        return self.n_features_in_
-
-    @property
-    def n_samples(self) -> Dict[str, int]:
-        """Return the number of samples in each dataset."""
-        return {name: dataset.X.shape[0] for name, dataset in self.datasets_.items()}
-
-    @property
-    def x_axis(self) -> np.ndarray:
-        """Return the feature names/indices."""
-        return self._x_axis
-
-    @property
     def confidence(self) -> float:
         """Return the confidence level for outlier detection."""
         return self._confidence
-
-    # -------------------------------------------------------------------------
-    # Figure Management
-    # -------------------------------------------------------------------------
-    def close_figures(self) -> None:
-        """Close all figures created by this inspector.
-
-        This method closes all matplotlib figures that were created by previous
-        calls to `inspect()` or `inspect_spectra()`. Use this to free memory
-        when you're done with the plots.
-
-        Examples
-        --------
-        >>> inspector = PCAInspector(model, X_train)
-        >>> figures = inspector.inspect()
-        >>> # ... work with figures ...
-        >>> inspector.close_figures()  # Free memory
-        """
-        import matplotlib.pyplot as plt
-
-        for fig in self._tracked_figures:
-            plt.close(fig)
-        self._tracked_figures.clear()
-
-    def _track_figures(self, figures: Dict[str, "Figure"]) -> Dict[str, "Figure"]:
-        """Track figures for later cleanup and return them.
-
-        Parameters
-        ----------
-        figures : dict
-            Dictionary of figure name to Figure object
-
-        Returns
-        -------
-        dict
-            The same dictionary (for chaining)
-        """
-        self._tracked_figures.extend(figures.values())
-        return figures
-
-    def _cleanup_previous_figures(self) -> None:
-        """Close previously tracked figures to prevent memory leaks."""
-        self.close_figures()
 
     # -------------------------------------------------------------------------
     # Summary helpers

@@ -834,19 +834,21 @@ class TestPCAInspectorInspectSpectra:
         assert "preprocessed_spectra" in figures
         assert all(isinstance(fig, plt.Figure) for fig in figures.values())
 
-    def test_inspect_spectra_without_pipeline_raises_error(
+    def test_inspect_spectra_without_pipeline_returns_raw_only(
         self, fitted_pca, dummy_data_loader
     ):
-        """Test inspect_spectra without pipeline raises ValueError."""
+        """Test inspect_spectra without pipeline returns only raw spectra."""
         # Arrange
         X, y = dummy_data_loader
         inspector = PCAInspector(model=fitted_pca, X_train=X, y_train=y)
 
+        # Act
+        figures = inspector.inspect_spectra()
+
         # Assert
-        with pytest.raises(
-            ValueError, match="Spectra inspection requires a preprocessing pipeline"
-        ):
-            inspector.inspect_spectra()
+        assert isinstance(figures, dict)
+        assert "raw_spectra" in figures
+        assert "preprocessed_spectra" not in figures
 
     def test_inspect_spectra_with_color_by_y(
         self, fitted_pipeline_pca, dummy_data_loader

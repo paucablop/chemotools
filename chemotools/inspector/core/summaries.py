@@ -88,3 +88,64 @@ class PLSRegressionSummary(InspectorSummary, LatentSummary, RegressionSummary):
     total_x_variance: Optional[float] = None
     explained_y_variance_ratio: Optional[List[float]] = None
     total_y_variance: Optional[float] = None
+
+
+@dataclass(kw_only=True)
+class PreprocessingSummary:
+    """Summary for preprocessing pipelines.
+
+    Attributes
+    ----------
+    pipeline_type : str
+        Class name of the pipeline (e.g. ``'Pipeline'``).
+    total_steps : int
+        Total number of steps in the pipeline (including model steps).
+    n_preprocessing_steps : int
+        Number of preprocessing steps that are visualised.
+    n_excluded_steps : int
+        Number of model/estimator steps that were excluded.
+    n_features : int
+        Number of input features.
+    n_samples : dict of str to int
+        Number of samples per dataset split.
+    steps : list of dict
+        Details of each preprocessing step (step number, name, type).
+    excluded : list of dict
+        Details of each excluded model step (name, type).
+    """
+
+    pipeline_type: str
+    total_steps: int
+    n_preprocessing_steps: int
+    n_excluded_steps: int
+    n_features: int
+    n_samples: Dict[str, int]
+    steps: List[Dict[str, Any]]
+    excluded: List[Dict[str, Any]]
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Return summary as a plain dictionary."""
+        return {k: v for k, v in asdict(self).items() if v is not None}
+
+    def __repr__(self) -> str:  # noqa: D105
+        lines = [
+            "=" * 60,
+            "Preprocessing Inspector Summary",
+            "=" * 60,
+            f"  Pipeline:             {self.pipeline_type}",
+            f"  Total steps:          {self.total_steps}",
+            f"  Preprocessing steps:  {self.n_preprocessing_steps}",
+            f"  Excluded steps:       {self.n_excluded_steps}",
+            f"  Input features:       {self.n_features}",
+            f"  Datasets:             {self.n_samples}",
+            "-" * 60,
+            "  Preprocessing steps (visualised):",
+        ]
+        for s in self.steps:
+            lines.append(f"    {s['step']}. {s['name']} ({s['type']})")
+        if self.excluded:
+            lines.append("  Excluded (model) steps:")
+            for s in self.excluded:
+                lines.append(f"    - {s['name']} ({s['type']})")
+        lines.append("=" * 60)
+        return "\n".join(lines)

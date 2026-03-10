@@ -330,15 +330,20 @@ class TestInspectFigures:
         for fig in figures.values():
             plt.close(fig)
 
-    def test_inspect_spectra_requires_pipeline(self, fitted_pls, regression_data):
-        """Test that inspect_spectra() raises an error when model is not a pipeline."""
+    def test_inspect_spectra_without_pipeline_returns_raw_only(
+        self, fitted_pls, regression_data
+    ):
+        """Test that inspect_spectra() returns only raw spectra without pipeline."""
         # Arrange
         X_train, y_train = regression_data["train"]
         inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
 
-        # Act & Assert
-        with pytest.raises(ValueError, match="requires a preprocessing"):
-            inspector.inspect_spectra()
+        # Act
+        figures = inspector.inspect_spectra()
+
+        # Assert
+        assert "raw_spectra" in figures
+        assert "preprocessed_spectra" not in figures
 
     def test_inspect_spectra_pipeline_single_dataset(
         self, fitted_pipeline, regression_data

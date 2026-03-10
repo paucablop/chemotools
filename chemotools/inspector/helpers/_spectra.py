@@ -23,10 +23,10 @@ from ..core.utils import prepare_color_values
 
 def create_spectra_plots_single_dataset(
     X_raw: np.ndarray,
-    X_preprocessed: np.ndarray,
+    X_preprocessed: Optional[np.ndarray],
     y: Optional[np.ndarray],
     x_axis: np.ndarray,
-    preprocessed_x_axis: np.ndarray,
+    preprocessed_x_axis: Optional[np.ndarray],
     dataset_name: str,
     color_by: Optional[Union[str, Dict[str, np.ndarray]]],
     xlabel: str,
@@ -34,24 +34,25 @@ def create_spectra_plots_single_dataset(
     figsize: Tuple[float, float],
     color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Dict[str, Figure]:
-    """Create raw and preprocessed spectra plots for a single dataset.
+    """Create raw and (optionally) preprocessed spectra plots for a single dataset.
 
-    Creates two separate figures comparing raw and preprocessed spectra.
-    Useful for visualizing the effect of preprocessing steps.
+    Always creates a raw spectra figure.  If *X_preprocessed* is provided,
+    also creates a preprocessed spectra figure.
 
     Parameters
     ----------
     X_raw : np.ndarray
         Raw spectra data of shape (n_samples, n_features)
-    X_preprocessed : np.ndarray
-        Preprocessed spectra data of shape (n_samples, n_features_preprocessed)
+    X_preprocessed : np.ndarray or None
+        Preprocessed spectra data of shape (n_samples, n_features_preprocessed).
+        If ``None``, no preprocessed figure is generated.
     y : Optional[np.ndarray]
         Target values for coloring spectra
     x_axis : np.ndarray
         X-axis values (e.g. wavenumbers/wavelengths) for raw spectra
-    preprocessed_x_axis : np.ndarray
-        X-axis values (e.g. wavenumbers/wavelengths) for preprocessed spectra
-        (may differ if feature selection was applied)
+    preprocessed_x_axis : np.ndarray or None
+        X-axis values for preprocessed spectra (may differ if feature selection
+        was applied).  Required when *X_preprocessed* is not ``None``.
     dataset_name : str
         Name of dataset (e.g., 'train', 'test', 'val')
     color_by : str or dict, optional
@@ -68,7 +69,8 @@ def create_spectra_plots_single_dataset(
     Returns
     -------
     Dict[str, Figure]
-        Dictionary with 'raw_spectra' and 'preprocessed_spectra' keys
+        Always contains ``'raw_spectra'``.  Contains
+        ``'preprocessed_spectra'`` only when *X_preprocessed* is not ``None``.
 
     Examples
     --------
@@ -109,53 +111,60 @@ def create_spectra_plots_single_dataset(
     )
     figures["raw_spectra"] = fig1
 
-    # Figure 2: Preprocessed spectra
-    empty_labels_preproc = [""] * X_preprocessed.shape[0] if suppress_labels else None
-    plot_preprocessed = SpectraPlot(
-        x=preprocessed_x_axis,
-        y=X_preprocessed,
-        color_by=color_values,
-        colormap="shap",
-        labels=empty_labels_preproc,
-        color_mode=color_mode,
-    )
-    fig2 = plot_preprocessed.show(
-        figsize=figsize,
-        title=f"Preprocessed Spectra ({dataset_name.capitalize()})",
-        xlabel=xlabel,
-        ylabel="Intensity",
-        xlim=xlim,
-    )
-    figures["preprocessed_spectra"] = fig2
+    # Figure 2: Preprocessed spectra (only when data is provided)
+    if X_preprocessed is not None:
+        assert preprocessed_x_axis is not None
+        empty_labels_preproc = (
+            [""] * X_preprocessed.shape[0] if suppress_labels else None
+        )
+        plot_preprocessed = SpectraPlot(
+            x=preprocessed_x_axis,
+            y=X_preprocessed,
+            color_by=color_values,
+            colormap="shap",
+            labels=empty_labels_preproc,
+            color_mode=color_mode,
+        )
+        fig2 = plot_preprocessed.show(
+            figsize=figsize,
+            title=f"Preprocessed Spectra ({dataset_name.capitalize()})",
+            xlabel=xlabel,
+            ylabel="Intensity",
+            xlim=xlim,
+        )
+        figures["preprocessed_spectra"] = fig2
 
     return figures
 
 
 def create_spectra_plots_multi_dataset(
     raw_data: Dict[str, np.ndarray],
-    preprocessed_data: Dict[str, np.ndarray],
+    preprocessed_data: Optional[Dict[str, np.ndarray]],
     x_axis: np.ndarray,
-    preprocessed_x_axis: np.ndarray,
+    preprocessed_x_axis: Optional[np.ndarray],
     xlabel: str,
     xlim: Optional[Tuple[float, float]],
     figsize: Tuple[float, float],
     color_mode: Optional[Literal["continuous", "categorical"]] = None,
 ) -> Dict[str, Figure]:
-    """Create raw and preprocessed spectra plots with multiple datasets.
+    """Create raw and (optionally) preprocessed spectra plots with multiple datasets.
 
-    Creates two figures with all datasets plotted together, useful for
-    comparing spectra across train/test/validation sets.
+    Always creates a raw spectra figure with all datasets overlaid.  If
+    *preprocessed_data* is provided, also creates a preprocessed spectra
+    figure.
 
     Parameters
     ----------
     raw_data : Dict[str, np.ndarray]
         Dictionary mapping dataset names to raw spectra arrays
-    preprocessed_data : Dict[str, np.ndarray]
-        Dictionary mapping dataset names to preprocessed spectra arrays
+    preprocessed_data : Dict[str, np.ndarray] or None
+        Dictionary mapping dataset names to preprocessed spectra arrays.
+        If ``None``, no preprocessed figure is generated.
     x_axis : np.ndarray
         X-axis values for raw spectra
-    preprocessed_x_axis : np.ndarray
-        X-axis values for preprocessed spectra
+    preprocessed_x_axis : np.ndarray or None
+        X-axis values for preprocessed spectra.  Required when
+        *preprocessed_data* is not ``None``.
     xlabel : str
         Label for x-axis
     xlim : Optional[Tuple[float, float]]
@@ -168,7 +177,9 @@ def create_spectra_plots_multi_dataset(
     Returns
     -------
     Dict[str, Figure]
-        Dictionary with 'raw_spectra' and 'preprocessed_spectra' keys
+        Always contains ``'raw_spectra'``.  Contains
+        ``'preprocessed_spectra'`` only when *preprocessed_data* is not
+        ``None``.
     """
     figures = {}
 
@@ -198,27 +209,31 @@ def create_spectra_plots_multi_dataset(
 
     figures["raw_spectra"] = fig_raw
 
-    # Create preprocessed spectra plot with all datasets
-    fig_prep, ax_prep = plt.subplots(figsize=figsize)
+    # Create preprocessed spectra plot with all datasets (only when data is provided)
+    if preprocessed_data is not None:
+        assert preprocessed_x_axis is not None
+        fig_prep, ax_prep = plt.subplots(figsize=figsize)
 
-    for name, X in preprocessed_data.items():
-        color = DATASET_COLORS.get(name, "black")
+        for name, X in preprocessed_data.items():
+            color = DATASET_COLORS.get(name, "black")
 
-        labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
-        plot = SpectraPlot(
-            x=preprocessed_x_axis, y=X, labels=labels, color_mode=color_mode
+            labels = [name.capitalize()] + [None] * (X.shape[0] - 1)
+            plot = SpectraPlot(
+                x=preprocessed_x_axis, y=X, labels=labels, color_mode=color_mode
+            )
+
+            plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
+
+        ax_prep.set_title(
+            "Preprocessed Spectra Comparison", fontsize=14, fontweight="bold"
         )
+        ax_prep.set_xlabel(xlabel, fontsize=12)
+        ax_prep.set_ylabel("Intensity", fontsize=12)
+        ax_prep.grid(alpha=0.3)
+        if xlim:
+            ax_prep.set_xlim(xlim)
+        ax_prep.legend()
 
-        plot.render(ax=ax_prep, color=color, alpha=0.6, linewidth=1)
-
-    ax_prep.set_title("Preprocessed Spectra Comparison", fontsize=14, fontweight="bold")
-    ax_prep.set_xlabel(xlabel, fontsize=12)
-    ax_prep.set_ylabel("Intensity", fontsize=12)
-    ax_prep.grid(alpha=0.3)
-    if xlim:
-        ax_prep.set_xlim(xlim)
-    ax_prep.legend()
-
-    figures["preprocessed_spectra"] = fig_prep
+        figures["preprocessed_spectra"] = fig_prep
 
     return figures

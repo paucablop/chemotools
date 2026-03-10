@@ -4,6 +4,9 @@ implements the Orthogonal Signal Correction (OSC) technique for preprocessing
 spectral data by removing variations orthogonal to the target variable.
 """
 
+# Author: Pau Cabaneros
+# License: MIT
+
 import warnings
 from numbers import Integral, Real
 from typing import Literal, Tuple

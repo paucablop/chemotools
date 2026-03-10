@@ -4,6 +4,9 @@ implements the External Parameter Orthogonalization (EPO) technique for preproce
 spectral data by removing variations orthogonal to the external parameters.
 """
 
+# Author: Pau Cabaneros
+# License: MIT
+
 from numbers import Integral
 from typing import Optional
 

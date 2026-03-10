@@ -12,8 +12,9 @@ import_optional_dependency(
 
 from ._pca_inspector import PCAInspector  # noqa: E402
 from ._pls_regression_inspector import PLSRegressionInspector  # noqa: E402
+from ._preprocessing_inspector import PreprocessingInspector  # noqa: E402
 
-__all__ = ["PCAInspector", "PLSRegressionInspector"]
+__all__ = ["PCAInspector", "PLSRegressionInspector", "PreprocessingInspector"]
 
 # Show experimental warning on module import
 warnings.warn(

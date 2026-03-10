@@ -81,9 +81,9 @@ class SpectraMixin:
     ) -> Dict[str, "Figure"]:
         """Create independent plots comparing raw and preprocessed spectra.
 
-        Only available if model is a Pipeline with preprocessing steps.
-        Creates two separate figure windows: one for raw spectra and one
-        for preprocessed spectra. When multiple datasets are provided,
+        Always creates a figure for raw spectra. If the model is a
+        Pipeline with preprocessing steps, also creates a figure for
+        preprocessed spectra. When multiple datasets are provided,
         all spectra are plotted on the same figure with colors indicating
         the dataset.
 
@@ -108,13 +108,9 @@ class SpectraMixin:
         Returns
         -------
         figures : dict
-            Dictionary containing both figures with keys:
-            'raw_spectra', 'preprocessed_spectra'
-
-        Raises
-        ------
-        ValueError
-            If no preprocessing pipeline is available
+            Dictionary containing figures. Always includes ``'raw_spectra'``.
+            Includes ``'preprocessed_spectra'`` only when a preprocessing
+            pipeline is available.
 
         Examples
         --------
@@ -129,11 +125,7 @@ class SpectraMixin:
         """
         inspector = self._spectra_inspector()
 
-        if inspector.transformer is None:
-            raise ValueError(
-                "Spectra inspection requires a preprocessing pipeline. "
-                "Model must be a Pipeline with preprocessing steps."
-            )
+        has_preprocessing = inspector.transformer is not None
 
         # Normalize dataset to always be a list
         datasets = normalize_datasets(dataset)
@@ -143,17 +135,22 @@ class SpectraMixin:
         xlabel = get_xlabel_for_features(inspector.feature_names is not None)
 
         # Get preprocessed x_axis (may be subset if feature selection)
-        preprocessed_x_axis = inspector._get_preprocessed_x_axis()
+        preprocessed_x_axis = (
+            inspector._get_preprocessed_x_axis() if has_preprocessing else None
+        )
 
         if is_multi_dataset:
             # Multiple datasets: plot all on same figure, color by dataset
             raw_data = {}
-            preprocessed_data = {}
+            preprocessed_data: Optional[Dict[str, np.ndarray]] = (
+                {} if has_preprocessing else None
+            )
             for ds in datasets:
                 X_raw, _ = inspector._get_raw_data(ds)
-                X_preprocessed = inspector._get_preprocessed_data(ds)
                 raw_data[ds] = X_raw
-                preprocessed_data[ds] = X_preprocessed
+                if has_preprocessing:
+                    assert preprocessed_data is not None
+                    preprocessed_data[ds] = inspector._get_preprocessed_data(ds)
 
             figures = create_spectra_plots_multi_dataset(
                 raw_data=raw_data,
@@ -169,7 +166,9 @@ class SpectraMixin:
             # Single dataset
             ds = datasets[0]
             X_raw, y = inspector._get_raw_data(ds)
-            X_preprocessed = inspector._get_preprocessed_data(ds)
+            X_preprocessed = (
+                inspector._get_preprocessed_data(ds) if has_preprocessing else None
+            )
 
             figures = create_spectra_plots_single_dataset(
                 X_raw=X_raw,
