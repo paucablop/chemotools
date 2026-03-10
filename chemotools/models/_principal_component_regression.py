@@ -52,7 +52,7 @@ class PCR(BaseEstimator, RegressorMixin):
         ],
     }
 
-    def __init__(self, n_components=2):
+    def __init__(self, n_components: int = 2):
         self.n_components = n_components
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "PCR":
