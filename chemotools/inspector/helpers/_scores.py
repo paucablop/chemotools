@@ -216,7 +216,8 @@ def _render_multi_scores_1d(
     for ds_name, data in datasets_data.items():
         scores = data["scores"]
         y = data["y"]
-        assert scores is not None, f"Scores data is required for dataset {ds_name}"
+        if scores is None:
+            raise ValueError(f"Scores data is required for dataset {ds_name}")
 
         pc_scores = scores[:, component]
         marker = DATASET_MARKERS.get(ds_name, "o")
@@ -293,10 +294,11 @@ def _render_multi_scores_2d(
     for ds_name, data in datasets_data.items():
         scores = data["scores"]
         y = data["y"]
-        assert scores is not None, f"Scores data is required for dataset {ds_name}"
+        if scores is None:
+            raise ValueError(f"Scores data is required for dataset {ds_name}")
 
         color = DATASET_COLORS.get(ds_name, "grey")
-        marker = DATASET_MARKERS.get(ds_name, "grey")
+        marker = DATASET_MARKERS.get(ds_name, "o")
         color_values = prepare_color_values(color_by, ds_name, y, scores.shape[0])
 
         plot = ScoresPlot(

@@ -113,7 +113,10 @@ def create_spectra_plots_single_dataset(
 
     # Figure 2: Preprocessed spectra (only when data is provided)
     if X_preprocessed is not None:
-        assert preprocessed_x_axis is not None
+        if preprocessed_x_axis is None:
+            raise ValueError(
+                "preprocessed_x_axis must be provided when X_preprocessed is not None."
+            )
         empty_labels_preproc = (
             [""] * X_preprocessed.shape[0] if suppress_labels else None
         )
@@ -211,7 +214,11 @@ def create_spectra_plots_multi_dataset(
 
     # Create preprocessed spectra plot with all datasets (only when data is provided)
     if preprocessed_data is not None:
-        assert preprocessed_x_axis is not None
+        if preprocessed_x_axis is None:
+            raise ValueError(
+                "preprocessed_x_axis must be provided when preprocessed_data is not "
+                "None."
+            )
         fig_prep, ax_prep = plt.subplots(figsize=figsize)
 
         for name, X in preprocessed_data.items():

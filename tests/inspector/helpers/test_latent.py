@@ -571,7 +571,7 @@ class TestCreateScoresPlotMultiDataset:
 
         # Act & Assert (2D case)
         with pytest.raises(
-            AssertionError, match="Scores data is required for dataset test"
+            ValueError, match="Scores data is required for dataset test"
         ):
             create_scores_plot_multi_dataset(
                 component_spec=(0, 1),
