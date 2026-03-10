@@ -29,11 +29,11 @@ msgstr "检查器"
 
 #: ../../source/methods/inspector.rst:3
 msgid ""
-"Interactively explore and diagnose your PCA and PLS models with the "
-"inspector module. Inspectors provide a unified interface for creating "
-"comprehensive diagnostic visualizations, including scores plots, "
-"loadings, explained variance, outlier detection, and regression "
-"diagnostics."
+"Interactively explore and diagnose your PCA and PLS models or "
+"preprocessing pipeline with the inspector module. Inspectors "
+"provide a unified interface for creating comprehensive diagnostic "
+"visualizations, including scores plots, loadings, explained "
+"variance, outlier detection, and regression diagnostics."
 msgstr ""
 "通过检查器模块，交互式地探索和诊断您的PCA和PLS模型。检查器提供了一个统一的接口，用于创建全面的诊断可视化图表，包括得分图、载荷图、解释方差、异常值检测和回归诊断。"
 

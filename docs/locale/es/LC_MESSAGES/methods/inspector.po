@@ -29,16 +29,24 @@ msgstr ""
 
 #: ../../source/methods/inspector.rst:3
 msgid ""
-"Interactively explore and diagnose your PCA and PLS models with the "
-"inspector module. Inspectors provide a unified interface for creating "
-"comprehensive diagnostic visualizations, including scores plots, "
-"loadings, explained variance, outlier detection, and regression "
-"diagnostics."
+"Interactively explore and diagnose your PCA and PLS models or "
+"preprocessing pipeline with the inspector module. Inspectors "
+"provide a unified interface for creating comprehensive diagnostic "
+"visualizations, including scores plots, loadings, explained "
+"variance, outlier detection, and regression diagnostics."
+
 msgstr ""
+"Explore e inspeccione de forma interactiva sus modelos de PCA y PLS o su "
+"pipeline de preprocesamiento con el módulo inspector. Los inspectores "
+"proporcionan una interfaz unificada para crear visualizaciones de diagnóstico "
+"completas, incluidos gráficos de puntuaciones, cargas, varianza explicada, "
+"detección de valores atípicos y diagnósticos de regresión."
 
 #: ../../source/methods/inspector.rst:7
 msgid ""
 "The inspector module is experimental and under active development. The "
 "API may change in future versions."
 msgstr ""
+"El módulo inspector es experimental y está en desarrollo activo. La "
+"API puede cambiar en versiones futuras."
 

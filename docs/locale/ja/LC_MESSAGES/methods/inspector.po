@@ -29,11 +29,11 @@ msgstr "インスペクタ"
 
 #: ../../source/methods/inspector.rst:3
 msgid ""
-"Interactively explore and diagnose your PCA and PLS models with the "
-"inspector module. Inspectors provide a unified interface for creating "
-"comprehensive diagnostic visualizations, including scores plots, "
-"loadings, explained variance, outlier detection, and regression "
-"diagnostics."
+"Interactively explore and diagnose your PCA and PLS models or "
+"preprocessing pipeline with the inspector module. Inspectors "
+"provide a unified interface for creating comprehensive diagnostic "
+"visualizations, including scores plots, loadings, explained "
+"variance, outlier detection, and regression diagnostics."
 msgstr "インスペクタモジュールを使用して、PCAおよびPLSモデルを対話的に探索・診断します。インスペクタは、スコアプロット、ローディング、説明分散、外れ値検出、回帰診断などの包括的な診断可視化を作成するための統一インターフェースを提供します。"
 
 #: ../../source/methods/inspector.rst:7

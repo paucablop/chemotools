@@ -1,6 +1,6 @@
 Inspector
 =========
-Interactively explore and diagnose your PCA and PLS models with the inspector module. Inspectors provide a unified interface for creating comprehensive diagnostic visualizations, including scores plots, loadings, explained variance, outlier detection, and regression diagnostics.
+Interactively explore and diagnose your PCA and PLS models or preprocessing pipeline with the inspector module. Inspectors provide a unified interface for creating comprehensive diagnostic visualizations, including scores plots, loadings, explained variance, outlier detection, and regression diagnostics.
 
 .. note::
 

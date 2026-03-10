@@ -9,4 +9,5 @@ Inspector Classes
 
     PCAInspector
     PLSRegressionInspector
+    PreprocessingInspector
 
