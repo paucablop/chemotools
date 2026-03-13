@@ -14,7 +14,7 @@ from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 import numpy as np
 
 
-class PrincipalComponentRegression(BaseEstimator, RegressorMixin):
+class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
     """
     Description
 
