@@ -55,7 +55,7 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
         "copy": ["boolean"],
     }
 
-    def __init__(self, n_components: int = None, copy: bool = True):
+    def __init__(self, n_components: int | None = None, copy: bool = True):
         self.n_components = n_components
         self.copy = copy
 
