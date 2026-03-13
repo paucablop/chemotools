@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.scale._min_max_scaler` module implements a Min-Max Scaler transformer.
+The :mod:`chemotools.models._principal_component_regression` module implements a PCR model.
 """
 
 # Authors: Ruggero Guerrini
@@ -8,39 +8,41 @@ The :mod:`chemotools.scale._min_max_scaler` module implements a Min-Max Scaler t
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
-from sklearn.utils.validation import check_X_y, check_array
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import validate_data, check_is_fitted
 from numbers import Integral
 from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 import numpy as np
 
 
-class PCR(BaseEstimator, RegressorMixin):
+class PrincipalComponentRegression(BaseEstimator, RegressorMixin):
     """
     Description
 
     Parameters
     ----------
-    use_min : bool, default=True
-        The normalization to use. If True, the data is subtracted by the minimum and
-        scaled by the maximum. If False, the data is scaled by the maximum.
+    n_components : int, default = 2
+        The number of components used to calculate the PCA model
+        # add comments on parameter constraints
 
     Attributes
     ----------
-    n_features_in_ : int
-        The number of features in the input data.
+    pca_ : PCA objects from sklearn
+        Fitted PCA model
+
+    lr_ : Linear Regression objects from sklearn
+        Fitted Linear Regression model
 
     Examples
     --------
-    >>> from chemotools.datasets import load_fermentation_train
-    >>> from chemotools.scale import MinMaxScaler
-    >>> # Load sample data
-    >>> X, _ = load_fermentation_train()
-    >>> # Initialize MinMaxScaler
-    >>> scaler = MinMaxScaler()
-    MinMaxScaler()
-    >>> # Fit and transform the data
-    >>> X_scaled = scaler.fit_transform(X)
+    >>> from chemotools.decomposition import PrincipalComponentRegression
+    >>> # Generate sample data
+    >>> X = np.random.randn(100, 50)
+    >>> X_test = np.random.randn(10, 50)
+    >>> y = X[:, 0] + 2*X[:, 1] + np.random.randn(100)*0.1
+    >>> # Fit model
+    >>> pcr = PrincipalComponentRegression(n_components=2)
+    >>> pcr.fit(X, y)
+    >>> y_hat = pcr.predict(X_test)
     """
 
     _parameter_constraints: dict = {
@@ -50,56 +52,78 @@ class PCR(BaseEstimator, RegressorMixin):
             StrOptions({"mle"}),
             None,
         ],
+        "copy": ["boolean"],
     }
 
-    def __init__(self, n_components: int = 2):
+    def __init__(self, n_components: int = 2, copy: bool = True):
         self.n_components = n_components
+        self.copy = copy
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> "PCR":
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "PrincipalComponentRegression":
         """
-        Fit the transformer to the input data.
+        Fit the model to the input data.
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
-        y : None
-            Ignored to align with API.
+        y : np.ndarray of shape (n_samples, )
+            The properties to be predicted.
 
         Returns
         -------
-        self : MinMaxScaler
-            The fitted transformer.
+        self : PrincipalComponentRegression
+            The regression model.
         """
-        X, y = check_X_y(X, y)
-        if not 1 <= self.n_components <= min(X.shape):
-            raise ValueError("n_components must be between 1 and min(X.shape)")
+        # Validate input data
+        self._validate_params()
+        X, y = validate_data(
+            self,
+            X,
+            y,
+            ensure_2d=True,
+            reset=True,
+            copy=self.copy,
+            dtype=np.float64,
+            multi_output=True,
+        )
+
+        # Train PCA model
         self.pca_ = PCA(n_components=self.n_components).fit(X)
         T = self.pca_.transform(X)
+
+        # Train linear regression model
         self.lr_ = LinearRegression().fit(T, y)
-        # expose pca and linear regression fitting attributes
 
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
-        Transform the input data by scaling it.
+        Predict new data
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform.
-
-        y : None
-            Ignored to align with API.
+            The input data to predict.
 
         Returns
         -------
-        X_transformed : np.ndarray of shape (n_samples, n_features)
-            The transformed data.
+        y_hat : np.ndarray of shape (n_samples,)
+            The predicted value.
         """
+        # Validate input data
         check_is_fitted(self, ["pca_", "lr_"])
-        X = check_array(X)
+        X = validate_data(
+            self,
+            X,
+            ensure_2d=True,
+            reset=True,
+            copy=self.copy,
+            dtype=np.float64,
+            multi_output=True,
+        )
+
+        # Predict
         T = self.pca_.transform(X)
         return self.lr_.predict(T)
