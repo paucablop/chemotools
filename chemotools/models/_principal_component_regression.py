@@ -118,7 +118,7 @@ class PrincipalComponentRegression(BaseEstimator, RegressorMixin):
             self,
             X,
             ensure_2d=True,
-            reset=True,
+            reset=False,
             copy=self.copy,
             dtype=np.float64,
             multi_output=True,
