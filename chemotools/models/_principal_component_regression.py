@@ -86,7 +86,7 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
             reset=True,
             copy=self.copy,
             dtype=np.float64,
-            multi_output=True,
+            # multi_output=True,
         )
 
         # Train PCA model
