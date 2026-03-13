@@ -121,7 +121,6 @@ class PrincipalComponentRegression(BaseEstimator, RegressorMixin):
             reset=False,
             copy=self.copy,
             dtype=np.float64,
-            multi_output=True,
         )
 
         # Predict
