@@ -38,7 +38,8 @@ def test_band_scaler_with_area():
     x_axis = np.array([100, 200, 300, 400, 500, 600, 700])
 
     # The band includes only the second feature (index 1)
-    scaling_factor = np.trapezoid(spectra[0, 2:4], x=x_axis[2:4], axis=0)
+    trapz_func = getattr(np, "trapezoid", getattr(np, "trapz"))
+    scaling_factor = trapz_func(spectra[0, 2:4], x=x_axis[2:4], axis=0)
     reference_spectra = spectra / scaling_factor
 
     # Act
