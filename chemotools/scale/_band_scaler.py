@@ -5,7 +5,7 @@ The :mod:`chemotools.scale._band_scaler` module implements a Band Scaler transfo
 # Authors: Pau Cabaneros
 # License: MIT
 import warnings
-from numbers import Integral
+from numbers import Real
 from typing import Optional
 
 import numpy as np
@@ -94,19 +94,20 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
     - By providing an `x_axis`, the 'area' method uses the actual distances
         between points (:math:`\Delta x`) to calculate a physically accurate integral.
 
-    If no `x_axis` is provided, 'area' defaults to a summation of values,
+    When using ``aggregation='area'``, an ``x_axis`` must be provided. If it is
+    omitted, the transformer raises a :class:`ValueError` rather than implicitly
     assuming uniform sampling density across the selected band.
 
     See also
     --------
-    chemotools.scale.MunMaxScaler : Scales features to the Min-Max range.
+    chemotools.scale.MinMaxScaler : Scales features to the Min-Max range.
     chemotools.scale.NormScaler : Scales features to unit norm.
     chemotools.scale.PointScaler : Scales features by the intensity at a specific point.
     """
 
     _parameter_constraints: dict = {
-        "start": [Interval(Integral, 0, None, closed="left")],
-        "end": [Interval(Integral, -1, None, closed="left")],
+        "start": [Interval(Real, 0, None, closed="left")],
+        "end": [Interval(Real, -1, None, closed="left")],
         "x_axis": ["array-like", None],
         "aggregation": [StrOptions({"mean", "area"})],
         "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
@@ -169,7 +170,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             )
 
         # Validate that x_axis is provided when aggregation is 'area'
-        if self.aggregation == "area" and self.x_axis is None:
+        if self.aggregation == "area" and axis_values is None:
             raise ValueError("x_axis must be provided when aggregation='area'.")
 
         return self

@@ -33,7 +33,7 @@ msgstr ""
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid "Extended Multiplicative Scatter Correction (EMSC)."
-msgstr ""拡張乗法散乱補正 (EMSC)。"
+msgstr "拡張乗法散乱補正 (EMSC)。"
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid ""
