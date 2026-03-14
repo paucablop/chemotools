@@ -67,6 +67,41 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
     BandScaler(start=10, end=20)
     >>> # Fit and transform the data
     >>> X_scaled = scaler.fit_transform(X)
+
+
+    Notes
+    -----
+    The choice between 'mean' and 'area' aggregation depends on whether the
+    normalization should be based on average signal intensity or total
+    integrated signal:
+
+    - **Mean Scaling ('mean')**: Normalizes by the average intensity across the
+        band. This is standard for correcting global intensity fluctuations
+        (e.g., source power drift or pathlength changes) while preserving the
+        relative magnitude of the spectral profile.
+
+    - **Area Scaling ('area')**: Normalizes by the numerical integral
+        (Trapezoidal rule) of the band. In many spectroscopic applications,
+        the area under a curve is more representative of the total concentration
+        or molar abundance than a single peak height or average intensity.
+
+    **Importance of Coordinate-Aware Scaling**:
+    In some spectrometers, the sampling interval (distance between
+    points on the x-axis) is not perfectly constant across the entire detector.
+    - If the sampling is **non-linear**, a simple summation (equivalent to
+        assuming :math:`\Delta x=1`) will mathematically over-weight regions where data
+        points are more densely packed.
+    - By providing an `x_axis`, the 'area' method uses the actual distances
+        between points (:math:`\Delta x`) to calculate a physically accurate integral.
+
+    If no `x_axis` is provided, 'area' defaults to a summation of values,
+    assuming uniform sampling density across the selected band.
+
+    See also
+    --------
+    chemotools.scale.MunMaxScaler : Scales features to the Min-Max range.
+    chemotools.scale.NormScaler : Scales features to unit norm.
+    chemotools.scale.PointScaler : Scales features by the intensity at a specific point.
     """
 
     _parameter_constraints: dict = {

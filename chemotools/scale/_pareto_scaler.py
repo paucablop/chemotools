@@ -70,13 +70,13 @@ class ParetoScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     Notes
     -----
-    In spectroscopic applications, standard Pareto scaling ($P=0.5$) is often used
+    In spectroscopic applications, standard Pareto scaling (:math:`P=0.5`) is often used
     to reduce the dominance of large peaks (e.g., solvent or high-abundance
     metabolites) without inflating baseline noise as severely as autoscaling.
 
-    According to Varmuza & Filzmoser, $P$ should be treated as a tunable
+    According to Varmuza & Filzmoser, :math:`P` should be treated as a tunable
     hyperparameter. For datasets where relevant information is buried in
-    low-intensity signals but the noise floor is high, an "Adjusted" $P$ (e.g.,
+    low-intensity signals but the noise floor is high, an "Adjusted" :math:`P` (e.g.,
     0.3 or 0.7) may provide a superior balance of signal-to-noise ratio and
     model interpretability compared to fixed Pareto scaling.
 

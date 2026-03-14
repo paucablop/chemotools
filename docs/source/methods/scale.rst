@@ -7,7 +7,9 @@ Scaling Methods
     :toctree: ./generated
     :nosignatures:
 
+    BandScaler
     MinMaxScaler
     NormScaler
+    ParetoScaler
     PointScaler
 
