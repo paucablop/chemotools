@@ -265,7 +265,7 @@ msgid ""
 "<https://jacksonburns.github.io/astartes/>`_."
 msgstr ""
 "Para más detalles, consulta la `documentación de Astartes "
-"<https://astartes.readthedocs.io/>`_."
+"<https://jacksonburns.github.io/astartes/>`_。"
 
 #~ msgid ""
 #~ "**Chemotools** focuses on preprocessing and"

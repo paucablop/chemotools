@@ -33,7 +33,7 @@ msgstr ""
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid "Extended Multiplicative Scatter Correction (EMSC)."
-msgstr ""
+msgstr "Corrección de dispersión multiplicativa extendida (EMSC)."
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid ""
@@ -45,7 +45,7 @@ msgstr ""
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid "Multiplicative Scatter Correction (MSC)."
-msgstr ""
+msgstr "Corrección de dispersión multiplicativa (MSC)."
 
 #: ../../source/methods/scatter.rst:14:<autosummary>:1
 msgid ":py:obj:`RobustNormalVariate <chemotools.scatter.RobustNormalVariate>`"

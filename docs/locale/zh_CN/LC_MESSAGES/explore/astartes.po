@@ -222,7 +222,7 @@ msgstr "Astartes不是 ``chemotools`` 的依赖项，因此你需要单独安装
 msgid ""
 "For more details, check out the `Astartes documentation "
 "<https://jacksonburns.github.io/astartes/>`_."
-msgstr "更多详情，请查看`Astartes文档 <https://astartes.readthedocs.io/>`_。"
+msgstr "更多详情，请查看`Astartes文档 <https://jacksonburns.github.io/astartes/>`_。"
 
 #~ msgid ""
 #~ "**Chemotools** focuses on preprocessing and"

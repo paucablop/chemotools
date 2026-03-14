@@ -223,7 +223,7 @@ msgid ""
 "For more details, check out the `Astartes documentation "
 "<https://jacksonburns.github.io/astartes/>`_."
 msgstr ""
-"詳細については、`Astartesドキュメンテーション <https://astartes.readthedocs.io/>`_ "
+"詳細については、`Astartesドキュメンテーション <https://jacksonburns.github.io/astartes/>`_。"
 "を確認してください。"
 
 #~ msgid ""

@@ -106,6 +106,14 @@ The ``PreprocessingInspector`` also supports multi-dataset comparison. You can o
 
 .. code-block:: python
 
+    from sklearn.model_selection import train_test_split
+
+    # Split the data into training and test sets
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=0
+    )
+
+    # Initialize the inspector with both train and test data
     inspector = PreprocessingInspector(
         pca,
         X_train=X_train,
