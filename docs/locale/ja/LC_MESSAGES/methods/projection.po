@@ -11,8 +11,8 @@ msgstr ""
 "POT-Creation-Date: 2026-03-14 16:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh_CN\n"
-"Language-Team: zh_CN <LL@li.org>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -26,7 +26,7 @@ msgstr ""
 #: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
 msgid ""
 ":py:obj:`ExternalParameterOrthogonalization "
-"<chemotools.cross_decomposition.ExternalParameterOrthogonalization>`"
+"<chemotools.projection.ExternalParameterOrthogonalization>`"
 msgstr ""
 
 #: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
@@ -38,7 +38,7 @@ msgstr ""
 #: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
 msgid ""
 ":py:obj:`OrthogonalSignalCorrection "
-"<chemotools.cross_decomposition.OrthogonalSignalCorrection>`"
+"<chemotools.projection.OrthogonalSignalCorrection>`"
 msgstr ""
 
 #: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1

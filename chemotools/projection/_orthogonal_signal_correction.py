@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.cross_decomposition._orthogonal_signal_correction` module
+The :mod:`chemotools.projection._orthogonal_signal_correction` module
 implements the Orthogonal Signal Correction (OSC) technique for preprocessing
 spectral data by removing variations orthogonal to the target variable.
 """
@@ -91,7 +91,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         Fit and apply OSC to remove variation in `X` that is orthogonal to `y`.
 
     >>> import numpy as np
-    >>> from chemotools.cross_decomposition import OrthogonalSignalCorrection
+    >>> from chemotools.projection import OrthogonalSignalCorrection
     >>> rng = np.random.default_rng(0)
     >>> X = rng.normal(size=(8, 5))
     >>> y = np.linspace(0, 1, 8)
@@ -146,7 +146,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     See Also
     --------
-        chemotools.cross_decomposition.ExternalParameterOrthogonalization : Remove
+        chemotools.projection.ExternalParameterOrthogonalization : Remove
             variation linked to external nuisance parameters.
         sklearn.pipeline.make_pipeline : Build preprocessing and modelling pipelines.
 

@@ -1,7 +1,7 @@
 OrthogonalSignalCorrection
 ==========================
 
-.. currentmodule:: chemotools.cross_decomposition
+.. currentmodule:: chemotools.projection
 
 .. autoclass:: OrthogonalSignalCorrection
     :members:

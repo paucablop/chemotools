@@ -23,14 +23,14 @@ msgstr ""
 msgid "OrthogonalSignalCorrection"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:1
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:1
 #: of
 msgid ""
 "Bases: :py:class:`~sklearn.base.TransformerMixin`, "
 ":py:class:`~sklearn.base.BaseEstimator`"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:1
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:1
 #: of
 msgid ""
 "A transformer that removes variation in X that is orthogonal to the "
@@ -41,13 +41,13 @@ msgstr ""
 msgid "Parameters"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:3
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:124
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:3
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:124
 #: of
 msgid "Number of orthogonal components to remove. Must be a positive integer."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:5
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:5
 #: of
 msgid ""
 "Method for calculating orthogonal components: - 'wold': Original method "
@@ -55,18 +55,18 @@ msgid ""
 "[2]_ - 'fearn': Method by Fearn (2000) [3]_"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:10
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:10
 #: of
 msgid "Maximum number of iterations for the component calculation algorithms."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:12
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:12
 #: of
 msgid "Tolerance for convergence in the iterative algorithms."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:14
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:126
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:14
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:126
 #: of
 msgid "Whether to copy X and Y in fit before applying centering."
 msgstr ""
@@ -75,42 +75,42 @@ msgstr ""
 msgid "Variables"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:17
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:17
 #: of
 msgid "The mean of the features in the training data."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:20
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:20
 #: of
 msgid "The mean of the target variable(s) in the training data."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:23
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:23
 #: of
 msgid "The scores of the orthogonal components."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:26
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:26
 #: of
 msgid "The weights of the orthogonal components."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:29
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:29
 #: of
 msgid "The loadings of the orthogonal components."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:32
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:32
 #: of
 msgid "The number of iterations taken for each component to converge."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:36
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:36
 #: of
 msgid "References"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:37
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:37
 #: of
 msgid ""
 "Svante Wold, Henrik Antti, Fredrik Lindgren, Jerker Öhman (1998), "
@@ -119,7 +119,7 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(98)00109-9."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:43
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:43
 #: of
 msgid ""
 "Jonas Sjöblom, Olof Svensson, Mats Josefson, Hans Kullberg, Svante Wold "
@@ -129,7 +129,7 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(98)00112-9."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:51
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:51
 #: of
 msgid ""
 "Tom Fearn (2000), On orthogonal signal correction, Chemometrics and "
@@ -137,32 +137,32 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(99)00045-3."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:58
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:58
 #: of
 msgid "Examples"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:59
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:59
 #: of
 msgid "Fit and apply OSC to remove variation in `X` that is orthogonal to `y`."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:71
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:71
 #: of
 msgid "Multivariate targets are also supported."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:78
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:78
 #: of
 msgid "The transformer can be used inside a scikit-learn pipeline."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:94
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:94
 #: of
 msgid "Notes"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:95
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:95
 #: of
 msgid ""
 "OSC is a supervised preprocessing method: it removes components from `X` "
@@ -171,7 +171,7 @@ msgid ""
 "problem."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:99
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:99
 #: of
 msgid ""
 "The transformed data keep the same shape as the input data. This "
@@ -179,32 +179,32 @@ msgid ""
 "classical dimension reduction."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:103
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:103
 #: of
 msgid "The available methods differ in how orthogonal components are estimated:"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:105
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:105
 #: of
 msgid "`wold` and `sjoblom` use iterative updates and may emit"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:106
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:106
 #: of
 msgid "`ConvergenceWarning` if `max_iter` is reached before convergence."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:107
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:107
 #: of
 msgid "`fearn` uses a direct SVD-based formulation and does not require an"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:108
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:108
 #: of
 msgid "iterative loop."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:110
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:110
 #: of
 msgid ""
 "In practice, a small number of components is usually preferred. Removing "
@@ -212,42 +212,42 @@ msgid ""
 "still useful for the downstream model."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:116
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:116
 #: of
-msgid ":py:obj:`chemotools.cross_decomposition.ExternalParameterOrthogonalization`"
+msgid ":py:obj:`chemotools.projection.ExternalParameterOrthogonalization`"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:117
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:117
 #: of
 msgid "Remove variation linked to external nuisance parameters."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:119
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:119
 #: of
 msgid ":py:obj:`sklearn.pipeline.make_pipeline`"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:120
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:120
 #: of
 msgid "Build preprocessing and modelling pipelines."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection:122
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:122
 #: of
 msgid "Initialize the Orthogonal Signal Correction (OSC) transformer."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:1
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:1
 #: of
 msgid "Fit the OSC model to calculate the orthogonal components to remove."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:3
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:3
 #: of
 msgid "Training vectors. Accepts numpy arrays, pandas DataFrames."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:5
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:5
 #: of
 msgid "Target vectors. Accepts 1D (univariate) or 2D (multivariate) targets."
 msgstr ""
@@ -256,7 +256,7 @@ msgstr ""
 msgid "Returns"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:8
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.fit:8
 #: of
 msgid "**self** -- Fitted OSC model with calculated orthogonal components."
 msgstr ""
@@ -265,27 +265,27 @@ msgstr ""
 msgid "Return type"
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:1
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:1
 #: of
 msgid "Apply orthogonal signal correction to X."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:3
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:3
 #: of
 msgid "Projects X onto the latent components found during fitting."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:5
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:5
 #: of
 msgid "Samples to transform."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:7
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:7
 #: of
 msgid "Ignored to align with API."
 msgstr ""
 
-#: chemotools.cross_decomposition._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:10
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection.transform:10
 #: of
 msgid "**X_transformed** -- X transformed with removed orthogonal variation."
 msgstr ""

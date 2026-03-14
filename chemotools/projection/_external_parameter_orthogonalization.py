@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.cross_decomposition._external_parameter_orthogonalization` module
+The :mod:`chemotools.projection._external_parameter_orthogonalization` module
 implements the External Parameter Orthogonalization (EPO) technique for preprocessing
 spectral data by removing variations orthogonal to the external parameters.
 """
@@ -56,7 +56,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
     Examples
     --------
     >>> import numpy as np
-    >>> from chemotools.cross_decomposition import (
+    >>> from chemotools.projection import (
     ...     ExternalParameterOrthogonalization,
     ... )
     >>> rng = np.random.default_rng(0)
@@ -93,7 +93,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
 
     See Also
     --------
-    chemotools.cross_decomposition.OrthogonalSignalCorrection : Remove variation
+    chemotools.projection.OrthogonalSignalCorrection : Remove variation
         orthogonal to a supervised target.
     sklearn.pipeline.make_pipeline : Compose EPO with downstream estimators.
 

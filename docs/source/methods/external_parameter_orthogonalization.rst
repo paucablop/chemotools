@@ -1,7 +1,7 @@
 ExternalParameterOrthogonalization
 ==================================
 
-.. currentmodule:: chemotools.cross_decomposition
+.. currentmodule:: chemotools.projection
 
 .. autoclass:: ExternalParameterOrthogonalization
     :members:

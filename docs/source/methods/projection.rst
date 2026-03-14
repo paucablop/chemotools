@@ -1,5 +1,5 @@
-Cross Decomposition Methods
-===========================
+Projection Methods
+==================
 
 .. toctree::
     :maxdepth: 1
@@ -7,12 +7,11 @@ Cross Decomposition Methods
     external_parameter_orthogonalization
     orthogonal_signal_correction
 
-.. currentmodule:: chemotools.cross_decomposition
+.. currentmodule:: chemotools.projection
 
 .. autosummary::
     :nosignatures:
 
     ExternalParameterOrthogonalization
     OrthogonalSignalCorrection
-
 

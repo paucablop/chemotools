@@ -1,5 +1,5 @@
 """
-The module :mod:`chemotools.cross_decomposition._pls_regression` implements an enhanced
+The module :mod:`chemotools.regression._pls_regression` implements an enhanced
 version of PLS regression with automatic explained variance calculation for both X and
 Y spaces. This extension of sklearn's PLSRegression.
 """
@@ -92,7 +92,7 @@ class PLSRegression(_SklearnPLSRegression):
     --------
     **Basic usage with automatic variance calculation**
 
-    >>> from chemotools.models import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> import numpy as np
     >>>
     >>> # Generate sample data

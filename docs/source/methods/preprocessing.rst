@@ -7,7 +7,7 @@ Preprocess your data to remove noise and enhance the chemical information contai
     :caption: API Modules
 
     baseline
-    cross_decomposition
+    projection
     derivative
     scale
     scatter

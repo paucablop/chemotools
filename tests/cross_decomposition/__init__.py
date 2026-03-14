@@ -1,1 +1,1 @@
-"""Tests for chemotools.cross_decomposition module."""
+"""Tests for chemotools.cross_decomposition compatibility layer."""
