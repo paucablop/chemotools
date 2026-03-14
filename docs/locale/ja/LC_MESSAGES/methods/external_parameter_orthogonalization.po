@@ -1,0 +1,309 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-03-14 16:49+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/external_parameter_orthogonalization.rst:2
+msgid "ExternalParameterOrthogonalization"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:1
+#: of
+msgid ""
+"Bases: :py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:1
+#: of
+msgid ""
+"A transformer that removes variation linked to external nuisance "
+"parameters."
+msgstr ""
+
+#: ../../source/methods/external_parameter_orthogonalization.rst
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit
+#: of
+msgid "Parameters"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:3
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:77
+#: of
+msgid "Number of orthogonal components to remove. Must be a positive integer."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:5
+#: of
+msgid ""
+"Placeholder argument kept for API compatibility with scikit-learn style "
+"estimators. Input validation currently relies on the default behavior of "
+"the underlying validation utilities."
+msgstr ""
+
+#: ../../source/methods/external_parameter_orthogonalization.rst
+msgid "Variables"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:10
+#: of
+msgid "Mean spectrum computed from the calibration data passed to `fit()`."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:13
+#: of
+msgid ""
+"Orthogonal projection matrix used to suppress nuisance variation. "
+"Applying `X_centered @ P_epo_` removes the subspace spanned by the first "
+"`n_components` singular vectors of the external variation matrix."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:18
+#: of
+msgid "Number of features seen during `fit()`."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:22
+#: of
+msgid "References"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:23
+#: of
+msgid ""
+"Jean-Michel Roger, Fabien Chauchard, Veronique Bellon-Maurel (2003), "
+"EPO–PLS external parameter orthogonalisation of PLS application to "
+"temperature-independent measurement of sugar content of intact fruits, "
+"Chemometrics and Intelligent Laboratory Systems, Volume 66, Issue 2, "
+"Pages 191-204, https://doi.org/10.1016/S0169-7439(03)00051-0"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:31
+#: of
+msgid "Examples"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:44
+#: of
+msgid ""
+"Repeated measurements of the same physical sample can be grouped through "
+"`sample_ids` so that the nuisance subspace is estimated from within-"
+"sample differences only."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:54
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:22
+#: of
+msgid "Notes"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:55
+#: of
+msgid ""
+"EPO is commonly used when spectral measurements are affected by known "
+"nuisance sources such as temperature, instrument transfer, humidity, or "
+"acquisition conditions. The nuisance structure is estimated from "
+"`X_external`, then projected out from `X`."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:60
+#: of
+msgid ""
+"If `sample_ids` are provided, the difference matrix is built from "
+"deviations around the mean spectrum of each repeated sample. This "
+"isolates variation due to the external condition while suppressing the "
+"underlying chemical signal."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:64
+#: of
+msgid ""
+"The transformer preserves the original number of features. It performs "
+"signal correction, not dimensionality reduction."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:69
+#: of
+msgid ":py:obj:`chemotools.cross_decomposition.OrthogonalSignalCorrection`"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:70
+#: of
+msgid "Remove variation orthogonal to a supervised target."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:72
+#: of
+msgid ":py:obj:`sklearn.pipeline.make_pipeline`"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:73
+#: of
+msgid "Compose EPO with downstream estimators."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:75
+#: of
+msgid "Initialize the External Parameter Orthogonalization (EPO) transformer."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization:79
+#: of
+msgid "Whether to copy X and Y in fit before applying centering."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:1
+#: of
+msgid "Fit the EPO projection from calibration and nuisance spectra."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:3
+#: of
+msgid ""
+"Calibration spectra that will later be corrected by the learned EPO "
+"projection."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:6
+#: of
+msgid "Ignored. Present for scikit-learn API compatibility."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:8
+#: of
+msgid ""
+"Spectra describing the nuisance variation to remove. These may be the "
+"same samples measured under perturbed external conditions, transfer "
+"standards, or any dataset representative of the unwanted subspace."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:12
+#: of
+msgid ""
+"Optional identifiers linking repeated measurements of the same sample. "
+"When provided, the nuisance difference matrix is computed within each "
+"sample group, which helps isolate external variation from chemical "
+"differences between samples."
+msgstr ""
+
+#: ../../source/methods/external_parameter_orthogonalization.rst
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit
+#: of
+msgid "Returns"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:18
+#: of
+msgid "**self** -- Fitted estimator storing the projection matrix in `P_epo_`."
+msgstr ""
+
+#: ../../source/methods/external_parameter_orthogonalization.rst
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit
+#: of
+msgid "Return type"
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.fit:23
+#: of
+msgid ""
+"The nuisance variation matrix $D$ is constructed as either centered "
+"`X_external` or within-group deviations when `sample_ids` are available. "
+"A singular value decomposition of $D$ yields the dominant nuisance "
+"directions, and the projection matrix is then defined as $P = I - VV^T$."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.transform:1
+#: of
+msgid "Project spectra onto the subspace orthogonal to nuisance variation."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.transform:3
+#: of
+msgid "Spectra to correct."
+msgstr ""
+
+#: chemotools.cross_decomposition._external_parameter_orthogonalization.ExternalParameterOrthogonalization.transform:6
+#: of
+msgid ""
+"Corrected spectra after centering with `mean_X_` and projection with "
+"`P_epo_`."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``fit`` method."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a "
+"sub-estimator within a :term:`meta-estimator` and metadata routing is "
+"enabled with ``enable_metadata_routing=True`` (see "
+":func:`sklearn.set_config`). Please check the :ref:`User Guide "
+"<metadata_routing>` on how the routing mechanism works."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass"
+" it to ``fit``."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an"
+" error if the user provides it."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some "
+"parameters and not others."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``X_external`` parameter in ``fit``."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:27
+msgid "Metadata routing for ``sample_ids`` parameter in ``fit``."
+msgstr ""
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:30
+msgid "**self** -- The updated object."
+msgstr ""
+

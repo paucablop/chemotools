@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"POT-Creation-Date: 2026-03-14 16:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -23,23 +23,35 @@ msgstr ""
 msgid "Inspector Classes"
 msgstr "检查器类"
 
-#: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
 msgid ":py:obj:`PCAInspector <chemotools.inspector.PCAInspector>`"
 msgstr ""
 
-#: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
 msgid "Inspector for PCA model diagnostics and visualization."
 msgstr "用于PCA模型诊断与可视化的检查器。"
 
-#: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
 msgid ""
 ":py:obj:`PLSRegressionInspector "
 "<chemotools.inspector.PLSRegressionInspector>`"
 msgstr ""
 
-#: ../../source/methods/inspector_methods.rst:12:<autosummary>:1
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
 msgid "Inspector for PLS Regression model diagnostics and visualization."
 msgstr "用于PLS回归模型诊断与可视化的检查器。"
+
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
+msgid ""
+":py:obj:`PreprocessingInspector "
+"<chemotools.inspector.PreprocessingInspector>`"
+msgstr ""
+
+#: ../../source/methods/inspector_methods.rst:13:<autosummary>:1
+msgid ""
+"Inspector for visualizing the effects of each preprocessing step in a "
+"pipeline."
+msgstr ""
 
 #~ msgid ":py:obj:PCAInspector <chemotools.inspector.PCAInspector>"
 #~ msgstr ""

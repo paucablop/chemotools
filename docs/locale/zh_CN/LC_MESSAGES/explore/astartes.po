@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-15 05:16+0800\n"
+"POT-Creation-Date: 2026-03-14 16:49+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -29,18 +29,20 @@ msgid ""
 "best approach for spectroscopic data, you're not alone. Random splits can"
 " leave gaps in your calibration set or, worse, put very similar samples "
 "in both sets—leading to overly optimistic error estimates."
-msgstr ""
-"如果你曾怀疑随机划分训练集/测试集是否真的是处理光谱数据的最佳方法，那么你并非一个人。随机划分可能会在你的校准集中留下空白，或者更糟的是，在两组中都放入非常相似的样本——从而导致过于乐观的误差估计。"
+msgstr "如果你曾怀疑随机划分训练集/测试集是否真的是处理光谱数据的最佳方法，那么你并非一个人。随机划分可能会在你的校准集中留下空白，或者更糟的是，在两组中都放入非常相似的样本——从而导致过于乐观的误差估计。"
 
 #: ../../source/explore/astartes.rst:8
+#, fuzzy
 msgid ""
 "`Astartes <https://github.com/JacksonBurns/astartes>`_ solves this "
 "problem. It's a Python library that works as a drop-in replacement for "
-"``sklearn.model_selection.train_test_split`` , but with access to sampling"
+"``sklearn.model_selection.train_test_split``, but with access to sampling"
 " algorithms that actually make sense for chemometrics: **Kennard-Stone**,"
 " **SPXY**, and others."
 msgstr ""
-"`Astartes <https://github.com/JacksonBurns/astartes>`_ 解决了这个问题。它是一个Python库，可以作为``sklearn.model_selection.train_test_split`` 的直接替代品，但提供了对化学计量学真正有意义的采样算法：**Kennard-Stone**、**SPXY** 等。"
+"`Astartes <https://github.com/JacksonBurns/astartes>`_ "
+"解决了这个问题。它是一个Python库，可以作为``sklearn.model_selection.train_test_split`` "
+"的直接替代品，但提供了对化学计量学真正有意义的采样算法：**Kennard-Stone**、**SPXY** 等。"
 
 #: ../../source/explore/astartes.rst:11
 msgid "Why does this matter?"
@@ -53,15 +55,15 @@ msgid ""
 "representative calibration set, you *guarantee* it. This reduces the risk"
 " of extrapolation when predicting new samples."
 msgstr ""
-"例如，Kennard-Stone会选择最大化覆盖你光谱空间的样本。你不是希望随机抽取给你一个有代表性的校准集，而是*保证*这一点。这降低了预测新样本时的外推风险。"
+"例如，Kennard-"
+"Stone会选择最大化覆盖你光谱空间的样本。你不是希望随机抽取给你一个有代表性的校准集，而是*保证*这一点。这降低了预测新样本时的外推风险。"
 
 #: ../../source/explore/astartes.rst:15
 msgid ""
 "SPXY goes a step further by considering both the spectra (X) and the "
 "reference values (y) when selecting samples—useful when your y-values "
 "span a wide range."
-msgstr ""
-"SPXY更进一步，在选择样本时同时考虑光谱（X）和参考值（y）——这在你的y值跨度很大时很有用。"
+msgstr "SPXY更进一步，在选择样本时同时考虑光谱（X）和参考值（y）——这在你的y值跨度很大时很有用。"
 
 #: ../../source/explore/astartes.rst:18
 msgid "Available Samplers"
@@ -162,7 +164,10 @@ msgid ""
 "For the full list (including molecule-specific samplers like Scaffold), "
 "check the `Astartes GitHub page <https://github.com/JacksonBurns/astartes"
 "#implemented-sampling-algorithms>`_."
-msgstr "完整列表（包括Scaffold等分子特定采样器），请查看 `Astartes GitHub页面 <https://github.com/JacksonBurns/astartes#implemented-sampling-algorithms>`_ 。"
+msgstr ""
+"完整列表（包括Scaffold等分子特定采样器），请查看 `Astartes GitHub页面 "
+"<https://github.com/JacksonBurns/astartes#implemented-sampling-"
+"algorithms>`_ 。"
 
 #: ../../source/explore/astartes.rst:53
 msgid "Pairing with Chemotools"
@@ -213,9 +218,10 @@ msgid ""
 msgstr "Astartes不是 ``chemotools`` 的依赖项，因此你需要单独安装它："
 
 #: ../../source/explore/astartes.rst:106
+#, fuzzy
 msgid ""
 "For more details, check out the `Astartes documentation "
-"<https://astartes.readthedocs.io/>`_ ."
+"<https://jacksonburns.github.io/astartes/>`_."
 msgstr "更多详情，请查看`Astartes文档 <https://astartes.readthedocs.io/>`_。"
 
 #~ msgid ""
@@ -235,7 +241,11 @@ msgstr "更多详情，请查看`Astartes文档 <https://astartes.readthedocs.io
 #~ " \"rational\" sampling algorithms like "
 #~ "**Kennard-Stone** and **SPXY**, which are"
 #~ " essential in chemometrics."
-#~ msgstr "`Astartes <https://github.com/JacksonBurns/astartes>`_ 是一个用于严格数据集划分（采样）的Python库。它作为``sklearn.model_selection.train_test_split`` 的直接替代品，但提供了\"理性\"采样算法，如**Kennard-Stone**和**SPXY**，这些在化学计量学中至关重要。"
+#~ msgstr ""
+#~ "`Astartes <https://github.com/JacksonBurns/astartes>`_ "
+#~ "是一个用于严格数据集划分（采样）的Python库。它作为``sklearn.model_selection.train_test_split``"
+#~ " 的直接替代品，但提供了\"理性\"采样算法，如**Kennard-"
+#~ "Stone**和**SPXY**，这些在化学计量学中至关重要。"
 
 #~ msgid "Synergy with Chemotools"
 #~ msgstr "与Chemotools的协同作用"
@@ -271,3 +281,4 @@ msgstr "更多详情，请查看`Astartes文档 <https://astartes.readthedocs.io
 
 #~ msgid "You can install astartes via pip:"
 #~ msgstr "你可以通过pip安装astartes："
+

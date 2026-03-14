@@ -22,6 +22,7 @@ Reduce boilerplate code, make your model flows more readable and ensure to fully
 *   **Unified Interface**: Consistent API for PCA and PLS models.
 *   **Multi-Dataset Support**: Easily compare Training, Test, and Validation sets on the same plots.
 *   **Spectra Comparison**: Compare raw vs preprocessed spectra with ``.inspect_spectra()``.
+*   **Preprocessing Visualization**: Walk through each pipeline step and see its effect on your data with ``PreprocessingInspector``.
 *   **Data Access**: Extract scores, loadings, and coefficients for custom analysis.
 *   **Interactive & Publication Ready**: Returns standard matplotlib figures that can be further customized.
 
@@ -31,6 +32,7 @@ Basic Usage
 
 Currently, ``chemotools`` supports inspectors for:
 
+*   **Preprocessing**: ``PreprocessingInspector``
 *   **PCA**: ``PCAInspector``
 *   **PLS Regression**: ``PLSRegressionInspector``
 
@@ -46,7 +48,7 @@ For the example, let's load some data and train a PCA and a PLS regression model
     from chemotools.datasets import load_fermentation_train
     from chemotools.derivative import SavitzkyGolay
     from chemotools.feature_selection import RangeCut
-    from chemotools.inspector import PCAInspector, PLSRegressionInspector
+    from chemotools.inspector import PCAInspector, PLSRegressionInspector, PreprocessingInspector
 
 
     # 1. Load Data
@@ -76,10 +78,52 @@ Now that we have trained the models, we can inspect them using ``inspector``. Th
     The ``inspect()`` method returns a dictionary of ``matplotlib.figure.Figure`` objects, allowing you to save or modify them individually.
 
 
+Inspecting Preprocessing Steps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``PreprocessingInspector`` lets you visualize the cumulative effect of each preprocessing step in a pipeline. Rather than inspecting the final model, it focuses on **how your data changes** through each transformation.
+
+Using the same PCA pipeline we defined above, we can inspect how each preprocessing step transforms the data:
+
+.. code-block:: python
+
+    # Inspect the preprocessing steps of the PCA pipeline
+    inspector = PreprocessingInspector(pca, X_train=X, y_train=y, x_axis=wn)
+    figures = inspector.inspect()
+
+This generates one plot per preprocessing step, showing the raw data followed by the cumulative result after each transformation:
+
+*   **Raw Spectra**: The original input data.
+*   **After RangeCut**: The data after selecting the spectral region of interest.
+*   **After SavitzkyGolay**: The smoothed data.
+*   **After StandardScaler**: The mean-centered data.
+
+Model steps (e.g., PCA, PLS) are automatically excluded from the visualization.
+
+.. image:: ../_static/images/inspector/inspector_preprocessing_overview.png
+
+The ``PreprocessingInspector`` also supports multi-dataset comparison. You can overlay training, test, and validation data to verify that preprocessing behaves consistently across datasets:
+
+.. code-block:: python
+
+    inspector = PreprocessingInspector(
+        pca,
+        X_train=X_train,
+        y_train=y_train,
+        X_test=X_test,
+        y_test=y_test,
+        x_axis=wn,
+    )
+    figures = inspector.inspect(dataset=['train', 'test'])
+
+.. note::
+    The ``PreprocessingInspector`` also provides the ``inspect_spectra()`` method for a quick *raw vs. fully preprocessed* comparison, and a ``summary()`` method that returns a typed dataclass with pipeline information.
+
+
 Inspecting PCA Models
 ~~~~~~~~~~~~~~~~~~~~~
 
-First we take a look at the PCA model.
+Next, we take a look at the PCA model.
 
 .. code-block:: python
 
