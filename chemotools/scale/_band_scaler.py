@@ -1,10 +1,10 @@
 """
-The :mod:`chemotools.scale._point_scaler` module implements a Point Scaler transformer.
+The :mod:`chemotools.scale._band_scaler` module implements a Band Scaler transformer.
 """
 
 # Authors: Pau Cabaneros
 # License: MIT
-
+import warnings
 from numbers import Integral
 from typing import Optional
 
@@ -20,62 +20,70 @@ from chemotools._deprecation import (
 )
 
 
-class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    A transformer that scales the input data by the intensity value at a given point.
-    The point can be specified by an index or by a wavenumber.
+    A transformer that scales the input data by the average intensity of a specified
+    band. The band can be specified by an index range or by a range of wavenumbers.
 
     Parameters
     ----------
-    point : int, optional, default=0
-        The point to scale the data by. It can be an index or an x-axis value.
+    start : int, default=0
+        Index or x-axis value of the start of the range.
 
-    x_axis : array-like, optional, default=None
-        The x-axis values of the input data. If not provided, the indices will be used
-        instead. Default is None. If provided, the values must be in ascending order.
+    end : int, default=-1
+        Index or x-axis value of the end of the range.
+
+    x_axis : array-like, optional
+        X-axis values corresponding to columns. Must be ascending if provided.
 
     wavenumbers : array-like, optional
-        Deprecated alias for ``x_axis``.
+        Deprecated alias for ``x_axis``. Use ``x_axis`` instead.
 
     Attributes
     ----------
+    start_index_ : int
+        The index of the start of the band.
+
+    end_index_ : int
+        The index of the end of the band.
+
     n_features_in_ : int
         The number of features in the input data.
 
-    point_index_ : int
-        The index of the point to scale the data by. It is 0
-        if the wavenumbers are not provided.
 
     Examples
     --------
     >>> from chemotools.datasets import load_fermentation_train
-    >>> from chemotools.scale import PointScaler
+    >>> from chemotools.scale import BandScaler
     >>> # Load sample data
     >>> X, _ = load_fermentation_train()
-    >>> # Initialize PointScaler with point index
-    >>> scaler = PointScaler(point=10)
-    PointScaler(point=10, wavenumbers=None)
+    >>> # Initialize BandScaler with band indices
+    >>> scaler = BandScaler(start=10, end=20)
+    BandScaler(start=10, end=20)
     >>> # Fit and transform the data
     >>> X_scaled = scaler.fit_transform(X)
     """
 
     _parameter_constraints: dict = {
-        "point": [Interval(Integral, 0, None, closed="left")],
+        "start": Interval(Integral, 0, None, closed="left"),
+        "end": [Integral],
         "x_axis": ["array-like", None],
         "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
     def __init__(
         self,
-        point: int = 0,
+        start: int = 0,
+        end: int = -1,
         x_axis: Optional[np.ndarray] = None,
         wavenumbers=DEPRECATED_PARAMETER,
     ):
-        self.point = point
+        self.start = start
+        self.end = end
         self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
-    def fit(self, X: np.ndarray, y=None) -> "PointScaler":
+    def fit(self, X: np.ndarray, y=None) -> "BandScaler":
         """
         Fit the transformer to the input data.
 
@@ -89,7 +97,7 @@ class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstima
 
         Returns
         -------
-        self : PointScaler
+        self : BandScaler
             The fitted transformer.
         """
         # Validate the input parameters
@@ -102,17 +110,27 @@ class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstima
 
         axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
 
-        # Set the point index
+        # Resolve the point index
         if axis_values is None:
-            self.point_index_ = self.point
+            self.start_index_ = self.start
+            self.end_index_ = self.end
         else:
-            self.point_index_ = self._find_index(self.point, axis_values)
+            self.start_index_ = self._find_index(self.start, axis_values)
+            self.end_index_ = self._find_index(self.end, axis_values)
+
+        # Validate that the end is greater than start
+        if self.start_index_ >= self.end_index_ and self.end_index_ != -1:
+            raise ValueError(
+                f"start_index_ ({self.start_index_}) must be less than "
+                f"end_index_ ({self.end_index_})."
+            )
 
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """
-        Transform the input data by scaling by the value at a given Point.
+        Transform the input data by scaling by the average intensity of the specified
+        band.
 
         Parameters
         ----------
@@ -128,7 +146,7 @@ class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstima
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "point_index_")
+        check_is_fitted(self, ["start_index_", "end_index_"])
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
@@ -141,8 +159,17 @@ class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstima
             dtype=np.float64,
         )
 
-        # Scale the data by Point
-        for i, x in enumerate(X_):
-            X_[i] = x / x[self.point_index_]
+        # Scale the data by the average intensity of the specified band
+        band_mean = X_[:, self.start_index_ : self.end_index_].mean(
+            axis=1, keepdims=True
+        )
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Avoid division by zero by setting zero means to one (no scaling) and raise
+        # user warning
+        if np.isclose(band_mean, 0).any():
+            warnings.warn(
+                "The mean for sample(s) is zero. These samples will not be scaled.",
+                UserWarning,
+            )
+
+        return X_ / band_mean

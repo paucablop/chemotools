@@ -12,14 +12,14 @@ from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils._param_validation import Integral, Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._axis_mixin import XAxisMixin
 from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
-    resolve_renamed_parameter,
 )
 
 
-class RangeCut(SelectorMixin, BaseEstimator):
+class RangeCut(XAxisMixin, SelectorMixin, BaseEstimator):
     """Select a contiguous spectral region by index or by x-axis value.
 
     The range can be specified in two ways:
@@ -36,10 +36,13 @@ class RangeCut(SelectorMixin, BaseEstimator):
     ----------
     start : int, default=0
         Index or x-axis value of the start of the range.
+
     end : int, default=-1
         Index or x-axis value of the end of the range.
+
     x_axis : array-like, optional
         X-axis values corresponding to columns. Must be ascending if provided.
+
     wavenumbers : array-like, optional
         Deprecated alias for ``x_axis``. Use ``x_axis`` instead.
 
@@ -47,10 +50,13 @@ class RangeCut(SelectorMixin, BaseEstimator):
     ----------
     start_index_ : int
         Resolved start index.
+
     end_index_ : int
         Resolved end index.
+
     x_axis_ : array-like or None
         Selected x-axis values (if provided), else ``None``.
+
     wavenumbers_ : array-like or None
         Deprecated alias for ``x_axis_``.
 
@@ -109,7 +115,7 @@ class RangeCut(SelectorMixin, BaseEstimator):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        axis_values = self._resolve_x_axis()
+        axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
 
         # Set the start and end indices
         if axis_values is None:
@@ -143,15 +149,3 @@ class RangeCut(SelectorMixin, BaseEstimator):
         mask[self.start_index_ : self.end_index_] = True
 
         return mask
-
-    def _resolve_x_axis(self):
-        return resolve_renamed_parameter(
-            new_name="x_axis",
-            new_value=self.x_axis,
-            new_default=None,
-            old_name="wavenumbers",
-            old_value=self.wavenumbers,
-        )
-
-    def _find_index(self, target: float, axis: np.ndarray) -> int:
-        return int(np.argmin(np.abs(axis - target)))

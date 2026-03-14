@@ -7,21 +7,21 @@ spectral data based on indices or wavenumbers.
 # Author: Pau Cabaneros
 # License: MIT
 
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._axis_mixin import XAxisMixin
 from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
-    resolve_renamed_parameter,
 )
 
 
-class IndexSelector(SelectorMixin, BaseEstimator):
+class IndexSelector(XAxisMixin, SelectorMixin, BaseEstimator):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:
@@ -112,7 +112,7 @@ class IndexSelector(SelectorMixin, BaseEstimator):
         # Set the fitted attribute to True
         self._is_fitted = True
 
-        axis_values = self._resolve_x_axis()
+        axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
 
         # Set the start and end indices
         if self.features is None:
@@ -144,23 +144,3 @@ class IndexSelector(SelectorMixin, BaseEstimator):
         mask[self.features_index_] = True
 
         return mask
-
-    def _find_index(self, target: Union[float, int], axis_values) -> int:
-        if axis_values is None:
-            return int(target)
-        wavenumbers = np.array(axis_values)
-        return int(np.argmin(np.abs(wavenumbers - target)))
-
-    def _find_indices(self, features: np.ndarray, axis_values) -> np.ndarray:
-        return np.array(
-            [self._find_index(feature, axis_values) for feature in features]
-        )
-
-    def _resolve_x_axis(self):
-        return resolve_renamed_parameter(
-            new_name="x_axis",
-            new_value=self.x_axis,
-            new_default=None,
-            old_name="wavenumbers",
-            old_value=self.wavenumbers,
-        )
