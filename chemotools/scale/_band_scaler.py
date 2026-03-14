@@ -216,7 +216,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         # 3. Scale by the area under the band
         elif self.aggregation == "area":
             trapz_func = getattr(
-                np, "trapezoid", getattr(np, "trapz")
+                np, "trapezoid", getattr(np, "trapz", None)
             )  # support for numpy < 2.0.0
             # Handle non-constant sampling using the Trapezoidal rule
             assert self.x_axis is not None  # narrow type (validated in fit())
