@@ -218,6 +218,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             trapz_func = getattr(
                 np, "trapezoid", getattr(np, "trapz", None)
             )  # support for numpy < 2.0.0
+            assert trapz_func is not None  # available in all supported numpy versions
             # Handle non-constant sampling using the Trapezoidal rule
             assert self.x_axis is not None  # narrow type (validated in fit())
             band_x = self.x_axis[self.start_index_ : self.end_index_]
