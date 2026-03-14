@@ -48,8 +48,6 @@ def _make_osc_dataset(
 
 
 # Test compliance with scikit-learn
-
-
 def test_compliance_osc():
     """Check sklearn estimator compliance for the OSC transformer."""
     # Arrange

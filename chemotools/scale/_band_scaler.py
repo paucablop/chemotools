@@ -10,7 +10,7 @@ from typing import Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
-from sklearn.utils._param_validation import Interval
+from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._axis_mixin import XAxisMixin
@@ -35,6 +35,11 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
 
     x_axis : array-like, optional
         X-axis values corresponding to columns. Must be ascending if provided.
+
+    aggregation : {'mean', 'area'}, default='mean'
+        The aggregation method to use for calculating the band intensity.
+        - 'mean': Calculate the mean intensity of the band.
+        - 'area': Calculate the area under the band using the trapezoidal rule.
 
     wavenumbers : array-like, optional
         Deprecated alias for ``x_axis``. Use ``x_axis`` instead.
@@ -65,9 +70,10 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
     """
 
     _parameter_constraints: dict = {
-        "start": Interval(Integral, 0, None, closed="left"),
-        "end": [Integral],
+        "start": [Interval(Integral, 0, None, closed="left")],
+        "end": [Interval(Integral, -1, None, closed="left")],
         "x_axis": ["array-like", None],
+        "aggregation": [StrOptions({"mean", "area"})],
         "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
@@ -76,11 +82,13 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         start: int = 0,
         end: int = -1,
         x_axis: Optional[np.ndarray] = None,
+        aggregation: str = "mean",
         wavenumbers=DEPRECATED_PARAMETER,
     ):
         self.start = start
         self.end = end
         self.x_axis = x_axis
+        self.aggregation = aggregation
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "BandScaler":
@@ -125,6 +133,10 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
                 f"end_index_ ({self.end_index_})."
             )
 
+        # Validate that x_axis is provided when aggregation is 'area'
+        if self.aggregation == "area" and self.x_axis is None:
+            raise ValueError("x_axis must be provided when aggregation='area'.")
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -159,17 +171,33 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             dtype=np.float64,
         )
 
-        # Scale the data by the average intensity of the specified band
-        band_mean = X_[:, self.start_index_ : self.end_index_].mean(
-            axis=1, keepdims=True
-        )
+        # Extract the band of interest
+        band_y = X_[:, self.start_index_ : self.end_index_]
+
+        # 2. Scale the data by the average intensity of the specified band
+        if self.aggregation == "mean":
+            scaling_factor = band_y.mean(axis=1, keepdims=True)
+
+        # 3. Scale by the area under the band
+        elif self.aggregation == "area":
+            trapz_func = getattr(
+                np, "trapezoid", getattr(np, "trapz")
+            )  # support for numpy < 2.0.0
+            # Handle non-constant sampling using the Trapezoidal rule
+            assert self.x_axis is not None  # narrow type (validated in fit())
+            band_x = self.x_axis[self.start_index_ : self.end_index_]
+            scaling_factor = trapz_func(band_y, x=band_x, axis=1)[:, np.newaxis]
 
         # Avoid division by zero by setting zero means to one (no scaling) and raise
         # user warning
-        if np.isclose(band_mean, 0).any():
+        zero_mask = np.isclose(scaling_factor, 0).ravel()
+        if zero_mask.any():
+            zero_indices = np.flatnonzero(zero_mask).tolist()
             warnings.warn(
-                "The mean for sample(s) is zero. These samples will not be scaled.",
+                f"The scaling factor for sample(s) {zero_indices} is zero. "
+                "These samples will not be scaled.",
                 UserWarning,
             )
+            scaling_factor = np.where(np.isclose(scaling_factor, 0), 1, scaling_factor)
 
-        return X_ / band_mean
+        return X_ / scaling_factor
