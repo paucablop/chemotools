@@ -1,9 +1,12 @@
 """Tests for enhanced PCR."""
 
-from chemotools.models._principal_component_regression import PrincipalComponentRegression
+from chemotools.models._principal_component_regression import (
+    PrincipalComponentRegression,
+)
 from sklearn.utils.estimator_checks import check_estimator
 import pytest
 import numpy as np
+
 # Import the package needed to make the comparison with a sklearn pipeline
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
@@ -17,6 +20,7 @@ def test_compliance_PrincipalComponentRegression():
     # Act & Assert
     check_estimator(transformer)
 
+
 # Test functionality
 class TestPrincipalComponentRegressionCompatibility:
     """
@@ -26,7 +30,7 @@ class TestPrincipalComponentRegressionCompatibility:
     def test_same_predictions_as_sklearn(self):
         # Arrange
         np.random.seed(17)
-        X = np.random.randn(100,50)
+        X = np.random.randn(100, 50)
         y = np.random.randn(100)
 
         # Fit both models with same parameters
@@ -44,7 +48,7 @@ class TestPrincipalComponentRegressionCompatibility:
         np.testing.assert_array_almost_equal(
             sklearn_pred,
             chemotools_pred,
-            decimal = 10,
+            decimal=10,
             err_msg="Predictions should match sklearn exactly",
         )
 
@@ -79,8 +83,8 @@ class TestPrincipalComponentRegressionCompatibility:
         for attr in sklearn_attributes:
             sklearn_pca = sklearn_pcr.named_steps["pca"]
             sklearn_val = getattr(sklearn_pca, attr)
-            assert hasattr(chemotools_pcr,"pca_") # Check there is PCA
-            chemotools_val = getattr(chemotools_pcr.pca_,attr)
+            assert hasattr(chemotools_pcr, "pca_")  # Check there is PCA
+            chemotools_val = getattr(chemotools_pcr.pca_, attr)
             np.testing.assert_array_almost_equal(
                 sklearn_val,
                 chemotools_val,
@@ -98,16 +102,15 @@ class TestPrincipalComponentRegressionCompatibility:
         for attr in sklearn_attributes:
             sklearn_lr = sklearn_pcr.named_steps["linearregression"]
             sklearn_val = getattr(sklearn_lr, attr)
-            assert hasattr(chemotools_pcr,"lr_") # Check there is PCA
-            chemotools_val = getattr(chemotools_pcr.lr_,attr)
+            assert hasattr(chemotools_pcr, "lr_")  # Check there is PCA
+            chemotools_val = getattr(chemotools_pcr.lr_, attr)
             np.testing.assert_array_almost_equal(
                 sklearn_val,
                 chemotools_val,
                 decimal=10,
                 err_msg=f"Attribute {attr} should match sklearn exactly",
             )
-        
-    
+
     def test_same_score_as_sklearn(self):
         """
         Test that score() method produces same R² as sklearn.
@@ -155,7 +158,7 @@ class TestPrincipalComponentRegressionCompatibility:
         # Act
         sklearn_pred = sklearn_pcr.predict(X)
         chemotools_pred = chemotools_pcr.predict(X)
-        
+
         # Assert
         np.testing.assert_array_almost_equal(
             sklearn_pred,
@@ -164,10 +167,12 @@ class TestPrincipalComponentRegressionCompatibility:
             err_msg="Multivariate predictions should match sklearn",
         )
 
+
 class TestPrincipalComponentRegressionVarianceCalculation:
     """
     Test the new variance calculation features.
     """
+
     def test_has_explained_variance_attributes(self):
         """
         Test that explained variance attributes are created after fitting.
@@ -205,8 +210,8 @@ class TestPrincipalComponentRegressionVarianceCalculation:
 
         # Assert
         assert np.all(chemotools_pcr.pca_.explained_variance_ratio_ >= 0), (
-                "X-space variance should be non-negative"
-                )
+            "X-space variance should be non-negative"
+        )
 
     def test_variance_calculation_with_pandas(self):
         """
@@ -243,7 +248,7 @@ class TestPrincipalComponentRegressionVarianceCalculation:
             chemotools_pcr.fit(X, y)
 
             assert len(chemotools_pcr.pca_.explained_variance_ratio_) == n_comp
-    
+
     def test_variance_calculation_preserves_sklearn_behavior(self):
         """
         Test that adding variance calculation doesn't change predictions.
@@ -274,7 +279,7 @@ class TestPrincipalComponentRegressionVarianceCalculation:
         np.testing.assert_array_almost_equal(
             sklearn_pred,
             chemotools_pred,
-            decimal = 10,
+            decimal=10,
             err_msg="Prediction should match sklearn",
         )
         np.testing.assert_array_almost_equal(
@@ -284,17 +289,19 @@ class TestPrincipalComponentRegressionVarianceCalculation:
             err_msg="Variance calculation shouldn't change predictions",
         )
 
+
 class TestPrincipalComponentRegressionEdgeCases:
     """
     Test edge cases and error handling
     """
+
     def test_works_with_minimum_samples(self):
         """
         Test that it works with minimum number of samples.
         """
         # Arrange
         np.random.seed(17)
-        X = np.random.randn(10,5) # Only 10 samples
+        X = np.random.randn(10, 5)  # Only 10 samples
         y = np.random.randn(10)
 
         # Act
@@ -302,6 +309,5 @@ class TestPrincipalComponentRegressionEdgeCases:
         chemotools_pcr.fit(X, y)
 
         # Assert
-        assert hasattr(chemotools_pcr,"pca_")
-        assert hasattr(chemotools_pcr.pca_,"explained_variance_ratio_")
-    
+        assert hasattr(chemotools_pcr, "pca_")
+        assert hasattr(chemotools_pcr.pca_, "explained_variance_ratio_")
