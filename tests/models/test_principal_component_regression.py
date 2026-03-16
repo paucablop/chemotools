@@ -51,6 +51,7 @@ class TestPrincipalComponentRegressionCompatibility:
             decimal=10,
             err_msg="Predictions should match sklearn exactly",
         )
+
     def test_y_dimensions(self):
         """
         Test that y dimesions predicted is the right one.
@@ -67,12 +68,12 @@ class TestPrincipalComponentRegressionCompatibility:
         assert chemotools_pcr.predict(X).shape == y.shape
 
         # Act & Assert - Test 2D y
-        for n_y in [1,2,3,4]:
-            y = np.random.randn(100,n_y)
+        for n_y in [1, 2, 3, 4]:
+            y = np.random.randn(100, n_y)
             chemotools_pcr = PrincipalComponentRegression(n_components=5)
             chemotools_pcr.fit(X, y)
             assert chemotools_pcr.predict(X).shape == y.shape
-        
+
     def test_same_attributes_as_sklearn(self):
         """
         Test that all sklearn attributes are present and identical.

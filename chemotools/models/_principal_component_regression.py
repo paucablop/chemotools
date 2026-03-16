@@ -58,10 +58,12 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
     def __init__(self, n_components: int | None = None, copy: bool = True):
         self.n_components = n_components
         self.copy = copy
+
     def __sklearn_tags__(self):
         tags = super().__sklearn_tags__()
         tags.target_tags.multi_output = True
         return tags
+
     def fit(self, X: np.ndarray, y: np.ndarray) -> "PrincipalComponentRegression":
         """
         Fit the model to the input data.
