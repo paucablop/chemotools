@@ -58,7 +58,10 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
     def __init__(self, n_components: int | None = None, copy: bool = True):
         self.n_components = n_components
         self.copy = copy
-
+    def __sklearn_tags__(self):
+        tags = super().__sklearn_tags__()
+        tags.target_tags.multi_output = True
+        return tags
     def fit(self, X: np.ndarray, y: np.ndarray) -> "PrincipalComponentRegression":
         """
         Fit the model to the input data.
@@ -68,7 +71,7 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
         X : np.ndarray of shape (n_samples, n_features)
             The input data to fit the transformer to.
 
-        y : np.ndarray of shape (n_samples, )
+        y : np.ndarray of shape (n_samples, ) or (n_samples, n_targets)
             The properties to be predicted.
 
         Returns
@@ -109,7 +112,7 @@ class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
 
         Returns
         -------
-        y_hat : np.ndarray of shape (n_samples,)
+        y_hat : np.ndarray of shape (n_samples,) or (n_samples, n_targets)
             The predicted value.
         """
         # Validate input data
