@@ -1,4 +1,4 @@
-"""Tests for enhanced PCR."""
+"""Test for PCR"""
 
 from chemotools.models._principal_component_regression import (
     PrincipalComponentRegression,
@@ -73,6 +73,83 @@ class TestPrincipalComponentRegressionCompatibility:
             chemotools_pcr = PrincipalComponentRegression(n_components=5)
             chemotools_pcr.fit(X, y)
             assert chemotools_pcr.predict(X).shape == y.shape
+    def test_attributs(self):
+        """
+        Test all the attributes are presents 
+        """
+        # Arrange
+        np.random.seed(17)
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100)
+
+        # Act
+        sklearn_pcr = make_pipeline(PCA(n_components=5), LinearRegression())
+        chemotools_pcr = PrincipalComponentRegression(n_components=5)
+        sklearn_pcr.fit(X, y)
+        chemotools_pcr.fit(X, y)
+
+        # Assert - PCA
+        sklearn_attributes = [
+            "components_",
+            "explained_variance_",
+            "explained_variance_ratio_",
+        ]
+        
+        for attr in sklearn_attributes:
+            sklearn_pca = sklearn_pcr.named_steps["pca"]
+            sklearn_val = getattr(sklearn_pca, attr)
+            chemotools_val = getattr(chemotools_pcr, attr)
+            np.testing.assert_array_almost_equal(
+                sklearn_val,
+                chemotools_val,
+                decimal=10,
+                err_msg=f"Attribute {attr} should match sklearn exactly",
+            )
+        # Assert - linear regression
+        sklearn_attributes = [
+            "coef_",
+            "intercept_",
+            "rank_",
+            "singular_",
+        ]
+    
+        for attr in sklearn_attributes:
+            sklearn_lr = sklearn_pcr.named_steps["linearregression"]
+            sklearn_val = getattr(sklearn_lr, attr)
+            chemotools_val = getattr(chemotools_pcr, attr)
+            np.testing.assert_array_almost_equal(
+                sklearn_val,
+                chemotools_val,
+                decimal=10,
+                err_msg=f"Attribute {attr} should match sklearn exactly",
+            )
+
+    def test_tranform_as_sklearn(self):
+        """
+        Test that the transform function match with the PCA transform
+        """   
+
+        # Arrange
+        np.random.seed(17)
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100)
+
+        # Act
+        sklearn_pcr = make_pipeline(PCA(n_components=5), LinearRegression())
+        chemotools_pcr = PrincipalComponentRegression(n_components=5)
+        sklearn_pcr.fit(X, y)
+        chemotools_pcr.fit(X, y)
+
+        # Assert - PCA
+        assert chemotools_pcr.transform(X).shape == chemotools_pcr.pca_.transform(X).shape
+        np.testing.assert_array_almost_equal(
+                chemotools_pcr.transform(X),
+                chemotools_pcr.pca_.transform(X),
+                decimal=10,
+                err_msg=f"The transformed data should match sklearn exactly",
+            )
+
+
 
     def test_same_attributes_as_sklearn(self):
         """
