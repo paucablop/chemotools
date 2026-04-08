@@ -149,7 +149,7 @@ class TestPrincipalComponentRegressionCompatibility:
             chemotools_pcr.transform(X),
             chemotools_pcr.pca_.transform(X),
             decimal=10,
-            err_msg=f"The transformed data should match sklearn exactly",
+            err_msg="The transformed data should match sklearn exactly",
         )
 
     def test_same_attributes_as_sklearn(self):
