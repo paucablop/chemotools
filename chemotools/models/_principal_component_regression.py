@@ -5,7 +5,7 @@ The :mod:`chemotools.models._principal_component_regression` module implements a
 # Authors: Ruggero Guerrini
 # License: MIT
 
-from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.base import BaseEstimator, TransformerMixin, RegressorMixin
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.utils.validation import validate_data, check_is_fitted
@@ -14,7 +14,7 @@ from sklearn.utils._param_validation import Interval, RealNotInt, StrOptions
 import numpy as np
 
 
-class PrincipalComponentRegression(RegressorMixin, BaseEstimator):
+class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimator):
     """
     Description
 
