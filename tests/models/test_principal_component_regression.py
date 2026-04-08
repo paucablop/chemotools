@@ -73,9 +73,10 @@ class TestPrincipalComponentRegressionCompatibility:
             chemotools_pcr = PrincipalComponentRegression(n_components=5)
             chemotools_pcr.fit(X, y)
             assert chemotools_pcr.predict(X).shape == y.shape
+
     def test_attributs(self):
         """
-        Test all the attributes are presents 
+        Test all the attributes are presents
         """
         # Arrange
         np.random.seed(17)
@@ -94,7 +95,7 @@ class TestPrincipalComponentRegressionCompatibility:
             "explained_variance_",
             "explained_variance_ratio_",
         ]
-        
+
         for attr in sklearn_attributes:
             sklearn_pca = sklearn_pcr.named_steps["pca"]
             sklearn_val = getattr(sklearn_pca, attr)
@@ -112,7 +113,7 @@ class TestPrincipalComponentRegressionCompatibility:
             "rank_",
             "singular_",
         ]
-    
+
         for attr in sklearn_attributes:
             sklearn_lr = sklearn_pcr.named_steps["linearregression"]
             sklearn_val = getattr(sklearn_lr, attr)
@@ -127,7 +128,7 @@ class TestPrincipalComponentRegressionCompatibility:
     def test_tranform_as_sklearn(self):
         """
         Test that the transform function match with the PCA transform
-        """   
+        """
 
         # Arrange
         np.random.seed(17)
@@ -141,15 +142,15 @@ class TestPrincipalComponentRegressionCompatibility:
         chemotools_pcr.fit(X, y)
 
         # Assert - PCA
-        assert chemotools_pcr.transform(X).shape == chemotools_pcr.pca_.transform(X).shape
+        assert (
+            chemotools_pcr.transform(X).shape == chemotools_pcr.pca_.transform(X).shape
+        )
         np.testing.assert_array_almost_equal(
-                chemotools_pcr.transform(X),
-                chemotools_pcr.pca_.transform(X),
-                decimal=10,
-                err_msg=f"The transformed data should match sklearn exactly",
-            )
-
-
+            chemotools_pcr.transform(X),
+            chemotools_pcr.pca_.transform(X),
+            decimal=10,
+            err_msg=f"The transformed data should match sklearn exactly",
+        )
 
     def test_same_attributes_as_sklearn(self):
         """
