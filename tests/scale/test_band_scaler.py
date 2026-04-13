@@ -65,9 +65,10 @@ def test_band_scaler_with_mean_and_baseline_correction_nonuniform_x_axis():
     spectra = np.array([[0.0, 1.0, 3.0, 2.0, 4.0, 5.0]])
     x_axis = np.array([0.0, 1.0, 3.0, 4.0, 10.0, 11.0])
 
-    # Band: start=1.0 (index 1), end=10.0 (index 4), slice [1:4] → x=[1,3,4]
+    # Band: start=1.0 (start_index_=1), end=10.0 (end_index_=4, exclusive).
+    # BandScaler slices X[:, start_index_:end_index_] = X[:, 1:4] → indices [1,2,3] → x=[1,3,4]
     band_y = spectra[0, 1:4]
-    band_x = x_axis[1:4]  # [1.0, 3.0, 4.0] — non-uniform
+    band_x = x_axis[1:4]  # [1.0, 3.0, 4.0] — non-uniform spacing
 
     # Expected baseline: linear in x (not linear in index)
     # t = (x - x[0]) / (x[-1] - x[0]) = [0, 2/3, 1] ≠ linspace(0, 1, 3) = [0, 0.5, 1]
