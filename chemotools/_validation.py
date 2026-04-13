@@ -91,12 +91,12 @@ def get_model_parameters(estimator: EstimatorType) -> Tuple[int, int, int]:
         If *estimator* is neither ``_BasePCA`` nor ``_PLS``.
     """
     if isinstance(estimator, _BasePCA):
-        return estimator.n_features_in_, estimator.n_components_, estimator.n_samples_  # type: ignore[unresolved-attribute]  # sklearn fitted attributes
+        return estimator.n_features_in_, estimator.n_components_, estimator.n_samples_  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attributes
     if isinstance(estimator, _PLS):
         return (
-            estimator.n_features_in_,  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
+            estimator.n_features_in_,  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
             estimator.n_components,
-            len(estimator.x_scores_),  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
+            len(estimator.x_scores_),  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
         )
     raise TypeError(
         f"Cannot extract parameters from {type(estimator).__name__}. "

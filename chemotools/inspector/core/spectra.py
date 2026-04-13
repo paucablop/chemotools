@@ -90,7 +90,7 @@ class SpectraMixin:
     # Private methods
     # ------------------------------------------------------------------
     def _spectra_inspector(self) -> "_SpectraInspectorProto":
-        return self  # type: ignore[return-value]
+        return self  # type: ignore[ty:invalid-return-type]
 
     # ------------------------------------------------------------------
     # Public API

@@ -137,7 +137,7 @@ class LatentVariableMixin:
     # Private methods
     # ------------------------------------------------------------------
     def _latent_inspector(self) -> "_LatentInspectorProto":
-        return self  # type: ignore[return-value]
+        return self  # type: ignore[ty:invalid-return-type]
 
     def _get_latent_component_label(self) -> str:
         return getattr(self, "component_label", "LV")
