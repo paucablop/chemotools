@@ -232,11 +232,11 @@ class SubtractReference(
         reference_cut = self.reference_[self.start_index_ : self.end_index_]
 
         denom = np.dot(reference_cut, reference_cut)
-        if denom == 0:
+        if np.isclose(denom, 0.0):
             raise ValueError(
-                "Reference spectrum has zero norm in the specified range "
-                f"[{self.start_index_}:{self.end_index_}]. "
-                "Cannot compute scaling factor."
+                "Reference spectrum has zero or near-zero norm in the "
+                f"specified range [{self.start_index_}:{self.end_index_}] "
+                f"(denom={denom}). Cannot compute scaling factor."
             )
 
         return np.dot(X_cut, reference_cut) / denom
