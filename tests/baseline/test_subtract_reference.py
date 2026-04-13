@@ -171,6 +171,6 @@ def test_scale_reference_denominator_zero_raises_error():
 
     # Act & Assert — should raise an error due to zero denominator
     with pytest.raises(
-        ValueError, match="Reference spectrum has zero norm in the specified range"
+        ValueError, match="Reference spectrum has zero or near-zero norm in the"
     ):
         baseline.fit_transform(X)
