@@ -20,7 +20,18 @@ class SubtractReference(
     XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 ):
     """
-    A transformer that subtracts a reference spectrum from the input data.
+    Subtract a reference spectrum from spectral data.
+
+    By default, the transformer computes :math:`x - r` for each sample.
+    When ``scale_reference=True``, the reference is first scaled by an
+    optimal factor :math:`a` that solves:
+
+    .. math::
+
+        \min_a \|x - a \cdot r\|_2
+
+    and returns :math:`x - a \cdot r`. The factor can be computed over a
+    sub-range of the spectrum defined by ``start`` and ``end``.
 
     Parameters
     ----------
@@ -29,10 +40,10 @@ class SubtractReference(
         data. If None, the original spectrum is returned.
 
     scale_reference : bool, default=False
-        If True, the reference is scaled by a factor ``a`` before
-        subtraction, where ``a`` minimises ``||x - a * r||_2`` (or
-        over the sub-range defined by ``start`` / ``end``).
-        If False, a simple subtraction ``x - r`` is performed and
+        If True, the reference is scaled by a factor :math:`a` before
+        subtraction, where :math:`a` minimises :math:`\|x - a \cdot r\|_2`
+        (or over the sub-range defined by ``start`` / ``end``).
+        If False, a simple subtraction :math:`x - r` is performed and
         ``start``, ``end``, and ``x_axis`` are ignored.
 
     start : int, default=0
