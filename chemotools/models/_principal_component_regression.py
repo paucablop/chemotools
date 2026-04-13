@@ -81,7 +81,9 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
     }
 
     def __init__(
-        self, n_components: int | None = None, copy: bool = True,
+        self,
+        n_components: int | None = None,
+        copy: bool = True,
     ):
         self.n_components = n_components
         self.copy = copy
