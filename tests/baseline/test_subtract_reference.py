@@ -22,9 +22,7 @@ def test_subtract_reference(spectrum):
     spectrum_corrected = baseline.fit_transform(spectrum)
 
     # Assert
-    assert np.allclose(
-        spectrum_corrected[0], np.zeros(spectrum.shape[1]), atol=1e-8
-    )
+    assert np.allclose(spectrum_corrected[0], np.zeros(spectrum.shape[1]), atol=1e-8)
 
 
 def test_subtract_reference_raise_error_with_2D_reference(spectrum):
