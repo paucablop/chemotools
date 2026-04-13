@@ -162,14 +162,15 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         )
 
         axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
+        self.axis_values_ = np.asarray(axis_values) if axis_values is not None else None
 
         # Resolve the point index
-        if axis_values is None:
+        if self.axis_values_ is None:
             self.start_index_ = self.start
             self.end_index_ = self.end
         else:
-            self.start_index_ = self._find_index(self.start, axis_values)
-            self.end_index_ = self._find_index(self.end, axis_values)
+            self.start_index_ = self._find_index(self.start, self.axis_values_)
+            self.end_index_ = self._find_index(self.end, self.axis_values_)
 
         # Validate that the end is greater than start
         if self.start_index_ >= self.end_index_ and self.end_index_ != -1:
@@ -179,7 +180,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             )
 
         # Validate that x_axis is provided when aggregation is 'area'
-        if self.aggregation == "area" and axis_values is None:
+        if self.aggregation == "area" and self.axis_values_ is None:
             raise ValueError("x_axis must be provided when aggregation='area'.")
 
         return self
@@ -236,8 +237,8 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             )  # support for numpy < 2.0.0
             assert trapz_func is not None  # available in all supported numpy versions
             # Handle non-constant sampling using the Trapezoidal rule
-            assert self.x_axis is not None  # narrow type (validated in fit())
-            band_x = self.x_axis[self.start_index_ : self.end_index_]
+            assert self.axis_values_ is not None  # narrow type (validated in fit())
+            band_x = self.axis_values_[self.start_index_ : self.end_index_]
             scaling_factor = trapz_func(band_y, x=band_x, axis=1)[:, np.newaxis]
 
         # Avoid division by zero by setting zero means to one (no scaling) and raise
