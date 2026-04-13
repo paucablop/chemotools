@@ -81,7 +81,9 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
         "scale": ["boolean"],
     }
 
-    def __init__(self, n_components: int | None = None, copy: bool = True, scale: bool = True):
+    def __init__(
+        self, n_components: int | None = None, copy: bool = True, scale: bool = True
+    ):
         self.n_components = n_components
         self.copy = copy
         self.scale = scale
@@ -122,8 +124,7 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
         )
 
         # Train PCA model
-        self.pca_ = PCA(n_components=self.n_components,
-            scale=self.scale).fit(X)
+        self.pca_ = PCA(n_components=self.n_components, scale=self.scale).fit(X)
         x_scores = self.pca_.transform(X)
 
         # Train linear regression model
