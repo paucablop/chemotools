@@ -41,6 +41,12 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         - 'mean': Calculate the mean intensity of the band.
         - 'area': Calculate the area under the band using the trapezoidal rule.
 
+    baseline_correction : bool, default=False
+        If True, a linear baseline connecting the band endpoints is
+        subtracted from the band before computing the scaling factor.
+        This removes the effect of a sloped baseline on the mean or
+        area calculation.
+
     wavenumbers : array-like, optional
         Deprecated alias for ``x_axis``. Use ``x_axis`` instead.
 
@@ -110,6 +116,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         "end": [Interval(Real, -1, None, closed="left")],
         "x_axis": ["array-like", None],
         "aggregation": [StrOptions({"mean", "area"})],
+        "baseline_correction": ["boolean"],
         "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
 
@@ -119,12 +126,14 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         end: int = -1,
         x_axis: Optional[np.ndarray] = None,
         aggregation: str = "mean",
+        baseline_correction: bool = False,
         wavenumbers=DEPRECATED_PARAMETER,
     ):
         self.start = start
         self.end = end
         self.x_axis = x_axis
         self.aggregation = aggregation
+        self.baseline_correction = baseline_correction
         self.wavenumbers = wavenumbers
 
     def fit(self, X: np.ndarray, y=None) -> "BandScaler":
@@ -207,14 +216,20 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             dtype=np.float64,
         )
 
-        # Extract the band of interest
+        # 1. Extract the band of interest
         band_y = X_[:, self.start_index_ : self.end_index_]
 
-        # 2. Scale the data by the average intensity of the specified band
+        # 2. Apply baseline correction if enabled
+        if self.baseline_correction:
+            t = np.linspace(0, 1, num=band_y.shape[1])
+            baseline = band_y[:, 0:1] + t * (band_y[:, -1:] - band_y[:, 0:1])
+            band_y = band_y - baseline
+
+        # 3. Scale the data by the average intensity of the specified band
         if self.aggregation == "mean":
             scaling_factor = band_y.mean(axis=1, keepdims=True)
 
-        # 3. Scale by the area under the band
+        # 4. Scale by the area under the band
         elif self.aggregation == "area":
             trapz_func = getattr(
                 np, "trapezoid", getattr(np, "trapz", None)

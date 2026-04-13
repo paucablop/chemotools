@@ -31,6 +31,61 @@ def test_band_scaler_with_mean():
     assert np.allclose(spectra_scaled, reference_spectra, atol=1e-8)
 
 
+def test_band_scaler_with_mean_and_baseline_correction():
+    """Test that BandScaler correctly scales the spectrum using mean aggregation with
+    baseline correction."""
+    # Arrange
+    spectra = np.array([[1.0, 1.0, 2.0, 3.0, 2.0, 1.0, 1.0]])
+    x_axis = np.array([100, 200, 300, 400, 500, 600, 700])
+
+    # The band includes features 1:6
+    baseline = np.ones_like(spectra)
+    band_y = spectra[0, 1:6] - baseline[0, 1:6]
+    scaling_factor = band_y.mean()
+    reference_spectra = spectra / scaling_factor
+
+    # Act
+    scaler = BandScaler(
+        start=200,
+        end=700,
+        x_axis=x_axis,
+        aggregation="mean",
+        baseline_correction=True,
+    )
+    spectra_scaled = scaler.fit_transform(spectra)
+
+    # Assert
+    assert np.allclose(spectra_scaled, reference_spectra, atol=1e-8)
+
+
+def test_band_scaler_with_area_and_baseline_correction():
+    """Test that BandScaler correctly scales the spectrum using area aggregation with
+    baseline correction."""
+    # Arrange
+    spectra = np.array([[1.0, 1.0, 2.0, 3.0, 2.0, 1.0, 1.0]])
+    x_axis = np.array([100, 200, 300, 400, 500, 600, 700])
+
+    # The band includes features 1:6
+    baseline = np.ones_like(spectra)
+    band_y = spectra[0, 1:6] - baseline[0, 1:6]
+    trapz_func = getattr(np, "trapezoid", getattr(np, "trapz", None))
+    scaling_factor = trapz_func(band_y, x=x_axis[1:6], axis=0)
+    reference_spectra = spectra / scaling_factor
+
+    # Act
+    scaler = BandScaler(
+        start=200,
+        end=700,
+        x_axis=x_axis,
+        aggregation="area",
+        baseline_correction=True,
+    )
+    spectra_scaled = scaler.fit_transform(spectra)
+
+    # Assert
+    assert np.allclose(spectra_scaled, reference_spectra, atol=1e-8)
+
+
 def test_band_scaler_with_area():
     """Test that BandScaler correctly scales the spectrum using area aggregation."""
     # Arrange
