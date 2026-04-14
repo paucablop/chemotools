@@ -58,6 +58,41 @@ def test_band_scaler_with_mean_and_baseline_correction():
     assert np.allclose(spectra_scaled, reference_spectra, atol=1e-8)
 
 
+def test_band_scaler_with_mean_and_baseline_correction_nonuniform_x_axis():
+    """Test that BandScaler baseline correction uses actual x-axis spacing, not
+    index-based spacing, so that non-uniform x-axis grids are handled correctly."""
+    # Arrange: non-uniformly spaced x-axis with 6 points
+    spectra = np.array([[0.0, 1.0, 3.0, 2.0, 4.0, 5.0]])
+    x_axis = np.array([0.0, 1.0, 3.0, 4.0, 10.0, 11.0])
+
+    # Band: start=1.0 (start_index_=1), end=10.0 (end_index_=4, exclusive).
+    # BandScaler slices
+    # X[:, start_index_:end_index_] = X[:, 1:4] → indices [1,2,3] → x=[1,3,4]
+    band_y = spectra[0, 1:4]
+    band_x = x_axis[1:4]  # [1.0, 3.0, 4.0] — non-uniform spacing
+
+    # Expected baseline: linear in x (not linear in index)
+    # t = (x - x[0]) / (x[-1] - x[0]) = [0, 2/3, 1] ≠ linspace(0, 1, 3) = [0, 0.5, 1]
+    t = (band_x - band_x[0]) / (band_x[-1] - band_x[0])
+    baseline_values = band_y[0] + t * (band_y[-1] - band_y[0])
+    band_y_corrected = band_y - baseline_values
+    scaling_factor = band_y_corrected.mean()
+    reference_spectra = spectra / scaling_factor
+
+    # Act
+    scaler = BandScaler(
+        start=1.0,
+        end=10.0,
+        x_axis=x_axis,
+        aggregation="mean",
+        baseline_correction=True,
+    )
+    spectra_scaled = scaler.fit_transform(spectra)
+
+    # Assert
+    assert np.allclose(spectra_scaled, reference_spectra, atol=1e-8)
+
+
 def test_band_scaler_with_area_and_baseline_correction():
     """Test that BandScaler correctly scales the spectrum using area aggregation with
     baseline correction."""

@@ -220,9 +220,26 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         # 1. Extract the band of interest
         band_y = X_[:, self.start_index_ : self.end_index_]
 
+        # Resolve band x-axis values if available (used for baseline correction
+        # and area)
+        axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
+        band_x = (
+            axis_values[self.start_index_ : self.end_index_]
+            if axis_values is not None
+            else None
+        )
+
         # 2. Apply baseline correction if enabled
         if self.baseline_correction:
-            t = np.linspace(0, 1, num=band_y.shape[1])
+            if band_x is not None:
+                x_range = band_x[-1] - band_x[0]
+                t = (
+                    (band_x - band_x[0]) / x_range
+                    if x_range != 0
+                    else np.linspace(0, 1, num=band_y.shape[1])
+                )
+            else:
+                t = np.linspace(0, 1, num=band_y.shape[1])
             baseline = band_y[:, 0:1] + t * (band_y[:, -1:] - band_y[:, 0:1])
             band_y = band_y - baseline
 
@@ -237,8 +254,7 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
             )  # support for numpy < 2.0.0
             assert trapz_func is not None  # available in all supported numpy versions
             # Handle non-constant sampling using the Trapezoidal rule
-            assert self.axis_values_ is not None  # narrow type (validated in fit())
-            band_x = self.axis_values_[self.start_index_ : self.end_index_]
+            assert band_x is not None  # narrow type (validated in fit())
             scaling_factor = trapz_func(band_y, x=band_x, axis=1)[:, np.newaxis]
 
         # Avoid division by zero by setting zero means to one (no scaling) and raise
