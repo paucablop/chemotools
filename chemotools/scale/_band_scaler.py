@@ -221,11 +221,11 @@ class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         band_y = X_[:, self.start_index_ : self.end_index_]
 
         # Resolve band x-axis values if available (used for baseline correction
-        # and area)
-        axis_values = self._resolve_x_axis(self.x_axis, self.wavenumbers)
+        # and area). Use the persisted axis from fit() so the deprecated
+        # ``wavenumbers`` path works correctly.
         band_x = (
-            axis_values[self.start_index_ : self.end_index_]
-            if axis_values is not None
+            self.axis_values_[self.start_index_ : self.end_index_]
+            if self.axis_values_ is not None
             else None
         )
 
