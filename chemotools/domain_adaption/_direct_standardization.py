@@ -1,5 +1,5 @@
 """
-The :mod:'chemotools.domain_adaption:DirectStandardization' 
+The :mod:'chemotools.domain_adaption:DirectStandardization'
 module implements a Direct Standardization transformer
 """
 
@@ -14,15 +14,15 @@ class DirectStandardization(BaseEstimator, TransformerMixin):
     """
     Description
     -----------
-    Implement a direct standardization transformer for the calibration 
+    Implement a direct standardization transformer for the calibration
     transfer application.
-    X_master contains the reference measurements acquired 
+    X_master contains the reference measurements acquired
     on the master instrument.
-    X_slave contains the corresponding measurements of the same samples 
+    X_slave contains the corresponding measurements of the same samples
     acquired on the slave instrument.
-    The transformer estimates a mapping from the slave space to 
+    The transformer estimates a mapping from the slave space to
     the master space.
-    After fitting, new X_slave spectra can be transformed into 
+    After fitting, new X_slave spectra can be transformed into
     the X_master space.
 
     Parameters
