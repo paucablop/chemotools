@@ -5,6 +5,7 @@ Test for DirectStandardization
 # Authors: Ruggero Guerrini
 # License: MIT
 import numpy as np
+
 from chemotools.domain_adaption._direct_standardization import (
     DirectStandardization,
 )
