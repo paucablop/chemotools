@@ -134,13 +134,16 @@ class SubtractReference(
         # Set the reference
         if self.reference is not None:
             # Check that the reference is a 1D array and has only finite values
-            if self.reference.ndim != 1:
+            reference = np.asarray(self.reference, dtype=np.float64)
+            if reference.ndim != 1:
                 raise ValueError(
                     f"Reference spectrum must be a 1D array. "
-                    f"Got {self.reference.ndim}D array instead."
+                    f"Got {reference.ndim}D array instead."
                 )
+            if not np.isfinite(reference).all():
+                raise ValueError("Reference spectrum must contain only finite values.")
 
-            self.reference_ = np.asarray(self.reference, dtype=np.float64)
+            self.reference_ = reference
             if self.reference_.shape[0] != X.shape[1]:
                 raise ValueError(
                     f"Reference spectrum must have the same number of features as X. "
