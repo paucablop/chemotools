@@ -162,7 +162,11 @@ class SubtractReference(
             else:
                 axis = np.asarray(self.x_axis)
                 self.start_index_ = self._find_index(self.start, axis)
-                self.end_index_ = self._find_index(self.end, axis)
+                self.end_index_ = (
+                    X.shape[1]
+                    if self.end == -1
+                    else self._find_index(self.end, axis)
+                )
                 self.x_axis_ = axis[self.start_index_ : self.end_index_]
 
             if self.start_index_ >= self.end_index_:
