@@ -460,7 +460,7 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
         ):
             # Apply only this step's transform to the previous cumulative output
             for ds_name in datasets:
-                cumulative[ds_name] = _step_transformer.transform(cumulative[ds_name])  # type: ignore[union-attr]
+                cumulative[ds_name] = _step_transformer.transform(cumulative[ds_name])  # type: ignore[ty:unresolved-attribute]
 
             # Cumulative step label for the title/key
             latest_step_type = type(_step_transformer).__name__

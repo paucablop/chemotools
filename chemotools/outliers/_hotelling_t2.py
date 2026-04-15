@@ -95,10 +95,10 @@ class HotellingT2(_ModelResidualsBase):
     def _compute_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> np.ndarray:
         """Calculate Hotelling's T-squared statistics for input data."""
         if isinstance(self.estimator_, _BasePCA):
-            variances = self.estimator_.explained_variance_  # type: ignore[unresolved-attribute]
+            variances = self.estimator_.explained_variance_  # type: ignore[ty:unresolved-attribute]
 
         if isinstance(self.estimator_, _PLS):
-            variances = np.var(self.estimator_.x_scores_, axis=0)  # type: ignore[unresolved-attribute]
+            variances = np.var(self.estimator_.x_scores_, axis=0)  # type: ignore[ty:unresolved-attribute]
 
         X_transformed = self.estimator_.transform(X)
         return np.sum((X_transformed**2) / variances, axis=1)
