@@ -304,7 +304,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         loadings : ndarray of shape (n_features, n_components_selected)
             PCA loadings (components transposed)
         """
-        loadings = self.estimator.components_.T  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
+        loadings = self.estimator.components_.T  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
         return select_components(loadings, components)
 
     # ------------------------------------------------------------------

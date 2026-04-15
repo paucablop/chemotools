@@ -118,7 +118,7 @@ class RegressionMixin:
     # Private methods
     # ------------------------------------------------------------------
     def _regression_inspector(self) -> "_RegressionInspectorProto":
-        return self  # type: ignore[return-value]
+        return self  # type: ignore[ty:invalid-return-type]
 
     def _regression_dataset_exists(self, dataset: str) -> bool:
         inspector = self._regression_inspector()

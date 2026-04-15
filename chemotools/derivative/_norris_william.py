@@ -7,6 +7,7 @@ transformer to calculate the Norris-Williams derivative of spectral data.
 # License: MIT
 
 from numbers import Integral
+from typing import Literal
 
 import numpy as np
 from scipy.ndimage import convolve1d
