@@ -436,23 +436,6 @@ class _BaseInspector(_DataHoldingBase, ABC):
             self._preprocessed_cache[name] = self.transformer_.transform(X)
         return self._preprocessed_cache[name]
 
-    def _get_feature_mask(self) -> Optional[np.ndarray]:
-        """Get feature selection mask if a selector is present in the pipeline."""
-        from sklearn.feature_selection._base import SelectorMixin
-
-        transformer = self.transformer_
-        if transformer is None:
-            return None
-
-        if isinstance(transformer, Pipeline):
-            for _, step in transformer.steps:
-                if isinstance(step, SelectorMixin):
-                    return step.get_support()
-        elif isinstance(transformer, SelectorMixin):
-            return transformer.get_support()
-
-        return None
-
     def _get_preprocessed_feature_names(
         self, base_dataset: str = "train"
     ) -> np.ndarray:

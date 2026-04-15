@@ -7,7 +7,6 @@ from sklearn.base import BaseEstimator
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest, f_classif
-from sklearn.feature_selection._base import SelectorMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -596,8 +595,10 @@ class TestInspectorErrors:
 class TestFeatureSelection:
     """Tests for feature selection and mask handling."""
 
-    def test_get_feature_mask_with_pipeline_selector(self):
-        """Test get_feature_mask with a pipeline containing a selector."""
+    def test_preprocessed_feature_names_with_pipeline_selector(self):
+        """
+        Test _get_preprocessed_feature_names with a pipeline containing a selector.
+        """
         # Arrange
         X = np.random.rand(10, 5)
         y = np.array([0] * 5 + [1] * 5)
@@ -609,16 +610,6 @@ class TestFeatureSelection:
         pipeline.fit(X, y)
 
         # Act
-        inspector = ConcreteInspector(
-            model=pipeline, X_train=X, y_train=y, supervised=True
-        )
-        mask = inspector._get_feature_mask()
-
-        # Assert
-        assert mask is not None
-        assert mask.sum() == 2
-
-        # Also test _get_preprocessed_feature_names with mask
         feature_names = np.array([f"feat_{i}" for i in range(5)])
         inspector = ConcreteInspector(
             model=pipeline,
@@ -628,41 +619,10 @@ class TestFeatureSelection:
             feature_names=feature_names,
         )
         selected_names = inspector._get_preprocessed_feature_names()
+
+        # Assert
         assert len(selected_names) == 2
         assert np.all(np.isin(selected_names, feature_names))
-
-    def test_get_feature_mask_with_selector_model(self):
-        """Test get_feature_mask when the transformer is a selector instance."""
-        # Arrange
-        X = np.random.rand(10, 5)
-        y = np.array([0] * 5 + [1] * 5)
-
-        class MockSelector(BaseEstimator, SelectorMixin):
-            def fit(self, X, y=None):
-                return self
-
-            def transform(self, X):
-                return X[:, :2]
-
-            def _get_support_mask(self):
-                return np.array([True, True, False, False, False])
-
-        selector = MockSelector()
-        pca = PCA(n_components=2)
-        pca.fit(X)  # Fit PCA separately as we are mocking the extraction
-
-        # Patch _validate_and_extract_model to return our selector as transformer
-        with mock.patch(
-            "chemotools.inspector.core.base._validate_and_extract_model",
-            return_value=(pca, selector),
-        ):
-            inspector = ConcreteInspector(
-                model=pca, X_train=X, y_train=y, supervised=True
-            )
-            mask = inspector._get_feature_mask()
-
-            assert mask is not None
-            assert np.array_equal(mask, np.array([True, True, False, False, False]))
 
 
 class TestBaseInspectorMethods:
