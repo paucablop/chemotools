@@ -7,6 +7,7 @@ the Mean Filter (MF) transformation.
 # License: MIT
 
 from numbers import Integral
+from typing import Literal
 
 import numpy as np
 from scipy.ndimage import uniform_filter1d
@@ -57,9 +58,7 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
 
     _parameter_constraints: dict = {
         "window_length": [Interval(Integral, 3, None, closed="left")],
-        "mode": [
-            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
-        ],
+        "mode": [StrOptions({"nearest", "constant", "reflect", "wrap", "mirror"})],
         "window_size": [
             Interval(Integral, 3, None, closed="left"),
             deprecated_parameter_constraint(),
@@ -67,7 +66,10 @@ class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     }
 
     def __init__(
-        self, window_length: int = 3, mode="nearest", window_size=DEPRECATED_PARAMETER
+        self,
+        window_length: int = 3,
+        mode: Literal["nearest", "constant", "reflect", "wrap", "mirror"] = "nearest",
+        window_size=DEPRECATED_PARAMETER,
     ) -> None:
         self.window_length = window_length
         self.window_size = window_size

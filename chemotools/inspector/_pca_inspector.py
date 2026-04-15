@@ -318,7 +318,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
         explained_variance_ratio : ndarray of shape (n_components,)
             Explained variance ratio
         """
-        return self.estimator.explained_variance_ratio_  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
+        return self.estimator.explained_variance_ratio_  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
 
     # ------------------------------------------------------------------
     # Main inspection method
