@@ -319,7 +319,9 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
         selection), the returned array will reflect the new dimensionality.
         """
         X_prep = self._get_preprocessed_data("train")
-        return self._x_axis_for_n_features(X_prep.shape[1])
+        return self._resolve_x_axis_after_transform(
+            self._preprocessing_steps, X_prep.shape[1]
+        )
 
     # ------------------------------------------------------------------
     # Core API
@@ -467,8 +469,12 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
             fig_key = f"step_{step_idx}_{step_name}"
             title = f"Step {step_idx}: after {latest_step_type}"
 
+            steps_so_far = self._preprocessing_steps[:step_idx]
+
             if is_multi:
-                step_x_axis = self._resolve_step_x_axis(cumulative[datasets[0]])
+                step_x_axis = self._resolve_x_axis_after_transform(
+                    steps_so_far, cumulative[datasets[0]].shape[1]
+                )
 
                 figures[fig_key] = self._plot_multi_dataset_step(
                     datasets,
@@ -483,7 +489,9 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
             else:
                 ds_name = datasets[0]
                 ds = self._get_dataset(ds_name)
-                step_x_axis = self._resolve_step_x_axis(cumulative[ds_name])
+                step_x_axis = self._resolve_x_axis_after_transform(
+                    steps_so_far, cumulative[ds_name].shape[1]
+                )
 
                 color_values = prepare_color_values(
                     color_by, ds_name, ds.y, ds.X.shape[0]
@@ -546,22 +554,6 @@ class PreprocessingInspector(SpectraMixin, _DataHoldingBase):
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
-    def _resolve_step_x_axis(self, X_step: np.ndarray) -> np.ndarray:
-        """Return the appropriate x-axis for a transformed array."""
-        return self._x_axis_for_n_features(X_step.shape[1])
-
-    def _x_axis_for_n_features(self, n_features_out: int) -> np.ndarray:
-        """Return the appropriate x-axis for a given output dimensionality.
-
-        If the number of features is unchanged and feature names were
-        provided, use them.  Otherwise fall back to integer indices.
-        """
-        if n_features_out == self.n_features_in_ and self.feature_names is not None:
-            return self.feature_names.copy()
-        if n_features_out == self.n_features_in_:
-            return self._x_axis.copy()
-        return np.arange(n_features_out)
-
     def _plot_multi_dataset_step(
         self,
         datasets: List[str],
