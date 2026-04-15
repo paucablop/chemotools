@@ -214,11 +214,7 @@ class _DataHoldingBase:
 
         for _, step in steps:
             if isinstance(step, SelectorMixin):
-                try:
-                    axis = axis[step.get_support()]
-                except Exception:
-                    # Failsafe if the selector is not fitted or errors internally
-                    pass
+                axis = axis[step.get_support()]
 
         if axis.shape[0] != n_features_out:
             return np.arange(n_features_out)
