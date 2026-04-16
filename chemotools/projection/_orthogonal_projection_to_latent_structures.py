@@ -7,24 +7,151 @@ preprocessing spectral data by removing variations orthogonal to the target vari
 # Author: Pau Cabaneros
 # License: MIT
 
+from numbers import Integral
+
 import numpy as np
 from scipy.linalg import svd
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import validate_data
 
 
 class OrthogonalPLS(TransformerMixin, BaseEstimator):
+    """
+    A transformer that implements the Orthogonal Projection to Latent Structures (OPLS)
+    technique for preprocessing spectral data by removing variations orthogonal to the
+    target variable. This implementation is based on the algorithm implemented by Trygg
+    and Wold in their 2002 paper [1].
+
+    Note that OPLS is a supervised transformer that splits the data into
+
+    - an orthogonal part (variation in X that is not related to y)
+    - a predictive part (variation in X that is related to y).
+
+    The `fit` method computes the orthogonal components
+
+    Parameters
+    ----------
+    n_components : int, default=1
+        The number of orthogonal components to compute. This determines how many
+        orthogonal variations will be removed from the data.
+
+    copy : bool, default=False
+        If True, a copy of the input data is created and used for computations.
+        If False, the input data is modified in place.
+
+    Attributes
+    ----------
+    x_weights_ : ndarray of shape (n_features, n_components)
+        The weights of the original components.
+
+    x_weights_orth_ : ndarray of shape (n_features, n_components)
+        The weights of the orthogonal components.
+
+    x_loadings_ : ndarray of shape (n_features, n_components)
+        The loadings of the original components.
+
+    x_loadings_orth_ : ndarray of shape (n_features, n_components)
+        The loadings of the orthogonal components.
+
+    x_scores_ : ndarray of shape (n_samples, n_components)
+        The scores of the original components.
+
+    x_scores_orth_ : ndarray of shape (n_samples, n_components)
+        The scores of the orthogonal components.
+
+    References
+    ----------
+    [1] Trygg, J., & Wold, S. (2002).
+    Orthogonal projections to latent structures (O-PLS).
+    Journal of Chemometrics
+    Volume 16, Issue 3, Pages 119-128,
+    https://https://doi.org/10.1002/cem.695.
+
+    Examples
+    --------
+    Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal to `y`.
+    >>> import numpy as np
+    >>> from chemotools.projection import OrthogonalPLS
+    >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+    >>> y = np.array([1, 2, 3])
+    >>> opls = OrthogonalPLS(n_components=1)
+    >>> opls.fit(X, y)
+    OrthogonalPLS(n_components=1, copy=False)
+    >>> X_transformed = opls.transform(X, y)
+    """
+
+    _parameter_constraints: dict = {
+        "n_components": [Interval(Integral, 1, None, closed="left")],
+        "copy": ["boolean"],
+    }
+
     def __init__(self, n_components: int = 1, copy=False):
+        """Initialize the OrthogonalPLS transformer.
+
+        Parameters
+        ----------
+        n_components : int, default=1
+            The number of orthogonal components to compute. This determines how many
+            orthogonal variations will be removed from the data.
+
+        copy : bool, default=False
+            If True, a copy of the input data is created and used for computations.
+            If False, the input data is modified in place.
+        """
         self.n_components = n_components
         self.copy = copy
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "OrthogonalPLS":
+        """Fit the OorthogonalPLS model to the training data.
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data to fit the model to.
+
+        y : array-like of shape (n_samples,)
+            The target values.
+
+        Returns
+        -------
+        self : OrthogonalPLS
+            Fitted estimator.
+        """
+        # Check that X is a 2D array and has only finite values
+        self._validate_params()
+        X, y = validate_data(
+            self,
+            X,
+            y=y,
+            ensure_2d=True,
+            reset=True,
+            copy=self.copy,
+            dtype=np.float64,
+            multi_output=True,
+        )
+        y = np.asarray(y, dtype=np.float64)
+
+        # Validate that there are at least 2 samples
+        n_samples = X.shape[0]
+        if n_samples < 2:
+            raise ValueError(
+                "n_samples=1 is not enough for orthogonal signal correction. "
+                "At least 2 samples are required."
+            )
+
+        # Center the data
+        self.mean_X_ = np.mean(X, axis=0)
+        self.mean_y_ = np.mean(y, axis=0) if y.ndim == 2 else np.mean(y)
+        X_centered = X - self.mean_X_
+        y_centered = y - self.mean_y_
+
         # Get the dimensions
         n = X.shape[0]
         p = X.shape[1]
 
         # TODO: Mean center and optionally scale the data
-        Xk = X.copy()
-        yk = y.copy()
+        Xk = X_centered.copy()
+        yk = y_centered.copy()
         yk = yk.reshape(-1, 1)
 
         # Allocate scores and weights
@@ -88,7 +215,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             self.x_scores_[:, k] = x_scores
             self.x_scores_orth_[:, k] = x_scores_orth
 
-            return self
+        return self
 
     def transform(self, X: np.ndarray, y: np.ndarray, copy=True) -> np.ndarray:
-        return X - self.dot(self.scores_orth_, self.x_loadings_orth_)
+        return X - np.dot(self.x_scores_orth_, self.x_loadings_orth_)
