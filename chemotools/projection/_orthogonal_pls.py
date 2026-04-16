@@ -13,7 +13,7 @@ import numpy as np
 from scipy.linalg import svd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils._param_validation import Interval
-from sklearn.utils.validation import validate_data
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class OrthogonalPLS(TransformerMixin, BaseEstimator):
@@ -149,7 +149,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         n = X.shape[0]
         p = X.shape[1]
 
-        # TODO: Mean center and optionally scale the data
+        # Mean center and optionally scale the data
         Xk = X_centered.copy()
         yk = y_centered.copy()
         yk = yk.reshape(-1, 1)
@@ -218,4 +218,46 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X: np.ndarray, y: np.ndarray, copy=True) -> np.ndarray:
-        return X - np.dot(self.x_scores_orth_, self.x_loadings_orth_)
+        """Apply the OrthoghonalPLS correction to X
+
+        This returns the predictinve part of the data, i.e. the variation in X that is
+        related to y, after removing the orthogonal part (variation in X that is not
+        related to y).
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data to transform.
+
+        y : array-like of shape (n_samples,)
+            The target values.
+
+        Returns
+        -------
+        X_transformed : array-like of shape (n_samples, n_features)
+            The transformed data.
+        """
+        # Check that the estimator is fitted
+        check_is_fitted(self, "n_features_in_")
+
+        # Validate input data
+        X = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            reset=False,
+            copy=self.copy,
+            dtype=np.float64,
+        )
+
+        # Mean center the new data
+        Xc = X - self.mean_X_
+
+        # Return the transformed data
+        for k in range(self.n_components):
+            # Calculate scores for the NEW data using learned weights
+            t_ortho = np.dot(Xc, self.x_weights_orth_[:, k])
+            # Subtract the learned loading pattern
+            Xc -= np.outer(t_ortho, self.x_loadings_orth_[:, k])
+        return Xc
