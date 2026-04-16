@@ -217,7 +217,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
 
         return self
 
-    def transform(self, X: np.ndarray, y: np.ndarray, copy=True) -> np.ndarray:
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Apply the OrthoghonalPLS correction to X
 
         This returns the predictinve part of the data, i.e. the variation in X that is
@@ -229,8 +229,8 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         X : array-like of shape (n_samples, n_features)
             The input data to transform.
 
-        y : array-like of shape (n_samples,)
-            The target values.
+        y : None
+            Ignored to align with API.
 
         Returns
         -------
