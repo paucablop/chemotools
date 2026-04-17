@@ -1,5 +1,6 @@
 """Tests for OrthogonalPLS."""
 
+import numpy as np
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.projection import OrthogonalPLS
@@ -13,3 +14,33 @@ def test_compliance_opls():
 
     # Act & Assert
     check_estimator(transformer)
+
+
+# Test OPLS against literature example
+def test_opls_correctness():
+    """
+    Test the correctness of the OPLS implementation against the example provided in
+    the original paper by Trygg and Wold (2002) [1].
+    """
+    # Arrange
+    X = np.array([[-2.18, 1.84, -0.48, 0.83], [-2.18, -0.16, 1.52, 0.83]]).T
+    y = np.array([2, 2, 0, -4])
+
+    # Reference values are taken from [1]
+    x_weights_orth_ref = np.array([-0.89, 0.45])
+    x_loadings_orth_ref = np.array([-1.16, -0.09])
+    x_scores_orth_ref = np.array([0.97, -1.71, 1.11, -0.37])
+
+    # Act
+    opls = OrthogonalPLS(n_components=1).fit(X, y)
+
+    # Assert
+    np.testing.assert_allclose(
+        opls.x_weights_orth_.flatten(), x_weights_orth_ref, atol=1e-2
+    )
+    np.testing.assert_allclose(
+        opls.x_loadings_orth_.flatten(), x_loadings_orth_ref, atol=1e-2
+    )
+    np.testing.assert_allclose(
+        opls.x_scores_orth_.flatten(), x_scores_orth_ref, atol=1e-2
+    )
