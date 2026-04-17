@@ -67,11 +67,11 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         The mean of the target variable `y` used for centering.
 
     retained_variance_ratio_ : float
-        The proportion of variance in `X` retained explained by the predictive 
+        The proportion of variance in `X` retained explained by the predictive
         components.
 
     removed_variance_ratio_ : float
-        The proportion of variance in `X` removed explained by the orthogonal 
+        The proportion of variance in `X` removed explained by the orthogonal
         components.
 
     References
