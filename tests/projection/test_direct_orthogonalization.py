@@ -22,7 +22,7 @@ def test_compliance_direct_orthogonalization():
 # Test functionality
 def test_direct_orthogonalization_correctness():
     """
-    Test the correctness of the DirectOrthogonalization implementation against the 
+    Test the correctness of the DirectOrthogonalization implementation against the
     example provided in the original paper by Trygg and Wold (2002) [1].
     """
     # Arrange
@@ -49,8 +49,11 @@ def test_direct_orthogonalization_raises_error_many_components():
     y = np.array([2, 2, 0, -4])
 
     # Act / Assert
-    with pytest.raises(ValueError, match="Number of components must be less than or" \
-    " equal to the number of features"):
+    with pytest.raises(
+        ValueError,
+        match="Number of components must be less than or"
+        " equal to the number of features",
+    ):
         DirectOrthogonalization(n_components=3).fit(X, y)
 
 
