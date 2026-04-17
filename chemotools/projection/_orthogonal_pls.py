@@ -60,11 +60,19 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
     x_scores_orth_ : ndarray of shape (n_samples, n_components)
         The scores of the orthogonal components.
 
-    explained_variance_ratio_pred_ : float
-        The proportion of variance in `X` explained by the predictive components.
+    X_mean_ : ndarray of shape (n_features,)
+        The mean of the original data `X` used for centering.
 
-    explained_variance_ratio_orth_ : float
-        The proportion of variance in `X` explained by the orthogonal components.
+    y_mean_ : float or ndarray of shape (n_targets,)
+        The mean of the target variable `y` used for centering.
+
+    retained_variance_ratio_ : float
+        The proportion of variance in `X` retained explained by the predictive 
+        components.
+
+    removed_variance_ratio_ : float
+        The proportion of variance in `X` removed explained by the orthogonal 
+        components.
 
     References
     ----------
@@ -227,9 +235,9 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         # Step 10: Calculate sum of squares in defleated Xk
         total_ss_x_k = np.sum(Xk**2)
 
-        # Step 11: Calculate explained variance ratio in prediction matrix
-        self.explained_variance_ratio_pred_ = total_ss_x_k / total_ss_x
-        self.explained_variance_ratio_orth_ = 1 - self.explained_variance_ratio_pred_
+        # Step 11: Calculate variance ratio in prediction matrix
+        self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
+        self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
 
         return self
 

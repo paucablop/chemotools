@@ -49,7 +49,7 @@ def test_opls_correctness():
 
     # Numerical stability
     np.testing.assert_allclose(
-        opls.explained_variance_ratio_pred_, 0.5743272092463821, atol=1e-8
+        opls.retained_variance_ratio_, 0.5743272092463821, atol=1e-8
     )
 
 
