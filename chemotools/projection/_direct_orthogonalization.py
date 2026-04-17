@@ -172,7 +172,7 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         max_components = Vt.shape[0]
         if self.n_components > max_components:
             raise ValueError(
-                "Number of components must be less than or equal to the number " \
+                "Number of components must be less than or equal to the number "
                 "of features."
             )
 
