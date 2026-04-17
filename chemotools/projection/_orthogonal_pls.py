@@ -64,8 +64,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
     ----------
     [1] Trygg, J., & Wold, S. (2002).
     Orthogonal projections to latent structures (O-PLS).
-    Journal of Chemometrics
-    Volume 16, Issue 3, Pages 119-128,
+    Journal of Chemometricsm, Volume 16, Issue 3, Pages 119-128,
     https://https://doi.org/10.1002/cem.695.
 
     Examples
