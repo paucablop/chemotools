@@ -60,6 +60,12 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
     x_scores_orth_ : ndarray of shape (n_samples, n_components)
         The scores of the orthogonal components.
 
+    explained_variance_ratio_pred_ : float
+        The proportion of variance in `X` explained by the predictive components.
+
+    explained_variance_ratio_orth_ : float
+        The proportion of variance in `X` explained by the orthogonal components.
+
     References
     ----------
     [1] Trygg, J., & Wold, S. (2002).
@@ -161,9 +167,13 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         self.x_scores_ = np.zeros((n, self.n_components))  # t in [1]
         self.x_scores_orth_ = np.zeros((n, self.n_components))  # t_ortho in [1]
 
+        # Calculate total sum of squares for X
+        total_ss_x = np.sum(Xk**2)
+
         # For each component
         for k in range(self.n_components):
-            # Step 1: Weights are calculated through SVD to support multi y
+            # Step 1: Weights are calculated through SVD to support multi y (Step 1
+            # in [1])
             # Step 1.1. Calculate covariance matrix (C)
             C = np.dot(Xk.T, yk)
 
@@ -214,6 +224,13 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             self.x_scores_[:, k] = x_scores
             self.x_scores_orth_[:, k] = x_scores_orth
 
+        # Step 10: Calculate sum of squares in defleated Xk
+        total_ss_x_k = np.sum(Xk**2)
+
+        # Step 11: Calculate explained variance ratio in prediction matrix
+        self.explained_variance_ratio_pred_ = total_ss_x_k / total_ss_x
+        self.explained_variance_ratio_orth_ = 1 - self.explained_variance_ratio_pred_
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -256,7 +273,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         # Return the transformed data
         for k in range(self.n_components):
             # Calculate scores for the NEW data using learned weights
-            t_ortho = np.dot(Xc, self.x_weights_orth_[:, k])
+            scores_orth = np.dot(Xc, self.x_weights_orth_[:, k])
             # Subtract the learned loading pattern
-            Xc -= np.outer(t_ortho, self.x_loadings_orth_[:, k])
+            Xc -= np.outer(scores_orth, self.x_loadings_orth_[:, k])
         return Xc
