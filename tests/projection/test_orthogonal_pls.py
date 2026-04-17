@@ -1,6 +1,7 @@
 """Tests for OrthogonalPLS."""
 
 import numpy as np
+import pytest
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.projection import OrthogonalPLS
@@ -35,6 +36,7 @@ def test_opls_correctness():
     opls = OrthogonalPLS(n_components=1).fit(X, y)
 
     # Assert
+    # Absolute tolerance 1e-2 because of reference's precision
     np.testing.assert_allclose(
         opls.x_weights_orth_.flatten(), x_weights_orth_ref, atol=1e-2
     )
@@ -44,3 +46,20 @@ def test_opls_correctness():
     np.testing.assert_allclose(
         opls.x_scores_orth_.flatten(), x_scores_orth_ref, atol=1e-2
     )
+
+    # Numerical stability
+    np.testing.assert_allclose(
+        opls.explained_variance_ratio_pred_, 0.5743272092463821, atol=1e-8
+    )
+
+
+def test_fit_rejects_single_sample():
+    """Reject datasets with fewer than two samples."""
+    # Arrange
+    X = np.array([[1.0, 2.0, 3.0]])
+    y = np.array([1.0])
+    transformer = OrthogonalPLS()
+
+    # Act / Assert
+    with pytest.raises(ValueError, match="At least 2 samples are required"):
+        transformer.fit(X, y)
