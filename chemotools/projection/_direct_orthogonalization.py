@@ -1,6 +1,6 @@
 """
 The :mod:`chemotools.projection._direct_orthogonalization` module implements the Direct
-Orthogonalization (DO) technique forpreprocessing spectral data by removing variations
+Orthogonalization (DO) technique for preprocessing spectral data by removing variations
 orthogonal to the target variable.
 """
 
@@ -32,6 +32,28 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
+    weights_orth_ : ndarray of shape (n_features, n_components)
+        The weights of the orthogonal components.
+
+    loadings_orth_ : ndarray of shape (n_features, n_components)
+        The loadings of the orthogonal components.
+
+    scores_orth_ : ndarray of shape (n_samples, n_components)
+        The scores of the orthogonal components.
+
+    X_mean_ : ndarray of shape (n_features,)
+        The mean of the original data `X` used for centering.
+
+    y_mean_ : float or ndarray of shape (n_targets,)
+        The mean of the target variable `y` used for centering.
+
+    retained_variance_ratio_ : float
+        The proportion of variance in `X` retained explained by the predictive
+        components.
+
+    removed_variance_ratio_ : float
+        The proportion of variance in `X` removed explained by the orthogonal
+        components.
 
 
     References
@@ -41,6 +63,13 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
     Chemometrics and Intelligent Laboratory Systems,
     Volume 47, Issue 1, Pages 51-63,
     https://doi.org/10.1016/S0169-7439(98)00158-0.
+
+    [2] O. Svensson, T. Kourti, J. F. MacGregor (2002).
+    An investigation of orthogonal signal correction algorithms and their
+    characteristics.
+    Journal of Chemometrics,
+    Volume 16, Issue 4, Pages 176-188,
+    https://doi.org/10.1002/cem.700
 
     Examples
     --------
@@ -123,18 +152,28 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         # Mean center and optionally scale the data
         Xk = X_centered.copy()
         yk = y_centered.copy()
-        yk = yk.reshape(-1, 1)
+        yk = y_centered.reshape(-1, 1) if y_centered.ndim == 1 else y_centered
 
-        for i, yq in enumerate(yk):
-            # Step 1: Orthogonalize Xk w.r.t. yk (Step 2.1 in [1])
-            x_weights = np.dot(Xk.T, yq) / np.dot(yq.T, yq)
+        # Calculate total sum of squares for X
+        total_ss_x = np.sum(Xk**2)
 
-            # Step 2: Deflate Xk (Step 2.2 in [1])
-            Xk -= np.outer(yq.T, x_weights)
+        # Step 1: Orthogonalize X with respect to y using regression (Step 2 in [1])
+        # Generalization to multivariate y. coef_yx is w in [1].
+        coef_yx = np.linalg.pinv(yk.T @ yk) @ yk.T @ Xk
+
+        # Step 2: Deflate X by removing the variation explained by y (Step 2 in [1])
+        Xk -= yk @ coef_yx
 
         # Step 3: SVD of the deflated Xk to get orthogonal components (Step 3 in [1])
-        U, S, Vt = svd(Xk, full_matrices=False)
+        _, _, Vt = svd(Xk, full_matrices=False)
         self.x_loadings_orth_ = Vt[: self.n_components].T
+
+        # Check that n_components is not greater than the maximum possible components
+        max_components = Vt.shape[0]
+        if self.n_components > max_components:
+            raise ValueError(
+                f"n_components={self.n_components} must be <= {max_components}."
+            )
 
         # Step 4: Calculate orthogonal scores (Step 4.1 in [1])
         self.x_scores_orth_ = np.dot(X_centered, self.x_loadings_orth_)
@@ -149,10 +188,17 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
             p_ortho = self.x_loadings_orth_[:, k]
             X_deflated -= np.outer(t_ortho, p_ortho)
 
+        # Step 10: Calculate sum of squares in defleated Xk
+        total_ss_x_k = np.sum(X_deflated**2)
+
+        # Step 11: Calculate variance ratio in prediction matrix
+        self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
+        self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """Apply the OrthoghonalPLS correction to X
+        """Apply the Direct Orthogonalization (D) correction to X
 
         This returns the predictinve part of the data, i.e. the variation in X that is
         related to y, after removing the orthogonal part (variation in X that is not
