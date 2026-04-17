@@ -1,0 +1,197 @@
+"""
+The :mod:`chemotools.projection._direct_orthogonalization` module implements the Direct
+Orthogonalization (DO) technique forpreprocessing spectral data by removing variations
+orthogonal to the target variable.
+"""
+
+# Author: Pau Cabaneros
+# License: MIT
+
+from numbers import Integral
+
+import numpy as np
+from scipy.linalg import svd
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._param_validation import Interval
+from sklearn.utils.validation import check_is_fitted, validate_data
+
+
+class DirectOrthogonalization(TransformerMixin, BaseEstimator):
+    """
+    Remove orthogonal variation to y using the Direct Orthogonalization method [1].
+
+    Parameters
+    ----------
+    n_components : int, default=1
+        The number of orthogonal components to compute. This determines how many
+        orthogonal variations will be removed from the data.
+
+    copy : bool, default=False
+        If True, a copy of the input data is created and used for computations.
+        If False, the input data is modified in place.
+
+    Attributes
+    ----------
+
+
+    References
+    ----------
+    [1] Clause A. Andersson, (1999).
+    Direct orthogonalization.
+    Chemometrics and Intelligent Laboratory Systems,
+    Volume 47, Issue 1, Pages 51-63,
+    https://doi.org/10.1016/S0169-7439(98)00158-0.
+
+    Examples
+    --------
+    Fit and apply DirectOrthogonalization to remove variation in `X` that is orthogonal
+    to `y`.
+    >>> import numpy as np
+    >>> from chemotools.projection import DirectOrthogonalization
+    >>> X = np.array([[1, 2], [3, 4], [5, 6]])
+    >>> y = np.array([1, 2, 3])
+    >>> do = DirectOrthogonalization(n_components=1)
+    >>> do.fit(X, y)
+    DirectOrthogonalization(n_components=1, copy=False)
+    >>> X_transformed = do.transform(X, y)
+    """
+
+    _parameter_constraints: dict = {
+        "n_components": [Interval(Integral, 1, None, closed="left")],
+        "copy": ["boolean"],
+    }
+
+    def __init__(self, n_components: int = 1, copy=False):
+        """Initialize the DirectOrthogonalization transformer.
+
+        Parameters
+        ----------
+        n_components : int, default=1
+            The number of orthogonal components to compute. This determines how many
+            orthogonal variations will be removed from the data.
+
+        copy : bool, default=False
+            If True, a copy of the input data is created and used for computations.
+            If False, the input data is modified in place.
+        """
+        self.n_components = n_components
+        self.copy = copy
+
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "DirectOrthogonalization":
+        """Fit the DirectOrthogonalization model to the training data.
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data to fit the model to.
+
+        y : array-like of shape (n_samples,)
+            The target values.
+
+        Returns
+        -------
+        self : DirectOrthogonalization
+            Fitted estimator.
+        """
+        # Check that X is a 2D array and has only finite values
+        self._validate_params()
+        X, y = validate_data(
+            self,
+            X,
+            y=y,
+            ensure_2d=True,
+            reset=True,
+            copy=self.copy,
+            dtype=np.float64,
+            multi_output=True,
+        )
+        y = np.asarray(y, dtype=np.float64)
+
+        # Validate that there are at least 2 samples
+        n_samples = X.shape[0]
+        if n_samples < 2:
+            raise ValueError(
+                "n_samples=1 is not enough for orthogonal signal correction. "
+                "At least 2 samples are required."
+            )
+
+        # Center the data
+        self.mean_X_ = np.mean(X, axis=0)
+        self.mean_y_ = np.mean(y, axis=0) if y.ndim == 2 else np.mean(y)
+        X_centered = X - self.mean_X_
+        y_centered = y - self.mean_y_
+
+        # Mean center and optionally scale the data
+        Xk = X_centered.copy()
+        yk = y_centered.copy()
+        yk = yk.reshape(-1, 1)
+
+        for i, yq in enumerate(yk):
+            # Step 1: Orthogonalize Xk w.r.t. yk (Step 2.1 in [1])
+            x_weights = np.dot(Xk.T, yq) / np.dot(yq.T, yq)
+
+            # Step 2: Deflate Xk (Step 2.2 in [1])
+            Xk -= np.outer(yq.T, x_weights)
+
+        # Step 3: SVD of the deflated Xk to get orthogonal components (Step 3 in [1])
+        U, S, Vt = svd(Xk, full_matrices=False)
+        self.x_loadings_orth_ = Vt[: self.n_components].T
+
+        # Step 4: Calculate orthogonal scores (Step 4.1 in [1])
+        self.x_scores_orth_ = np.dot(X_centered, self.x_loadings_orth_)
+
+        # Step 5: Orthogonal weights are the same as loadings (Table 1 in [2])
+        self.x_weights_orth_ = self.x_loadings_orth_
+
+        # Step 5: Deflate X by removing the orthogonal variation (Step 4.2 in [1])
+        X_deflated = X_centered.copy()
+        for k in range(self.n_components):
+            t_ortho = self.x_scores_orth_[:, k]
+            p_ortho = self.x_loadings_orth_[:, k]
+            X_deflated -= np.outer(t_ortho, p_ortho)
+
+        return self
+
+    def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """Apply the OrthoghonalPLS correction to X
+
+        This returns the predictinve part of the data, i.e. the variation in X that is
+        related to y, after removing the orthogonal part (variation in X that is not
+        related to y).
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            The input data to transform.
+
+        y : None
+            Ignored to align with API.
+
+        Returns
+        -------
+        X_transformed : array-like of shape (n_samples, n_features)
+            The transformed data.
+        """
+        # Check that the estimator is fitted
+        check_is_fitted(self, "n_features_in_")
+
+        # Validate input data
+        X = validate_data(
+            self,
+            X,
+            y="no_validation",
+            ensure_2d=True,
+            reset=False,
+            copy=self.copy,
+            dtype=np.float64,
+        )
+
+        # Mean center the new data
+        Xc = X - self.mean_X_
+
+        # Transform the data
+        for k in range(self.n_components):
+            # Calculate scores for the NEW data using learned weights
+            t_ortho = np.dot(Xc, self.x_weights_orth_[:, k])
+            # Subtract the learned loading pattern
+            Xc -= np.outer(t_ortho, self.x_loadings_orth_[:, k])
+        return Xc
