@@ -35,7 +35,7 @@ def test_direct_orthogonalization_correctness():
     # Assert
     # Calculated value used to assess numerical stability
     np.testing.assert_allclose(
-        do.retained_variance_ratio_, 0.7495221388680522, atol=1e-8
+        do.removed_variance_ratio_, 0.7495221388680522, atol=1e-8
     )
 
 
