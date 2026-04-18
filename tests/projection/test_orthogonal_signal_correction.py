@@ -413,3 +413,21 @@ def test_raises_error_for_invalid_method():
         ValueError, match="The 'method' parameter of OrthogonalSignalCorrection"
     ):
         transformer.fit(X, y)
+
+@pytest.mark.parametrize("method", ["wold", "sjoblom", "fearn"])
+def test_osc_has_correct_variance_ratios(method):
+    """Test that OrthogonalSignalCorrection has correct variance ratios."""
+    # Arrange
+    X, y, _, _ = _make_osc_dataset()
+    transformer = OrthogonalSignalCorrection(method=method, n_components=1)
+    transformer.fit(X, y)
+
+    # Act
+    _ = transformer.transform(X, y)
+
+    # Assert
+    assert 0.0 <= transformer.retained_variance_ratio_ <= 1.0
+    assert 0.0 <= transformer.removed_variance_ratio_ <= 1.0
+    assert np.isclose(
+        transformer.retained_variance_ratio_ + transformer.removed_variance_ratio_, 1.0
+    )
