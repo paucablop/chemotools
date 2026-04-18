@@ -196,16 +196,13 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         # Step 5: Orthogonal weights are the same as loadings (Table 1 in [2])
         self.x_weights_orth_ = self.x_loadings_orth_
 
-        # Step 6: Calculate orthogonal scores (vectorized version of Step 4.2 in [1])
-        self.x_scores_orth_ = np.dot(X_centered, self.x_loadings_orth_)
-
-        # Step 7: Deflate X globally (vectorized version of Step 4.2 in [1])
+        # Step 6: Deflate X globally (vectorized version of Step 4.2 in [1])
         X_deflated = X_centered - np.dot(self.x_scores_orth_, self.x_loadings_orth_.T)
 
-        # Step 8: Calculate sum of squares in defleated Xk
+        # Step 7: Calculate sum of squares in defleated Xk
         total_ss_x_k = np.sum(X_deflated**2)
 
-        # Step 9: Calculate variance ratio in prediction matrix
+        # Step 8: Calculate variance ratio in prediction matrix
         self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
         self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
 
