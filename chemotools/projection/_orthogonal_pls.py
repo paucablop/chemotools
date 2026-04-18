@@ -156,7 +156,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         n_samples = X.shape[0]
         if n_samples < 2:
             raise ValueError(
-                "n_samples=1 is not enough for orthogonal signal correction. "
+                "n_samples=1 is not enough for OrthogonalPLS (OPLS). "
                 "At least 2 samples are required."
             )
 
@@ -173,7 +173,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         # Mean center and optionally scale the data
         Xk = X_centered.copy()
         yk = y_centered.copy()
-        yk = yk.reshape(-1, 1)
+        yk = y_centered.reshape(-1, 1) if y_centered.ndim == 1 else y_centered.copy()
 
         # Allocate scores and weights
         self.x_weights_ = np.zeros((p, self.n_components))  # w in [1]
@@ -250,9 +250,9 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        """Apply the OrthoghonalPLS correction to X
+        """Apply the OrthogonalPLS correction to X
 
-        This returns the predictinve part of the data, i.e. the variation in X that is
+        This returns the predictive part of the data, i.e. the variation in X that is
         related to y, after removing the orthogonal part (variation in X that is not
         related to y).
 
