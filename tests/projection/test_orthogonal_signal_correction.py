@@ -414,6 +414,7 @@ def test_raises_error_for_invalid_method():
     ):
         transformer.fit(X, y)
 
+
 @pytest.mark.parametrize("method", ["wold", "sjoblom", "fearn"])
 def test_osc_has_correct_variance_ratios(method):
     """Test that OrthogonalSignalCorrection has correct variance ratios."""
