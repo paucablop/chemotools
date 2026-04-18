@@ -7,7 +7,7 @@ from sklearn.utils.estimator_checks import check_estimator
 from chemotools.projection import OrthogonalPLS
 
 
-# Test complience with scikit-learn
+# Test compliance with scikit-learn
 def test_compliance_opls():
     """Check sklearn estimator compliance for the OPLS transformer."""
     # Arrange
