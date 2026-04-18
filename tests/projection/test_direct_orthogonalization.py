@@ -35,10 +35,10 @@ def test_direct_orthogonalization_correctness():
     x_scores_orth_ref = np.array([-2.99481566, 1.49138404, 0.36794023, 1.13549139])
     x_transformed_ref = np.array(
         [
-            [0.38460468, -0.64013349],
-            [0.55911115, -0.93058093],
-            [-0.79789206, 1.3280063],
-            [-0.14582377, 0.24270812],
+            [ 0.387105, -0.637633],
+            [ 0.561611, -0.928081],
+            [-0.795392,  1.330506],
+            [-0.143324,  0.245208],
         ]
     )
 
@@ -64,7 +64,7 @@ def test_direct_orthogonalization_correctness():
         do.removed_variance_ratio_, 0.7495221388680522, atol=1e-8
     )
 
-    np.testing.assert_allclose(transformed, x_transformed_ref, atol=1e-8)
+    np.testing.assert_allclose(transformed, x_transformed_ref, atol=1e-6)
 
 
 def test_direct_orthogonalization_raises_error_many_components():

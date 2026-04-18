@@ -292,4 +292,5 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             scores_orth = np.dot(Xc, self.x_weights_orth_[:, k])
             # Subtract the learned loading pattern
             Xc -= np.outer(scores_orth, self.x_loadings_orth_[:, k])
-        return Xc
+
+        return Xc + self.mean_X_

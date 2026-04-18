@@ -251,4 +251,5 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         # Transform the data
         t_ortho = np.dot(Xc, self.x_weights_orth_)
         Xc -= np.dot(t_ortho, self.x_loadings_orth_.T)
-        return Xc
+
+        return Xc + self.mean_X_
