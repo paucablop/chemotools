@@ -83,8 +83,9 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    Fit and apply DirectOrthogonalization to remove variation in `X` that is orthogonal
-    to `y`.
+        Fit and apply DirectOrthogonalization to remove variation in `X` that is 
+        orthogonal to `y`.
+
     >>> import numpy as np
     >>> from chemotools.projection import DirectOrthogonalization
     >>> X = np.array([[1, 2], [3, 4], [5, 6]])

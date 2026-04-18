@@ -89,7 +89,9 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-    Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal to `y`.
+        Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal to 
+        `y`.
+
     >>> import numpy as np
     >>> from chemotools.projection import OrthogonalPLS
     >>> X = np.array([[1, 2], [3, 4], [5, 6]])
