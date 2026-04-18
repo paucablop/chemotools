@@ -83,7 +83,7 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-        Fit and apply DirectOrthogonalization to remove variation in `X` that is 
+        Fit and apply DirectOrthogonalization to remove variation in `X` that is
         orthogonal to `y`.
 
     >>> import numpy as np

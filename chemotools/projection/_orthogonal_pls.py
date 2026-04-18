@@ -89,7 +89,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-        Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal to 
+        Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal to
         `y`.
 
     >>> import numpy as np
