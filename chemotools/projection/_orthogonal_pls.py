@@ -18,17 +18,23 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class OrthogonalPLS(TransformerMixin, BaseEstimator):
     """
-    A transformer that implements the Orthogonal Projection to Latent Structures (OPLS)
-    technique for preprocessing spectral data by removing variations orthogonal to the
-    target variable. This implementation is based on the algorithm implemented by Trygg
-    and Wold in their 2002 paper [1].
+    A transformer that removes variation in X that is orthogonal to the target y using
+    Orthogonal Projection to Latent Structures (OPLS) [1]_.
 
-    Note that OPLS is a supervised transformer that splits the data into
+    OPLS extends PLS by explicitly separating X into predictive variation,
+    correlated with y, and orthogonal variation, unrelated to y. At each
+    iteration, a predictive weight vector is estimated using the PLS criterion
+    (maximizing covariance between X and y). Scores and loadings are then
+    computed, and the loading vector is decomposed into a component aligned
+    with the predictive weight and a component orthogonal to it. The orthogonal
+    component defines an orthogonal score vector, which is used to deflate X.
 
-    - an orthogonal part (variation in X that is not related to y)
-    - a predictive part (variation in X that is related to y).
+    This procedure is repeated to remove multiple orthogonal components while
+    retaining the predictive structure. Multivariate targets are supported via
+    decomposition of the cross-covariance matrix.
 
-    The `fit` method computes the orthogonal components
+    The transformer returns X with orthogonal variation removed, preserving the
+    original number of features.
 
     Parameters
     ----------
@@ -60,10 +66,10 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
     x_scores_orth_ : ndarray of shape (n_samples, n_components)
         The scores of the orthogonal components.
 
-    X_mean_ : ndarray of shape (n_features,)
+    mean_X_ : ndarray of shape (n_features,)
         The mean of the original data `X` used for centering.
 
-    y_mean_ : float or ndarray of shape (n_targets,)
+    mean_y_ : float or ndarray of shape (n_targets,)
         The mean of the target variable `y` used for centering.
 
     retained_variance_ratio_ : float
@@ -76,10 +82,10 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
 
     References
     ----------
-    [1] Trygg, J., & Wold, S. (2002).
-    Orthogonal projections to latent structures (O-PLS).
-    Journal of Chemometricsm, Volume 16, Issue 3, Pages 119-128,
-    https://https://doi.org/10.1002/cem.695.
+    .. [1] Trygg, J., & Wold, S. (2002).
+        Orthogonal projections to latent structures (O-PLS).
+        Journal of Chemometrics, Volume 16, Issue 3, Pages 119-128,
+        https://doi.org/10.1002/cem.695.
 
     Examples
     --------
@@ -262,7 +268,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        check_is_fitted(self, "x_weights_orth_")
 
         # Validate input data
         X = validate_data(

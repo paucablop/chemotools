@@ -21,7 +21,26 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
     """
-    A transformer that removes variation in X that is orthogonal to the target y.
+    Remove variation in X that is orthogonal to the target y using Orthogonal
+    Signal Correction (OSC) [1]_ [2]_ [3]_.
+
+    OSC identifies and removes spectral components that carry substantial
+    variance in X yet have no linear relationship with y. Three algorithmic
+    variants are available:
+
+    - **wold**: the original iterative method by Wold et al. (1998), which
+      alternates between constraining the scores to be orthogonal to y and
+      re-estimating loadings until convergence [1]_.
+    - **sjoblom**: a modified iterative scheme by Sjöblom et al. (1998) that
+      uses the pseudo-inverse of y to enforce orthogonality, often improving
+      convergence behaviour [2]_.
+    - **fearn**: a direct, non-iterative formulation by Fearn (2000) that
+      projects X onto the null space of y before extracting the dominant
+      singular vectors. This avoids convergence issues entirely [3]_.
+
+    The transformer returns the corrected matrix with the same number of
+    features as the input and is intended as a supervised signal correction
+    step prior to calibration.
 
     Parameters
     ----------
@@ -59,6 +78,12 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     loadings_ : ndarray of shape (n_features, n_components)
         The loadings of the orthogonal components.
+
+    retained_variance_ratio_ : float
+        The ratio of variance retained in X after removing the orthogonal components.
+
+    removed_variance_ratio_ : float
+        The ratio of variance removed from X by the orthogonal components.
 
     n_iter_ : ndarray of shape (n_components,)
         The number of iterations taken for each component to converge.
@@ -124,24 +149,17 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     Notes
     -----
-        OSC is a supervised preprocessing method: it removes components from `X`
-        that are orthogonal to the provided target `y`. Because of this, the target
-        used during `fit()` must be representative of the calibration problem.
+        OSC is a supervised preprocessing method: the target used during
+        ``fit()`` must be representative of the calibration problem.
 
-        The transformed data keep the same shape as the input data. This estimator
-        is therefore intended for signal correction rather than classical dimension
-        reduction.
+        The ``wold`` and ``sjoblom`` variants use iterative updates and may
+        emit ``ConvergenceWarning`` if ``max_iter`` is reached before
+        convergence. The ``fearn`` variant is non-iterative and does not
+        require convergence tuning.
 
-        The available methods differ in how orthogonal components are estimated:
-
-        - `wold` and `sjoblom` use iterative updates and may emit
-            `ConvergenceWarning` if `max_iter` is reached before convergence.
-        - `fearn` uses a direct SVD-based formulation and does not require an
-            iterative loop.
-
-        In practice, a small number of components is usually preferred. Removing too
-        many orthogonal components may discard structured variation that is still
-        useful for the downstream model.
+        In practice, a small number of components is usually sufficient.
+        Removing too many orthogonal components may discard structured
+        variation that is still useful for the downstream model.
 
 
     See Also
@@ -226,21 +244,31 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         X_centered = X - self.mean_X_
         y_centered = y - self.mean_y_
 
+        # Calculate total sum of squares for X
+        total_ss_x = np.sum(X_centered**2)
+
         # Dispatch to the selected OSC method
         if self.method == "wold":
-            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+            self.scores_, self.weights_, self.loadings_, self.n_iter_, Xk = (
                 self._wold_method(X_centered, y_centered)
             )
 
         if self.method == "sjoblom":
-            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+            self.scores_, self.weights_, self.loadings_, self.n_iter_, Xk = (
                 self._sjoblom_method(X_centered, y_centered)
             )
 
         if self.method == "fearn":
-            self.scores_, self.weights_, self.loadings_, self.n_iter_ = (
+            self.scores_, self.weights_, self.loadings_, self.n_iter_, Xk = (
                 self._fearn_method(X_centered, y_centered)
             )
+
+        # Calculate sum of squares in defleated Xk
+        total_ss_x_k = np.sum(Xk**2)
+
+        # Calculate variance ratio in prediction matrix
+        self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
+        self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
 
         return self
 
@@ -263,7 +291,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             X transformed with removed orthogonal variation.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        check_is_fitted(self, "weights_")
 
         # Validate input data
         X = validate_data(
@@ -285,7 +313,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
 
     def _wold_method(
         self, X: np.ndarray, y: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate orthogonal components using Wold's method."""
         # Initialize variables
         Xk = X.copy()
@@ -376,11 +404,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             # Update iteration count
             n_iter[k] = iteration + 1
 
-        return scores, weights, loadings, n_iter
+        return scores, weights, loadings, n_iter, Xk
 
     def _sjoblom_method(
         self, X: np.ndarray, y: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate orthogonal components using Sjöblom's method."""
         # Initialize variables
         Xk = X.copy()
@@ -484,9 +512,11 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
             # Update iteration count
             n_iter[k] = iteration + 1
 
-        return scores, weights, loadings, n_iter
+        return scores, weights, loadings, n_iter, Xk
 
-    def _fearn_method(self, X: np.ndarray, y: np.ndarray):
+    def _fearn_method(
+        self, X: np.ndarray, y: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Calculate orthogonal components using Fearn's method."""
         # Initialize variables
         X = X.copy()
@@ -528,4 +558,7 @@ class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
         # Calculate the loadings P from the projected scores.
         loadings = X.T @ scores @ pinv(score_gram)
 
-        return scores, weights, loadings, n_iter
+        # Calculate the deflated matrix (Xk)
+        Xk = X - scores @ loadings.T
+
+        return scores, weights, loadings, n_iter, Xk

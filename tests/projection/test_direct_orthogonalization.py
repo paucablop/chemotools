@@ -29,14 +29,42 @@ def test_direct_orthogonalization_correctness():
     X = np.array([[-2.18, 1.84, -0.48, 0.83], [-2.18, -0.16, 1.52, 0.83]]).T
     y = np.array([2, 2, 0, -4])
 
+    # Values calculated for numerical stability
+    x_weights_orth_ref = np.array([0.85718287, 0.51501217])
+    x_loadings_orth_ref = np.array([0.85718287, 0.51501217])
+    x_scores_orth_ref = np.array([-2.99481566, 1.49138404, 0.36794023, 1.13549139])
+    x_transformed_ref = np.array(
+        [
+            [0.38460468, -0.64013349],
+            [0.55911115, -0.93058093],
+            [-0.79789206, 1.3280063],
+            [-0.14582377, 0.24270812],
+        ]
+    )
+
     # Act
     do = DirectOrthogonalization(n_components=1).fit(X, y)
+    transformed = do.transform(X)
 
     # Assert
     # Calculated value used to assess numerical stability
     np.testing.assert_allclose(
+        do.x_weights_orth_.flatten(), x_weights_orth_ref, atol=1e-8
+    )
+
+    np.testing.assert_allclose(
+        do.x_loadings_orth_.flatten(), x_loadings_orth_ref, atol=1e-8
+    )
+
+    np.testing.assert_allclose(
+        do.x_scores_orth_.flatten(), x_scores_orth_ref, atol=1e-8
+    )
+
+    np.testing.assert_allclose(
         do.removed_variance_ratio_, 0.7495221388680522, atol=1e-8
     )
+
+    np.testing.assert_allclose(transformed, x_transformed_ref, atol=1e-8)
 
 
 def test_direct_orthogonalization_raises_error_many_components():

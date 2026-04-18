@@ -18,7 +18,17 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class DirectOrthogonalization(TransformerMixin, BaseEstimator):
     """
-    Remove orthogonal variation to y using the Direct Orthogonalization method [1].
+    Remove variation in X that is uncorrelated with the target y using Direct
+    Orthogonalization (DO) [1]_ [2]_.
+
+    DO removes from X systematic variation that is independent of y. X is
+    orthogonalized with respect to y, PCA is performed on the orthogonalized matrix
+    to estimate orthogonal components, and those components are subtracted from X to
+    obtain the corrected data.
+
+    The transformer returns the corrected matrix with the same number of features,
+    retaining variation relevant for predicting y. Inputs are typically assumed to
+    be mean-centered.
 
     Parameters
     ----------
@@ -32,19 +42,19 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
-    weights_orth_ : ndarray of shape (n_features, n_components)
+    x_weights_orth_ : ndarray of shape (n_features, n_components)
         The weights of the orthogonal components.
 
-    loadings_orth_ : ndarray of shape (n_features, n_components)
+    x_loadings_orth_ : ndarray of shape (n_features, n_components)
         The loadings of the orthogonal components.
 
-    scores_orth_ : ndarray of shape (n_samples, n_components)
+    x_scores_orth_ : ndarray of shape (n_samples, n_components)
         The scores of the orthogonal components.
 
-    X_mean_ : ndarray of shape (n_features,)
+    mean_X_ : ndarray of shape (n_features,)
         The mean of the original data `X` used for centering.
 
-    y_mean_ : float or ndarray of shape (n_targets,)
+    mean_y_ : float or ndarray of shape (n_targets,)
         The mean of the target variable `y` used for centering.
 
     retained_variance_ratio_ : float
@@ -58,18 +68,18 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
     References
     ----------
-    [1] Clause A. Andersson, (1999).
-    Direct orthogonalization.
-    Chemometrics and Intelligent Laboratory Systems,
-    Volume 47, Issue 1, Pages 51-63,
-    https://doi.org/10.1016/S0169-7439(98)00158-0.
+    .. [1] Clause A. Andersson, (1999).
+        Direct orthogonalization.
+        Chemometrics and Intelligent Laboratory Systems,
+        Volume 47, Issue 1, Pages 51-63,
+        https://doi.org/10.1016/S0169-7439(98)00158-0.
 
-    [2] O. Svensson, T. Kourti, J. F. MacGregor (2002).
-    An investigation of orthogonal signal correction algorithms and their
-    characteristics.
-    Journal of Chemometrics,
-    Volume 16, Issue 4, Pages 176-188,
-    https://doi.org/10.1002/cem.700
+    .. [2] O. Svensson, T. Kourti, J. F. MacGregor (2002).
+        An investigation of orthogonal signal correction algorithms and their
+        characteristics.
+        Journal of Chemometrics,
+        Volume 16, Issue 4, Pages 176-188,
+        https://doi.org/10.1002/cem.700
 
     Examples
     --------
@@ -159,7 +169,10 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
         # Step 1: Orthogonalize X with respect to y using regression (Step 2 in [1])
         # Generalization to multivariate y. coef_yx is w in [1].
-        coef_yx = np.linalg.pinv(yk.T @ yk) @ yk.T @ Xk
+        # This is equivalent to:
+        # coef_yx = np.linalg.pinv(yk.T @ yk) @ yk.T @ Xk,
+        # but using lstsq is more numerically stable and handles rank-deficient cases.
+        coef_yx, _, _, _ = np.linalg.lstsq(yk, Xk, rcond=None)
 
         # Step 2: Deflate X by removing the variation explained by y (Step 2 in [1])
         Xk -= yk @ coef_yx
@@ -182,17 +195,16 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         # Step 5: Orthogonal weights are the same as loadings (Table 1 in [2])
         self.x_weights_orth_ = self.x_loadings_orth_
 
-        # Step 5: Deflate X by removing the orthogonal variation (Step 4.2 in [1])
-        X_deflated = X_centered.copy()
-        for k in range(self.n_components):
-            t_ortho = self.x_scores_orth_[:, k]
-            p_ortho = self.x_loadings_orth_[:, k]
-            X_deflated -= np.outer(t_ortho, p_ortho)
+        # Step 6: Calculate orthogonal scores (vectorized version of Step 4.2 in [1])
+        self.x_scores_orth_ = np.dot(X_centered, self.x_loadings_orth_)
 
-        # Step 10: Calculate sum of squares in defleated Xk
+        # Step 7: Deflate X globally (vectorized version of Step 4.2 in [1])
+        X_deflated = X_centered - np.dot(self.x_scores_orth_, self.x_loadings_orth_.T)
+
+        # Step 8: Calculate sum of squares in defleated Xk
         total_ss_x_k = np.sum(X_deflated**2)
 
-        # Step 11: Calculate variance ratio in prediction matrix
+        # Step 9: Calculate variance ratio in prediction matrix
         self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
         self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
 
@@ -219,7 +231,7 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        check_is_fitted(self, "x_weights_orth_")
 
         # Validate input data
         X = validate_data(
@@ -236,9 +248,6 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         Xc = X - self.mean_X_
 
         # Transform the data
-        for k in range(self.n_components):
-            # Calculate scores for the NEW data using learned weights
-            t_ortho = np.dot(Xc, self.x_weights_orth_[:, k])
-            # Subtract the learned loading pattern
-            Xc -= np.outer(t_ortho, self.x_loadings_orth_[:, k])
+        t_ortho = np.dot(Xc, self.x_weights_orth_)
+        Xc -= np.dot(t_ortho, self.x_loadings_orth_.T)
         return Xc

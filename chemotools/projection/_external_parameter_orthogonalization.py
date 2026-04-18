@@ -18,7 +18,28 @@ from sklearn.utils.validation import check_array, check_is_fitted, validate_data
 
 class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
     """
-    A transformer that removes variation linked to external nuisance parameters.
+    Remove variation linked to known external nuisance parameters using
+    External Parameter Orthogonalization (EPO) [1]_.
+
+    EPO is designed for situations where spectral measurements are affected by
+    controlled external factors (e.g., temperature, humidity, instrument
+    differences) that are not related to the target property. The method
+    estimates a nuisance subspace from an auxiliary dataset or from structured
+    replicates in which the external parameter varies while the underlying
+    sample composition is held constant.
+
+    A matrix capturing this external variation is constructed (e.g., from
+    differences or deviations within replicate groups), and its dominant
+    components are obtained via SVD/PCA. These components define a subspace
+    associated with the external parameter. A projection operator is then
+    applied to X to remove variation in this subspace.
+
+    When ``sample_ids`` are provided, the external-effect matrix is formed from
+    within-sample deviations (i.e., each spectrum minus its sample mean),
+    isolating variation due to the external parameter from chemical variation.
+
+    The transformer preserves the original number of features and is intended
+    as a signal correction step rather than dimensionality reduction.
 
     Parameters
     ----------
@@ -214,7 +235,7 @@ class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
             Corrected spectra after centering with `mean_X_` and projection with
             `P_epo_`.
         """
-        check_is_fitted(self)
+        check_is_fitted(self, "P_epo_")
         X = validate_data(self, X, reset=False)
 
         # 1. Center the new data using the TRAINING mean
