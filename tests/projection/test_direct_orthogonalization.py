@@ -7,7 +7,7 @@ from sklearn.utils.estimator_checks import check_estimator
 from chemotools.projection import DirectOrthogonalization
 
 
-# Test complience with scikit-learn
+# Test compliance with scikit-learn
 def test_compliance_direct_orthogonalization():
     """
     Check sklearn estimator compliance for the DirectOrthogonalization transformer.
