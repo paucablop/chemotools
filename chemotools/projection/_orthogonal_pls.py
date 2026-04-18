@@ -1,7 +1,7 @@
 """
-The :mod:`chemotools.projection._orthogonal_projection_to_latent_structures` module
-implements the Orthogonal Projection to Latent Structures (OPLS) technique for
-preprocessing spectral data by removing variations orthogonal to the target variable.
+The :mod:`chemotools.projection._orthogonal_pls` module implements the Orthogonal
+Projection to Latent Structures (OPLS) technique for preprocessing spectral data by
+removing variations orthogonal to the target variable.
 """
 
 # Author: Pau Cabaneros
