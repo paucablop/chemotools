@@ -150,7 +150,7 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         n_samples = X.shape[0]
         if n_samples < 2:
             raise ValueError(
-                "n_samples=1 is not enough for orthogonal signal correction. "
+                "n_samples=1 is not enough for direct orthogonalization. "
                 "At least 2 samples are required."
             )
 
