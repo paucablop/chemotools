@@ -1,5 +1,5 @@
 Direct Orthogonalization
-======================================
+========================
 
 .. currentmodule:: chemotools.projection
 

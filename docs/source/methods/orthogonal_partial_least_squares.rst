@@ -1,5 +1,5 @@
 ExternalParameterOrthogonalization
-======================================
+==================================
 
 .. currentmodule:: chemotools.projection
 
