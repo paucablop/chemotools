@@ -193,8 +193,9 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             # Step 1.1. Calculate covariance matrix (C)
             C = np.dot(Xk.T, yk)
 
-            # Step 1.2: Calculate the SVD of C
-            U, _, _ = svd(C, full_matrices=True)
+            # Step 1.2: Calculate the reduced SVD of C since only the leading
+            # left singular vector is used           
+            U, _, _ = svd(C, full_matrices=False)
 
             # Step 1.3: We just use the first weight
             x_weights = U[:, 0]
