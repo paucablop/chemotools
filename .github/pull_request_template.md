@@ -128,6 +128,7 @@ Please focus on:
 <!-- Optional but encouraged for docs, CI, performance, or UX-related changes -->
 <details>
 <summary>Details</summary>
+</details>
 
 ```text
 Paste logs, benchmark numbers, or screenshots description here
