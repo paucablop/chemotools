@@ -163,17 +163,14 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         # Center the data
         self.mean_X_ = np.mean(X, axis=0)
         self.mean_y_ = np.mean(y, axis=0) if y.ndim == 2 else np.mean(y)
-        X_centered = X - self.mean_X_
-        y_centered = y - self.mean_y_
+        Xk = X - self.mean_X_
+        yk = y - self.mean_y_
 
         # Get the dimensions
         n = X.shape[0]
         p = X.shape[1]
 
-        # Mean center and optionally scale the data
-        Xk = X_centered.copy()
-        yk = y_centered.copy()
-        yk = y_centered.reshape(-1, 1) if y_centered.ndim == 1 else y_centered.copy()
+        yk = yk.reshape(-1, 1) if yk.ndim == 1 else yk
 
         # Allocate scores and weights
         self.x_weights_ = np.zeros((p, self.n_components))  # w in [1]
@@ -225,15 +222,15 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
                 x_weights_orth.T, x_weights_orth
             )
 
-            # Step 7: Calculate orthogonal x loadings (Step 10 in [1])
+            # Step 8: Calculate orthogonal x loadings (Step 10 in [1])
             x_loadings_orth = np.dot(x_scores_orth.T, Xk) / np.dot(
                 x_scores_orth.T, x_scores_orth
             )
 
-            # Step 8: Deflation of X matrix (Step 11 in [1])
+            # Step 9: Deflation of X matrix (Step 11 in [1])
             Xk -= np.outer(x_scores_orth, x_loadings_orth)
 
-            # Step 9: Collect the variables
+            # Step 10: Collect the variables
             self.x_weights_[:, k] = x_weights
             self.x_weights_orth_[:, k] = x_weights_orth
             self.x_loadings_[:, k] = x_loadings
@@ -241,10 +238,10 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
             self.x_scores_[:, k] = x_scores
             self.x_scores_orth_[:, k] = x_scores_orth
 
-        # Step 10: Calculate sum of squares in defleated Xk
+        # Step 11: Calculate sum of squares in defleated Xk
         total_ss_x_k = np.sum(Xk**2)
 
-        # Step 11: Calculate variance ratio in prediction matrix
+        # Step 12: Calculate variance ratio in prediction matrix
         self.retained_variance_ratio_ = total_ss_x_k / total_ss_x
         self.removed_variance_ratio_ = 1 - self.retained_variance_ratio_
 
