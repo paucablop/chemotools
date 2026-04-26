@@ -124,7 +124,7 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         self.copy = copy
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "OrthogonalPLS":
-        """Fit the OorthogonalPLS model to the training data.
+        """Fit the OrthogonalPLS model to the training data.
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
