@@ -211,7 +211,7 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         """Apply the Direct Orthogonalization (D) correction to X
 
-        This returns the predictinve part of the data, i.e. the variation in X that is
+        This returns the predictive part of the data, i.e. the variation in X that is
         related to y, after removing the orthogonal part (variation in X that is not
         related to y).
 
