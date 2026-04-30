@@ -140,7 +140,7 @@ class IndexSelector(XAxisMixin, SelectorMixin, BaseEstimator):
         check_is_fitted(self)
 
         # Create the mask
-        mask = np.zeros(self.n_features_in_, dtype=bool)  # type: ignore[unresolved-attribute]  # sklearn fitted attribute
+        mask = np.zeros(self.n_features_in_, dtype=bool)  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
         mask[self.features_index_] = True
 
         return mask

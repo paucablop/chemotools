@@ -7,6 +7,7 @@ transformer to calculate the Norris-Williams derivative of spectral data.
 # License: MIT
 
 from numbers import Integral
+from typing import Literal
 
 import numpy as np
 from scipy.ndimage import convolve1d
@@ -77,9 +78,7 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         "window_length": [Interval(Integral, 3, None, closed="left")],
         "gap_size": [Interval(Integral, 1, None, closed="left")],
         "deriv": [Interval(Integral, 1, 2, closed="both")],
-        "mode": [
-            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
-        ],
+        "mode": [StrOptions({"nearest", "constant", "reflect", "wrap", "mirror"})],
         "window_size": [
             Interval(Integral, 3, None, closed="left"),
             deprecated_parameter_constraint(),
@@ -95,7 +94,7 @@ class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
         window_length: int = 5,
         gap_size: int = 3,
         deriv: int = 1,
-        mode="nearest",
+        mode: Literal["nearest", "constant", "reflect", "wrap", "mirror"] = "nearest",
         window_size=DEPRECATED_PARAMETER,
         derivative_order=DEPRECATED_PARAMETER,
     ):

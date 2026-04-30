@@ -61,7 +61,6 @@ def create_preprocessing_step_plot(
         x=x_axis,
         y=X,
         color_by=color_values,
-        colormap="shap",
         labels=empty_labels,
         color_mode=color_mode,
     )

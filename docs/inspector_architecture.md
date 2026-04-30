@@ -87,7 +87,7 @@ Extends `_DataHoldingBase` with everything needed for model-based inspectors (PC
 | **Model extraction** | `_model`, `estimator_`, `transformer_`, `model` / `estimator` / `transformer` properties |
 | **Component resolution** | `n_components_`, `_resolve_n_components()` |
 | **Confidence** | `_confidence`, `confidence` property |
-| **Preprocessed data** | `_get_preprocessed_data()`, `_get_feature_mask()`, `_get_preprocessed_feature_names()`, `_get_preprocessed_x_axis()`, `_transform_data()` |
+| **Preprocessed data** | `_get_preprocessed_data()`, `_get_preprocessed_feature_names()`, `_get_preprocessed_x_axis()`, `_transform_data()` |
 | **Config preparation** | `_prepare_inspection_config()` — normalises dataset/color_by/annotate_by inputs |
 | **Summary** | `_base_summary()`, `_get_preprocessing_steps()` |
 | **Input validation** | Full `__init__` validation pipeline: `check_array`, feature consistency, supervised mode |

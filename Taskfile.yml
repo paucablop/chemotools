@@ -35,8 +35,7 @@ tasks:
     desc: Install all dependencies
     deps: [ensure:uv]
     cmds:
-      - "{{.UV}} sync --all-groups"
-      - "{{.UV}} pip install .[viz]"
+      - "{{.UV}} sync --all-groups --extra viz"
     sources:
       - pyproject.toml
     generates:

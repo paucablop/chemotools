@@ -194,6 +194,32 @@ class _DataHoldingBase:
         """Return the feature names/indices."""
         return self._x_axis
 
+    def _resolve_x_axis_after_transform(
+        self, steps: Sequence[Tuple[str, object]], n_features_out: int
+    ) -> np.ndarray:
+        """Return the x-axis after applying a sequence of pipeline steps.
+
+        Walks the steps looking for SelectorMixin instances and composes
+        their boolean masks to map back to the original feature_names.
+        If the composed mask length differs from the provided output dimensionality,
+        falls back to integer indices.
+        """
+        from sklearn.feature_selection._base import SelectorMixin
+
+        if self.feature_names is None:
+            # If we don't have explicit feature names, return indices
+            return np.arange(n_features_out)
+
+        axis = self.feature_names.copy()
+
+        for _, step in steps:
+            if isinstance(step, SelectorMixin):
+                axis = axis[step.get_support()]
+
+        if axis.shape[0] != n_features_out:
+            return np.arange(n_features_out)
+        return axis
+
     # -------------------------------------------------------------------------
     # Figure Management
     # -------------------------------------------------------------------------
@@ -410,34 +436,19 @@ class _BaseInspector(_DataHoldingBase, ABC):
             self._preprocessed_cache[name] = self.transformer_.transform(X)
         return self._preprocessed_cache[name]
 
-    def _get_feature_mask(self) -> Optional[np.ndarray]:
-        """Get feature selection mask if a selector is present in the pipeline."""
-        from sklearn.feature_selection._base import SelectorMixin
-
-        transformer = self.transformer_
-        if transformer is None:
-            return None
-
-        if isinstance(transformer, Pipeline):
-            for _, step in transformer.steps:
-                if isinstance(step, SelectorMixin):
-                    return step.get_support()
-        elif isinstance(transformer, SelectorMixin):
-            return transformer.get_support()
-
-        return None
-
     def _get_preprocessed_feature_names(
         self, base_dataset: str = "train"
     ) -> np.ndarray:
         """Get feature names after preprocessing (accounting for feature selection)."""
-        mask = self._get_feature_mask()
-        if mask is not None and self.feature_names is not None:
-            return self.feature_names[mask]
-        if self.feature_names is not None:
-            return self.feature_names
         X = self._get_preprocessed_data(base_dataset)
-        return np.arange(X.shape[1])
+        if self.transformer_ is None:
+            steps = []
+        elif isinstance(self.transformer_, Pipeline):
+            steps = self.transformer_.steps
+        else:
+            steps = [("transformer", self.transformer_)]
+
+        return self._resolve_x_axis_after_transform(steps, X.shape[1])
 
     def _get_preprocessed_x_axis(self) -> np.ndarray:
         """Get x_axis after feature selection.
