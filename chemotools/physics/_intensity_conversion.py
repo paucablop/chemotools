@@ -124,9 +124,11 @@ class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     Examples
     --------
     >>> import numpy as np
-    >>> from chemotools.conversion import IntensityConversion
+    >>> from chemotools.physics import IntensityConversion
     >>> X = np.array([[0.0, 1.0, 2.0]])
-    >>> converter = IntensityConversion(input_unit="absorbance", output_unit="transmittance")
+    >>> converter = IntensityConversion(
+            input_unit="absorbance", output_unit="transmittance"
+        )
     IntensityConversion()
     >>> converter.fit_transform(X)
     array([[1.  , 0.1 , 0.01]])
@@ -170,7 +172,9 @@ class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
                 f"supported. Supported conversions are: {sorted(_VALID_CONVERSIONS)}."
             )
 
-        validate_data(self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64)
+        validate_data(
+            self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
+        )
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:

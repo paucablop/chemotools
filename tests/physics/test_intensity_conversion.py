@@ -4,14 +4,15 @@ from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.physics import IntensityConversion
 
-
 # --- sklearn compliance ---
+
 
 def test_compliance_intensity_conversion():
     check_estimator(IntensityConversion())
 
 
 # --- absorbance <-> transmittance ---
+
 
 def test_absorbance_to_transmittance_zero():
     X = np.array([[0.0, 0.0]])
@@ -46,6 +47,7 @@ def test_absorbance_transmittance_round_trip():
 
 # --- reflectance <-> kubelka_munk ---
 
+
 def test_reflectance_to_kubelka_munk_one():
     X = np.array([[1.0]])
     result = IntensityConversion("reflectance", "kubelka_munk").fit_transform(X)
@@ -72,6 +74,7 @@ def test_reflectance_kubelka_munk_round_trip():
 
 
 # --- reflectance <-> pseudoabsorbance ---
+
 
 def test_reflectance_to_pseudoabsorbance_one():
     X = np.array([[1.0]])
@@ -100,11 +103,14 @@ def test_pseudoabsorbance_to_reflectance_one():
 def test_reflectance_pseudoabsorbance_round_trip():
     X_R = np.array([[0.1, 0.5, 0.9]])
     X_PA = IntensityConversion("reflectance", "pseudoabsorbance").fit_transform(X_R)
-    X_R_back = IntensityConversion("pseudoabsorbance", "reflectance").fit_transform(X_PA)
+    X_R_back = IntensityConversion("pseudoabsorbance", "reflectance").fit_transform(
+        X_PA
+    )
     assert np.allclose(X_R, X_R_back, atol=1e-10)
 
 
 # --- multiple samples ---
+
 
 def test_multiple_samples_absorbance_to_transmittance():
     X = np.array([[0.0], [1.0], [2.0]])
@@ -114,6 +120,7 @@ def test_multiple_samples_absorbance_to_transmittance():
 
 
 # --- validation errors ---
+
 
 def test_unsupported_conversion_raises():
     t = IntensityConversion(input_unit="absorbance", output_unit="reflectance")
@@ -134,6 +141,7 @@ def test_invalid_output_unit_raises():
 
 
 # --- numerical edge case warnings ---
+
 
 def test_zero_transmittance_warns():
     X = np.array([[0.0, 0.5]])
