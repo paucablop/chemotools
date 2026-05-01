@@ -58,6 +58,16 @@ def _reflectance_to_kubelka_munk(X: np.ndarray) -> np.ndarray:
 
 def _kubelka_munk_to_reflectance(X: np.ndarray) -> np.ndarray:
     # Inverse of F(R) = (1-R)^2 / (2R): R = (1+F) - sqrt((1+F)^2 - 1)
+    negative = X < 0
+    if negative.any():
+        warnings.warn(
+            f"Kubelka-Munk values < 0 found at indices "
+            f"{np.argwhere(negative).tolist()}. "
+            "These are non-physical and will produce nan in the output.",
+            UserWarning,
+            stacklevel=3,
+        )
+
     return (1.0 + X) - np.sqrt((1.0 + X) ** 2 - 1.0)
 
 

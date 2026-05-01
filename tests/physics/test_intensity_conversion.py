@@ -249,6 +249,18 @@ class TestEdgeCases:
         with pytest.warns(UserWarning):
             t.transform(X)
 
+    def test_zero_kubelka_munk_reflectance_warns(self):
+        """
+        Test that zero reflectance values warn during inverse Kubelka-Munk conversion.
+        """
+        # Arrange
+        X = np.array([[-0.1, 0.0, 0.5]])
+        t = IntensityConversion("kubelka_munk", "reflectance").fit(X)
+
+        # Act & Assert
+        with pytest.warns(UserWarning):
+            t.transform(X)
+
     def test_zero_reflectance_pseudoabsorbance_warns(self):
         """Test that zero reflectance values warn during pseudoabsorbance conversion."""
         # Arrange
