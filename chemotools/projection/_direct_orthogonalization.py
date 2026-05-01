@@ -160,23 +160,20 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
         X_centered = X - self.mean_X_
         y_centered = y - self.mean_y_
 
-        # Mean center and optionally scale the data
-        Xk = X_centered.copy()
-        yk = y_centered.copy()
         yk = y_centered.reshape(-1, 1) if y_centered.ndim == 1 else y_centered
 
         # Calculate total sum of squares for X
-        total_ss_x = np.sum(Xk**2)
+        total_ss_x = np.sum(X_centered**2)
 
         # Step 1: Orthogonalize X with respect to y using regression (Step 2 in [1])
         # Generalization to multivariate y. coef_yx is w in [1].
         # This is equivalent to:
-        # coef_yx = np.linalg.pinv(yk.T @ yk) @ yk.T @ Xk,
+        # coef_yx = np.linalg.pinv(yk.T @ yk) @ yk.T @ X_centered,
         # but using lstsq is more numerically stable and handles rank-deficient cases.
-        coef_yx, _, _, _ = np.linalg.lstsq(yk, Xk, rcond=None)
+        coef_yx, _, _, _ = np.linalg.lstsq(yk, X_centered, rcond=None)
 
         # Step 2: Deflate X by removing the variation explained by y (Step 2 in [1])
-        Xk -= yk @ coef_yx
+        Xk = X_centered - yk @ coef_yx
 
         # Step 3: SVD of the deflated Xk to get orthogonal components (Step 3 in [1])
         _, _, Vt = svd(Xk, full_matrices=False)
