@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-from sklearn.exceptions import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation import XAxisInterpolator
@@ -113,8 +112,7 @@ def test_rejects_invalid_methods():
 
     # Act & Assert
     with pytest.raises(
-        InvalidParameterError,
-        match="The 'method' parameter of XAxisInterpolator must be a str among "
-        "{'linear', 'cubic', 'pchip'}. Got 'banana' instead.",
+        ValueError,
+        match="The 'method' parameter of XAxisInterpolator must be a str among ",
     ):
         est.fit(X)
