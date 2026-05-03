@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.exceptions import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation import XAxisInterpolator
@@ -101,4 +102,19 @@ def test_fit_rejects_non_finite_common_axis():
 
     # Act & Assert
     with pytest.raises(ValueError, match="finite"):
+        est.fit(X)
+
+
+def test_rejects_invalid_methods():
+    """Validates that non-finite points in the target axis are rejected during fit."""
+    # Arrange
+    X = np.array([[1.0, 2.0, 3.0]])
+    est = XAxisInterpolator(common_x_axis=np.array([0.0, 1.0, 2.0]), method="banana")
+
+    # Act & Assert
+    with pytest.raises(
+        InvalidParameterError,
+        match="The 'method' parameter of XAxisInterpolator must be a str among " \
+        "{'linear', 'cubic', 'pchip'}. Got 'banana' instead.",
+    ):
         est.fit(X)
