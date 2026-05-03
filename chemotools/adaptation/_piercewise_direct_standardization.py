@@ -2,7 +2,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
@@ -58,7 +58,7 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
         self.scale = scale
 
     def fit(
-        self, X: np.ndarray, y: np.ndarray = None
+        self, X: np.ndarray, y: np.ndarray | None = None
     ) -> "PiercewiseDirectStandardization":
         """
         Fit the PiercewiseDirectStandardization to the input data.
@@ -80,8 +80,8 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
         self : PiercewiseDirectStandardization
             The PDS transformer.
         """
-        
-        # validate_data 
+
+        # validate_data
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
         # To protect from .ndim
@@ -98,7 +98,9 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
             if self.n_components is None:
                 raise ValueError("n_components must be specified")
             if self.n_components > self.window_length + 1:
-                raise ValueError("n_components must be smaller or equal to window_length")
+                raise ValueError(
+                    "n_components must be smaller or equal to window_length"
+                )
             _, y = validate_data(
                 self,
                 X,
@@ -140,8 +142,7 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
                 ).fit(X[:, l_lim:r_lim], y[:, i])
                 self.pls_.append(model)
             print("Error Method: You must have two set of data not only one")
-            return self    
-        
+            return self
 
     def transform(self, X_new) -> np.ndarray:
         """
@@ -172,7 +173,5 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
             # close to the edge avoid errors
             l_lim = max(0, i - self.window_length)
             r_lim = min(self.n_features_, i + self.window_length + 1)
-            X_transformed[:, i] = self.pls_[i].predict(
-                X_new[:, l_lim:r_lim]
-            )
+            X_transformed[:, i] = self.pls_[i].predict(X_new[:, l_lim:r_lim])
         return X_transformed

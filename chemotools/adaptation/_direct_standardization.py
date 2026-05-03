@@ -8,7 +8,7 @@ module implements a Direct Standardization transformer
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import validate_data, check_is_fitted
+from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class DirectStandardization(TransformerMixin, BaseEstimator):
@@ -37,7 +37,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     Examples
     --------
     **Basic usage**
-    >>> # Inport necessary libraries
+    >>> # Import necessary libraries
     >>> from chemotools.adaptation import DirectStandardization
     >>> import numpy as np
     >>>
@@ -51,7 +51,9 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     """
 
-    def fit(self, X: np.ndarray, y: np.ndarray = None) -> "DirectStandardization":
+    def fit(
+        self, X: np.ndarray, y: np.ndarray | None = None
+    ) -> "DirectStandardization":
         """
         Fit the DirectStandardization to the input data.
         Use always both "X" and "y", that must share the same
@@ -60,7 +62,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         To preserve the compatibility with scikitlearn, the case
         where y is None or its shape are not equal to X are accepted.
         In this case the T matrix will be an identity matrix.
-        
+
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
@@ -95,7 +97,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
             self.T_ = np.linalg.pinv(X) @ y
             return self
 
-        # If y is not explicited, T wil be an Identity matrix.
+        # If y is not set, T will be an Identity matrix.
         # It was done to preserve the compatibility with scikitlearn
         self.T_ = np.eye(X.shape[1])
         return self

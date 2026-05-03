@@ -6,12 +6,10 @@ Test for DirectStandardization
 # License: MIT
 import numpy as np
 import pytest
-from sklearn.utils.estimator_checks import check_estimator
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.adaptation._direct_standardization import (
-    DirectStandardization,
-)
+from chemotools.adaptation._direct_standardization import DirectStandardization
 
 
 def data_diff(dataset_ref, dataset_test):
