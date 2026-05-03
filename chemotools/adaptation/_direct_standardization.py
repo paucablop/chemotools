@@ -16,11 +16,11 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     Implement a direct standardization transformer for the calibration
     transfer application.
     y contains the reference measurements acquired
-    on the master instrument.
+    on the target instrument.
     X contains the corresponding measurements of the same samples
-    acquired on the slave instrument.
-    The transformer estimates a mapping from the slave space to
-    the master space.
+    acquired on the source instrument.
+    The transformer estimates a mapping from the source space to
+    the target space.
     After fitting, new X spectra can be transformed into
     the y space.
 
@@ -33,6 +33,13 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     T : np.ndarray of shape (n_features, n_features)
         The pxp matrix that solver the problem X T = y
         using the method of least squares
+
+    Reference
+    ---------
+    .. [1] Wang, Yongdong., Veltkamp,
+        D. J., & Kowalski, B. R. (1991).
+        Multivariate instrument standardization.
+        Analytical Chemistry, 63(23), 2750–2756.
 
     Examples
     --------
@@ -66,9 +73,9 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The slave data
+            The source data
         y : np.ndarray of shape (n_samples, n_features)
-            The master data
+            The target data
 
         Returns
         -------
@@ -104,7 +111,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     def transform(self, X) -> np.ndarray:
         """
-        Transform the slave data
+        Transform the source data
 
         Parameters
         ----------

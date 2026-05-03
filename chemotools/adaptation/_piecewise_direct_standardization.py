@@ -1,19 +1,24 @@
+"""
+Test for PiecewiseDirectStandardization
+"""
+
 # author: Ruggero Guerrini
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
+class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     """
-    Implement a piercewise direct standardization transformer for
+    Implement a piecewise direct standardization transformer for
     the calibration transfer
     (domain adaption) application.
     y contains the reference measurements acquired
-    on the master instrument.
+    on the target instrument.
     X contains the corresponding measurements of the same samples
-    acquired on the slave instrument.
+    acquired on the source instrument.
     The transformer use a moving window PLS regressor to estimate the transformation.
     PLS is chosen as in a small window the variables are strongly collerated,
     making the use of OLS not possible.
@@ -31,18 +36,34 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
     scale : bool, default = True
         Whether to scale X and Y in the PLS model
 
+    Reference
+    ---------
+    .. [1] Wang, Yongdong., Veltkamp,
+        D. J., & Kowalski, B. R. (1991).
+        Multivariate instrument standardization.
+        Analytical Chemistry, 63(23), 2750–2756.
+
+    .. [2] Bouveresse, E.; Massart, D. L. (1996).
+        Improvement of the piecewise
+        direct standardisation procedure
+        for the transfer of NIR spectra
+        for multivariate calibration.
+        Chemometrics and Intelligent
+        Laboratory Systems, 32(2), 201–213.
+
     Attributes
     ----------
-    n_samples_ : number of samples for both master and slave matrix
+    n_samples_ : number of samples for both target and source matrix
 
-    n_features_ : number of features for both master and slave matrix
+    n_features_ : number of features for both target and source matrix
 
     pls_ :
+
     Examples
     --------
         X = np.random.randn((100,50))
         X_portbale = X*2+5
-        PDS = PiercewiseDirectStandardization().fit(X,y)
+        PDS = PiecewiseDirectStandardization().fit(X,y)
         X_transf = PDS.transform(X)
 
     """
@@ -59,9 +80,9 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
 
     def fit(
         self, X: np.ndarray, y: np.ndarray | None = None
-    ) -> "PiercewiseDirectStandardization":
+    ) -> "PiecewiseDirectStandardization":
         """
-        Fit the PiercewiseDirectStandardization to the input data.
+        Fit the PiecewiseDirectStandardization to the input data.
 
         IMPORTANT
         To preserve the compatibility with scikitlearn, the case
@@ -71,13 +92,13 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The slave data
+            The source data
         y : np.ndarray of shape (n_samples, n_features)
-            The master data
+            The target data
 
         Returns
         -------
-        self : PiercewiseDirectStandardization
+        self : PiecewiseDirectStandardization
             The PDS transformer.
         """
 
@@ -92,7 +113,7 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
         if y is not None and y.ndim == 2:
             # Fundamental checks
             if X.shape != y.shape:
-                raise ValueError("Master and Slave matrix must have same shape!")
+                raise ValueError("target and source matrix must have same shape!")
             if self.window_length is None:
                 raise ValueError("window_length must be specified")
             if self.n_components is None:
@@ -106,7 +127,7 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
                 X,
                 y,
                 ensure_2d=True,
-                reset=False,  # reset=False perché X già validato
+                reset=False,
                 dtype=np.float64,
                 multi_output=True,
             )
@@ -123,7 +144,12 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
                     n_components=self.n_components,
                     scale=self.scale,
                 ).fit(X[:, l_lim:r_lim], y[:, i])
-                self.pls_.append(model)
+                params = {
+                    "x_mean_": model._x_mean,
+                    "coef_": model.coef_,
+                    "intercept_": model.intercept_,
+                }
+                self.pls_.append(params)
             return self
         else:
             y = X
@@ -140,13 +166,18 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
                     n_components=self.n_components,
                     scale=self.scale,
                 ).fit(X[:, l_lim:r_lim], y[:, i])
-                self.pls_.append(model)
+                params = {
+                    "x_mean_": model._x_mean,
+                    "coef_": model.coef_,
+                    "intercept_": model.intercept_,
+                }
+                self.pls_.append(params)
             print("Error Method: You must have two set of data not only one")
             return self
 
     def transform(self, X_new) -> np.ndarray:
         """
-        Use the trained model to transform the slave data
+        Use the trained model to transform the source data
 
         Parameters
         ----------
@@ -173,5 +204,9 @@ class PiercewiseDirectStandardization(TransformerMixin, BaseEstimator):
             # close to the edge avoid errors
             l_lim = max(0, i - self.window_length)
             r_lim = min(self.n_features_, i + self.window_length + 1)
-            X_transformed[:, i] = self.pls_[i].predict(X_new[:, l_lim:r_lim])
+
+            X = X_new[:, l_lim:r_lim] - self.pls_[i]["x_mean_"]
+            X_transformed[:, i] = (
+                X @ self.pls_[i]["coef_"].T + self.pls_[i]["intercept_"]
+            ).ravel()
         return X_transformed
