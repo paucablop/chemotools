@@ -31,7 +31,7 @@ def sample_data():
 def test_compliance_DirectStandardization():
     # Arrange
     transformer = DirectStandardization()
-    
+
     # Act & Assert
     check_estimator(transformer)
 

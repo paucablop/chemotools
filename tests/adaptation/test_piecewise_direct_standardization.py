@@ -32,7 +32,7 @@ def data_diff(dataset_ref, dataset_test):
 def test_compliance_DirectStandardization():
     # Arrange
     transformer = PiecewiseDirectStandardization()
-    
+
     # Act & Assert
     check_estimator(transformer)
 
