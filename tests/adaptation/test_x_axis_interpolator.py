@@ -114,7 +114,7 @@ def test_rejects_invalid_methods():
     # Act & Assert
     with pytest.raises(
         InvalidParameterError,
-        match="The 'method' parameter of XAxisInterpolator must be a str among " \
+        match="The 'method' parameter of XAxisInterpolator must be a str among "
         "{'linear', 'cubic', 'pchip'}. Got 'banana' instead.",
     ):
         est.fit(X)
