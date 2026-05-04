@@ -1,5 +1,5 @@
 """
-The :mod: chemotools.adaptation._x_axis_interpolator allows resampling each X to a
+The :mod:`chemotools.adaptation._x_axis_interpolator` allows resampling each X to a
 common x_axis grid.
 """
 
