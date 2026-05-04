@@ -104,7 +104,7 @@ class TestEstimator:
 class TestFitExceptions:
     def test_fit_rejects_invalid_methods(self):
         """
-        Validates that non-finite points in the target axis are rejected during fit.
+        Validates that unsupported interpolation methods are rejected during fit.
         """
         # Arrange
         X = np.array([[1.0, 2.0, 3.0]])
