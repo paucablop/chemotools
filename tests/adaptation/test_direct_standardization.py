@@ -8,9 +8,13 @@ Test for DirectStandardization
 import numpy as np
 import pytest
 from sklearn.exceptions import NotFittedError
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation._direct_standardization import DirectStandardization
+from chemotools.derivative import SavitzkyGolay
+from chemotools.scatter import StandardNormalVariate
 
 
 def data_diff(dataset_ref, dataset_test):
@@ -158,3 +162,64 @@ def test_transform_raises_on_wrong_n_features(sample_data):
     # Assert
     with pytest.raises(ValueError):
         model.transform(X_wrong)
+
+
+# Test Pipeline
+def test_pipeline(sample_data):
+    # Arrange
+    X_target, X_source = sample_data
+
+    # Act
+    pipe = Pipeline(
+        [
+            ("scaler", StandardNormalVariate()),
+            (
+                "model",
+                DirectStandardization(),
+            ),
+        ]
+    )
+
+    pipe.fit(X_source, X_target)
+    X_transformed = pipe.transform(X_source)
+
+    # Assert
+    assert X_transformed.shape == X_source.shape == X_target.shape
+
+
+# Test Pipeline, GridSearchCV
+def pds_score(estimator, X, y):
+    X_transformed = estimator.transform(X)
+    return -data_diff(y, X_transformed)
+
+
+def test_pipeline_gridsearchcv(sample_data):
+    # Arrange
+    X_target, X_source = sample_data
+    pipe = Pipeline(
+        [
+            ("scaler", SavitzkyGolay()),
+            (
+                "model",
+                DirectStandardization(),
+            ),
+        ]
+    )
+    param_grid = {
+        "scaler__window_length": [15, 25, 35],
+        "scaler__polyorder": [2, 3],
+        "scaler__deriv": [1, 2],
+    }
+    grid = GridSearchCV(
+        estimator=pipe,
+        param_grid=param_grid,
+        cv=3,
+        scoring=pds_score,
+        error_score="raise",
+    )
+
+    # Act
+    grid.fit(X_source, X_target)
+
+    # Assert
+    assert grid.best_estimator_ is not None
