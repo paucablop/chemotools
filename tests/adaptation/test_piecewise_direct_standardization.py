@@ -32,7 +32,7 @@ def data_diff(dataset_ref, dataset_test):
     return difference
 
 
-def test_compliance_DirectStandardization():
+def test_compliance_PiecewiseDirectStandardization():
     # Arrange
     transformer = PiecewiseDirectStandardization()
 
