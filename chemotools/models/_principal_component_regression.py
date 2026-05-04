@@ -16,7 +16,7 @@ import numpy as np
 
 class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimator):
     """
-    Description
+    Implement Principal Component regression
 
     Parameters
     ----------
@@ -124,23 +124,24 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
         )
 
         # Train PCA model
-        self.pca_ = PCA(n_components=self.n_components).fit(X)
-        x_scores = self.pca_.transform(X)
+        pca = PCA(n_components=self.n_components).fit(X)
+        x_scores = pca.transform(X)
 
         # Train linear regression model
-        self.lr_ = LinearRegression().fit(x_scores, y)
+        lr = LinearRegression().fit(x_scores, y)
 
         # Expose fitting attributes for PCA
-        self.components_ = self.pca_.components_
-        self.explained_variance_ = self.pca_.explained_variance_
-        self.explained_variance_ratio_ = self.pca_.explained_variance_ratio_
-        self.noise_variance_ = self.pca_.noise_variance_
+        self.mean_ = pca.mean_
+        self.components_ = pca.components_
+        self.explained_variance_ = pca.explained_variance_
+        self.explained_variance_ratio_ = pca.explained_variance_ratio_
+        self.noise_variance_ = pca.noise_variance_
 
         # Expose fitting attributes for linear regression
-        self.coef_ = self.lr_.coef_
-        self.intercept_ = self.lr_.intercept_
-        self.rank_ = self.lr_.rank_
-        self.singular_ = self.lr_.singular_
+        self.coef_ = lr.coef_
+        self.intercept_ = lr.intercept_
+        self.rank_ = lr.rank_
+        self.singular_ = lr.singular_
 
         return self
 
@@ -158,7 +159,18 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
         x_scores : np.ndarray of shape (n_samples,n_components)
             The transformed data.
         """
-        return self.pca_.transform(X)
+        # Validate input data
+        check_is_fitted(self, ["mean_", "components_", "coef_", "intercept_"])
+        X = validate_data(
+            self,
+            X,
+            ensure_2d=True,
+            reset=False,
+            copy=self.copy,
+            dtype=np.float64,
+        )
+
+        return (X - self.mean_) @ self.components_.T
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -175,7 +187,7 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
             The predicted value.
         """
         # Validate input data
-        check_is_fitted(self, ["pca_", "lr_"])
+        check_is_fitted(self, ["mean_", "components_", "coef_", "intercept_"])
         X = validate_data(
             self,
             X,
@@ -185,6 +197,6 @@ class PrincipalComponentRegression(TransformerMixin, RegressorMixin, BaseEstimat
             dtype=np.float64,
         )
 
-        # Predict
-        T = self.pca_.transform(X)
-        return self.lr_.predict(T)
+        # Transform
+        T = (X - self.mean_) @ self.components_.T
+        return T @ self.coef_.T + self.intercept_
