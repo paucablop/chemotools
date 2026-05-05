@@ -174,10 +174,14 @@ def test_pipeline(sample_data):
     rng = np.random.default_rng(17)
     # Act
     pipe = Pipeline(
-    [
-        ("scaler", StandardNormalVariate()),
-        ("model",DirectStandardization(X_target=X_target),),
-    ])
+        [
+            ("scaler", StandardNormalVariate()),
+            (
+                "model",
+                DirectStandardization(X_target=X_target),
+            ),
+        ]
+    )
 
     pipe.fit(X_source)
     X_transformed = pipe.transform(X_source)

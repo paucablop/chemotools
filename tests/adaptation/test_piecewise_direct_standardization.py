@@ -209,10 +209,12 @@ def test_pipeline(sample_data):
     pipe = Pipeline(
         [
             ("scaler", StandardNormalVariate()),
-            ("model",PiecewiseDirectStandardization(X_target=X_target, 
-                window_length=25, 
-                n_components=2, 
-                scale=True),),
+            (
+                "model",
+                PiecewiseDirectStandardization(
+                    X_target=X_target, window_length=25, n_components=2, scale=True
+                ),
+            ),
         ]
     )
 
