@@ -15,7 +15,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.utils.metadata_routing import MetadataRouter
 
-from chemotools.adaptation._direct_standardization import DirectStandardization
+from chemotools.adaptation._direct_standardization import (
+    DirectStandardization,
+)
 from chemotools.derivative import SavitzkyGolay
 from chemotools.scatter import StandardNormalVariate
 
@@ -171,7 +173,6 @@ def test_transform_raises_on_wrong_n_features(sample_data):
 def test_pipeline(sample_data):
     # Arrange
     X_target, X_source = sample_data
-    rng = np.random.default_rng(17)
     # Act
     pipe = Pipeline(
         [
