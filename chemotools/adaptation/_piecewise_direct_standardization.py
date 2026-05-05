@@ -105,7 +105,7 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     >>> from sklearn.pipeline import Pipeline
     >>> from sklearn.utils.estimator_checks import check_estimator
     >>> from sklearn.utils.metadata_routing import MetadataRouter
-    >>> from chemotools.adaptation._direct_standardization import PiecewiseDirectStandardization
+    >>> from chemotools.adaptation import PiecewiseDirectStandardization
     >>> from chemotools.derivative import SavitzkyGolay
     >>> from chemotools.scatter import StandardNormalVariate
     >>>
