@@ -7,10 +7,13 @@ Test for DirectStandardization
 
 import numpy as np
 import pytest
+import sklearn
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.metadata_routing import MetadataRouter
 
 from chemotools.adaptation._direct_standardization import DirectStandardization
 from chemotools.derivative import SavitzkyGolay
@@ -168,14 +171,13 @@ def test_transform_raises_on_wrong_n_features(sample_data):
 def test_pipeline(sample_data):
     # Arrange
     X_target, X_source = sample_data
-
+    rng = np.random.default_rng(17)
     # Act
     pipe = Pipeline(
-        [
-            ("scaler", StandardNormalVariate()),
-            ("model", DirectStandardization(X_target=X_target)),
-        ]
-    )
+    [
+        ("scaler", StandardNormalVariate()),
+        ("model",DirectStandardization(X_target=X_target),),
+    ])
 
     pipe.fit(X_source)
     X_transformed = pipe.transform(X_source)
@@ -184,36 +186,40 @@ def test_pipeline(sample_data):
     assert X_transformed.shape == X_source.shape == X_target.shape
 
 
-# Test Pipeline, GridSearchCV
-def pds_score(estimator, X, X_target):
-    X_transformed = estimator.transform(X)
-    return -data_diff(X_target, X_transformed)
+def get_metadata_routing(self):
+    router = MetadataRouter(owner=self.__class__.__name__)
+    router.add_self_request(self)
+    return router
 
 
-def test_pipeline_gridsearchcv(sample_data):
+def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     # Arrange
     X_target, X_source = sample_data
+    rng = np.random.default_rng(42)
+    y_concentration = rng.normal(size=(100, 1))
+
+    sklearn.set_config(enable_metadata_routing=True)
+
     pipe = Pipeline(
         [
             ("scaler", SavitzkyGolay()),
-            ("model", DirectStandardization()),
+            ("ds", DirectStandardization().set_fit_request(X_target=True)),
+            ("pls", PLSRegression()),
         ]
     )
     param_grid = {
-        "scaler__window_length": [15, 25, 35],
+        "scaler__window_length": [15, 25],
         "scaler__polyorder": [2, 3],
         "scaler__deriv": [1, 2],
+        "pls__n_components": [2, 3],
     }
-    grid = GridSearchCV(
-        estimator=pipe,
-        param_grid=param_grid,
-        cv=3,
-        scoring=pds_score,
-        error_score="raise",
-    )
+    grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
-    # Act
-    grid.fit(X_source, X_target)
+    # Act — X_target passa come kwarg, sklearn lo smista a DS con gli indici corretti
+    grid.fit(X_source, y_concentration, X_target=X_target)
 
     # Assert
     assert grid.best_estimator_ is not None
+
+    # Cleanup — reset config per non sporcare altri test
+    sklearn.set_config(enable_metadata_routing=False)

@@ -6,14 +6,18 @@ Test for PiecewiseDirectStandardization
 # License: MIT
 import numpy as np
 import pytest
+import sklearn
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.metadata_routing import MetadataRouter
 
 from chemotools.adaptation._piecewise_direct_standardization import (
     PiecewiseDirectStandardization,
 )
+from chemotools.derivative import SavitzkyGolay
 from chemotools.scatter import StandardNormalVariate
 
 
@@ -45,7 +49,7 @@ def test_fit_sets_attributes(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
 
     # Assert
     assert hasattr(model, "n_samples_")
@@ -61,7 +65,7 @@ def test_transform_preserves_shape(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
     X_transformed = model.transform(X_source)
 
     # Assert
@@ -72,7 +76,7 @@ def test_transform_preserves_shape(sample_data):
 def test_transform_improves_match_to_target(sample_data):
     # Arrange
     X_target, X_source = sample_data
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
 
     # Act
     X_transformed = model.transform(X_source)
@@ -90,11 +94,11 @@ def test_fit_raises_on_shape_mismatch():
     X_source = rng.normal(size=(90, 20))
 
     # Act
-    model = PiecewiseDirectStandardization()
+    model = PiecewiseDirectStandardization(X_target=X_target)
 
     # Assert
-    with pytest.raises(ValueError, match="same shape"):
-        model.fit(X_source, X_target)
+    with pytest.raises(ValueError, match="must have the same shape"):
+        model.fit(X_source)
 
 
 def test_fit_raises_when_n_components_too_large(sample_data):
@@ -102,11 +106,13 @@ def test_fit_raises_when_n_components_too_large(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = PiecewiseDirectStandardization(window_length=2, n_components=4)
+    model = PiecewiseDirectStandardization(
+        window_length=2, n_components=4, X_target=X_target
+    )
 
     # Assert
     with pytest.raises(ValueError, match="n_components"):
-        model.fit(X_source, X_target)
+        model.fit(X_source)
 
 
 def test_transform_before_fit_raises(sample_data):
@@ -128,7 +134,7 @@ def test_transform_does_not_modify_input(sample_data):
     X_target_original = X_target.copy()
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
     model.transform(X_source)
 
     # Assert
@@ -141,7 +147,7 @@ def test_transform_is_idempotent_on_input(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
     result1 = model.transform(X_source)
     result2 = model.transform(X_source)
 
@@ -155,7 +161,7 @@ def test_pls_params_keys(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
 
     # Assert
     for params in model.pls_:
@@ -172,7 +178,7 @@ def test_transform_on_unseen_data(sample_data):
     X_new = rng.normal(size=X_source.shape)
 
     # Act
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
     X_transformed = model.transform(X_new)
 
     # Assert
@@ -187,7 +193,7 @@ def test_transform_raises_on_wrong_n_features(sample_data):
 
     # Act
     X_wrong = rng.normal(size=(100, 15))  # 15 invece di 20
-    model = PiecewiseDirectStandardization().fit(X_source, X_target)
+    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
 
     # Assert
     with pytest.raises(ValueError):
@@ -203,55 +209,56 @@ def test_pipeline(sample_data):
     pipe = Pipeline(
         [
             ("scaler", StandardNormalVariate()),
-            (
-                "model",
-                PiecewiseDirectStandardization(
-                    window_length=25, n_components=2, scale=True
-                ),
-            ),
+            ("model",PiecewiseDirectStandardization(X_target=X_target, 
+                window_length=25, 
+                n_components=2, 
+                scale=True),),
         ]
     )
 
-    pipe.fit(X_source, X_target)
+    pipe.fit(X_source)
     X_transformed = pipe.transform(X_source)
 
     # Assert
     assert X_transformed.shape == X_source.shape == X_target.shape
 
 
-# Test Pipeline, GridSearchCV
-def pds_score(estimator, X, y):
-    X_transformed = estimator.transform(X)
-    return -data_diff(y, X_transformed)
+def get_metadata_routing(self):
+    router = MetadataRouter(owner=self.__class__.__name__)
+    router.add_self_request(self)
+    return router
 
 
-def test_pipeline_gridsearchcv(sample_data):
+def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     # Arrange
     X_target, X_source = sample_data
+    rng = np.random.default_rng(42)
+    y_concentration = rng.normal(size=(100, 1))
+
+    sklearn.set_config(enable_metadata_routing=True)
+
     pipe = Pipeline(
         [
-            ("scaler", StandardNormalVariate()),
-            (
-                "model",
-                PiecewiseDirectStandardization(),
-            ),
+            ("scaler", SavitzkyGolay()),
+            ("model", PiecewiseDirectStandardization().set_fit_request(X_target=True)),
+            ("pls", PLSRegression()),
         ]
     )
     param_grid = {
-        "model__window_length": [15, 25, 35],
-        "model__n_components": [1, 2],
-        "model__scale": [True, False],
+        "scaler__window_length": [15, 25],
+        "scaler__polyorder": [2, 3],
+        "scaler__deriv": [1, 2],
+        "model__window_length": [10, 15, 20],
+        "model__n_components": [2, 3, 5],
+        "pls__n_components": [2, 3],
     }
-    grid = GridSearchCV(
-        estimator=pipe,
-        param_grid=param_grid,
-        cv=3,
-        scoring=pds_score,
-        error_score="raise",
-    )
+    grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
-    # Act
-    grid.fit(X_source, X_target)
+    # Act — X_target passa come kwarg, sklearn lo smista a DS con gli indici corretti
+    grid.fit(X_source, y_concentration, X_target=X_target)
 
     # Assert
     assert grid.best_estimator_ is not None
+
+    # Cleanup — reset config per non sporcare altri test
+    sklearn.set_config(enable_metadata_routing=False)

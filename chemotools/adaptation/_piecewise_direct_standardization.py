@@ -2,11 +2,15 @@
 Test for PiecewiseDirectStandardization
 """
 
-# author: Ruggero Guerrini
+# Author: Ruggero Guerrini
+# Licence: MIT
+
+from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
+from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
@@ -14,19 +18,23 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     """
     Implement a piecewise direct standardization transformer for
     the calibration transfer
-    (domain adaption) application.
-    y contains the reference measurements acquired
-    on the target instrument.
-    X contains the corresponding measurements of the same samples
-    acquired on the source instrument.
-    The transformer use a moving window PLS regressor to estimate the transformation.
-    PLS is chosen as in a small window the variables are strongly collerated,
-    making the use of OLS not possible.
-    After fitting, new X spectra can be transformed into
-    the y space.
+    (domain adaptation) application.
+    NOTE
+    X_target can be provided either at initialization or during fit.
+
+    - Use initialization when X_target is fixed and reused across multiple fits
+    (e.g., same target instrument used repeatedly in pipelines).
+
+    - Use fit-time X_target when working with Pipeline or GridSearchCV,
+    or when X_target varies across experiments (e.g., cross-validation splits
+    or different target batches).
 
     Parameters
     ----------
+    X_target : np.ndarray of shape (n_samples, n_features), optional
+        Target instrument data used to compute the transformation.
+        If not provided, X is used as both source and target.
+
     window_length : int
         Half-width (w) of the local spectral window used in PDS
 
@@ -53,47 +61,126 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
 
     Attributes
     ----------
-    n_samples_ : number of samples for both target and source matrix
+    n_samples_ : int
+        Number of samples in the training data (X and X_target).
 
-    n_features_ : number of features for both target and source matrix
+    n_features_ : int
+        Number of features in the traininf data (X and X_target).
 
-    pls_ :
+    pls_ : list[dict]
+        List containing the parameters of the local PLS models for each feature.
+        Each dictionary contains:
+        - 'x_mean_' : mean of the local X window
+        - 'coef_' : regression coefficients
+        - 'intercept_' : intercept term
+
+    Raises
+    ------
+    ValueError
+        If X and X_target do not have the same shape.
 
     Examples
     --------
-        X = np.random.randn((100,50))
-        X_portbale = X*2+5
-        PDS = PiecewiseDirectStandardization().fit(X,y)
-        X_transf = PDS.transform(X)
+    **Basic usage**
+    >>> # Import necessary libraries
+    >>> from chemotools.adaptation import PiecewiseDirectStandardization
+    >>> import numpy as np
+    >>>
+    >>> # Generate sample data
+    >>> rng = np.random.default_rng(17)
+    >>> X_target = rng.normal(size=(100, 20))
+    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
+    >>> # Train the model
+    >>> DS = PiecewiseDirectStandardization(X_target = X_target).fit(X_source)
+    >>> # Apply to a new set of data
+    >>> X_transf = DS.transform(X_source_new)
+    **Use the module for a Pipeline/GridSearchCV**
+    >>> # Import necessary libraries
+    >>> import numpy as np
+    >>> import pytest
+    >>> import sklearn
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from sklearn.exceptions import NotFittedError
+    >>> from sklearn.model_selection import GridSearchCV
+    >>> from sklearn.pipeline import Pipeline
+    >>> from sklearn.utils.estimator_checks import check_estimator
+    >>> from sklearn.utils.metadata_routing import MetadataRouter
+    >>> from chemotools.adaptation._direct_standardization import PiecewiseDirectStandardization
+    >>> from chemotools.derivative import SavitzkyGolay
+    >>> from chemotools.scatter import StandardNormalVariate
+    >>>
+    >>> # Generate sample data
+    >>> rng = np.random.default_rng(17)
+    >>> X_target = rng.normal(size=(100, 20))
+    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
+    >>> # Pipeline
+    >>> pipe = Pipeline([
+    >>>     ("scaler", StandardNormalVariate()),
+    >>>     ("model", PiecewiseDirectStandardization(X_target = X_target)),
+    >>> ])
+    >>> pipe.fit(X_source)
+    >>> X_transformed = pipe.transform(X_source)
+    >>>
+    >>> # Generate sample data
+    >>> rng = np.random.default_rng(17)
+    >>> X_target = rng.normal(size=(100, 20))
+    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
+    >>> # Pipeline + GridSearchCV
+    >>> sklearn.set_config(enable_metadata_routing=True)
+    >>> pipe = Pipeline([
+    >>>     ("scaler", SavitzkyGolay()),
+    >>>     ("model", PiecewiseDirectStandardization().set_fit_request(X_target=True)),
+    >>>     ("pls", PLSRegression()),
+    >>> ])
+    >>> param_grid = {
+    >>>     "scaler__window_length": [15, 25],
+    >>>     "scaler__polyorder": [2, 3],
+    >>>     "scaler__deriv": [1, 2],
+    >>>     "model__window_length": [10, 15, 20],
+    >>>     "model__n_components": [2, 3, 5],
+    >>>     "pls__n_components": [2, 3],
+    >>> }
+    >>> grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
+    >>> grid.fit(X_source, y_concentration, X_target=X_target)
 
     """
 
+    _parameter_constraints: dict = {
+        "X_target": ["no_validation"],
+        "window_length": [Interval(Integral, 1, None, closed="left")],
+        "n_components": [Interval(Integral, 1, None, closed="left")],
+        "scale": ["boolean"],
+    }
+
     def __init__(
         self,
+        X_target: np.ndarray | None = None,
         window_length: int = 25,
         n_components: int = 2,
         scale: bool = True,
     ):
+        self.X_target = X_target
         self.window_length = window_length
         self.n_components = n_components
         self.scale = scale
 
     def fit(
-        self, X: np.ndarray, y: np.ndarray | None = None
+        self, X: np.ndarray, y=None, X_target: np.ndarray | None = None
     ) -> "PiecewiseDirectStandardization":
         """
         Fit the PiecewiseDirectStandardization to the input data.
-
-        IMPORTANT
-        To preserve the compatibility with scikitlearn, the case
-        where y is None or its shape are not equal to X are accepted.
-        In this case the PDS is applied to the same data matrix (X -> X)
+        If X_target is not provided, X is used as both source and target,
+        resulting in an identity-like transformation.
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
             The source data
-        y : np.ndarray of shape (n_samples, n_features)
+
+        y : Ignored
+            Present for API compatibility with scikit-learn.
+
+        X_target : np.ndarray of shape (n_samples, n_features)
             The target data
 
         Returns
@@ -104,76 +191,39 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
 
         # validate_data
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
-
-        # To protect from .ndim
-        if y is not None:
-            y = np.asarray(y)
-
-        # Real case
-        if y is not None and y.ndim == 2:
-            # Fundamental checks
-            if X.shape != y.shape:
-                raise ValueError("target and source matrix must have same shape!")
-            if self.window_length is None:
-                raise ValueError("window_length must be specified")
-            if self.n_components is None:
-                raise ValueError("n_components must be specified")
-            if self.n_components > self.window_length + 1:
-                raise ValueError(
-                    "n_components must be smaller or equal to window_length"
-                )
-            _, y = validate_data(
-                self,
-                X,
-                y,
-                ensure_2d=True,
-                reset=False,
-                dtype=np.float64,
-                multi_output=True,
-            )
-            n, p = y.shape
-            self.n_samples_ = n
-            self.n_features_ = p
-
-            self.pls_ = []
-            for i in range(p):
-                # close to the edge avoid errors
-                l_lim = max(0, i - self.window_length)
-                r_lim = min(p, i + self.window_length + 1)
-                model = PLSRegression(
-                    n_components=self.n_components,
-                    scale=self.scale,
-                ).fit(X[:, l_lim:r_lim], y[:, i])
-                params = {
-                    "x_mean_": model.x_mean_,
-                    "coef_": model.coef_,
-                    "intercept_": model.intercept_,
-                }
-                self.pls_.append(params)
-            return self
+        # Priority: explicit fit-time X_target > __init__ X_target > identity
+        if X_target is not None:
+            _X_target = np.asarray(X_target, dtype=np.float64)
+        elif self.X_target is not None:
+            _X_target = np.asarray(self.X_target, dtype=np.float64)
         else:
-            y = X
-            n, p = y.shape
-            self.n_samples_ = n
-            self.n_features_ = p
+            _X_target = X.copy()
 
-            self.pls_ = []
-            for i in range(p):
-                # close to the edge avoid errors
-                l_lim = max(0, i - self.window_length)
-                r_lim = min(p, i + self.window_length + 1)
-                model = PLSRegression(
-                    n_components=self.n_components,
-                    scale=self.scale,
-                ).fit(X[:, l_lim:r_lim], y[:, i])
-                params = {
-                    "x_mean_": model._x_mean,
-                    "coef_": model.coef_,
-                    "intercept_": model.intercept_,
-                }
-                self.pls_.append(params)
-            print("Error Method: You must have two set of data not only one")
-            return self
+        if _X_target.shape != X.shape:
+            raise ValueError(
+                f"X and X_target must have the same shape, "
+                f"got X={X.shape} and X_target={_X_target.shape}."
+            )
+        n, p = _X_target.shape
+        self.n_samples_ = n
+        self.n_features_ = p
+
+        self.pls_ = []
+        for i in range(p):
+            # close to the edge avoid errors
+            l_lim = max(0, i - self.window_length)
+            r_lim = min(p, i + self.window_length + 1)
+            model = PLSRegression(
+                n_components=self.n_components,
+                scale=self.scale,
+            ).fit(X[:, l_lim:r_lim], _X_target[:, i])
+            params = {
+                "x_mean_": X[:, l_lim:r_lim].mean(axis=0),
+                "coef_": model.coef_,
+                "intercept_": model.intercept_,
+            }
+            self.pls_.append(params)
+        return self
 
     def transform(self, X_new) -> np.ndarray:
         """
