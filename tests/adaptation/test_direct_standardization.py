@@ -27,9 +27,9 @@ def data_diff(dataset_ref, dataset_test):
 @pytest.fixture
 def sample_data():
     rng = np.random.default_rng(17)
-    y = rng.normal(size=(100, 20))
-    X = y * 2 - rng.normal(size=(100, 20)) * 0.02
-    return y, X
+    X_target = rng.normal(size=(100, 20))
+    X = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
+    return X_target, X
 
 
 def test_compliance_DirectStandardization():
@@ -42,15 +42,15 @@ def test_compliance_DirectStandardization():
 
 def test_improvement(sample_data):
     # Arrange
-    y, X = sample_data
+    X_target, X = sample_data
 
     # Fit model
-    model = DirectStandardization().fit(X, y)
+    model = DirectStandardization(X_target=X_target).fit(X)
 
     # Act
     X_transformed = model.transform(X)
-    before = data_diff(y, X)
-    after = data_diff(y, X_transformed)
+    before = data_diff(X_target, X)
+    after = data_diff(X_target, X_transformed)
 
     # Assert
     assert before > after
@@ -58,23 +58,23 @@ def test_improvement(sample_data):
 
 def test_transform_preserves_shape(sample_data):
     # Arrange
-    y, X = sample_data
+    X_target, X = sample_data
 
     # Act
-    model = DirectStandardization().fit(X, y)
+    model = DirectStandardization(X_target=X_target).fit(X)
     X_transformed = model.transform(X)
 
     # Assert
     assert X_transformed.shape == X.shape
-    assert X_transformed.shape == y.shape
+    assert X_transformed.shape == X_target.shape
 
 
 def test_fit_sets_attributes(sample_data):
     # Arrange
-    y, X = sample_data
+    X_target, X = sample_data
 
     # Act
-    model = DirectStandardization().fit(X, y)
+    model = DirectStandardization(X_target=X_target).fit(X)
 
     # Assert
     assert hasattr(model, "T_")
@@ -82,13 +82,13 @@ def test_fit_sets_attributes(sample_data):
 
 def test_transform_improves_match_to_target(sample_data):
     # Arrange
-    y, X = sample_data
-    model = DirectStandardization().fit(X, y)
+    X_target, X = sample_data
+    model = DirectStandardization(X_target=X_target).fit(X)
 
     # Act
     X_transformed = model.transform(X)
-    before = data_diff(y, X)
-    after = data_diff(y, X_transformed)
+    before = data_diff(X_target, X)
+    after = data_diff(X_target, X_transformed)
 
     # Assert
     assert after < before
@@ -96,24 +96,24 @@ def test_transform_improves_match_to_target(sample_data):
 
 def test_transform_before_fit_raises(sample_data):
     # Arrange
-    _, X = sample_data
+    X_target, X = sample_data
 
     # Act
-    model = DirectStandardization()
+    model = DirectStandardization(X_target=X_target)
 
     # Assert
     with pytest.raises(NotFittedError):
         model.transform(X)
 
 
-def test_transform_does_not_modify_input(sample_data):
+def test_transform_does_not_modifX_target_input(sample_data):
     # Arrange
     X_target, X_source = sample_data
     X_source_original = X_source.copy()
     X_target_original = X_target.copy()
 
     # Act
-    model = DirectStandardization().fit(X_source, X_target)
+    model = DirectStandardization(X_target=X_target).fit(X_source)
     model.transform(X_source)
 
     # Assert
@@ -126,7 +126,7 @@ def test_transform_is_idempotent_on_input(sample_data):
     X_target, X_source = sample_data
 
     # Act
-    model = DirectStandardization().fit(X_source, X_target)
+    model = DirectStandardization(X_target=X_target).fit(X_source)
     result1 = model.transform(X_source)
     result2 = model.transform(X_source)
 
@@ -142,7 +142,7 @@ def test_transform_on_unseen_data(sample_data):
     X_new = rng.normal(size=X_source.shape)
 
     # Act
-    model = DirectStandardization().fit(X_source, X_target)
+    model = DirectStandardization(X_target=X_target).fit(X_source)
     X_transformed = model.transform(X_new)
 
     # Assert
@@ -157,7 +157,7 @@ def test_transform_raises_on_wrong_n_features(sample_data):
 
     # Act
     X_wrong = rng.normal(size=(100, 15))  # 15 invece di 20
-    model = DirectStandardization().fit(X_source, X_target)
+    model = DirectStandardization(X_target=X_target).fit(X_source)
 
     # Assert
     with pytest.raises(ValueError):
@@ -173,14 +173,11 @@ def test_pipeline(sample_data):
     pipe = Pipeline(
         [
             ("scaler", StandardNormalVariate()),
-            (
-                "model",
-                DirectStandardization(),
-            ),
+            ("model", DirectStandardization(X_target=X_target)),
         ]
     )
 
-    pipe.fit(X_source, X_target)
+    pipe.fit(X_source)
     X_transformed = pipe.transform(X_source)
 
     # Assert
@@ -188,9 +185,9 @@ def test_pipeline(sample_data):
 
 
 # Test Pipeline, GridSearchCV
-def pds_score(estimator, X, y):
+def pds_score(estimator, X, X_target):
     X_transformed = estimator.transform(X)
-    return -data_diff(y, X_transformed)
+    return -data_diff(X_target, X_transformed)
 
 
 def test_pipeline_gridsearchcv(sample_data):
@@ -199,10 +196,7 @@ def test_pipeline_gridsearchcv(sample_data):
     pipe = Pipeline(
         [
             ("scaler", SavitzkyGolay()),
-            (
-                "model",
-                DirectStandardization(),
-            ),
+            ("model", DirectStandardization()),
         ]
     )
     param_grid = {

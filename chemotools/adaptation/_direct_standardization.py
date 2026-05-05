@@ -26,8 +26,8 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     Parameters
     ----------
-    None
-
+    X_target : np.ndarray of shape (n_samples, n_features)
+        Data for which the transformation matrix is calculated
     Attributes
     ----------
     T : np.ndarray of shape (n_features, n_features)
@@ -58,24 +58,19 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     """
 
-    def fit(
-        self, X: np.ndarray, y: np.ndarray | None = None
-    ) -> "DirectStandardization":
+    def __init__(self, X_target: np.ndarray | None = None):
+
+        self.X_target = X_target
+
+    def fit(self, X: np.ndarray, y=None) -> "DirectStandardization":
         """
         Fit the DirectStandardization to the input data.
-        Use always both "X" and "y", that must share the same
-        dimensions.
-        IMPORTANT
-        To preserve the compatibility with scikitlearn, the case
-        where y is None or its shape are not equal to X are accepted.
-        In this case the T matrix will be an identity matrix.
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
             The source data
-        y : np.ndarray of shape (n_samples, n_features)
-            The target data
+
 
         Returns
         -------
@@ -86,27 +81,12 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         # validate_data
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
-        # To protect from .ndim
-        if y is not None:
-            y = np.asarray(y)
+        if self.X_target is None:
+            X_target = X.copy()
+        else:
+            X_target = self.X_target
 
-        # Real case
-        if y is not None and y.ndim == 2:
-            _, y = validate_data(
-                self,
-                X,
-                y,
-                ensure_2d=True,
-                reset=False,  # reset=False perché X già validato
-                dtype=np.float64,
-                multi_output=True,
-            )
-            self.T_ = np.linalg.pinv(X) @ y
-            return self
-
-        # If y is not set, T will be an Identity matrix.
-        # It was done to preserve the compatibility with scikitlearn
-        self.T_ = np.eye(X.shape[1])
+        self.T_ = np.linalg.pinv(X) @ X_target
         return self
 
     def transform(self, X) -> np.ndarray:

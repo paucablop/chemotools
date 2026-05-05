@@ -145,7 +145,7 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
                     scale=self.scale,
                 ).fit(X[:, l_lim:r_lim], y[:, i])
                 params = {
-                    "x_mean_": model._x_mean,
+                    "x_mean_": model.x_mean_,
                     "coef_": model.coef_,
                     "intercept_": model.intercept_,
                 }
