@@ -68,8 +68,6 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
 
     """
 
-
-
     def __init__(
         self,
         window_length: int = 25,
