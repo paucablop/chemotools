@@ -128,6 +128,12 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
+        # Validate n_components
+        if self.n_components > X.shape[0]:
+            raise ValueError(
+                f"n_components={self.n_components} must be <= n_samples={X.shape[0]}"
+            )
+
         # If X_source is None, default to identity transformation
         if X_source is None:
             warnings.warn(
