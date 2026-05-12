@@ -44,6 +44,17 @@ def test_compliance_PiecewiseDirectStandardization():
     check_estimator(transformer)
 
 
+def test_init_and_fit_time_X_target_give_same_result(sample_data):
+    X_target, X_source = sample_data
+
+    model_init = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
+    model_fit = PiecewiseDirectStandardization().fit(X_source, X_target=X_target)
+
+    np.testing.assert_array_equal(model_init.coef_, model_fit.coef_)
+    np.testing.assert_array_equal(model_init.x_mean_, model_fit.x_mean_)
+    np.testing.assert_array_equal(model_init.intercept_, model_fit.intercept_)
+
+
 def test_fit_sets_attributes(sample_data):
     # Arrange
     X_target, X_source = sample_data
@@ -54,10 +65,14 @@ def test_fit_sets_attributes(sample_data):
     # Assert
     assert hasattr(model, "n_samples_")
     assert hasattr(model, "n_features_")
-    assert hasattr(model, "pls_")
+    assert hasattr(model, "x_mean_")
+    assert hasattr(model, "coef_")
+    assert hasattr(model, "intercept_")
+    assert model.x_mean_.shape == (X_target.shape[1], 2 * model.window_length + 1)
+    assert model.coef_.shape == (X_target.shape[1], 2 * model.window_length + 1)
+    assert model.intercept_.shape == (X_target.shape[1],)
     assert model.n_samples_ == X_target.shape[0]
     assert model.n_features_ == X_target.shape[1]
-    assert len(model.pls_) == X_target.shape[1]
 
 
 def test_transform_preserves_shape(sample_data):
@@ -153,21 +168,6 @@ def test_transform_is_idempotent_on_input(sample_data):
 
     # Assert
     np.testing.assert_array_equal(result1, result2)
-
-
-# Verify that there are always all the attributes
-def test_pls_params_keys(sample_data):
-    # Arrange
-    X_target, X_source = sample_data
-
-    # Act
-    model = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
-
-    # Assert
-    for params in model.pls_:
-        assert "x_mean_" in params
-        assert "coef_" in params
-        assert "intercept_" in params
 
 
 # Transform must works on unseen data with the same shape

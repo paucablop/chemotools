@@ -65,14 +65,16 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         Number of samples in the training data (X and X_target).
 
     n_features_ : int
-        Number of features in the traininf data (X and X_target).
+        Number of features in the training data (X and X_target).
 
-    pls_ : list[dict]
-        List containing the parameters of the local PLS models for each feature.
-        Each dictionary contains:
-        - 'x_mean_' : mean of the local X window
-        - 'coef_' : regression coefficients
-        - 'intercept_' : intercept term
+    x_mean_ : np.ndarray of shape (n_features, 2 * window_length + 1)
+        Mean of the local X window for each feature.
+
+    coef_ : np.ndarray of shape (n_features, 2 * window_length + 1)
+        Regression coefficients for each local PLS model.
+
+    intercept_ : np.ndarray of shape (n_features,)
+        Intercept term for each local PLS model.
 
     Raises
     ------
@@ -82,50 +84,48 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     Examples
     --------
     **Basic usage**
-    >>> # Import necessary libraries
-    >>> from chemotools.adaptation import PiecewiseDirectStandardization
     >>> import numpy as np
+    >>> from chemotools.adaptation import PiecewiseDirectStandardization
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Train the model
-    >>> DS = PiecewiseDirectStandardization(X_target = X_target).fit(X_source)
-    >>> # Apply to a new set of data
-    >>> X_transf = DS.transform(X_source_new)
-    **Use the module for a Pipeline/GridSearchCV**
-    >>> # Import necessary libraries
+    >>> X_source_new = rng.normal(size=(10, 20))
+    >>>
+    >>> PDS = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
+    >>> X_transf = PDS.transform(X_source_new)
+
+    **Pipeline**
     >>> import numpy as np
-    >>> import pytest
-    >>> import sklearn
-    >>> from sklearn.cross_decomposition import PLSRegression
-    >>> from sklearn.exceptions import NotFittedError
-    >>> from sklearn.model_selection import GridSearchCV
     >>> from sklearn.pipeline import Pipeline
-    >>> from sklearn.utils.estimator_checks import check_estimator
-    >>> from sklearn.utils.metadata_routing import MetadataRouter
     >>> from chemotools.adaptation import PiecewiseDirectStandardization
-    >>> from chemotools.derivative import SavitzkyGolay
     >>> from chemotools.scatter import StandardNormalVariate
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline
+    >>>
     >>> pipe = Pipeline([
     >>>     ("scaler", StandardNormalVariate()),
-    >>>     ("model", PiecewiseDirectStandardization(X_target = X_target)),
+    >>>     ("model", PiecewiseDirectStandardization(X_target=X_target)),
     >>> ])
     >>> pipe.fit(X_source)
     >>> X_transformed = pipe.transform(X_source)
+
+    **Pipeline + GridSearchCV**
+    >>> import numpy as np
+    >>> import sklearn
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from sklearn.model_selection import GridSearchCV
+    >>> from sklearn.pipeline import Pipeline
+    >>> from chemotools.adaptation import PiecewiseDirectStandardization
+    >>> from chemotools.derivative import SavitzkyGolay
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline + GridSearchCV
+    >>> y_concentration = rng.normal(size=(100, 1))
+    >>>
     >>> sklearn.set_config(enable_metadata_routing=True)
     >>> pipe = Pipeline([
     >>>     ("scaler", SavitzkyGolay()),
@@ -175,18 +175,18 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The source data
+            Source data.
 
         y : Ignored
             Present for API compatibility with scikit-learn.
 
-        X_target : np.ndarray of shape (n_samples, n_features)
-            The target data
+        X_target : np.ndarray of shape (n_samples, n_features), optional
+            Target data. Overrides the value provided at initialization.
 
         Returns
         -------
         self : PiecewiseDirectStandardization
-            The PDS transformer.
+            PDS transformer.
         """
 
         # validate_data
@@ -208,55 +208,56 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         self.n_samples_ = n
         self.n_features_ = p
 
-        self.pls_ = []
+        max_win = 2 * self.window_length + 1
+        self.x_mean_ = np.zeros((p, max_win))
+        self.coef_ = np.zeros((p, max_win))
+        self.intercept_ = np.zeros(p)
+
         for i in range(p):
-            # close to the edge avoid errors
             l_lim = max(0, i - self.window_length)
             r_lim = min(p, i + self.window_length + 1)
+            win_size = r_lim - l_lim
+
             model = PLSRegression(
                 n_components=self.n_components,
                 scale=self.scale,
             ).fit(X[:, l_lim:r_lim], _X_target[:, i])
-            params = {
-                "x_mean_": X[:, l_lim:r_lim].mean(axis=0),
-                "coef_": model.coef_,
-                "intercept_": model.intercept_,
-            }
-            self.pls_.append(params)
+
+            self.x_mean_[i, :win_size] = X[:, l_lim:r_lim].mean(axis=0)
+            self.coef_[i, :win_size] = model.coef_.ravel()
+            self.intercept_[i] = model.intercept_[0]
         return self
 
-    def transform(self, X_new) -> np.ndarray:
+    def transform(self, X) -> np.ndarray:
         """
         Use the trained model to transform the source data
 
         Parameters
         ----------
-        X_new : np.ndarray of shape (n_samples, n_features)
-            The input data to transform
+        X : np.ndarray of shape (n_samples, n_features)
+            Input data to transform
 
         Returns
         -------
         X_transformed : np.ndarray of shape (n_samples, n_features)
-            The data transformed
+            Data transformed
         """
         # Check the data
-        X_new = validate_data(
+        X = validate_data(
             self,
-            X_new,
+            X,
             ensure_2d=True,
             reset=False,
             dtype=np.float64,
         )
         # Verify that the model was trained
         check_is_fitted(self)
-        X_transformed = np.zeros(X_new.shape)
+        X_transformed = np.zeros(X.shape)
         for i in range(self.n_features_):
-            # close to the edge avoid errors
             l_lim = max(0, i - self.window_length)
             r_lim = min(self.n_features_, i + self.window_length + 1)
+            win_size = r_lim - l_lim
 
-            X = X_new[:, l_lim:r_lim] - self.pls_[i]["x_mean_"]
-            X_transformed[:, i] = (
-                X @ self.pls_[i]["coef_"].T + self.pls_[i]["intercept_"]
-            ).ravel()
+            X_win = X[:, l_lim:r_lim] - self.x_mean_[i, :win_size]
+            X_transformed[:, i] = X_win @ self.coef_[i, :win_size] + self.intercept_[i]
         return X_transformed

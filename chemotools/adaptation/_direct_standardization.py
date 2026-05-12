@@ -1,5 +1,5 @@
 """
-The :mod:'chemotools.domain_adaptation:DirectStandardization'
+The :mod:'chemotools.adaptation:DirectStandardization'
 module implements a Direct Standardization transformer
 """
 
@@ -23,6 +23,14 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     transfer) applications. The transformer used least squares to find a linear map from
     the source space to the target space, following the implementation by [1].
 
+
+
+    Parameters
+    ----------
+    X_target : np.ndarray of shape (n_samples, n_features), optional
+        Target instrument data used to compute the transformation.
+        If not provided, X is used as both source and target.
+
     Attributes
     ----------
     T_ : np.ndarray of shape (n_features, n_features)
@@ -42,7 +50,6 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-
     """
 
     def fit(
@@ -65,6 +72,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Returns
         -------
         self : DirectStandardization
+            DS transformer.
         """
         # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
@@ -96,12 +104,12 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform
+            Input data to transform
 
         Returns
         -------
-        X_transf : np.ndarray of shape (n_samples, n_features)
-            The data transformed
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            Data transformed
         """
         # Check that the estimator is fitted
 
