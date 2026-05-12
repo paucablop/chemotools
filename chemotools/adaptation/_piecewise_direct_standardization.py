@@ -1,6 +1,6 @@
 """
-The :mod: `chemotools.domain_adaptation._picewise_direct_standardization`
-module implements the Picewise Direct Standardization (PDS) transformer
+The :mod: `chemotools.domain_adaptation._Piecewise_direct_standardization`
+module implements the Piecewise Direct Standardization (PDS) transformer
 """
 
 # Author: Ruggero Guerrini
@@ -18,7 +18,7 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     """
-    Picewise Direct Standardization (PDS) is a transformer used for domain adaptation
+    Piecewise Direct Standardization (PDS) is a transformer used for domain adaptation
     (calibration) applications. The transformer uses least squares to find a linear map
     from the target instrument space to the source instrument space, following the
     implementation by [1] and [2].
@@ -156,9 +156,9 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         p = X.shape[1]
 
         max_win = 2 * self.window_length + 1
-        self.x_mean_ = np.zeros((p, max_win))
-        self.coef_ = np.zeros((p, max_win))
-        self.intercept_ = np.zeros(p)
+        self.x_mean_ = np.empty((p, max_win))
+        self.coef_ = np.empty((p, max_win))
+        self.intercept_ = np.empty(p)
 
         for i in range(p):
             l_lim = max(0, i - self.window_length)
