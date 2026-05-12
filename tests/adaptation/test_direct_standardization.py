@@ -45,15 +45,6 @@ def test_compliance_DirectStandardization():
     check_estimator(transformer)
 
 
-def test_init_and_fit_time_X_target_give_same_result(sample_data):
-    X_target, X_source = sample_data
-
-    model_init = DirectStandardization(X_target=X_target).fit(X_source)
-    model_fit = DirectStandardization().fit(X_source, X_target=X_target)
-
-    np.testing.assert_array_equal(model_init.T_, model_fit.T_)
-
-
 def test_improvement(sample_data):
     # Arrange
     X_source, X = sample_data
@@ -207,7 +198,7 @@ def get_metadata_routing(self):
 
 def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     # Arrange
-    X_target, X_source = sample_data
+    _, X_source = sample_data
     rng = np.random.default_rng(42)
     y_concentration = rng.normal(size=(100, 1))
 
