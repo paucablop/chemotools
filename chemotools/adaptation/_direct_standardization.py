@@ -84,7 +84,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         # Check consistency in between X and X_target
         check_consistent_length(X, X_source)
 
-        self.T_ = np.linalg.pinv(X) @ X_source
+        self.T_, _, _, _ = np.linalg.lstsq(X, X_source, rcond=None)
 
         return self
 
