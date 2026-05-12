@@ -261,4 +261,3 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
             X_win = X[:, l_lim:r_lim] - self.x_mean_[i, :win_size]
             X_transformed[:, i] = X_win @ self.coef_[i, :win_size] + self.intercept_[i]
         return X_transformed
-

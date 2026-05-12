@@ -43,15 +43,17 @@ def test_compliance_PiecewiseDirectStandardization():
     # Act & Assert
     check_estimator(transformer)
 
+
 def test_init_and_fit_time_X_target_give_same_result(sample_data):
     X_target, X_source = sample_data
 
     model_init = PiecewiseDirectStandardization(X_target=X_target).fit(X_source)
-    model_fit  = PiecewiseDirectStandardization().fit(X_source, X_target=X_target)
+    model_fit = PiecewiseDirectStandardization().fit(X_source, X_target=X_target)
 
     np.testing.assert_array_equal(model_init.coef_, model_fit.coef_)
     np.testing.assert_array_equal(model_init.x_mean_, model_fit.x_mean_)
     np.testing.assert_array_equal(model_init.intercept_, model_fit.intercept_)
+
 
 def test_fit_sets_attributes(sample_data):
     # Arrange

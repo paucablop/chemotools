@@ -32,7 +32,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     X_target : np.ndarray of shape (n_samples, n_features), optional
         Target instrument data used to compute the transformation.
         If not provided, X is used as both source and target.
-        
+
     Attributes
     ----------
     T_ : np.ndarray of shape (n_features, n_features)
