@@ -7,9 +7,11 @@ module implements a Direct Standardization transformer
 # License: MIT
 
 import warnings
+from numbers import Real
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import (
     check_is_fitted,
     validate_data,
@@ -29,6 +31,9 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Linear transformation matrix mapping target instrument space to source
         instrument space.
 
+    x_source_provided_ : bool
+        Boolean value to flag if X_source was provided during fitting
+
     Raises
     ------
     ValueError
@@ -45,8 +50,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     --------
 
     """
-
-    _parameter_constraints: dict = {}
+    
 
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
@@ -80,6 +84,8 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
                 "transformation."
             )
             self.T_ = np.eye(X.shape[1])
+            self.x_source_provided_ = False
+
             return self
 
         # Check that X_target is a 2D array and has only finite values
@@ -95,6 +101,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
             )
 
         self.T_, _, _, _ = np.linalg.lstsq(X, X_source, rcond=None)
+        self.x_source_provided_ = True
 
         return self
 
