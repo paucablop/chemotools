@@ -11,7 +11,6 @@ import warnings
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils.validation import (
-    check_consistent_length,
     check_is_fitted,
     validate_data,
 )
@@ -20,13 +19,15 @@ from sklearn.utils.validation import (
 class DirectStandardization(TransformerMixin, BaseEstimator):
     """
     Direct Standardization (DS) is a transformer used for domain adaptation (calibration
-    transfer) applications. The transformer used least squares to find a linear map from
-    the source space to the target space, following the implementation by [1].
+    transfer) applications. The transformer uses least squares to find a linear map from
+    the target instrument space to the source instrument space, following the
+    implementation by [1].
 
     Attributes
     ----------
     T_ : np.ndarray of shape (n_features, n_features)
-        Linear transformation matrix mapping source space to target space.
+        Linear transformation matrix mapping target instrument space to source
+        instrument space.
 
     Raises
     ------
@@ -45,11 +46,13 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     """
 
+    _parameter_constraints: dict = {}
+
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
     ) -> "DirectStandardization":
         """
-        Fit the direct standardization of new X data  model.
+        Fit the Direct Standardization model.
 
         Parameters
         ----------
@@ -60,7 +63,8 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
             Ignored to align with API.
 
         X_source : np.ndarray of shape (n_samples, n_features), optional
-            Target data. Overrides the value provided at initialization.
+            Data from the source instrument. If None, the transformer defaults to
+            an identity transformation.
 
         Returns
         -------
@@ -69,20 +73,26 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
-        # Check that X_target is not None
+        # If X_source is None, default to identity transformation
         if X_source is None:
-            X_source = np.eye(X.shape[0], X.shape[1])
             warnings.warn(
-                "Input X_source is None, defaulting to identity matrix with X shape"
+                "X_source is None, the transformer will act as an identity " \
+                "transformation."
             )
+            self.T_ = np.eye(X.shape[1])
+            return self
 
         # Check that X_target is a 2D array and has only finite values
         X_source = validate_data(
-            self, X_source, ensure_2d=True, reset=True, dtype=np.float64
+            self, X_source, ensure_2d=True, reset=False, dtype=np.float64
         )
 
-        # Check consistency in between X and X_target
-        check_consistent_length(X, X_source)
+        # Check consistency between X and X_source
+        if X_source.shape != X.shape:
+            raise ValueError(
+                f"X and X_source must have the same shape, "
+                f"got X={X.shape} and X_source={X_source.shape}."
+            )
 
         self.T_, _, _, _ = np.linalg.lstsq(X, X_source, rcond=None)
 
