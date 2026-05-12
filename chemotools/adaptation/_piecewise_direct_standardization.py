@@ -58,7 +58,7 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     Raises
     ------
     ValueError
-        If X and X_target do not have the same shape.
+        If X and X_source do not have the same shape.
 
     Reference
     ---------
@@ -75,7 +75,17 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
-
+    >>> import numpy as np
+    >>> from chemotools.adaptation import PiecewiseDirectStandardization
+    >>> rng = np.random.default_rng(42)
+    >>> X = rng.normal(size=(50, 100))
+    >>> X_source = X * 1.2 + rng.normal(0, 0.1, size=(50, 100))
+    >>> pds = PiecewiseDirectStandardization(window_length=5, n_components=2)
+    >>> pds.fit(X, X_source=X_source)
+    PiecewiseDirectStandardization(n_components=2, window_length=5)
+    >>> X_transformed = pds.transform(X)
+    >>> X_transformed.shape
+    (50, 100)
 
     """
 
