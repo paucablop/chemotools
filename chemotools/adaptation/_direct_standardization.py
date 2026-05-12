@@ -76,7 +76,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         # If X_source is None, default to identity transformation
         if X_source is None:
             warnings.warn(
-                "X_source is None, the transformer will act as an identity " \
+                "X_source is None, the transformer will act as an identity "
                 "transformation."
             )
             self.T_ = np.eye(X.shape[1])
