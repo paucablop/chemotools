@@ -19,7 +19,7 @@ from sklearn.utils.validation import (
 class DirectStandardization(TransformerMixin, BaseEstimator):
     """
     Direct Standardization (DS) is a transformer used for domain adaptation (calibration
-    transfer) applications. The transformer uses least squares to find a linear map from
+    ) applications. The transformer uses least squares to find a linear map from
     the target instrument space to the source instrument space, following the
     implementation by [1].
 
