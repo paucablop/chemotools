@@ -118,7 +118,7 @@ def test_transform_does_not_modify_X_target_input(sample_data):
     X_target_original = X_target.copy()
 
     # Act
-    model = DirectStandardization().fit(X_source,  X_source=X_source)
+    model = DirectStandardization().fit(X_source, X_source=X_source)
     model.transform(X_source)
 
     # Assert
@@ -220,7 +220,10 @@ def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
     # Act — X_target passa come kwarg, sklearn lo smista a DS con gli indici corretti
-    grid.fit(X_source, y_concentration, )
+    grid.fit(
+        X_source,
+        y_concentration,
+    )
 
     # Assert
     assert grid.best_estimator_ is not None

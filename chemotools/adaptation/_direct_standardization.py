@@ -72,8 +72,9 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         # Check that X_target is not None
         if X_source is None:
             X_source = np.eye(X.shape[0], X.shape[1])
-            warnings.warn("Input X_source is None, defaulting to identity matrix "
-            "with X shape")
+            warnings.warn(
+                "Input X_source is None, defaulting to identity matrix with X shape"
+            )
 
         # Check that X_target is a 2D array and has only finite values
         X_source = validate_data(
