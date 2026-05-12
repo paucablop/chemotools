@@ -46,6 +46,16 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     Examples
     --------
+    **Basic usage**
+    >>> import numpy as np
+    >>> from chemotools.adaptation import DirectStandardization
+    >>>
+    >>> rng = np.random.default_rng(17)
+    >>> X_source = rng.normal(size=(100, 20))
+    >>> X_target = X_source * 2 - rng.normal(size=(100, 20)) * 0.02
+    >>>
+    >>> ds = DirectStandardization().fit(X_target, X_source=X_source)
+    >>> X_transf = ds.transform(X_target)
 
     """
 
