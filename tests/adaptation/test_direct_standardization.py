@@ -30,14 +30,6 @@ def data_diff(dataset_ref, dataset_test):
     return difference
 
 
-@pytest.fixture
-def sample_data():
-    rng = np.random.default_rng(17)
-    X_target = rng.normal(size=(100, 20))
-    X = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    return X_target, X
-
-
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
@@ -56,10 +48,10 @@ class TestFit:
     def test_fit_sets_attributes(self, sample_data):
         """Verifies that fit stores the transformation matrix T_."""
         # Arrange
-        X_source, X = sample_data
+        X_target, X_source = sample_data
 
         # Act
-        model = DirectStandardization().fit(X, X_source=X_source)
+        model = DirectStandardization().fit(X_target, X_source=X_source)
 
         # Assert
         assert hasattr(model, "T_")
@@ -67,7 +59,7 @@ class TestFit:
     def test_fit_should_raise_error_size_missmatch(self, sample_data):
         """Verifies fir raise eror when size missmatch"""
         # Arrange
-        X_source, X = sample_data
+        X_target, X_source = sample_data
 
         # Act & Assert
         with pytest.raises(
@@ -77,7 +69,7 @@ class TestFit:
                 "X_source=(99, 20)."
             ),
         ):
-            DirectStandardization().fit(X, X_source=X_source[:-1, :])
+            DirectStandardization().fit(X_target, X_source=X_source[:-1, :])
 
 
 class TestTransform:
@@ -87,12 +79,12 @@ class TestTransform:
         """Verifies that the transformed data is closer to the source than the
         original."""
         # Arrange
-        X_source, X = sample_data
-        model = DirectStandardization().fit(X, X_source=X_source)
+        X_target, X_source = sample_data
+        model = DirectStandardization().fit(X_target, X_source=X_source)
 
         # Act
-        X_transformed = model.transform(X)
-        before = data_diff(X_source, X)
+        X_transformed = model.transform(X_target)
+        before = data_diff(X_source, X_target)
         after = data_diff(X_source, X_transformed)
 
         # Assert
@@ -101,26 +93,26 @@ class TestTransform:
     def test_transform_preserves_shape(self, sample_data):
         """Verifies that the output shape matches both input X and X_source."""
         # Arrange
-        X_source, X = sample_data
+        X_target, X_source = sample_data
 
         # Act
-        model = DirectStandardization().fit(X, X_source=X_source)
-        X_transformed = model.transform(X)
+        model = DirectStandardization().fit(X_target, X_source=X_source)
+        X_transformed = model.transform(X_target)
 
         # Assert
-        assert X_transformed.shape == X.shape
+        assert X_transformed.shape == X_target.shape
         assert X_transformed.shape == X_source.shape
 
     def test_transform_improves_match_to_target(self, sample_data):
         """Verifies that transformation reduces the distance to the source instrument
         data."""
         # Arrange
-        X_source, X = sample_data
-        model = DirectStandardization().fit(X, X_source=X_source)
+        X_target, X_source = sample_data
+        model = DirectStandardization().fit(X_target, X_source=X_source)
 
         # Act
-        X_transformed = model.transform(X)
-        before = data_diff(X_source, X)
+        X_transformed = model.transform(X_target)
+        before = data_diff(X_source, X_target)
         after = data_diff(X_source, X_transformed)
 
         # Assert
@@ -129,12 +121,12 @@ class TestTransform:
     def test_transform_before_fit_raises(self, sample_data):
         """Verifies that calling transform before fit raises NotFittedError."""
         # Arrange
-        _, X = sample_data
+        X_target, _ = sample_data
         model = DirectStandardization()
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            model.transform(X)
+            model.transform(X_target)
 
     def test_transform_does_not_modify_input(self, sample_data):
         """Verifies that fit and transform do not mutate the input arrays."""

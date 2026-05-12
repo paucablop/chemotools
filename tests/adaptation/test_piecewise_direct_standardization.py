@@ -29,14 +29,6 @@ def data_diff(dataset_ref, dataset_test):
     return difference
 
 
-@pytest.fixture
-def sample_data():
-    rng = np.random.default_rng(17)
-    X = rng.normal(size=(100, 20))
-    X_source = X * 2 - rng.normal(size=(100, 20)) * 0.02
-    return X, X_source
-
-
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
@@ -56,25 +48,25 @@ class TestFit:
     def test_fit_sets_attributes(self, sample_data):
         """Verifies that fit stores the required fitted attributes."""
         # Arrange
-        X, X_source = sample_data
+        X_target, X_source = sample_data
 
         # Act
-        model = PiecewiseDirectStandardization().fit(X, X_source=X_source)
+        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
 
         # Assert
         assert hasattr(model, "n_features_in_")
         assert hasattr(model, "x_mean_")
         assert hasattr(model, "coef_")
         assert hasattr(model, "intercept_")
-        assert model.x_mean_.shape == (X.shape[1], 2 * model.window_length + 1)
-        assert model.coef_.shape == (X.shape[1], 2 * model.window_length + 1)
-        assert model.intercept_.shape == (X.shape[1],)
-        assert model.n_features_in_ == X.shape[1]
+        assert model.x_mean_.shape == (X_target.shape[1], 2 * model.window_length + 1)
+        assert model.coef_.shape == (X_target.shape[1], 2 * model.window_length + 1)
+        assert model.intercept_.shape == (X_target.shape[1],)
+        assert model.n_features_in_ == X_target.shape[1]
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
         # Arrange
-        X, X_source = sample_data
+        X_target, X_source = sample_data
         model = PiecewiseDirectStandardization()
 
         # Act & Assert
@@ -85,17 +77,17 @@ class TestFit:
                 "X_source=(99, 20)."
             ),
         ):
-            model.fit(X, X_source=X_source[:-1, :])
+            model.fit(X_target, X_source=X_source[:-1, :])
 
     def test_fit_raises_when_n_components_too_large(self, sample_data):
         """Verifies fit raises ValueError when n_components is too large for PLS."""
         # Arrange
-        X, X_source = sample_data
+        X_target, X_source = sample_data
         model = PiecewiseDirectStandardization(window_length=2, n_components=4)
 
         # Act & Assert
         with pytest.raises(ValueError, match="n_components"):
-            model.fit(X, X_source=X_source)
+            model.fit(X_target, X_source=X_source)
 
     def test_fit_raises_when_n_components_exceeds_n_samples(self):
         """Verifies fit raises ValueError when n_components exceeds n_samples."""
@@ -119,26 +111,26 @@ class TestTransform:
     def test_transform_preserves_shape(self, sample_data):
         """Verifies that the output shape matches both input X and X_source."""
         # Arrange
-        X, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X, X_source=X_source)
+        X_target, X_source = sample_data
+        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
 
         # Act
-        X_transformed = model.transform(X)
+        X_transformed = model.transform(X_target)
 
         # Assert
         assert X_transformed.shape == X_source.shape
-        assert X_transformed.shape == X.shape
+        assert X_transformed.shape == X_target.shape
 
     def test_transform_improves_match_to_target(self, sample_data):
         """Verifies that transformation reduces the distance to the source instrument
         data."""
         # Arrange
-        X, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X, X_source=X_source)
+        X_target, X_source = sample_data
+        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
 
         # Act
-        X_transformed = model.transform(X)
-        before = data_diff(X, X_source)
+        X_transformed = model.transform(X_target)
+        before = data_diff(X_target, X_source)
         after = data_diff(X_transformed, X_source)
 
         # Assert
@@ -147,38 +139,38 @@ class TestTransform:
     def test_transform_before_fit_raises(self, sample_data):
         """Verifies that calling transform before fit raises NotFittedError."""
         # Arrange
-        X, _ = sample_data
+        X_target, _ = sample_data
         model = PiecewiseDirectStandardization()
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            model.transform(X)
+            model.transform(X_target)
 
     def test_transform_does_not_modify_input(self, sample_data):
         """Verifies that fit and transform do not mutate the input arrays."""
         # Arrange
-        X, X_source = sample_data
-        X_original = X.copy()
+        X_target, X_source = sample_data
+        X_target_original = X_target.copy()
         X_source_original = X_source.copy()
 
         # Act
-        model = PiecewiseDirectStandardization().fit(X, X_source=X_source)
-        model.transform(X)
+        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+        model.transform(X_target)
 
         # Assert
-        np.testing.assert_array_equal(X, X_original)
+        np.testing.assert_array_equal(X_target, X_target_original)
         np.testing.assert_array_equal(X_source, X_source_original)
 
     def test_transform_is_deterministic(self, sample_data):
         """Verifies that calling transform multiple times with the same input gives
         identical results."""
         # Arrange
-        X, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X, X_source=X_source)
+        X_target, X_source = sample_data
+        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
 
         # Act
-        result1 = model.transform(X)
-        result2 = model.transform(X)
+        result1 = model.transform(X_target)
+        result2 = model.transform(X_target)
 
         # Assert
         np.testing.assert_array_equal(result1, result2)
@@ -252,7 +244,7 @@ class TestPipeline:
         """Verifies that X_source metadata routing works inside a Pipeline with
         GridSearchCV."""
         # Arrange
-        X, X_source = sample_data
+        X_target, X_source = sample_data
         rng = np.random.default_rng(42)
         y_concentration = rng.normal(size=(100, 1))
 
@@ -279,7 +271,7 @@ class TestPipeline:
         grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
         # Act - X_source passed as kwarg, sklearn routes it to PDS with correct indices
-        grid.fit(X, y_concentration, X_source=X_source)
+        grid.fit(X_target, y_concentration, X_source=X_source)
 
         # Assert - verify the grid search completed and the fitted model works
         assert grid.best_estimator_ is not None
