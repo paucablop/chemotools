@@ -1,5 +1,5 @@
 """
-The :mod:'chemotools.domain_adaptation:DirectStandardization'
+The :mod:'chemotools.adaptation:DirectStandardization'
 module implements a Direct Standardization transformer
 """
 
@@ -32,6 +32,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     X_target : np.ndarray of shape (n_samples, n_features), optional
         Target instrument data used to compute the transformation.
         If not provided, X is used as both source and target.
+        
     Attributes
     ----------
     T_ : np.ndarray of shape (n_features, n_features)
@@ -52,50 +53,48 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     Examples
     --------
     **Basic usage**
-    >>> # Import necessary libraries
-    >>> from chemotools.adaptation import DirectStandardization
     >>> import numpy as np
+    >>> from chemotools.adaptation import DirectStandardization
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Train the model
+    >>> X_source_new = rng.normal(size=(10, 20))
+    >>>
     >>> DS = DirectStandardization(X_target=X_target).fit(X_source)
-    >>> # Apply to a new set of data
     >>> X_transf = DS.transform(X_source_new)
-    **Use the module for a Pipeline/GridSearchCV**
-    >>> # Import necessary libraries
+
+    **Pipeline**
     >>> import numpy as np
-    >>> import pytest
-    >>> import sklearn
-    >>> from sklearn.cross_decomposition import PLSRegression
-    >>> from sklearn.exceptions import NotFittedError
-    >>> from sklearn.model_selection import GridSearchCV
     >>> from sklearn.pipeline import Pipeline
-    >>> from sklearn.utils.estimator_checks import check_estimator
-    >>> from sklearn.utils.metadata_routing import MetadataRouter
-    >>> from chemotools.adaptation._direct_standardization import DirectStandardization
-    >>> from chemotools.derivative import SavitzkyGolay
+    >>> from chemotools.adaptation import DirectStandardization
     >>> from chemotools.scatter import StandardNormalVariate
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline
+    >>>
     >>> pipe = Pipeline([
     >>>     ("scaler", StandardNormalVariate()),
-    >>>     ("model", DirectStandardization(X_target=X_target)),
+    >>>     ("ds", DirectStandardization(X_target=X_target)),
     >>> ])
     >>> pipe.fit(X_source)
     >>> X_transformed = pipe.transform(X_source)
+
+    **Pipeline + GridSearchCV**
+    >>> import numpy as np
+    >>> import sklearn
+    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from sklearn.model_selection import GridSearchCV
+    >>> from sklearn.pipeline import Pipeline
+    >>> from chemotools.adaptation import DirectStandardization
+    >>> from chemotools.derivative import SavitzkyGolay
     >>>
-    >>> # Generate sample data
     >>> rng = np.random.default_rng(17)
     >>> X_target = rng.normal(size=(100, 20))
     >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline + GridSearchCV
+    >>> y_concentration = rng.normal(size=(100, 1))
+    >>>
     >>> sklearn.set_config(enable_metadata_routing=True)
     >>> pipe = Pipeline([
     >>>     ("scaler", SavitzkyGolay()),
@@ -139,6 +138,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Returns
         -------
         self : DirectStandardization
+            DS transformer.
         """
 
         # validate_data
@@ -168,12 +168,12 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform
+            Input data to transform
 
         Returns
         -------
-        X_transf : np.ndarray of shape (n_samples, n_features)
-            The data transformed
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            Data transformed
         """
         # Validate input data
         check_is_fitted(self, ["T_"])
