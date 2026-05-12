@@ -47,15 +47,15 @@ def test_compliance_DirectStandardization():
 
 def test_improvement(sample_data):
     # Arrange
-    X_target, X = sample_data
+    X_source, X = sample_data
 
     # Fit model
-    model = DirectStandardization(X_target=X_target).fit(X)
+    model = DirectStandardization().fit(X, X_source=X_source)
 
     # Act
     X_transformed = model.transform(X)
-    before = data_diff(X_target, X)
-    after = data_diff(X_target, X_transformed)
+    before = data_diff(X_source, X)
+    after = data_diff(X_source, X_transformed)
 
     # Assert
     assert before > after
@@ -63,23 +63,23 @@ def test_improvement(sample_data):
 
 def test_transform_preserves_shape(sample_data):
     # Arrange
-    X_target, X = sample_data
+    X_source, X = sample_data
 
     # Act
-    model = DirectStandardization(X_target=X_target).fit(X)
+    model = DirectStandardization().fit(X, X_source=X_source)
     X_transformed = model.transform(X)
 
     # Assert
     assert X_transformed.shape == X.shape
-    assert X_transformed.shape == X_target.shape
+    assert X_transformed.shape == X_source.shape
 
 
 def test_fit_sets_attributes(sample_data):
     # Arrange
-    X_target, X = sample_data
+    X_source, X = sample_data
 
     # Act
-    model = DirectStandardization(X_target=X_target).fit(X)
+    model = DirectStandardization().fit(X, X_source=X_source)
 
     # Assert
     assert hasattr(model, "T_")
@@ -87,13 +87,13 @@ def test_fit_sets_attributes(sample_data):
 
 def test_transform_improves_match_to_target(sample_data):
     # Arrange
-    X_target, X = sample_data
-    model = DirectStandardization(X_target=X_target).fit(X)
+    X_source, X = sample_data
+    model = DirectStandardization().fit(X, X_source=X_source)
 
     # Act
     X_transformed = model.transform(X)
-    before = data_diff(X_target, X)
-    after = data_diff(X_target, X_transformed)
+    before = data_diff(X_source, X)
+    after = data_diff(X_source, X_transformed)
 
     # Assert
     assert after < before
@@ -101,24 +101,24 @@ def test_transform_improves_match_to_target(sample_data):
 
 def test_transform_before_fit_raises(sample_data):
     # Arrange
-    X_target, X = sample_data
+    _, X = sample_data
 
     # Act
-    model = DirectStandardization(X_target=X_target)
+    model = DirectStandardization()
 
     # Assert
     with pytest.raises(NotFittedError):
         model.transform(X)
 
 
-def test_transform_does_not_modifX_target_input(sample_data):
+def test_transform_does_not_modify_X_target_input(sample_data):
     # Arrange
     X_target, X_source = sample_data
     X_source_original = X_source.copy()
     X_target_original = X_target.copy()
 
     # Act
-    model = DirectStandardization(X_target=X_target).fit(X_source)
+    model = DirectStandardization().fit(X_source,  X_source=X_source)
     model.transform(X_source)
 
     # Assert
@@ -128,10 +128,10 @@ def test_transform_does_not_modifX_target_input(sample_data):
 
 def test_transform_is_idempotent_on_input(sample_data):
     # Arrange
-    X_target, X_source = sample_data
+    _, X_source = sample_data
 
     # Act
-    model = DirectStandardization(X_target=X_target).fit(X_source)
+    model = DirectStandardization().fit(X_source)
     result1 = model.transform(X_source)
     result2 = model.transform(X_source)
 
@@ -139,15 +139,14 @@ def test_transform_is_idempotent_on_input(sample_data):
     np.testing.assert_array_equal(result1, result2)
 
 
-# Transform must works on unseen data with the same shape
 def test_transform_on_unseen_data(sample_data):
     # Arrange
-    X_target, X_source = sample_data
+    _, X_source = sample_data
     rng = np.random.default_rng(17)
     X_new = rng.normal(size=X_source.shape)
 
     # Act
-    model = DirectStandardization(X_target=X_target).fit(X_source)
+    model = DirectStandardization().fit(X_source)
     X_transformed = model.transform(X_new)
 
     # Assert
@@ -162,7 +161,7 @@ def test_transform_raises_on_wrong_n_features(sample_data):
 
     # Act
     X_wrong = rng.normal(size=(100, 15))  # 15 invece di 20
-    model = DirectStandardization(X_target=X_target).fit(X_source)
+    model = DirectStandardization().fit(X_source)
 
     # Assert
     with pytest.raises(ValueError):
@@ -179,7 +178,7 @@ def test_pipeline(sample_data):
             ("scaler", StandardNormalVariate()),
             (
                 "model",
-                DirectStandardization(X_target=X_target),
+                DirectStandardization(),
             ),
         ]
     )
@@ -208,7 +207,7 @@ def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     pipe = Pipeline(
         [
             ("scaler", SavitzkyGolay()),
-            ("ds", DirectStandardization().set_fit_request(X_target=True)),
+            ("ds", DirectStandardization().set_fit_request(X_source=True)),
             ("pls", PLSRegression()),
         ]
     )
@@ -221,7 +220,7 @@ def test_pipeline_gridsearchcv_pls_metadata_routing(sample_data):
     grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
     # Act — X_target passa come kwarg, sklearn lo smista a DS con gli indici corretti
-    grid.fit(X_source, y_concentration, X_target=X_target)
+    grid.fit(X_source, y_concentration, )
 
     # Assert
     assert grid.best_estimator_ is not None

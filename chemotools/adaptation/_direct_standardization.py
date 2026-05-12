@@ -6,164 +6,91 @@ module implements a Direct Standardization transformer
 # Authors: Ruggero Guerrini
 # License: MIT
 
+import warnings
+
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils.validation import check_is_fitted, validate_data
+from sklearn.utils.validation import (
+    check_consistent_length,
+    check_is_fitted,
+    validate_data,
+)
 
 
 class DirectStandardization(TransformerMixin, BaseEstimator):
     """
-    Direct Standardization (DS) transformer for calibration transfer
-    (domain adaptation) applications.
-    The transformer estimates a global linear mapping from the source
-    space to the target space using least squares.
-    NOTE
-    X_target can be provided either at initialization or during fit.
+    Direct Standardization (DS) is a transformer used for domain adaptation (calibration
+    transfer) applications. The transformer used least squares to find a linear map from
+    the source space to the target space, following the implementation by [1].
 
-    - Use initialization when X_target is fixed and reused across multiple fits
-    (e.g., same target instrument used repeatedly in pipelines).
-
-    - Use fit-time X_target when working with Pipeline or GridSearchCV,
-    or when X_target varies across experiments (e.g., cross-validation splits
-    or different target batches).
-
-    Parameters
-    ----------
-    X_target : np.ndarray of shape (n_samples, n_features), optional
-        Target instrument data used to compute the transformation.
-        If not provided, X is used as both source and target.
     Attributes
     ----------
     T_ : np.ndarray of shape (n_features, n_features)
         Linear transformation matrix mapping source space to target space.
 
-    Reference
-    ---------
-    .. [1] Wang, Yongdong., Veltkamp,
-        D. J., & Kowalski, B. R. (1991).
-        Multivariate instrument standardization.
-        Analytical Chemistry, 63(23), 2750–2756.
-
     Raises
     ------
     ValueError
-        If X and X_target do not have the same shape.
+        If X and X_source do not have the same shape.
+
+    Reference
+    ---------
+    .. [1] Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991),
+        Multivariate instrument standardization,
+        Analytical Chemistry, 63(23), Pages 2750–2756,
+        https://doi.org/10.1021/ac00023a016.
 
     Examples
     --------
-    **Basic usage**
-    >>> # Import necessary libraries
-    >>> from chemotools.adaptation import DirectStandardization
-    >>> import numpy as np
-    >>>
-    >>> # Generate sample data
-    >>> rng = np.random.default_rng(17)
-    >>> X_target = rng.normal(size=(100, 20))
-    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Train the model
-    >>> DS = DirectStandardization(X_target=X_target).fit(X_source)
-    >>> # Apply to a new set of data
-    >>> X_transf = DS.transform(X_source_new)
-    **Use the module for a Pipeline/GridSearchCV**
-    >>> # Import necessary libraries
-    >>> import numpy as np
-    >>> import pytest
-    >>> import sklearn
-    >>> from sklearn.cross_decomposition import PLSRegression
-    >>> from sklearn.exceptions import NotFittedError
-    >>> from sklearn.model_selection import GridSearchCV
-    >>> from sklearn.pipeline import Pipeline
-    >>> from sklearn.utils.estimator_checks import check_estimator
-    >>> from sklearn.utils.metadata_routing import MetadataRouter
-    >>> from chemotools.adaptation._direct_standardization import DirectStandardization
-    >>> from chemotools.derivative import SavitzkyGolay
-    >>> from chemotools.scatter import StandardNormalVariate
-    >>>
-    >>> # Generate sample data
-    >>> rng = np.random.default_rng(17)
-    >>> X_target = rng.normal(size=(100, 20))
-    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline
-    >>> pipe = Pipeline([
-    >>>     ("scaler", StandardNormalVariate()),
-    >>>     ("model", DirectStandardization(X_target=X_target)),
-    >>> ])
-    >>> pipe.fit(X_source)
-    >>> X_transformed = pipe.transform(X_source)
-    >>>
-    >>> # Generate sample data
-    >>> rng = np.random.default_rng(17)
-    >>> X_target = rng.normal(size=(100, 20))
-    >>> X_source = X_target * 2 - rng.normal(size=(100, 20)) * 0.02
-    >>> # Pipeline + GridSearchCV
-    >>> sklearn.set_config(enable_metadata_routing=True)
-    >>> pipe = Pipeline([
-    >>>     ("scaler", SavitzkyGolay()),
-    >>>     ("ds", DirectStandardization().set_fit_request(X_target=True)),
-    >>>     ("pls", PLSRegression()),
-    >>> ])
-    >>> param_grid = {
-    >>>     "scaler__window_length": [15, 25],
-    >>>     "scaler__polyorder": [2, 3],
-    >>>     "scaler__deriv": [1, 2],
-    >>>     "pls__n_components": [2, 3],
-    >>> }
-    >>> grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
-    >>> grid.fit(X_source, y_concentration, X_target=X_target)
+
     """
 
-    _parameter_constraints: dict = {
-        "X_target": ["no_validation"],
-    }
-
-    def __init__(self, X_target: np.ndarray | None = None):
-        self.X_target = X_target
-
     def fit(
-        self, X: np.ndarray, y=None, X_target: np.ndarray | None = None
+        self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
     ) -> "DirectStandardization":
         """
-        Fit the DirectStandardization model.
+        Fit the direct standardization of new X data  model.
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            Source data.
+            Data from the target instrument.
 
-        y : Ignored
-            Present for API compatibility with scikit-learn.
+        y : None
+            Ignored to align with API.
 
-        X_target : np.ndarray of shape (n_samples, n_features), optional
+        X_source : np.ndarray of shape (n_samples, n_features), optional
             Target data. Overrides the value provided at initialization.
 
         Returns
         -------
         self : DirectStandardization
         """
-
-        # validate_data
+        # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
-        # Priority: explicit fit-time X_target > __init__ X_target > identity
-        if X_target is not None:
-            _X_target = np.asarray(X_target, dtype=np.float64)
-        elif self.X_target is not None:
-            _X_target = np.asarray(self.X_target, dtype=np.float64)
-        else:
-            _X_target = X.copy()
 
-        if _X_target.shape != X.shape:
-            raise ValueError(
-                f"X and X_target must have the same shape, "
-                f"got X={X.shape} and X_target={_X_target.shape}."
-            )
+        # Check that X_target is not None
+        if X_source is None:
+            X_source = np.eye(X.shape[0], X.shape[1])
+            warnings.warn("Input X_source is None, defaulting to identity matrix "
+            "with X shape")
 
-        self.T_ = np.linalg.pinv(X) @ _X_target
+        # Check that X_target is a 2D array and has only finite values
+        X_source = validate_data(
+            self, X_source, ensure_2d=True, reset=True, dtype=np.float64
+        )
+
+        # Check consistency in between X and X_target
+        check_consistent_length(X, X_source)
+
+        self.T_ = np.linalg.pinv(X) @ X_source
 
         return self
 
     def transform(self, X) -> np.ndarray:
         """
-        Transform the source data
+        Transform the data from the target space to the source space using the map
+        self.T_
 
         Parameters
         ----------
@@ -175,8 +102,11 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
         X_transf : np.ndarray of shape (n_samples, n_features)
             The data transformed
         """
-        # Validate input data
+        # Check that the estimator is fitted
+
         check_is_fitted(self, ["T_"])
+
+        # Validate the input data
         X = validate_data(
             self,
             X,
@@ -184,5 +114,6 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
             reset=False,
             dtype=np.float64,
         )
+
         # Apply the transformation
         return X @ self.T_
