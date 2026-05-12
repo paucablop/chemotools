@@ -7,11 +7,9 @@ module implements a Direct Standardization transformer
 # License: MIT
 
 import warnings
-from numbers import Real
 
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import (
     check_is_fitted,
     validate_data,
@@ -50,7 +48,6 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     --------
 
     """
-    
 
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
