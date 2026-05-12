@@ -1,6 +1,6 @@
 """
-The :mod:'chemotools.domain_adaptation:DirectStandardization'
-module implements a Direct Standardization transformer
+The :mod: `chemotools.domain_adaptation._direct_standardization`
+module implements the Direct Standardization (DS) transformer
 """
 
 # Authors: Ruggero Guerrini
