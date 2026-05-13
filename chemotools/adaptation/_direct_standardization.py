@@ -115,7 +115,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     def transform(self, X) -> np.ndarray:
         """
         Transform the data from the target space to the source space using the map
-        self.T_
+        self.T_.
 
         Parameters
         ----------
