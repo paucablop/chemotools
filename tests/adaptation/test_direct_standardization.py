@@ -56,8 +56,8 @@ class TestFit:
         # Assert
         assert hasattr(model, "T_")
 
-    def test_fit_should_raise_error_size_missmatch(self, sample_data):
-        """Verifies fir raise eror when size missmatch"""
+    def test_fit_should_raise_error_size_mismatch(self, sample_data):
+        """Verifies fir raise eror when size mismatch"""
         # Arrange
         X_target, X_source = sample_data
 
