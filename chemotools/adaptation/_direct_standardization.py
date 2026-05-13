@@ -95,7 +95,7 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
             return self
 
-        # Check that X_target is a 2D array and has only finite values
+        # Check that X_source is a 2D array and has only finite values
         X_source = validate_data(
             self, X_source, ensure_2d=True, reset=False, dtype=np.float64
         )
