@@ -46,14 +46,14 @@ class TestFit:
     """Tests for the fit method behavior."""
 
     def test_fit_sets_attributes(self, sample_data):
-        """Verifies that fit stores the required fitted attributes."""
+        """Verifies that fit stores the required fitted attributes with valid values."""
         # Arrange
         X_target, X_source = sample_data
 
         # Act
         model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
 
-        # Assert
+        # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "n_features_in_")
         assert hasattr(model, "x_mean_")
         assert hasattr(model, "coef_")
@@ -62,6 +62,12 @@ class TestFit:
         assert model.coef_.shape == (X_target.shape[1], 2 * model.window_length + 1)
         assert model.intercept_.shape == (X_target.shape[1],)
         assert model.n_features_in_ == X_target.shape[1]
+
+        # Assert - Check values are finite and reasonable
+        assert np.all(np.isfinite(model.x_mean_))
+        assert np.all(np.isfinite(model.coef_))
+        assert np.all(np.isfinite(model.intercept_))
+        assert np.all(np.abs(model.coef_) < 100)  # Reasonable magnitude
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
@@ -161,19 +167,137 @@ class TestTransform:
         np.testing.assert_array_equal(X_target, X_target_original)
         np.testing.assert_array_equal(X_source, X_source_original)
 
-    def test_transform_is_deterministic(self, sample_data):
-        """Verifies that calling transform multiple times with the same input gives
-        identical results."""
-        # Arrange
-        X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+
+class TestNumericalCorrectness:
+    """Tests for numerical correctness and regression testing.
+
+    These tests verify that the algorithm produces expected numerical outputs.
+    They serve as regression tests to catch unintended changes in functionality.
+    """
+
+    def test_snapshot_transform_output(self):
+        """Snapshot test: verifies transform output matches reference values.
+
+        This is a golden/snapshot test with hardcoded expected output.
+        If this test fails after code changes, verify the change is intentional.
+        Reference output generated from v0.1.0 implementation.
+        """
+        # Arrange - Fixed data (do not change!)
+        rng = np.random.default_rng(123)
+        X_target = rng.normal(size=(15, 8))
+        X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(15, 8))
+        X_test = rng.normal(size=(3, 8))
+
+        # Expected reference output (generated 2026-05-13)
+        expected_output = np.array(
+            [
+                [
+                    0.39513615,
+                    1.35118188,
+                    -0.51249342,
+                    1.20729721,
+                    -0.98750849,
+                    0.23742579,
+                    -0.0638159,
+                    0.06496122,
+                ],
+                [
+                    1.94173571,
+                    0.58747117,
+                    -0.67292598,
+                    -3.39671469,
+                    1.21977115,
+                    0.81321256,
+                    0.26092964,
+                    -0.78148859,
+                ],
+                [
+                    2.0125865,
+                    -2.60604827,
+                    -1.06508618,
+                    -2.01281042,
+                    0.3192351,
+                    -0.27806908,
+                    2.60372142,
+                    0.1832874,
+                ],
+            ]
+        )
 
         # Act
-        result1 = model.transform(X_target)
-        result2 = model.transform(X_target)
+        model = PiecewiseDirectStandardization(
+            window_length=2, n_components=2, scale=True
+        )
+        model.fit(X_target, X_source=X_source)
+        output = model.transform(X_test)
 
-        # Assert
+        # Assert - Output should match reference within tolerance
+        np.testing.assert_allclose(output, expected_output, rtol=1e-6, atol=1e-8)
+
+    def test_transform_output_characteristics(self):
+        """Verifies that transform output has expected characteristics."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 8))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
+
+        model = PiecewiseDirectStandardization(
+            window_length=1, n_components=2, scale=False
+        )
+        model.fit(X_target, X_source=X_source)
+
+        # Act
+        X_test = rng.normal(size=(5, 8))
+        X_transformed = model.transform(X_test)
+
+        # Assert - Check output properties
+        assert X_transformed.shape == X_test.shape
+        assert np.all(np.isfinite(X_transformed))
+        assert np.abs(X_transformed).mean() > 0  # Non-zero output
+        assert np.abs(X_transformed).max() < 100  # Reasonable magnitude
+
+    def test_transformation_is_reproducible(self):
+        """Verifies that same inputs always produce same outputs."""
+        # Arrange
+        rng = np.random.default_rng(99)
+        X_target = rng.normal(size=(25, 12))
+        X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(25, 12))
+        X_test = rng.normal(size=(10, 12))
+
+        # Act - Fit and transform twice
+        model1 = PiecewiseDirectStandardization(window_length=3, n_components=2)
+        model1.fit(X_target, X_source=X_source)
+        result1 = model1.transform(X_test)
+
+        model2 = PiecewiseDirectStandardization(window_length=3, n_components=2)
+        model2.fit(X_target, X_source=X_source)
+        result2 = model2.transform(X_test)
+
+        # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
+        np.testing.assert_array_equal(model1.coef_, model2.coef_)
+        np.testing.assert_array_equal(model1.intercept_, model2.intercept_)
+
+    def test_known_linear_transformation(self):
+        """Verifies correct behavior on a known linear transformation."""
+        # Arrange - Create data with known linear relationship
+        rng = np.random.default_rng(777)
+        X_target = rng.normal(size=(50, 15))
+        # Simple scaling: X_source = 2 * X_target (perfect linear relationship)
+        X_source = 2.0 * X_target
+
+        # Act
+        model = PiecewiseDirectStandardization(window_length=2, n_components=1)
+        model.fit(X_target, X_source=X_source)
+        X_transformed = model.transform(X_target)
+
+        # Assert - Transformed data should be close to X_source
+        # PDS with local windows won't perfectly recover global scaling,
+        # but should still substantially improve the match
+        relative_error = np.linalg.norm(X_transformed - X_source) / np.linalg.norm(
+            X_source
+        )
+        assert relative_error < 0.3  # Less than 30% error (PDS has local bias)
 
 
 class TestEdgeCases:
