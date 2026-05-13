@@ -130,8 +130,8 @@ class TestTransform:
         X_target_original = X_target.copy()
 
         # Act
-        model = DirectStandardization().fit(X_source, X_source=X_source)
-        model.transform(X_source)
+        model = DirectStandardization().fit(X_target, X_source=X_source)
+        model.transform(X_target)
 
         # Assert
         np.testing.assert_array_equal(X_source, X_source_original)
