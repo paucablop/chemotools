@@ -367,37 +367,37 @@ class TestPipeline:
         y_concentration = rng.normal(size=(100, 1))
 
         sklearn.set_config(enable_metadata_routing=True)
+        try:
+            pipe = Pipeline(
+                [
+                    ("scaler", SavitzkyGolay()),
+                    (
+                        "model",
+                        PiecewiseDirectStandardization().set_fit_request(X_source=True),
+                    ),
+                    ("pls", PLSRegression()),
+                ]
+            )
+            param_grid = {
+                "scaler__window_length": [15, 25],
+                "scaler__polyorder": [2, 3],
+                "scaler__deriv": [1, 2],
+                "model__window_length": [10, 15, 20],
+                "model__n_components": [2, 3, 5],
+                "pls__n_components": [2, 3],
+            }
+            grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
-        pipe = Pipeline(
-            [
-                ("scaler", SavitzkyGolay()),
-                (
-                    "model",
-                    PiecewiseDirectStandardization().set_fit_request(X_source=True),
-                ),
-                ("pls", PLSRegression()),
-            ]
-        )
-        param_grid = {
-            "scaler__window_length": [15, 25],
-            "scaler__polyorder": [2, 3],
-            "scaler__deriv": [1, 2],
-            "model__window_length": [10, 15, 20],
-            "model__n_components": [2, 3, 5],
-            "pls__n_components": [2, 3],
-        }
-        grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
+            # Act
+            grid.fit(X_target, y_concentration, X_source=X_source)
+            X_test = rng.normal(size=(10, 20))
+            y_pred = grid.best_estimator_.predict(X_test)
 
-        # Act - X_source passed as kwarg, sklearn routes it to PDS with correct indices
-        grid.fit(X_target, y_concentration, X_source=X_source)
+            # Assert
+            assert grid.best_estimator_ is not None
+            assert hasattr(grid.best_estimator_, "named_steps")
+            assert y_pred.shape == (10, 1)
 
-        # Assert - verify the grid search completed and the fitted model works
-        assert grid.best_estimator_ is not None
-        assert hasattr(grid.best_estimator_, "named_steps")
-        # Verify the best model can actually transform data
-        X_test = rng.normal(size=(10, 20))
-        y_pred = grid.best_estimator_.predict(X_test)
-        assert y_pred.shape == (10, 1)
-
-        # Cleanup - reset config to avoid affecting other tests
-        sklearn.set_config(enable_metadata_routing=False)
+        finally:
+            # Cleanup - reset config to avoid affecting other tests
+            sklearn.set_config(enable_metadata_routing=False)

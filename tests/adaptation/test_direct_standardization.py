@@ -340,28 +340,31 @@ class TestPipeline:
 
         sklearn.set_config(enable_metadata_routing=True)
 
-        pipe = Pipeline(
-            [
-                ("scaler", SavitzkyGolay()),
-                ("ds", DirectStandardization().set_fit_request(X_source=True)),
-                ("pls", PLSRegression()),
-            ]
-        )
-        param_grid = {
-            "scaler__window_length": [15, 25],
-            "scaler__polyorder": [2, 3],
-            "scaler__deriv": [1, 2],
-            "pls__n_components": [2, 3],
-        }
-        grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
+        try:
+            pipe = Pipeline(
+                [
+                    ("scaler", SavitzkyGolay()),
+                    ("ds", DirectStandardization().set_fit_request(X_source=True)),
+                    ("pls", PLSRegression()),
+                ]
+            )
+            param_grid = {
+                "scaler__window_length": [15, 25],
+                "scaler__polyorder": [2, 3],
+                "scaler__deriv": [1, 2],
+                "pls__n_components": [2, 3],
+            }
+            grid = GridSearchCV(pipe, param_grid, cv=3, error_score="raise")
 
-        # Act
-        grid.fit(
-            X_source,
-            y_concentration,
-        )
+            # Act
+            grid.fit(
+                X_source,
+                y_concentration,
+            )
 
-        # Assert
-        assert grid.best_estimator_ is not None
+            # Assert
+            assert grid.best_estimator_ is not None
 
-        sklearn.set_config(enable_metadata_routing=False)
+        finally:
+            # Cleanup - reset config to avoid affecting other tests
+            sklearn.set_config(enable_metadata_routing=False)
