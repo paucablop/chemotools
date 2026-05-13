@@ -1,0 +1,204 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-13 22:38+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/direct_orthogonalization.rst:2
+msgid "Direct Orthogonalization"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:1 of
+msgid ""
+"Bases: :py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:1 of
+msgid ""
+"Remove variation in X that is uncorrelated with the target y using Direct"
+" Orthogonalization (DO) [1]_ [2]_."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:4 of
+msgid ""
+"DO removes from X systematic variation that is independent of y. X is "
+"orthogonalized with respect to y, PCA is performed on the orthogonalized "
+"matrix to estimate orthogonal components, and those components are "
+"subtracted from X to obtain the corrected data."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:9 of
+msgid ""
+"The transformer returns the corrected matrix with the same number of "
+"features, retaining variation relevant for predicting y. Inputs are "
+"typically assumed to be mean-centered."
+msgstr ""
+
+#: ../../source/methods/direct_orthogonalization.rst
+msgid "Parameters"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:13
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:74
+#: of
+msgid ""
+"The number of orthogonal components to compute. This determines how many "
+"orthogonal variations will be removed from the data."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:16
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:77
+#: of
+msgid ""
+"If True, a copy of the input data is created and used for computations. "
+"If False, the input data is modified in place."
+msgstr ""
+
+#: ../../source/methods/direct_orthogonalization.rst
+msgid "Variables"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:20
+#: of
+msgid "The weights of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:23
+#: of
+msgid "The loadings of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:26
+#: of
+msgid "The scores of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:29
+#: of
+msgid "The mean of the original data `X` used for centering."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:32
+#: of
+msgid "The mean of the target variable `y` used for centering."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:35
+#: of
+msgid ""
+"The proportion of variance in `X` retained explained by the predictive "
+"components."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:39
+#: of
+msgid ""
+"The proportion of variance in `X` removed explained by the orthogonal "
+"components."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:44
+#: of
+msgid "References"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:45
+#: of
+msgid ""
+"Clause A. Andersson, (1999). Direct orthogonalization. Chemometrics and "
+"Intelligent Laboratory Systems, Volume 47, Issue 1, Pages 51-63, "
+"https://doi.org/10.1016/S0169-7439(98)00158-0."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:51
+#: of
+msgid ""
+"O. Svensson, T. Kourti, J. F. MacGregor (2002). An investigation of "
+"orthogonal signal correction algorithms and their characteristics. "
+"Journal of Chemometrics, Volume 16, Issue 4, Pages 176-188, "
+"https://doi.org/10.1002/cem.700"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:59
+#: of
+msgid "Examples"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:60
+#: of
+msgid ""
+"Fit and apply DirectOrthogonalization to remove variation in `X` that is "
+"orthogonal to `y`."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:72
+#: of
+msgid "Initialize the DirectOrthogonalization transformer."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.fit:1
+#: of
+msgid ""
+"Fit the DirectOrthogonalization model to the training data. :param X: The"
+" input data to fit the model to. :type X: array-like of shape (n_samples,"
+" n_features) :param y: The target values. :type y: array-like of shape "
+"(n_samples,)"
+msgstr ""
+
+#: ../../source/methods/direct_orthogonalization.rst
+msgid "Returns"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.fit:7
+#: of
+msgid "**self** -- Fitted estimator."
+msgstr ""
+
+#: ../../source/methods/direct_orthogonalization.rst
+msgid "Return type"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.transform:1
+#: of
+msgid "Apply the Direct Orthogonalization (D) correction to X"
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.transform:3
+#: of
+msgid ""
+"This returns the predictive part of the data, i.e. the variation in X "
+"that is related to y, after removing the orthogonal part (variation in X "
+"that is not related to y)."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.transform:7
+#: of
+msgid "The input data to transform."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.transform:9
+#: of
+msgid "Ignored to align with API."
+msgstr ""
+
+#: chemotools.projection._direct_orthogonalization.DirectOrthogonalization.transform:12
+#: of
+msgid "**X_transformed** -- The transformed data."
+msgstr ""
+

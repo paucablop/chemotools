@@ -1,0 +1,196 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-13 22:38+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/orthogonal_partial_least_squares.rst:2
+msgid "ExternalParameterOrthogonalization"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:1 of
+msgid ""
+"Bases: :py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:1 of
+msgid ""
+"A transformer that removes variation in X that is orthogonal to the "
+"target y using Orthogonal Projection to Latent Structures (OPLS) [1]_."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:4 of
+msgid ""
+"OPLS extends PLS by explicitly separating X into predictive variation, "
+"correlated with y, and orthogonal variation, unrelated to y. At each "
+"iteration, a predictive weight vector is estimated using the PLS "
+"criterion (maximizing covariance between X and y). Scores and loadings "
+"are then computed, and the loading vector is decomposed into a component "
+"aligned with the predictive weight and a component orthogonal to it. The "
+"orthogonal component defines an orthogonal score vector, which is used to"
+" deflate X."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:12 of
+msgid ""
+"This procedure is repeated to remove multiple orthogonal components while"
+" retaining the predictive structure. Multivariate targets are supported "
+"via decomposition of the cross-covariance matrix."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:16 of
+msgid ""
+"The transformer returns X with orthogonal variation removed, preserving "
+"the original number of features."
+msgstr ""
+
+#: ../../source/methods/orthogonal_partial_least_squares.rst
+msgid "Parameters"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:19
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:82 of
+msgid ""
+"The number of orthogonal components to compute. This determines how many "
+"orthogonal variations will be removed from the data."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:22
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:85 of
+msgid ""
+"If True, a copy of the input data is created and used for computations. "
+"If False, the input data is modified in place."
+msgstr ""
+
+#: ../../source/methods/orthogonal_partial_least_squares.rst
+msgid "Variables"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:26 of
+msgid "The weights of the original components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:29 of
+msgid "The weights of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:32 of
+msgid "The loadings of the original components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:35 of
+msgid "The loadings of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:38 of
+msgid "The scores of the original components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:41 of
+msgid "The scores of the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:44 of
+msgid "The mean of the original data `X` used for centering."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:47 of
+msgid "The mean of the target variable `y` used for centering."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:50 of
+msgid ""
+"The proportion of variance in `X` retained explained by the predictive "
+"components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:54 of
+msgid ""
+"The proportion of variance in `X` removed explained by the orthogonal "
+"components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:60 of
+msgid "References"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:61 of
+msgid ""
+"Trygg, J., & Wold, S. (2002). Orthogonal projections to latent structures"
+" (O-PLS). Journal of Chemometrics, Volume 16, Issue 3, Pages 119-128, "
+"https://doi.org/10.1002/cem.695."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:67 of
+msgid "Examples"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:68 of
+msgid ""
+"Fit and apply OrthogonalPLS to remove variation in `X` that is orthogonal"
+" to `y`."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS:80 of
+msgid "Initialize the OrthogonalPLS transformer."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.fit:1 of
+msgid ""
+"Fit the OrthogonalPLS model to the training data. :param X: The input "
+"data to fit the model to. :type X: array-like of shape (n_samples, "
+"n_features) :param y: The target values. :type y: array-like of shape "
+"(n_samples,)"
+msgstr ""
+
+#: ../../source/methods/orthogonal_partial_least_squares.rst
+msgid "Returns"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.fit:7 of
+msgid "**self** -- Fitted estimator."
+msgstr ""
+
+#: ../../source/methods/orthogonal_partial_least_squares.rst
+msgid "Return type"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.transform:1 of
+msgid "Apply the OrthogonalPLS correction to X"
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.transform:3 of
+msgid ""
+"This returns the predictive part of the data, i.e. the variation in X "
+"that is related to y, after removing the orthogonal part (variation in X "
+"that is not related to y)."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.transform:7 of
+msgid "The input data to transform."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.transform:9 of
+msgid "Ignored to align with API."
+msgstr ""
+
+#: chemotools.projection._orthogonal_pls.OrthogonalPLS.transform:12 of
+msgid "**X_transformed** -- The transformed data."
+msgstr ""
+

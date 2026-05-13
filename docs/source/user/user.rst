@@ -30,7 +30,7 @@ Load, define and apply preprocessing steps to the training data. Here we use a S
 
 .. code-block:: python
 
-    from chemotools.derivate import SavitzkyGolay
+    from chemotools.derivative import SavitzkyGolay
 
     # Configure the preprocessing step
     sg = SavitzkyGolay(window_size=3, polynomial_order=1, derivate_order=1)
@@ -48,7 +48,7 @@ Combine preprocessing and modelling steps in a single pipeline.
 
 .. code-block:: python
 
-    from chemotools.derivate import SavitzkyGolay
+    from chemotools.derivative import SavitzkyGolay
     from sklearn.cross_decomposition import PLSRegression
     from sklearn.pipeline import make_pipeline
     

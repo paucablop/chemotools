@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-14 16:49+0800\n"
+"POT-Creation-Date: 2026-05-13 22:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -33,21 +33,61 @@ msgstr ""
 #: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:1
 #: of
 msgid ""
-"A transformer that removes variation in X that is orthogonal to the "
-"target y."
+"Remove variation in X that is orthogonal to the target y using Orthogonal"
+" Signal Correction (OSC) [1]_ [2]_ [3]_."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:4
+#: of
+msgid ""
+"OSC identifies and removes spectral components that carry substantial "
+"variance in X yet have no linear relationship with y. Three algorithmic "
+"variants are available:"
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:8
+#: of
+msgid ""
+"**wold**: the original iterative method by Wold et al. (1998), which "
+"alternates between constraining the scores to be orthogonal to y and re-"
+"estimating loadings until convergence [1]_."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:11
+#: of
+msgid ""
+"**sjoblom**: a modified iterative scheme by Sjöblom et al. (1998) that "
+"uses the pseudo-inverse of y to enforce orthogonality, often improving "
+"convergence behaviour [2]_."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:14
+#: of
+msgid ""
+"**fearn**: a direct, non-iterative formulation by Fearn (2000) that "
+"projects X onto the null space of y before extracting the dominant "
+"singular vectors. This avoids convergence issues entirely [3]_."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:18
+#: of
+msgid ""
+"The transformer returns the corrected matrix with the same number of "
+"features as the input and is intended as a supervised signal correction "
+"step prior to calibration."
 msgstr ""
 
 #: ../../source/methods/orthogonal_signal_correction.rst
 msgid "Parameters"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:3
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:124
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:22
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:142
 #: of
 msgid "Number of orthogonal components to remove. Must be a positive integer."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:5
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:24
 #: of
 msgid ""
 "Method for calculating orthogonal components: - 'wold': Original method "
@@ -55,18 +95,18 @@ msgid ""
 "[2]_ - 'fearn': Method by Fearn (2000) [3]_"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:10
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:29
 #: of
 msgid "Maximum number of iterations for the component calculation algorithms."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:12
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:31
 #: of
 msgid "Tolerance for convergence in the iterative algorithms."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:14
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:126
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:33
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:144
 #: of
 msgid "Whether to copy X and Y in fit before applying centering."
 msgstr ""
@@ -75,42 +115,54 @@ msgstr ""
 msgid "Variables"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:17
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:36
 #: of
 msgid "The mean of the features in the training data."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:20
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:39
 #: of
 msgid "The mean of the target variable(s) in the training data."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:23
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:42
 #: of
 msgid "The scores of the orthogonal components."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:26
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:45
 #: of
 msgid "The weights of the orthogonal components."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:29
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:48
 #: of
 msgid "The loadings of the orthogonal components."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:32
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:51
+#: of
+msgid ""
+"The ratio of variance retained in X after removing the orthogonal "
+"components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:54
+#: of
+msgid "The ratio of variance removed from X by the orthogonal components."
+msgstr ""
+
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:57
 #: of
 msgid "The number of iterations taken for each component to converge."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:36
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:61
 #: of
 msgid "References"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:37
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:62
 #: of
 msgid ""
 "Svante Wold, Henrik Antti, Fredrik Lindgren, Jerker Öhman (1998), "
@@ -119,7 +171,7 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(98)00109-9."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:43
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:68
 #: of
 msgid ""
 "Jonas Sjöblom, Olof Svensson, Mats Josefson, Hans Kullberg, Svante Wold "
@@ -129,7 +181,7 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(98)00112-9."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:51
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:76
 #: of
 msgid ""
 "Tom Fearn (2000), On orthogonal signal correction, Chemometrics and "
@@ -137,102 +189,76 @@ msgid ""
 "https://doi.org/10.1016/S0169-7439(99)00045-3."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:58
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:83
 #: of
 msgid "Examples"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:59
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:84
 #: of
 msgid "Fit and apply OSC to remove variation in `X` that is orthogonal to `y`."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:71
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:96
 #: of
 msgid "Multivariate targets are also supported."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:78
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:103
 #: of
 msgid "The transformer can be used inside a scikit-learn pipeline."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:94
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:119
 #: of
 msgid "Notes"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:95
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:120
 #: of
 msgid ""
-"OSC is a supervised preprocessing method: it removes components from `X` "
-"that are orthogonal to the provided target `y`. Because of this, the "
-"target used during `fit()` must be representative of the calibration "
-"problem."
+"OSC is a supervised preprocessing method: the target used during "
+"``fit()`` must be representative of the calibration problem."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:99
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:123
 #: of
 msgid ""
-"The transformed data keep the same shape as the input data. This "
-"estimator is therefore intended for signal correction rather than "
-"classical dimension reduction."
+"The ``wold`` and ``sjoblom`` variants use iterative updates and may emit "
+"``ConvergenceWarning`` if ``max_iter`` is reached before convergence. The"
+" ``fearn`` variant is non-iterative and does not require convergence "
+"tuning."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:103
-#: of
-msgid "The available methods differ in how orthogonal components are estimated:"
-msgstr ""
-
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:105
-#: of
-msgid "`wold` and `sjoblom` use iterative updates and may emit"
-msgstr ""
-
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:106
-#: of
-msgid "`ConvergenceWarning` if `max_iter` is reached before convergence."
-msgstr ""
-
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:107
-#: of
-msgid "`fearn` uses a direct SVD-based formulation and does not require an"
-msgstr ""
-
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:108
-#: of
-msgid "iterative loop."
-msgstr ""
-
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:110
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:128
 #: of
 msgid ""
-"In practice, a small number of components is usually preferred. Removing "
-"too many orthogonal components may discard structured variation that is "
+"In practice, a small number of components is usually sufficient. Removing"
+" too many orthogonal components may discard structured variation that is "
 "still useful for the downstream model."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:116
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:134
 #: of
 msgid ":py:obj:`chemotools.projection.ExternalParameterOrthogonalization`"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:117
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:135
 #: of
 msgid "Remove variation linked to external nuisance parameters."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:119
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:137
 #: of
 msgid ":py:obj:`sklearn.pipeline.make_pipeline`"
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:120
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:138
 #: of
 msgid "Build preprocessing and modelling pipelines."
 msgstr ""
 
-#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:122
+#: chemotools.projection._orthogonal_signal_correction.OrthogonalSignalCorrection:140
 #: of
 msgid "Initialize the Orthogonal Signal Correction (OSC) transformer."
 msgstr ""
@@ -289,4 +315,52 @@ msgstr ""
 #: of
 msgid "**X_transformed** -- X transformed with removed orthogonal variation."
 msgstr ""
+
+#~ msgid ""
+#~ "A transformer that removes variation in"
+#~ " X that is orthogonal to the "
+#~ "target y."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "OSC is a supervised preprocessing "
+#~ "method: it removes components from `X`"
+#~ " that are orthogonal to the provided"
+#~ " target `y`. Because of this, the "
+#~ "target used during `fit()` must be "
+#~ "representative of the calibration problem."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The transformed data keep the same "
+#~ "shape as the input data. This "
+#~ "estimator is therefore intended for "
+#~ "signal correction rather than classical "
+#~ "dimension reduction."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The available methods differ in how "
+#~ "orthogonal components are estimated:"
+#~ msgstr ""
+
+#~ msgid "`wold` and `sjoblom` use iterative updates and may emit"
+#~ msgstr ""
+
+#~ msgid "`ConvergenceWarning` if `max_iter` is reached before convergence."
+#~ msgstr ""
+
+#~ msgid "`fearn` uses a direct SVD-based formulation and does not require an"
+#~ msgstr ""
+
+#~ msgid "iterative loop."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "In practice, a small number of "
+#~ "components is usually preferred. Removing "
+#~ "too many orthogonal components may "
+#~ "discard structured variation that is "
+#~ "still useful for the downstream model."
+#~ msgstr ""
 

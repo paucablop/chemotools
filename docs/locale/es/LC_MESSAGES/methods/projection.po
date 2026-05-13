@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-14 16:49+0800\n"
+"POT-Creation-Date: 2026-05-13 22:38+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -19,31 +19,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../source/methods/cross_decomposition.rst:2
-msgid "Cross Decomposition Methods"
+#: ../../source/methods/projection.rst:2
+msgid "Projection Methods"
 msgstr ""
 
-#: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
+#: ../../source/methods/projection.rst:14:<autosummary>:1
+msgid ""
+":py:obj:`DirectOrthogonalization "
+"<chemotools.projection.DirectOrthogonalization>`"
+msgstr ""
+
+#: ../../source/methods/projection.rst:14:<autosummary>:1
+msgid ""
+"Remove variation in X that is uncorrelated with the target y using Direct"
+" Orthogonalization (DO) [1]_ [2]_."
+msgstr ""
+
+#: ../../source/methods/projection.rst:14:<autosummary>:1
 msgid ""
 ":py:obj:`ExternalParameterOrthogonalization "
 "<chemotools.projection.ExternalParameterOrthogonalization>`"
 msgstr ""
 
-#: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
+#: ../../source/methods/projection.rst:14:<autosummary>:1
 msgid ""
-"A transformer that removes variation linked to external nuisance "
-"parameters."
+"Remove variation linked to known external nuisance parameters using "
+"External Parameter Orthogonalization (EPO) [1]_."
 msgstr ""
 
-#: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
+#: ../../source/methods/projection.rst:14:<autosummary>:1
+msgid ":py:obj:`OrthogonalPLS <chemotools.projection.OrthogonalPLS>`"
+msgstr ""
+
+#: ../../source/methods/projection.rst:14:<autosummary>:1
+msgid ""
+"A transformer that removes variation in X that is orthogonal to the "
+"target y using Orthogonal Projection to Latent Structures (OPLS) [1]_."
+msgstr ""
+
+#: ../../source/methods/projection.rst:14:<autosummary>:1
 msgid ""
 ":py:obj:`OrthogonalSignalCorrection "
 "<chemotools.projection.OrthogonalSignalCorrection>`"
 msgstr ""
 
-#: ../../source/methods/cross_decomposition.rst:18:<autosummary>:1
+#: ../../source/methods/projection.rst:14:<autosummary>:1
 msgid ""
-"A transformer that removes variation in X that is orthogonal to the "
-"target y."
+"Remove variation in X that is orthogonal to the target y using Orthogonal"
+" Signal Correction (OSC) [1]_ [2]_ [3]_."
 msgstr ""
+
+#~ msgid "Cross Decomposition Methods"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A transformer that removes variation "
+#~ "linked to external nuisance parameters."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "A transformer that removes variation in"
+#~ " X that is orthogonal to the "
+#~ "target y."
+#~ msgstr ""
 
