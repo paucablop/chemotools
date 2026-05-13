@@ -176,9 +176,9 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         p = X.shape[1]
 
         max_win = 2 * self.window_length + 1
-        self.x_mean_ = np.empty((p, max_win))
-        self.coef_ = np.empty((p, max_win))
-        self.intercept_ = np.empty(p)
+        self.x_mean_ = np.zeros((p, max_win), dtype=np.float64)
+        self.coef_ = np.zeros((p, max_win), dtype=np.float64)
+        self.intercept_ = np.empty(p, dtype=np.float64)
 
         for i in range(p):
             l_lim = max(0, i - self.window_length)
@@ -209,6 +209,9 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         X_transformed : np.ndarray of shape (n_samples, n_features)
             Data transformed
         """
+        # Verify that the model was trained
+        check_is_fitted(self)
+
         # Check the data
         X = validate_data(
             self,
@@ -217,9 +220,6 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
             reset=False,
             dtype=np.float64,
         )
-
-        # Verify that the model was trained
-        check_is_fitted(self)
 
         # If fitted as identity, return X unchanged
         if not self.x_source_provided_:
