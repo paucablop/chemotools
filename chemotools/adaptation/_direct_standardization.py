@@ -9,14 +9,14 @@ module implements the Direct Standardization (DS) transformer
 import warnings
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import (
     check_is_fitted,
     validate_data,
 )
 
 
-class DirectStandardization(TransformerMixin, BaseEstimator):
+class DirectStandardization(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
     """
     Direct Standardization (DS) is a transformer used for domain adaptation (calibration
     ) applications. The transformer uses least squares to find a linear map from

@@ -10,13 +10,15 @@ import warnings
 from numbers import Integral
 
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
+class PiecewiseDirectStandardization(
+    OneToOneFeatureMixin, TransformerMixin, BaseEstimator
+):
     """
     Piecewise Direct Standardization (PDS) is a transformer used for domain adaptation
     (calibration) applications. The transformer uses least squares to find a linear map
