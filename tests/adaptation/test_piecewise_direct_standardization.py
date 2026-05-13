@@ -20,13 +20,7 @@ from chemotools.adaptation._piecewise_direct_standardization import (
     PiecewiseDirectStandardization,
 )
 from chemotools.derivative import SavitzkyGolay
-
-
-def data_diff(dataset_ref, dataset_test):
-    diff_norm = np.linalg.norm(dataset_ref - dataset_test)
-    ref_norm = np.linalg.norm(dataset_ref)
-    difference = diff_norm / ref_norm
-    return difference
+from tests.adaptation.conftest import data_diff
 
 
 class TestSklearnCompliance:
