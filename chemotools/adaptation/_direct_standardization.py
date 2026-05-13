@@ -59,6 +59,11 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
 
     """
 
+    # Fitted attributes (set during fit, typed for type checkers)
+    n_features_in_: int
+    T_: np.ndarray
+    x_source_provided_: bool
+
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
     ) -> "DirectStandardization":

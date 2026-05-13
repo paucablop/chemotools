@@ -180,7 +180,7 @@ class TestNumericalCorrectness:
 
         This is a golden/snapshot test with hardcoded expected output.
         If this test fails after code changes, verify the change is intentional.
-        Reference output generated from v0.1.0 implementation.
+        Reference output generated from v0.4.0 implementation.
         """
         # Arrange - Fixed data (do not change!)
         rng = np.random.default_rng(123)
@@ -188,7 +188,7 @@ class TestNumericalCorrectness:
         X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(15, 8))
         X_test = rng.normal(size=(3, 8))
 
-        # Expected reference output (generated 2026-05-13)
+        # Expected reference output
         expected_output = np.array(
             [
                 [
