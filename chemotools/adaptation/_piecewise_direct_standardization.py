@@ -116,7 +116,7 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
     ) -> "PiecewiseDirectStandardization":
         """
-        Fit the PiecewiseDirectStandardization to the input data..
+        Fit the PiecewiseDirectStandardization to the input data.
 
         Parameters
         ----------
