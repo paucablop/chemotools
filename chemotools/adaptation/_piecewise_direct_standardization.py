@@ -1,5 +1,5 @@
 """
-The :mod: `chemotools.domain_adaptation._Piecewise_direct_standardization`
+The :mod: `chemotools.adaptation._piecewise_direct_standardization`
 module implements the Piecewise Direct Standardization (PDS) transformer
 """
 

@@ -1,5 +1,5 @@
 """
-The :mod: `chemotools.domain_adaptation._direct_standardization`
+The :mod: `chemotools.adaptation._direct_standardization`
 module implements the Direct Standardization (DS) transformer
 """
 
