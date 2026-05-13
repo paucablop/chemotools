@@ -60,6 +60,10 @@ class PiecewiseDirectStandardization(TransformerMixin, BaseEstimator):
     ValueError
         If X and X_source do not have the same shape.
 
+    See Also
+    --------
+    DirectStandardization : Global linear transformation without local windows.
+
     Reference
     ---------
     .. [1] Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991),

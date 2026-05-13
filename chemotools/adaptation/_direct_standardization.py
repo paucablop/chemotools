@@ -37,6 +37,10 @@ class DirectStandardization(TransformerMixin, BaseEstimator):
     ValueError
         If X and X_source do not have the same shape.
 
+    See Also
+    --------
+    PiecewiseDirectStandardization : Localized version using windowed PLS regression.
+
     Reference
     ---------
     .. [1] Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991),
