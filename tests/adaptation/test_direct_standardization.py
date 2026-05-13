@@ -185,6 +185,132 @@ class TestTransform:
             model.transform(X_wrong)
 
 
+class TestNumericalCorrectness:
+    """Tests for numerical correctness and regression testing.
+
+    These tests verify that the algorithm produces expected numerical outputs.
+    They serve as regression tests to catch unintended changes in functionality.
+    """
+
+    def test_snapshot_transformation_matrix_and_output(self):
+        """Snapshot test: verifies T_ matrix and transform output match reference.
+
+        This is a golden/snapshot test with hardcoded expected values.
+        If this test fails after code changes, verify the change is intentional.
+        Reference values generated from v0.1.0 implementation.
+        """
+        # Arrange - Fixed data (do not change!)
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(10, 5))
+        X_source = X_target * 1.5 + rng.normal(0, 0.05, size=(10, 5))
+        X_test = np.array(
+            [
+                [-0.37816255, 1.2992283, -0.35626397, 0.73751557, -0.93361768],
+                [-0.20543756, -0.95002205, -0.33903308, 0.84030814, -1.72732042],
+                [0.43442364, 0.2377356, -0.59414996, -1.44605785, 0.07212951],
+            ]
+        )
+
+        # Expected T_ matrix (generated 2026-05-13)
+        expected_T = np.array(
+            [
+                [1.48716816, -0.01063016, -0.02058649, -0.0073408, -0.02897037],
+                [-0.06621325, 1.46246043, 0.03103749, -0.03535038, -0.02991129],
+                [-0.05116713, -0.01801761, 1.48973578, 0.00199055, 0.00249581],
+                [0.01808751, 0.0136685, -0.03753605, 1.54421807, 0.00581606],
+                [0.02576647, 0.00534746, -0.00495776, 0.04992774, 1.52699328],
+            ]
+        )
+
+        # Expected transform output (generated 2026-05-13)
+        expected_output = np.array(
+            [
+                [-0.64090464, 1.91559718, -0.50568414, 1.04841009, -1.45013374],
+                [-0.25457667, -1.3788283, -0.55330498, 1.24579467, -2.59919758],
+                [0.63642365, 0.33438636, -0.83276929, -2.24220316, 0.08055164],
+            ]
+        )
+
+        # Act
+        model = DirectStandardization()
+        model.fit(X_target, X_source=X_source)
+        output = model.transform(X_test)
+
+        # Assert - Both T_ and output should match references
+        np.testing.assert_allclose(model.T_, expected_T, rtol=1e-6, atol=1e-8)
+        np.testing.assert_allclose(output, expected_output, rtol=1e-6, atol=1e-8)
+
+    def test_transformation_matrix_properties(self):
+        """Verifies that T_ matrix has expected properties."""
+        # Arrange
+        rng = np.random.default_rng(12345)
+        X_target = rng.normal(size=(50, 10))
+        X_source = X_target * 1.5 + rng.normal(0, 0.05, size=(50, 10))
+
+        # Act
+        model = DirectStandardization()
+        model.fit(X_target, X_source=X_source)
+
+        # Assert - Check T_ matrix properties
+        assert model.T_.shape == (10, 10)
+        assert np.all(np.isfinite(model.T_))
+        # For scaling transformations, T_ should be diagonally dominant
+        diagonal_dominance = np.abs(np.diag(model.T_)).sum() / np.abs(model.T_).sum()
+        assert diagonal_dominance > 0.5
+
+    def test_transformation_is_reproducible(self):
+        """Verifies that same inputs always produce same outputs."""
+        # Arrange
+        rng = np.random.default_rng(99)
+        X_target = rng.normal(size=(40, 12))
+        X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(40, 12))
+        X_test = rng.normal(size=(15, 12))
+
+        # Act - Fit and transform twice
+        model1 = DirectStandardization()
+        model1.fit(X_target, X_source=X_source)
+        result1 = model1.transform(X_test)
+
+        model2 = DirectStandardization()
+        model2.fit(X_target, X_source=X_source)
+        result2 = model2.transform(X_test)
+
+        # Assert - Results should be bit-for-bit identical
+        np.testing.assert_array_equal(result1, result2)
+        np.testing.assert_array_equal(model1.T_, model2.T_)
+
+    def test_known_linear_transformation(self):
+        """Verifies correct behavior on a known linear transformation."""
+        # Arrange - Create data with known linear relationship
+        rng = np.random.default_rng(777)
+        X_target = rng.normal(size=(100, 15))
+        # Simple scaling: X_source = 2 * X_target (perfect linear relationship)
+        X_source = 2.0 * X_target
+
+        # Act
+        model = DirectStandardization()
+        model.fit(X_target, X_source=X_source)
+        X_transformed = model.transform(X_target)
+
+        # Assert - Transformed data should be very close to X_source
+        # (Direct Standardization should perfectly recover the linear scaling)
+        np.testing.assert_allclose(X_transformed, X_source, rtol=1e-10, atol=1e-10)
+
+    def test_identity_transformation_when_data_identical(self):
+        """Verifies that T_ is identity matrix when X_target ≈ X_source."""
+        # Arrange - Create nearly identical data
+        rng = np.random.default_rng(555)
+        X_target = rng.normal(size=(50, 10))
+        X_source = X_target + rng.normal(0, 0.001, size=(50, 10))  # Tiny noise
+
+        # Act
+        model = DirectStandardization()
+        model.fit(X_target, X_source=X_source)
+
+        # Assert - T_ should be close to identity matrix
+        np.testing.assert_allclose(model.T_, np.eye(10), rtol=0.1, atol=0.1)
+
+
 class TestPipeline:
     """Tests for sklearn Pipeline and metadata routing integration."""
 
