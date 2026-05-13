@@ -164,6 +164,11 @@ class DirectOrthogonalization(TransformerMixin, BaseEstimator):
 
         # Calculate total sum of squares for X
         total_ss_x = np.sum(X_centered**2)
+        if total_ss_x == 0:
+            raise ValueError(
+                "X has zero variance after mean-centering. OrthogonalPLS requires "
+                "X to contain at least some non-constant features."
+            )
 
         # Step 1: Orthogonalize X with respect to y using regression (Step 2 in [1])
         # Generalization to multivariate y. coef_yx is w in [1].

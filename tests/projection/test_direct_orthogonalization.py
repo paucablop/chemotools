@@ -95,3 +95,15 @@ def test_fit_rejects_single_sample():
     # Act / Assert
     with pytest.raises(ValueError, match="At least 2 samples are required"):
         do.fit(X, y)
+
+
+def test_fit_rejects_zero_variance_X():
+    """Reject X with zero variance after mean-centering (all-constant matrix)."""
+    # Arrange
+    X = np.ones((3, 2))
+    y = np.array([1.0, 2.0, 3.0])
+    transformer = DirectOrthogonalization(n_components=1)
+
+    # Act / Assert
+    with pytest.raises(ValueError, match="X has zero variance after mean-centering"):
+        transformer.fit(X, y)

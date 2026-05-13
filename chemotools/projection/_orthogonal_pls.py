@@ -153,11 +153,23 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         y = np.asarray(y, dtype=np.float64)
 
         # Validate that there are at least 2 samples
-        n_samples = X.shape[0]
+        n_samples, n_features = X.shape
         if n_samples < 2:
             raise ValueError(
                 "n_samples=1 is not enough for OrthogonalPLS (OPLS). "
                 "At least 2 samples are required."
+            )
+
+        # Validate that n_components does not exceed the rank of X after centering.
+        # Centering reduces the effective rank in the sample direction by 1, so the
+        # maximum number of meaningful components is min(n_samples - 1, n_features).
+        max_components = min(n_samples - 1, n_features)
+        if self.n_components > max_components:
+            raise ValueError(
+                f"n_components={self.n_components} is too large. "
+                f"After mean-centering, the effective rank of X is at most "
+                f"min(n_samples - 1, n_features) = {max_components}. "
+                f"Set n_components to a value <= {max_components}."
             )
 
         # Center the data
@@ -167,8 +179,8 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
         yk = y - self.mean_y_
 
         # Get the dimensions
-        n = X.shape[0]
-        p = X.shape[1]
+        n = n_samples
+        p = n_features
 
         yk = yk.reshape(-1, 1) if yk.ndim == 1 else yk
 
@@ -182,6 +194,11 @@ class OrthogonalPLS(TransformerMixin, BaseEstimator):
 
         # Calculate total sum of squares for X
         total_ss_x = np.sum(Xk**2)
+        if total_ss_x == 0:
+            raise ValueError(
+                "X has zero variance after mean-centering. OrthogonalPLS requires "
+                "X to contain at least some non-constant features."
+            )
 
         # For each component
         for k in range(self.n_components):

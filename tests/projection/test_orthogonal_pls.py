@@ -63,3 +63,27 @@ def test_fit_rejects_single_sample():
     # Act / Assert
     with pytest.raises(ValueError, match="At least 2 samples are required"):
         transformer.fit(X, y)
+
+
+def test_fit_rejects_n_components_exceeding_rank():
+    """Reject n_components larger than min(n_samples - 1, n_features)."""
+    # Arrange: 3 samples x 2 features → max components = min(2, 2) = 2
+    X = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
+    y = np.array([1.0, 2.0, 3.0])
+    transformer = OrthogonalPLS(n_components=3)
+
+    # Act / Assert
+    with pytest.raises(ValueError, match="n_components=3 is too large"):
+        transformer.fit(X, y)
+
+
+def test_fit_rejects_zero_variance_X():
+    """Reject X with zero variance after mean-centering (all-constant matrix)."""
+    # Arrange
+    X = np.ones((3, 2))
+    y = np.array([1.0, 2.0, 3.0])
+    transformer = OrthogonalPLS(n_components=1)
+
+    # Act / Assert
+    with pytest.raises(ValueError, match="X has zero variance after mean-centering"):
+        transformer.fit(X, y)
