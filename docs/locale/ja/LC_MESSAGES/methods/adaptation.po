@@ -1,0 +1,39 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/adaptation.rst:5
+msgid "API Modules"
+msgstr "API モジュール"
+
+#: ../../source/methods/adaptation.rst:1
+msgid "Domain Adaptation"
+msgstr "ドメイン適応"
+
+#: ../../source/methods/adaptation.rst:3
+msgid ""
+"Transfer calibration models between instruments or correct for "
+"differences in spectral axes. Adaptation methods ensure that models "
+"trained on one instrument remain valid when applied to another, reducing "
+"the need for expensive recalibration campaigns."
+msgstr ""
+"機器間でキャリブレーションモデルを転送したり、スペクトル軸の差異を補正したりします。"
+"適応手法は、ある機器でトレーニングされたモデルが別の機器に適用されても有効であることを"
+"保証し、高価な再キャリブレーションキャンペーンの必要性を削減します。"

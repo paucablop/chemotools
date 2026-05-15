@@ -1,4 +1,4 @@
-Plotting Classes
+Plotting Methods
 ================
 
 .. currentmodule:: chemotools.plotting

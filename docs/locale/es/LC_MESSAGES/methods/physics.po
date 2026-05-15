@@ -1,0 +1,42 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/physics.rst:5
+msgid "API Modules"
+msgstr "Módulos de API"
+
+#: ../../source/methods/physics.rst:1
+msgid "Physics"
+msgstr "Física"
+
+#: ../../source/methods/physics.rst:3
+msgid ""
+"Convert spectral intensity between physical representations such as "
+"absorbance, transmittance, reflectance, Kubelka-Munk, and "
+"pseudoabsorbance. These conversions are fundamental when working with "
+"data from different instrument configurations or when preparing spectra "
+"for specific chemometric models."
+msgstr ""
+"Convierte la intensidad espectral entre representaciones físicas como la "
+"absorbancia, transmitancia, reflectancia, Kubelka-Munk y "
+"pseudoabsorbancia. Estas conversiones son fundamentales al trabajar con "
+"datos de diferentes configuraciones de instrumentos o al preparar "
+"espectros para modelos quimiométricos específicos."

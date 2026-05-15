@@ -21,7 +21,7 @@ class DirectStandardization(OneToOneFeatureMixin, TransformerMixin, BaseEstimato
     Direct Standardization (DS) is a transformer used for domain adaptation (calibration
     ) applications. The transformer uses least squares to find a linear map from
     the target instrument space to the source instrument space, following the
-    implementation by [1].
+    implementation by [1]_.
 
     Attributes
     ----------
@@ -41,8 +41,8 @@ class DirectStandardization(OneToOneFeatureMixin, TransformerMixin, BaseEstimato
     --------
     PiecewiseDirectStandardization : Localized version using windowed PLS regression.
 
-    Reference
-    ---------
+    References
+    ----------
     .. [1] Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991),
         Multivariate instrument standardization,
         Analytical Chemistry, 63(23), Pages 2750–2756,
@@ -124,7 +124,7 @@ class DirectStandardization(OneToOneFeatureMixin, TransformerMixin, BaseEstimato
     def transform(self, X) -> np.ndarray:
         """
         Transform the data from the target space to the source space using the map
-        self.T_.
+        ``self.T_``.
 
         Parameters
         ----------

@@ -1,5 +1,5 @@
-Derivative
-==========
+Derivative Methods
+==================
 
 .. currentmodule:: chemotools.derivative
 

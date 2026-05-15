@@ -1,0 +1,38 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/adaptation.rst:5
+msgid "API Modules"
+msgstr "API 模块"
+
+#: ../../source/methods/adaptation.rst:1
+msgid "Domain Adaptation"
+msgstr "域适应"
+
+#: ../../source/methods/adaptation.rst:3
+msgid ""
+"Transfer calibration models between instruments or correct for "
+"differences in spectral axes. Adaptation methods ensure that models "
+"trained on one instrument remain valid when applied to another, reducing "
+"the need for expensive recalibration campaigns."
+msgstr ""
+"在仪器之间传递校准模型，或纠正光谱轴的差异。适应方法确保在一台仪器上训练的模型在"
+"应用于另一台仪器时仍然有效，从而减少昂贵的重新校准工作的需求。"

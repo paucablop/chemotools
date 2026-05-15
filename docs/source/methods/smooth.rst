@@ -1,5 +1,5 @@
-Smoothing Methods
-=================
+Smooth Methods
+==============
 
 .. currentmodule:: chemotools.smooth
 

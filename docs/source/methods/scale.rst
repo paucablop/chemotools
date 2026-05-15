@@ -1,5 +1,5 @@
-Scaling Methods
-===============
+Scale Methods
+=============
 
 .. currentmodule:: chemotools.scale
 

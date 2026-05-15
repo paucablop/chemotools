@@ -3,10 +3,7 @@
 Methods overview
 ================
 
-This page is a placeholder for upcoming method categories such as Augmentation, Feature Selection, and Outliers.
-
-Available pages
----------------
+Browse the available chemotools methods by category.
 
 .. toctree::
     :maxdepth: 1
@@ -17,3 +14,5 @@ Available pages
     outliers
     plotting
     inspector
+    physics
+    adaptation

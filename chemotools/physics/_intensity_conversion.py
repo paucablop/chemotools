@@ -102,6 +102,8 @@ class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     """
     A transformer that converts spectral intensity data between common
     measurement units used in vibrational and diffuse reflectance spectroscopy.
+    For the full list of supported conversions and their equations, see the
+    **Notes** section below.
 
     All ratio units (transmittance, reflectance) use the standard fraction
     convention (0–1). Data in percent (0–100) must be divided by 100 before
@@ -119,13 +121,6 @@ class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
         ``"absorbance"``, ``"transmittance"``, ``"reflectance"``,
         ``"kubelka_munk"``, ``"pseudoabsorbance"``.
 
-    Supported conversion pairs
-    --------------------------
-    - ``"absorbance"`` ↔ ``"transmittance"``: T = 10^(−A), A = −log₁₀(T)
-    - ``"reflectance"`` → ``"kubelka_munk"``: F(R) = (1−R)²/(2R)
-    - ``"kubelka_munk"`` → ``"reflectance"``: R = (1+F) − √((1+F)²−1)
-    - ``"reflectance"`` ↔ ``"pseudoabsorbance"``: PA = −log₁₀(R), R = 10^(−PA)
-
     Attributes
     ----------
     n_features_in_ : int
@@ -142,6 +137,34 @@ class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator)
     IntensityConversion()
     >>> converter.fit_transform(X)
     array([[1.  , 0.1 , 0.01]])
+
+    Notes
+    -----
+    Supported conversion pairs:
+
+    - ``"absorbance"`` ↔ ``"transmittance"``:
+
+      .. math::
+
+         T = 10^{-A}, \\quad A = -\\log_{10}(T)
+
+    - ``"reflectance"`` → ``"kubelka_munk"``:
+
+      .. math::
+
+         F(R) = \\frac{(1-R)^2}{2R}
+
+    - ``"kubelka_munk"`` → ``"reflectance"``:
+
+      .. math::
+
+         R = (1+F) - \\sqrt{(1+F)^2 - 1}
+
+    - ``"reflectance"`` ↔ ``"pseudoabsorbance"``:
+
+      .. math::
+
+         PA = -\\log_{10}(R), \\quad R = 10^{-PA}
     """
 
     _parameter_constraints: dict = {

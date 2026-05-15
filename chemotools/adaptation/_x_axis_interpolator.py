@@ -53,7 +53,7 @@ class XAxisInterpolator(TransformerMixin, BaseEstimator):
     n_features_in_ : int
         Number of input features seen during ``fit``.
 
-    feature_names_in_ : ndarray of shape (n_features_in_,)
+    feature_names_in_ : ndarray of shape (``n_features_in_``,)
         Names of features seen during ``fit`` (only if ``X`` had names).
     """
 

@@ -110,6 +110,15 @@ BUTTON_TRANSLATIONS = {
             "translation": "检查器",
             "url": "inspector.html",
         },
+        # _methods/index page — new modules
+        "Physics": {
+            "translation": "物理",
+            "url": "physics.html",
+        },
+        "Domain adaptation": {
+            "translation": "域适应",
+            "url": "adaptation.html",
+        },
     },
     "es": {
         # Main index page
@@ -201,6 +210,15 @@ BUTTON_TRANSLATIONS = {
             "translation": "Inspector",
             "url": "inspector.html",
         },
+        # _methods/index page — new modules
+        "Physics": {
+            "translation": "Física",
+            "url": "physics.html",
+        },
+        "Domain adaptation": {
+            "translation": "Adaptación de dominio",
+            "url": "adaptation.html",
+        },
     },
     "ja": {
         # Main index page
@@ -291,6 +309,15 @@ BUTTON_TRANSLATIONS = {
         "Inspector": {
             "translation": "インスペクター",
             "url": "inspector.html",
+        },
+        # _methods/index page — new modules
+        "Physics": {
+            "translation": "物理学",
+            "url": "physics.html",
+        },
+        "Domain adaptation": {
+            "translation": "ドメイン適応",
+            "url": "adaptation.html",
         },
     },
 }

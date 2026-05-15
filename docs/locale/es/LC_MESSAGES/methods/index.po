@@ -91,3 +91,27 @@ msgstr "Explora y diagnistica tus modelos PCA y PLS con visualizaciones."
 msgid "Inspector"
 msgstr ""
 
+#: ../../source/methods/index.rst:106
+msgid ""
+"Convert spectral intensity units between absorbance, transmittance, "
+"reflectance, and Kubelka-Munk representations."
+msgstr ""
+"Convierte la intensidad espectral entre absorbancia, transmitancia, "
+"reflectancia y representaciones de Kubelka-Munk."
+
+#: ../../source/methods/index.rst:108
+msgid "Physics"
+msgstr ""
+
+#: ../../source/methods/index.rst:120
+msgid ""
+"Transfer calibration models between instruments to correct for "
+"differences in measurement conditions and instrument response."
+msgstr ""
+"Transfiere modelos de calibración entre instrumentos para corregir "
+"diferencias en condiciones de medición y respuesta instrumental."
+
+#: ../../source/methods/index.rst:122
+msgid "Domain adaptation"
+msgstr ""
+

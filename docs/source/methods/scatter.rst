@@ -1,5 +1,5 @@
-Scattering Methods
-==================
+Scatter Methods
+===============
 
 .. currentmodule:: chemotools.scatter
 

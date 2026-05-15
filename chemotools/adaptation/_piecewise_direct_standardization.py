@@ -23,7 +23,7 @@ class PiecewiseDirectStandardization(
     Piecewise Direct Standardization (PDS) is a transformer used for domain adaptation
     (calibration) applications. The transformer uses least squares to find a linear map
     from the target instrument space to the source instrument space, following the
-    implementation by [1] and [2].
+    implementation by [1]_ and [2]_.
 
     Parameters
     ----------
@@ -66,8 +66,8 @@ class PiecewiseDirectStandardization(
     --------
     DirectStandardization : Global linear transformation without local windows.
 
-    Reference
-    ---------
+    References
+    ----------
     .. [1] Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991),
         Multivariate instrument standardization,
         Analytical Chemistry, 63(23), Pages 2750–2756,

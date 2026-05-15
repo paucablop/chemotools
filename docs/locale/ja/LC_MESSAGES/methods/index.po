@@ -82,3 +82,23 @@ msgstr "包括的な可視化により、PCAおよびPLSモデルを対話的に
 msgid "Inspector"
 msgstr ""
 
+#: ../../source/methods/index.rst:106
+msgid ""
+"Convert spectral intensity units between absorbance, transmittance, "
+"reflectance, and Kubelka-Munk representations."
+msgstr "吸光度、透過率、反射率、クベルカ-ムンク表現間でスペクトル強度を変換します。"
+
+#: ../../source/methods/index.rst:108
+msgid "Physics"
+msgstr ""
+
+#: ../../source/methods/index.rst:120
+msgid ""
+"Transfer calibration models between instruments to correct for "
+"differences in measurement conditions and instrument response."
+msgstr "機器間でキャリブレーションモデルを転送し、測定条件や機器応答の違いを補正します。"
+
+#: ../../source/methods/index.rst:122
+msgid "Domain adaptation"
+msgstr ""
+

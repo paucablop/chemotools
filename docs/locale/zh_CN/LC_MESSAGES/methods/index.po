@@ -83,3 +83,23 @@ msgstr "通过全面的可视化图表，交互式地探索和诊断您的PCA与
 msgid "Inspector"
 msgstr ""
 
+#: ../../source/methods/index.rst:106
+msgid ""
+"Convert spectral intensity units between absorbance, transmittance, "
+"reflectance, and Kubelka-Munk representations."
+msgstr "在吸光度、透射率、反射率和Kubelka-Munk表示之间转换光谱强度。"
+
+#: ../../source/methods/index.rst:108
+msgid "Physics"
+msgstr ""
+
+#: ../../source/methods/index.rst:120
+msgid ""
+"Transfer calibration models between instruments to correct for "
+"differences in measurement conditions and instrument response."
+msgstr "在仪器之间传递校准模型，以纠正测量条件和仪器响应的差异。"
+
+#: ../../source/methods/index.rst:122
+msgid "Domain adaptation"
+msgstr ""
+

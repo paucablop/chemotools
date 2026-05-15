@@ -1,0 +1,68 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/adaptation_methods.rst:2
+msgid "Domain Adaptation Methods"
+msgstr "ドメイン適応メソッド"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+":py:obj:`DirectStandardization "
+"<chemotools.adaptation.DirectStandardization>`"
+msgstr ""
+":py:obj:`DirectStandardization "
+"<chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+"Direct Standardization (DS) is a transformer used for domain adaptation "
+"(calibration) applications."
+msgstr ""
+"直接標準化（DS）は、ドメイン適応（キャリブレーション）アプリケーションに使用される"
+"トランスフォーマーです。"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+":py:obj:`PiecewiseDirectStandardization "
+"<chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ""
+":py:obj:`PiecewiseDirectStandardization "
+"<chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+"Piecewise Direct Standardization (PDS) is a transformer used for domain "
+"adaptation (calibration) applications."
+msgstr ""
+"区分的直接標準化（PDS）は、ドメイン適応（キャリブレーション）アプリケーションに"
+"使用されるトランスフォーマーです。"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+":py:obj:`XAxisInterpolator "
+"<chemotools.adaptation.XAxisInterpolator>`"
+msgstr ""
+":py:obj:`XAxisInterpolator "
+"<chemotools.adaptation.XAxisInterpolator>`"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
+msgstr "``X`` の各行を共有の ``common_x_axis`` に補間します。"

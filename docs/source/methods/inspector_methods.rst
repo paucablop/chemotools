@@ -1,4 +1,4 @@
-Inspector Classes
+Inspector Methods
 =================
 
 .. currentmodule:: chemotools.inspector
