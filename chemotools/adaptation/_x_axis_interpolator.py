@@ -99,6 +99,9 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         -------
         self : object
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Validate the X data
         validate_data(self, X, ensure_2d=True, dtype="numeric")
 

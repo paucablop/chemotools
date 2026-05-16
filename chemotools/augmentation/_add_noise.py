@@ -59,7 +59,7 @@ class AddNoise(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
     """
 
     _parameter_constraints: dict = {
-        "distribution": StrOptions({"gaussian", "poisson", "exponential"}),
+        "distribution": [StrOptions({"gaussian", "poisson", "exponential"})],
         "scale": [Interval(Real, 0, None, closed="both")],
         "random_state": [None, int, np.random.RandomState],
     }
@@ -95,6 +95,9 @@ class AddNoise(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimat
         ValueError
             If X is not a 2D array or contains non-finite values.
         """
+
+        # Validate the input parameters
+        self._validate_params()
 
         # Check that X is a 2D array and has only finite values
         X = validate_data(

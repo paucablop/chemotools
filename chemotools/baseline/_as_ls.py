@@ -94,7 +94,7 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
         "lam": [Interval(Real, 0, None, closed="both")],
         "penalty": [Interval(Real, 0, 1, closed="both")],
         "nr_iterations": [Interval(Real, 1, None, closed="both")],
-        "solver_type": StrOptions({"banded", "sparse"}),
+        "solver_type": [StrOptions({"banded", "sparse"})],
         "max_iter_after_warmstart": [Interval(Real, 1, None, closed="both")],
     }
 

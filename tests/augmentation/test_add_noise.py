@@ -63,5 +63,5 @@ def test_invalid_noise_distribution():
     add_noise = AddNoise(distribution="invalid", scale=0.5, random_state=42)
 
     # Assert
-    with pytest.raises(ValueError, match="Invalid noise distribution.*"):
+    with pytest.raises(ValueError, match="distribution"):
         add_noise.fit_transform(spectrum)

@@ -128,5 +128,5 @@ def test_invalid_padding_mode():
     spectrum_shift = IndexShift(shift=1, padding_mode="invalid", random_state=42)
 
     # Assert
-    with pytest.raises(ValueError, match="Unknown padding mode"):
+    with pytest.raises(ValueError, match="padding_mode"):
         spectrum_shift.fit_transform(spectrum)

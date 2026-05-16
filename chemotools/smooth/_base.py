@@ -55,6 +55,7 @@ class _BaseWhittaker(
         self.solver_type = solver_type
 
     def fit(self, X: np.ndarray, y=None) -> Self:
+        self._validate_params()
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
         self.DtD_ = self._precompute_DtD(X.shape[1])
         solver = whittaker_solver_dispatch(self.solver_type)
@@ -146,6 +147,7 @@ class _BaseFIRFilter(
 
     # sklearn API
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
+        self._validate_params()
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )

@@ -64,7 +64,7 @@ class GaussianBroadening(
 
     _parameter_constraints: dict = {
         "sigma": [Interval(Real, 0, None, closed="both")],
-        "mode": StrOptions({"reflect", "constant", "nearest", "mirror", "wrap"}),
+        "mode": [StrOptions({"reflect", "constant", "nearest", "mirror", "wrap"})],
         "pad_value": [Real],
         "random_state": [None, int, np.random.RandomState],
         "truncate": [Interval(Real, 0, None, closed="both")],
@@ -101,6 +101,9 @@ class GaussianBroadening(
         self : GaussianBroadening
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )

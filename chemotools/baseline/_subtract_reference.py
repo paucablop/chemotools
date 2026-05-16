@@ -91,7 +91,7 @@ class SubtractReference(
     _parameter_constraints: dict = {
         "reference": ["array-like", None],
         "scale_reference": ["boolean"],
-        "start": Interval(Integral, 0, None, closed="left"),
+        "start": [Interval(Integral, 0, None, closed="left")],
         "end": [Integral],
         "x_axis": ["array-like", None],
     }
@@ -127,6 +127,9 @@ class SubtractReference(
         self : SubtractReference
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

@@ -106,6 +106,9 @@ class FractionalShift(
         ValueError
             If X is not a 2D array or contains non-finite values.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )

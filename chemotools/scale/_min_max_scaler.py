@@ -68,6 +68,9 @@ class MinMaxScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
         self : MinMaxScaler
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

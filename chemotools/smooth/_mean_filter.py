@@ -58,7 +58,7 @@ class MeanFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
     """
 
     _parameter_constraints: dict = {
-        "window_length": [Interval(Integral, 3, None, closed="left")],
+        "window_length": [Interval(Integral, 1, None, closed="left")],
         "mode": [StrOptions({"nearest", "constant", "reflect", "wrap", "mirror"})],
         "window_size": [
             Interval(Integral, 3, None, closed="left"),
@@ -93,6 +93,9 @@ class MeanFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
         self : MeanFilter
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

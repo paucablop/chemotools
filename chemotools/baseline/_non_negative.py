@@ -10,6 +10,7 @@ from typing import Literal
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
+from sklearn.utils._param_validation import StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
@@ -45,6 +46,8 @@ class NonNegative(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEsti
     >>> X_non_negative = transformer.transform(X)
     """
 
+    _parameter_constraints: dict = {"mode": [StrOptions({"zero", "abs"})]}
+
     def __init__(self, mode: Literal["zero", "abs"] = "zero"):
         self.mode = mode
 
@@ -65,6 +68,9 @@ class NonNegative(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEsti
         self : NonNegative
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

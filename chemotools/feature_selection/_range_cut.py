@@ -9,7 +9,7 @@ from typing import Optional
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.feature_selection._base import SelectorMixin
-from sklearn.utils._param_validation import Integral, Interval
+from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._axis_mixin import XAxisMixin
@@ -76,8 +76,8 @@ class RangeCut(DocLinkMixin, XAxisMixin, SelectorMixin, BaseEstimator):
     """
 
     _parameter_constraints: dict = {
-        "start": Interval(Integral, 0, None, closed="left"),
-        "end": [Integral],
+        "start": [Interval(Real, 0, None, closed="left")],
+        "end": [Real],
         "x_axis": ["array-like", None],
         "wavenumbers": ["array-like", None, deprecated_parameter_constraint()],
     }
@@ -111,6 +111,9 @@ class RangeCut(DocLinkMixin, XAxisMixin, SelectorMixin, BaseEstimator):
         self : RangeCut
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

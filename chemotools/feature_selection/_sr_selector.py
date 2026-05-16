@@ -8,11 +8,10 @@ PLS regression models.
 # License: MIT
 
 import numpy as np
-from sklearn.pipeline import Pipeline
 from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import validate_data
 
-from ._base import ModelTypes, _PLSFeatureSelectorBase
+from ._base import _PLSFeatureSelectorBase
 
 
 class SRSelector(_PLSFeatureSelectorBase):
@@ -66,7 +65,7 @@ class SRSelector(_PLSFeatureSelectorBase):
     """
 
     _parameter_constraints: dict = {
-        "model": [Pipeline, ModelTypes],
+        "model": [object],
         "threshold": [Interval(Real, 0, None, closed="both")],
     }
 
@@ -96,6 +95,9 @@ class SRSelector(_PLSFeatureSelectorBase):
         self : SRSelector
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64

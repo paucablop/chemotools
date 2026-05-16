@@ -39,6 +39,8 @@ class LinearCorrection(
     >>> X_corrected = transformer.transform(X)
     """
 
+    _parameter_constraints: dict = {}
+
     def fit(self, X: np.ndarray, y=None) -> "LinearCorrection":
         """
         Fit the transformer to the input data.
@@ -56,6 +58,9 @@ class LinearCorrection(
         self : LinearCorrection
             The fitted transformer.
         """
+        # Validate the input parameters
+        self._validate_params()
+
         # Check that X is a 2D array and has only finite values
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
