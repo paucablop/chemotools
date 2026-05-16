@@ -10,6 +10,8 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
+
 _VALID_UNITS = frozenset(
     {"absorbance", "transmittance", "kubelka_munk", "reflectance", "pseudoabsorbance"}
 )
@@ -98,7 +100,9 @@ _CONVERSION_DISPATCH = {
 }
 
 
-class IntensityConversion(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class IntensityConversion(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that converts spectral intensity data between common
     measurement units used in vibrational and diffuse reflectance spectroscopy.

@@ -100,6 +100,6 @@ msgid ""
 msgstr "在仪器之间传递校准模型，以纠正测量条件和仪器响应的差异。"
 
 #: ../../source/methods/index.rst:122
-msgid "Domain adaptation"
+msgid "Adaptation"
 msgstr ""
 

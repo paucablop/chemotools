@@ -12,8 +12,10 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class NormScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class NormScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that scales the input data by the L-norm of the spectrum.
 

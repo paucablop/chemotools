@@ -99,6 +99,6 @@ msgid ""
 msgstr "機器間でキャリブレーションモデルを転送し、測定条件や機器応答の違いを補正します。"
 
 #: ../../source/methods/index.rst:122
-msgid "Domain adaptation"
+msgid "Adaptation"
 msgstr ""
 

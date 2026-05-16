@@ -16,8 +16,10 @@ from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class IndexShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class IndexShift(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     Shift the spectrum a given number of indices between -shift and +shift drawn
     from a discrete uniform distribution.

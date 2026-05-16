@@ -14,8 +14,10 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class ParetoScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class ParetoScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     This transformer scales data using a generalized power of the standard deviation,
     as described by [1]_. It acts as a bridge between Mean Centering (P=0) and

@@ -7,6 +7,7 @@ from sklearn.cross_decomposition._pls import _PLS
 from sklearn.feature_selection._base import SelectorMixin
 from sklearn.pipeline import Pipeline
 
+from chemotools._doc_mixin import DocLinkMixin
 from chemotools._types import ModelInput
 from chemotools._validation import validate_and_extract_model
 
@@ -14,7 +15,7 @@ from chemotools._validation import validate_and_extract_model
 ModelTypes = ModelInput
 
 
-class _PLSFeatureSelectorBase(ABC, BaseEstimator, SelectorMixin):
+class _PLSFeatureSelectorBase(DocLinkMixin, ABC, BaseEstimator, SelectorMixin):
     """Feature selection base class for _PLS-like models.
 
     Parameters

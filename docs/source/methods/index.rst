@@ -125,4 +125,4 @@ Methods
          :color: secondary
          :click-parent:
 
-         **Domain adaptation**
+         **Adaptation**

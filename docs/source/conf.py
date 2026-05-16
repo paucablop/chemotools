@@ -11,9 +11,8 @@ import sys
 sys.path.insert(0, os.path.abspath("../.."))
 
 project = "chemotools"
-copyright = "2025, chemotools"
+copyright = "2026, chemotools"
 author = "Pau Cabaneros"
-# release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

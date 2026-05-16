@@ -12,8 +12,10 @@ import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class NonNegative(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class NonNegative(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that sets all negative values to zero or to abs.
 

@@ -14,8 +14,10 @@ from sklearn.base import BaseEstimator, TransformerMixin, _fit_context
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class XAxisInterpolator(TransformerMixin, BaseEstimator):
+
+class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
     """Interpolate every row of ``X`` onto a shared ``common_x_axis``.
 
     The transformer resamples each row of ``X`` from a sample-specific (or shared)

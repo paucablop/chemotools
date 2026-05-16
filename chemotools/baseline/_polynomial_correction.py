@@ -14,8 +14,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class PolynomialCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class PolynomialCorrection(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that subtracts a polynomial baseline from
     the input data. The polynomial is fitted to the points in

@@ -115,8 +115,8 @@ BUTTON_TRANSLATIONS = {
             "translation": "物理",
             "url": "physics.html",
         },
-        "Domain adaptation": {
-            "translation": "域适应",
+        "Adaptation": {
+            "translation": "适应",
             "url": "adaptation.html",
         },
     },
@@ -215,8 +215,8 @@ BUTTON_TRANSLATIONS = {
             "translation": "Física",
             "url": "physics.html",
         },
-        "Domain adaptation": {
-            "translation": "Adaptación de dominio",
+        "Adaptation": {
+            "translation": "Adaptación",
             "url": "adaptation.html",
         },
     },
@@ -315,8 +315,8 @@ BUTTON_TRANSLATIONS = {
             "translation": "物理学",
             "url": "physics.html",
         },
-        "Domain adaptation": {
-            "translation": "ドメイン適応",
+        "Adaptation": {
+            "translation": "適応",
             "url": "adaptation.html",
         },
     },

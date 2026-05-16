@@ -10,8 +10,12 @@ import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class LinearCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class LinearCorrection(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that corrects a baseline by subtracting a linear baseline through the
     initial and final points of the spectrum.

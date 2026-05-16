@@ -15,8 +15,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_array, check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class ExternalParameterOrthogonalization(TransformerMixin, BaseEstimator):
+
+class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation linked to known external nuisance parameters using
     External Parameter Orthogonalization (EPO) [1]_.

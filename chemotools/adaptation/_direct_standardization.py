@@ -15,8 +15,12 @@ from sklearn.utils.validation import (
     validate_data,
 )
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class DirectStandardization(OneToOneFeatureMixin, TransformerMixin, BaseEstimator):
+
+class DirectStandardization(
+    DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
+):
     """
     Direct Standardization (DS) is a transformer used for domain adaptation (calibration
     ) applications. The transformer uses least squares to find a linear map from

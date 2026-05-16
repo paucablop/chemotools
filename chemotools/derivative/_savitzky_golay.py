@@ -20,9 +20,12 @@ from chemotools._deprecation import (
     deprecated_parameter_constraint,
     resolve_renamed_parameter,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class SavitzkyGolay(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class SavitzkyGolay(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that calculates the Savitzky-Golay derivative of the input data.
 

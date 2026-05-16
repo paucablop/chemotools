@@ -13,8 +13,12 @@ from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class RobustNormalVariate(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class RobustNormalVariate(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that calculates the robust normal variate of the input data.
 

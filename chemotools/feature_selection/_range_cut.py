@@ -17,9 +17,10 @@ from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class RangeCut(XAxisMixin, SelectorMixin, BaseEstimator):
+class RangeCut(DocLinkMixin, XAxisMixin, SelectorMixin, BaseEstimator):
     """Select a contiguous spectral region by index or by x-axis value.
 
     The range can be specified in two ways:

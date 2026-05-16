@@ -21,7 +21,7 @@ What is chemotools?
 
 Extensive Toolkit
 -----------------
-Spectroscopy is diverse — different **instruments**, **sample matrices**, and **analysis goals** demand different approaches. ``chemotools`` provides a **focused set of transformers** for spectroscopic data and makes it simple to assemble them into **preprocessing pipelines**. By connecting to the wider **Python ecosystem**, you can leverage **state-of-the-art machine learning** and **scientific libraries** to build **robust, end-to-end spectroscopic models**.
+Spectroscopy is diverse — different **instruments**, **sample matrices**, and **analysis goals** demand different approaches. ``chemotools`` provides a **focused set of transformers** for spectroscopic data and makes it simple to assemble them into **preprocessing pipelines**. The toolkit covers baseline correction, smoothing, scaling, derivatization, scatter correction, **physical unit conversions** (absorbance, transmittance, reflectance, Kubelka-Munk), and **adaptation** methods for calibration transfer between instruments. By connecting to the wider **Python ecosystem**, you can leverage **state-of-the-art machine learning** and **scientific libraries** to build **robust, end-to-end spectroscopic models**.
 
 .. image:: ./_static/atom.png
    :class: no-background

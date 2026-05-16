@@ -20,9 +20,10 @@ from chemotools._deprecation import (
     deprecated_parameter_constraint,
     resolve_renamed_parameter,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class MedianFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A smoothing transformer that calculates the median filter of the input data.
 

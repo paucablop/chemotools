@@ -19,9 +19,10 @@ from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class IndexSelector(XAxisMixin, SelectorMixin, BaseEstimator):
+class IndexSelector(DocLinkMixin, XAxisMixin, SelectorMixin, BaseEstimator):
     """
     A transformer that Selects the spectral data to a specified array of features. This
     array can be continuous or discontinuous. The array of features is specified by:

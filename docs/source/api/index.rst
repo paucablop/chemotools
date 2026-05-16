@@ -21,6 +21,13 @@ For detailed documentation with examples and visual guides, see the :doc:`Method
 
 .. toctree::
    :maxdepth: 1
+   :caption: Spectroscopy & Adaptation
+
+   Physics <physics>
+   Adaptation <adaptation>
+
+.. toctree::
+   :maxdepth: 1
    :caption: Visualization & Inspection
 
    Plotting <plotting>
@@ -37,6 +44,8 @@ All classes can be imported directly from their respective modules:
    from chemotools.augmentation import AddNoise, BaselineShift
    from chemotools.scale import MinMaxScaler, NormScaler
    from chemotools.outliers import HotellingT2, Leverage
+   from chemotools.physics import IntensityConversion
+   from chemotools.adaptation import DirectStandardization, PiecewiseDirectStandardization, XAxisInterpolator
    from chemotools.plotting import SpectraPlot, ScoresPlot
    from chemotools.inspector import PCAInspector, PLSRegressionInspector
    # ... and so on

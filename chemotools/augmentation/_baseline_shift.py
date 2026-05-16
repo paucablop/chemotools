@@ -14,8 +14,12 @@ from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class BaselineShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class BaselineShift(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     Adds a constant baseline to the data. The baseline is drawn from a one-sided
     uniform distribution between 0 and 0 + scale.

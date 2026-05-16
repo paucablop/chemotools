@@ -20,8 +20,8 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/adaptation_methods.rst:2
-msgid "Domain Adaptation Methods"
-msgstr "域适应方法"
+msgid "Adaptation Methods"
+msgstr "适应方法"
 
 #: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
 msgid ""

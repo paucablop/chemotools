@@ -13,8 +13,12 @@ from scipy.interpolate import CubicSpline
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class CubicSplineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class CubicSplineCorrection(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that corrects a baseline by subtracting a cubic spline through the
     points defined by the indices.

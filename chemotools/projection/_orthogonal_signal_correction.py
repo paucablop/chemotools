@@ -18,8 +18,10 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class OrthogonalSignalCorrection(TransformerMixin, BaseEstimator):
+
+class OrthogonalSignalCorrection(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation in X that is orthogonal to the target y using Orthogonal
     Signal Correction (OSC) [1]_ [2]_ [3]_.

@@ -6,9 +6,11 @@ from sklearn.utils import check_array, check_consistent_length
 from sklearn.utils._param_validation import StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
+
 
 class MultiplicativeScatterCorrection(
-    OneToOneFeatureMixin, TransformerMixin, BaseEstimator
+    DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
     """Multiplicative Scatter Correction (MSC).
 

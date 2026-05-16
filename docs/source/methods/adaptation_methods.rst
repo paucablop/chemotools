@@ -1,5 +1,5 @@
-Domain Adaptation Methods
-=========================
+Adaptation Methods
+==================
 
 .. currentmodule:: chemotools.adaptation
 

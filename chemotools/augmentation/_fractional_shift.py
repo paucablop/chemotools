@@ -18,8 +18,12 @@ from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class FractionalShift(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class FractionalShift(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     Shift signals by a random fractional amount using cubic spline interpolation.
 

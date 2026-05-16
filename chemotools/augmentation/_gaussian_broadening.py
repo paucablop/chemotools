@@ -16,8 +16,12 @@ from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class GaussianBroadening(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class GaussianBroadening(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     Transform spectral data by broadening peaks using Gaussian convolution.
 

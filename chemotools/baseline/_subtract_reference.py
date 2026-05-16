@@ -14,10 +14,11 @@ from sklearn.utils._param_validation import Integral, Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._axis_mixin import XAxisMixin
+from chemotools._doc_mixin import DocLinkMixin
 
 
 class SubtractReference(
-    XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+    DocLinkMixin, XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
 ):
     """
     Subtract a reference spectrum from spectral data.

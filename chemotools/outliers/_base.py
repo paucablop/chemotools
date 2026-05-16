@@ -14,6 +14,7 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+from chemotools._doc_mixin import DocLinkMixin
 from chemotools._types import EstimatorType, ModelInput
 from chemotools._validation import get_model_parameters, validate_and_extract_model
 
@@ -21,7 +22,7 @@ from chemotools._validation import get_model_parameters, validate_and_extract_mo
 ModelTypes = EstimatorType
 
 
-class _ModelResidualsBase(ABC, BaseEstimator, OutlierMixin):
+class _ModelResidualsBase(DocLinkMixin, ABC, BaseEstimator, OutlierMixin):
     """Base class for model outlier calculations.
 
     Implements statistical calculations for outlier detection in dimensionality

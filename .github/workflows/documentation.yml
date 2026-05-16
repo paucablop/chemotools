@@ -1,12 +1,10 @@
 name: Deploy Sphinx documentation to Pages
 
 on:
-  # TEMPORARY: Deploy from current branch for testing
   push:
-    branches: 
+    branches:
       - main
-      - 195-improve-documentation-page-generating-it-automatically  # Testing branch
-  
+
   # Deploy when a new release is published
   release:
     types: [published]

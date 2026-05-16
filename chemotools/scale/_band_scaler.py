@@ -18,9 +18,12 @@ from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class BandScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class BandScaler(
+    DocLinkMixin, XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that scales the input data by the average intensity of a specified
     band. The band can be specified by an index range or by a range of wavenumbers.

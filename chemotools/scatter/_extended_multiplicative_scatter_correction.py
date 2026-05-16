@@ -15,9 +15,11 @@ from sklearn.utils import check_array, check_consistent_length
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
+
 
 class ExtendedMultiplicativeScatterCorrection(
-    OneToOneFeatureMixin, TransformerMixin, BaseEstimator
+    DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
     """Extended Multiplicative Scatter Correction (EMSC).
 

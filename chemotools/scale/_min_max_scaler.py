@@ -10,8 +10,10 @@ import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class MinMaxScaler(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class MinMaxScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that scales the input data by subtracting
     the minimum and dividing by the difference between the

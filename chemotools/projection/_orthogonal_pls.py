@@ -15,8 +15,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class OrthogonalPLS(TransformerMixin, BaseEstimator):
+
+class OrthogonalPLS(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     A transformer that removes variation in X that is orthogonal to the target y using
     Orthogonal Projection to Latent Structures (OPLS) [1]_.

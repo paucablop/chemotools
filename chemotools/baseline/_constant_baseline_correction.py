@@ -19,9 +19,12 @@ from chemotools._deprecation import (
     deprecated_parameter_constraint,
     resolve_renamed_parameter,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class ConstantBaselineCorrection(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class ConstantBaselineCorrection(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that corrects a baseline by subtracting a constant value.
     The constant value is taken by the mean of the features between the start

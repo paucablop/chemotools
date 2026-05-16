@@ -19,10 +19,12 @@ It provides modular transformers for spectral data, designed to plug seamlessly 
 
 ## Features
 
-- Preprocessing for spectral data (baseline correction, smoothing, scaling, derivatization, scatter correction).  
-- Fully compatible with `scikit-learn` pipelines and transformers.  
-- Simple, modular API for flexible workflows.  
-- Open-source, actively maintained, and published on [PyPI](https://pypi.org/project/chemotools/) and [Conda](https://anaconda.org/conda-forge/chemotools).  
+- Preprocessing for spectral data (baseline correction, smoothing, scaling, derivatization, scatter correction).
+- Physical unit conversions (absorbance, transmittance, reflectance, Kubelka-Munk, pseudoabsorbance).
+- Adaptation methods for calibration transfer between instruments (DS, PDS, x-axis interpolation).
+- Fully compatible with `scikit-learn` pipelines and transformers.
+- Simple, modular API for flexible workflows.
+- Open-source, actively maintained, and published on [PyPI](https://pypi.org/project/chemotools/) and [Conda](https://anaconda.org/conda-forge/chemotools).
 
 ## Installation
 

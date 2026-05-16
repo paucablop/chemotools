@@ -14,8 +14,10 @@ from sklearn.utils import check_random_state
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class AddNoise(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+
+class AddNoise(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """Add noise to input data from various probability distributions.
 
     This transformer adds random noise from specified probability distributions

@@ -24,8 +24,8 @@ msgid "API Modules"
 msgstr "Módulos de API"
 
 #: ../../source/methods/adaptation.rst:1
-msgid "Domain Adaptation"
-msgstr "Adaptación de dominio"
+msgid "Adaptation"
+msgstr "Adaptación"
 
 #: ../../source/methods/adaptation.rst:3
 msgid ""

@@ -20,9 +20,12 @@ from chemotools._deprecation import (
     deprecated_parameter_constraint,
     resolve_renamed_parameter,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class NorrisWilliams(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class NorrisWilliams(
+    DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that calculates the Norris-Williams derivative of the input data.
 

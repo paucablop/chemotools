@@ -24,8 +24,8 @@ msgid "API Modules"
 msgstr "API 模块"
 
 #: ../../source/methods/adaptation.rst:1
-msgid "Domain Adaptation"
-msgstr "域适应"
+msgid "Adaptation"
+msgstr "适应"
 
 #: ../../source/methods/adaptation.rst:3
 msgid ""

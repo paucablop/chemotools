@@ -15,8 +15,10 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
+from chemotools._doc_mixin import DocLinkMixin
 
-class DirectOrthogonalization(TransformerMixin, BaseEstimator):
+
+class DirectOrthogonalization(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation in X that is uncorrelated with the target y using Direct
     Orthogonalization (DO) [1]_ [2]_.

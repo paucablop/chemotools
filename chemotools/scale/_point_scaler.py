@@ -18,9 +18,12 @@ from chemotools._deprecation import (
     DEPRECATED_PARAMETER,
     deprecated_parameter_constraint,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class PointScaler(XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class PointScaler(
+    DocLinkMixin, XAxisMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator
+):
     """
     A transformer that scales the input data by the intensity value at a given point.
     The point can be specified by an index or by a wavenumber.

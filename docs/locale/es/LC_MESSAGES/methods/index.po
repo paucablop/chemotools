@@ -112,6 +112,6 @@ msgstr ""
 "diferencias en condiciones de medición y respuesta instrumental."
 
 #: ../../source/methods/index.rst:122
-msgid "Domain adaptation"
+msgid "Adaptation"
 msgstr ""
 

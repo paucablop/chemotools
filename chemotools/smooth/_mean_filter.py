@@ -20,9 +20,10 @@ from chemotools._deprecation import (
     deprecated_parameter_constraint,
     resolve_renamed_parameter,
 )
+from chemotools._doc_mixin import DocLinkMixin
 
 
-class MeanFilter(TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
+class MeanFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
     A transformer that calculates the mean filter of the input data.
 
