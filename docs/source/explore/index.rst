@@ -18,6 +18,9 @@ Discover the environment
    plotting_fundamentals
    inspector_fundamentals
    astartes
+   dynamic_transformers
+   orthogonal_projections
+   calibration_transfer
 
 .. grid:: 1 1 3 3
    :gutter: 2 3 4 4
@@ -121,4 +124,35 @@ Discover the environment
             :click-parent:
 
             **Sampling with Astartes**
+
+   .. grid-item-card::
+      :img-top: ../_static/images/explore/dynamic_transformers.png
+      :text-align: center
+
+      .. button-ref:: ./dynamic_transformers
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Dynamic transformers**
+
+   .. grid-item-card::
+      :text-align: center
+
+      .. button-ref:: ./orthogonal_projections
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Orthogonal projections**
+
+   .. grid-item-card::
+      :text-align: center
+
+      .. button-ref:: ./calibration_transfer
+            :expand:
+            :color: secondary
+            :click-parent:
+
+            **Calibration transfer**
 
