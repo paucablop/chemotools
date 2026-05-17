@@ -137,6 +137,7 @@ Discover the environment
             **Dynamic transformers**
 
    .. grid-item-card::
+      :img-top: ../_static/images/explore/orthogonal_projections.png
       :text-align: center
 
       .. button-ref:: ./orthogonal_projections
