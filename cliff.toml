@@ -35,3 +35,7 @@ commit_parsers = [
 
 filter_commits = true
 tag_pattern = "v[0-9].*"
+
+[remote.github]
+owner = "paucablop"
+repo = "chemotools"
