@@ -148,6 +148,7 @@ Discover the environment
             **Orthogonal projections**
 
    .. grid-item-card::
+      :img-top: ../_static/images/explore/calibration_transfer.png
       :text-align: center
 
       .. button-ref:: ./calibration_transfer

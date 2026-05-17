@@ -3,13 +3,13 @@
 Calibration transfer
 ====================
 
-A calibration model trained on one instrument does not always predict
+A model trained on one instrument does not always predict
 accurately on a second instrument — even when measuring the same samples.
 Differences in detector response, optical alignment, wavelength accuracy, and
 environmental conditions all introduce systematic spectral shifts between
 instruments.
 
-**Calibration transfer** (also called *instrument standardization*) corrects
+**Calibration transfer** (also called *model transder* or *domain adaptation*) corrects
 for these differences so that a model built on a *source* instrument can be
 applied to spectra measured on a *target* instrument, without rebuilding the
 model from scratch.
@@ -189,10 +189,11 @@ References
    Improvement of the piecewise direct standardisation procedure for the
    transfer of NIR spectra for multivariate calibration.
    *Chemometrics and Intelligent Laboratory Systems*, 32(2), 201–213.
+   https://doi.org/10.1016/0169-7439(95)00074-7
 
 .. seealso::
 
-   * :class:`chemotools.adaptation.DirectStandardization`
-   * :class:`chemotools.adaptation.PiecewiseDirectStandardization`
-   * :class:`chemotools.adaptation.XAxisInterpolator` — align spectra to a
+   * :doc:`DirectStandardization <../methods/generated/chemotools.adaptation.DirectStandardization>`
+   * :doc:`PiecewiseDirectStandardization <../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`
+   * :doc:`XAxisInterpolator <../methods/generated/chemotools.adaptation.XAxisInterpolator>` — align spectra to a
      common x-axis grid before standardization.

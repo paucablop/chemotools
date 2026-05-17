@@ -295,5 +295,5 @@ until prediction time.
 
 .. seealso::
 
-   :class:`chemotools.adaptation.XAxisInterpolator` — full API reference.
+   :doc:`XAxisInterpolator <../methods/generated/chemotools.adaptation.XAxisInterpolator>` — full API reference.
 
