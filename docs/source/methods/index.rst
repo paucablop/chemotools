@@ -100,7 +100,7 @@ Methods
          **Inspector**
 
    .. grid-item-card::
-      :img-top: ../_static/images/methods/plotting_card.png
+      :img-top: ../_static/images/methods/physics.png
       :text-align: center
 
       Convert spectral intensity units between absorbance, transmittance, reflectance, and Kubelka-Munk representations.
@@ -114,7 +114,7 @@ Methods
          **Physics**
 
    .. grid-item-card::
-      :img-top: ../_static/images/methods/plotting_card.png
+      :img-top: ../_static/images/methods/adaptation.png
       :text-align: center
 
       Transfer calibration models between instruments to correct for differences in measurement conditions and instrument response.
