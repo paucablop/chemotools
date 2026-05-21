@@ -18,6 +18,7 @@ Baseline correction methods for spectral preprocessing. These methods remove bas
        LinearCorrection,
        NonNegative,
        PolynomialCorrection,
+       RubberbandCorrection,
        SubtractReference,
    )
 
@@ -46,6 +47,8 @@ Available Classes
      - Enforce non-negative values
    * - :doc:`PolynomialCorrection </methods/generated/chemotools.baseline.PolynomialCorrection>`
      - Polynomial baseline fitting and subtraction
+   * - :doc:`RubberbandCorrection </methods/generated/chemotools.baseline.RubberbandCorrection>`
+     - Rubberband (convex hull) baseline correction
    * - :doc:`SubtractReference </methods/generated/chemotools.baseline.SubtractReference>`
      - Subtract a reference spectrum
 

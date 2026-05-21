@@ -6,6 +6,7 @@ from ._cubic_spline_correction import CubicSplineCorrection
 from ._linear_correction import LinearCorrection
 from ._non_negative import NonNegative
 from ._polynomial_correction import PolynomialCorrection
+from ._rubberband_correction import RubberbandCorrection
 from ._subtract_reference import SubtractReference
 
 __all__ = [
@@ -17,5 +18,6 @@ __all__ = [
     "LinearCorrection",
     "NonNegative",
     "PolynomialCorrection",
+    "RubberbandCorrection",
     "SubtractReference",
 ]

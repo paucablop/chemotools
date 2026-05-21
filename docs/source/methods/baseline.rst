@@ -15,6 +15,7 @@ Baseline Methods
     LinearCorrection
     NonNegative
     PolynomialCorrection
+    RubberbandCorrection
     SubtractReference
 
 
