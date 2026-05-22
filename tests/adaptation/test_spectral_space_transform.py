@@ -139,6 +139,65 @@ class TestNumericalCorrectness:
     They serve as regression tests to catch unintended changes in functionality.
     """
 
+    def test_snapshot_transform_output(self):
+        """Snapshot test: verifies transform output matches reference values.
+
+        This is a golden/snapshot test with hardcoded expected output.
+        If this test fails after code changes, verify the change is intentional.
+        Reference output generated from v0.4.0 implementation.
+        """
+        # Arrange - Fixed data (do not change!)
+        rng = np.random.default_rng(123)
+        X_target = rng.normal(size=(15, 8))
+        X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(15, 8))
+        X_test = rng.normal(size=(3, 8))
+
+        # Expected reference output
+        expected_output = np.array(
+            [
+                [
+                    0.33766514,
+                    1.20500713,
+                    -0.79705418,
+                    1.084966,
+                    -0.70751184,
+                    0.1530644,
+                    -0.14018872,
+                    0.0766695,
+                ],
+                [
+                    1.45796125,
+                    1.04039632,
+                    -0.63244578,
+                    -2.8429184,
+                    0.92801337,
+                    0.70227497,
+                    0.09480183,
+                    -0.52365807,
+                ],
+                [
+                    1.72038539,
+                    -2.24518931,
+                    -1.05896606,
+                    -1.38621342,
+                    0.19916246,
+                    -0.4604514,
+                    2.23600502,
+                    0.16752753,
+                ],
+            ]
+        )
+
+        # Act
+        model = SpectralSpaceTransform(
+            n_components=2,
+        )
+        model.fit(X_target, X_source=X_source)
+        output = model.transform(X_test)
+
+        # Assert - Output should match reference within tolerance
+        np.testing.assert_allclose(output, expected_output, rtol=1e-6, atol=1e-8)
+
     def test_transform_output_characteristics(self):
         """Verifies that transform output has expected characteristics."""
         # Arrange
@@ -182,6 +241,45 @@ class TestNumericalCorrectness:
         np.testing.assert_array_equal(result1, result2)
         np.testing.assert_array_equal(model1.p1_, model2.p1_)
         np.testing.assert_array_equal(model1.p2_, model2.p2_)
+    def test_n_components_exceeds_n_samples(self):
+        """Verifies n_components > n_samples - 1 rises ValueError."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(8, 20))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(8, 20))
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="n_components=40 is too large"):
+            model = SpectralSpaceTransform(n_components=40)
+            model.fit(X_target, X_source=X_source)
+
+
+    def test_n_components_exceeds_n_features(self):
+        """Verifies n_components > 2*n_features rises ValueError."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(20, 8))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="n_components=17 is too large"):
+            model = SpectralSpaceTransform(n_components=17)
+            model.fit(X_target, X_source=X_source)
+
+
+    def test_n_components_at_boundary_is_valid(self):
+        """Verifies n_components == min(n_samples-1, n_features) is accepted."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(20, 8))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
+
+        # Act
+        model = SpectralSpaceTransform(n_components=9)
+        model.fit(X_target, X_source=X_source)
+
+        # Assert
+        assert model.transform(X_target).shape == X_target.shape
 
 
 class TestEdgeCases:

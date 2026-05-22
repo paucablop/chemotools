@@ -152,11 +152,28 @@ class SpectralSpaceTransform(
             )
 
         x = np.hstack([X_source, X])
-        u, s, vh = np.linalg.svd(x, full_matrices=False)
-        v = vh.T
-        n_col_ref = X_source.shape[1]
 
+        # Validate that n_components does not exceed the rank of X ( [X_source, X] )
+        # after centering.
+        # Centering reduces the effective rank in the sample direction by 1, so the
+        # maximum number of meaningful components is min(n_samples - 1, 2*n_features).
+        max_components = min(x.shape[0] - 1, x.shape[1])
+        if self.n_components > max_components:
+            raise ValueError(
+                f"n_components={self.n_components} is too large. "
+                f"After mean-centering, the effective rank of X is at most "
+                f"min(n_samples - 1, 2*n_features) = {max_components}. "
+                f"Set n_components to a value <= {max_components}."
+            )
+        # Compute the SVD of the joint matrix x = [X_source | X].
+        u, s, vh = np.linalg.svd(x, full_matrices=False)
+        # Transpose vh to get V of shape (2*n_features, n_components)
+        v = vh.T
+        # n_col_ref corresponds to the number of features (for both Source and Target)
+        n_col_ref = X_source.shape[1]
+        # p1_: projection matrix for the source domain.
         self.p1_ = v[0:n_col_ref, 0 : self.n_components].T
+        # p2_: projection matrix for the target domain.
         self.p2_ = v[n_col_ref:, 0 : self.n_components].T
 
         self.x_source_provided_ = True
@@ -197,6 +214,10 @@ class SpectralSpaceTransform(
         # x_source_provided_ is True
         assert self.p1_ is not None
         assert self.p2_ is not None
-
+        # Compute the pseudo-inverse of p2_ to project from target latent space
+        # back to the feature space.
         p2_inv = np.linalg.pinv(self.p2_)
+        # Apply the transformation:
+        # X @ p2_inv @ self.p1_ : map X to the latent space, then reconstruct in source domain
+        # X - (X @ p2_inv @ self.p2_) : add back the residual not captured by the latent space
         return (X @ p2_inv @ self.p1_) + X - (X @ p2_inv @ self.p2_)
