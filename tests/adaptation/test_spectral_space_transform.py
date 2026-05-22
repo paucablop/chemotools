@@ -241,6 +241,7 @@ class TestNumericalCorrectness:
         np.testing.assert_array_equal(result1, result2)
         np.testing.assert_array_equal(model1.p1_, model2.p1_)
         np.testing.assert_array_equal(model1.p2_, model2.p2_)
+
     def test_n_components_exceeds_n_samples(self):
         """Verifies n_components > n_samples - 1 rises ValueError."""
         # Arrange
@@ -253,7 +254,6 @@ class TestNumericalCorrectness:
             model = SpectralSpaceTransform(n_components=40)
             model.fit(X_target, X_source=X_source)
 
-
     def test_n_components_exceeds_n_features(self):
         """Verifies n_components > 2*n_features rises ValueError."""
         # Arrange
@@ -265,7 +265,6 @@ class TestNumericalCorrectness:
         with pytest.raises(ValueError, match="n_components=17 is too large"):
             model = SpectralSpaceTransform(n_components=17)
             model.fit(X_target, X_source=X_source)
-
 
     def test_n_components_at_boundary_is_valid(self):
         """Verifies n_components == min(n_samples-1, n_features) is accepted."""
