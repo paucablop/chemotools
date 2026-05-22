@@ -218,6 +218,8 @@ class SpectralSpaceTransform(
         # back to the feature space.
         p2_inv = np.linalg.pinv(self.p2_)
         # Apply the transformation:
-        # X @ p2_inv @ self.p1_ : map X to the latent space, then reconstruct in source domain
-        # X - (X @ p2_inv @ self.p2_) : add back the residual not captured by the latent space
+        # X @ p2_inv @ self.p1_ : map X to the latent space, then reconstruct
+        # in source domain
+        # X - (X @ p2_inv @ self.p2_) : add back the residual not captured by
+        # the latent space
         return (X @ p2_inv @ self.p1_) + X - (X @ p2_inv @ self.p2_)
