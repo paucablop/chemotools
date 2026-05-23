@@ -44,7 +44,7 @@ class SpectralSpaceTransform(
     Attributes
     ----------
     n_features_in_ : int
-        Number of features seen during
+        Number of features seen during fit.
 
     p1_ : ndarray of shape (n_components, n_features), or None
         Projection matrix associated with the source domain. It maps the
@@ -53,6 +53,9 @@ class SpectralSpaceTransform(
     p2_ : ndarray of shape (n_components, n_features), or None
         Projection matrix associated with the target domain. It maps target
         data into the shared latent space.
+
+    p2_inv_ : ndarray of shape (n_components, n_features), or None
+        Pseudoinverse of p2
 
     x_source_provided_ : bool
         Boolean flag indicating if X_source was provided during fitting.
@@ -92,6 +95,7 @@ class SpectralSpaceTransform(
     n_features_in_: int
     p1_: np.ndarray | None
     p2_: np.ndarray | None
+    p2_inv_: np.ndarray | None
     x_source_provided_: bool
 
     _parameter_constraints = {
@@ -124,6 +128,7 @@ class SpectralSpaceTransform(
         self : SpectralSpaceTransform
         """
         # Validate the input parameters
+        self._validate_params()
         # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
@@ -137,6 +142,7 @@ class SpectralSpaceTransform(
             self.n_features_in_ = X.shape[1]
             self.p1_ = None
             self.p2_ = None
+            self.p2_inv_ = None
             return self
 
         # Check that X_source is a 2D array and has only finite values
@@ -153,16 +159,16 @@ class SpectralSpaceTransform(
 
         x = np.hstack([X_source, X])
 
-        # Validate that n_components does not exceed the rank of X ( [X_source, X] )
-        # after centering.
-        # Centering reduces the effective rank in the sample direction by 1, so the
-        # maximum number of meaningful components is min(n_samples - 1, 2*n_features).
-        max_components = min(x.shape[0] - 1, x.shape[1])
+        # Validate that n_components does not exceed the rank of X ( [X_source, X] ).
+        # The SVD is applied directly to the concatenated matrix without centering,
+        # therefore the maximum rank is at most min(n_samples, 2*n_features).
+
+        max_components = min(x.shape[0], x.shape[1])
         if self.n_components > max_components:
             raise ValueError(
                 f"n_components={self.n_components} is too large. "
-                f"After mean-centering, the effective rank of X is at most "
-                f"min(n_samples - 1, 2*n_features) = {max_components}. "
+                f"The rank of the concatenated matrix is at most "
+                f"min(n_samples, 2*n_features) = {max_components}. "
                 f"Set n_components to a value <= {max_components}."
             )
         # Compute the SVD of the joint matrix x = [X_source | X].
@@ -175,7 +181,9 @@ class SpectralSpaceTransform(
         self.p1_ = v[0:n_col_ref, 0 : self.n_components].T
         # p2_: projection matrix for the target domain.
         self.p2_ = v[n_col_ref:, 0 : self.n_components].T
-
+        # Compute the pseudo-inverse of p2_ to project from target latent space
+        # back to the feature space.
+        self.p2_inv_ = np.linalg.pinv(self.p2_)
         self.x_source_provided_ = True
         self.n_features_in_ = X.shape[1]
         return self
@@ -195,7 +203,7 @@ class SpectralSpaceTransform(
             Data transformed
         """
         # Verify that the model was trained
-        check_is_fitted(self, ["p1_", "p2_"])
+        check_is_fitted(self, ["p1_", "p2_", "p2_inv_"])
 
         # Check the data
         X = validate_data(
@@ -214,12 +222,11 @@ class SpectralSpaceTransform(
         # x_source_provided_ is True
         assert self.p1_ is not None
         assert self.p2_ is not None
-        # Compute the pseudo-inverse of p2_ to project from target latent space
-        # back to the feature space.
-        p2_inv = np.linalg.pinv(self.p2_)
+        assert self.p2_inv_ is not None
+
         # Apply the transformation:
         # X @ p2_inv @ self.p1_ : map X to the latent space, then reconstruct
         # in source domain
         # X - (X @ p2_inv @ self.p2_) : add back the residual not captured by
         # the latent space
-        return (X @ p2_inv @ self.p1_) + X - (X @ p2_inv @ self.p2_)
+        return (X @ self.p2_inv_ @ self.p1_) + X - (X @ self.p2_inv_ @ self.p2_)

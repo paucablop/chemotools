@@ -51,6 +51,7 @@ class TestFit:
         assert hasattr(model, "n_features_in_")
         assert hasattr(model, "p1_")
         assert hasattr(model, "p2_")
+        assert hasattr(model, "p2_inv_")
         assert model.p1_.shape == model.p2_.shape
         assert model.n_features_in_ == X_target.shape[1]
 
@@ -243,7 +244,7 @@ class TestNumericalCorrectness:
         np.testing.assert_array_equal(model1.p2_, model2.p2_)
 
     def test_n_components_exceeds_n_samples(self):
-        """Verifies n_components > n_samples - 1 rises ValueError."""
+        """Verifies n_components > n_samples - 1 raises ValueError."""
         # Arrange
         rng = np.random.default_rng(17)
         X_target = rng.normal(size=(8, 20))
@@ -255,7 +256,7 @@ class TestNumericalCorrectness:
             model.fit(X_target, X_source=X_source)
 
     def test_n_components_exceeds_n_features(self):
-        """Verifies n_components > 2*n_features rises ValueError."""
+        """Verifies n_components > 2*n_features raises ValueError."""
         # Arrange
         rng = np.random.default_rng(17)
         X_target = rng.normal(size=(20, 8))
