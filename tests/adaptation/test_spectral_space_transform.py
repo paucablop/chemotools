@@ -6,6 +6,7 @@ Test for SpectralSpaceTransform
 # License: MIT
 
 import re
+import warnings
 
 import numpy as np
 import pytest
@@ -49,15 +50,15 @@ class TestFit:
 
         # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "n_features_in_")
-        assert hasattr(model, "p1_")
-        assert hasattr(model, "p2_")
-        assert hasattr(model, "p2_inv_")
-        assert model.p1_.shape == model.p2_.shape
+        assert hasattr(model, "P1_")
+        assert hasattr(model, "P2_")
+        assert hasattr(model, "T_")
+        assert model.P1_.shape == model.P2_.shape
         assert model.n_features_in_ == X_target.shape[1]
 
         # Assert - Check values are finite and reasonable
-        assert np.all(np.isfinite(model.p1_))
-        assert np.all(np.isfinite(model.p2_))
+        assert np.all(np.isfinite(model.P1_))
+        assert np.all(np.isfinite(model.P2_))
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
@@ -145,7 +146,8 @@ class TestNumericalCorrectness:
 
         This is a golden/snapshot test with hardcoded expected output.
         If this test fails after code changes, verify the change is intentional.
-        Reference output generated from v0.4.0 implementation.
+        Reference output generated with with_mean=True, with_std=False
+        (current defaults)
         """
         # Arrange - Fixed data (do not change!)
         rng = np.random.default_rng(123)
@@ -153,38 +155,38 @@ class TestNumericalCorrectness:
         X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(15, 8))
         X_test = rng.normal(size=(3, 8))
 
-        # Expected reference output
+        # Expected reference output (generated with with_mean=True, with_std=False)
         expected_output = np.array(
             [
                 [
-                    0.33766514,
-                    1.20500713,
-                    -0.79705418,
-                    1.084966,
-                    -0.70751184,
-                    0.1530644,
-                    -0.14018872,
-                    0.0766695,
+                    0.34477441,
+                    1.11211523,
+                    -0.58705409,
+                    1.17686593,
+                    -0.6932544,
+                    0.25381937,
+                    -0.05075614,
+                    -0.06602294,
                 ],
                 [
-                    1.45796125,
-                    1.04039632,
-                    -0.63244578,
-                    -2.8429184,
-                    0.92801337,
-                    0.70227497,
-                    0.09480183,
-                    -0.52365807,
+                    1.46727768,
+                    0.93425806,
+                    -0.36373723,
+                    -2.72465293,
+                    0.94963568,
+                    0.82598552,
+                    0.19712279,
+                    -0.71140041,
                 ],
                 [
-                    1.72038539,
-                    -2.24518931,
-                    -1.05896606,
-                    -1.38621342,
-                    0.19916246,
-                    -0.4604514,
-                    2.23600502,
-                    0.16752753,
+                    1.68110708,
+                    -2.3451825,
+                    -0.82396761,
+                    -1.33091796,
+                    0.18088225,
+                    -0.43624381,
+                    2.27549503,
+                    0.08766347,
                 ],
             ]
         )
@@ -240,8 +242,9 @@ class TestNumericalCorrectness:
 
         # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
-        np.testing.assert_array_equal(model1.p1_, model2.p1_)
-        np.testing.assert_array_equal(model1.p2_, model2.p2_)
+        np.testing.assert_array_equal(model1.P1_, model2.P1_)
+        np.testing.assert_array_equal(model1.P2_, model2.P2_)
+        np.testing.assert_array_equal(model1.T_, model2.T_)
 
     def test_n_components_exceeds_n_samples(self):
         """Verifies n_components > n_samples - 1 raises ValueError."""
@@ -284,6 +287,68 @@ class TestNumericalCorrectness:
 
 class TestEdgeCases:
     """Tests for edge cases and special scenarios."""
+
+    def test_constant_target_feature_warns(self):
+        """Verifies a warning is raised when X (target) has a constant feature
+        and with_std=True."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 2] = 3.0  # make feature 2 constant
+        X_source = rng.normal(size=(20, 5))
+
+        # Act & Assert
+        with pytest.warns(UserWarning, match="X \\(target\\) has 1 constant feature"):
+            SpectralSpaceTransform(with_std=True).fit(X_target, X_source=X_source)
+
+    def test_constant_source_feature_warns(self):
+        """Verifies a warning is raised when X_source has a constant feature
+        and with_std=True."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_source = rng.normal(size=(20, 5))
+        X_source[:, 0] = 0.0  # make feature 0 constant
+
+        # Act & Assert
+        with pytest.warns(UserWarning, match="X_source has 1 constant feature"):
+            SpectralSpaceTransform(with_std=True).fit(X_target, X_source=X_source)
+
+    def test_constant_feature_std_clamped_to_one(self):
+        """Verifies that the stored std for constant features is 1, not 0."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 1] = 7.0
+        X_source = rng.normal(size=(20, 5))
+        X_source[:, 3] = -2.0
+
+        # Act
+        with pytest.warns(UserWarning):
+            model = SpectralSpaceTransform(with_std=True).fit(
+                X_target, X_source=X_source
+            )
+
+        # Assert - constant features must have std == 1, not 0
+        assert model.X_target_std_[1] == 1.0
+        assert model.X_source_std_[3] == 1.0
+        # Non-constant features must retain their real std
+        assert model.X_target_std_[0] != 1.0
+        assert model.X_source_std_[0] != 1.0
+
+    def test_no_warning_when_with_std_false(self):
+        """Verifies no zero-variance warning is raised when with_std=False,
+        even if features are constant."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 0] = 5.0
+        X_source = rng.normal(size=(20, 5))
+
+        # Act & Assert - no UserWarning about constant features
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", UserWarning)
+            SpectralSpaceTransform(with_std=False).fit(X_target, X_source=X_source)
 
     def test_identity_transformation_when_X_source_is_none(self):
         """Verifies that fitting with X_source=None results in identity
