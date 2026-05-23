@@ -87,6 +87,14 @@ class SpectralSpaceTransform(
     x_source_provided_ : bool
         Boolean flag indicating if X_source was provided during fitting.
 
+    Raises
+    ------
+    ValueError
+        If ``X`` and ``X_source`` do not have the same shape.
+    ValueError
+        If ``n_components`` exceeds ``min(n_samples, 2 * n_features)`` of the
+        concatenated matrix.
+
     See Also
     --------
     PiecewiseDirectStandardization : Local standardization using moving windows.
@@ -116,6 +124,12 @@ class SpectralSpaceTransform(
 
     """
 
+    _parameter_constraints = {
+        "n_components": [Interval(Integral, 1, None, closed="left")],
+        "with_mean": ["boolean"],
+        "with_std": ["boolean"],
+    }
+
     # Fitted attributes (set during fit, typed for type checkers)
     n_features_in_: int
     X_target_mean_: np.ndarray
@@ -126,12 +140,6 @@ class SpectralSpaceTransform(
     P2_: np.ndarray | None
     T_: np.ndarray | None
     x_source_provided_: bool
-
-    _parameter_constraints = {
-        "n_components": [Interval(Integral, 1, None, closed="left")],
-        "with_mean": ["boolean"],
-        "with_std": ["boolean"],
-    }
 
     def __init__(
         self,
