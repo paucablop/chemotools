@@ -179,7 +179,6 @@ class PiecewiseDirectStandardization(
                 f"got X={X.shape} and X_source={X_source.shape}."
             )
 
-        self.x_source_provided_ = True
         p = X.shape[1]
 
         max_win = 2 * self.window_length + 1
@@ -200,6 +199,9 @@ class PiecewiseDirectStandardization(
             self.x_mean_[i, :win_size] = X[:, l_lim:r_lim].mean(axis=0)
             self.coef_[i, :win_size] = model.coef_.ravel()
             self.intercept_[i] = model.intercept_[0]
+
+        self.x_source_provided_ = True
+
         return self
 
     def transform(self, X) -> np.ndarray:
@@ -232,7 +234,7 @@ class PiecewiseDirectStandardization(
         if not self.x_source_provided_:
             return X
 
-        # Type assertions for type checker - these are guaranteed non-None when
+        # Narrow types for the type checker — guaranteed non-None when
         # x_source_provided_ is True
         assert self.x_mean_ is not None
         assert self.coef_ is not None
