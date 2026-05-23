@@ -101,7 +101,7 @@ class SpectralSpaceTransform(
     DirectStandardization : Global linear transformation without local windows.
 
     References
-    ---------
+    ----------
     .. [1] Du, W., Chen, Z.-P., Zhong, L.-J.,Wang, S.-X., Yu, R.-Q., Nordon, A.,
         Littlejohn, D., & Holden, M. (2011).
         Maintaining the predictive abilities of multivariate calibration models by
@@ -129,17 +129,6 @@ class SpectralSpaceTransform(
         "with_mean": ["boolean"],
         "with_std": ["boolean"],
     }
-
-    # Fitted attributes (set during fit, typed for type checkers)
-    n_features_in_: int
-    X_target_mean_: np.ndarray
-    X_source_mean_: np.ndarray
-    X_target_std_: np.ndarray
-    X_source_std_: np.ndarray
-    P1_: np.ndarray | None
-    P2_: np.ndarray | None
-    T_: np.ndarray | None
-    x_source_provided_: bool
 
     def __init__(
         self,
@@ -186,7 +175,6 @@ class SpectralSpaceTransform(
                 "transformation."
             )
             self.x_source_provided_ = False
-            self.n_features_in_ = X.shape[1]
             self.X_target_mean_ = np.zeros(X.shape[1])
             self.X_source_mean_ = np.zeros(X.shape[1])
             self.X_target_std_ = np.ones(X.shape[1])
