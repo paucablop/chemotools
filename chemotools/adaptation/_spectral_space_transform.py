@@ -79,10 +79,30 @@ class SpectralSpaceTransform(
         Projection matrix associated with the target domain. It maps target
         data into the shared latent space.
 
+    A_ : ndarray of shape (n_features, n_components), or None
+        Pseudoinverse of ``P2_``. Left factor of the low-rank correction;
+        stored to avoid recomputing the pseudoinverse on every transform call.
+
+    A_eff_ : ndarray of shape (n_features, n_components), or None
+        Effective left factor ``A_ / X_target_std_[:, None]`` with target
+        scaling absorbed. Equals ``A_`` when ``with_std=False``.
+
+    dP_eff_ : ndarray of shape (n_components, n_features), or None
+        Effective right factor ``(P1_ - P2_) * X_source_std_[None, :]`` with
+        source scaling absorbed. Equals ``P1_ - P2_`` when ``with_std=False``.
+
+    scale_ : ndarray of shape (n_features,), or None
+        Per-feature combined scale ``X_source_std_ / X_target_std_``.
+        Ones vector when ``with_std=False``.
+
+    bias_ : ndarray of shape (n_features,), or None
+        Precomputed per-feature bias that absorbs all mean and std shifts,
+        allowing :meth:`transform` to avoid intermediate array allocations.
+
     T_ : ndarray of shape (n_features, n_features), or None
-        Precomputed transformation matrix ``I + pinv(P2_) @ (P1_ - P2_)``.
-        Applying ``X_scaled @ T_`` is equivalent to the full SST formula
-        and avoids recomputing the products on every call to :meth:`transform`.
+        Full transformation matrix ``I + A_ @ (P1_ - P2_)`` (property,
+        computed on demand). Equivalent to ``X_scaled @ T_`` in the SST
+        formula but never materialised during :meth:`transform`.
 
     x_source_provided_ : bool
         Boolean flag indicating if X_source was provided during fitting.
@@ -181,7 +201,11 @@ class SpectralSpaceTransform(
             self.X_source_std_ = np.ones(X.shape[1])
             self.P1_ = None
             self.P2_ = None
-            self.T_ = None
+            self.A_ = None
+            self.A_eff_ = None
+            self.dP_eff_ = None
+            self.scale_ = None
+            self.bias_ = None
             return self
 
         # Check that X_source is a 2D array and has only finite values
@@ -259,10 +283,22 @@ class SpectralSpaceTransform(
         self.P1_ = V[0:n_col_ref, 0 : self.n_components].T
         self.P2_ = V[n_col_ref:, 0 : self.n_components].T
 
-        # Precompute the full transformation matrix T_ = I + pinv(P2_) @ (P1_ - P2_)
-        # so that transform() reduces to a single matrix multiply: X_scaled @ T_.
-        # T_ is derived from Equation 6 in [1], isolating the X_test term.
-        self.T_ = np.eye(n_col_ref) + np.linalg.pinv(self.P2_) @ (self.P1_ - self.P2_)
+        # Precompute A_ = pinv(P2_), the left factor of the low-rank correction.
+        # Storing A_ avoids recomputing the pseudoinverse on every transform call.
+        # T_ = I + A_ @ (P1_ - P2_) is available as a property (from Equation 6 in [1]).
+        self.A_ = np.linalg.pinv(self.P2_)
+
+        # Fold centering and scaling into effective factor matrices so that
+        # transform() needs only two matmuls and one vector addition.
+        dP = self.P1_ - self.P2_
+        self.A_eff_ = self.A_ / self.X_target_std_[:, None]
+        self.dP_eff_ = dP * self.X_source_std_[None, :]
+        self.scale_ = self.X_source_std_ / self.X_target_std_
+        self.bias_ = (
+            self.X_source_mean_
+            - self.X_target_mean_ * self.scale_
+            - (self.X_target_mean_ @ self.A_eff_) @ self.dP_eff_
+        )
 
         self.x_source_provided_ = True
 
@@ -298,9 +334,18 @@ class SpectralSpaceTransform(
         if not self.x_source_provided_:
             return X
 
-        # Center and scale the input using target statistics
-        X_scaled = (X - self.X_target_mean_) / self.X_target_std_
+        # Apply the precomputed factored transform (Equation 6 in [1]):
+        #   (X - mean_t)/std_t @ T_ * std_s + mean_s
+        # bias_ absorbs all mean/std shifts; A_eff_ and dP_eff_ absorb the
+        # per-feature scaling, so no intermediate arrays are needed.
+        correction = (X @ self.A_eff_) @ self.dP_eff_ + self.bias_
+        if self.with_std:
+            return X * self.scale_ + correction
+        return X + correction
 
-        # Apply the precomputed transformation matrix and unscale to source domain
-        # Equation 6 in [1], with the precomputation of T_
-        return (X_scaled @ self.T_) * self.X_source_std_ + self.X_source_mean_
+    @property
+    def T_(self) -> np.ndarray | None:
+        if not self.x_source_provided_:
+            return None
+        n = self.n_features_in_
+        return np.eye(n) + self.A_ @ (self.P1_ - self.P2_)

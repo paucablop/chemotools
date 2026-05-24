@@ -52,7 +52,7 @@ class TestFit:
         assert hasattr(model, "n_features_in_")
         assert hasattr(model, "P1_")
         assert hasattr(model, "P2_")
-        assert hasattr(model, "T_")
+        assert hasattr(model, "A_")
         assert model.P1_.shape == model.P2_.shape
         assert model.n_features_in_ == X_target.shape[1]
 
