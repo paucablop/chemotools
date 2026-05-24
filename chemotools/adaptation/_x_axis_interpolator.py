@@ -66,6 +66,9 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         "right": [Interval(Real, None, None, closed="neither"), None, np.nan.__class__],
     }
 
+    n_features_in_: int
+    common_x_axis_: np.ndarray
+
     def __init__(
         self,
         common_x_axis: np.ndarray,
@@ -99,11 +102,8 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         -------
         self : object
         """
-        # Validate the input parameters
-        self._validate_params()
-
         # Validate the X data
-        validate_data(self, X, ensure_2d=True, dtype="numeric")
+        validate_data(self, X, ensure_2d=True, reset=True, dtype="numeric")
 
         # Validate the common_x_axis
         common_x_axis = np.asarray(self.common_x_axis, dtype=float)
