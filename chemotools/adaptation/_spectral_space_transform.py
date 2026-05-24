@@ -150,6 +150,11 @@ class SpectralSpaceTransform(
         "with_std": ["boolean"],
     }
 
+    n_features_in_: int
+    P1_: np.ndarray | None
+    P2_: np.ndarray | None
+    A_: np.ndarray | None
+
     def __init__(
         self,
         n_components: int = 2,
@@ -347,5 +352,8 @@ class SpectralSpaceTransform(
     def T_(self) -> np.ndarray | None:
         if not self.x_source_provided_:
             return None
+        assert self.A_ is not None
+        assert self.P1_ is not None
+        assert self.P2_ is not None
         n = self.n_features_in_
         return np.eye(n) + self.A_ @ (self.P1_ - self.P2_)
