@@ -49,19 +49,17 @@ class TestFit:
 
         # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "n_features_in_")
-        assert hasattr(model, "x_mean_")
-        assert hasattr(model, "coef_")
-        assert hasattr(model, "intercept_")
-        assert model.x_mean_.shape == (X_target.shape[1], 2 * model.window_length + 1)
-        assert model.coef_.shape == (X_target.shape[1], 2 * model.window_length + 1)
-        assert model.intercept_.shape == (X_target.shape[1],)
+        assert hasattr(model, "T_")
+        assert hasattr(model, "bias_")
+        assert model.T_.shape == (X_target.shape[1], X_target.shape[1])
+        assert model.bias_.shape == (X_target.shape[1],)
         assert model.n_features_in_ == X_target.shape[1]
 
         # Assert - Check values are finite and reasonable
-        assert np.all(np.isfinite(model.x_mean_))
-        assert np.all(np.isfinite(model.coef_))
-        assert np.all(np.isfinite(model.intercept_))
-        assert np.all(np.abs(model.coef_) < 100)  # Reasonable magnitude
+        T_dense = model.T_.toarray() if hasattr(model.T_, "toarray") else model.T_
+        assert np.all(np.isfinite(T_dense))
+        assert np.all(np.isfinite(model.bias_))
+        assert np.abs(T_dense).max() < 100  # Reasonable magnitude
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
@@ -269,8 +267,10 @@ class TestNumericalCorrectness:
 
         # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
-        np.testing.assert_array_equal(model1.coef_, model2.coef_)
-        np.testing.assert_array_equal(model1.intercept_, model2.intercept_)
+        np.testing.assert_array_equal(model1.bias_, model2.bias_)
+        T1 = model1.T_.toarray() if hasattr(model1.T_, "toarray") else model1.T_
+        T2 = model2.T_.toarray() if hasattr(model2.T_, "toarray") else model2.T_
+        np.testing.assert_array_equal(T1, T2)
 
     def test_known_linear_transformation(self):
         """Verifies correct behavior on a known linear transformation."""
@@ -332,9 +332,9 @@ class TestEdgeCases:
 
         # Assert - transformation should still work correctly
         assert X_transformed.shape == X.shape
-        # For edge features with window_length >> n_features, all features are used
-        assert model.x_mean_.shape == (10, 101)  # 2 * 50 + 1
-        assert model.coef_.shape == (10, 101)
+        # T_ is square with shape (n_features, n_features) regardless of window_length
+        assert model.T_.shape == (10, 10)
+        assert model.bias_.shape == (10,)
 
     def test_window_length_equals_one(self):
         """Verifies that minimal window_length of 1 works correctly."""
@@ -350,9 +350,9 @@ class TestEdgeCases:
 
         # Assert
         assert X_transformed.shape == X.shape
-        # Interior features use 3 features, edges use fewer
-        assert model.x_mean_.shape == (20, 3)  # 2 * 1 + 1
-        assert model.coef_.shape == (20, 3)
+        # T_ is always square (n_features, n_features)
+        assert model.T_.shape == (20, 20)
+        assert model.bias_.shape == (20,)
 
 
 class TestPipeline:

@@ -3,16 +3,17 @@ The :mod: `chemotools.adaptation._piecewise_direct_standardization`
 module implements the Piecewise Direct Standardization (PDS) transformer
 """
 
-# Author: Ruggero Guerrini
+# Author: Ruggero Guerrini & Pau Cabaneros
 # Licence: MIT
 
 import warnings
 from numbers import Integral
 
 import numpy as np
+from scipy.sparse import csr_matrix, lil_matrix
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
-from sklearn.utils._param_validation import Interval
+from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
@@ -29,31 +30,38 @@ class PiecewiseDirectStandardization(
 
     Parameters
     ----------
-    window_length : int
+    window_length : int, default=25
         Half-width (w) of the local spectral window used in PDS
 
-    n_components : int
+    n_components : int, default=2
         Number of components to keep for PLS model
 
     scale : bool, default = True
         Whether to scale X and Y in the PLS model
+
+    storage : str {"dense", "sparse"}, default="dense"
+        Storage format for the regression coefficients.
+        - "dense" stores the full matrix with zeros outside the local windows, while
+        - "sparse" stores only the non-zero coefficients for memory efficiency.
+
+        "sparse" is recommended for large feature sets and small window_length, while
+        "dense" may be faster for small feature sets or large window_length.
 
     Attributes
     ----------
     n_features_in_ : int
         Number of features seen during fit (set automatically by sklearn).
 
-    x_mean_ : np.ndarray of shape (n_features, 2 * window_length + 1) or None
-        Mean of the local X window for each feature. None if fitted with X_source=None
-        (identity transformation).
+    T_ : np.ndarray or scipy.sparse.csr_matrix of shape (n_features, n_features), or
+        None.
+        Banded transformation matrix mapping target instrument space to source
+        instrument space. Dense ndarray when ``storage="dense"``, CSR sparse
+        matrix when ``storage="sparse"``. None if fitted with X_source=None.
 
-    coef_ : np.ndarray of shape (n_features, 2 * window_length + 1) or None
-        Regression coefficients for each local PLS model. None if fitted with
-        X_source=None (identity transformation).
-
-    intercept_ : np.ndarray of shape (n_features,) or None
-        Intercept term for each local PLS model. None if fitted with X_source=None
-        (identity transformation).
+    bias_ : np.ndarray of shape (n_features,), or None
+        Precomputed per-feature bias that absorbs local PLS centering, allowing
+        :meth:`transform` to avoid per-sample intermediate allocations. None if
+        fitted with X_source=None.
 
     x_source_provided_ : bool
         Boolean flag indicating if X_source was provided during fitting.
@@ -63,6 +71,11 @@ class PiecewiseDirectStandardization(
     ------
     ValueError
         If X and X_source do not have the same shape.
+    ValueError
+        If ``n_components`` exceeds ``n_samples``.
+    ValueError
+        If ``n_components`` exceeds the minimum window size at the boundaries
+        (``window_length + 1``).
 
     See Also
     --------
@@ -101,13 +114,12 @@ class PiecewiseDirectStandardization(
         "window_length": [Interval(Integral, 1, None, closed="left")],
         "n_components": [Interval(Integral, 1, None, closed="left")],
         "scale": ["boolean"],
+        "storage": [StrOptions({"dense", "sparse"})],
     }
 
-    # Fitted attributes (set during fit, typed for type checkers)
     n_features_in_: int
-    x_mean_: np.ndarray | None
-    coef_: np.ndarray | None
-    intercept_: np.ndarray | None
+    T_: np.ndarray | csr_matrix | None
+    bias_: np.ndarray | None
     x_source_provided_: bool
 
     def __init__(
@@ -115,10 +127,12 @@ class PiecewiseDirectStandardization(
         window_length: int = 25,
         n_components: int = 2,
         scale: bool = True,
+        storage: str = "dense",
     ):
         self.window_length = window_length
         self.n_components = n_components
         self.scale = scale
+        self.storage = storage
 
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
@@ -149,12 +163,6 @@ class PiecewiseDirectStandardization(
         # Check that X is a 2D array and has only finite values
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
 
-        # Validate n_components
-        if self.n_components > X.shape[0]:
-            raise ValueError(
-                f"n_components={self.n_components} must be <= n_samples={X.shape[0]}"
-            )
-
         # If X_source is None, default to identity transformation
         if X_source is None:
             warnings.warn(
@@ -162,10 +170,15 @@ class PiecewiseDirectStandardization(
                 "transformation."
             )
             self.x_source_provided_ = False
-            self.x_mean_ = None
-            self.coef_ = None
-            self.intercept_ = None
+            self.T_ = None
+            self.bias_ = None
             return self
+
+        # Validate n_components against n_samples
+        if self.n_components > X.shape[0]:
+            raise ValueError(
+                f"n_components={self.n_components} must be <= n_samples={X.shape[0]}"
+            )
 
         # Check that X_source is a 2D array and has only finite values
         X_source = validate_data(
@@ -179,26 +192,53 @@ class PiecewiseDirectStandardization(
                 f"got X={X.shape} and X_source={X_source.shape}."
             )
 
-        p = X.shape[1]
+        n_features = X.shape[1]
 
-        max_win = 2 * self.window_length + 1
-        self.x_mean_ = np.zeros((p, max_win), dtype=np.float64)
-        self.coef_ = np.zeros((p, max_win), dtype=np.float64)
-        self.intercept_ = np.empty(p, dtype=np.float64)
+        # Validate n_components against the minimum window size at the boundaries
+        min_win_size = self.window_length + 1
+        if self.n_components > min_win_size:
+            raise ValueError(
+                f"n_components={self.n_components} cannot be strictly greater than "
+                f"the minimum window size at the boundaries ({min_win_size}). "
+                f"Please decrease n_components or increase window_length."
+            )
 
-        for i in range(p):
+        # Pre-allocate a local build matrix (lil_matrix for sparse, ndarray for dense)
+        # and only assign to self.T_ after the final conversion, so the annotated
+        # type (ndarray | csr_matrix | None) is never violated mid-construction.
+        _T: np.ndarray | lil_matrix = (
+            lil_matrix((n_features, n_features), dtype=np.float64)
+            if self.storage == "sparse"
+            else np.zeros((n_features, n_features), dtype=np.float64)
+        )
+
+        self.bias_ = np.zeros(n_features, dtype=np.float64)
+
+        for i in range(n_features):
             l_lim = max(0, i - self.window_length)
-            r_lim = min(p, i + self.window_length + 1)
-            win_size = r_lim - l_lim
+            r_lim = min(n_features, i + self.window_length + 1)
 
+            # Fit local PLS model
             model = PLSRegression(
                 n_components=self.n_components,
                 scale=self.scale,
             ).fit(X[:, l_lim:r_lim], X_source[:, i])
 
-            self.x_mean_[i, :win_size] = X[:, l_lim:r_lim].mean(axis=0)
-            self.coef_[i, :win_size] = model.coef_.ravel()
-            self.intercept_[i] = model.intercept_[0]
+            coef = model.coef_.ravel()
+            mean = X[:, l_lim:r_lim].mean(axis=0)
+            intercept = model.intercept_[0]
+
+            # Populate the diagonal band in the build matrix
+            _T[l_lim:r_lim, i] = coef
+
+            # Precalculate the shifted bias
+            self.bias_[i] = intercept - np.dot(mean, coef)
+
+        # Convert to the appropriate format for efficient arithmetic during transform
+        if isinstance(_T, lil_matrix):
+            self.T_ = _T.tocsr()
+        else:
+            self.T_ = _T
 
         self.x_source_provided_ = True
 
@@ -206,7 +246,7 @@ class PiecewiseDirectStandardization(
 
     def transform(self, X) -> np.ndarray:
         """
-        Use the trained model to transform the source data
+        Use the trained model to transform the target data
 
         Parameters
         ----------
@@ -218,34 +258,13 @@ class PiecewiseDirectStandardization(
         X_transformed : np.ndarray of shape (n_samples, n_features)
             Data transformed
         """
-        # Verify that the model was trained
-        check_is_fitted(self)
+        check_is_fitted(self, ["x_source_provided_"])
+        X = validate_data(self, X, ensure_2d=True, reset=False, dtype=np.float64)
 
-        # Check the data
-        X = validate_data(
-            self,
-            X,
-            ensure_2d=True,
-            reset=False,
-            dtype=np.float64,
-        )
-
-        # If fitted as identity, return X unchanged
         if not self.x_source_provided_:
             return X
 
-        # Narrow types for the type checker — guaranteed non-None when
-        # x_source_provided_ is True
-        assert self.x_mean_ is not None
-        assert self.coef_ is not None
-        assert self.intercept_ is not None
+        assert self.T_ is not None
+        assert self.bias_ is not None
 
-        X_transformed = np.zeros(X.shape)
-        for i in range(self.n_features_in_):
-            l_lim = max(0, i - self.window_length)
-            r_lim = min(self.n_features_in_, i + self.window_length + 1)
-            win_size = r_lim - l_lim
-
-            X_win = X[:, l_lim:r_lim] - self.x_mean_[i, :win_size]
-            X_transformed[:, i] = X_win @ self.coef_[i, :win_size] + self.intercept_[i]
-        return X_transformed
+        return X @ self.T_ + self.bias_
