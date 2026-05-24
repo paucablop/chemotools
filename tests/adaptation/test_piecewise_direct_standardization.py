@@ -73,8 +73,8 @@ class TestFit:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                "X and X_source must have the same shape, got X=(100, 20) and "
-                "X_source=(99, 20)."
+                "X and X_source must have the same shape, got X=(100, 50) and "
+                "X_source=(99, 50)."
             ),
         ):
             model.fit(X_target, X_source=X_source[:-1, :])
@@ -390,7 +390,7 @@ class TestPipeline:
 
             # Act
             grid.fit(X_target, y_concentration, X_source=X_source)
-            X_test = rng.normal(size=(10, 20))
+            X_test = rng.normal(size=(10, 50))
             y_pred = grid.best_estimator_.predict(X_test)
 
             # Assert
