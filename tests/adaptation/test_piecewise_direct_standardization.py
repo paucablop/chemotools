@@ -10,6 +10,7 @@ import re
 import numpy as np
 import pytest
 import sklearn
+from scipy.sparse import csr_matrix
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
@@ -59,7 +60,7 @@ class TestFit:
         T_dense = model.T_.toarray() if hasattr(model.T_, "toarray") else model.T_
         assert np.all(np.isfinite(T_dense))
         assert np.all(np.isfinite(model.bias_))
-        assert np.abs(T_dense).max() < 100  # Reasonable magnitude
+        assert np.abs(T_dense).max() < 100
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
@@ -101,6 +102,18 @@ class TestFit:
             match=re.escape("n_components=15 must be <= n_samples=10"),
         ):
             model.fit(X, X_source=X_source)
+
+    def test_fit_stores_T_as_sparse(self, sample_data):
+        """Verifies fit stores T_ as a sparse matrix when appropriate."""
+        # Arrange
+        X_target, X_source = sample_data
+        model = PiecewiseDirectStandardization(n_components=15, storage="sparse")
+
+        # Act
+        model.fit(X_target, X_source=X_source)
+
+        # Assert
+        assert isinstance(model.T_, csr_matrix)
 
 
 class TestTransform:
