@@ -785,7 +785,10 @@ class TestSerialization:
         y_hat_before = model.predict(X_test)
 
         # Act
-        loaded_model = pickle.loads(pickle.dumps(model))
+
+        # Safe: using pickle on trusted in-memory objects (test context)
+        loaded_model = pickle.loads(pickle.dumps(model))  # nosec B301
+
         y_hat_after = loaded_model.predict(X_test)
 
         # Assert
