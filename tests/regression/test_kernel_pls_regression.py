@@ -12,7 +12,7 @@ from sklearn.preprocessing import KernelCenterer, StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 from sklearn.utils.validation import check_is_fitted
 
-from chemotools.models._kernel_pls import KernelPLS
+from chemotools.regression._kernel_pls_regression import KernelPLSRegression
 
 
 @pytest.fixture
@@ -36,11 +36,11 @@ def sample_data_2d_y(sample_data):
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
-    def test_compliance_KernelPLS(self):
+    def test_compliance_KernelPLSRegression(self):
         """Verifies that KernelPLS passes all sklearn estimator
         checks."""
         # Arrange
-        transformer = KernelPLS()
+        transformer = KernelPLSRegression()
         # Act & Assert
         check_estimator(transformer)
 
@@ -51,7 +51,7 @@ class TestFitPredict:
         # Arrange
         X, y, X_test = sample_data
         # Act
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
         # Assert
         check_is_fitted(model)
 
@@ -60,7 +60,7 @@ class TestFitPredict:
         # Arrange
         X, y, X_test = sample_data
         # Act
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
         # Assert
         y_hat = model.predict(X_test)
         assert y_hat.shape[0] == X_test.shape[0]
@@ -71,7 +71,7 @@ class TestFitPredict:
         X, y, X_test = sample_data
 
         # Act
-        y_hat = KernelPLS().fit(X, y).predict(X_test)
+        y_hat = KernelPLSRegression().fit(X, y).predict(X_test)
 
         # Assert
         assert isinstance(y_hat, np.ndarray)
@@ -80,7 +80,7 @@ class TestFitPredict:
         """Verifies that predictions are deterministic across repeated calls."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         np.testing.assert_array_equal(
@@ -90,14 +90,14 @@ class TestFitPredict:
 
     def test_predict_single_sample(self, sample_data) -> None:
         X, y, X_test = sample_data
-        y_hat = KernelPLS().fit(X, y).predict(X_test[:1])
+        y_hat = KernelPLSRegression().fit(X, y).predict(X_test[:1])
         assert y_hat.shape[0] == 1
 
     def test_predict_single_sample_1d_raises_error(self, sample_data) -> None:
         """Verifies that predict rejects 1D input samples."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError, match="Expected 2D array"):
@@ -110,7 +110,7 @@ class TestAttributes:
         # Arrange
         X, y, X_test = sample_data
         # Act
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
         # Assert
         attributes = [
             "X_train_",
@@ -144,7 +144,7 @@ class TestAttributes:
         n_components = 3
 
         # Act
-        model = KernelPLS(n_components=n_components).fit(X, y)
+        model = KernelPLSRegression(n_components=n_components).fit(X, y)
 
         # Assert
         assert model.X_train_.shape == X.shape
@@ -160,7 +160,7 @@ class TestAttributes:
         X, y, _ = sample_data
 
         # Act
-        model = KernelPLS(scale_X=False).fit(X, y)
+        model = KernelPLSRegression(scale_X=False).fit(X, y)
 
         # Assert
         np.testing.assert_array_equal(model.X_mean_, np.zeros(X.shape[1]))
@@ -173,7 +173,7 @@ class TestAttributes:
         X, y, _ = sample_data
 
         # Act
-        model = KernelPLS(scale_X=True).fit(X, y)
+        model = KernelPLSRegression(scale_X=True).fit(X, y)
 
         # Assert
         np.testing.assert_array_almost_equal(model.X_mean_, X.mean(axis=0))
@@ -193,7 +193,7 @@ class TestStd:
         gamma = 0.5
         n_components = 2
 
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=n_components,
             kernel=kernel,
             gamma=gamma,
@@ -239,7 +239,7 @@ class TestKernels:
         # Arrange
         X, y, X_test = sample_data
         gamma = 0.5
-        model = KernelPLS(kernel=kernel, gamma=gamma).fit(X, y)
+        model = KernelPLSRegression(kernel=kernel, gamma=gamma).fit(X, y)
         model.predict(X_test)
         if kernel in {"rbf", "poly", "sigmoid"}:
             K_train = pairwise_kernels(X, X, metric=kernel, gamma=gamma)
@@ -265,8 +265,8 @@ class TestScalingAndTargets:
         X, y, X_test = sample_data
 
         # Act
-        y1 = KernelPLS(scale_X=False).fit(X, y).predict(X_test)
-        y2 = KernelPLS(scale_X=True).fit(X, y).predict(X_test)
+        y1 = KernelPLSRegression(scale_X=False).fit(X, y).predict(X_test)
+        y2 = KernelPLSRegression(scale_X=True).fit(X, y).predict(X_test)
 
         # Assert
         assert np.max(np.abs(y1 - y2)) > 1e-8
@@ -281,8 +281,8 @@ class TestScalingAndTargets:
         X_test_sc = scaler.transform(X_test)
 
         # Act
-        y_manual = KernelPLS(scale_X=False).fit(X_sc, y).predict(X_test_sc)
-        y_auto = KernelPLS(scale_X=True).fit(X, y).predict(X_test)
+        y_manual = KernelPLSRegression(scale_X=False).fit(X_sc, y).predict(X_test_sc)
+        y_auto = KernelPLSRegression(scale_X=True).fit(X, y).predict(X_test)
 
         # Assert
         np.testing.assert_array_almost_equal(y_manual, y_auto, decimal=8)
@@ -295,7 +295,7 @@ class TestScalingAndTargets:
 
         # Act and Assert
         with pytest.raises(ValueError, match="n_components"):
-            KernelPLS(n_components=X.shape[0] + 1).fit(X, y)
+            KernelPLSRegression(n_components=X.shape[0] + 1).fit(X, y)
 
     def test_works_with_multivariate_y(self, sample_data_2d_y) -> None:
         """Verifies that the model supports multivariate (multi-output)
@@ -304,7 +304,7 @@ class TestScalingAndTargets:
         X, y, X_test = sample_data_2d_y
 
         # Act
-        y_hat = KernelPLS().fit(X, y).predict(X_test)
+        y_hat = KernelPLSRegression().fit(X, y).predict(X_test)
 
         # Assert
         assert y_hat.shape == (X_test.shape[0], 2)
@@ -318,7 +318,7 @@ class TestScalingAndTargets:
         # Act
         if y.ndim == 2:
             y = y.ravel()
-        y_hat = KernelPLS().fit(y=y, X=X).predict(X_test)
+        y_hat = KernelPLSRegression().fit(y=y, X=X).predict(X_test)
 
         # Assert
         assert y_hat.ndim == 1
@@ -330,7 +330,7 @@ class TestScalingAndTargets:
         y_2d = y.reshape(-1, 1)
 
         # Act
-        y_hat = KernelPLS().fit(X, y_2d).predict(X_test)
+        y_hat = KernelPLSRegression().fit(X, y_2d).predict(X_test)
 
         # Assert
         assert y_hat.ndim == 2
@@ -347,7 +347,7 @@ class TestScalingAndTargets:
         n_components = 2
         scale = False
 
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=n_components,
             kernel=kernel,
             gamma=gamma,
@@ -391,7 +391,7 @@ class TestTransform:
         n_components = 3
 
         # Act
-        T = KernelPLS(n_components=n_components).fit(X, y).transform(X_test)
+        T = KernelPLSRegression(n_components=n_components).fit(X, y).transform(X_test)
 
         # Assert
         assert T.shape == (X_test.shape[0], n_components)
@@ -402,7 +402,7 @@ class TestTransform:
         X, y, X_test = sample_data
 
         # Act
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Assert
         np.testing.assert_array_equal(model.transform(X_test), model.transform(X_test))
@@ -414,7 +414,7 @@ class TestTransform:
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            KernelPLS().transform(X_test)
+            KernelPLSRegression().transform(X_test)
 
 
 class TestErrorHandling:
@@ -425,7 +425,7 @@ class TestErrorHandling:
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            KernelPLS().predict(X_test)
+            KernelPLSRegression().predict(X_test)
 
     def test_unsupported_kernel_raises_error(self, sample_data) -> None:
         """Ensures that providing an unsupported kernel raises a ValueError."""
@@ -434,7 +434,7 @@ class TestErrorHandling:
 
         # Act & Assert
         with pytest.raises(ValueError, match="kernel"):
-            KernelPLS(kernel="wrong_kernel").fit(X, y)
+            KernelPLSRegression(kernel="wrong_kernel").fit(X, y)
 
 
 class TestPipelineGridSearchCV:
@@ -447,7 +447,7 @@ class TestPipelineGridSearchCV:
         pipe = Pipeline(
             [
                 ("scaler", StandardScaler()),
-                ("model", KernelPLS(n_components=2, kernel="rbf", gamma=0.5)),
+                ("model", KernelPLSRegression(n_components=2, kernel="rbf", gamma=0.5)),
             ]
         )
         pipe.fit(X, y)
@@ -467,7 +467,7 @@ class TestPipelineGridSearchCV:
         pipe = Pipeline(
             [
                 ("scaler", StandardScaler()),
-                ("model", KernelPLS()),
+                ("model", KernelPLSRegression()),
             ]
         )
         param_grid = [
@@ -492,7 +492,7 @@ class TestSklearnAPIExtended:
     def test_clone_preserves_parameters(self) -> None:
         """Verifies that sklearn.clone preserves init parameters."""
         # Arrange
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=3,
             kernel="rbf",
             gamma=0.5,
@@ -514,7 +514,7 @@ class TestSklearnAPIExtended:
         """Verifies that a cloned KernelPLS estimator can be fitted."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS(n_components=2, kernel="rbf", gamma=0.5)
+        model = KernelPLSRegression(n_components=2, kernel="rbf", gamma=0.5)
 
         # Act
         cloned_model = clone(model).fit(X, y)
@@ -530,7 +530,7 @@ class TestSklearnAPIExtended:
         X, y, _ = sample_data
 
         # Act
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Assert
         assert hasattr(model, "n_features_in_")
@@ -543,7 +543,7 @@ class TestSklearnAPIExtended:
         # Arrange
         X, y, _ = sample_data
         X_wrong = X[:, :-1]
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError):
@@ -556,7 +556,7 @@ class TestSklearnAPIExtended:
         # Arrange
         X, y, _ = sample_data
         X_wrong = X[:, :-1]
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError):
@@ -573,7 +573,7 @@ class TestFitTransform:
         n_components = 3
 
         # Act
-        T = KernelPLS(n_components=n_components).fit_transform(X, y)
+        T = KernelPLSRegression(n_components=n_components).fit_transform(X, y)
 
         # Assert
         assert T.shape == (X.shape[0], n_components)
@@ -582,8 +582,8 @@ class TestFitTransform:
         """fit_transform should match fit followed by transform."""
         # Arrange
         X, y, _ = sample_data
-        model_1 = KernelPLS(n_components=2)
-        model_2 = KernelPLS(n_components=2)
+        model_1 = KernelPLSRegression(n_components=2)
+        model_2 = KernelPLSRegression(n_components=2)
 
         # Act
         T_fit_transform = model_1.fit_transform(X, y)
@@ -602,7 +602,7 @@ class TestFitTransform:
         X, y, _ = sample_data
 
         # Act
-        T = KernelPLS().fit_transform(X, y)
+        T = KernelPLSRegression().fit_transform(X, y)
 
         # Assert
         assert isinstance(T, np.ndarray)
@@ -620,7 +620,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            KernelPLS().fit(X_nan, y)
+            KernelPLSRegression().fit(X_nan, y)
 
     def test_fit_with_inf_in_X_raises_error(self, sample_data) -> None:
         """Verifies that infinite values in X are rejected."""
@@ -631,7 +631,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            KernelPLS().fit(X_inf, y)
+            KernelPLSRegression().fit(X_inf, y)
 
     def test_fit_with_nan_in_y_raises_error(self, sample_data) -> None:
         """Verifies that NaN values in y are rejected."""
@@ -642,7 +642,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            KernelPLS().fit(X, y_nan)
+            KernelPLSRegression().fit(X, y_nan)
 
     def test_fit_with_mismatched_X_y_lengths_raises_error(self, sample_data) -> None:
         """Verifies that inconsistent X and y lengths are rejected."""
@@ -651,7 +651,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            KernelPLS().fit(X[:-1], y)
+            KernelPLSRegression().fit(X[:-1], y)
 
     def test_n_components_zero_raises_error(self, sample_data) -> None:
         """Verifies that n_components=0 is rejected."""
@@ -660,7 +660,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="n_components"):
-            KernelPLS(n_components=0).fit(X, y)
+            KernelPLSRegression(n_components=0).fit(X, y)
 
     def test_n_components_negative_raises_error(self, sample_data) -> None:
         """Verifies that negative n_components is rejected."""
@@ -669,7 +669,7 @@ class TestInputValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="n_components"):
-            KernelPLS(n_components=-1).fit(X, y)
+            KernelPLSRegression(n_components=-1).fit(X, y)
 
     def test_predict_with_nan_raises_error(self, sample_data) -> None:
         """Verifies that NaN values in prediction data are rejected."""
@@ -677,7 +677,7 @@ class TestInputValidation:
         X, y, X_test = sample_data
         X_test_nan = X_test.copy()
         X_test_nan[0, 0] = np.nan
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError):
@@ -689,7 +689,7 @@ class TestInputValidation:
         X, y, X_test = sample_data
         X_test_nan = X_test.copy()
         X_test_nan[0, 0] = np.nan
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError):
@@ -703,7 +703,7 @@ class TestTransformConsistency:
         """Transforming the training data should reproduce x_scores_."""
         # Arrange
         X, y, _ = sample_data
-        model = KernelPLS(n_components=2).fit(X, y)
+        model = KernelPLSRegression(n_components=2).fit(X, y)
 
         # Act
         T = model.transform(X)
@@ -719,7 +719,7 @@ class TestTransformConsistency:
         """Verifies that transform works with a single 2D sample."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS(n_components=2).fit(X, y)
+        model = KernelPLSRegression(n_components=2).fit(X, y)
 
         # Act
         T = model.transform(X_test[:1])
@@ -731,7 +731,7 @@ class TestTransformConsistency:
         """Verifies that transform rejects 1D samples."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS().fit(X, y)
+        model = KernelPLSRegression().fit(X, y)
 
         # Act & Assert
         with pytest.raises(ValueError, match="Expected 2D array"):
@@ -752,8 +752,8 @@ class TestPredictionConsistency:
         y_2d = y.reshape(-1, 1)
 
         # Act
-        y_hat_1d = KernelPLS().fit(X, y_1d).predict(X_test)
-        y_hat_2d = KernelPLS().fit(X, y_2d).predict(X_test)
+        y_hat_1d = KernelPLSRegression().fit(X, y_1d).predict(X_test)
+        y_hat_2d = KernelPLSRegression().fit(X, y_2d).predict(X_test)
 
         # Assert
         np.testing.assert_array_almost_equal(
@@ -768,7 +768,7 @@ class TestPredictionConsistency:
         X, y, _ = sample_data
 
         # Act
-        y_hat = KernelPLS().fit(X, y).predict(X)
+        y_hat = KernelPLSRegression().fit(X, y).predict(X)
 
         # Assert
         assert y_hat.shape == y.shape
@@ -781,7 +781,7 @@ class TestSerialization:
         """Verifies that pickling and unpickling preserve predictions."""
         # Arrange
         X, y, X_test = sample_data
-        model = KernelPLS(n_components=2, kernel="rbf", gamma=0.5).fit(X, y)
+        model = KernelPLSRegression(n_components=2, kernel="rbf", gamma=0.5).fit(X, y)
         y_hat_before = model.predict(X_test)
 
         # Act
@@ -810,7 +810,7 @@ class TestKernelParameters:
         X, y, X_test = sample_data
 
         # Act
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=2,
             kernel="poly",
             gamma=0.5,
@@ -829,7 +829,7 @@ class TestKernelParameters:
         X, y, X_test = sample_data
 
         # Act
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=2,
             kernel="poly",
             gamma=0.5,
@@ -848,7 +848,7 @@ class TestKernelParameters:
         X, y, X_test = sample_data
 
         # Act
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=2,
             kernel="sigmoid",
             gamma=0.1,
@@ -872,7 +872,7 @@ class TestKernelParameters:
         coef0 = 1.5
         scale = False
 
-        model = KernelPLS(
+        model = KernelPLSRegression(
             n_components=n_components,
             kernel="poly",
             gamma=gamma,
@@ -931,7 +931,7 @@ class TestParameterValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="gamma"):
-            KernelPLS(kernel="rbf", gamma=gamma).fit(X, y)
+            KernelPLSRegression(kernel="rbf", gamma=gamma).fit(X, y)
 
     @pytest.mark.parametrize("degree", [0, -1])
     def test_invalid_degree_raises_error(self, sample_data, degree) -> None:
@@ -941,7 +941,7 @@ class TestParameterValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="degree"):
-            KernelPLS(kernel="poly", degree=degree).fit(X, y)
+            KernelPLSRegression(kernel="poly", degree=degree).fit(X, y)
 
     @pytest.mark.parametrize("scale", ["yes", 1])
     def test_invalid_scale_raises_error(self, sample_data, scale) -> None:
@@ -951,7 +951,7 @@ class TestParameterValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="scale"):
-            KernelPLS(scale=scale).fit(X, y)
+            KernelPLSRegression(scale=scale).fit(X, y)
 
     @pytest.mark.parametrize("scale_X", ["yes", 1])
     def test_invalid_scale_X_raises_error(self, sample_data, scale_X) -> None:
@@ -961,7 +961,7 @@ class TestParameterValidation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="scale_X"):
-            KernelPLS(scale_X=scale_X).fit(X, y)
+            KernelPLSRegression(scale_X=scale_X).fit(X, y)
 
 
 class TestScore:
@@ -971,7 +971,7 @@ class TestScore:
         """Verifies that score returns a finite scalar."""
         # Arrange
         X, y, _ = sample_data
-        model = KernelPLS(n_components=2).fit(X, y)
+        model = KernelPLSRegression(n_components=2).fit(X, y)
 
         # Act
         score = model.score(X, y)

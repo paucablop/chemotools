@@ -4,11 +4,8 @@ import warnings
 
 from chemotools.regression import PLSRegression
 
-from ._kernel_pls import KernelPLS
-
 __all__ = [
     "PLSRegression",
-    "KernelPLS",
 ]
 
 # Show compatibility notices on module import

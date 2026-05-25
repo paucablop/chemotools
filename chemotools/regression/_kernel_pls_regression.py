@@ -1,5 +1,5 @@
 """
-The :mod:`chemotools.models._kernel_pls` module implements Kernel PLS regression.
+The :mod:`chemotools.regression._kernel_pls` module implements Kernel PLS regression.
 """
 
 # Authors: Ruggero Guerrini
@@ -15,9 +15,9 @@ from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
-class KernelPLS(RegressorMixin, TransformerMixin, BaseEstimator):
+class KernelPLSRegression(RegressorMixin, TransformerMixin, BaseEstimator):
     """
-    Kernel Partial Least Squares (KernelPLS) regression.
+    Kernel Partial Least Squares (KernelPLSRegression) regression.
 
     Implements non-linear regression by applying the kernel trick to map
     input data into a reproducing kernel Hilbert space (RKHS), followed
@@ -223,7 +223,7 @@ class KernelPLS(RegressorMixin, TransformerMixin, BaseEstimator):
         K_pred_cols = X.mean(axis=1, keepdims=True)
         return X - self.K_fit_rows_ - K_pred_cols + self.K_fit_all_
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> "KernelPLS":
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "KernelPLSRegression":
         """
         Fit the KernelPLS model.
 
