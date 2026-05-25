@@ -1,5 +1,5 @@
 """
-The :mod: `chemotools.adaptation._spectral_space_transform`
+The :mod:`chemotools.adaptation._spectral_space_transform`
 module implements the Spectral Space Transform (SST) transformer
 """
 
