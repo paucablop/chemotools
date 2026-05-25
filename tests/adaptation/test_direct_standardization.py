@@ -59,8 +59,8 @@ class TestFit:
         with pytest.raises(
             ValueError,
             match=re.escape(
-                "X and X_source must have the same shape, got X=(100, 20) and "
-                "X_source=(99, 20)."
+                "X and X_source must have the same shape, got X=(100, 50) and "
+                "X_source=(99, 50)."
             ),
         ):
             DirectStandardization().fit(X_target, X_source=X_source[:-1, :])
@@ -171,7 +171,7 @@ class TestTransform:
         # Arrange
         X_target, X_source = sample_data
         rng = np.random.default_rng(99)
-        X_wrong = rng.normal(size=(100, 15))  # 15 instead of 20
+        X_wrong = rng.normal(size=(100, 15))  # 15 instead of 50
         model = DirectStandardization().fit(X_source)
 
         # Act & Assert

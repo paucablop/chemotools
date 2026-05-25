@@ -1,24 +1,24 @@
 """
-Test for PiecewiseDirectStandardization
+Test for SpectralSpaceTransform
 """
 
 # Authors: Ruggero Guerrini
 # License: MIT
 
 import re
+import warnings
 
 import numpy as np
 import pytest
 import sklearn
-from scipy.sparse import csr_matrix
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.adaptation._piecewise_direct_standardization import (
-    PiecewiseDirectStandardization,
+from chemotools.adaptation._spectral_space_transform import (
+    SpectralSpaceTransform,
 )
 from chemotools.derivative import SavitzkyGolay
 from tests.adaptation.conftest import data_diff
@@ -27,11 +27,11 @@ from tests.adaptation.conftest import data_diff
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
-    def test_compliance_PiecewiseDirectStandardization(self):
-        """Verifies that PiecewiseDirectStandardization passes all sklearn estimator
+    def test_compliance_SpectralSpaceTransform(self):
+        """Verifies that SpectralSpaceTransform passes all sklearn estimator
         checks."""
         # Arrange
-        transformer = PiecewiseDirectStandardization()
+        transformer = SpectralSpaceTransform()
 
         # Act & Assert
         check_estimator(transformer)
@@ -46,27 +46,25 @@ class TestFit:
         X_target, X_source = sample_data
 
         # Act
-        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+        model = SpectralSpaceTransform().fit(X_target, X_source=X_source)
 
         # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "n_features_in_")
-        assert hasattr(model, "T_")
-        assert hasattr(model, "bias_")
-        assert model.T_.shape == (X_target.shape[1], X_target.shape[1])
-        assert model.bias_.shape == (X_target.shape[1],)
+        assert hasattr(model, "P1_")
+        assert hasattr(model, "P2_")
+        assert hasattr(model, "A_")
+        assert model.P1_.shape == model.P2_.shape
         assert model.n_features_in_ == X_target.shape[1]
 
         # Assert - Check values are finite and reasonable
-        T_dense = model.T_.toarray() if hasattr(model.T_, "toarray") else model.T_
-        assert np.all(np.isfinite(T_dense))
-        assert np.all(np.isfinite(model.bias_))
-        assert np.abs(T_dense).max() < 100
+        assert np.all(np.isfinite(model.P1_))
+        assert np.all(np.isfinite(model.P2_))
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
         # Arrange
         X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization()
+        model = SpectralSpaceTransform()
 
         # Act & Assert
         with pytest.raises(
@@ -78,43 +76,6 @@ class TestFit:
         ):
             model.fit(X_target, X_source=X_source[:-1, :])
 
-    def test_fit_raises_when_n_components_too_large(self, sample_data):
-        """Verifies fit raises ValueError when n_components is too large for PLS."""
-        # Arrange
-        X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization(window_length=2, n_components=4)
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="n_components"):
-            model.fit(X_target, X_source=X_source)
-
-    def test_fit_raises_when_n_components_exceeds_n_samples(self):
-        """Verifies fit raises ValueError when n_components exceeds n_samples."""
-        # Arrange
-        rng = np.random.default_rng(42)
-        X = rng.normal(size=(10, 50))  # Only 10 samples
-        X_source = rng.normal(size=(10, 50))
-        model = PiecewiseDirectStandardization(n_components=15)  # More than 10 samples
-
-        # Act & Assert
-        with pytest.raises(
-            ValueError,
-            match=re.escape("n_components=15 must be <= n_samples=10"),
-        ):
-            model.fit(X, X_source=X_source)
-
-    def test_fit_stores_T_as_sparse(self, sample_data):
-        """Verifies fit stores T_ as a sparse matrix when appropriate."""
-        # Arrange
-        X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization(n_components=15, storage="sparse")
-
-        # Act
-        model.fit(X_target, X_source=X_source)
-
-        # Assert
-        assert isinstance(model.T_, csr_matrix)
-
 
 class TestTransform:
     """Tests for the transform method behavior."""
@@ -123,7 +84,7 @@ class TestTransform:
         """Verifies that the output shape matches both input X and X_source."""
         # Arrange
         X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+        model = SpectralSpaceTransform().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -137,7 +98,7 @@ class TestTransform:
         data."""
         # Arrange
         X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+        model = SpectralSpaceTransform().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -151,7 +112,7 @@ class TestTransform:
         """Verifies that calling transform before fit raises NotFittedError."""
         # Arrange
         X_target, _ = sample_data
-        model = PiecewiseDirectStandardization()
+        model = SpectralSpaceTransform()
 
         # Act & Assert
         with pytest.raises(NotFittedError):
@@ -165,7 +126,7 @@ class TestTransform:
         X_source_original = X_source.copy()
 
         # Act
-        model = PiecewiseDirectStandardization().fit(X_target, X_source=X_source)
+        model = SpectralSpaceTransform().fit(X_target, X_source=X_source)
         model.transform(X_target)
 
         # Assert
@@ -185,7 +146,8 @@ class TestNumericalCorrectness:
 
         This is a golden/snapshot test with hardcoded expected output.
         If this test fails after code changes, verify the change is intentional.
-        Reference output generated from v0.4.0 implementation.
+        Reference output generated with with_mean=True, with_std=False
+        (current defaults)
         """
         # Arrange - Fixed data (do not change!)
         rng = np.random.default_rng(123)
@@ -193,45 +155,45 @@ class TestNumericalCorrectness:
         X_source = X_target * 1.3 + rng.normal(0, 0.08, size=(15, 8))
         X_test = rng.normal(size=(3, 8))
 
-        # Expected reference output
+        # Expected reference output (generated with with_mean=True, with_std=False)
         expected_output = np.array(
             [
                 [
-                    0.39513615,
-                    1.35118188,
-                    -0.51249342,
-                    1.20729721,
-                    -0.98750849,
-                    0.23742579,
-                    -0.0638159,
-                    0.06496122,
+                    0.34477441,
+                    1.11211523,
+                    -0.58705409,
+                    1.17686593,
+                    -0.6932544,
+                    0.25381937,
+                    -0.05075614,
+                    -0.06602294,
                 ],
                 [
-                    1.94173571,
-                    0.58747117,
-                    -0.67292598,
-                    -3.39671469,
-                    1.21977115,
-                    0.81321256,
-                    0.26092964,
-                    -0.78148859,
+                    1.46727768,
+                    0.93425806,
+                    -0.36373723,
+                    -2.72465293,
+                    0.94963568,
+                    0.82598552,
+                    0.19712279,
+                    -0.71140041,
                 ],
                 [
-                    2.0125865,
-                    -2.60604827,
-                    -1.06508618,
-                    -2.01281042,
-                    0.3192351,
-                    -0.27806908,
-                    2.60372142,
-                    0.1832874,
+                    1.68110708,
+                    -2.3451825,
+                    -0.82396761,
+                    -1.33091796,
+                    0.18088225,
+                    -0.43624381,
+                    2.27549503,
+                    0.08766347,
                 ],
             ]
         )
 
         # Act
-        model = PiecewiseDirectStandardization(
-            window_length=2, n_components=2, scale=True
+        model = SpectralSpaceTransform(
+            n_components=2,
         )
         model.fit(X_target, X_source=X_source)
         output = model.transform(X_test)
@@ -246,8 +208,8 @@ class TestNumericalCorrectness:
         X_target = rng.normal(size=(20, 8))
         X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
 
-        model = PiecewiseDirectStandardization(
-            window_length=1, n_components=2, scale=False
+        model = SpectralSpaceTransform(
+            n_components=2,
         )
         model.fit(X_target, X_source=X_source)
 
@@ -270,45 +232,123 @@ class TestNumericalCorrectness:
         X_test = rng.normal(size=(10, 12))
 
         # Act - Fit and transform twice
-        model1 = PiecewiseDirectStandardization(window_length=3, n_components=2)
+        model1 = SpectralSpaceTransform(n_components=2)
         model1.fit(X_target, X_source=X_source)
         result1 = model1.transform(X_test)
 
-        model2 = PiecewiseDirectStandardization(window_length=3, n_components=2)
+        model2 = SpectralSpaceTransform(n_components=2)
         model2.fit(X_target, X_source=X_source)
         result2 = model2.transform(X_test)
 
         # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
-        np.testing.assert_array_equal(model1.bias_, model2.bias_)
-        T1 = model1.T_.toarray() if hasattr(model1.T_, "toarray") else model1.T_
-        T2 = model2.T_.toarray() if hasattr(model2.T_, "toarray") else model2.T_
-        np.testing.assert_array_equal(T1, T2)
+        np.testing.assert_array_equal(model1.P1_, model2.P1_)
+        np.testing.assert_array_equal(model1.P2_, model2.P2_)
+        np.testing.assert_array_equal(model1.T_, model2.T_)
 
-    def test_known_linear_transformation(self):
-        """Verifies correct behavior on a known linear transformation."""
-        # Arrange - Create data with known linear relationship
-        rng = np.random.default_rng(777)
-        X_target = rng.normal(size=(50, 15))
-        # Simple scaling: X_source = 2 * X_target (perfect linear relationship)
-        X_source = 2.0 * X_target
+    def test_n_components_exceeds_n_samples(self):
+        """Verifies n_components > n_samples - 1 raises ValueError."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(8, 20))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(8, 20))
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="n_components=40 is too large"):
+            model = SpectralSpaceTransform(n_components=40)
+            model.fit(X_target, X_source=X_source)
+
+    def test_n_components_exceeds_n_features(self):
+        """Verifies n_components > 2*n_features raises ValueError."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(20, 8))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="n_components=17 is too large"):
+            model = SpectralSpaceTransform(n_components=17)
+            model.fit(X_target, X_source=X_source)
+
+    def test_n_components_at_boundary_is_valid(self):
+        """Verifies n_components == min(n_samples-1, n_features) is accepted."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X_target = rng.normal(size=(20, 8))
+        X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
 
         # Act
-        model = PiecewiseDirectStandardization(window_length=2, n_components=1)
+        model = SpectralSpaceTransform(n_components=9)
         model.fit(X_target, X_source=X_source)
-        X_transformed = model.transform(X_target)
 
-        # Assert - Transformed data should be close to X_source
-        # PDS with local windows won't perfectly recover global scaling,
-        # but should still substantially improve the match
-        relative_error = np.linalg.norm(X_transformed - X_source) / np.linalg.norm(
-            X_source
-        )
-        assert relative_error < 0.3  # Less than 30% error (PDS has local bias)
+        # Assert
+        assert model.transform(X_target).shape == X_target.shape
 
 
 class TestEdgeCases:
     """Tests for edge cases and special scenarios."""
+
+    def test_constant_target_feature_warns(self):
+        """Verifies a warning is raised when X (target) has a constant feature
+        and with_std=True."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 2] = 3.0  # make feature 2 constant
+        X_source = rng.normal(size=(20, 5))
+
+        # Act & Assert
+        with pytest.warns(UserWarning, match="X \\(target\\) has 1 constant feature"):
+            SpectralSpaceTransform(with_std=True).fit(X_target, X_source=X_source)
+
+    def test_constant_source_feature_warns(self):
+        """Verifies a warning is raised when X_source has a constant feature
+        and with_std=True."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_source = rng.normal(size=(20, 5))
+        X_source[:, 0] = 0.0  # make feature 0 constant
+
+        # Act & Assert
+        with pytest.warns(UserWarning, match="X_source has 1 constant feature"):
+            SpectralSpaceTransform(with_std=True).fit(X_target, X_source=X_source)
+
+    def test_constant_feature_std_clamped_to_one(self):
+        """Verifies that the stored std for constant features is 1, not 0."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 1] = 7.0
+        X_source = rng.normal(size=(20, 5))
+        X_source[:, 3] = -2.0
+
+        # Act
+        with pytest.warns(UserWarning):
+            model = SpectralSpaceTransform(with_std=True).fit(
+                X_target, X_source=X_source
+            )
+
+        # Assert - constant features must have std == 1, not 0
+        assert model.X_target_std_[1] == 1.0
+        assert model.X_source_std_[3] == 1.0
+        # Non-constant features must retain their real std
+        assert model.X_target_std_[0] != 1.0
+        assert model.X_source_std_[0] != 1.0
+
+    def test_no_warning_when_with_std_false(self):
+        """Verifies no zero-variance warning is raised when with_std=False,
+        even if features are constant."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X_target = rng.normal(size=(20, 5))
+        X_target[:, 0] = 5.0
+        X_source = rng.normal(size=(20, 5))
+
+        # Act & Assert - no UserWarning about constant features
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", UserWarning)
+            SpectralSpaceTransform(with_std=False).fit(X_target, X_source=X_source)
 
     def test_identity_transformation_when_X_source_is_none(self):
         """Verifies that fitting with X_source=None results in identity
@@ -316,7 +356,7 @@ class TestEdgeCases:
         # Arrange
         rng = np.random.default_rng(42)
         X = rng.normal(size=(50, 10))
-        model = PiecewiseDirectStandardization()
+        model = SpectralSpaceTransform()
 
         # Act - fit with X_source=None should trigger identity transformation
         with pytest.warns(UserWarning, match="identity transformation"):
@@ -328,44 +368,6 @@ class TestEdgeCases:
         np.testing.assert_array_equal(X_transformed, X)
         assert hasattr(model, "x_source_provided_")
         assert model.x_source_provided_ is False
-
-    def test_window_length_larger_than_features(self):
-        """Verifies that window_length larger than n_features is handled gracefully."""
-        # Arrange - window_length exceeds number of features
-        rng = np.random.default_rng(17)
-        X = rng.normal(size=(50, 10))
-        X_source = X * 1.5 + rng.normal(0, 0.05, size=(50, 10))
-
-        # Act - should handle gracefully by using all features in window
-        model = PiecewiseDirectStandardization(
-            window_length=50
-        )  # Much larger than 10 features
-        model.fit(X, X_source=X_source)
-        X_transformed = model.transform(X)
-
-        # Assert - transformation should still work correctly
-        assert X_transformed.shape == X.shape
-        # T_ is square with shape (n_features, n_features) regardless of window_length
-        assert model.T_.shape == (10, 10)
-        assert model.bias_.shape == (10,)
-
-    def test_window_length_equals_one(self):
-        """Verifies that minimal window_length of 1 works correctly."""
-        # Arrange - minimal window_length
-        rng = np.random.default_rng(17)
-        X = rng.normal(size=(50, 20))
-        X_source = X * 1.2 + rng.normal(0, 0.1, size=(50, 20))
-
-        # Act - each feature uses itself and immediate neighbors only
-        model = PiecewiseDirectStandardization(window_length=1, n_components=1)
-        model.fit(X, X_source=X_source)
-        X_transformed = model.transform(X)
-
-        # Assert
-        assert X_transformed.shape == X.shape
-        # T_ is always square (n_features, n_features)
-        assert model.T_.shape == (20, 20)
-        assert model.bias_.shape == (20,)
 
 
 class TestPipeline:
@@ -386,7 +388,7 @@ class TestPipeline:
                     ("scaler", SavitzkyGolay()),
                     (
                         "model",
-                        PiecewiseDirectStandardization().set_fit_request(X_source=True),
+                        SpectralSpaceTransform().set_fit_request(X_source=True),
                     ),
                     ("pls", PLSRegression()),
                 ]
@@ -395,7 +397,6 @@ class TestPipeline:
                 "scaler__window_length": [15, 25],
                 "scaler__polyorder": [2, 3],
                 "scaler__deriv": [1, 2],
-                "model__window_length": [10, 15, 20],
                 "model__n_components": [2, 3, 5],
                 "pls__n_components": [2, 3],
             }
