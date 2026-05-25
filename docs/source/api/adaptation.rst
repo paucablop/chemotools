@@ -12,6 +12,7 @@ Adaptation methods for calibration transfer between instruments. These transform
    from chemotools.adaptation import (
        DirectStandardization,
        PiecewiseDirectStandardization,
+       SpectralSpaceTransform,
        XAxisInterpolator,
    )
 
@@ -28,6 +29,8 @@ Available Classes
      - Linear calibration transfer via least-squares mapping between instruments
    * - :doc:`PiecewiseDirectStandardization </methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`
      - Piecewise calibration transfer using local least-squares windows
+   * - :doc:`SpectralSpaceTransform </methods/generated/chemotools.adaptation.SpectralSpaceTransform>`
+     - SVD-based shared latent space domain adaptation
    * - :doc:`XAxisInterpolator </methods/generated/chemotools.adaptation.XAxisInterpolator>`
      - Resample spectra onto a shared x-axis grid via interpolation
 

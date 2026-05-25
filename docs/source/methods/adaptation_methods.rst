@@ -9,4 +9,5 @@ Adaptation Methods
 
     DirectStandardization
     PiecewiseDirectStandardization
+    SpectralSpaceTransform
     XAxisInterpolator

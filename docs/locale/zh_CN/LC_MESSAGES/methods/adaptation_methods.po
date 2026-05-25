@@ -55,6 +55,21 @@ msgstr ""
 
 #: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
 msgid ""
+":py:obj:`SpectralSpaceTransform "
+"<chemotools.adaptation.SpectralSpaceTransform>`"
+msgstr ""
+":py:obj:`SpectralSpaceTransform "
+"<chemotools.adaptation.SpectralSpaceTransform>`"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
+"Spectral Space Transform (SST) is a transformer used for domain adaptation "
+"(calibration) applications."
+msgstr ""
+"光谱空间变换（SST）是一种用于域适应（校准）应用的转换器。"
+
+#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+msgid ""
 ":py:obj:`XAxisInterpolator "
 "<chemotools.adaptation.XAxisInterpolator>`"
 msgstr ""
