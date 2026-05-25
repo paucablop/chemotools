@@ -267,4 +267,4 @@ class PiecewiseDirectStandardization(
         assert self.T_ is not None
         assert self.bias_ is not None
 
-        return X @ self.T_ + self.bias_
+        return np.asarray(X @ self.T_ + self.bias_)
