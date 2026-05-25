@@ -112,14 +112,10 @@ class StandardNormalVariate(
         )
 
         # Calculate the standard normal variate
-        for i, x in enumerate(X_):
-            X_[i] = self._calculate_standard_normal_variate(x)
+        mean = X_.mean(axis=1, keepdims=True)
+        std = X_.std(axis=1, keepdims=True)
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _calculate_standard_normal_variate(self, x) -> np.ndarray:
-        std = x.std()
-        if std == 0:
+        if np.any(std == 0):
             warnings.warn(
                 "Standard deviation is zero in SNV. "
                 "This indicates a flat signal and will "
@@ -127,4 +123,5 @@ class StandardNormalVariate(
                 UserWarning,
                 stacklevel=2,
             )
-        return (x - x.mean()) / std
+
+        return (X_ - mean) / std
