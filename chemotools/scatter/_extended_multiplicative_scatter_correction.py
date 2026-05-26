@@ -140,7 +140,8 @@ class ExtendedMultiplicativeScatterCorrection(
             check_array(self.weights, ensure_2d=False)
             if self.weights is not None
             else np.ones(n_features)
-        )
+        )[:, np.newaxis]
+
         check_consistent_length(self.weights_, X.T)
 
         # 3. Build Design Matrix A
@@ -157,6 +158,9 @@ class ExtendedMultiplicativeScatterCorrection(
             if interf.shape[1] != n_features:
                 raise ValueError("Interference spectra must match X feature count.")
             self.A_ = np.column_stack([self.A_, interf.T])
+
+        # Store
+        self.WA_ = self.A_ * self.weights_
 
         return self
 
@@ -177,13 +181,13 @@ class ExtendedMultiplicativeScatterCorrection(
         X = validate_data(self, X, reset=False, dtype=np.float64)
 
         # Apply weights to A and X for Weighted Least Squares
-        W = self.weights_[:, np.newaxis]
-        WA = self.A_ * W
-        WX = (X * self.weights_).T
+        # W = self.weights_[:, np.newaxis]
+        # WA = self.A_ * self.weights_
+        WX = (X * self.weights_.flatten()).T
 
         # Solve regression: WA @ coeffs = WX
         # lstsq is more robust than inv() or pinv() for singular matrices
-        coeffs, _, _, _ = np.linalg.lstsq(WA, WX, rcond=None)
+        coeffs, _, _, _ = np.linalg.lstsq(self.WA_, WX, rcond=None)
 
         # Partition coefficients
         n_poly = self.order + 1
