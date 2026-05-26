@@ -137,7 +137,6 @@ class RobustNormalVariate(
         # Calculate the standard deviation only for those values
         denom = np.std(X_, axis=1, keepdims=True, where=mask)
 
-
         if np.any(denom == 0):
             warnings.warn(
                 "Denominator is zero in RNV. Adding epsilon to avoid NaNs.",
