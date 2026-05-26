@@ -131,10 +131,12 @@ class RobustNormalVariate(
         # Calculate the standard normal variate
         percentile = np.percentile(X_, self.percentile, axis=1, keepdims=True)
 
-        # Keep row structure while selecting values <= row percentile.
-        # Boolean indexing would flatten to 1D and break axis-wise reduction.
-        masked = np.where(X_ <= percentile, X_, np.nan)
-        denom = np.nanstd(masked, axis=1, keepdims=True)
+        # Create a mask for values below or equal to the percentile
+        mask = X_ <= percentile
+
+        # Calculate the standard deviation only for those values
+        denom = np.std(X_, axis=1, keepdims=True, where=mask)
+
 
         if np.any(denom == 0):
             warnings.warn(
