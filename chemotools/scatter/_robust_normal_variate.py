@@ -129,18 +129,18 @@ class RobustNormalVariate(
         )
 
         # Calculate the standard normal variate
-        for i, x in enumerate(X_):
-            X_[i] = self._calculate_robust_normal_variate(x)
+        percentile = np.percentile(X_, self.percentile, axis=1, keepdims=True)
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Keep row structure while selecting values <= row percentile.
+        # Boolean indexing would flatten to 1D and break axis-wise reduction.
+        masked = np.where(X_ <= percentile, X_, np.nan)
+        denom = np.nanstd(masked, axis=1, keepdims=True)
 
-    def _calculate_robust_normal_variate(self, x) -> np.ndarray:
-        percentile = np.percentile(x, self.percentile)
-        denom = np.std(x[x <= percentile])
-        if denom == 0:
+        if np.any(denom == 0):
             warnings.warn(
                 "Denominator is zero in RNV. Adding epsilon to avoid NaNs.",
                 UserWarning,
                 stacklevel=2,
             )
-        return (x - percentile) / (denom + self.epsilon)
+
+        return (X_ - percentile) / (denom + self.epsilon)
