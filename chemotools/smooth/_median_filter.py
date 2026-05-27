@@ -10,6 +10,7 @@ from numbers import Integral
 from typing import Literal
 
 import numpy as np
+from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import median_filter
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
@@ -35,6 +36,10 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     mode : str, optional, default="nearest"
         The mode to use for the median filter. Can be "nearest", "constant", "reflect",
         "wrap", "mirror" or "interp". Default is "nearest".
+
+    n_jobs : int, optional, default=1
+        Number of parallel jobs used to process samples independently.
+        Uses serial execution when set to 1.
 
     window_size : int, optional
         Deprecated alias for ``window_length``.
@@ -66,6 +71,7 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             Interval(Integral, 3, None, closed="left"),
             deprecated_parameter_constraint(),
         ],
+        "n_jobs": [Interval(Integral, -1, None, closed="left")],
     }
 
     def __init__(
@@ -81,11 +87,13 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             "grid-mirror",
             "grid-wrap",
         ] = "nearest",
+        n_jobs: int = 1,
         window_size=DEPRECATED_PARAMETER,
     ) -> None:
         self.window_length = window_length
         self.window_size = window_size
         self.mode = mode
+        self.n_jobs = n_jobs
 
     def fit(self, X: np.ndarray, y=None) -> "MedianFilter":
         """
@@ -120,6 +128,9 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             old_value=self.window_size,
         )
 
+        if self.n_jobs == 0:
+            raise ValueError("n_jobs must be different from 0")
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -153,7 +164,32 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             dtype=np.float64,
         )
 
-        # Mean filter the data
-        for i, x in enumerate(X_):
-            X_[i] = median_filter(x, size=self.window_length_, mode=self.mode)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Median filter the data
+        if self.n_jobs == 1:
+            return median_filter(
+                X_, size=self.window_length_, mode=self.mode, axes=(1,)
+            )
+
+        # Parallelize across samples (rows)
+        n_effective_jobs = effective_n_jobs(self.n_jobs)
+        if n_effective_jobs <= 1 or X_.shape[0] < 2:
+            return median_filter(
+                X_, size=self.window_length_, mode=self.mode, axes=(1,)
+            )
+
+        n_samples = X_.shape[0]
+        chunk_size = max(1, (n_samples + n_effective_jobs - 1) // n_effective_jobs)
+        chunks = [
+            X_[start : start + chunk_size] for start in range(0, n_samples, chunk_size)
+        ]
+
+        filtered_chunks = Parallel(n_jobs=self.n_jobs, prefer="threads")(
+            delayed(median_filter)(
+                chunk,
+                size=self.window_length_,
+                mode=self.mode,
+                axes=(1,),
+            )
+            for chunk in chunks
+        )
+        return np.concatenate(filtered_chunks, axis=0)
