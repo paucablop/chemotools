@@ -149,6 +149,21 @@ class NorrisWilliams(
             old_value=self.derivative_order,
         )
 
+        # Calculate the smoothing kernel
+        self.smoothing_kernel_ = self._smoothing_kernel()
+
+        # Calculate the derivative kernel
+        if self.deriv_ == 1:
+            self.derivative_kernel_ = self._first_derivative_kernel()
+        elif self.deriv_ == 2:
+            self.derivative_kernel_ = self._second_derivative_kernel()
+        else:
+            raise ValueError(f"Expected deriv to be 1 or 2 but got {self.deriv_}")
+
+        self.kernel_ = np.convolve(
+            self.smoothing_kernel_, self.derivative_kernel_, mode="full"
+        )
+
         return self
 
     def transform(self, X: np.ndarray, y=None):
@@ -182,19 +197,9 @@ class NorrisWilliams(
             dtype=np.float64,
         )
 
-        if self.deriv_ == 1:
-            for i, x in enumerate(X_):
-                derivative = self._spectrum_first_derivative(x)
-                X_[i] = derivative
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-        if self.deriv_ == 2:
-            for i, x in enumerate(X_):
-                derivative = self._spectrum_second_derivative(x)
-                X_[i] = derivative
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-        raise ValueError(f"Expected deriv to be 1 or 2 but got {self.deriv_}")
+        # X_ = convolve1d(X_, self.smoothing_kernel_, mode=self.mode, axis=1)
+        X_transformed = convolve1d(X_, self.kernel_, mode=self.mode, axis=1)
+        return X_transformed
 
     def _smoothing_kernel(self):
         return np.ones(self.window_length_) / self.window_length_
@@ -214,16 +219,12 @@ class NorrisWilliams(
 
     def _spectrum_first_derivative(self, X):
         # Apply filter of data
-        smoothing_kernel = self._smoothing_kernel()
-        first_derivative_kernel = self._first_derivative_kernel()
-        smoothed = convolve1d(X, smoothing_kernel, mode=self.mode)
-        derivative = convolve1d(smoothed, first_derivative_kernel, mode=self.mode)
+        smoothed = convolve1d(X, self.smoothing_kernel_, mode=self.mode)
+        derivative = convolve1d(smoothed, self.derivative_kernel_, mode=self.mode)
         return derivative
 
     def _spectrum_second_derivative(self, X):
         # Apply filter of data
-        smoothing_kernel = self._smoothing_kernel()
-        second_derivative_kernel = self._second_derivative_kernel()
-        smoothed = convolve1d(X, smoothing_kernel, mode=self.mode)
-        derivative = convolve1d(smoothed, second_derivative_kernel, mode=self.mode)
+        smoothed = convolve1d(X, self.smoothing_kernel_, mode=self.mode)
+        derivative = convolve1d(smoothed, self.derivative_kernel_, mode=self.mode)
         return derivative
