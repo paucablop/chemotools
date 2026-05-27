@@ -198,14 +198,13 @@ class SavitzkyGolay(
         )
 
         # Calculate the standard normal variate
-        for i, x in enumerate(X_):
-            X_[i] = savgol_filter(
-                x,
-                self.window_length_,
-                self.polyorder_,
-                deriv=self.deriv_,
-                axis=0,
-                mode=self.mode,
-            )
+        X_ = savgol_filter(
+            X_,
+            self.window_length_,
+            self.polyorder_,
+            deriv=self.deriv_,
+            axis=1,
+            mode=self.mode,
+        )
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        return X_
