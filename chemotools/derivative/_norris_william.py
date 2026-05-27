@@ -154,14 +154,15 @@ class NorrisWilliams(
 
         # Calculate the derivative kernel
         if self.deriv_ == 1:
-            self.derivative_kernel_ = self._first_derivative_kernel()
+            derivative_kernel_ = self._first_derivative_kernel()
         elif self.deriv_ == 2:
-            self.derivative_kernel_ = self._second_derivative_kernel()
+            derivative_kernel_ = self._second_derivative_kernel()
         else:
             raise ValueError(f"Expected deriv to be 1 or 2 but got {self.deriv_}")
 
+        # Fuse the kernels to create the Norris-Williams kernel
         self.kernel_ = np.convolve(
-            self.smoothing_kernel_, self.derivative_kernel_, mode="full"
+            self.smoothing_kernel_, derivative_kernel_, mode="full"
         )
 
         return self
@@ -184,7 +185,7 @@ class NorrisWilliams(
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        check_is_fitted(self, ["n_features_in_", "kernel_"])
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
@@ -197,7 +198,7 @@ class NorrisWilliams(
             dtype=np.float64,
         )
 
-        # X_ = convolve1d(X_, self.smoothing_kernel_, mode=self.mode, axis=1)
+        # Calculate the Norris-Williams derivative
         X_transformed = convolve1d(X_, self.kernel_, mode=self.mode, axis=1)
         return X_transformed
 
@@ -216,15 +217,3 @@ class NorrisWilliams(
         array[-1] = 1 / (self.gap_size)
         array[int((self.gap_size - 1) / 2)] = -2 / self.gap_size
         return array
-
-    def _spectrum_first_derivative(self, X):
-        # Apply filter of data
-        smoothed = convolve1d(X, self.smoothing_kernel_, mode=self.mode)
-        derivative = convolve1d(smoothed, self.derivative_kernel_, mode=self.mode)
-        return derivative
-
-    def _spectrum_second_derivative(self, X):
-        # Apply filter of data
-        smoothed = convolve1d(X, self.smoothing_kernel_, mode=self.mode)
-        derivative = convolve1d(smoothed, self.derivative_kernel_, mode=self.mode)
-        return derivative

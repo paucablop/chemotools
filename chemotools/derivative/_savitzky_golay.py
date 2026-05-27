@@ -197,7 +197,7 @@ class SavitzkyGolay(
             dtype=np.float64,
         )
 
-        # Calculate the standard normal variate
+        # Calculate the Savitzky-Golay derivative
         X_ = savgol_filter(
             X_,
             self.window_length_,
