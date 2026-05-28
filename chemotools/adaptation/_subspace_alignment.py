@@ -21,7 +21,7 @@ from sklearn.utils.validation import (
 from chemotools._doc_mixin import DocLinkMixin
 
 
-class Subspaceaslignment(
+class SubspaceAlignment(
     DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
     """
@@ -132,7 +132,7 @@ class Subspaceaslignment(
 
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
-    ) -> "Subspaceaslignment":
+    ) -> "SubspaceAlignment":
         """
         Fit the Subspace Alignment model.
 

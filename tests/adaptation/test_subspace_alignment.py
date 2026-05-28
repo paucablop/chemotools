@@ -1,5 +1,5 @@
 """
-Test for Subspaceaslignment
+Test for SubspaceAlignment
 """
 
 # Authors: Ruggero Guerrini
@@ -15,7 +15,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation._subspace_alignment import (
-    Subspaceaslignment,
+    SubspaceAlignment,
 )
 from chemotools.derivative import SavitzkyGolay
 from tests.adaptation.conftest import data_diff
@@ -24,11 +24,11 @@ from tests.adaptation.conftest import data_diff
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
-    def test_compliance_Subspaceaslignment(self):
-        """Verifies that Subspaceaslignment passes all sklearn estimator
+    def test_compliance_SubspaceAlignment(self):
+        """Verifies that SubspaceAlignment passes all sklearn estimator
         checks."""
         # Arrange
-        transformer = Subspaceaslignment()
+        transformer = SubspaceAlignment()
 
         # Act & Assert
         check_estimator(transformer)
@@ -43,7 +43,7 @@ class TestFit:
         X_target, X_source = sample_data
 
         # Act
-        model = Subspaceaslignment().fit(X_target, X_source=X_source)
+        model = SubspaceAlignment().fit(X_target, X_source=X_source)
 
         # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "components_X_")
@@ -67,7 +67,7 @@ class TestFit:
         """Verifies fit raises ValueError when X and X_source have different shapes."""
         # Arrange
         X_target, X_source = sample_data
-        model = Subspaceaslignment()
+        model = SubspaceAlignment()
 
         # Act & Assert
         with pytest.raises(
@@ -83,7 +83,7 @@ class TestTransform:
         """Verifies that the output shape matches both input X and X_source."""
         # Arrange
         X_target, X_source = sample_data
-        model = Subspaceaslignment().fit(X_target, X_source=X_source)
+        model = SubspaceAlignment().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -96,7 +96,7 @@ class TestTransform:
         data."""
         # Arrange
         X_target, X_source = sample_data
-        model = Subspaceaslignment().fit(X_target, X_source=X_source)
+        model = SubspaceAlignment().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -110,7 +110,7 @@ class TestTransform:
         """Verifies that calling transform before fit raises NotFittedError."""
         # Arrange
         X_target, _ = sample_data
-        model = Subspaceaslignment()
+        model = SubspaceAlignment()
 
         # Act & Assert
         with pytest.raises(NotFittedError):
@@ -124,7 +124,7 @@ class TestTransform:
         X_source_original = X_source.copy()
 
         # Act
-        model = Subspaceaslignment().fit(X_target, X_source=X_source)
+        model = SubspaceAlignment().fit(X_target, X_source=X_source)
         model.transform(X_target)
 
         # Assert
@@ -188,7 +188,7 @@ class TestNumericalCorrectness:
         )
 
         # Act
-        model = Subspaceaslignment()
+        model = SubspaceAlignment()
 
         model.fit(X_target, X_source=X_source)
         output = model.transform(X_test)
@@ -203,7 +203,7 @@ class TestNumericalCorrectness:
         X_target = rng.normal(size=(20, 8))
         X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
 
-        model = Subspaceaslignment()
+        model = SubspaceAlignment()
         model.fit(X_target, X_source=X_source)
 
         # Act
@@ -225,11 +225,11 @@ class TestNumericalCorrectness:
         X_test = rng.normal(size=(10, 12))
 
         # Act - Fit and transform twice
-        model1 = Subspaceaslignment(n_components=2)
+        model1 = SubspaceAlignment(n_components=2)
         model1.fit(X_target, X_source=X_source)
         result1 = model1.transform(X_test)
 
-        model2 = Subspaceaslignment(n_components=2)
+        model2 = SubspaceAlignment(n_components=2)
         model2.fit(X_target, X_source=X_source)
         result2 = model2.transform(X_test)
 
@@ -255,7 +255,7 @@ class TestNumericalCorrectness:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            model = Subspaceaslignment(n_components=40)
+            model = SubspaceAlignment(n_components=40)
             model.fit(X_target, X_source=X_source)
 
     def test_n_components_exceeds_n_features(self):
@@ -267,7 +267,7 @@ class TestNumericalCorrectness:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            model = Subspaceaslignment(n_components=17)
+            model = SubspaceAlignment(n_components=17)
             model.fit(X_target, X_source=X_source)
 
 
@@ -280,7 +280,7 @@ class TestEdgeCases:
         # Arrange
         rng = np.random.default_rng(17)
         X = rng.normal(size=(50, 10))
-        model = Subspaceaslignment()
+        model = SubspaceAlignment()
 
         # Act - fit with X_source=None should trigger identity transformation
         with pytest.warns(UserWarning, match="identity transformation"):
@@ -312,7 +312,7 @@ class TestPipeline:
                     ("scaler", SavitzkyGolay()),
                     (
                         "model",
-                        Subspaceaslignment().set_fit_request(X_source=True),
+                        SubspaceAlignment().set_fit_request(X_source=True),
                     ),
                     ("pls", PLSRegression()),
                 ]
