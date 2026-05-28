@@ -58,7 +58,7 @@ class Subspaceaslignment(
         Alignment matrix.
 
     X_mean_ : np.ndarray of shape (n_features,), or None
-        Mean of the target domain data ``X``. 
+        Mean of the target domain data ``X``.
 
     X_std_ : np.ndarray of shape (n_features,), or None
         Standard deviation of the target domain data ``X``.
