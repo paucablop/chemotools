@@ -9,7 +9,6 @@ The test suite covers:
 - Numerical edge cases (single sample, single feature, identical domains)
 """
 
-
 import numpy as np
 import pytest
 import sklearn
@@ -105,8 +104,10 @@ class TestAttributes:
         with pytest.raises(ValueError):
             model.fit(X_target, X_source=X_source[:, :-1])
 
+
 class TestFeaturesMismatch:
     """Test for features mismatch."""
+
     def test_raise_on_feature_mismatch(self, sample_data):
         """Verifies that feature mismatch raises a error."""
         X_target, X_source = sample_data
@@ -115,6 +116,8 @@ class TestFeaturesMismatch:
 
         with pytest.raises(ValueError, match="same number of features"):
             model.fit(X_target, X_source=X_source[:, :-1])
+
+
 class TestTransform:
     """Tests for the transform method behavior."""
 
@@ -185,8 +188,6 @@ class TestNumericalCorrectness:
 
         This is a golden/snapshot test with hardcoded expected output.
         If this test fails after code changes, verify the change is intentional.
-        Reference output generated with with_mean=True, with_std=False
-        (current defaults)
         """
         # Arrange - Fixed data (do not change!)
         rng = np.random.default_rng(123)

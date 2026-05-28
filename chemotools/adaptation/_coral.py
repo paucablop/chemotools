@@ -124,23 +124,22 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
     >>> X_adapted = pipe.transform(X_source)
     """
 
-    # Fitted attributes
-    n_features_in_: int
-    A_: np.ndarray
-    CS_: np.ndarray
-    CT_: np.ndarray
-    x_source_provided_: bool
-
     _parameter_constraints: dict = {
         "reg": [Interval(Real, 0, None, closed="left")],
     }
+    # Fitted attributes
+    n_features_in_: int
+    X_centered_: np.ndarray | None
+    X_source_mean_: np.ndarray | None
+    X_source_centered_: np.ndarray | None
+    C_X_: np.ndarray | None
+    C_X_source_: np.ndarray | None
+    C_X_inv_sqrt_: np.ndarray | None
+    C_X_source_sqrt_: np.ndarray | None
+    x_source_provided_: bool
 
     def __init__(self, reg: float = 1.0) -> None:
         self.reg = reg
-
-    # ------------------------------------------------------------------
-    # Public scikit-learn API
-    # ------------------------------------------------------------------
 
     def fit(
         self,

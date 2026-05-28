@@ -1,12 +1,9 @@
 """
-Test for SubspaceAlignement
+Test for Subspaceaslignment
 """
 
 # Authors: Ruggero Guerrini
 # License: MIT
-
-import re
-import warnings
 
 import numpy as np
 import pytest
@@ -17,8 +14,8 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.adaptation._subspace_alignement import (
-    SubspaceAlignement,
+from chemotools.adaptation._subspace_alignment import (
+    Subspaceaslignment,
 )
 from chemotools.derivative import SavitzkyGolay
 from tests.adaptation.conftest import data_diff
@@ -27,11 +24,11 @@ from tests.adaptation.conftest import data_diff
 class TestSklearnCompliance:
     """Tests for sklearn estimator API compliance."""
 
-    def test_compliance_SubspaceAlignement(self):
-        """Verifies that SubspaceAlignement passes all sklearn estimator
+    def test_compliance_Subspaceaslignment(self):
+        """Verifies that Subspaceaslignment passes all sklearn estimator
         checks."""
         # Arrange
-        transformer = SubspaceAlignement()
+        transformer = Subspaceaslignment()
 
         # Act & Assert
         check_estimator(transformer)
@@ -46,7 +43,7 @@ class TestFit:
         X_target, X_source = sample_data
 
         # Act
-        model = SubspaceAlignement().fit(X_target, X_source=X_source)
+        model = Subspaceaslignment().fit(X_target, X_source=X_source)
 
         # Assert - Check attributes exist with correct shapes
         assert hasattr(model, "components_X_")
@@ -56,8 +53,6 @@ class TestFit:
         assert hasattr(model, "X_std_")
         assert hasattr(model, "X_source_mean_")
         assert hasattr(model, "X_source_std_")
-
-        
 
         # Assert - Check values are finite and reasonable
 
@@ -72,7 +67,7 @@ class TestFit:
         """Verifies fit raises ValueError when X and X_source have different shapes."""
         # Arrange
         X_target, X_source = sample_data
-        model = SubspaceAlignement()
+        model = Subspaceaslignment()
 
         # Act & Assert
         with pytest.raises(
@@ -88,7 +83,7 @@ class TestTransform:
         """Verifies that the output shape matches both input X and X_source."""
         # Arrange
         X_target, X_source = sample_data
-        model = SubspaceAlignement().fit(X_target, X_source=X_source)
+        model = Subspaceaslignment().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -101,7 +96,7 @@ class TestTransform:
         data."""
         # Arrange
         X_target, X_source = sample_data
-        model = SubspaceAlignement().fit(X_target, X_source=X_source)
+        model = Subspaceaslignment().fit(X_target, X_source=X_source)
 
         # Act
         X_transformed = model.transform(X_target)
@@ -115,7 +110,7 @@ class TestTransform:
         """Verifies that calling transform before fit raises NotFittedError."""
         # Arrange
         X_target, _ = sample_data
-        model = SubspaceAlignement()
+        model = Subspaceaslignment()
 
         # Act & Assert
         with pytest.raises(NotFittedError):
@@ -129,7 +124,7 @@ class TestTransform:
         X_source_original = X_source.copy()
 
         # Act
-        model = SubspaceAlignement().fit(X_target, X_source=X_source)
+        model = Subspaceaslignment().fit(X_target, X_source=X_source)
         model.transform(X_target)
 
         # Assert
@@ -149,8 +144,6 @@ class TestNumericalCorrectness:
 
         This is a golden/snapshot test with hardcoded expected output.
         If this test fails after code changes, verify the change is intentional.
-        Reference output generated with with_mean=True, with_std=False
-        (current defaults)
         """
         # Arrange - Fixed data (do not change!)
         rng = np.random.default_rng(123)
@@ -160,34 +153,42 @@ class TestNumericalCorrectness:
 
         # Expected reference output (generated with with_mean=True, with_std=False)
         expected_output = np.array(
-            [[ 0.42496044,
-            -0.27328656,
-            0.97811483,
-            0.32371867,
-            -0.15827008,
-            0.31078968,
-            0.27923039,
-            -0.59861651],
-            [1.37732014,
-            0.87882016,
-            0.60471303,
-            -1.63905586,
-            0.82340457,
-            0.39435677,
-            1.56047534,
-            0.09773151],
-            [1.5468466,
-            -1.47909193,
-            -0.64075961,
-            -1.09483044,
-            0.20015182,
-            0.46108194,
-            1.91553028,
-            0.86251811]]
+            [
+                [
+                    0.42496044,
+                    -0.27328656,
+                    0.97811483,
+                    0.32371867,
+                    -0.15827008,
+                    0.31078968,
+                    0.27923039,
+                    -0.59861651,
+                ],
+                [
+                    1.37732014,
+                    0.87882016,
+                    0.60471303,
+                    -1.63905586,
+                    0.82340457,
+                    0.39435677,
+                    1.56047534,
+                    0.09773151,
+                ],
+                [
+                    1.5468466,
+                    -1.47909193,
+                    -0.64075961,
+                    -1.09483044,
+                    0.20015182,
+                    0.46108194,
+                    1.91553028,
+                    0.86251811,
+                ],
+            ]
         )
 
         # Act
-        model = SubspaceAlignement()
+        model = Subspaceaslignment()
 
         model.fit(X_target, X_source=X_source)
         output = model.transform(X_test)
@@ -202,7 +203,7 @@ class TestNumericalCorrectness:
         X_target = rng.normal(size=(20, 8))
         X_source = X_target * 2.0 + rng.normal(0, 0.1, size=(20, 8))
 
-        model = SubspaceAlignement()
+        model = Subspaceaslignment()
         model.fit(X_target, X_source=X_source)
 
         # Act
@@ -224,26 +225,26 @@ class TestNumericalCorrectness:
         X_test = rng.normal(size=(10, 12))
 
         # Act - Fit and transform twice
-        model1 = SubspaceAlignement(n_components=2)
+        model1 = Subspaceaslignment(n_components=2)
         model1.fit(X_target, X_source=X_source)
         result1 = model1.transform(X_test)
 
-        model2 = SubspaceAlignement(n_components=2)
+        model2 = Subspaceaslignment(n_components=2)
         model2.fit(X_target, X_source=X_source)
         result2 = model2.transform(X_test)
 
         # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
-        self.components_X_ = None
-        self.components_X_source_ = None
-        self.x_source_provided_ = False
-        self.X_mean_ = None
-        self.X_std_ = None
-        self.X_source_mean_ = None
-        self.X_source_std_ = None
-        for i in ["components_X_","components_X_source_","x_source_provided_",
-            "X_mean_","X_std_","X_source_mean_","X_source_std_"]:
-            np.testing.assert_array_equal(getattr(model1,i), getattr(model2,i))
+        for i in [
+            "components_X_",
+            "components_X_source_",
+            "x_source_provided_",
+            "X_mean_",
+            "X_std_",
+            "X_source_mean_",
+            "X_source_std_",
+        ]:
+            np.testing.assert_array_equal(getattr(model1, i), getattr(model2, i))
 
     def test_n_components_exceeds_n_samples(self):
         """Verifies n_components > n_samples - 1 raises ValueError."""
@@ -254,7 +255,7 @@ class TestNumericalCorrectness:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            model = SubspaceAlignement(n_components=40)
+            model = Subspaceaslignment(n_components=40)
             model.fit(X_target, X_source=X_source)
 
     def test_n_components_exceeds_n_features(self):
@@ -266,60 +267,12 @@ class TestNumericalCorrectness:
 
         # Act & Assert
         with pytest.raises(ValueError):
-            model = SubspaceAlignement(n_components=17)
+            model = Subspaceaslignment(n_components=17)
             model.fit(X_target, X_source=X_source)
 
 
 class TestEdgeCases:
     """Tests for edge cases and special scenarios."""
-
-#     def test_constant_target_feature_warns(self):
-#         """Verifies a warning is raised when X (target) has a constant feature
-#         and with_std=True."""
-#         # Arrange
-#         rng = np.random.default_rng(17)
-#         X_target = rng.normal(size=(20, 5))
-#         X_target[:, 2] = 3.0  # make feature 2 constant
-#         X_source = rng.normal(size=(20, 5))
-
-#         # Act & Assert
-#         with pytest.warns(UserWarning, match="X \\(target\\) has 1 constant feature"):
-#             SubspaceAlignement(with_std=True).fit(X_target, X_source=X_source)
-
-#     def test_constant_source_feature_warns(self):
-#         """Verifies a warning is raised when X_source has a constant feature
-#         and with_std=True."""
-#         # Arrange
-#         rng = np.random.default_rng(17)
-#         X_target = rng.normal(size=(20, 5))
-#         X_source = rng.normal(size=(20, 5))
-#         X_source[:, 0] = 0.0  # make feature 0 constant
-
-#         # Act & Assert
-#         with pytest.warns(UserWarning, match="X_source has 1 constant feature"):
-#             SubspaceAlignement(with_std=True).fit(X_target, X_source=X_source)
-
-#     def test_constant_feature_std_clamped_to_one(self):
-#         """Verifies that the stored std for constant features is 1, not 0."""
-#         # Arrange
-#         rng = np.random.default_rng(17)
-#         X_target = rng.normal(size=(20, 5))
-#         X_target[:, 1] = 7.0
-#         X_source = rng.normal(size=(20, 5))
-#         X_source[:, 3] = -2.0
-
-#         # Act
-#         with pytest.warns(UserWarning):
-#             model = SubspaceAlignement(with_std=True).fit(
-#                 X_target, X_source=X_source
-#             )
-
-#         # Assert - constant features must have std == 1, not 0
-#         assert model.X_target_std_[1] == 1.0
-#         assert model.X_source_std_[3] == 1.0
-#         # Non-constant features must retain their real std
-#         assert model.X_target_std_[0] != 1.0
-#         assert model.X_source_std_[0] != 1.0
 
     def test_identity_transformation_when_X_source_is_none(self):
         """Verifies that fitting with X_source=None results in identity
@@ -327,7 +280,7 @@ class TestEdgeCases:
         # Arrange
         rng = np.random.default_rng(17)
         X = rng.normal(size=(50, 10))
-        model = SubspaceAlignement()
+        model = Subspaceaslignment()
 
         # Act - fit with X_source=None should trigger identity transformation
         with pytest.warns(UserWarning, match="identity transformation"):
@@ -359,7 +312,7 @@ class TestPipeline:
                     ("scaler", SavitzkyGolay()),
                     (
                         "model",
-                        SubspaceAlignement().set_fit_request(X_source=True),
+                        Subspaceaslignment().set_fit_request(X_source=True),
                     ),
                     ("pls", PLSRegression()),
                 ]

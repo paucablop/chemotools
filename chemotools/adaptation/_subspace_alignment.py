@@ -1,6 +1,6 @@
 """
-The :mod: `chemotools.adaptation._subspace_alignement`
-module implements the Subspace Alignement (SA) transformer
+The :mod: `chemotools.adaptation._subspace_alignment`
+module implements the Subspace aslignment (SA) transformer
 """
 
 # Authors: Ruggero Guerrini
@@ -21,11 +21,11 @@ from sklearn.utils.validation import (
 from chemotools._doc_mixin import DocLinkMixin
 
 
-class SubspaceAlignement(
+class Subspaceaslignment(
     DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
     """
-    Subspace Alignement (SA) is a transformer used for domain adaptation (calibration
+    Subspace aslignment (SA) is a transformer used for domain adaptation (calibration
     ) applications. [..], following the
     implementation by [1]_.
 
@@ -38,6 +38,14 @@ class SubspaceAlignement(
     x_source_provided_ : bool
         Boolean value to flag if X_source was provided during fitting
 
+    n_features_in_: int
+    components_X: np.ndarray | None
+    components_X_source: np.ndarray | None
+    x_source_provided_: bool
+    X_mean_: np.ndarray | None
+    X_std_: np.ndarray | None
+    X_source_mean_: np.ndarray | None
+    X_source_std_: np.ndarray | None
     Raises
     ------
     ValueError
@@ -51,38 +59,39 @@ class SubspaceAlignement(
     ----------
     .. [1] B. Fernando, A. Habrard, M. Sebban, and T. Tuytelaars,
         “Unsupervised Visual Domain Adaptation Using Subspace Alignment,”
-        in Proceedings of the IEEE International Conference on Computer 
+        in Proceedings of the IEEE International Conference on Computer
         Vision (ICCV), 2013, pp. 2960–2967
 
     Examples
     --------
     **Basic usage**
     >>> import numpy as np
-    >>> from chemotools.adaptation import SubspaceAlignement
+    >>> from chemotools.adaptation import Subspaceaslignment
     >>>
     >>> rng = np.random.default_rng(17)
     >>> X_source = rng.normal(size=(100, 20))
     >>> X_target = X_source * 2 - rng.normal(size=(100, 20)) * 0.02
     >>>
-    >>> ds = SubspaceAlignement().fit(X_target, X_source=X_source)
+    >>> ds = Subspaceaslignment().fit(X_target, X_source=X_source)
     >>> X_transf = ds.transform(X_target)
 
     """
 
-    # Fitted attributes (set during fit, typed for type checkers)
+    _parameter_constraints: dict = {
+        "n_components": [Interval(Integral, 1, None, closed="left")],
+        "scale": ["boolean"],
+    }
+
+    # Fitted attributes
     n_features_in_: int
-    components_X : np.ndarray | None
-    components_X_source : np.ndarray | None
+    components_X: np.ndarray | None
+    components_X_source: np.ndarray | None
     x_source_provided_: bool
     X_mean_: np.ndarray | None
     X_std_: np.ndarray | None
     X_source_mean_: np.ndarray | None
     X_source_std_: np.ndarray | None
 
-    _parameter_constraints: dict = {
-        "n_components": [Interval(Integral, 1, None, closed="left")],
-        "scale": ["boolean"],
-    }
     def __init__(
         self,
         n_components: int = 4,
@@ -93,7 +102,7 @@ class SubspaceAlignement(
 
     def fit(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
-    ) -> "SubspaceAlignement":
+    ) -> "Subspaceaslignment":
         """
         Fit the Direct Standardization model.
 
@@ -148,16 +157,22 @@ class SubspaceAlignement(
         self.X_std_ = X.std(axis=0)
         self.X_source_mean_ = X_source.mean(axis=0)
         self.X_source_std_ = X_source.std(axis=0)
-        if self.scale == True:
-            X_scaled = (X - self.X_mean_)/self.X_std_
-            X_source_scaled = (X_source - self.X_source_mean_)/self.X_source_std_
-        else: 
+        if self.scale:
+            X_scaled = (X - self.X_mean_) / self.X_std_
+            X_source_scaled = (X_source - self.X_source_mean_) / self.X_source_std_
+        else:
             X_scaled = X.copy()
             X_source_scaled = X_source.copy()
-            
-        self.components_X_ = PCA(n_components=self.n_components).fit(X_scaled).components_
-        self.components_X_source_ = PCA(n_components=self.n_components).fit(X_source_scaled).components_
-        self.A_ = self.components_X_.T @ self.components_X_ @ self.components_X_source_.T
+
+        self.components_X_ = (
+            PCA(n_components=self.n_components).fit(X_scaled).components_
+        )
+        self.components_X_source_ = (
+            PCA(n_components=self.n_components).fit(X_source_scaled).components_
+        )
+        self.A_ = (
+            self.components_X_.T @ self.components_X_ @ self.components_X_source_.T
+        )
 
         self.x_source_provided_ = True
 
