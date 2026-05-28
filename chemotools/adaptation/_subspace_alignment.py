@@ -25,55 +25,83 @@ class Subspaceaslignment(
     DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator
 ):
     """
-    Subspace aslignment (SA) is a transformer used for domain adaptation (calibration
-    ) applications. [..], following the
-    implementation by [1]_.
+    Subspace Alignment (SA) is an unsupervised domain adaptation transformer
+    hat aligns the principal subspaces of source and target feature
+    distributions, without requiring any target labels.
+
+    SA is a linear transformation method used to transfer spectral data from
+    a target domain to a source (reference) domain, allowing calibration
+    models to remain valid across different instruments or acquisition
+    conditions, following the implementation by [1]_.
+
+    Parameters
+    ----------
+    n_components : int, default=4
+        Number of principal components retained by PCA for each domain.
+
+    scale : bool, default=False
+        If True, centre and scale each domain's data by its mean and standard
+        deviation before computing the PCA subspaces.
 
     Attributes
     ----------
-    T_ : np.ndarray of shape (n_features, n_features)
-        Linear transformation matrix mapping target instrument space to source
-        instrument space.
+    n_features_in_ : int
+        Number of features seen during :meth:`fit`.
+
+    components_X_ : np.ndarray of shape (n_components, n_features), or None
+        PCA components of the target domain ``X``.
+
+    components_X_source_ : np.ndarray of shape (n_components, n_features), or None
+        PCA components of the source domain ``X_source``.
+
+    A_ : np.ndarray of shape (n_features, n_components), or None
+        Alignment matrix.
+
+    X_mean_ : np.ndarray of shape (n_features,), or None
+        Mean of the target domain data ``X``. 
+
+    X_std_ : np.ndarray of shape (n_features,), or None
+        Standard deviation of the target domain data ``X``.
+
+    X_source_mean_ : np.ndarray of shape (n_features,), or None
+        Mean of the source domain data ``X_source``
+
+    X_source_std_ : np.ndarray of shape (n_features,), or None
+        Standard deviation of the source domain data ``X_source``.
 
     x_source_provided_ : bool
-        Boolean value to flag if X_source was provided during fitting
+        Boolean flag indicating if X_source was provided during fitting.
 
-    n_features_in_: int
-    components_X: np.ndarray | None
-    components_X_source: np.ndarray | None
-    x_source_provided_: bool
-    X_mean_: np.ndarray | None
-    X_std_: np.ndarray | None
-    X_source_mean_: np.ndarray | None
-    X_source_std_: np.ndarray | None
     Raises
     ------
     ValueError
-        If X and X_source do not have the same shape.
+        If ``X`` and ``X_source`` do not have the same number of features.
 
     See Also
     --------
-    PiecewiseDirectStandardization : Localized version using windowed PLS regression.
+    DirectStandardization : Supervised calibration transfer via least squares.
+    SpectralSpaceTransform : Subspace-based calibration transfer via SVD.
 
     References
     ----------
     .. [1] B. Fernando, A. Habrard, M. Sebban, and T. Tuytelaars,
-        “Unsupervised Visual Domain Adaptation Using Subspace Alignment,”
+        "Unsupervised Visual Domain Adaptation Using Subspace Alignment,"
         in Proceedings of the IEEE International Conference on Computer
-        Vision (ICCV), 2013, pp. 2960–2967
+        Vision (ICCV), 2013, pp. 2960–2967.
 
     Examples
     --------
     **Basic usage**
+
     >>> import numpy as np
-    >>> from chemotools.adaptation import Subspaceaslignment
+    >>> from chemotools.adaptation import SubspaceAlignment
     >>>
     >>> rng = np.random.default_rng(17)
     >>> X_source = rng.normal(size=(100, 20))
     >>> X_target = X_source * 2 - rng.normal(size=(100, 20)) * 0.02
     >>>
-    >>> ds = Subspaceaslignment().fit(X_target, X_source=X_source)
-    >>> X_transf = ds.transform(X_target)
+    >>> sa = SubspaceAlignment(n_components=5).fit(X_target, X_source=X_source)
+    >>> X_transf = sa.transform(X_target)
 
     """
 
@@ -104,7 +132,7 @@ class Subspaceaslignment(
         self, X: np.ndarray, y=None, *, X_source: np.ndarray | None = None
     ) -> "Subspaceaslignment":
         """
-        Fit the Direct Standardization model.
+        Fit the Subspace Alignment model.
 
         Parameters
         ----------
@@ -120,7 +148,8 @@ class Subspaceaslignment(
 
         Returns
         -------
-        self : DirectStandardization
+        self : SubspaceAlignment
+            Fitted estimator.
         """
         # Validate the input parameters
         self._validate_params()
@@ -180,18 +209,17 @@ class Subspaceaslignment(
 
     def transform(self, X) -> np.ndarray:
         """
-        Transform the data from the target space to the source space using the map
-        ``self.T_``.
+        Use the trained model to transform the target data
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            The input data to transform
+            Input data to transform
 
         Returns
         -------
-        X_transf : np.ndarray of shape (n_samples, n_features)
-            The data transformed
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            Data transformed
         """
         # Check that the estimator is fitted
 

@@ -23,7 +23,7 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
     that aligns the second-order statistics (covariance) of source and target feature
     distributions, without requiring any target labels.
 
-    SST is a linear transformation method used to transfer spectral data from
+    CORAL is a linear transformation method used to transfer spectral data from
     a target domain to a source (reference) domain, allowing calibration
     models to remain valid across different instruments or acquisition
     conditions, following the implementation by [1]_.
@@ -44,38 +44,35 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
         Number of features seen during :meth:`fit`.
 
     A_ : np.ndarray of shape (n_features, n_features)
-        The full CORAL linear transformation matrix such that
-        ``X_adapted = X_source @ A_``.
+        The full CORAL linear transformation matrix.
 
-    CS_ : np.ndarray of shape (n_features, n_features)
-        Regularised covariance matrix of the source domain computed during
-        :meth:`fit`.
+    C_X_ : np.ndarray of shape (n_features, n_features)
+        Regularised covariance matrix of the target domain ``X``.
 
-    CT_ : np.ndarray of shape (n_features, n_features)
-        Regularised covariance matrix of the target domain computed during
-        :meth:`fit`.
+    C_X_source_ : np.ndarray of shape (n_features, n_features)
+        Regularised covariance matrix of the source domain ``X_source``.
 
-    X_mean_: np.ndarray of shape (n_samples, n_features)
-        bla
+    C_X_inv_sqrt_ : np.ndarray of shape (n_features, n_features)
+        Inverse square root of ``C_X_``.
 
-    X_centered_: np.ndarray of shape (n_samples, n_features)
-        bla
+    C_X_source_sqrt_ : np.ndarray of shape (n_features, n_features)
+        Square root of ``C_X_source_``.
 
-    X_source_mean_: np.ndarray of shape (n_samples, n_features)
-        bla
+    X_mean_ : np.ndarray of shape (n_features,)
+        Mean of the target domain data ``X``.
 
-    X_source_centered_: np.ndarray of shape (n_samples, n_features)
-        bla
+    X_centered_ : np.ndarray of shape (n_samples, n_features)
+        Target domain data ``X`` centred by subtracting ``X_mean_``.
 
-    CS_inv_sqrt_ : np.ndarray of shape (n_features, n_features)
+    X_source_mean_ : np.ndarray of shape (n_features,)
+        Mean of the source domain data ``X_source``.
 
-
-    CS_inv_sqrt_ : np.ndarray of shape (n_features, n_features)
-        bla
+    X_source_centered_ : np.ndarray of shape (n_samples_source, n_features)
+        Source domain data ``X_source`` centred by subtracting
+        ``X_source_mean_``.
 
     x_source_provided_ : bool
-        ``True`` when ``X_source`` was supplied to :meth:`fit`.  ``False``
-        triggers an identity transformation (no adaptation).
+        Boolean flag indicating if X_source was provided during fitting.
 
     Raises
     ------
@@ -149,20 +146,19 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
         X_source: np.ndarray | None = None,
     ) -> "CORAL":
         """
-        Fit the CORAL model by computing source and target covariance matrices.
+        Fit the CORAL model.
 
         Parameters
         ----------
-        X : np.ndarray of shape (n_samples_source, n_features)
-            Source-domain feature matrix.
+        X : np.ndarray of shape (n_samples, n_features)
+            Data from the target instrument.
 
         y : None
-            Ignored; present only for API compatibility.
+            Ignored to align with API.
 
-        X_source : np.ndarray of shape (n_samples_target, n_features), optional
-            Target-domain feature matrix (unlabelled).  When ``None``, the
-            transformer degenerates to an identity transformation and a warning
-            is emitted.
+        X_source : np.ndarray of shape (n_samples, n_features), optional
+            Data from the source instrument. If None, the transformer defaults to
+            an identity transformation.
 
         Returns
         -------
@@ -186,7 +182,7 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
             self.C_X_source_ = None
             self.C_X_inv_sqrt_ = None
             self.C_X_source_sqrt_ = None
-            self.X_source_provided_ = False
+            self.x_source_provided_ = False
             return self
 
         # Validate X_source as a plain array (do not update n_features_in_)
@@ -235,27 +231,27 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
         # Compute the CORAL transformation:
         self.A_ = self.C_X_inv_sqrt_ @ self.C_X_source_sqrt_
 
-        self.X_source_provided_ = True
+        self.x_source_provided_ = True
         return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:
         """
-        Apply the CORAL transformation to source-domain data.
+        Use the trained model to transform the target data
 
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            Source-domain feature matrix to be adapted.
+            Input data to transform
 
         Returns
         -------
-        X_adapted : np.ndarray of shape (n_samples, n_features)
-            Adapted feature matrix with covariance aligned to the target domain.
+        X_transformed : np.ndarray of shape (n_samples, n_features)
+            Data transformed
         """
         check_is_fitted(self)
 
         X = validate_data(self, X, ensure_2d=True, reset=False, dtype=np.float64)
-        if not self.X_source_provided_:
+        if not self.x_source_provided_:
             return X
 
         assert self.X_mean_ is not None
@@ -266,7 +262,7 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
         assert self.C_X_source_ is not None
         assert self.C_X_inv_sqrt_ is not None
         assert self.C_X_source_sqrt_ is not None
-        assert self.X_source_provided_ is not False
+        assert self.x_source_provided_ is not False
 
         X_centered = X - self.X_mean_
         X_adapted = X_centered @ self.A_
