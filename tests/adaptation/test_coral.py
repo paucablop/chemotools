@@ -63,7 +63,7 @@ class TestAttributes:
             assert getattr(model, i).shape[1] == X_target.shape[1]
             assert getattr(model, i).shape[0] == X_source.shape[1]
             assert getattr(model, i).shape[1] == X_source.shape[1]
-        assert hasattr(model, "X_source_provided_")
+        assert hasattr(model, "x_source_provided_")
 
     def test_fit_sets_attributes_with_params(self, sample_data):
         """Verifies that fit stores the required fitted attributes with
@@ -91,7 +91,7 @@ class TestAttributes:
             assert getattr(model, i).shape[1] == X_target.shape[1]
             assert getattr(model, i).shape[0] == X_source.shape[1]
             assert getattr(model, i).shape[1] == X_source.shape[1]
-        assert hasattr(model, "X_source_provided_")
+        assert hasattr(model, "x_source_provided_")
 
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different
@@ -308,8 +308,8 @@ class TestEdgeCases:
 
         # Assert - should return X unchanged
         np.testing.assert_array_equal(X_transformed, X)
-        assert hasattr(model, "X_source_provided_")
-        assert model.X_source_provided_ is False
+        assert hasattr(model, "x_source_provided_")
+        assert model.x_source_provided_ is False
 
 
 class TestPipeline:
