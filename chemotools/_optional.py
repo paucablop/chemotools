@@ -7,7 +7,7 @@ checking and importing packages that are not listed in the core
 
 from __future__ import annotations
 
-from importlib import import_module
+import importlib
 from types import ModuleType
 
 
@@ -43,7 +43,7 @@ def import_optional_dependency(
         When *package_name* cannot be imported.
     """
     try:
-        return import_module(package_name)
+        return importlib.import_module(package_name)
     except (ModuleNotFoundError, ImportError) as exc:
         # Only intercept errors that originate from *this* package.
         if (
