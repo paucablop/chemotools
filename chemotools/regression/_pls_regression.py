@@ -201,7 +201,13 @@ class PLSRegression(_SklearnPLSRegression):
 
         return self
 
-    def transform(self, X: np.ndarray, y: np.ndarray | None = None, copy: bool = True):
+    def transform(
+        self,
+        X: np.ndarray,
+        y: np.ndarray | None = None,
+        copy: bool = True,
+        return_y: bool = False,
+    ) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
         """Apply dimensionality reduction to X.
 
         Projects X onto the latent components found during fitting.
@@ -214,13 +220,44 @@ class PLSRegression(_SklearnPLSRegression):
             Target vectors. Only used to transform Y when provided.
         copy : bool, default=True
             Whether to copy X and Y, or perform in-place normalization.
+        return_y : bool, default=False
+            Whether to return transformed Y (Y-scores) along with X-scores.
 
         Returns
         -------
         X_scores : ndarray of shape (n_samples, n_components)
             X transformed into the latent space (X-scores).
+        Y_scores : ndarray of shape (n_samples, n_components), optional
+            Y transformed into the latent space (Y-scores), returned if `return_y=True`.
         """
-        return super().transform(X, y=y, copy=copy)
+        if return_y:
+            return super().transform(X, y=y, copy=copy)
+        else:
+            return super().transform(X, copy=copy)
+
+    def get_feature_names_out(
+        self, input_features: list[str] | None = None
+    ) -> np.ndarray:
+        """Return the feature names for the transformed data.
+
+        This returns a list [LV1, LV2, ..., LV{n_components}] of feature names.
+
+        This functions is used when the sklearn
+        .set_output("pandas")/set_config(transform_output="pandas")
+        feature is used.
+
+        Parameters
+        ----------
+        input_features : list of str, optional
+            Input feature names. Ignored in this implementation since output features
+            are fixed. Used for compatibility with sklearn's API.
+
+        Returns
+        -------
+        np.ndarray of shape (n_components,)
+            - Latent variable names
+        """
+        return np.asarray([f"LV{i + 1}" for i in range(self.n_components)])
 
     def _calculate_explained_variance_deflation(
         self, X, y
