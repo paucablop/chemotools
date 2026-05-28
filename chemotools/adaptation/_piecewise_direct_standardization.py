@@ -80,6 +80,9 @@ class PiecewiseDirectStandardization(
     See Also
     --------
     DirectStandardization : Global linear transformation without local windows.
+    SpectralSpaceTransform : Linear alignment via SVD of the source-target matrix.
+    CORrelationALignment : Unsupervised alignment via covariance matrix whitening.
+    SubspaceAlignment : Unsupervised alignment via PCA subspace projection.
 
     References
     ----------

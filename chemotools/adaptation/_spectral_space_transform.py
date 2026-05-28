@@ -119,6 +119,9 @@ class SpectralSpaceTransform(
     --------
     PiecewiseDirectStandardization : Local standardization using moving windows.
     DirectStandardization : Global linear transformation without local windows.
+    CORrelationALignment : Unsupervised alignment via covariance matrix whitening.
+    SubspaceAlignment : Unsupervised alignment via PCA subspace projection.
+
 
     References
     ----------

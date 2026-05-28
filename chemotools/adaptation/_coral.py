@@ -81,8 +81,10 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
 
     See Also
     --------
-    DirectStandardization : Supervised calibration transfer via least squares.
-    SpectralSpaceTransform : Subspace-based calibration transfer via SVD.
+    PiecewiseDirectStandardization : Local standardization using moving windows.
+    DirectStandardization : Global linear transformation without local windows.
+    SpectralSpaceTransform : Linear alignment via SVD of the source-target matrix.
+    SubspaceAlignment : Unsupervised alignment via PCA subspace projection.
 
     References
     ----------
