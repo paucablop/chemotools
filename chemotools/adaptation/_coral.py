@@ -187,18 +187,17 @@ class CORAL(DocLinkMixin, OneToOneFeatureMixin, TransformerMixin, BaseEstimator)
             self.x_source_provided_ = False
             return self
 
-        # Validate X_source as a plain array (do not update n_features_in_)
-        X_source = np.asarray(X_source, dtype=np.float64)
-        if X_source.ndim != 2:
-            raise ValueError(
-                f"X_source must be a 2D array, got {X_source.ndim}D array."
-            )
-        if X_source.shape[1] != X.shape[1]:
-            raise ValueError(
-                f"X and X_source must have the same number of features, "
-                f"got X={X.shape[1]} and X_source={X_source.shape[1]}."
-            )
+        # Validate X_source
+        X_source = validate_data(
+            self, X_source, ensure_2d=True, reset=False, dtype=np.float64
+        )
 
+        if X.shape[0] < 2:
+            raise ValueError(f"X must have at least 2 samples, got {X.shape[0]}.")
+        if X_source.shape[0] < 2:
+            raise ValueError(
+                f"X_source must have at least 2 samples, got {X_source.shape[0]}."
+            )
         # Center the data
         self.X_mean_ = X.mean(axis=0)
         self.X_centered_ = X - self.X_mean_

@@ -105,6 +105,16 @@ class TestAttributes:
             model.fit(X_target, X_source=X_source[:, :-1])
 
 
+class TestFit:
+    """Test for the fit method behavior."""
+
+    def test_coral_raises_if_single_sample(self):
+        X = np.array([[1.0, 2.0]])
+        X_source = np.array([[3.0, 4.0]])
+        with pytest.raises(ValueError, match="at least 2 samples"):
+            CORAL().fit(X, X_source=X_source)
+
+
 class TestFeaturesMismatch:
     """Test for features mismatch."""
 
@@ -114,7 +124,7 @@ class TestFeaturesMismatch:
 
         model = CORAL()
 
-        with pytest.raises(ValueError, match="same number of features"):
+        with pytest.raises(ValueError, match="features"):
             model.fit(X_target, X_source=X_source[:, :-1])
 
 

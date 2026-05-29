@@ -1,6 +1,6 @@
 """
 The :mod: `chemotools.adaptation._subspace_alignment`
-module implements the Subspace aslignment (SA) transformer
+module implements the Subspace alignment (SA) transformer
 """
 
 # Authors: Ruggero Guerrini
@@ -26,7 +26,7 @@ class SubspaceAlignment(
 ):
     """
     Subspace Alignment (SA) is an unsupervised domain adaptation transformer
-    hat aligns the principal subspaces of source and target feature
+    that aligns the principal subspaces of source and target feature
     distributions, without requiring any target labels.
 
     SA is a linear transformation method used to transfer spectral data from
@@ -178,16 +178,14 @@ class SubspaceAlignment(
             self, X_source, ensure_2d=True, reset=False, dtype=np.float64
         )
 
-        # Check consistency between X and X_source
-        # if X_source.shape != X.shape:
-        #     raise ValueError(
-        #         f"X and X_source must have the same shape, "
-        #         f"got X={X.shape} and X_source={X_source.shape}."
-        #     )
         self.X_mean_ = X.mean(axis=0)
-        self.X_std_ = X.std(axis=0)
         self.X_source_mean_ = X_source.mean(axis=0)
-        self.X_source_std_ = X_source.std(axis=0)
+        # If scale=True, zero-variance features would cause division by zero.
+        # Replace std=0 with 1.0 to leave constant features unchanged.
+        self.X_std_ = np.where(X.std(axis=0) == 0, 1.0, X.std(axis=0))
+        self.X_source_std_ = np.where(
+            X_source.std(axis=0) == 0, 1.0, X_source.std(axis=0)
+        )
         if self.scale:
             X_scaled = (X - self.X_mean_) / self.X_std_
             X_source_scaled = (X_source - self.X_source_mean_) / self.X_source_std_
