@@ -10,7 +10,6 @@ from numbers import Integral
 from typing import Literal
 
 import numpy as np
-from joblib import Parallel, delayed, effective_n_jobs
 from scipy.ndimage import median_filter
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.utils._param_validation import Interval, StrOptions
@@ -22,6 +21,7 @@ from chemotools._deprecation import (
     resolve_renamed_parameter,
 )
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools._parallel import parallel_apply_by_rows
 
 
 class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -188,40 +188,13 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             dtype=np.float64,
         )
 
-        # Median filter the data
-        if self.n_jobs == 1:
-            return median_filter(
-                X_, size=self.window_length_, mode=self.mode, axes=(1,)
-            )
-
-        # Parallelize across samples (rows)
-        n_effective_jobs = effective_n_jobs(self.n_jobs)
-        if n_effective_jobs <= 1 or X_.shape[0] < 2:
-            return median_filter(
-                X_, size=self.window_length_, mode=self.mode, axes=(1,)
-            )
-
-        n_samples = X_.shape[0]
-        chunk_size = max(1, (n_samples + n_effective_jobs - 1) // n_effective_jobs)
-        chunks = [
-            X_[start : start + chunk_size] for start in range(0, n_samples, chunk_size)
-        ]
-
-        filtered_chunks = Parallel(n_jobs=self.n_jobs, prefer="threads")(
-            delayed(median_filter)(
-                chunk,
-                size=self.window_length_,
-                mode=self.mode,
-                axes=(1,),
-            )
-            for chunk in chunks
+        X_transformed = parallel_apply_by_rows(
+            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
         )
 
-        X_out = np.empty_like(X_)
-        start = 0
-        for filtered_chunk in filtered_chunks:
-            stop = start + filtered_chunk.shape[0]
-            X_out[start:stop] = filtered_chunk
-            start = stop
+        return X_transformed
 
-        return X_out
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        return median_filter(
+            X_block, size=self.window_length_, mode=self.mode, axes=(1,)
+        )
