@@ -116,6 +116,47 @@ def test_median_filter_invalid_n_jobs_zero():
         mf.fit(X)
 
 
+def test_median_filter_even_window_length_rejected():
+    # Arrange
+    X = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]], dtype=np.float64)
+    mf = MedianFilter(window_length=4)
+
+    # Act
+    with pytest.raises(ValueError, match="odd"):
+        mf.fit(X)
+
+
+@pytest.mark.parametrize("mode", ["grid-constant", "grid-mirror", "grid-wrap"])
+def test_median_filter_grid_mode_aliases(mode):
+    # Arrange
+    X = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]], dtype=np.float64)
+    mf = MedianFilter(window_length=3, mode=mode)
+
+    # Act
+    y = mf.fit_transform(X)
+
+    # Assert
+    assert y.shape == X.shape
+
+
+def test_median_filter_legacy_state_without_n_jobs():
+    # Arrange
+    legacy = MedianFilter(window_length=3, mode="nearest")
+    legacy_state = {
+        "window_length": legacy.window_length,
+        "window_size": legacy.window_size,
+        "mode": legacy.mode,
+    }
+    restored = MedianFilter()
+
+    # Act
+    restored.__setstate__(legacy_state)
+
+    # Assert
+    assert restored.n_jobs == 1
+    assert restored.get_params(deep=False)["n_jobs"] == 1
+
+
 # --- Deprecation tests ---
 def test_median_filter_window_size_deprecated():
     """Using the old `window_size` parameter emits a FutureWarning."""

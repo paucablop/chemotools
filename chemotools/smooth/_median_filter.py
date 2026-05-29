@@ -35,7 +35,8 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
 
     mode : str, optional, default="nearest"
         The mode to use for the median filter. Can be "nearest", "constant", "reflect",
-        "wrap", "mirror" or "interp". Default is "nearest".
+        "wrap", "mirror", "grid-constant", "grid-mirror" or "grid-wrap".
+        Default is "nearest".
 
     n_jobs : int, optional, default=1
         Number of parallel jobs used to process samples independently.
@@ -65,13 +66,27 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     _parameter_constraints: dict = {
         "window_length": [Interval(Integral, 3, None, closed="left")],
         "mode": [
-            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
+            StrOptions(
+                {
+                    "nearest",
+                    "constant",
+                    "reflect",
+                    "wrap",
+                    "mirror",
+                    "grid-constant",
+                    "grid-mirror",
+                    "grid-wrap",
+                }
+            )
         ],
         "window_size": [
             Interval(Integral, 3, None, closed="left"),
             deprecated_parameter_constraint(),
         ],
-        "n_jobs": [Interval(Integral, -1, None, closed="left")],
+        "n_jobs": [
+            Interval(Integral, None, -1, closed="right"),
+            Interval(Integral, 1, None, closed="left"),
+        ],
     }
 
     def __init__(
@@ -94,6 +109,12 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
         self.window_size = window_size
         self.mode = mode
         self.n_jobs = n_jobs
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore state while keeping backward compatibility with old pickles."""
+        super().__setstate__(state)
+        if "n_jobs" not in self.__dict__:
+            self.n_jobs = 1
 
     def fit(self, X: np.ndarray, y=None) -> "MedianFilter":
         """
@@ -127,6 +148,9 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             old_name="window_size",
             old_value=self.window_size,
         )
+
+        if self.window_length_ % 2 == 0:
+            raise ValueError("window_length must be odd")
 
         if self.n_jobs == 0:
             raise ValueError("n_jobs must be different from 0")
@@ -192,4 +216,12 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             )
             for chunk in chunks
         )
-        return np.concatenate(filtered_chunks, axis=0)
+
+        X_out = np.empty_like(X_)
+        start = 0
+        for filtered_chunk in filtered_chunks:
+            stop = start + filtered_chunk.shape[0]
+            X_out[start:stop] = filtered_chunk
+            start = stop
+
+        return X_out
