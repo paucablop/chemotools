@@ -2,11 +2,10 @@
 # License: MIT
 
 from abc import abstractmethod
-from typing import Callable, Optional
 
 import numpy as np
 
-from chemotools.utils._linear_algebra import whittaker_solver_dispatch
+from chemotools.utils._whittaker_solvers import WhittakerSolver
 
 
 class _BaselineWhittakerMixin:
@@ -28,8 +27,8 @@ class _BaselineWhittakerMixin:
     Subclasses must provide:
     - a `_calculate_baseline(x, w, max_iter, solver)` method
       returning (baseline, weights).
-    - a `_solve_whittaker(x, w, solver)` method (provided by
-      `_BaseWhittaker`).
+    - a ``solver_`` fitted attribute (a :class:`WhittakerSolver` instance,
+      set by ``_BaseWhittaker.fit``).
     - a `w_init_` attribute set during fit (typically from
       `_compute_warmstart_weights`).
 
@@ -60,7 +59,7 @@ class _BaselineWhittakerMixin:
     def _compute_warmstart_weights(
         self,
         X: np.ndarray,
-        solver: Optional[Callable] = whittaker_solver_dispatch,
+        solver: WhittakerSolver,
     ) -> np.ndarray:
         """Compute initial weights from the first spectrum.
 
@@ -90,7 +89,7 @@ class _BaselineWhittakerMixin:
     def _apply_baseline_correction(
         self,
         X: np.ndarray,
-        solver: Optional[Callable] = whittaker_solver_dispatch,
+        solver: WhittakerSolver,
     ) -> np.ndarray:
         """Apply baseline correction to all spectra using warm-start weights.
 
@@ -106,6 +105,7 @@ class _BaselineWhittakerMixin:
         X : np.ndarray of shape (n_samples, n_features)
             Baseline-corrected spectra.
         """
+        X_out = np.empty_like(X)
         for i, x in enumerate(X):
             z, _ = self._calculate_baseline(
                 x,
@@ -113,12 +113,12 @@ class _BaselineWhittakerMixin:
                 max_iter=min(self.nr_iterations, self.max_iter_after_warmstart),
                 solver=solver,
             )
-            X[i] = x - z
-        return X
+            X_out[i] = x - z
+        return X_out
 
     @abstractmethod
     def _calculate_baseline(
-        self, x: np.ndarray, w: np.ndarray, max_iter: int, solver: Optional[Callable]
+        self, x: np.ndarray, w: np.ndarray, max_iter: int, solver: WhittakerSolver
     ) -> tuple[np.ndarray, np.ndarray]:
         """Subclasses must implement algorithm-specific baseline estimation."""
         ...

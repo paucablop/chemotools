@@ -7,12 +7,13 @@ Adaptive Iteratively Reweighted Penalized Least Squares
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-from typing import Callable, Literal, Optional
+from typing import Literal
 
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
 from chemotools.smooth._base import _BaseWhittaker
+from chemotools.utils._whittaker_solvers import WhittakerSolver
 
 from ._base import _BaselineWhittakerMixin
 
@@ -103,8 +104,9 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         nr_iterations: int = 100,
         solver_type: Literal["banded", "sparse"] = "banded",
         max_iter_after_warmstart: int = 20,
+        n_jobs: int = 1,
     ):
-        _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type)
+        _BaseWhittaker.__init__(self, lam=lam, solver_type=solver_type, n_jobs=n_jobs)
         _BaselineWhittakerMixin.__init__(
             self,
             nr_iterations=nr_iterations,
@@ -153,7 +155,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         X: np.ndarray,
         y=None,
         nr_iterations: int = 1,
-        solver: Optional[Callable] = None,
+        solver: WhittakerSolver | None = None,
     ) -> "AirPls":
         """Fit core implementation: compute warm-start weights.
 
@@ -173,38 +175,15 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         self : AirPls
             Fitted instance.
         """
+        assert solver is not None
         self.w_init_ = self._compute_warmstart_weights(X, solver)
         return self
 
-    def _transform_core(
-        self,
-        X: np.ndarray,
-        y=None,
-        nr_iterations: int = 1,
-        solver: Optional[Callable] = None,
-    ) -> np.ndarray:
-        """Transform core implementation: apply baseline correction.
-
-        Parameters
-        ----------
-        X : np.ndarray of shape (n_samples, n_features)
-            Input spectra to correct.
-        y : None
-            Ignored.
-        nr_iterations : int
-            Not used in this implementation.
-        solver : Callable
-            Whittaker solver function.
-
-        Returns
-        -------
-        X_corrected : np.ndarray of shape (n_samples, n_features)
-            Baseline-corrected spectra.
-        """
-        return self._apply_baseline_correction(X, solver)
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        return self._apply_baseline_correction(X_block, self.solver_)
 
     def _calculate_baseline(
-        self, x: np.ndarray, w: np.ndarray, max_iter: int, solver: Optional[Callable]
+        self, x: np.ndarray, w: np.ndarray, max_iter: int, solver
     ) -> tuple[np.ndarray, np.ndarray]:
         """
         Compute AirPls baseline for a single spectrum.
@@ -229,7 +208,7 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
 
         for i in range(max_iter):
             # Step 1: Whittaker smoothing
-            z = self._solve_whittaker(x, w, solver=solver)
+            z = solver.solve(x, w)
 
             # Step 2: Residuals
             d = x - z

@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable, Literal, Optional
+from numbers import Integral
+from typing import TYPE_CHECKING, Literal, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
@@ -22,13 +23,17 @@ from chemotools._deprecation import (
 if TYPE_CHECKING:
     from typing_extensions import Self
 
+from sklearn.utils._param_validation import Interval
+
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools._parallel import parallel_apply_by_rows
 from chemotools.utils._linear_algebra import (
     compute_DtD_banded,
     compute_DtD_sparse,
-    whittaker_smooth_banded,
-    whittaker_smooth_sparse,
-    whittaker_solver_dispatch,
+)
+from chemotools.utils._whittaker_solvers import (
+    WhittakerSolver,
+    whittaker_solver_factory,
 )
 
 logger = logging.getLogger(__name__)
@@ -41,31 +46,47 @@ class _BaseWhittaker(
 
     This implements the sklearn boilerplate (validation, fitted checks)
     and delegates algorithm-specific behavior to subclasses via
-    `_fit_core` and `_transform_core`.
+    `_fit_core` and `_transform_block`.
     """
+
+    _parameter_constraints: dict = {
+        "n_jobs": [
+            Interval(Integral, None, -1, closed="right"),
+            Interval(Integral, 1, None, closed="left"),
+        ],
+    }
 
     def __init__(
         self,
         lam: float = 1e4,
         weights: Optional[np.ndarray] = None,
         solver_type: Literal["banded", "sparse"] = "banded",
+        n_jobs: int = 1,
     ):
         self.lam = lam
         self.weights = weights
         self.solver_type = solver_type
+        self.n_jobs = n_jobs
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore state while keeping backward compatibility with old pickles."""
+        super().__setstate__(state)
+        if "n_jobs" not in self.__dict__:
+            self.n_jobs = 1
 
     def fit(self, X: np.ndarray, y=None) -> Self:
         self._validate_params()
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
         self.DtD_ = self._precompute_DtD(X.shape[1])
-        solver = whittaker_solver_dispatch(self.solver_type)
-        return self._fit_core(X, y, solver=solver)
+        self.solver_ = whittaker_solver_factory(self.solver_type, self.lam, self.DtD_)
+        return self._fit_core(X, y, solver=self.solver_)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
-        check_is_fitted(self, ["DtD_"])
+        check_is_fitted(self, ["DtD_", "solver_"])
         X_ = validate_data(self, X, ensure_2d=True, copy=True, reset=False)
-        solver = whittaker_solver_dispatch(self.solver_type)
-        return self._transform_core(X_, y, solver=solver)
+        return parallel_apply_by_rows(
+            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
+        )
 
     @abstractmethod
     def _fit_core(
@@ -73,20 +94,14 @@ class _BaseWhittaker(
         X: np.ndarray,
         y=None,
         nr_iterations: int = 1,
-        solver: Callable = whittaker_smooth_banded,
+        solver: WhittakerSolver | None = None,
     ) -> Self:
         """Subclasses can extend fitting logic here."""
         ...
 
     @abstractmethod
-    def _transform_core(
-        self,
-        X: np.ndarray,
-        y=None,
-        nr_iterations: int = 1,
-        solver: Callable = whittaker_smooth_banded,
-    ) -> np.ndarray:
-        """Subclasses must override to implement algorithm-specific transform."""
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        """Subclasses must override to implement the per-block transform."""
         ...
 
     def _precompute_DtD(self, n_features: int):
@@ -95,19 +110,6 @@ class _BaseWhittaker(
             if self.solver_type == "banded"
             else compute_DtD_sparse(n_features)
         )
-
-    def _solve_whittaker(
-        self, x: np.ndarray, w: np.ndarray, solver: Optional[Callable]
-    ) -> np.ndarray:
-        """Solve (diag(w) + lam*D^T D) z = w*x."""
-        if solver is None:
-            solver = whittaker_solver_dispatch(self.solver_type)
-        try:
-            return solver(x, w, self.lam, self.DtD_)
-        except Exception as e:
-            logger.debug("Primary solver failed (%s); fallback to sparse LU.", e)
-            DtD = compute_DtD_sparse(len(x))
-            return whittaker_smooth_sparse(x, w, self.lam, DtD)
 
 
 class _BaseFIRFilter(

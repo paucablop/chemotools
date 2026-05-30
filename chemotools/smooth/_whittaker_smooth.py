@@ -6,14 +6,10 @@ the Whittaker smoothing algorithm.
 # Authors: Niklas Zell <nik.zoe@web.de>, Pau Cabaneros
 # License: MIT
 
-from typing import Callable, Literal
+from typing import Literal
 
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
-
-from chemotools.utils._linear_algebra import (
-    whittaker_smooth_banded,
-)
 
 from ._base import _BaseWhittaker
 
@@ -84,8 +80,11 @@ class WhittakerSmooth(_BaseWhittaker):
         lam: float = 1e4,
         weights: np.ndarray | None = None,
         solver_type: Literal["banded", "sparse"] = "banded",
+        n_jobs: int = 1,
     ):
-        super().__init__(lam=lam, weights=weights, solver_type=solver_type)
+        super().__init__(
+            lam=lam, weights=weights, solver_type=solver_type, n_jobs=n_jobs
+        )
 
     def fit(self, X: np.ndarray, y=None) -> "WhittakerSmooth":
         """
@@ -124,14 +123,23 @@ class WhittakerSmooth(_BaseWhittaker):
         X_transformed : ndarray of shape (n_samples, n_features)
             The smoothed version of the input data.
         """
-        return super().transform(X, y)
+        from sklearn.utils.validation import check_is_fitted, validate_data
+
+        check_is_fitted(self, ["DtD_", "solver_", "weights_"])
+        X_ = validate_data(
+            self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
+        )
+        # solve_batch issues a single batched LAPACK call over all rows.
+        # Chunking via parallel_apply_by_rows splits that into N smaller calls
+        # and adds process/thread overhead without gain — bypass it entirely.
+        return self.solver_.solve_batch(X_, self.weights_)
 
     def _fit_core(
         self,
         X: np.ndarray,
         y=None,
         nr_iterations: int = 1,
-        solver: Callable = whittaker_smooth_banded,
+        solver=None,
     ) -> "WhittakerSmooth":
         """
         Core fitting logic for Whittaker smoothing.
@@ -162,35 +170,5 @@ class WhittakerSmooth(_BaseWhittaker):
         )
         return self
 
-    def _transform_core(
-        self,
-        X: np.ndarray,
-        y=None,
-        nr_iterations: int = 1,
-        solver: Callable = whittaker_smooth_banded,
-    ) -> np.ndarray:
-        """
-        Core transformation logic for Whittaker smoothing.
-
-        Applies Whittaker smoothing to each input sample using
-        the stored weights and regularization parameter.
-
-        Parameters
-        ----------
-        X : ndarray of shape (n_samples, n_features)
-            The input data to smooth.
-
-        y : None
-            Ignored.
-
-        nr_iterations : int, default=1
-            Not used. Present for API consistency with subclasses.
-
-        Returns
-        -------
-        X_smooth : ndarray of shape (n_samples, n_features)
-            The smoothed input data.
-        """
-        for i, x in enumerate(X):
-            X[i] = self._solve_whittaker(x, self.weights_, solver)
-        return X
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        return self.solver_.solve_batch(X_block, self.weights_)

@@ -111,6 +111,44 @@ def whittaker_smooth_banded(x, w, lam, DtD_ab):
     return solveh_banded(ab, w * x, lower=False, overwrite_ab=True, overwrite_b=True)
 
 
+def whittaker_smooth_banded_batch(
+    X: np.ndarray, w: np.ndarray, lam: float, DtD_ab: np.ndarray
+) -> np.ndarray:
+    """
+    Solve the Whittaker smoothing system for all rows of X in a single call.
+
+    Numerically equivalent to applying ``whittaker_smooth_banded`` independently
+    to each row, but uses a single Cholesky factorization followed by a batched
+    back-substitution over all right-hand sides.
+
+    Parameters
+    ----------
+    X : ndarray of shape (n_samples, n_features)
+        Input data matrix. Each row is an independent signal to smooth.
+
+    w : ndarray of shape (n_features,)
+        Observation weights, identical for every row.
+
+    lam : float
+        Regularization parameter.
+
+    DtD_ab : ndarray of shape (3, n_features)
+        Banded representation of DᵀD in upper form.
+
+    Returns
+    -------
+    Z : ndarray of shape (n_samples, n_features)
+        Smoothed output matrix.
+    """
+    ab = np.empty_like(DtD_ab)
+    ab[...] = DtD_ab
+    ab[2, :] = lam * ab[2, :] + w  # main diag updated
+    ab[1, 1:] = lam * ab[1, 1:]  # superdiag
+    ab[0, 2:] = lam * ab[0, 2:]  # 2nd superdiag
+    b = np.asfortranarray((w * X).T)  # (n_features, n_samples)
+    return solveh_banded(ab, b, lower=False, overwrite_ab=True, overwrite_b=True).T
+
+
 def whittaker_smooth_sparse(x, w, lam, DtD_sparse):
     """
     Solve the Whittaker smoothing system using a sparse LU decomposition.

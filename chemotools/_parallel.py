@@ -23,9 +23,7 @@ def parallel_apply_by_rows(
         X[start : start + chunk_size] for start in range(0, n_samples, chunk_size)
     ]
 
-    out_chunks = Parallel(n_jobs=n_jobs, prefer="threads")(
-        delayed(block_fn)(chunk) for chunk in chunks
-    )
+    out_chunks = Parallel(n_jobs=n_jobs)(delayed(block_fn)(chunk) for chunk in chunks)
 
     X_out = np.empty_like(X)
     start = 0
