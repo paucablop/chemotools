@@ -6,11 +6,16 @@ a rubberband baseline correction transformer.
 # Author: Lasse Skjoldborg Krog
 # License: MIT
 
+from numbers import Integral
+
 import numpy as np
+from scipy.spatial import ConvexHull, QhullError
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
+from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools._parallel import parallel_apply_by_rows
 
 
 class RubberbandCorrection(
@@ -55,7 +60,21 @@ class RubberbandCorrection(
     >>> X_corrected = transformer.transform(X)
     """
 
-    _parameter_constraints: dict = {}
+    _parameter_constraints: dict = {
+        "n_jobs": [
+            Interval(Integral, None, -1, closed="right"),
+            Interval(Integral, 1, None, closed="left"),
+        ],
+    }
+
+    def __init__(self, n_jobs: int = 1):
+        self.n_jobs = n_jobs
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore state while keeping backward compatibility with old pickles."""
+        super().__setstate__(state)
+        if "n_jobs" not in self.__dict__:
+            self.n_jobs = 1
 
     def fit(self, X: np.ndarray, y=None) -> "RubberbandCorrection":
         """
@@ -115,40 +134,60 @@ class RubberbandCorrection(
             dtype=np.float64,
         )
 
-        # Subtract the rubberband baseline from each spectrum
-        for i, x in enumerate(X_):
-            X_[i] = x - self._rubberband_baseline(x)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        X_transformed = parallel_apply_by_rows(
+            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
+        )
+        return X_transformed
 
     @staticmethod
-    def _rubberband_baseline(x: np.ndarray) -> np.ndarray:
+    def _rubberband_baseline_single(x: np.ndarray) -> np.ndarray:
         """Return the rubberband (lower convex hull) baseline of one spectrum.
 
-        The lower convex hull is found with Andrew's monotone chain
-        algorithm and linearly interpolated back onto every feature index.
+        The lower convex hull is extracted from ``scipy.spatial.ConvexHull``
+        by selecting edges whose outward normal points downward (``b < 0`` in
+        the ``ax + by + c = 0`` facet equation).  Linear interpolation fills
+        in every feature index.
 
-        See the ``References`` section of the class docstring for the
-        algorithm source.
+        Falls back to a straight line between the two endpoints when the input
+        is degenerate (collinear points → ``QhullError``).
         """
         n = x.size
+        pts = np.empty((n, 2), dtype=np.float64)
+        pts[:, 0] = np.arange(n, dtype=np.float64)
+        pts[:, 1] = x
 
-        # Andrew's monotone chain — lower hull only. Reference implementation:
-        # https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
-        lower: list[tuple[int, float]] = []
-        for i in range(n):
-            point = (i, float(x[i]))
-            while len(lower) >= 2:
-                o, a = lower[-2], lower[-1]
-                cross = (a[0] - o[0]) * (point[1] - o[1]) - (a[1] - o[1]) * (
-                    point[0] - o[0]
-                )
-                if cross <= 0:
-                    lower.pop()
-                else:
-                    break
-            lower.append(point)
+        try:
+            hull = ConvexHull(pts)
+        except QhullError:
+            # Flat or monotone spectra: lower hull is the straight
+            # line form the first to the last point.
+            return np.interp(
+                np.arange(n, dtype=np.float64),
+                [0.0, float(n - 1)],
+                [x[0], x[-1]],
+            )
 
-        hull_idx = np.array([p[0] for p in lower])
-        hull_val = np.array([p[1] for p in lower])
-        return np.interp(np.arange(n), hull_idx, hull_val)
+        # Calculation of the lower hull
+        # hull.equations has shape (nfacets, 3): each row [a, b, c] is the
+        # outward-facing half-plane ax + by + c = 0.  Lower hull edges have
+        # their outward normal pointing downward, so b < 0.
+        lower_verts = np.unique(hull.simplices[hull.equations[:, 1] < 0])
+        return np.interp(
+            np.arange(n, dtype=np.float64),
+            lower_verts.astype(np.float64),
+            x[lower_verts],
+        )
+
+    @staticmethod
+    def _rubberband_baseline_block(X_block: np.ndarray) -> np.ndarray:
+        """Apply rubberband baseline correction to a block of spectra."""
+        return np.array(
+            [
+                X_block[i]
+                - RubberbandCorrection._rubberband_baseline_single(X_block[i])
+                for i in range(X_block.shape[0])
+            ]
+        )
+
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        return self._rubberband_baseline_block(X_block)
