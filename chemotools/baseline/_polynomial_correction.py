@@ -132,10 +132,12 @@ class PolynomialCorrection(
             dtype=np.float64,
         )
 
-        # Calculate polynomial baseline correction
-        for i, x in enumerate(X_):
-            X_[i] = self._baseline_correct_spectrum(x)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Calculate polynomial baseline correction.
+        intensity = X_[:, self.indices_].T  # (M, n_samples)
+        poly = np.polyfit(self.indices_, intensity, self.order)  # (order+1, n_samples)
+        x_range = np.arange(X_.shape[1])
+        baseline = np.polyval(poly, x_range[:, np.newaxis]).T  # (n_samples, n_features)
+        return X_ - baseline
 
     def _baseline_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
         """
