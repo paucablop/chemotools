@@ -145,7 +145,4 @@ class PointScaler(
         )
 
         # Scale the data by Point
-        for i, x in enumerate(X_):
-            X_[i] = x / x[self.point_index_]
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        return X_ / X_[:, self.point_index_][:, np.newaxis]
