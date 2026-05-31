@@ -154,10 +154,8 @@ class ConstantBaselineCorrection(
         )
 
         # Base line correct the spectra
-        for i, x in enumerate(X_):
-            mean_baseline = np.mean(x[self.start_index_ : self.end_index_ + 1])
-            X_[i, :] = x - mean_baseline
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        mean_baseline = np.mean(X_[:, self.start_index_ : self.end_index_ + 1], axis=1)
+        return X_ - mean_baseline[:, np.newaxis]
 
     def _find_index(self, target: float, axis_values) -> int:
         wavenumbers = np.array(axis_values)
