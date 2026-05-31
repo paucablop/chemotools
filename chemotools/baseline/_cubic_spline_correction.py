@@ -122,13 +122,7 @@ class CubicSplineCorrection(
         )
 
         # Calculate spline baseline correction
-        for i, x in enumerate(X_):
-            X_[i] = self._spline_baseline_correct(x)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-    def _spline_baseline_correct(self, x: np.ndarray) -> np.ndarray:
-        indices = self.indices_
-        intensity = x[indices]
-        spl = CubicSpline(indices, intensity)
-        baseline = spl(range(len(x)))
-        return x - baseline
+        intensity = X_[:, self.indices_]
+        spl = CubicSpline(self.indices_, intensity, axis=1)
+        baseline = spl(range(X_.shape[1]))
+        return X_ - baseline
