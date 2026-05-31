@@ -83,7 +83,9 @@ class _BaseWhittaker(
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
         check_is_fitted(self, ["DtD_", "solver_"])
-        X_ = validate_data(self, X, ensure_2d=True, copy=True, reset=False)
+        X_ = validate_data(
+            self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
+        )
         return parallel_apply_by_rows(
             X_, n_jobs=self.n_jobs, block_fn=self._transform_block
         )
@@ -93,7 +95,6 @@ class _BaseWhittaker(
         self,
         X: np.ndarray,
         y=None,
-        nr_iterations: int = 1,
         solver: WhittakerSolver | None = None,
     ) -> Self:
         """Subclasses can extend fitting logic here."""

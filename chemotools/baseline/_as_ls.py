@@ -157,7 +157,6 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
         self,
         X: np.ndarray,
         y=None,
-        nr_iterations: int = 1,
         solver: WhittakerSolver | None = None,
     ) -> "AsLs":
         """Fit core implementation: compute warm-start weights.
@@ -168,10 +167,8 @@ class AsLs(_BaselineWhittakerMixin, _BaseWhittaker):
             Input spectra.
         y : None
             Ignored.
-        nr_iterations : int
-            Not used in this implementation.
-        solver : Optional[Callable]
-            Whittaker solver function.
+        solver : WhittakerSolver or None
+            Whittaker solver instance, provided by ``_BaseWhittaker.fit``.
 
         Returns
         -------

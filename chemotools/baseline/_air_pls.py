@@ -154,7 +154,6 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
         self,
         X: np.ndarray,
         y=None,
-        nr_iterations: int = 1,
         solver: WhittakerSolver | None = None,
     ) -> "AirPls":
         """Fit core implementation: compute warm-start weights.
@@ -165,10 +164,8 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
             Input spectra.
         y : None
             Ignored.
-        nr_iterations : int
-            Not used in this implementation.
-        solver : Optional[Callable]
-            Whittaker solver function.
+        solver : WhittakerSolver or None
+            Whittaker solver instance, provided by ``_BaseWhittaker.fit``.
 
         Returns
         -------
@@ -229,10 +226,10 @@ class AirPls(_BaselineWhittakerMixin, _BaseWhittaker):
             if dssn > 0:
                 new_w[mask] = np.exp(i * (-d_neg[mask]) / dssn)
 
-                # Boundary handling
-                neg_vals = d[mask]
-                if neg_vals.size > 0:
-                    new_w[0] = np.exp(i * (-neg_vals).max() / dssn)
+                # Boundary handling: d_neg.min() is the most-negative residual
+                # (scalar, no allocation); valid here because dssn > 0 guarantees
+                # at least one negative value in d_neg.
+                new_w[0] = np.exp(i * (-d_neg.min()) / dssn)
                 new_w[-1] = new_w[0]
 
             w = new_w

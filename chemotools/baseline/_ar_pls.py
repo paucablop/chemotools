@@ -157,7 +157,6 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
         self,
         X: np.ndarray,
         y=None,
-        nr_iterations: int = 1,
         solver: WhittakerSolver | None = None,
     ) -> "ArPls":
         """Fit core implementation: compute warm-start weights.
@@ -168,10 +167,8 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
             Input spectra.
         y : None
             Ignored.
-        nr_iterations : int
-            Not used in this implementation.
-        solver : Optional[Callable]
-            Whittaker solver function.
+        solver : WhittakerSolver or None
+            Whittaker solver instance, provided by ``_BaseWhittaker.fit``.
 
         Returns
         -------
@@ -228,8 +225,9 @@ class ArPls(_BaselineWhittakerMixin, _BaseWhittaker):
             exponent = np.clip(2 * (d - (2 * s - m)) / s, -709, 709)
             new_w = 1.0 / (1.0 + np.exp(exponent))
 
-            # Convergence check
-            if np.linalg.norm(w - new_w) / np.linalg.norm(w) < self.ratio:
+            # Convergence check (squared form avoids two sqrt calls)
+            diff = w - new_w
+            if np.dot(diff, diff) < self.ratio**2 * np.dot(w, w):
                 w = new_w
                 break
             w = new_w

@@ -96,9 +96,10 @@ class _BaselineWhittakerMixin:
         Parameters
         ----------
         X : np.ndarray of shape (n_samples, n_features)
-            Input spectra to correct (will be modified in-place).
-        solver : Optional[Callable]
-            Whittaker solver function to use.
+            Input spectra to correct. The input array is not modified; a new
+            array of the same shape is returned.
+        solver : WhittakerSolver
+            Whittaker solver instance to use.
 
         Returns
         -------

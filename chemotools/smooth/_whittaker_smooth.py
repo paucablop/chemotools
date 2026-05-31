@@ -11,6 +11,8 @@ from typing import Literal
 import numpy as np
 from sklearn.utils._param_validation import Interval, Real, StrOptions
 
+from chemotools.utils._whittaker_solvers import WhittakerSolver
+
 from ._base import _BaseWhittaker
 
 
@@ -138,8 +140,7 @@ class WhittakerSmooth(_BaseWhittaker):
         self,
         X: np.ndarray,
         y=None,
-        nr_iterations: int = 1,
-        solver=None,
+        solver: WhittakerSolver | None = None,
     ) -> "WhittakerSmooth":
         """
         Core fitting logic for Whittaker smoothing.
@@ -156,8 +157,9 @@ class WhittakerSmooth(_BaseWhittaker):
         y : None
             Ignored.
 
-        nr_iterations : int, default=1
-            Not used. Present for API consistency with subclasses.
+        solver : WhittakerSolver or None
+            Whittaker solver instance, provided by ``_BaseWhittaker.fit``.
+            Not used by this implementation.
 
         Returns
         -------
