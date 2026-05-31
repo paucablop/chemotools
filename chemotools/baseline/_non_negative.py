@@ -109,11 +109,7 @@ class NonNegative(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEsti
         )
 
         # Calculate non-negative values
-        for i, x in enumerate(X_):
-            if self.mode == "zero":
-                X_[i] = np.clip(x, a_min=0, a_max=np.inf)
-
-            if self.mode == "abs":
-                X_[i] = np.abs(x)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        if self.mode == "zero":
+            return np.clip(X_, a_min=0, a_max=np.inf)
+        else:  # self.mode == "abs"
+            return np.absolute(X_)
