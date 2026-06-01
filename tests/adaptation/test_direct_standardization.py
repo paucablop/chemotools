@@ -40,7 +40,7 @@ class TestFit:
     """Tests for the fit method behavior."""
 
     def test_fit_sets_attributes(self, sample_data):
-        """Verifies that fit stores the transformation matrix T_."""
+        """Verifies that fit stores the low-rank factors V_ds_ and B_ds_."""
         # Arrange
         X_target, X_source = sample_data
 
@@ -48,7 +48,8 @@ class TestFit:
         model = DirectStandardization().fit(X_target, X_source=X_source)
 
         # Assert
-        assert hasattr(model, "T_")
+        assert hasattr(model, "V_ds_")
+        assert hasattr(model, "B_ds_")
 
     def test_fit_should_raise_error_size_mismatch(self, sample_data):
         """Verifies fir raise eror when size mismatch"""
@@ -230,8 +231,10 @@ class TestNumericalCorrectness:
         model.fit(X_target, X_source=X_source)
         output = model.transform(X_test)
 
-        # Assert - Both T_ and output should match references
-        np.testing.assert_allclose(model.T_, expected_T, rtol=1e-6, atol=1e-8)
+        # Assert — output must match reference; reconstruct T_ = V_ds_ @ B_ds_
+        # to verify the transformation matrix too.
+        T_reconstructed = model.V_ds_ @ model.B_ds_
+        np.testing.assert_allclose(T_reconstructed, expected_T, rtol=1e-6, atol=1e-8)
         np.testing.assert_allclose(output, expected_output, rtol=1e-6, atol=1e-8)
 
     def test_transformation_matrix_properties(self):
@@ -245,11 +248,14 @@ class TestNumericalCorrectness:
         model = DirectStandardization()
         model.fit(X_target, X_source=X_source)
 
-        # Assert - Check T_ matrix properties
-        assert model.T_.shape == (10, 10)
-        assert np.all(np.isfinite(model.T_))
+        # Assert — reconstruct T_ = V_ds_ @ B_ds_ and check its properties.
+        T_reconstructed = model.V_ds_ @ model.B_ds_
+        assert T_reconstructed.shape == (10, 10)
+        assert np.all(np.isfinite(T_reconstructed))
         # For scaling transformations, T_ should be diagonally dominant
-        diagonal_dominance = np.abs(np.diag(model.T_)).sum() / np.abs(model.T_).sum()
+        diagonal_dominance = (
+            np.abs(np.diag(T_reconstructed)).sum() / np.abs(T_reconstructed).sum()
+        )
         assert diagonal_dominance > 0.5
 
     def test_transformation_is_reproducible(self):
@@ -271,7 +277,6 @@ class TestNumericalCorrectness:
 
         # Assert - Results should be bit-for-bit identical
         np.testing.assert_array_equal(result1, result2)
-        np.testing.assert_array_equal(model1.T_, model2.T_)
 
     def test_known_linear_transformation(self):
         """Verifies correct behavior on a known linear transformation."""
@@ -301,8 +306,9 @@ class TestNumericalCorrectness:
         model = DirectStandardization()
         model.fit(X_target, X_source=X_source)
 
-        # Assert - T_ should be close to identity matrix
-        np.testing.assert_allclose(model.T_, np.eye(10), rtol=0.1, atol=0.1)
+        # Assert — reconstruct T_ = V_ds_ @ B_ds_ and verify it is close to identity.
+        T_reconstructed = model.V_ds_ @ model.B_ds_
+        np.testing.assert_allclose(T_reconstructed, np.eye(10), rtol=0.1, atol=0.1)
 
 
 class TestPipeline:
@@ -368,3 +374,132 @@ class TestPipeline:
         finally:
             # Cleanup - reset config to avoid affecting other tests
             sklearn.set_config(enable_metadata_routing=False)
+
+
+def test_direct_standardization_snapshot_with_x_source():
+    # Snapshot of exact output when X_source is provided.
+    # Arrange
+    rng = np.random.default_rng(0)
+    X_target = rng.normal(size=(5, 20))
+    X_source = X_target * 1.5 + 0.1 * rng.normal(size=(5, 20))
+    ds = DirectStandardization()
+
+    # Act
+    result = ds.fit(X_target, X_source=X_source).transform(X_target)
+
+    # Assert
+    expected = np.array(
+        [
+            [
+                0.23886361662757627,
+                -0.09918599160837233,
+                0.9442045164023949,
+                0.04991368990671592,
+                -0.7161998444794951,
+                0.41435318789276954,
+                1.8846932581892792,
+                1.4827232300478732,
+                -1.280616971067948,
+                -1.8594952468124477,
+                -0.9930757774469787,
+                0.07291693876864694,
+                -3.4951163145803337,
+                -0.30797605639442255,
+                -1.7994492272088958,
+                -1.1742380071450191,
+                -0.6742902720547739,
+                -0.4018408556589549,
+                0.7018190707915262,
+                1.6802564522751204,
+            ],
+            [
+                -0.11404317224546476,
+                2.1341030738823887,
+                -0.990232649155631,
+                0.38458772004055647,
+                1.341700762474011,
+                0.06406698262364141,
+                -1.2575230508822546,
+                -1.3567427852963292,
+                -0.7434436839157736,
+                0.2273122414039284,
+                -1.6187273833152604,
+                -0.28692165433667793,
+                -0.20297031995468173,
+                0.9435141240053947,
+                0.32059721690710197,
+                0.6372430394811639,
+                -0.8405164314502568,
+                -0.07940388692418487,
+                0.9394328144642967,
+                2.3630150897514826,
+            ],
+            [
+                -1.854636297331318,
+                2.3132627973939295,
+                2.0559358774470837,
+                1.2102428170777193,
+                0.42862486751919326,
+                -0.5067755526585042,
+                1.9968674954678405,
+                2.929496001884205,
+                2.6220791199471223,
+                2.0806719883553453,
+                0.5071939653888975,
+                -1.8041304128125577,
+                -0.09164179524113923,
+                0.9336501558246921,
+                -1.9336955017929918,
+                0.4441455718466588,
+                0.6748640536628067,
+                1.0334568605995273,
+                -1.894748930636309,
+                -1.2323771445983318,
+            ],
+            [
+                -0.6033476573268008,
+                -1.7844612655536298,
+                2.556050974373385,
+                -0.767481555648522,
+                0.6751020382784171,
+                -0.3928389151168504,
+                2.3838712445020374,
+                1.8318341936552176,
+                1.1147628408729824,
+                -3.2135160226255444,
+                0.18473694809034752,
+                1.0302965592859707,
+                1.5976078426457128,
+                -0.8897658835519603,
+                2.7943359527783866,
+                -1.9958657508607698,
+                -1.1396808275270245,
+                1.5054604169513508,
+                -0.1199140429230029,
+                2.9795952083420794,
+            ],
+            [
+                0.2623265399287314,
+                -1.0540771493867893,
+                -0.5050329442155544,
+                -1.6567521465697503,
+                -1.9602070821396405,
+                0.9976014092501123,
+                0.8240908145633679,
+                2.080736226645507,
+                -1.0967631792711638,
+                2.4862278799820663,
+                -0.6255080593115535,
+                2.2308370985767647,
+                -0.5404956922970585,
+                -1.1082853448245469,
+                0.3463655507700452,
+                1.7115047887284798,
+                0.11324944066562813,
+                -0.9368590161691409,
+                -2.0590883387908545,
+                -2.043646594223014,
+            ],
+        ]
+    )
+    assert np.allclose(result, expected, atol=1e-12)
