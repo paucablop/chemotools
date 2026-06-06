@@ -6,7 +6,7 @@ common x_axis grid.
 # Author: Pau Cabaneros
 # License: MIT
 
-from numbers import Real
+from numbers import Integral, Real
 
 import numpy as np
 from scipy.interpolate import CubicSpline, PchipInterpolator
@@ -15,6 +15,7 @@ from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools._parallel import parallel_apply_by_row_slices
 
 
 class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
@@ -47,6 +48,10 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
     right : float, default=np.nan
         Value returned for query points above the input grid.
 
+    n_jobs : int, default=1
+        Number of parallel jobs used to process sample rows independently
+        during :meth:`transform`. Use ``1`` for serial execution.
+
     Attributes
     ----------
     common_x_axis_ : ndarray of shape (n_output_features,)
@@ -64,6 +69,10 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         "method": [StrOptions({"linear", "cubic", "pchip"})],
         "left": [Interval(Real, None, None, closed="neither"), None, np.nan.__class__],
         "right": [Interval(Real, None, None, closed="neither"), None, np.nan.__class__],
+        "n_jobs": [
+            Interval(Integral, None, -1, closed="right"),
+            Interval(Integral, 1, None, closed="left"),
+        ],
     }
 
     n_features_in_: int
@@ -75,11 +84,19 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         method: str = "cubic",
         left=np.nan,
         right=np.nan,
+        n_jobs: int = 1,
     ):
         self.common_x_axis = common_x_axis
         self.method = method
         self.left = left
         self.right = right
+        self.n_jobs = n_jobs
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore state while keeping backward compatibility with old pickles."""
+        super().__setstate__(state)
+        if "n_jobs" not in self.__dict__:
+            self.n_jobs = 1
 
     @_fit_context(prefer_skip_nested_validation=True)
     def fit(self, X: np.ndarray, y=None, x_axis=None) -> "XAxisInterpolator":
@@ -169,21 +186,32 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
                 "Expected one of {'linear', 'cubic', 'pchip'}."
             )
 
-        X_transformed = np.empty((n_samples, target.size), dtype=float)
-        for i in range(n_samples):
-            xi = x_per_row[i]
-            left_value, right_value = self._resolve_fill_values(
-                X[i], self.left, self.right
-            )
-            X_transformed[i] = self._interpolate_row(
-                xi=xi,
-                yi=X[i],
-                target=target,
-                left_value=left_value,
-                right_value=right_value,
-            )
+        def transform_block(start: int, stop: int) -> np.ndarray:
+            X_block = X[start:stop]
+            x_block = x_per_row[start:stop]
+            out_block = np.empty((X_block.shape[0], target.size), dtype=float)
+            for i in range(X_block.shape[0]):
+                xi = x_block[i]
+                yi = X_block[i]
+                left_value, right_value = self._resolve_fill_values(
+                    yi, self.left, self.right
+                )
+                out_block[i] = self._interpolate_row(
+                    xi=xi,
+                    yi=yi,
+                    target=target,
+                    left_value=left_value,
+                    right_value=right_value,
+                )
+            return out_block
 
-        return X_transformed
+        return parallel_apply_by_row_slices(
+            n_rows=n_samples,
+            n_jobs=self.n_jobs,
+            block_fn=transform_block,
+            empty_shape=(0, target.size),
+            dtype=float,
+        )
 
     def fit_transform(self, X, y=None, **fit_params):
         """Fit to data, then transform it.
