@@ -1,0 +1,123 @@
+groups:
+  smooth:
+    description: Spectral smoothing transformers
+
+estimators:
+  - key: smooth.mean_filter
+    group: smooth
+    class_path: chemotools.smooth.MeanFilter
+    constructor_defaults:
+      window_length: 3
+      mode: nearest
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: smooth.median_filter
+    group: smooth
+    class_path: chemotools.smooth.MedianFilter
+    constructor_defaults:
+      window_length: 3
+      mode: nearest
+      n_jobs: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: smooth.modified_sinc_filter
+    group: smooth
+    class_path: chemotools.smooth.ModifiedSincFilter
+    constructor_defaults:
+      window_length: 21
+      n: 6
+      alpha: 4.0
+      use_corrections: true
+      mode: interp
+      axis: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: smooth.savitzky_golay_filter
+    group: smooth
+    class_path: chemotools.smooth.SavitzkyGolayFilter
+    constructor_defaults:
+      window_length: 3
+      polyorder: 1
+      mode: nearest
+      axis: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: smooth.whittaker_smooth
+    group: smooth
+    class_path: chemotools.smooth.WhittakerSmooth
+    constructor_defaults:
+      lam: 10000.0
+      weights: null
+      solver_type: banded
+      n_jobs: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

@@ -1,0 +1,52 @@
+groups:
+  derivative:
+    description: Spectral derivative transformers
+
+estimators:
+  - key: derivative.norris_williams
+    group: derivative
+    class_path: chemotools.derivative.NorrisWilliams
+    constructor_defaults:
+      window_length: 5
+      gap_size: 3
+      deriv: 1
+      mode: nearest
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: derivative.savitzky_golay
+    group: derivative
+    class_path: chemotools.derivative.SavitzkyGolay
+    constructor_defaults:
+      window_length: 3
+      polyorder: 1
+      deriv: 1
+      mode: nearest
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

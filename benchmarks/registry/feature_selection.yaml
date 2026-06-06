@@ -1,0 +1,49 @@
+groups:
+  feature_selection:
+    description: Unsupervised feature selection transformers
+
+estimators:
+  - key: feature_selection.index_selector
+    group: feature_selection
+    class_path: chemotools.feature_selection.IndexSelector
+    constructor_defaults:
+      features: null
+      x_axis: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: feature_selection.range_cut
+    group: feature_selection
+    class_path: chemotools.feature_selection.RangeCut
+    constructor_defaults:
+      start: 0
+      end: -1
+      x_axis: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

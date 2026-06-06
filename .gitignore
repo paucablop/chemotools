@@ -162,3 +162,10 @@ uv.lock
 # Auto-generated version file (setuptools-scm / hatch-vcs)
 chemotools/_version.py
 
+
+# Benchmarking results
+benchmarks/results/*
+
+profile*.py
+
+docs/performance_*
