@@ -108,6 +108,18 @@ class NorrisWilliams(
         self.window_size = window_size
         self.derivative_order = derivative_order
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only deprecated parameter names."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+        if "deriv" not in self.__dict__ and "derivative_order" in self.__dict__:
+            self.deriv = self.derivative_order
+        if "derivative_order" not in self.__dict__:
+            self.derivative_order = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "NorrisWilliams":
         """
         Fit the transformer to the input data.

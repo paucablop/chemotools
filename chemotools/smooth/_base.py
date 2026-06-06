@@ -148,6 +148,14 @@ class _BaseFIRFilter(
         self.mode = mode
         self.axis = axis
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only the deprecated window alias."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+
     # sklearn API
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
         self._validate_params()

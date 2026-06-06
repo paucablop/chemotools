@@ -4,6 +4,7 @@
 import numpy as np
 
 from chemotools._deprecation import (
+    DEPRECATED_PARAMETER,
     resolve_renamed_parameter,
 )
 
@@ -11,6 +12,18 @@ from chemotools._deprecation import (
 class XAxisMixin:
     """Mixin providing x-axis resolution and index lookup for transformers
     that accept ``x_axis`` and the deprecated ``wavenumbers`` parameter."""
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only one of the axis names."""
+        self.__dict__.update(state)
+        if "x_axis" not in self.__dict__ and "wavenumbers" in self.__dict__:
+            self.x_axis = self.wavenumbers
+        if "wavenumbers" not in self.__dict__ and "x_axis" in self.__dict__:
+            self.wavenumbers = DEPRECATED_PARAMETER
+        if "x_axis" not in self.__dict__:
+            self.x_axis = None
+        if "wavenumbers" not in self.__dict__:
+            self.wavenumbers = DEPRECATED_PARAMETER
 
     @staticmethod
     def _resolve_x_axis(x_axis, wavenumbers):

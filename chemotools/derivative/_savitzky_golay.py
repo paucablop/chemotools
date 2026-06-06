@@ -117,6 +117,22 @@ class SavitzkyGolay(
         self.derivate_order = derivate_order
         self.mode = mode
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only deprecated parameter names."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+        if "polyorder" not in self.__dict__ and "polynomial_order" in self.__dict__:
+            self.polyorder = self.polynomial_order
+        if "polynomial_order" not in self.__dict__:
+            self.polynomial_order = DEPRECATED_PARAMETER
+        if "deriv" not in self.__dict__ and "derivate_order" in self.__dict__:
+            self.deriv = self.derivate_order
+        if "derivate_order" not in self.__dict__:
+            self.derivate_order = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "SavitzkyGolay":
         """
         Fit the transformer to the input data.

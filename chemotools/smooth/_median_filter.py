@@ -113,6 +113,10 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     def __setstate__(self, state: dict) -> None:
         """Restore state while keeping backward compatibility with old pickles."""
         super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
         if "n_jobs" not in self.__dict__:
             self.n_jobs = 1
 
