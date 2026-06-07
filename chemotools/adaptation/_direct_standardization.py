@@ -139,8 +139,19 @@ class DirectStandardization(
         # thin factors is O(n_features * r) vs O(n_features^2) for the full
         # matrix, and transform becomes two small matmuls instead of one huge one.
         U, s, Vt = np.linalg.svd(X, full_matrices=False)
+
+        # Numerical cutoff
+        eps = np.finfo(s.dtype).eps
+        tol = max(X.shape) * np.amax(s) * eps
+
+        # Inversion of s with cutoff
+        s_inv = np.zeros_like(s)
+        mask = s > tol
+        s_inv[mask] = 1.0 / s[mask]
+
+        # Transformation using the safe s_inv
         self.V_ds_ = Vt.T  # (n_features, r)
-        self.B_ds_ = (1.0 / s[:, None]) * (U.T @ X_source)  # (r, n_features)
+        self.B_ds_ = s_inv[:, None] * (U.T @ X_source)  # (r, n_features)
         self.x_source_provided_ = True
 
         return self
