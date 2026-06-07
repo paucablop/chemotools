@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 from sklearn.utils._param_validation import Interval
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._parallel import parallel_apply_by_rows
+from chemotools._parallel import apply_rows
 from chemotools.utils._linear_algebra import (
     compute_DtD_banded,
     compute_DtD_sparse,
@@ -86,9 +86,7 @@ class _BaseWhittaker(
         X_ = validate_data(
             self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
         )
-        return parallel_apply_by_rows(
-            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
-        )
+        return apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
 
     @abstractmethod
     def _fit_core(

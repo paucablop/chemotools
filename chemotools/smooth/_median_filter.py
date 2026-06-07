@@ -21,7 +21,7 @@ from chemotools._deprecation import (
     resolve_renamed_parameter,
 )
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._parallel import parallel_apply_by_rows
+from chemotools._parallel import apply_rows
 
 
 class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -192,9 +192,7 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             dtype=np.float64,
         )
 
-        X_transformed = parallel_apply_by_rows(
-            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
-        )
+        X_transformed = apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
 
         return X_transformed
 

@@ -15,7 +15,17 @@ from sklearn.utils._param_validation import Interval, Real
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._parallel import parallel_apply_by_rows
+from chemotools._parallel import parallel_map_reduce, row_chunks
+
+
+def _reduce_rnv_blocks(
+    parts: list[tuple[np.ndarray, bool]],
+) -> tuple[np.ndarray, bool]:
+    """Reduce per-block (array, zero_denom_flag) pairs into a single result."""
+    return (
+        np.concatenate([arr for arr, _ in parts], axis=0),
+        any(flag for _, flag in parts),
+    )
 
 
 class RobustNormalVariate(
@@ -157,18 +167,11 @@ class RobustNormalVariate(
             dtype=np.float64,
         )
 
-        zero_denom_detected = False
-
-        def block_fn(X_block: np.ndarray) -> np.ndarray:
-            nonlocal zero_denom_detected
-            transformed, has_zero_denom = self._calculate_rnv(X_block)
-            if has_zero_denom:
-                zero_denom_detected = True
-            return transformed
-
-        # Calculate robust normal variate for this validated block
-        X_transformed = parallel_apply_by_rows(
-            X_, n_jobs=self.n_jobs, block_fn=block_fn
+        X_transformed, zero_denom_detected = parallel_map_reduce(
+            row_chunks(X_, self.n_jobs),
+            n_jobs=self.n_jobs,
+            map_fn=self._calculate_rnv,
+            reduce_fn=_reduce_rnv_blocks,
         )
 
         if zero_denom_detected:

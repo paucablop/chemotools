@@ -15,7 +15,7 @@ from sklearn.utils._param_validation import Interval
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._parallel import parallel_apply_by_rows
+from chemotools._parallel import apply_rows
 
 
 class RubberbandCorrection(
@@ -134,9 +134,7 @@ class RubberbandCorrection(
             dtype=np.float64,
         )
 
-        X_transformed = parallel_apply_by_rows(
-            X_, n_jobs=self.n_jobs, block_fn=self._transform_block
-        )
+        X_transformed = apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
         return X_transformed
 
     @staticmethod

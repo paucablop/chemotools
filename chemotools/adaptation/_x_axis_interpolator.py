@@ -15,7 +15,7 @@ from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._parallel import parallel_apply_by_row_slices
+from chemotools._parallel import apply_row_slices
 
 
 class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
@@ -205,10 +205,10 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
                 )
             return out_block
 
-        return parallel_apply_by_row_slices(
+        return apply_row_slices(
             n_rows=n_samples,
             n_jobs=self.n_jobs,
-            block_fn=transform_block,
+            fn=transform_block,
             empty_shape=(0, target.size),
             dtype=float,
         )
