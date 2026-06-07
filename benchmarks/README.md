@@ -22,6 +22,7 @@ Registry files:
 	`benchmarks/registry/baseline.yaml`,
 	`benchmarks/registry/derivative.yaml`,
 	`benchmarks/registry/feature_selection.yaml`,
+	`benchmarks/registry/projection.yaml`,
 	`benchmarks/registry/scale.yaml`,
 	`benchmarks/registry/scatter.yaml`, and
 	`benchmarks/registry/smooth.yaml`

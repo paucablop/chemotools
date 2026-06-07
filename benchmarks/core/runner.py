@@ -234,6 +234,12 @@ class BenchmarkRunner:
                     "X_target": x_target,
                     "X_source": x_source,
                     "X_fit": x_target,
+                    "y_fit": rng.normal(size=scenario.n_fit_samples).astype(
+                        dtype, copy=False
+                    ),
+                    "X_external": rng.normal(size=x_target.shape).astype(
+                        dtype, copy=False
+                    ),
                     "X_transform": x_transform,
                 }
             )
@@ -276,6 +282,12 @@ class BenchmarkRunner:
             context.update(
                 {
                     "X_fit": x_fit,
+                    "y_fit": rng.normal(size=scenario.n_fit_samples).astype(
+                        dtype, copy=False
+                    ),
+                    "X_external": rng.normal(size=x_fit.shape).astype(
+                        dtype, copy=False
+                    ),
                     "X_transform": x_transform,
                     "common_x_axis": common_x_axis,
                     "x_axis_transform": x_axis_transform,
@@ -293,7 +305,16 @@ class BenchmarkRunner:
             dtype,
             copy=False,
         )
-        context.update({"X_fit": x_fit, "X_transform": x_transform})
+        y_fit = rng.normal(size=scenario.n_fit_samples).astype(dtype, copy=False)
+        x_external = rng.normal(size=x_fit.shape).astype(dtype, copy=False)
+        context.update(
+            {
+                "X_fit": x_fit,
+                "y_fit": y_fit,
+                "X_external": x_external,
+                "X_transform": x_transform,
+            }
+        )
         return context
 
     def _run_single(
