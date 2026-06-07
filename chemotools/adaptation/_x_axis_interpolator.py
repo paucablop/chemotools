@@ -62,6 +62,16 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
 
     feature_names_in_ : ndarray of shape (``n_features_in_``,)
         Names of features seen during ``fit`` (only if ``X`` had names).
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.adaptation import XAxisInterpolator
+    >>> target = np.linspace(1100, 2500, 6)
+    >>> x_axis = np.linspace(1000, 2600, 8)
+    >>> X = np.random.default_rng(1).normal(size=(3, 8))
+    >>> interp = XAxisInterpolator(common_x_axis=target, method="linear")
+    >>> X_new = interp.fit(X).transform(X, x_axis=x_axis)
     """
 
     _parameter_constraints: dict = {

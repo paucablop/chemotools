@@ -32,7 +32,12 @@ class RubberbandCorrection(
     The lower convex hull is computed with Andrew's monotone chain
     algorithm [1]_ [2]_ in feature-index space, so the feature axis
     (e.g. wavenumbers) is assumed to be sorted; even spacing is not required.
-    The method has no parameters.
+
+    Parameters
+    ----------
+    n_jobs : int, default=1
+        Number of parallel jobs used to process spectra independently during
+        :meth:`transform`.
 
     Attributes
     ----------

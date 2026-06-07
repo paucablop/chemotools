@@ -27,6 +27,11 @@ class DirectStandardization(
     the target instrument space to the source instrument space, following the
     implementation by [1]_.
 
+    Parameters
+    ----------
+    None
+        The transformer has no constructor hyperparameters.
+
     Attributes
     ----------
     V_ds_ : np.ndarray of shape (n_features, n_transfer_samples)
