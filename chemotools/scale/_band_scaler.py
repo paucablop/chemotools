@@ -139,6 +139,14 @@ class BandScaler(
         self.baseline_correction = baseline_correction
         self.wavenumbers = wavenumbers
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored the axis only under wavenumbers."""
+        super().__setstate__(state)
+        if "x_axis" not in self.__dict__ and "wavenumbers" in self.__dict__:
+            self.x_axis = self.wavenumbers
+        if "wavenumbers" not in self.__dict__:
+            self.wavenumbers = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "BandScaler":
         """
         Fit the transformer to the input data.

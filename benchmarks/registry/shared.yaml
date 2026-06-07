@@ -1,0 +1,43 @@
+version: 1
+
+groups:
+  adaptation:
+    description: Domain adaptation transformers
+
+scenarios:
+  tiny:
+    n_fit_samples: 20
+    n_transform_samples: 200
+    n_features: 128
+    dtype: float64
+    seed: 42
+
+  standard:
+    n_fit_samples: 50
+    n_transform_samples: 10000
+    n_features: 2048
+    dtype: float64
+    seed: 42
+
+  large:
+    n_fit_samples: 100
+    n_transform_samples: 20000
+    n_features: 4096
+    dtype: float64
+    seed: 42
+
+profiles:
+  fast:
+    runs: 10
+    warmups: 3
+    measure_peak_memory: false
+
+  regular:
+    runs: 100
+    warmups: 10
+    measure_peak_memory: true
+
+  large:
+    runs: 30
+    warmups: 5
+    measure_peak_memory: false

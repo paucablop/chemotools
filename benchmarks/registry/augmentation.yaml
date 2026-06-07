@@ -1,0 +1,144 @@
+groups:
+  augmentation:
+    description: Data augmentation transformers
+
+estimators:
+  - key: augmentation.add_noise
+    group: augmentation
+    class_path: chemotools.augmentation.AddNoise
+    constructor_defaults:
+      distribution: gaussian
+      scale: 0.01
+      random_state: 42
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: augmentation.baseline_shift
+    group: augmentation
+    class_path: chemotools.augmentation.BaselineShift
+    constructor_defaults:
+      scale: 0.05
+      random_state: 42
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: augmentation.fractional_shift
+    group: augmentation
+    class_path: chemotools.augmentation.FractionalShift
+    constructor_defaults:
+      shift: 0.25
+      padding_mode: linear
+      pad_value: 0.0
+      random_state: 42
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: augmentation.gaussian_broadening
+    group: augmentation
+    class_path: chemotools.augmentation.GaussianBroadening
+    constructor_defaults:
+      sigma: 1.0
+      mode: reflect
+      pad_value: 0.0
+      random_state: 42
+      truncate: 4.0
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: augmentation.index_shift
+    group: augmentation
+    class_path: chemotools.augmentation.IndexShift
+    constructor_defaults:
+      shift: 2
+      padding_mode: linear
+      pad_value: 0.0
+      random_state: 42
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: augmentation.spectrum_scale
+    group: augmentation
+    class_path: chemotools.augmentation.SpectrumScale
+    constructor_defaults:
+      scale: 0.05
+      random_state: 42
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

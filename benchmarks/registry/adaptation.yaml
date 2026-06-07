@@ -1,0 +1,109 @@
+estimators:
+  - key: adaptation.direct_standardization
+    group: adaptation
+    class_path: chemotools.adaptation.DirectStandardization
+    constructor_defaults: {}
+    fit_strategy:
+      adapter: source_target_pair
+      source_scale: 1.5
+      source_noise: 0.1
+      fit_input: X_target
+      fit_kwargs:
+        X_source: X_source
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: adaptation.piecewise_direct_standardization
+    group: adaptation
+    class_path: chemotools.adaptation.PiecewiseDirectStandardization
+    constructor_defaults:
+      window_length: 25
+      n_components: 2
+      storage: dense
+      scale: true
+    fit_strategy:
+      adapter: source_target_pair
+      source_scale: 1.5
+      source_noise: 0.1
+      fit_input: X_target
+      fit_kwargs:
+        X_source: X_source
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: adaptation.spectral_space_transform
+    group: adaptation
+    class_path: chemotools.adaptation.SpectralSpaceTransform
+    constructor_defaults:
+      n_components: 2
+      with_mean: true
+      with_std: false
+    fit_strategy:
+      adapter: source_target_pair
+      source_scale: 1.5
+      source_noise: 0.1
+      fit_input: X_target
+      fit_kwargs:
+        X_source: X_source
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: adaptation.x_axis_interpolator
+    group: adaptation
+    class_path: chemotools.adaptation.XAxisInterpolator
+    constructor_defaults:
+      method: cubic
+      left: null
+      right: null
+      n_jobs: 1
+    constructor_grid:
+      method: [linear, cubic, pchip]
+      n_jobs: [1, -1]
+    fit_strategy:
+      adapter: interpolation_fit
+      x_axis_mode: shared
+      common_points: 1000
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: interpolation_transform
+      x_axis_mode: shared
+      transform_input: X_transform
+      transform_kwargs:
+        x_axis: x_axis_transform
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+      stability_guard:
+        max_cv_percent: 25.0

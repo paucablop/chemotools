@@ -1,0 +1,95 @@
+groups:
+  scatter:
+    description: Scatter correction transformers
+
+estimators:
+  - key: scatter.extended_multiplicative_scatter_correction
+    group: scatter
+    class_path: chemotools.scatter.ExtendedMultiplicativeScatterCorrection
+    constructor_defaults:
+      method: mean
+      order: 2
+      reference: null
+      interferences: null
+      weights: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scatter.multiplicative_scatter_correction
+    group: scatter
+    class_path: chemotools.scatter.MultiplicativeScatterCorrection
+    constructor_defaults:
+      method: mean
+      reference: null
+      weights: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scatter.robust_normal_variate
+    group: scatter
+    class_path: chemotools.scatter.RobustNormalVariate
+    constructor_defaults:
+      percentile: 25
+      epsilon: 1.0e-10
+      n_jobs: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scatter.standard_normal_variate
+    group: scatter
+    class_path: chemotools.scatter.StandardNormalVariate
+    constructor_defaults: {}
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

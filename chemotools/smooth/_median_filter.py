@@ -21,6 +21,7 @@ from chemotools._deprecation import (
     resolve_renamed_parameter,
 )
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools._parallel import apply_rows
 
 
 class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
@@ -34,7 +35,12 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
 
     mode : str, optional, default="nearest"
         The mode to use for the median filter. Can be "nearest", "constant", "reflect",
-        "wrap", "mirror" or "interp". Default is "nearest".
+        "wrap", "mirror", "grid-constant", "grid-mirror" or "grid-wrap".
+        Default is "nearest".
+
+    n_jobs : int, optional, default=1
+        Number of parallel jobs used to process samples independently.
+        Uses serial execution when set to 1.
 
     window_size : int, optional
         Deprecated alias for ``window_length``.
@@ -60,11 +66,26 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     _parameter_constraints: dict = {
         "window_length": [Interval(Integral, 3, None, closed="left")],
         "mode": [
-            StrOptions({"nearest", "constant", "reflect", "wrap", "mirror", "interp"})
+            StrOptions(
+                {
+                    "nearest",
+                    "constant",
+                    "reflect",
+                    "wrap",
+                    "mirror",
+                    "grid-constant",
+                    "grid-mirror",
+                    "grid-wrap",
+                }
+            )
         ],
         "window_size": [
             Interval(Integral, 3, None, closed="left"),
             deprecated_parameter_constraint(),
+        ],
+        "n_jobs": [
+            Interval(Integral, None, -1, closed="right"),
+            Interval(Integral, 1, None, closed="left"),
         ],
     }
 
@@ -81,11 +102,23 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             "grid-mirror",
             "grid-wrap",
         ] = "nearest",
+        n_jobs: int = 1,
         window_size=DEPRECATED_PARAMETER,
     ) -> None:
         self.window_length = window_length
         self.window_size = window_size
         self.mode = mode
+        self.n_jobs = n_jobs
+
+    def __setstate__(self, state: dict) -> None:
+        """Restore state while keeping backward compatibility with old pickles."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+        if "n_jobs" not in self.__dict__:
+            self.n_jobs = 1
 
     def fit(self, X: np.ndarray, y=None) -> "MedianFilter":
         """
@@ -120,6 +153,12 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             old_value=self.window_size,
         )
 
+        if self.window_length_ % 2 == 0:
+            raise ValueError("window_length must be odd")
+
+        if self.n_jobs == 0:
+            raise ValueError("n_jobs must be different from 0")
+
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
@@ -153,7 +192,11 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
             dtype=np.float64,
         )
 
-        # Mean filter the data
-        for i, x in enumerate(X_):
-            X_[i] = median_filter(x, size=self.window_length_, mode=self.mode)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        X_transformed = apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
+
+        return X_transformed
+
+    def _transform_block(self, X_block: np.ndarray) -> np.ndarray:
+        return median_filter(
+            X_block, size=self.window_length_, mode=self.mode, axes=(1,)
+        )

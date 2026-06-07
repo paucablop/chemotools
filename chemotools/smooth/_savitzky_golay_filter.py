@@ -94,6 +94,14 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
         self.polyorder = polyorder
         self.polynomial_order = polynomial_order
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only deprecated polynomial aliases."""
+        super().__setstate__(state)
+        if "polyorder" not in self.__dict__ and "polynomial_order" in self.__dict__:
+            self.polyorder = self.polynomial_order
+        if "polynomial_order" not in self.__dict__:
+            self.polynomial_order = DEPRECATED_PARAMETER
+
     def fit(
         self, X: np.ndarray, y: Optional[np.ndarray] = None
     ) -> "SavitzkyGolayFilter":

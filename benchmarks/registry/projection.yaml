@@ -1,0 +1,108 @@
+groups:
+  projection:
+    description: Orthogonal projection and signal-correction transformers
+
+estimators:
+  - key: projection.direct_orthogonalization
+    group: projection
+    class_path: chemotools.projection.DirectOrthogonalization
+    constructor_defaults:
+      n_components: 1
+      copy: false
+    constructor_grid:
+      n_components: [1, 2]
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs:
+        y: y_fit
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: projection.external_parameter_orthogonalization
+    group: projection
+    class_path: chemotools.projection.ExternalParameterOrthogonalization
+    constructor_defaults:
+      n_components: 2
+      copy: true
+    constructor_grid:
+      n_components: [1, 2]
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs:
+        X_external: X_external
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: projection.orthogonal_pls
+    group: projection
+    class_path: chemotools.projection.OrthogonalPLS
+    constructor_defaults:
+      n_components: 1
+      copy: false
+    constructor_grid:
+      n_components: [1, 2]
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs:
+        y: y_fit
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: projection.orthogonal_signal_correction
+    group: projection
+    class_path: chemotools.projection.OrthogonalSignalCorrection
+    constructor_defaults:
+      n_components: 2
+      method: fearn
+      max_iter: 500
+      tol: 1.0e-6
+      copy: true
+    constructor_grid:
+      n_components: [1, 2]
+      method: [fearn, sjoblom, wold]
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs:
+        y: y_fit
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

@@ -78,6 +78,14 @@ class PointScaler(
         self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored the axis only under wavenumbers."""
+        super().__setstate__(state)
+        if "x_axis" not in self.__dict__ and "wavenumbers" in self.__dict__:
+            self.x_axis = self.wavenumbers
+        if "wavenumbers" not in self.__dict__:
+            self.wavenumbers = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "PointScaler":
         """
         Fit the transformer to the input data.
@@ -145,7 +153,4 @@ class PointScaler(
         )
 
         # Scale the data by Point
-        for i, x in enumerate(X_):
-            X_[i] = x / x[self.point_index_]
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        return X_ / X_[:, self.point_index_][:, np.newaxis]

@@ -58,10 +58,11 @@ class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEst
     mean_X_ : ndarray of shape (n_features,)
         Mean spectrum computed from the calibration data passed to `fit()`.
 
-    P_epo_ : ndarray of shape (n_features, n_features)
-        Orthogonal projection matrix used to suppress nuisance variation.
-        Applying `X_centered @ P_epo_` removes the subspace spanned by the first
-        `n_components` singular vectors of the external variation matrix.
+    V_epo_ : ndarray of shape (n_features, n_components)
+        Nuisance directions whose subspace is removed during `transform()`.
+        These are the first `n_components` right singular vectors of the external
+        variation matrix, stored column-wise. The implicit projection matrix is
+        ``I - V_epo_ @ V_epo_.T``, but it is never materialised.
 
     n_features_in_ : int
         Number of features seen during `fit()`.
@@ -193,7 +194,7 @@ class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEst
 
         if X_external is None:
             # No nuisance subspace: identity projection (no correction)
-            self.P_epo_ = np.eye(X.shape[1])
+            self.V_epo_ = np.empty((X.shape[1], 0))
             self.n_features_in_ = X.shape[1]
             return self
 
@@ -213,12 +214,9 @@ class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEst
         # We perform SVD on D to find the loadings (Vt) of the nuisance.
         _, _, Vt = np.linalg.svd(D, full_matrices=False)
 
-        # 4. Define the projection operator
+        # 4. Store the nuisance directions (low-rank representation)
         # V are the first k components that span the 'bad' subspace
-        V = Vt[: self.n_components, :].T
-
-        # P = I - V * V^T
-        self.P_epo_ = np.eye(X.shape[1]) - (V @ V.T)
+        self.V_epo_ = Vt[: self.n_components, :].T
 
         self.n_features_in_ = X.shape[1]
         return self
@@ -235,17 +233,19 @@ class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEst
         -------
         ndarray of shape (n_samples, n_features)
             Corrected spectra after centering with `mean_X_` and projection with
-            `P_epo_`.
+            ``I - V_epo_ @ V_epo_.T``.
         """
-        check_is_fitted(self, "P_epo_")
+        check_is_fitted(self, "V_epo_")
         X = validate_data(self, X, reset=False)
 
         # 1. Center the new data using the TRAINING mean
         X_centered = X - self.mean_X_
 
-        # 2. Project into the orthogonal space
-        # X_corr = (X - mu) @ (I - VV^T)
-        return X_centered @ self.P_epo_ + self.mean_X_
+        # 2. Project into the orthogonal space using the low-rank form:
+        # X_corr = X_centered - (X_centered @ V) @ V^T + mean_X_
+        # Equivalent to X_centered @ (I - V @ V^T) but avoids the n_features x
+        # n_features matrix. Two small matmuls: (n,p)@(p,k) then (n,k)@(k,p).
+        return X_centered - (X_centered @ self.V_epo_) @ self.V_epo_.T + self.mean_X_
 
     def _build_difference_matrix(
         self, X_ext: np.ndarray, sample_ids: np.ndarray

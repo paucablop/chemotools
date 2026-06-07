@@ -117,6 +117,22 @@ class SavitzkyGolay(
         self.derivate_order = derivate_order
         self.mode = mode
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only deprecated parameter names."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+        if "polyorder" not in self.__dict__ and "polynomial_order" in self.__dict__:
+            self.polyorder = self.polynomial_order
+        if "polynomial_order" not in self.__dict__:
+            self.polynomial_order = DEPRECATED_PARAMETER
+        if "deriv" not in self.__dict__ and "derivate_order" in self.__dict__:
+            self.deriv = self.derivate_order
+        if "derivate_order" not in self.__dict__:
+            self.derivate_order = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "SavitzkyGolay":
         """
         Fit the transformer to the input data.
@@ -197,15 +213,14 @@ class SavitzkyGolay(
             dtype=np.float64,
         )
 
-        # Calculate the standard normal variate
-        for i, x in enumerate(X_):
-            X_[i] = savgol_filter(
-                x,
-                self.window_length_,
-                self.polyorder_,
-                deriv=self.deriv_,
-                axis=0,
-                mode=self.mode,
-            )
+        # Calculate the Savitzky-Golay derivative
+        X_ = savgol_filter(
+            X_,
+            self.window_length_,
+            self.polyorder_,
+            deriv=self.deriv_,
+            axis=1,
+            mode=self.mode,
+        )
 
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        return X_

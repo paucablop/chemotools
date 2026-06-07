@@ -33,6 +33,7 @@ dev = [
     "nox",
     "pytest>=8.3.0",
     "pytest-cov>=6.3.0",
+    "pyyaml>=6.0.2",
     "ruff>=0.10.0",
     "pandas-stubs>=2.2.3.241126,<3",
     "scipy-stubs>=1.15.1.0,<2",
@@ -80,4 +81,5 @@ extend-exclude = ["chemotools/_version.py"]
 exclude = ["chemotools/_version.py"]
 
 [tool.ruff.lint]
+exclude = ["benchmarks/*"]
 select = ["C", "E", "F", "I"] # Defaults + I sort + C complexity 

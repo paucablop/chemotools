@@ -1,0 +1,116 @@
+groups:
+  scale:
+    description: Spectral scaling transformers
+
+estimators:
+  - key: scale.band_scaler
+    group: scale
+    class_path: chemotools.scale.BandScaler
+    constructor_defaults:
+      start: 0
+      end: -1
+      x_axis: null
+      aggregation: mean
+      baseline_correction: false
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scale.min_max_scaler
+    group: scale
+    class_path: chemotools.scale.MinMaxScaler
+    constructor_defaults:
+      use_min: true
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scale.norm_scaler
+    group: scale
+    class_path: chemotools.scale.NormScaler
+    constructor_defaults:
+      l_norm: 2
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scale.pareto_scaler
+    group: scale
+    class_path: chemotools.scale.ParetoScaler
+    constructor_defaults:
+      p: 0.5
+      with_mean: true
+      copy: true
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: scale.point_scaler
+    group: scale
+    class_path: chemotools.scale.PointScaler
+    constructor_defaults:
+      point: 0
+      x_axis: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

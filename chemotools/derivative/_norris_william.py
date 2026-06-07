@@ -108,6 +108,18 @@ class NorrisWilliams(
         self.window_size = window_size
         self.derivative_order = derivative_order
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored only deprecated parameter names."""
+        super().__setstate__(state)
+        if "window_length" not in self.__dict__ and "window_size" in self.__dict__:
+            self.window_length = self.window_size
+        if "window_size" not in self.__dict__ and "window_length" in self.__dict__:
+            self.window_size = DEPRECATED_PARAMETER
+        if "deriv" not in self.__dict__ and "derivative_order" in self.__dict__:
+            self.deriv = self.derivative_order
+        if "derivative_order" not in self.__dict__:
+            self.derivative_order = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "NorrisWilliams":
         """
         Fit the transformer to the input data.
@@ -149,6 +161,22 @@ class NorrisWilliams(
             old_value=self.derivative_order,
         )
 
+        # Calculate the smoothing kernel
+        self.smoothing_kernel_ = self._smoothing_kernel()
+
+        # Calculate the derivative kernel
+        if self.deriv_ == 1:
+            derivative_kernel_ = self._first_derivative_kernel()
+        elif self.deriv_ == 2:
+            derivative_kernel_ = self._second_derivative_kernel()
+        else:
+            raise ValueError(f"Expected deriv to be 1 or 2 but got {self.deriv_}")
+
+        # Fuse the kernels to create the Norris-Williams kernel
+        self.kernel_ = np.convolve(
+            self.smoothing_kernel_, derivative_kernel_, mode="full"
+        )
+
         return self
 
     def transform(self, X: np.ndarray, y=None):
@@ -169,7 +197,7 @@ class NorrisWilliams(
             The transformed data.
         """
         # Check that the estimator is fitted
-        check_is_fitted(self, "n_features_in_")
+        check_is_fitted(self, ["n_features_in_", "kernel_"])
 
         # Check that X is a 2D array and has only finite values
         X_ = validate_data(
@@ -182,19 +210,9 @@ class NorrisWilliams(
             dtype=np.float64,
         )
 
-        if self.deriv_ == 1:
-            for i, x in enumerate(X_):
-                derivative = self._spectrum_first_derivative(x)
-                X_[i] = derivative
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-        if self.deriv_ == 2:
-            for i, x in enumerate(X_):
-                derivative = self._spectrum_second_derivative(x)
-                X_[i] = derivative
-            return X_.reshape(-1, 1) if X_.ndim == 1 else X_
-
-        raise ValueError(f"Expected deriv to be 1 or 2 but got {self.deriv_}")
+        # Calculate the Norris-Williams derivative
+        X_transformed = convolve1d(X_, self.kernel_, mode=self.mode, axis=1)
+        return X_transformed
 
     def _smoothing_kernel(self):
         return np.ones(self.window_length_) / self.window_length_
@@ -211,19 +229,3 @@ class NorrisWilliams(
         array[-1] = 1 / (self.gap_size)
         array[int((self.gap_size - 1) / 2)] = -2 / self.gap_size
         return array
-
-    def _spectrum_first_derivative(self, X):
-        # Apply filter of data
-        smoothing_kernel = self._smoothing_kernel()
-        first_derivative_kernel = self._first_derivative_kernel()
-        smoothed = convolve1d(X, smoothing_kernel, mode=self.mode)
-        derivative = convolve1d(smoothed, first_derivative_kernel, mode=self.mode)
-        return derivative
-
-    def _spectrum_second_derivative(self, X):
-        # Apply filter of data
-        smoothing_kernel = self._smoothing_kernel()
-        second_derivative_kernel = self._second_derivative_kernel()
-        smoothed = convolve1d(X, smoothing_kernel, mode=self.mode)
-        derivative = convolve1d(smoothed, second_derivative_kernel, mode=self.mode)
-        return derivative

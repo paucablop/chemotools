@@ -172,3 +172,113 @@ def test_scale_reference_denominator_zero_raises_error():
         ValueError, match="Reference spectrum has zero or near-zero norm in the"
     ):
         baseline.fit_transform(X)
+
+
+def test_subtract_reference_snapshot_simple():
+    # Snapshot of the exact output for plain subtraction (x - r).
+    # Arrange
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(3, 10))
+    reference = rng.normal(size=10)
+    transformer = SubtractReference(reference=reference)
+
+    # Act
+    result = transformer.fit_transform(X)
+
+    # Assert
+    expected = np.array(
+        [
+            [
+                1.1353484046321292,
+                0.07707071158041118,
+                0.7996476603577598,
+                -0.43594546753276797,
+                -0.7503284956674519,
+                0.00622234586956333,
+                1.9578286545484767,
+                1.0766945968220116,
+                -1.487710705868322,
+                -2.758852616266813,
+            ],
+            [
+                0.3863437210013837,
+                0.25050155421895665,
+                -2.1658057647243565,
+                -0.7596372486183534,
+                -1.460570069759406,
+                -1.087640063743373,
+                0.10956962656102953,
+                -0.18668652267638508,
+                -0.3723449336871967,
+                -0.4509177757780831,
+            ],
+            [
+                0.8810835205947016,
+                1.5756390454213989,
+                -0.5059696635721358,
+                -0.18933551459278797,
+                0.6888110591454677,
+                -0.26136041127904686,
+                -0.08967063993546898,
+                -0.79211174256565,
+                -1.2417012957286686,
+                -1.2732360217507113,
+            ],
+        ]
+    )
+    assert np.allclose(result, expected, atol=1e-12)
+
+
+def test_subtract_reference_snapshot_scaled():
+    # Snapshot of the exact output for scaled subtraction (x - a*r).
+    # Arrange
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(3, 10))
+    reference = rng.normal(size=10)
+    transformer = SubtractReference(reference=reference, scale_reference=True)
+
+    # Act
+    result = transformer.fit_transform(X)
+
+    # Assert
+    expected = np.array(
+        [
+            [
+                -0.6139669596271106,
+                -0.2853574349376211,
+                0.5237663809205624,
+                0.5011508589879359,
+                -0.3783992780670029,
+                0.6219590175121377,
+                0.8249722433863134,
+                0.8521194806711528,
+                -0.12935528265894392,
+                -0.17125852337801795,
+            ],
+            [
+                -0.07676382518630498,
+                0.15455361193675277,
+                -2.238841596324328,
+                -0.5115536902256272,
+                -1.3621068476111295,
+                -0.9246321207914073,
+                -0.19033876244375175,
+                -0.24613974254762308,
+                -0.01273873588785562,
+                0.23411270835931053,
+            ],
+            [
+                0.06805019118113773,
+                1.4071924813214367,
+                -0.6341916409962466,
+                0.24620090262434208,
+                0.8616734579273617,
+                0.02481693925235796,
+                -0.6161909224030617,
+                -0.8964880363535276,
+                -0.6103753182503009,
+                -0.07059395760630963,
+            ],
+        ]
+    )
+    assert np.allclose(result, expected, atol=1e-12)

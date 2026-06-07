@@ -85,6 +85,14 @@ class ConstantBaselineCorrection(
         self.x_axis = x_axis
         self.wavenumbers = wavenumbers
 
+    def __setstate__(self, state: dict) -> None:
+        """Restore old pickles that stored the axis only under wavenumbers."""
+        super().__setstate__(state)
+        if "x_axis" not in self.__dict__ and "wavenumbers" in self.__dict__:
+            self.x_axis = self.wavenumbers
+        if "wavenumbers" not in self.__dict__:
+            self.wavenumbers = DEPRECATED_PARAMETER
+
     def fit(self, X: np.ndarray, y=None) -> "ConstantBaselineCorrection":
         """
         Fit the transformer to the input data.
@@ -154,10 +162,8 @@ class ConstantBaselineCorrection(
         )
 
         # Base line correct the spectra
-        for i, x in enumerate(X_):
-            mean_baseline = np.mean(x[self.start_index_ : self.end_index_ + 1])
-            X_[i, :] = x - mean_baseline
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        mean_baseline = np.mean(X_[:, self.start_index_ : self.end_index_ + 1], axis=1)
+        return X_ - mean_baseline[:, np.newaxis]
 
     def _find_index(self, target: float, axis_values) -> int:
         wavenumbers = np.array(axis_values)

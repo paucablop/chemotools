@@ -10,7 +10,6 @@ import re
 import numpy as np
 import pytest
 import sklearn
-from scipy.sparse import csr_matrix
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
@@ -62,6 +61,28 @@ class TestFit:
         assert np.all(np.isfinite(model.bias_))
         assert np.abs(T_dense).max() < 100
 
+    def test_fit_sets_attributes_band(self, sample_data):
+        """Verifies fit with storage='band' sets coef_band_ and interior indices."""
+        # Arrange
+        X_target, X_source = sample_data
+        w = 5
+
+        # Act
+        model = PiecewiseDirectStandardization(
+            window_length=w, n_components=2, storage="band"
+        ).fit(X_target, X_source=X_source)
+
+        # Assert
+        p = X_target.shape[1]
+        full_win = 2 * w + 1
+        assert model.T_ is None
+        assert model.coef_band_ is not None
+        assert model.coef_band_.shape == (p, full_win)
+        assert np.all(np.isfinite(model.coef_band_))
+        assert model.interior_start_ == w
+        assert model.interior_end_ == p - w
+        assert model.bias_.shape == (p,)
+
     def test_fit_raises_on_shape_mismatch(self, sample_data):
         """Verifies fit raises ValueError when X and X_source have different shapes."""
         # Arrange
@@ -102,18 +123,6 @@ class TestFit:
             match=re.escape("n_components=15 must be <= n_samples=10"),
         ):
             model.fit(X, X_source=X_source)
-
-    def test_fit_stores_T_as_sparse(self, sample_data):
-        """Verifies fit stores T_ as a sparse matrix when appropriate."""
-        # Arrange
-        X_target, X_source = sample_data
-        model = PiecewiseDirectStandardization(n_components=15, storage="sparse")
-
-        # Act
-        model.fit(X_target, X_source=X_source)
-
-        # Assert
-        assert isinstance(model.T_, csr_matrix)
 
 
 class TestTransform:
@@ -285,6 +294,28 @@ class TestNumericalCorrectness:
         T2 = model2.T_.toarray() if hasattr(model2.T_, "toarray") else model2.T_
         np.testing.assert_array_equal(T1, T2)
 
+    def test_band_and_dense_give_identical_output(self):
+        """Verifies storage='band' produces numerically identical output to 'dense'."""
+        # Arrange
+        rng = np.random.default_rng(7)
+        X_target = rng.normal(size=(30, 20))
+        X_source = X_target * 1.4 + rng.normal(0, 0.05, size=(30, 20))
+        X_test = rng.normal(size=(10, 20))
+
+        # Act
+        pds_dense = PiecewiseDirectStandardization(
+            window_length=3, n_components=2, storage="dense"
+        ).fit(X_target, X_source=X_source)
+        pds_band = PiecewiseDirectStandardization(
+            window_length=3, n_components=2, storage="band"
+        ).fit(X_target, X_source=X_source)
+
+        out_dense = pds_dense.transform(X_test)
+        out_band = pds_band.transform(X_test)
+
+        # Assert - both approaches must agree to near machine precision
+        np.testing.assert_allclose(out_band, out_dense, atol=1e-12)
+
     def test_known_linear_transformation(self):
         """Verifies correct behavior on a known linear transformation."""
         # Arrange - Create data with known linear relationship
@@ -349,6 +380,29 @@ class TestEdgeCases:
         assert model.T_.shape == (10, 10)
         assert model.bias_.shape == (10,)
 
+    def test_window_length_larger_than_features_band(self):
+        """Verifies band storage handles window_length >= n_features gracefully."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X = rng.normal(size=(50, 10))
+        X_source = X * 1.5 + rng.normal(0, 0.05, size=(50, 10))
+
+        # Act
+        model_dense = PiecewiseDirectStandardization(
+            window_length=50, storage="dense"
+        ).fit(X, X_source=X_source)
+        model_band = PiecewiseDirectStandardization(
+            window_length=50, storage="band"
+        ).fit(X, X_source=X_source)
+        X_test = rng.normal(size=(5, 10))
+
+        # Assert - band and dense agree
+        np.testing.assert_allclose(
+            model_band.transform(X_test),
+            model_dense.transform(X_test),
+            atol=1e-12,
+        )
+
     def test_window_length_equals_one(self):
         """Verifies that minimal window_length of 1 works correctly."""
         # Arrange - minimal window_length
@@ -366,6 +420,27 @@ class TestEdgeCases:
         # T_ is always square (n_features, n_features)
         assert model.T_.shape == (20, 20)
         assert model.bias_.shape == (20,)
+
+    def test_window_length_equals_one_band(self):
+        """Verifies band storage with minimal window_length=1 agrees with dense."""
+        # Arrange
+        rng = np.random.default_rng(17)
+        X = rng.normal(size=(50, 20))
+        X_source = X * 1.2 + rng.normal(0, 0.1, size=(50, 20))
+        X_test = rng.normal(size=(5, 20))
+
+        model_dense = PiecewiseDirectStandardization(
+            window_length=1, n_components=1, storage="dense"
+        ).fit(X, X_source=X_source)
+        model_band = PiecewiseDirectStandardization(
+            window_length=1, n_components=1, storage="band"
+        ).fit(X, X_source=X_source)
+
+        np.testing.assert_allclose(
+            model_band.transform(X_test),
+            model_dense.transform(X_test),
+            atol=1e-12,
+        )
 
 
 class TestPipeline:

@@ -26,6 +26,32 @@ def test_mean_filter():
     assert np.allclose(array_corrected[0], [1, 1.5, 2.5, 3.5, 4.5], atol=1e-8)
 
 
+def test_mean_filter_snapshot_current_behavior():
+    """Snapshot test to lock current transform output for nearest mode."""
+    # Arrange
+    mf = MeanFilter(window_length=3, mode="nearest")
+    X = np.array(
+        [
+            [0.0, 1.0, 2.0, 3.0, 4.0, 5.0],
+            [5.0, 4.0, 3.0, 2.0, 1.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+    expected = np.array(
+        [
+            [0.333333333333, 1.0, 2.0, 3.0, 4.0, 4.666666666667],
+            [4.666666666667, 4.0, 3.0, 2.0, 1.0, 0.333333333333],
+        ],
+        dtype=np.float64,
+    )
+
+    # Act
+    observed = mf.fit_transform(X)
+
+    # Assert
+    np.testing.assert_allclose(observed, expected, rtol=0.0, atol=1e-12)
+
+
 # --- Deprecation tests ---
 def test_mean_filter_window_size_deprecated():
     """Using the old `window_size` parameter emits a FutureWarning."""

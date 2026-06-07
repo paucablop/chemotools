@@ -143,6 +143,5 @@ class MeanFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
         )
 
         # Mean filter the data
-        for i, x in enumerate(X_):
-            X_[i] = uniform_filter1d(x, size=self.window_length_, mode=self.mode)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        X_ = uniform_filter1d(X_, size=self.window_length_, mode=self.mode, axis=1)
+        return X_

@@ -45,6 +45,54 @@ def test_norris_williams_filter_2():
     assert np.allclose(spectrum_corrected[0], np.zeros((1, 10)), atol=1e-2)
 
 
+def test_norris_williams_snapshot_deriv_1_current_behavior():
+    """Snapshot test that locks current deriv=1 transform output."""
+    # Arrange
+    transformer = NorrisWilliams(window_length=5, gap_size=3, deriv=1, mode="nearest")
+    X = np.array(
+        [
+            [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0],
+            [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0],
+        ],
+        dtype=np.float64,
+    )
+    expected = np.array(
+        [
+            [
+                0.333333333333,
+                0.466666666667,
+                0.6,
+                0.666666666667,
+                0.666666666667,
+                0.666666666667,
+                0.666666666667,
+                0.6,
+                0.466666666667,
+                0.333333333333,
+            ],
+            [
+                -0.333333333333,
+                -0.466666666667,
+                -0.6,
+                -0.666666666667,
+                -0.666666666667,
+                -0.666666666667,
+                -0.666666666667,
+                -0.6,
+                -0.466666666667,
+                -0.333333333333,
+            ],
+        ],
+        dtype=np.float64,
+    )
+
+    # Act
+    observed = transformer.fit_transform(X)
+
+    # Assert
+    np.testing.assert_allclose(observed, expected, rtol=0.0, atol=1e-12)
+
+
 def test_norris_williams_wrong_filter():
     # Arrange
     norris_williams_filter = NorrisWilliams(deriv=5)

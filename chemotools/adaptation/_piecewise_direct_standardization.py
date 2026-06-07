@@ -10,7 +10,6 @@ import warnings
 from numbers import Integral
 
 import numpy as np
-from scipy.sparse import csr_matrix, lil_matrix
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.utils._param_validation import Interval, StrOptions
@@ -39,24 +38,37 @@ class PiecewiseDirectStandardization(
     scale : bool, default = True
         Whether to scale X and Y in the PLS model
 
-    storage : str {"dense", "sparse"}, default="dense"
+    storage : str {"dense", "band"}, default="dense"
         Storage format for the regression coefficients.
-        - "dense" stores the full matrix with zeros outside the local windows, while
-        - "sparse" stores only the non-zero coefficients for memory efficiency.
-
-        "sparse" is recommended for large feature sets and small window_length, while
-        "dense" may be faster for small feature sets or large window_length.
+        - ``"dense"`` stores the full ``(n_features, n_features)`` matrix.
+          Fastest when ``n_features`` is small enough that the matrix fits in CPU
+          cache (roughly ``n_features`` ≤ 1 500 at float64).
+        - ``"band"`` stores coefficients in a compact
+          ``(n_features, 2 * window_length + 1)`` array and exploits the band
+          structure in :meth:`transform` via a strided sliding-window view and
+          ``einsum``.  Fastest when ``n_features`` is large (roughly
+          ``n_features`` > 1 500), and uses ~2–5 % of the memory of ``"dense"``.
 
     Attributes
     ----------
     n_features_in_ : int
         Number of features seen during fit (set automatically by sklearn).
 
-    T_ : np.ndarray or scipy.sparse.csr_matrix of shape (n_features, n_features), or
-        None.
-        Banded transformation matrix mapping target instrument space to source
-        instrument space. Dense ndarray when ``storage="dense"``, CSR sparse
-        matrix when ``storage="sparse"``. None if fitted with X_source=None.
+    T_ : np.ndarray of shape (n_features, n_features), or None.
+        Banded transformation matrix.  Dense ndarray when ``storage="dense"``.
+        ``None`` when ``storage="band"`` or when fitted without ``X_source``.
+
+    coef_band_ : np.ndarray of shape (n_features, 2 * window_length + 1), or None.
+        Packed band of per-feature PLS coefficients.  Set only when
+        ``storage="band"``; ``None`` otherwise.
+
+    interior_start_ : int
+        Index of the first feature whose local window is fully interior
+        (``window_length``).  Set only when ``storage="band"``.
+
+    interior_end_ : int
+        One past the last interior feature (``n_features - window_length``).
+        Set only when ``storage="band"``.
 
     bias_ : np.ndarray of shape (n_features,), or None
         Precomputed per-feature bias that absorbs local PLS centering, allowing
@@ -114,11 +126,14 @@ class PiecewiseDirectStandardization(
         "window_length": [Interval(Integral, 1, None, closed="left")],
         "n_components": [Interval(Integral, 1, None, closed="left")],
         "scale": ["boolean"],
-        "storage": [StrOptions({"dense", "sparse"})],
+        "storage": [StrOptions({"dense", "band"})],
     }
 
     n_features_in_: int
-    T_: np.ndarray | csr_matrix | None
+    T_: np.ndarray | None
+    coef_band_: np.ndarray | None
+    interior_start_: int
+    interior_end_: int
     bias_: np.ndarray | None
     x_source_provided_: bool
 
@@ -171,6 +186,7 @@ class PiecewiseDirectStandardization(
             )
             self.x_source_provided_ = False
             self.T_ = None
+            self.coef_band_ = None
             self.bias_ = None
             return self
 
@@ -203,14 +219,15 @@ class PiecewiseDirectStandardization(
                 f"Please decrease n_components or increase window_length."
             )
 
-        # Pre-allocate a local build matrix (lil_matrix for sparse, ndarray for dense)
-        # and only assign to self.T_ after the final conversion, so the annotated
-        # type (ndarray | csr_matrix | None) is never violated mid-construction.
-        _T: np.ndarray | lil_matrix = (
-            lil_matrix((n_features, n_features), dtype=np.float64)
-            if self.storage == "sparse"
-            else np.zeros((n_features, n_features), dtype=np.float64)
-        )
+        full_win = 2 * self.window_length + 1
+
+        # Pre-allocate storage.  For "band" we skip the (n×n) matrix entirely.
+        _coef_band: np.ndarray | None = None
+        _T: np.ndarray | None = None
+        if self.storage == "band":
+            _coef_band = np.zeros((n_features, full_win), dtype=np.float64)
+        else:  # dense
+            _T = np.zeros((n_features, n_features), dtype=np.float64)
 
         self.bias_ = np.zeros(n_features, dtype=np.float64)
 
@@ -228,17 +245,32 @@ class PiecewiseDirectStandardization(
             mean = X[:, l_lim:r_lim].mean(axis=0)
             intercept = model.intercept_[0]
 
-            # Populate the diagonal band in the build matrix
-            _T[l_lim:r_lim, i] = coef
+            # Store coefficients in the appropriate structure
+            if self.storage == "band":
+                assert _coef_band is not None
+                _coef_band[i, : r_lim - l_lim] = coef
+            else:  # dense
+                assert _T is not None
+                _T[l_lim:r_lim, i] = coef
 
             # Precalculate the shifted bias
             self.bias_[i] = intercept - np.dot(mean, coef)
 
-        # Convert to the appropriate format for efficient arithmetic during transform
-        if isinstance(_T, lil_matrix):
-            self.T_ = _T.tocsr()
-        else:
+        # Finalise fitted attributes
+        if self.storage == "band":
+            self.coef_band_ = _coef_band
+            # Clamp so that interior_start_ <= interior_end_ and both are in
+            # [0, n_features].  When window_length >= n_features there are no
+            # interior features and every feature is handled by the boundary
+            # loop in transform().
+            self.interior_start_ = min(self.window_length, n_features)
+            self.interior_end_ = max(
+                n_features - self.window_length, self.interior_start_
+            )
+            self.T_ = None
+        else:  # dense
             self.T_ = _T
+            self.coef_band_ = None
 
         self.x_source_provided_ = True
 
@@ -264,7 +296,32 @@ class PiecewiseDirectStandardization(
         if not self.x_source_provided_:
             return X
 
-        assert self.T_ is not None
         assert self.bias_ is not None
 
+        if self.storage == "band":
+            assert self.coef_band_ is not None
+            full_win = 2 * self.window_length + 1
+            is_ = self.interior_start_
+            ie_ = self.interior_end_
+            p = X.shape[1]
+            out = np.empty_like(X)
+            if is_ < ie_:
+                # Zero-copy strided view: shape (n_samples, n_interior, full_win)
+                X_wins = np.lib.stride_tricks.sliding_window_view(X, full_win, axis=1)
+                # Interior features all share the same window width — one einsum call
+                out[:, is_:ie_] = np.einsum(
+                    "nfw,fw->nf",
+                    X_wins[:, : ie_ - is_],
+                    self.coef_band_[is_:ie_],
+                    optimize=True,
+                )
+            # Boundary features (2 * window_length of them total) — small loop.
+            # When window_length >= n_features every feature is a boundary feature.
+            for i in list(range(is_)) + list(range(ie_, p)):
+                lo = max(0, i - self.window_length)
+                r = min(p, i + self.window_length + 1)
+                out[:, i] = X[:, lo:r] @ self.coef_band_[i, : r - lo]
+            return np.asarray(out + self.bias_)
+
+        assert self.T_ is not None
         return np.asarray(X @ self.T_ + self.bias_)

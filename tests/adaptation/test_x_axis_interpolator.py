@@ -100,6 +100,51 @@ class TestEstimator:
             names, np.array(["x_0", "x_0.5", "x_2"], dtype=object)
         )
 
+    @pytest.mark.parametrize("method", ["linear", "cubic", "pchip"])
+    def test_parallel_matches_serial_for_shared_x_axis(self, method):
+        """Ensures n_jobs>1 matches serial results for a shared source axis."""
+        # Arrange
+        rng = np.random.default_rng(42)
+        X = rng.normal(size=(24, 50))
+        x_axis = np.linspace(1100.0, 2500.0, 50)
+        target = np.linspace(1100.0, 2500.0, 70)
+
+        serial = XAxisInterpolator(common_x_axis=target, method=method, n_jobs=1).fit(X)
+        parallel = XAxisInterpolator(common_x_axis=target, method=method, n_jobs=2).fit(
+            X
+        )
+
+        # Act
+        out_serial = serial.transform(X, x_axis=x_axis)
+        out_parallel = parallel.transform(X, x_axis=x_axis)
+
+        # Assert
+        np.testing.assert_allclose(out_parallel, out_serial, rtol=1e-12, atol=1e-12)
+
+    @pytest.mark.parametrize("method", ["linear", "cubic", "pchip"])
+    def test_parallel_matches_serial_for_per_row_x_axis(self, method):
+        """Ensures n_jobs>1 matches serial results for per-row source axes."""
+        # Arrange
+        rng = np.random.default_rng(123)
+        n_samples, n_features = 20, 40
+        X = rng.normal(size=(n_samples, n_features))
+        shared_x = np.linspace(900.0, 2200.0, n_features)
+        offsets = np.linspace(-0.2, 0.2, n_samples)
+        x_axis = shared_x[None, :] + offsets[:, None]
+        target = np.linspace(900.0, 2200.0, 60)
+
+        serial = XAxisInterpolator(common_x_axis=target, method=method, n_jobs=1).fit(X)
+        parallel = XAxisInterpolator(common_x_axis=target, method=method, n_jobs=2).fit(
+            X
+        )
+
+        # Act
+        out_serial = serial.transform(X, x_axis=x_axis)
+        out_parallel = parallel.transform(X, x_axis=x_axis)
+
+        # Assert
+        np.testing.assert_allclose(out_parallel, out_serial, rtol=1e-12, atol=1e-12)
+
 
 class TestFitExceptions:
     def test_fit_rejects_invalid_methods(self):

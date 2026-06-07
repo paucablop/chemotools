@@ -29,9 +29,17 @@ class DirectStandardization(
 
     Attributes
     ----------
-    T_ : np.ndarray of shape (n_features, n_features)
-        Linear transformation matrix mapping target instrument space to source
-        instrument space.
+    V_ds_ : np.ndarray of shape (n_features, n_transfer_samples)
+        Right singular vectors of the target transfer data X, used as the
+        column basis of the low-rank transformation. Empty (shape
+        ``(n_features, 0)``) when no ``X_source`` was provided.
+
+    B_ds_ : np.ndarray of shape (n_transfer_samples, n_features)
+        Projection of the source transfer data onto the singular basis.  The
+        full transformation is ``X @ V_ds_ @ B_ds_``, which is algebraically
+        equivalent to ``X @ T_`` but requires only
+        ``O(n_features × n_transfer_samples)`` storage instead of
+        ``O(n_features²)``.
 
     x_source_provided_ : bool
         Boolean value to flag if X_source was provided during fitting
@@ -69,7 +77,8 @@ class DirectStandardization(
 
     # Fitted attributes (set during fit, typed for type checkers)
     n_features_in_: int
-    T_: np.ndarray
+    V_ds_: np.ndarray
+    B_ds_: np.ndarray
     x_source_provided_: bool
 
     _parameter_constraints: dict = {}
@@ -107,7 +116,8 @@ class DirectStandardization(
                 "X_source is None, the transformer will act as an identity "
                 "transformation."
             )
-            self.T_ = np.eye(X.shape[1])
+            self.V_ds_ = np.empty((X.shape[1], 0))
+            self.B_ds_ = np.empty((0, X.shape[1]))
             self.x_source_provided_ = False
 
             return self
@@ -124,7 +134,24 @@ class DirectStandardization(
                 f"got X={X.shape} and X_source={X_source.shape}."
             )
 
-        self.T_, _, _, _ = np.linalg.lstsq(X, X_source, rcond=None)
+        # Low-rank factorisation: T_* = V_ds_ @ B_ds_
+        # rank(T_*) <= n_transfer_samples << n_features, so storing the two
+        # thin factors is O(n_features * r) vs O(n_features^2) for the full
+        # matrix, and transform becomes two small matmuls instead of one huge one.
+        U, s, Vt = np.linalg.svd(X, full_matrices=False)
+
+        # Numerical cutoff
+        eps = np.finfo(s.dtype).eps
+        tol = max(X.shape) * np.amax(s) * eps
+
+        # Inversion of s with cutoff
+        s_inv = np.zeros_like(s)
+        mask = s > tol
+        s_inv[mask] = 1.0 / s[mask]
+
+        # Transformation using the safe s_inv
+        self.V_ds_ = Vt.T  # (n_features, r)
+        self.B_ds_ = s_inv[:, None] * (U.T @ X_source)  # (r, n_features)
         self.x_source_provided_ = True
 
         return self
@@ -145,8 +172,7 @@ class DirectStandardization(
             The data transformed
         """
         # Check that the estimator is fitted
-
-        check_is_fitted(self, ["T_"])
+        check_is_fitted(self, "V_ds_")
 
         # Validate the input data
         X = validate_data(
@@ -157,5 +183,10 @@ class DirectStandardization(
             dtype=np.float64,
         )
 
-        # Apply the transformation
-        return X @ self.T_
+        # Identity fallback: no source data was provided at fit time
+        if not self.x_source_provided_:
+            return X
+
+        # Low-rank transform: equivalent to X @ T_* but O(n * p * r) instead
+        # of O(n * p^2), where r = n_transfer_samples << p = n_features.
+        return (X @ self.V_ds_) @ self.B_ds_

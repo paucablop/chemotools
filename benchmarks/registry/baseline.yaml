@@ -1,0 +1,234 @@
+groups:
+  baseline:
+    description: Baseline correction transformers
+
+estimators:
+  - key: baseline.air_pls
+    group: baseline
+    class_path: chemotools.baseline.AirPls
+    constructor_defaults:
+      lam: 10000.0
+      nr_iterations: 100
+      solver_type: banded
+      max_iter_after_warmstart: 20
+      n_jobs: -1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.ar_pls
+    group: baseline
+    class_path: chemotools.baseline.ArPls
+    constructor_defaults:
+      lam: 10000.0
+      ratio: 0.01
+      nr_iterations: 100
+      solver_type: banded
+      max_iter_after_warmstart: 20
+      n_jobs: -1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.as_ls
+    group: baseline
+    class_path: chemotools.baseline.AsLs
+    constructor_defaults:
+      lam: 10000.0
+      penalty: 0.01
+      nr_iterations: 100
+      solver_type: banded
+      max_iter_after_warmstart: 20
+      n_jobs: -1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.constant_baseline_correction
+    group: baseline
+    class_path: chemotools.baseline.ConstantBaselineCorrection
+    constructor_defaults:
+      start: 0
+      end: 1
+      x_axis: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.cubic_spline_correction
+    group: baseline
+    class_path: chemotools.baseline.CubicSplineCorrection
+    constructor_defaults:
+      indices: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.linear_correction
+    group: baseline
+    class_path: chemotools.baseline.LinearCorrection
+    constructor_defaults: {}
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.non_negative
+    group: baseline
+    class_path: chemotools.baseline.NonNegative
+    constructor_defaults:
+      mode: zero
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.polynomial_correction
+    group: baseline
+    class_path: chemotools.baseline.PolynomialCorrection
+    constructor_defaults:
+      order: 1
+      indices: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.rubberband_correction
+    group: baseline
+    class_path: chemotools.baseline.RubberbandCorrection
+    constructor_defaults:
+      n_jobs: 1
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true
+
+  - key: baseline.subtract_reference
+    group: baseline
+    class_path: chemotools.baseline.SubtractReference
+    constructor_defaults:
+      reference: null
+      scale_reference: false
+      start: 0
+      end: -1
+      x_axis: null
+    fit_strategy:
+      adapter: plain_fit
+      fit_input: X_fit
+      fit_kwargs: {}
+    transform_strategy:
+      adapter: plain_transform
+      transform_input: X_transform
+      transform_kwargs: {}
+    scenario_default: standard
+    profile_defaults:
+      sort: cumulative
+      top: 25
+    compare_policy:
+      max_p95_regression_percent: 2.0
+      require_median_improvement: true

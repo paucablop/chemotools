@@ -106,8 +106,6 @@ class NormScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
             dtype=np.float64,
         )
 
-        # Normalize the data by the maximum value
-        for i, x in enumerate(X_):
-            X_[i] = x / np.linalg.norm(x, ord=self.l_norm)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        # Normalize the data by the L-norm
+        norms = np.linalg.norm(X_, ord=self.l_norm, axis=1, keepdims=True)
+        return X_ / norms

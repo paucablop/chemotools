@@ -110,11 +110,10 @@ class MinMaxScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
 
         # Normalize the data by the maximum value
         if self.use_min:
-            X_ = (X_ - np.min(X_, axis=1, keepdims=True)) / (
-                np.max(X_, axis=1, keepdims=True) - np.min(X_, axis=1, keepdims=True)
-            )
+            X_min = np.min(X_, axis=1, keepdims=True)
+            X_max = np.max(X_, axis=1, keepdims=True)
+            return (X_ - X_min) / (X_max - X_min)
 
         else:
-            X_ = X_ / np.max(X_, axis=1, keepdims=True)
-
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+            X_max = np.max(X_, axis=1, keepdims=True)
+            return X_ / X_max

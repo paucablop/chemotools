@@ -100,25 +100,11 @@ class LinearCorrection(
         )
 
         # Calculate non-negative values
-        for i, x in enumerate(X_):
-            X_[i, :] = self._drift_correct_spectrum(x)
-        return X_.reshape(-1, 1) if X_.ndim == 1 else X_
+        x_range = np.arange(X_.shape[1])
 
-    def _drift_correct_spectrum(self, x: np.ndarray) -> np.ndarray:
-        # Can take any array and returns with a linear baseline correction
-        # Find the x values at the edges of the spectrum
-        y1: float = x[0]
-        y2: float = x[-1]
-
-        # Find the max and min wavenumebrs
-        x1 = 0
-        x2 = len(x)
-        x_range = np.linspace(x1, x2, x2)
-
-        # Calculate the straight line initial and end point
-        slope = (y2 - y1) / (x2 - x1)
-        intercept = y1 - slope * x1
-        drift_correction = slope * x_range + intercept
-
-        # Return the drift corrected spectrum
-        return x - drift_correction
+        X0 = X_[:, 0]
+        Xn = X_[:, -1]
+        slope = (Xn - X0) / (x_range[-1] - x_range[0])
+        intercept = X0 - slope * x_range[0]
+        drift_correction = slope[:, np.newaxis] * x_range + intercept[:, np.newaxis]
+        return X_ - drift_correction
