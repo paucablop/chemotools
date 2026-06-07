@@ -20,6 +20,11 @@ class LinearCorrection(
     A transformer that corrects a baseline by subtracting a linear baseline through the
     initial and final points of the spectrum.
 
+    Parameters
+    ----------
+    None
+        The transformer has no constructor hyperparameters.
+
     Attributes
     ----------
     n_features_in_ : int

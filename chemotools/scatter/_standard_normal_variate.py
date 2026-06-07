@@ -21,6 +21,11 @@ class StandardNormalVariate(
     """
     A transformer that calculates the standard normal variate of the input data.
 
+    Parameters
+    ----------
+    None
+        The transformer has no constructor hyperparameters.
+
     Attributes
     ----------
     n_features_in_ : int

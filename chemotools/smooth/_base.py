@@ -47,6 +47,23 @@ class _BaseWhittaker(
     This implements the sklearn boilerplate (validation, fitted checks)
     and delegates algorithm-specific behavior to subclasses via
     `_fit_core` and `_transform_block`.
+
+    Parameters
+    ----------
+    lam : float, default=1e4
+        Regularization strength passed to the Whittaker solver.
+    weights : ndarray of shape (n_features,), optional
+        Optional per-feature weights consumed by subclasses.
+    solver_type : {"banded", "sparse"}, default="banded"
+        Backend used to solve the Whittaker linear system.
+    n_jobs : int, default=1
+        Number of parallel jobs used during :meth:`transform`.
+
+    Examples
+    --------
+    Concrete subclasses call this base implementation through ``super()``:
+    validate ``X`` in :meth:`fit`, precompute solver artifacts, then implement
+    algorithm-specific behavior in :meth:`_fit_core` and :meth:`_transform_block`.
     """
 
     _parameter_constraints: dict = {
@@ -75,6 +92,20 @@ class _BaseWhittaker(
             self.n_jobs = 1
 
     def fit(self, X: np.ndarray, y=None) -> Self:
+        """Validate data and precompute solver artifacts.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Training matrix used to infer the number of features.
+        y : Ignored, default=None
+            Forwarded to subclass-specific :meth:`_fit_core`.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+        """
         self._validate_params()
         X = validate_data(self, X, ensure_2d=True, reset=True, dtype=np.float64)
         self.DtD_ = self._precompute_DtD(X.shape[1])
@@ -82,6 +113,20 @@ class _BaseWhittaker(
         return self._fit_core(X, y, solver=self.solver_)
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:
+        """Apply the subclass-defined Whittaker transform blockwise.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input matrix to transform.
+        y : Ignored, default=None
+            Present for sklearn API compatibility.
+
+        Returns
+        -------
+        X_transformed : ndarray of shape (n_samples, n_features)
+            Transformed matrix returned by :meth:`_transform_block`.
+        """
         check_is_fitted(self, ["DtD_", "solver_"])
         X_ = validate_data(
             self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
@@ -132,6 +177,11 @@ class _BaseFIRFilter(
         smooth along feature axis for each row.
     window_size : int, optional
         Deprecated alias for ``window_length``.
+
+    Examples
+    --------
+    Subclasses implement :meth:`_compute_kernel` and inherit the shared
+    validation, padding, and axis-aware convolution logic from this base class.
     """
 
     def __init__(
@@ -156,6 +206,20 @@ class _BaseFIRFilter(
 
     # sklearn API
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> Self:
+        """Validate inputs and precompute FIR kernel artifacts.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Training data used to validate dimensions.
+        y : Ignored, default=None
+            Present for sklearn API compatibility.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator with validated kernel.
+        """
         self._validate_params()
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -180,6 +244,20 @@ class _BaseFIRFilter(
         return self
 
     def transform(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> np.ndarray:
+        """Apply the FIR filter along the configured axis.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Input matrix to smooth.
+        y : Ignored, default=None
+            Present for sklearn API compatibility.
+
+        Returns
+        -------
+        X_transformed : ndarray of shape (n_samples, n_features)
+            Smoothed matrix.
+        """
         check_is_fitted(self, "kernel_")
         X_ = validate_data(
             self,

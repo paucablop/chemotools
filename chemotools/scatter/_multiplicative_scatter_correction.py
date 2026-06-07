@@ -106,6 +106,21 @@ class MultiplicativeScatterCorrection(
         self.weights = weights
 
     def fit(self, X, y=None):
+        """Fit the MSC reference and weighted regression matrix.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training spectra used to compute the reference spectrum when
+            ``reference`` is not provided.
+        y : None, default=None
+            Ignored to align with sklearn API.
+
+        Returns
+        -------
+        self : MultiplicativeScatterCorrection
+            Fitted transformer with cached pseudo-inverse.
+        """
         # 1. Validate parameters via the built-in sklearn machinery
         self._validate_params()
 
@@ -143,6 +158,18 @@ class MultiplicativeScatterCorrection(
         return self
 
     def transform(self, X):
+        """Apply multiplicative scatter correction to spectra.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Spectra to correct.
+
+        Returns
+        -------
+        X_corr : ndarray of shape (n_samples, n_features)
+            Corrected spectra.
+        """
         check_is_fitted(self)
         X = validate_data(self, X, reset=False, dtype=np.float64)
 
