@@ -303,7 +303,9 @@ class TestPreprocessingStepDetection:
         """Test that KernelPCA is automatically excluded."""
         # Arrange
         X, _, _ = spectral_data
-        pipe = make_pipeline(StandardScaler(), KernelPCA(n_components=5, random_state=42))
+        pipe = make_pipeline(
+            StandardScaler(), KernelPCA(n_components=5, random_state=42)
+        )
         pipe.fit(X)
 
         # Act
