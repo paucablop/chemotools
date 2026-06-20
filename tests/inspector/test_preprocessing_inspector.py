@@ -268,8 +268,12 @@ class TestPreprocessingStepDetection:
         """Test that NMF is automatically excluded from preprocessing steps."""
         # Arrange
         X, _, _ = spectral_data
-        X_pos = np.abs(X)  # NMF requires non-negative data
-        pipe = make_pipeline(MinMaxScaler(), NMF(n_components=5))
+        X_pos = np.ascontiguousarray(np.abs(X))  # NMF requires non-negative data
+        # Use MU solver for broad compatibility across old sklearn/Python combos.
+        pipe = make_pipeline(
+            MinMaxScaler(),
+            NMF(n_components=5, solver="mu", random_state=42),
+        )
         pipe.fit(X_pos)
 
         # Act
@@ -284,7 +288,7 @@ class TestPreprocessingStepDetection:
         """Test that FastICA is automatically excluded from preprocessing steps."""
         # Arrange
         X, _, _ = spectral_data
-        pipe = make_pipeline(StandardScaler(), FastICA(n_components=5))
+        pipe = make_pipeline(StandardScaler(), FastICA(n_components=5, random_state=42))
         pipe.fit(X)
 
         # Act
@@ -299,7 +303,7 @@ class TestPreprocessingStepDetection:
         """Test that KernelPCA is automatically excluded."""
         # Arrange
         X, _, _ = spectral_data
-        pipe = make_pipeline(StandardScaler(), KernelPCA(n_components=5))
+        pipe = make_pipeline(StandardScaler(), KernelPCA(n_components=5, random_state=42))
         pipe.fit(X)
 
         # Act
