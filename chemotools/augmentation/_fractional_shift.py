@@ -33,6 +33,11 @@ class FractionalShift(
         Maximum absolute shift applied to each signal.
         A random shift is drawn uniformly from [-shift, +shift].
 
+    min_shift : float or None, default=None
+        Minimum absolute shift applied to each signal. When provided, the
+        shift is drawn uniformly  from the union of [-shift, -min_shift]
+        and [min_shift, shift].
+
     padding_mode : {'zeros', 'constant', 'wrap', 'extend',
         'mirror', 'linear'}, default='linear'
         Padding strategy for extrapolated values.
@@ -64,6 +69,7 @@ class FractionalShift(
 
     _parameter_constraints: dict = {
         "shift": [Interval(Real, 0, None, closed="both")],
+        "min_shift": [None, Interval(Real, 0, None, closed="both")],
         "padding_mode": [
             StrOptions({"zeros", "constant", "extend", "mirror", "linear"})
         ],
@@ -74,6 +80,7 @@ class FractionalShift(
     def __init__(
         self,
         shift: float = 0.0,
+        min_shift: Optional[float] = None,
         padding_mode: Literal[
             "zeros", "constant", "extend", "mirror", "linear"
         ] = "linear",
@@ -81,6 +88,7 @@ class FractionalShift(
         random_state: Optional[int] = None,
     ):
         self.shift = shift
+        self.min_shift = min_shift
         self.padding_mode = padding_mode
         self.pad_value = pad_value
         self.random_state = random_state
@@ -104,10 +112,17 @@ class FractionalShift(
         Raises
         ------
         ValueError
-            If X is not a 2D array or contains non-finite values.
+            If X is not a 2D array or contains non-finite values, or if
+            `min_shift` is greater than `shift`.
         """
         # Validate the input parameters
         self._validate_params()
+
+        if self.min_shift is not None and self.min_shift > self.shift:
+            raise ValueError(
+                f"min_shift ({self.min_shift}) must be smaller than or equal "
+                f"to shift ({self.shift})."
+            )
 
         X = validate_data(
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
@@ -150,7 +165,12 @@ class FractionalShift(
 
     def _shift_signal(self, x: np.ndarray) -> np.ndarray:
         n = len(x)
-        shift = self._rng.uniform(-self.shift, self.shift)
+        if self.min_shift is not None:
+            mag = self._rng.uniform(self.min_shift, self.shift)
+            sign = self._rng.choice([-1.0, 1.0])
+            shift = sign * mag
+        else:
+            shift = self._rng.uniform(-self.shift, self.shift)
         indices = np.arange(n)
         shifted_indices = indices + shift
 
