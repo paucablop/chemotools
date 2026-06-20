@@ -84,13 +84,13 @@ class ExtendedMultiplicativeScatterCorrection(
        correction in vibrational spectroscopy, a tutorial,"
        Chemometrics and Intelligent Laboratory Systems, 2012.
 
-     Examples
-     --------
-     >>> import numpy as np
-     >>> from chemotools.scatter import ExtendedMultiplicativeScatterCorrection
-     >>> X = np.random.default_rng(7).normal(size=(8, 50))
-     >>> emsc = ExtendedMultiplicativeScatterCorrection(order=2)
-     >>> X_corr = emsc.fit_transform(X)
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.scatter import ExtendedMultiplicativeScatterCorrection
+    >>> X = np.random.default_rng(7).normal(size=(8, 50))
+    >>> emsc = ExtendedMultiplicativeScatterCorrection(order=2)
+    >>> X_corr = emsc.fit_transform(X)
     """
 
     _parameter_constraints: dict = {

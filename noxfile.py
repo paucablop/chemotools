@@ -7,6 +7,9 @@ import nox
 SUPPORTED_PYTHONS = ("3.10", "3.11", "3.12", "3.13", "3.14")
 MINIMUM_SKLEARN_PYTHONS = ("3.10", "3.11", "3.12")
 MINIMUM_SKLEARN = "1.6.*"
+# Use wheel-available pins for deterministic min-sklearn testing.
+MINIMUM_NUMPY = "2.2.6"
+MINIMUM_SCIPY = "1.13.1"
 LATEST_SKLEARN = "scikit-learn>=1.6.0,<2"
 
 TEST_DEPENDENCIES = ("pytest>=8.3.0", "pytest-cov>=6.3.0")
@@ -39,12 +42,16 @@ def install_test_dependencies(
     session: nox.Session,
     *,
     sklearn_requirement: str | None = None,
+    additional_requirements: tuple[str, ...] = (),
     extras: tuple[str, ...] = (),
 ) -> None:
     """Install the project test dependencies with an optional sklearn override."""
     install_project(session, *TEST_DEPENDENCIES, extras=extras)
+    upgrade_requirements: list[str] = [*additional_requirements]
     if sklearn_requirement is not None:
-        session.install("--upgrade", sklearn_requirement)
+        upgrade_requirements.insert(0, sklearn_requirement)
+    if upgrade_requirements:
+        session.install("--upgrade", *upgrade_requirements)
 
 
 @nox.session
@@ -90,6 +97,22 @@ def tests_min_sklearn(session: nox.Session) -> None:
     install_test_dependencies(
         session,
         sklearn_requirement=f"scikit-learn=={MINIMUM_SKLEARN}",
+        additional_requirements=(
+            f"numpy=={MINIMUM_NUMPY}",
+            f"scipy=={MINIMUM_SCIPY}",
+        ),
         extras=("viz",),
+    )
+    session.log("Resolved min stack versions:")
+    session.run(
+        "python",
+        "-c",
+        (
+            "import sys, numpy, scipy, sklearn; "
+            "print('python', sys.version.split()[0]); "
+            "print('numpy', numpy.__version__); "
+            "print('scipy', scipy.__version__); "
+            "print('sklearn', sklearn.__version__)"
+        ),
     )
     session.run("pytest", "-rs", *(session.posargs or ["tests/"]))

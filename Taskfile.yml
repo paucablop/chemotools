@@ -117,22 +117,61 @@ tasks:
     cmds:
       - task: test
 
-  nox:list:
+  test:nox:list:
     desc: List available nox sessions
     cmds:
       - "{{.UV}} run nox --list"
 
-  test:matrix:
-    desc: Run the nox compatibility test matrix locally
+  test:nox:core:
+    desc: Run nox core tests (no plotting/inspector)
+    cmds:
+      - "{{.UV}} run nox -s {{.NOX_CORE_TEST_SESSIONS}}"
+
+  test:nox:full:
+    desc: Run nox full test matrix (Python 3.10-3.14 with all features)
+    cmds:
+      - "{{.UV}} run nox -s {{.NOX_TEST_SESSIONS}}"
+
+  test:nox:min-sklearn:
+    desc: Run nox minimum scikit-learn compatibility tests
+    cmds:
+      - "{{.UV}} run nox -s {{.NOX_MIN_SKLEARN_SESSIONS}}"
+
+  test:nox:all:
+    desc: Run all nox test matrices (core + full + min-sklearn)
     cmds:
       - "{{.UV}} run nox -s {{.NOX_CORE_TEST_SESSIONS}}"
       - "{{.UV}} run nox -s {{.NOX_TEST_SESSIONS}}"
       - "{{.UV}} run nox -s {{.NOX_MIN_SKLEARN_SESSIONS}}"
 
+  test:matrix:
+    desc: Run the nox compatibility test matrix locally (alias for test:nox:all)
+    cmds:
+      - task: test:nox:all
+
   coverage:
     desc: Run tests with coverage report
     cmds:
       - "{{.UV}} run pytest --cov=chemotools --cov-report=xml --cov-report=term-missing"
+
+  # 🏎️ Benchmarking
+  benchmark:list:
+    desc: List available benchmarks (estimators, scenarios, profiles)
+    deps: [install]
+    cmds:
+      - "{{.UV}} run python benchmarks/benchmark.py list"
+
+  benchmark:list:all:
+    desc: List all benchmark registry entries in detail
+    deps: [install]
+    cmds:
+      - "{{.UV}} run python benchmarks/benchmark.py list --kind all"
+
+  benchmark:run:
+    desc: Run a specific benchmark (use -- --estimator NAME [--scenario NAME] [--profile NAME] [--set key=value])
+    deps: [install]
+    cmds:
+      - "{{.UV}} run python benchmarks/benchmark.py run {{.CLI_ARGS}}"
 
   # 📦 Packaging
   build:
