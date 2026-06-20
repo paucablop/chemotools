@@ -65,24 +65,58 @@ spectra_transformed = preprocessing.fit_transform(spectra)
 ## Development
 
 This project uses [uv](https://github.com/astral-sh/uv) for dependency management and [Task](https://taskfile.dev) to simplify common development workflows.
-You can get started quickly by using the predefined [Taskfile](./Taskfile.yml), which provides handy shortcuts such as:
+You can get started quickly by using the predefined [Taskfile](./Taskfile.yml), which provides handy shortcuts for common tasks:
+
+### Setup & Validation
 
 ```bash
 task install     # install all dependencies
 task check       # run formatting, linting, typing, and tests
 task test        # quick test run in the current environment
-task test:matrix # run the nox compatibility matrix locally
 task coverage    # run tests with coverage reporting
-task build       # build the package for distribution
 ```
 
-For compatibility testing across supported Python versions, use [`nox`](https://nox.thea.codes/):
+### Testing
+
+Run tests in your current environment:
+```bash
+task test           # quick test
+task test:quick     # same as task test
+```
+
+Run tests across the compatibility matrix using `nox`:
+```bash
+task test:nox:list              # list available nox sessions
+task test:nox:core              # core tests (no plotting/inspector)
+task test:nox:full              # full Python 3.10-3.14 matrix
+task test:nox:min-sklearn       # minimum scikit-learn compatibility tests
+task test:nox:all               # run all test matrices
+```
+
+### Benchmarking
+
+Profile performance of estimators:
+```bash
+task benchmark:list             # list available benchmarks
+task benchmark:list:all         # show detailed benchmark registry
+task benchmark:run -- --estimator adaptation.direct_standardization
+task benchmark:run -- --estimator baseline.air_pls --profile regular
+```
+
+### Building & Documentation
 
 ```bash
-uv run nox --list               # show available sessions
-uv run nox -s tests-3.12       # run tests on a specific Python version
-uv run nox -s tests-min-sklearn-3.10
-uv run nox -s tests-min-sklearn-3.12
+task build              # build the package
+task docs:html          # build English documentation
+task docs:html-all      # build all language variants
+```
+
+For more control, use [`nox`](https://nox.thea.codes/) directly:
+
+```bash
+uv run nox --list                       # show all available sessions
+uv run nox -s tests-3.12               # run tests on a specific Python version
+uv run nox -s tests-min-sklearn-3.12   # test minimum scikit-learn version
 ```
 
 ## Contributing
