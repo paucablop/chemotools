@@ -231,9 +231,12 @@ class PLSRegression(_SklearnPLSRegression):
             Y transformed into the latent space (Y-scores), returned if `return_y=True`.
         """
         if return_y:
+            if y is None:
+                 raise ValueError("return_y=True requires `y` to be provided.")
             return super().transform(X, y=y, copy=copy)
-        else:
-            return super().transform(X, copy=copy)
+        # else:
+        #     return super().transform(X, copy=copy)
+        return super().transform(X, copy=copy)
 
     def get_feature_names_out(
         self, input_features: list[str] | None = None
@@ -257,7 +260,11 @@ class PLSRegression(_SklearnPLSRegression):
         np.ndarray of shape (n_components,)
             - Latent variable names
         """
-        return np.asarray([f"LV{i + 1}" for i in range(self.n_components)])
+        from sklearn.utils.validation import check_is_fitted
+
+        check_is_fitted(self)
+        return np.asarray([f"LV{i + 1}" for i in range(self.n_components)],
+                          dtype=object)
 
     def _calculate_explained_variance_deflation(
         self, X, y
