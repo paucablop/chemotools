@@ -365,7 +365,7 @@ class PLSRegressionInspector(
             _, y = self._get_raw_data(dataset)
 
             # Use transform with Y to get Y-scores
-            _, y_scores = self.estimator.transform(X_preprocessed, y, return_y = True)
+            _, y_scores = self.estimator.transform(X_preprocessed, y, return_y=True)
             self._y_scores_cache[dataset] = y_scores
         return self._y_scores_cache[dataset]
 
