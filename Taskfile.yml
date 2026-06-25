@@ -137,6 +137,11 @@ tasks:
     cmds:
       - "{{.UV}} run nox -s {{.NOX_MIN_SKLEARN_SESSIONS}}"
 
+  docs:constraints:
+    desc: Validate transformer doc Parameters against _parameter_constraints
+    cmds:
+      - "{{.UV}} run nox -s docs-constraints"
+
   test:nox:all:
     desc: Run all nox test matrices (core + full + min-sklearn)
     cmds:
@@ -195,6 +200,7 @@ tasks:
       - task: lint
       - task: spelling
       - task: type-check
+      - task: docs:constraints
       - task: test
 
   check:matrix:
