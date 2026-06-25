@@ -154,7 +154,7 @@ tasks:
     cmds:
       - "{{.UV}} run pytest --cov=chemotools --cov-report=xml --cov-report=term-missing"
 
-  # � Benchmarking
+  # 🏎️ Benchmarking
   benchmark:list:
     desc: List available benchmarks (estimators, scenarios, profiles)
     deps: [install]
@@ -173,7 +173,7 @@ tasks:
     cmds:
       - "{{.UV}} run python benchmarks/benchmark.py run {{.CLI_ARGS}}"
 
-  # �📦 Packaging
+  # 📦 Packaging
   build:
     desc: Build the package
     cmds:
