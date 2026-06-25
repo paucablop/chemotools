@@ -32,6 +32,11 @@ class SpectrumScale(
     random_state : int, default=None
         The random state to use for the random number generator.
 
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of features seen during :meth:`fit`.
+
     Examples
     --------
     >>> from chemotools.augmentation import SpectrumScale

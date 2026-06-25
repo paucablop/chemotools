@@ -48,6 +48,11 @@ class GaussianBroadening(
         Truncate the filter at this many standard deviations.
         Larger values increase computation time but improve accuracy.
 
+    Attributes
+    ----------
+    n_features_in_ : int
+        Number of features seen during :meth:`fit`.
+
     Examples
     --------
     >>> from chemotools.augmentation import GaussianBroadening

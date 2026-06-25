@@ -82,7 +82,7 @@ class ParetoScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     0.3 or 0.7) may provide a superior balance of signal-to-noise ratio and
     model interpretability compared to fixed Pareto scaling.
 
-    See also
+    See Also
     --------
     sklearn.preprocessing.StandardScaler : Standardize features by removing the mean
     and scaling to unit variance.

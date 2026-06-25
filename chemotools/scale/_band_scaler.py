@@ -107,7 +107,7 @@ class BandScaler(
     omitted, the transformer raises a :class:`ValueError` rather than implicitly
     assuming uniform sampling density across the selected band.
 
-    See also
+    See Also
     --------
     chemotools.scale.MinMaxScaler : Scales features to the Min-Max range.
     chemotools.scale.NormScaler : Scales features to unit norm.

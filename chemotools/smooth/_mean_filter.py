@@ -34,7 +34,7 @@ class MeanFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
 
     mode : str, optional, default="nearest"
         The mode to use for the mean filter. Can be "nearest", "constant", "reflect",
-        "wrap", "mirror" or "interp". Default is "nearest".
+        "wrap" or "mirror". Default is "nearest".
 
     window_size : int, optional
         Deprecated alias for ``window_length``.
