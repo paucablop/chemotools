@@ -131,6 +131,8 @@ class _BaseWhittaker(
         X_ = validate_data(
             self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
         )
+        if self.n_jobs == 0:
+            raise ValueError("n_jobs must be different from 0")
         return apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
 
     @abstractmethod

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.utils._param_validation import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.smooth import MedianFilter
@@ -106,13 +107,25 @@ def test_median_filter_parallel_matches_serial():
     np.testing.assert_allclose(y_parallel, y_serial, rtol=0.0, atol=1e-12)
 
 
+def test_median_filter_n_jobs_minus_one_runs():
+    # Arrange
+    X = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]], dtype=np.float64)
+    mf = MedianFilter(window_length=3, n_jobs=-1)
+
+    # Act
+    y = mf.fit_transform(X)
+
+    # Assert
+    assert y.shape == X.shape
+
+
 def test_median_filter_invalid_n_jobs_zero():
     # Arrange
     X = np.array([[1.0, 2.0, 30.0, 4.0, 5.0]], dtype=np.float64)
     mf = MedianFilter(window_length=3, n_jobs=0)
 
-    # Act
-    with pytest.raises(ValueError, match="n_jobs"):
+    # Act & Assert
+    with pytest.raises((InvalidParameterError, ValueError), match="n_jobs"):
         mf.fit(X)
 
 

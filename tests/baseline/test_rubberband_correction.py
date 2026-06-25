@@ -1,7 +1,9 @@
 """Tests for :class:`chemotools.baseline.RubberbandCorrection`."""
 
 import numpy as np
+import pytest
 from numpy.testing import assert_allclose
+from sklearn.utils._param_validation import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.baseline import RubberbandCorrection
@@ -132,3 +134,54 @@ def test_rubberband_snapshot():
         ]
     )
     assert_allclose(result, expected, atol=1e-12)
+
+
+def test_rubberband_parallel_matches_serial():
+    # Arrange
+    rng = np.random.default_rng(123)
+    X = rng.normal(size=(16, 80)) + 5.0
+    serial = RubberbandCorrection(n_jobs=1)
+    parallel = RubberbandCorrection(n_jobs=2)
+
+    # Act
+    y_serial = serial.fit_transform(X)
+    y_parallel = parallel.fit_transform(X)
+
+    # Assert
+    np.testing.assert_allclose(y_parallel, y_serial, rtol=0.0, atol=1e-12)
+
+
+def test_rubberband_n_jobs_minus_one_runs():
+    # Arrange
+    X = np.array([[0.0, 1.0, 10.0, 3.0, 4.0]], dtype=np.float64)
+    transformer = RubberbandCorrection(n_jobs=-1)
+
+    # Act
+    y = transformer.fit_transform(X)
+
+    # Assert
+    assert y.shape == X.shape
+
+
+def test_rubberband_invalid_n_jobs_zero_rejected():
+    # Arrange
+    X = np.array([[0.0, 1.0, 10.0, 3.0, 4.0]], dtype=np.float64)
+    transformer = RubberbandCorrection(n_jobs=0)
+
+    # Act & Assert
+    with pytest.raises((InvalidParameterError, ValueError), match="n_jobs"):
+        transformer.fit(X)
+
+
+def test_rubberband_legacy_state_without_n_jobs():
+    # Arrange: simulate a pickle that pre-dates the n_jobs attribute
+    legacy = RubberbandCorrection()
+    legacy_state = {k: v for k, v in legacy.__dict__.items() if k != "n_jobs"}
+    restored = RubberbandCorrection()
+
+    # Act
+    restored.__setstate__(legacy_state)
+
+    # Assert
+    assert restored.n_jobs == 1
+    assert restored.get_params(deep=False)["n_jobs"] == 1
