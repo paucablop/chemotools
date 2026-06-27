@@ -36,10 +36,9 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         dict and forwarded to ``func``; any extra keys are silently ignored.
 
     validate : bool, default=True
-        If ``True``, ``transform`` calls ``check_is_fitted`` and
-        ``validate_data`` to enforce the scikit-learn contract.  Set to
-        ``False`` when ``func`` handles its own input validation or when
-        used outside a fitted pipeline.
+        If ``True``, ``transform`` calls ``validate_data`` to enforce the scikit-learn 
+        contract.  Set to ``False`` when ``func`` handles its own input validation or 
+        when used outside a fitted pipeline.
 
     Attributes
     ----------
