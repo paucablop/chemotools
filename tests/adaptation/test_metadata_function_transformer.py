@@ -145,6 +145,53 @@ class TestMetadataFunctionTransformerFit:
         except Exception as e:
             pytest.fail(f"fit raised an unexpected exception: {e}")
 
+    def test_fit_raises_when_required_arg_missing_from_metadata_with_var_keyword(self):
+        """Verifies that a required positional arg is still checked even when the
+        function also accepts **kwargs."""
+
+        # Arrange
+        def func_with_required_and_kwargs(X, required, **kwargs):
+            return X + required
+
+        transformer = MetadataFunctionTransformer(
+            func=func_with_required_and_kwargs, metadata=()
+        )
+
+        # Act & Assert
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "[MetadataFunctionTransformer] The function "
+                "'func_with_required_and_kwargs' requires the following arguments "
+                "without defaults, which are missing from `metadata`: ['required']"
+            ),
+        ):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
+    def test_fit_raises_when_metadata_key_is_positional_only(self):
+        """Verifies that a metadata key matching a positional-only parameter is
+        rejected because the transformer forwards metadata as keyword arguments."""
+
+        # Arrange
+        def func_with_positional_only(X, ref, /):
+            return X - ref
+
+        transformer = MetadataFunctionTransformer(
+            func=func_with_positional_only, metadata=("ref",)
+        )
+
+        # Act & Assert
+        with pytest.raises(
+            ValueError,
+            match=re.escape(
+                "[MetadataFunctionTransformer] The following keys in `metadata` "
+                "correspond to positional-only parameters of "
+                "'func_with_positional_only' and cannot be forwarded as keyword "
+                "arguments: ['ref']"
+            ),
+        ):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
 
 class TestMetadataFunctionTransformerTransform:
     """Tests for the transform method of MetadataFunctionTransformer."""
