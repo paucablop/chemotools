@@ -16,26 +16,8 @@ SECTION_BOUNDARY_RE = re.compile(r"\n[A-Za-z][A-Za-z0-9_ ]+\n[-]{3,}\s*\n")
 QUOTED_TOKEN_RE = re.compile(r"[\"']([A-Za-z0-9_-]+)[\"']")
 
 
-def _base_names(class_node: ast.ClassDef) -> list[str]:
-    names: list[str] = []
-    for base in class_node.bases:
-        if isinstance(base, ast.Name):
-            names.append(base.id)
-        elif isinstance(base, ast.Attribute):
-            names.append(base.attr)
-        elif isinstance(base, ast.Subscript):
-            value = base.value
-            if isinstance(value, ast.Name):
-                names.append(value.id)
-            elif isinstance(value, ast.Attribute):
-                names.append(value.attr)
-    return names
-
-
-def _is_public_transformer(class_node: ast.ClassDef) -> bool:
-    return "TransformerMixin" in _base_names(
-        class_node
-    ) and not class_node.name.startswith("_")
+def _is_public_name(class_node: ast.ClassDef) -> bool:
+    return not class_node.name.startswith("_")
 
 
 def _extract_parameters_lines(doc: str) -> list[str]:
@@ -103,22 +85,45 @@ def _parse_doc_parameters(doc: str) -> dict[str, str]:
 
 
 def _get_constraints_dict_node(class_node: ast.ClassDef) -> ast.Dict | None:
+    """Return the ``_parameter_constraints`` dict node, or None.
+
+    Returns None when the dict contains ``**spread`` expressions (inherited
+    constraints merged at class definition time).  Those classes are covered
+    by the base-class check and cannot be statically resolved here.
+    """
     for statement in class_node.body:
+        dict_node: ast.Dict | None = None
+
         if (
             isinstance(statement, ast.AnnAssign)
             and isinstance(statement.target, ast.Name)
             and statement.target.id == "_parameter_constraints"
             and isinstance(statement.value, ast.Dict)
         ):
-            return statement.value
+            dict_node = statement.value
 
-        if isinstance(statement, ast.Assign) and isinstance(statement.value, ast.Dict):
+        elif isinstance(statement, ast.Assign) and isinstance(
+            statement.value, ast.Dict
+        ):
             for target in statement.targets:
                 if (
                     isinstance(target, ast.Name)
                     and target.id == "_parameter_constraints"
                 ):
-                    return statement.value
+                    dict_node = statement.value
+                    break
+
+        if dict_node is None:
+            continue
+
+        # Skip dicts that spread-merge parent constraints
+        # (**base._parameter_constraints).  Those cannot be statically resolved
+        # and are covered by the base class entry.
+        has_spread = any(key is None for key in dict_node.keys)
+        if has_spread:
+            return None
+
+        return dict_node
 
     return None
 
@@ -168,13 +173,21 @@ def _parse_constraints(constraints_dict: ast.Dict) -> dict[str, ast.AST]:
 
 
 def _load_public_transformers() -> list[tuple[Path, ast.ClassDef]]:
+    """Load public classes that define their own ``_parameter_constraints``.
+
+    Using ``_parameter_constraints`` presence as the filter is intentional:
+    it is the exact artefact the test validates, it covers classes that inherit
+    ``TransformerMixin`` indirectly (e.g. via internal base classes), and it
+    avoids hardcoding project-specific base class names.
+    """
     classes: list[tuple[Path, ast.ClassDef]] = []
     for file_path in PACKAGE_ROOT.rglob("*.py"):
-        source = file_path.read_text(encoding="utf-8")
-        module = ast.parse(source)
+        module = ast.parse(file_path.read_text(encoding="utf-8"))
         for class_node in module.body:
-            if isinstance(class_node, ast.ClassDef) and _is_public_transformer(
-                class_node
+            if (
+                isinstance(class_node, ast.ClassDef)
+                and _is_public_name(class_node)
+                and _get_constraints_dict_node(class_node) is not None
             ):
                 classes.append((file_path, class_node))
     return classes
@@ -188,11 +201,9 @@ def test_transformer_docstring_parameter_constraints_are_consistent() -> None:
         class_doc = ast.get_docstring(class_node) or ""
         doc_parameters = _parse_doc_parameters(class_doc)
 
+        # _load_public_transformers guarantees _parameter_constraints exists.
         constraints_dict = _get_constraints_dict_node(class_node)
-        if constraints_dict is None:
-            # Some classes may inherit constraints from parent classes.
-            continue
-
+        assert constraints_dict is not None  # invariant enforced by loader
         constraints = _parse_constraints(constraints_dict)
 
         missing_in_docs = sorted(set(constraints) - set(doc_parameters))
