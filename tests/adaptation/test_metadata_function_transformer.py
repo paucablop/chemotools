@@ -189,8 +189,7 @@ class TestMetadataFunctionTransformerTransform:
         X_transformed = transformer.transform(X, reference=reference, **extra_metadata)
 
         # Assert
-        assert np.allclose(X_transformed, expected), "Transformed output does not "
-        "match expected result."
+        assert np.allclose(X_transformed, expected), "Transformed output does not match expected result."
 
 
 class TestMetadataFunctionTransformerFitTransform:
