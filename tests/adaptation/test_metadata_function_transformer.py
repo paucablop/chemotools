@@ -243,8 +243,7 @@ class TestMetadataFunctionTransformerRoutingRegisters:
             "Transformer should have a metadata attribute."
         )
         assert "reference" in transformer.metadata, (
-            "Metadata keys should include "
-            "'reference'."
+            "Metadata keys should include 'reference'."
         )
         assert transformer.get_metadata_routing().fit.__dict__ == {
             "_requests": {"reference": True},
