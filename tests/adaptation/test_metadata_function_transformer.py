@@ -166,7 +166,9 @@ class TestMetadataFunctionTransformerTransform:
         X_transformed = transformer.transform(X, reference=reference)
 
         # Assert
-        assert np.allclose(X_transformed, expected), "Transformed output does not match expected result."
+        assert np.allclose(X_transformed, expected), (
+            "Transformed output does not match expected result."
+        )
 
     def test_transform_ignores_extra_metadata_keys(self):
         """Verifies that transform ignores metadata keys that are not specified in
