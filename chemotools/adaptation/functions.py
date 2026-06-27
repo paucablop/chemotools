@@ -97,7 +97,7 @@ def divide_by_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     return X / reference
 
 
-def scale_by_factor(X: np.ndarray, factor: np.ndarray) -> np.ndarray:
+def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:
     """Multiply every row of ``X`` by a scalar or array factor.
 
     Useful for per-batch or per-sample intensity rescaling, e.g. correcting
