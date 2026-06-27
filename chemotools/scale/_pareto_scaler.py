@@ -85,7 +85,7 @@ class ParetoScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
     See Also
     --------
     sklearn.preprocessing.StandardScaler : Standardize features by removing the mean
-    and scaling to unit variance.
+        and scaling to unit variance.
     """
 
     _parameter_constraints: dict = {
