@@ -213,8 +213,9 @@ class TestMetadataFunctionTransformerFitTransform:
         X_transformed = transformer.fit_transform(X, reference=reference)
 
         # Assert
-        assert np.allclose(X_transformed, expected), "Transformed output does not "
-        "match expected result."
+        assert np.allclose(X_transformed, expected), (
+            "Transformed output does not match expected result."
+        )
 
 
 class TestMetadataFunctionTransformerRoutingRegisters:
@@ -238,10 +239,13 @@ class TestMetadataFunctionTransformerRoutingRegisters:
         _ = transformer.transform(X, reference=reference)
 
         # Assert
-        assert hasattr(transformer, "metadata"), "Transformer should have a "
-        "metadata attribute."
-        assert "reference" in transformer.metadata, "Metadata keys should include "
-        "'reference'."
+        assert hasattr(transformer, "metadata"), (
+            "Transformer should have a metadata attribute."
+        )
+        assert "reference" in transformer.metadata, (
+            "Metadata keys should include "
+            "'reference'."
+        )
         assert transformer.get_metadata_routing().fit.__dict__ == {
             "_requests": {"reference": True},
             "owner": "MetadataFunctionTransformer",
