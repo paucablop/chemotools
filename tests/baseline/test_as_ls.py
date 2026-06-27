@@ -82,10 +82,12 @@ def test_as_ls_invalid_n_jobs_zero_rejected():
 
 
 def test_as_ls_legacy_state_without_n_jobs():
-    # Arrange: simulate a pickle that pre-dates the n_jobs attribute
+    # Arrange: reproduce what pickle.loads does for an old pickle that pre-dates
+    # the n_jobs attribute — object.__new__ creates the instance without calling
+    # __init__, then __setstate__ receives the old (n_jobs-free) state dict.
     legacy = AsLs()
     legacy_state = {k: v for k, v in legacy.__dict__.items() if k != "n_jobs"}
-    restored = AsLs()
+    restored = object.__new__(AsLs)
 
     # Act
     restored.__setstate__(legacy_state)
