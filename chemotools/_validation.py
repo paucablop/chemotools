@@ -1,5 +1,8 @@
 """Shared model validation and parameter extraction utilities."""
 
+import inspect
+import warnings
+from collections.abc import Callable, Sequence
 from typing import Optional, Tuple, Type, Union
 
 from sklearn.cross_decomposition._pls import _PLS
@@ -102,3 +105,62 @@ def get_model_parameters(estimator: EstimatorType) -> Tuple[int, int, int]:
         f"Cannot extract parameters from {type(estimator).__name__}. "
         "Expected _BasePCA or _PLS."
     )
+
+
+def check_metadata_signature(
+    fn: Callable, metadata: Sequence[str], estimator_name: str = "Estimator"
+) -> None:
+    """
+    Validates that a function's signature matches the requested routing metadata.
+    """
+    try:
+        sig = inspect.signature(fn)
+    except ValueError:
+        warnings.warn(
+            f"Could not inspect the signature of '{getattr(fn, '__name__', repr(fn))}' "
+            "(e.g. a C-extension or ufunc). Metadata signature validation was skipped. "
+            "Ensure manually that the function accepts the metadata keys in "
+            f"`metadata`: {list(metadata)}.",
+            UserWarning,
+            stacklevel=3,
+        )
+        return
+
+    params = sig.parameters
+
+    # If the function accepts **kwargs, it can safely absorb any metadata
+    if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()):
+        return
+
+    # 1. Check for orphaned metadata (requested, but function can't accept it)
+    missing_in_func = [key for key in metadata if key not in params]
+    if missing_in_func:
+        raise ValueError(
+            f"[{estimator_name}] The function "
+            f"'{getattr(fn, '__name__', repr(fn))}' does not accept the "
+            f"following arguments requested in `metadata`: {missing_in_func}"
+        )
+
+    # 2. Check for starved function (function requires it, but not in metadata)
+    param_names = list(params.keys())
+    if len(param_names) > 1:
+        expected_kwargs = param_names[1:]
+        missing_in_metadata = []
+
+        for param_name in expected_kwargs:
+            p = params[param_name]
+            if (
+                p.default == inspect.Parameter.empty
+                and p.kind
+                not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+                and param_name not in metadata
+            ):
+                missing_in_metadata.append(param_name)
+
+        if missing_in_metadata:
+            raise ValueError(
+                f"[{estimator_name}] The function "
+                f"'{getattr(fn, '__name__', repr(fn))}' requires the following "
+                f"arguments without defaults, which are missing from "
+                f"`metadata`: {missing_in_metadata}"
+            )
