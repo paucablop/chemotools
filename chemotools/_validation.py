@@ -1,7 +1,6 @@
 """Shared model validation and parameter extraction utilities."""
 
 import inspect
-import warnings
 from collections.abc import Callable, Sequence
 from typing import Optional, Tuple, Type, Union
 
@@ -113,19 +112,7 @@ def check_metadata_signature(
     """
     Validates that a function's signature matches the requested routing metadata.
     """
-    try:
-        sig = inspect.signature(fn)
-    except ValueError:
-        warnings.warn(
-            f"Could not inspect the signature of '{getattr(fn, '__name__', repr(fn))}' "
-            "(e.g. a C-extension or ufunc). Metadata signature validation was skipped. "
-            "Ensure manually that the function accepts the metadata keys in "
-            f"`metadata`: {list(metadata)}.",
-            UserWarning,
-            stacklevel=3,
-        )
-        return
-
+    sig = inspect.signature(fn)
     params = sig.parameters
 
     # If the function accepts **kwargs, it can safely absorb any metadata
