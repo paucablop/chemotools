@@ -43,7 +43,10 @@ class SavitzkyGolayFilter(_BaseFIRFilter):
 
     mode : str, optional
         The mode to use for the Savitzky-Golay filter. Can be "nearest", "constant",
-        "reflect", "wrap", "mirror" or "interp". Default is "nearest".
+        "wrap", "mirror" or "interp". Default is "nearest".
+
+    axis : int, optional
+        Axis along which the filter is applied. Default is 1 (feature axis).
 
     Attributes
     ----------

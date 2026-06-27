@@ -53,7 +53,7 @@ class SavitzkyGolay(
 
     mode : str, optional, default="nearest"
         The mode to use for the derivative calculation. Can be "nearest", "constant",
-        "reflect", "wrap", "mirror" or "interp". Default is "nearest".
+        "wrap", "mirror" or "interp". Default is "nearest".
 
     Attributes
     ----------

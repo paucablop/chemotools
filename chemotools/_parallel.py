@@ -81,7 +81,7 @@ def apply_row_slices(
     Returns an empty array of empty_shape when n_rows == 0.
     """
     if n_rows == 0:
-        return np.empty(empty_shape, dtype=dtype)
+        return np.empty(empty_shape, dtype=np.dtype(dtype))
     return parallel_map_reduce(
         row_slices(n_rows, n_jobs),
         n_jobs=n_jobs,

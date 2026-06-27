@@ -35,7 +35,7 @@ class PiecewiseDirectStandardization(
     n_components : int, default=2
         Number of components to keep for PLS model
 
-    scale : bool, default = True
+    scale : bool, default=True
         Whether to scale X and Y in the PLS model
 
     storage : str {"dense", "band"}, default="dense"

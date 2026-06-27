@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.utils._param_validation import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.scatter import RobustNormalVariate
@@ -82,3 +83,56 @@ def test_rnv_percentile_above_100_rejected():
     # Act & Assert
     with pytest.raises(Exception, match="percentile"):
         rnv.fit(X)
+
+
+def test_rnv_parallel_matches_serial():
+    # Arrange
+    rng = np.random.default_rng(42)
+    X = rng.normal(size=(24, 64))
+    serial = RobustNormalVariate(n_jobs=1)
+    parallel = RobustNormalVariate(n_jobs=2)
+
+    # Act
+    y_serial = serial.fit_transform(X)
+    y_parallel = parallel.fit_transform(X)
+
+    # Assert
+    np.testing.assert_allclose(y_parallel, y_serial, rtol=0.0, atol=1e-12)
+
+
+def test_rnv_n_jobs_minus_one_runs():
+    # Arrange
+    X = np.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]], dtype=np.float64)
+    rnv = RobustNormalVariate(n_jobs=-1)
+
+    # Act
+    y = rnv.fit_transform(X)
+
+    # Assert
+    assert y.shape == X.shape
+
+
+def test_rnv_invalid_n_jobs_zero_rejected():
+    # Arrange
+    X = np.array([[1.0, 2.0, 3.0]], dtype=np.float64)
+    rnv = RobustNormalVariate(n_jobs=0)
+
+    # Act & Assert
+    with pytest.raises((InvalidParameterError, ValueError), match="n_jobs"):
+        rnv.fit(X)
+
+
+def test_rnv_legacy_state_without_n_jobs():
+    # Arrange: reproduce what pickle.loads does for an old pickle that pre-dates
+    # the n_jobs attribute — object.__new__ creates the instance without calling
+    # __init__, then __setstate__ receives the old (n_jobs-free) state dict.
+    legacy = RobustNormalVariate()
+    legacy_state = {k: v for k, v in legacy.__dict__.items() if k != "n_jobs"}
+    restored = object.__new__(RobustNormalVariate)
+
+    # Act
+    restored.__setstate__(legacy_state)
+
+    # Assert
+    assert restored.n_jobs == 1
+    assert restored.get_params(deep=False)["n_jobs"] == 1

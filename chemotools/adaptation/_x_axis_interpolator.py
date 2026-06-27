@@ -41,11 +41,11 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         The interpolation mode. One of:
         ``"linear"``, ``"cubic"`` or ``"pchip"``.
 
-    left : float, default=np.nan
+    left : float or None, default=np.nan
         Value returned for query points below the input grid (passed to
         :func:`numpy.interp`).
 
-    right : float, default=np.nan
+    right : float or None, default=np.nan
         Value returned for query points above the input grid.
 
     n_jobs : int, default=1

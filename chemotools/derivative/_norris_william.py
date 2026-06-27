@@ -44,7 +44,7 @@ class NorrisWilliams(
 
     mode : str, optional, default="nearest"
         The mode to use for the derivative calculation. Can be "nearest", "constant",
-        "reflect", "wrap", "mirror" or "interp". Default is "nearest".
+        "reflect", "wrap" or "mirror". Default is "nearest".
 
     window_size : int, optional
         Deprecated alias for ``window_length``.

@@ -156,9 +156,6 @@ class MedianFilter(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
         if self.window_length_ % 2 == 0:
             raise ValueError("window_length must be odd")
 
-        if self.n_jobs == 0:
-            raise ValueError("n_jobs must be different from 0")
-
         return self
 
     def transform(self, X: np.ndarray, y=None) -> np.ndarray:

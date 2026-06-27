@@ -59,6 +59,13 @@ class _BaseWhittaker(
     n_jobs : int, default=1
         Number of parallel jobs used during :meth:`transform`.
 
+    Attributes
+    ----------
+    DtD_ : ndarray
+        Precomputed linear-system structure for the configured solver backend.
+    solver_ : WhittakerSolver
+        Solver instance created during :meth:`fit`.
+
     Examples
     --------
     Concrete subclasses call this base implementation through ``super()``:
@@ -131,6 +138,8 @@ class _BaseWhittaker(
         X_ = validate_data(
             self, X, ensure_2d=True, copy=True, reset=False, dtype=np.float64
         )
+        if self.n_jobs == 0:
+            raise ValueError("n_jobs must be different from 0")
         return apply_rows(X_, n_jobs=self.n_jobs, fn=self._transform_block)
 
     @abstractmethod
@@ -177,6 +186,11 @@ class _BaseFIRFilter(
         smooth along feature axis for each row.
     window_size : int, optional
         Deprecated alias for ``window_length``.
+
+    Attributes
+    ----------
+    window_length_ : int
+        Validated effective window length used by the filter.
 
     Examples
     --------

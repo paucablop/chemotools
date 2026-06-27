@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+from sklearn.utils._param_validation import InvalidParameterError
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation import XAxisInterpolator
@@ -144,6 +145,47 @@ class TestEstimator:
 
         # Assert
         np.testing.assert_allclose(out_parallel, out_serial, rtol=1e-12, atol=1e-12)
+
+    def test_n_jobs_minus_one_runs(self):
+        """Ensures joblib convention n_jobs=-1 is accepted."""
+        # Arrange
+        X = np.array([[1.0, 2.0, 3.0], [3.0, 2.0, 1.0]], dtype=np.float64)
+        x_axis = np.array([0.0, 1.0, 2.0])
+        target = np.array([0.0, 0.5, 1.0, 1.5, 2.0])
+        est = XAxisInterpolator(common_x_axis=target, method="linear", n_jobs=-1).fit(X)
+
+        # Act
+        out = est.transform(X, x_axis=x_axis)
+
+        # Assert
+        assert out.shape == (2, 5)
+
+    def test_invalid_n_jobs_zero_rejected(self):
+        """Ensures invalid n_jobs=0 is rejected on fit."""
+        # Arrange
+        X = np.array([[1.0, 2.0, 3.0]], dtype=np.float64)
+        est = XAxisInterpolator(
+            common_x_axis=np.array([0.0, 1.0, 2.0]), method="linear", n_jobs=0
+        )
+
+        # Act & Assert
+        with pytest.raises((InvalidParameterError, ValueError), match="n_jobs"):
+            est.fit(X)
+
+    def test_legacy_state_without_n_jobs(self):
+        """Ensures __setstate__ injects n_jobs=1 for pickles that pre-date the
+        attribute."""
+        # Arrange: simulate a pickle that pre-dates the n_jobs attribute
+        legacy = XAxisInterpolator(common_x_axis=np.linspace(0, 1, 5))
+        legacy_state = {k: v for k, v in legacy.__dict__.items() if k != "n_jobs"}
+        restored = XAxisInterpolator(common_x_axis=np.linspace(0, 1, 5))
+
+        # Act
+        restored.__setstate__(legacy_state)
+
+        # Assert
+        assert restored.n_jobs == 1
+        assert restored.get_params(deep=False)["n_jobs"] == 1
 
 
 class TestFitExceptions:
@@ -305,3 +347,19 @@ class TestTransformExceptions:
         # Act & Assert
         with pytest.raises(ValueError, match="x_axis must contain only finite values"):
             est.transform(X, x_axis=x_axis)
+
+
+def test_x_axis_interpolator_legacy_state_without_n_jobs():
+    # Arrange: reproduce what pickle.loads does for an old pickle that pre-dates
+    # the n_jobs attribute — object.__new__ creates the instance without calling
+    # __init__, then __setstate__ receives the old (n_jobs-free) state dict.
+    legacy = XAxisInterpolator(common_x_axis=np.linspace(0, 1, 5))
+    legacy_state = {k: v for k, v in legacy.__dict__.items() if k != "n_jobs"}
+    restored = object.__new__(XAxisInterpolator)
+
+    # Act
+    restored.__setstate__(legacy_state)
+
+    # Assert
+    assert restored.n_jobs == 1
+    assert restored.get_params(deep=False)["n_jobs"] == 1

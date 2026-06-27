@@ -116,3 +116,10 @@ def tests_min_sklearn(session: nox.Session) -> None:
         ),
     )
     session.run("pytest", "-rs", *(session.posargs or ["tests/"]))
+
+
+@nox.session(name="docs-constraints")
+def docs_constraints(session: nox.Session) -> None:
+    """Validate transformer doc Parameters against _parameter_constraints."""
+    install_test_dependencies(session, sklearn_requirement=LATEST_SKLEARN)
+    session.run("pytest", "-rs", "tests/test_docstring_parameter_constraints.py")

@@ -38,8 +38,8 @@ class FractionalShift(
         shift is drawn uniformly  from the union of [-shift, -min_shift]
         and [min_shift, shift].
 
-    padding_mode : {'zeros', 'constant', 'wrap', 'extend',
-        'mirror', 'linear'}, default='linear'
+    padding_mode : {'zeros', 'constant', 'extend', 'mirror',
+        'linear'}, default='linear'
         Padding strategy for extrapolated values.
 
     pad_value : float, default=0.0
