@@ -27,6 +27,25 @@ Examples
 """
 
 import numpy as np
+from sklearn.utils.validation import check_array
+
+
+def _check_metadata(arr, name: str) -> np.ndarray:
+    """Validate *arr* as a numeric input for a metadata argument.
+
+    Scalars are returned as-is.  Array-like inputs are passed through
+    :func:`sklearn.utils.validation.check_array` with ``ensure_2d=True``,
+    which raises a ``ValueError`` for 1-D inputs and guides the user to
+    reshape with ``.reshape(-1, 1)`` (per-sample) or ``.reshape(1, -1)``
+    (shared).
+    """
+    arr = np.asarray(arr)
+    if arr.ndim == 0:
+        return arr  # scalar — valid for any function
+    try:
+        return check_array(arr, ensure_2d=True, dtype="numeric", input_name=name)
+    except ValueError as exc:
+        raise ValueError(f"Invalid metadata argument `{name}`: {exc}") from exc
 
 
 def subtract_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
@@ -40,9 +59,16 @@ def subtract_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     X : np.ndarray of shape (n_samples, n_features)
         Input spectra.
 
-    reference : np.ndarray of shape (1, n_features) or (n_samples, n_features)
-        Reference spectrum (or per-sample references) to subtract.
-        Must broadcast against ``X``.
+    reference : float or np.ndarray
+        Reference to subtract.  Accepted shapes:
+
+        * scalar ``float`` — subtracted from every element.
+        * ``(1, n_features)`` — shared reference broadcast across all samples.
+        * ``(n_samples, 1)`` — per-sample scalar subtracted from every feature.
+        * ``(n_samples, n_features)`` — per-sample full spectrum.
+
+        1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared
+        spectrum or ``.reshape(-1, 1)`` for a per-sample scalar.
 
     Returns
     -------
@@ -59,7 +85,7 @@ def subtract_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     array([[0.5, 1.5, 2.5],
            [3.5, 4.5, 5.5]])
     """
-    return X - reference
+    return X - _check_metadata(reference, "reference")
 
 
 def divide_by_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
@@ -74,10 +100,17 @@ def divide_by_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     X : np.ndarray of shape (n_samples, n_features)
         Input spectra.
 
-    reference : np.ndarray of shape (1, n_features) or (n_samples, n_features)
-        Reference spectrum (or per-sample references) to divide by.
-        Must broadcast against ``X``.  Zero values in ``reference`` will
-        produce ``inf`` or ``nan`` in the output.
+    reference : float or np.ndarray
+        Reference to divide by.  Accepted shapes:
+
+        * scalar ``float`` — divides every element.
+        * ``(1, n_features)`` — shared reference broadcast across all samples.
+        * ``(n_samples, 1)`` — per-sample scalar divisor.
+        * ``(n_samples, n_features)`` — per-sample full spectrum.
+
+        1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared
+        spectrum or ``.reshape(-1, 1)`` for a per-sample scalar.  Zero
+        values will produce ``inf`` or ``nan`` in the output.
 
     Returns
     -------
@@ -94,7 +127,7 @@ def divide_by_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     array([[1., 2., 3.],
            [4., 5., 6.]])
     """
-    return X / reference
+    return X / _check_metadata(reference, "reference")
 
 
 def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:
@@ -108,8 +141,15 @@ def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:
     X : np.ndarray of shape (n_samples, n_features)
         Input spectra.
 
-    factor : float or np.ndarray of shape (n_samples, 1) or (1, n_features)
-        Scaling factor.  Must broadcast against ``X``.
+    factor : float or np.ndarray
+        Scaling factor.  Accepted shapes:
+
+        * scalar ``float`` — multiplies every element.
+        * ``(n_samples, 1)`` — per-sample scalar factor.
+        * ``(1, n_features)`` — per-feature factor shared across samples.
+
+        1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample
+        or ``.reshape(1, -1)`` for per-feature.
 
     Returns
     -------
@@ -125,7 +165,7 @@ def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:
     array([[2. , 4. ],
            [1.5, 2. ]])
     """
-    return X * factor
+    return X * _check_metadata(factor, "factor")
 
 
 def add_offset(X: np.ndarray, offset: np.ndarray) -> np.ndarray:
@@ -139,8 +179,16 @@ def add_offset(X: np.ndarray, offset: np.ndarray) -> np.ndarray:
     X : np.ndarray of shape (n_samples, n_features)
         Input spectra.
 
-    offset : np.ndarray of shape (1, n_features) or (n_samples, n_features)
-        Offset to add.  Must broadcast against ``X``.
+    offset : float or np.ndarray
+        Offset to add.  Accepted shapes:
+
+        * scalar ``float`` — added to every element.
+        * ``(n_samples, 1)`` — per-sample scalar offset.
+        * ``(1, n_features)`` — per-feature offset shared across samples.
+        * ``(n_samples, n_features)`` — per-sample full spectrum.
+
+        1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample
+        or ``.reshape(1, -1)`` for per-feature.
 
     Returns
     -------
@@ -155,4 +203,4 @@ def add_offset(X: np.ndarray, offset: np.ndarray) -> np.ndarray:
     >>> add_offset(X, np.array([[0.1, 0.2, 0.3]]))
     array([[1.1, 2.2, 3.3]])
     """
-    return X + offset
+    return X + _check_metadata(offset, "offset")
