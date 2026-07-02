@@ -51,7 +51,7 @@ def _iter_chemotools_modules():
         except ImportError as exc:
             warnings.warn(
                 f"Skipping '{module_name}' during discovery: {exc}",
-                stacklevel=2,
+                stacklevel=3,
             )
 
 
