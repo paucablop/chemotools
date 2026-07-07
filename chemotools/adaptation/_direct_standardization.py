@@ -56,7 +56,10 @@ class DirectStandardization(
 
     See Also
     --------
-    PiecewiseDirectStandardization : Localized version using windowed PLS regression.
+    PiecewiseDirectStandardization : Local standardization using moving windows.
+    SpectralSpaceTransform : Linear alignment via SVD of the source-target matrix.
+    CORrelationALignment : Unsupervised alignment via covariance matrix whitening.
+    SubspaceAlignment : Unsupervised alignment via PCA subspace projection.
 
     References
     ----------
