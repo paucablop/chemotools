@@ -10,7 +10,6 @@ import re
 import numpy as np
 import pytest
 import sklearn
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
@@ -20,6 +19,7 @@ from chemotools.adaptation._piecewise_direct_standardization import (
     PiecewiseDirectStandardization,
 )
 from chemotools.derivative import SavitzkyGolay
+from chemotools.regression import PLSRegression
 from tests.adaptation.conftest import data_diff
 
 

@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-from sklearn.cross_decomposition import PLSRegression
 
 from chemotools.inspector.helpers._regression import (
     create_predicted_vs_actual_plot,
@@ -13,6 +12,7 @@ from chemotools.inspector.helpers._regression import (
     create_y_residual_plot,
 )
 from chemotools.outliers import Leverage, StudentizedResiduals
+from chemotools.regression import PLSRegression
 
 
 @pytest.fixture

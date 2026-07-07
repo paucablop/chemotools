@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, Dict, Optional, Sequence, Tuple, Union
 
 import numpy as np
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.pipeline import Pipeline
 
+from chemotools._types import PLSEstimatorType
 from chemotools.inspector.helpers import _regression as _regression_plots
 
 from .summaries import RegressionMetrics, RegressionSummary
@@ -23,7 +23,7 @@ if TYPE_CHECKING:  # pragma: no cover
         datasets_: Dict[str, Any]
 
         @property
-        def model(self) -> Union[_PLS, Pipeline]:  # pragma: no cover
+        def model(self) -> Union[PLSEstimatorType, Pipeline]:  # pragma: no cover
             ...
 
         @property

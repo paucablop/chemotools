@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.base import BaseEstimator
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.pipeline import Pipeline
@@ -14,6 +13,7 @@ from chemotools.inspector.core.base import (
     InspectorDataset,
     _BaseInspector,
 )
+from chemotools.regression import PLSRegression
 
 
 # Concrete implementation for testing the abstract base class

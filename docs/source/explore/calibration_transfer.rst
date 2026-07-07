@@ -93,7 +93,7 @@ transfer spectra as ``X_source``:
 .. code-block:: python
 
     from sklearn.pipeline import Pipeline
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
 
     pipe = Pipeline([
         ("ds",  DirectStandardization()),

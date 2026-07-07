@@ -18,9 +18,11 @@ readme = "README.md"
 license = "MIT"
 dependencies = [
     # numpy < 3 is risky if ecosystem hasn't caught up, but good for future-proofing
-    "numpy>=2.0.0,<3", 
+    "numpy>=2.0.0,<3",
     "scikit-learn>=1.6.0,<2",
     "scipy>=1.11.0,<2",
+    # Improved Kernel PLS backend for chemotools.regression.PLSRegression
+    "ikpls>=6.1.0",
 ]
 
 [project.optional-dependencies]
