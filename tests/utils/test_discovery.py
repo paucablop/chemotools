@@ -79,13 +79,13 @@ def test_discovery_skips_module_with_missing_optional_dependency(
     must be skipped with a warning instead of crashing discovery."""
     real_import_module = discovery_module.import_module
 
-    def fake_import_module(name):
+    def fake_import_module(name, package=None):
         if name == unimportable_module:
             raise ImportError(
                 f"'{name}' requires the optional dependency 'matplotlib'. "
                 "Install it with: pip install chemotools[viz]"
             )
-        return real_import_module(name)
+        return real_import_module(name, package)
 
     monkeypatch.setattr(discovery_module, "import_module", fake_import_module)
 
