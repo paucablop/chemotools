@@ -7,7 +7,6 @@ objects (i.e. estimators, displays, functions) from the `chemotools` package.
 
 import inspect
 import pkgutil
-import sys
 import warnings
 from importlib import import_module
 from operator import itemgetter
@@ -36,10 +35,6 @@ def _iter_chemotools_modules():
     need the affected submodule.
     """
     root = str(Path(__file__).parent.parent)  # chemotools package root
-    # Ensure chemotools is importable
-    if root not in sys.path:
-        sys.path.insert(0, root)
-
     for _, module_name, _ in pkgutil.walk_packages(path=[root], prefix="chemotools."):
         module_parts = module_name.split(".")
         # Skip ignored modules and any submodules of datasets
