@@ -536,7 +536,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
         if color_by is None and not use_suffix:
             color_by = "y"
 
-        return datasets, color_by, annotate_by  # type: ignore
+        return datasets, color_by, annotate_by
 
     # -------------------------------------------------------------------------
     # Properties
