@@ -32,6 +32,7 @@ _METADATA_EXPECTED_FAILURES = {
     "check_transformer_data_not_an_array": "transform requires metadata",
     "check_transformer_general": "transform requires metadata",
     "check_transformer_preserve_dtypes": "transform requires metadata",
+    "check_transformer_unfitted": "transform requires metadata",
 }
 
 

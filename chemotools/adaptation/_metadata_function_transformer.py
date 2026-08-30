@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.adaptation._metadata_function_transformer`
+module implements the MetadataFunctionTransformer.
+"""
+
+# Author: Pau Cabaneros
+# Licence: MIT
+
 from collections.abc import Callable, Sequence
 from typing import Any
 
@@ -7,10 +15,7 @@ from sklearn.utils.metadata_routing import MetadataRequest
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._validation import check_metadata_signature
-
-# Author: Pau Cabaneros
-# Licence: MIT
+from chemotools.adaptation.validation import _check_metadata_signature
 
 
 class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator):
@@ -104,10 +109,11 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         self._validate_params()
 
         # Validate the X data
-        validate_data(self, X, ensure_2d=True, reset=True, dtype="numeric")
+        if self.validate:
+            validate_data(self, X, ensure_2d=True, reset=True, dtype="numeric")
 
         # Validate that the provided metadata keys match the function signature
-        check_metadata_signature(
+        _check_metadata_signature(
             self.func, self.metadata, estimator_name=type(self).__name__
         )
         return self
@@ -130,7 +136,6 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         X_transformed : np.ndarray of shape (n_samples, n_features)
             The result of calling ``func(X, **kwargs)``.
         """
-
         # Ensures .fit() was called by checking for trailing underscore attributes
         check_is_fitted(self)
 

@@ -7,6 +7,48 @@ from chemotools.adaptation.functions import (
     scale_by_factor,
     subtract_reference,
 )
+from chemotools.adaptation.validation import check_metadata_function
+
+
+class TestValidationWithMetadataFunctionValidation:
+    @pytest.mark.parametrize(
+        "func, metadata, expected",
+        [
+            (
+                subtract_reference,
+                {"reference": np.array([[0.5, 0.5, 0.5]])},
+                [[0.5, 1.5, 2.5], [3.5, 4.5, 5.5]],
+            ),
+            (
+                divide_by_reference,
+                {"reference": np.array([[2.0, 2.0, 2.0]])},
+                [[0.5, 1.0, 1.5], [2.0, 2.5, 3.0]],
+            ),
+            (
+                scale_by_factor,
+                {"factor": np.array([[2.0], [0.5]])},
+                [[2.0, 4.0, 6.0], [2.0, 2.5, 3.0]],
+            ),
+            (
+                add_offset,
+                {"offset": np.array([[0.5], [1.0]])},
+                [[1.5, 2.5, 3.5], [5.0, 6.0, 7.0]],
+            ),
+        ],
+    )
+    def test_validation_with_metadata_function(self, func, metadata, expected):
+        """
+        Test that check_metadata_function validates the function and returns the
+        expected output.
+        """
+        # Arrange
+        X = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+
+        # Act
+        result = check_metadata_function(func, X, metadata=metadata)
+
+        # Assert
+        np.testing.assert_allclose(result, expected)
 
 
 class TestSubtractReference:
