@@ -20,8 +20,7 @@ from chemotools.adaptation.validation import _check_metadata_signature
 
 class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
-    A transformer that wraps an arbitrary callable and routes named metadata
-    to it during ``transform``.
+    Apply a callable that consumes feature data and routed metadata.
 
     This is useful when a preprocessing function requires per-sample or
     per-batch auxiliary information (e.g. reference spectra, wavelength
@@ -31,19 +30,27 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
     Parameters
     ----------
     func : Callable[..., np.ndarray]
-        The function to apply during ``transform``.  It must accept ``X``
-        as its first positional argument and return a 2-D ``np.ndarray``
-        of the same shape.
+        Function applied during ``transform``. It must accept ``X`` as its
+        first positional argument and each requested metadata value as a
+        keyword argument. The function is responsible for returning a numeric,
+        2-D ``np.ndarray`` with the same number of samples and features as ``X``.
+        Use :func:`chemotools.adaptation.validation.check_metadata_function`
+        to verify this contract on representative data.
 
     metadata : Sequence[str], default=()
-        Names of the keyword arguments that ``func`` expects in addition to
-        ``X``.  Only keys listed here are extracted from the ``**metadata``
-        dict and forwarded to ``func``; any extra keys are silently ignored.
+        Names of the keyword arguments requested through scikit-learn metadata
+        routing and forwarded to ``func``. Keys passed to ``transform`` but not
+        listed here are ignored. Every required keyword argument of ``func``
+        must be listed, and the corresponding value must be supplied when
+        calling ``transform``. The name ``"y"`` is reserved by the estimator
+        API and cannot be requested as metadata.
 
     validate : bool, default=True
-        If ``True``, ``transform`` calls ``validate_data`` to enforce the scikit-learn
-        contract.  Set to ``False`` when ``func`` handles its own input validation or
-        when used outside a fitted pipeline.
+        If ``True``, validate ``X`` as a numeric, 2-D array during ``fit`` and
+        ``transform``, and require the number of features to remain consistent.
+        This does not validate the output of ``func``. If ``False``, pass ``X``
+        to ``func`` unchanged. In both cases, ``fit`` must be called before
+        ``transform``.
 
     Attributes
     ----------
@@ -67,6 +74,24 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
     ...     func=subtract_reference, metadata=("reference",)
     ... )
     >>> X_transf = mft.fit_transform(X, reference=reference)
+
+    Notes
+    -----
+    To route metadata through a scikit-learn ``Pipeline``, enable metadata
+    routing globally with ``sklearn.set_config(enable_metadata_routing=True)``.
+    This is not required when calling this estimator directly.
+
+    The callable signature is validated during ``fit``, but the callable is
+    executed only during ``transform``. Consequently, errors that depend on
+    metadata values or callable execution are raised during ``transform``.
+    Use :func:`chemotools.adaptation.validation.check_metadata_function` to
+    validate a callable eagerly on representative inputs.
+
+    See Also
+    --------
+    chemotools.adaptation.validation.check_metadata_function : Validate a custom
+        metadata function on representative inputs.
+    chemotools.adaptation.functions : Predefined metadata-aware functions.
     """
 
     _parameter_constraints: dict = {
@@ -94,12 +119,12 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored; present for API compatibility.
+        y : array-like, default=None
+            Ignored. Present for API compatibility.
 
         **metadata : Any
-            Additional metadata forwarded by the pipeline; not used during
-            fitting.
+            Metadata accepted for routing compatibility. It is not forwarded
+            to ``func`` during fitting.
 
         Returns
         -------
@@ -116,6 +141,7 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         _check_metadata_signature(
             self.func, self.metadata, estimator_name=type(self).__name__
         )
+        self._is_fitted = True
         return self
 
     def transform(self, X: Any, **metadata: Any) -> np.ndarray:
@@ -128,16 +154,17 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
             Data to transform.
 
         **metadata : Any
-            Keyword arguments passed to ``func``.  Only keys listed in
-            ``self.metadata`` are forwarded.
+            Metadata values passed to ``func`` as keyword arguments. Only keys
+            listed in ``self.metadata`` are forwarded.
 
         Returns
         -------
         X_transformed : np.ndarray of shape (n_samples, n_features)
-            The result of calling ``func(X, **kwargs)``.
+            Result returned by ``func(X, **kwargs)``. Output type and shape are
+            the responsibility of ``func`` and are not validated here.
         """
-        # Ensures .fit() was called by checking for trailing underscore attributes
-        check_is_fitted(self)
+        # Ensures .fit() was called
+        check_is_fitted(self, "_is_fitted")
 
         # Validates X and ensures it has the same number of features as seen in fit
         if self.validate:
@@ -159,8 +186,8 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored; present for API compatibility.
+        y : array-like, default=None
+            Ignored. Present for API compatibility.
 
         **metadata : Any
             Keyword arguments forwarded to both ``fit`` and ``transform``.
@@ -168,6 +195,7 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         Returns
         -------
         X_transformed : np.ndarray of shape (n_samples, n_features)
+            Result returned by ``func``.
         """
         # Explicitly pass metadata to BOTH fit and transform
         return self.fit(X, y, **metadata).transform(X, **metadata)

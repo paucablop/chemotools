@@ -1,7 +1,11 @@
+import pickle
 import re
 
 import numpy as np
 import pytest
+from sklearn import config_context
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.adaptation import MetadataFunctionTransformer
@@ -193,9 +197,67 @@ class TestMetadataFunctionTransformerFit:
         ):
             transformer.fit(X=[[1, 2], [3, 4]])
 
+    @pytest.mark.parametrize(
+        "func",
+        [
+            lambda: np.ones((2, 2)),
+            lambda *, X: X,
+            lambda **metadata: metadata["X"],
+        ],
+    )
+    def test_fit_raises_when_func_cannot_accept_X_positionally(self, func):
+        """Verifies that func must accept X as its first positional argument."""
+        transformer = MetadataFunctionTransformer(func=func)
+
+        with pytest.raises(
+            ValueError, match=re.escape("cannot be called as `func(X, **metadata)`")
+        ):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
+    def test_fit_raises_when_func_signature_cannot_be_inspected(self):
+        """Verifies that uninspectable callable signatures fail clearly."""
+        transformer = MetadataFunctionTransformer(func=dict.update)
+
+        with pytest.raises(TypeError, match="Could not inspect the signature of"):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
+    def test_fit_raises_when_metadata_names_are_not_strings(self):
+        """Verifies that metadata routing keys must be strings."""
+        transformer = MetadataFunctionTransformer(
+            func=lambda X, **metadata: X, metadata=(1,)
+        )
+
+        with pytest.raises(TypeError, match="entries in `metadata` must be strings"):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
+    def test_fit_raises_when_metadata_names_are_duplicated(self):
+        """Verifies that each metadata routing key is declared once."""
+        transformer = MetadataFunctionTransformer(
+            func=lambda X, reference: X, metadata=("reference", "reference")
+        )
+
+        with pytest.raises(ValueError, match="Entries in `metadata` must be unique"):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
+    def test_fit_raises_when_metadata_name_is_y(self):
+        """Verifies that metadata cannot collide with the estimator y argument."""
+        transformer = MetadataFunctionTransformer(func=lambda X, y: X, metadata=("y",))
+
+        with pytest.raises(ValueError, match="`y` cannot be requested in `metadata`"):
+            transformer.fit(X=[[1, 2], [3, 4]])
+
 
 class TestMetadataFunctionTransformerTransform:
     """Tests for the transform method of MetadataFunctionTransformer."""
+
+    def test_transform_with_validation_disabled_after_fit(self):
+        """Verifies that disabling data validation still records fitted state."""
+        transformer = MetadataFunctionTransformer(func=_identity, validate=False)
+        X = [[1, 2], [3, 4]]
+
+        transformer.fit(X)
+
+        assert transformer.transform(X) is X
 
     def test_transform_routes_metadata_to_func(self):
         """Verifies that transform correctly routes metadata to the function."""
@@ -239,6 +301,20 @@ class TestMetadataFunctionTransformerTransform:
         # Assert
         assert np.allclose(X_transformed, expected), (
             "Transformed output does not match expected result."
+        )
+
+    def test_fitted_transformer_round_trips_through_pickle(self):
+        """Verifies persistence with a predefined module-level function."""
+        X = np.array([[1.0, 2.0], [3.0, 4.0]])
+        reference = np.array([[0.5, 0.5]])
+        transformer = MetadataFunctionTransformer(
+            func=subtract_reference, metadata=("reference",)
+        ).fit(X)
+
+        restored = pickle.loads(pickle.dumps(transformer))
+
+        np.testing.assert_allclose(
+            restored.transform(X, reference=reference), X - reference
         )
 
 
@@ -303,3 +379,48 @@ class TestMetadataFunctionTransformerRoutingRegisters:
             "owner": "MetadataFunctionTransformer",
             "method": "transform",
         }
+
+    def test_pipeline_routes_metadata_during_fit_transform_and_transform(self):
+        """Verifies metadata routing through an sklearn Pipeline."""
+        X = np.array([[1.0, 2.0], [3.0, 4.0]])
+        reference = np.array([[0.5, 0.5]])
+        expected = X - reference
+        pipeline = Pipeline(
+            [
+                (
+                    "subtract_reference",
+                    MetadataFunctionTransformer(
+                        func=subtract_reference, metadata=("reference",)
+                    ),
+                )
+            ]
+        )
+
+        with config_context(enable_metadata_routing=True):
+            transformed_during_fit = pipeline.fit_transform(X, reference=reference)
+            transformed = pipeline.transform(X, reference=reference)
+
+        np.testing.assert_allclose(transformed_during_fit, expected)
+        np.testing.assert_allclose(transformed, expected)
+
+    def test_pipeline_routes_metadata_to_intermediate_transformer(self):
+        """Verifies routing before a downstream pipeline step."""
+        X = np.array([[1.0, 2.0], [3.0, 5.0], [6.0, 8.0]])
+        reference = np.array([[0.5, 1.0]])
+        pipeline = Pipeline(
+            [
+                (
+                    "subtract_reference",
+                    MetadataFunctionTransformer(
+                        func=subtract_reference, metadata=("reference",)
+                    ),
+                ),
+                ("scale", StandardScaler()),
+            ]
+        )
+        expected = StandardScaler().fit_transform(X - reference)
+
+        with config_context(enable_metadata_routing=True):
+            transformed = pipeline.fit_transform(X, reference=reference)
+
+        np.testing.assert_allclose(transformed, expected)

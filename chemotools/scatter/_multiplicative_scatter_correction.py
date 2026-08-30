@@ -1,3 +1,11 @@
+"""
+The :mod:`chemotools.scatter._multiplicative_scatter_correction` module
+implements an Multiplicative Scatter Correction transformer.
+"""
+
+# Authors: Pau Cabaneros
+# License: MIT
+
 from typing import Literal, Optional
 
 import numpy as np
@@ -18,8 +26,6 @@ class MultiplicativeScatterCorrection(
     multiplicative scatter effects in spectral data (like NIR). It linearizes
     each spectrum against a reference spectrum (usually the mean or median)
     using Ordinary Least Squares (OLS) or Weighted Least Squares (WLS).
-
-    Read more in the :ref:`User Guide <msc>`.
 
     Parameters
     ----------

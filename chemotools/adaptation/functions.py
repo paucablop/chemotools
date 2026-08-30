@@ -6,9 +6,9 @@ Each function follows the calling convention expected by
 any additional inputs are named keyword arguments declared in the transformer's
 ``metadata`` parameter.
 
-Because these are module-level named functions they can be pickled, which is
-required whenever a pipeline is serialised (``joblib.dump``) or cloned
-(e.g. inside ``GridSearchCV``).
+These module-level named functions can be pickled by the standard library,
+which is important when serialising a pipeline with tools such as
+``joblib.dump``.
 
 Examples
 --------
@@ -48,7 +48,7 @@ def _check_metadata(arr, name: str) -> np.ndarray:
         raise ValueError(f"Invalid metadata argument `{name}`: {exc}") from exc
 
 
-def subtract_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
+def subtract_reference(X: np.ndarray, reference: float | np.ndarray) -> np.ndarray:
     """Subtract a reference spectrum from every row of ``X``.
 
     A common operation in spectroscopy for blank or solvent subtraction,
@@ -88,7 +88,7 @@ def subtract_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
     return X - _check_metadata(reference, "reference")
 
 
-def divide_by_reference(X: np.ndarray, reference: np.ndarray) -> np.ndarray:
+def divide_by_reference(X: np.ndarray, reference: float | np.ndarray) -> np.ndarray:
     """Divide every row of ``X`` by a reference spectrum.
 
     Useful for single-beam transmission corrections or ratiometric
@@ -168,7 +168,7 @@ def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:
     return X * _check_metadata(factor, "factor")
 
 
-def add_offset(X: np.ndarray, offset: np.ndarray) -> np.ndarray:
+def add_offset(X: np.ndarray, offset: float | np.ndarray) -> np.ndarray:
     """Add a baseline offset to every row of ``X``.
 
     Useful for correcting instrument drift, dark-current baselines, or

@@ -1,8 +1,7 @@
-"""
-Shared model validation for metadata-based transformers and function routing.
-"""
+"""Validation utilities for metadata-aware transformation functions."""
 
 import inspect
+from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
 from typing import Any
 
@@ -17,27 +16,66 @@ def check_metadata_function(
     metadata: Mapping[str, Any] | None = None,
     preserve_features: bool = True,
 ) -> np.ndarray:
-    """Validate a metadata function by executing it on representative data and return
-    its validated output.
+    """Validate a metadata function on representative data.
+
+    The function is called once as ``func(X_checked, **metadata)``. Its output
+    is validated as a finite, numeric, 2-D array that preserves the number of
+    input samples and, by default, the number of input features.
 
     Parameters
     ----------
     func : callable
-        Function invoked as ``func(X, **metadata)``.
+        Function invoked as ``func(X_checked, **metadata)``.
 
     X : array-like of shape (n_samples, n_features)
         Representative input data.
 
     metadata : mapping of str to object, default=None
-        Representative metadata passed to the function.
+        Representative keyword arguments passed to ``func``. Use ``None`` when
+        the function requires no metadata.
 
     preserve_features : bool, default=True
-        Whether the output must preserve the number of features.
+        If ``True``, require the output to have the same number of features as
+        ``X``. The number of samples is always required to match.
 
     Returns
     -------
     result : np.ndarray
-        Validated result produced by the function.
+        Validated output produced by ``func``.
+
+    Raises
+    ------
+    TypeError
+        If ``func`` is not callable or its signature cannot be inspected.
+    ValueError
+        If ``X`` is invalid, ``func`` cannot be called with the supplied
+        arguments, its output is not a finite numeric 2-D array, or its output
+        does not preserve the required dimensions.
+
+    Notes
+    -----
+    This check executes user-provided code. Exceptions raised by ``func`` are
+    propagated unchanged, and functions with side effects will perform those
+    side effects once. The validated input and output may be converted to
+    NumPy arrays by :func:`sklearn.utils.validation.check_array`.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from chemotools.adaptation.functions import subtract_reference
+    >>> from chemotools.adaptation.validation import check_metadata_function
+    >>> X = np.array([[1.0, 2.0], [3.0, 4.0]])
+    >>> reference = np.array([[0.5, 0.5]])
+    >>> check_metadata_function(
+    ...     subtract_reference, X, metadata={"reference": reference}
+    ... )
+    array([[0.5, 1.5],
+           [2.5, 3.5]])
+
+    See Also
+    --------
+    chemotools.adaptation.MetadataFunctionTransformer : Wrap a function for
+        scikit-learn metadata routing.
     """
 
     # Check that the function is callable
@@ -96,13 +134,47 @@ def check_metadata_function(
     return output_checked
 
 
+def _validate_metadata_names(metadata: Sequence[str], estimator_name: str) -> list[str]:
+    """Return validated, unique metadata names."""
+    metadata_names = list(metadata)
+    invalid_names = [name for name in metadata_names if not isinstance(name, str)]
+    if invalid_names:
+        raise TypeError(
+            f"[{estimator_name}] All entries in `metadata` must be strings. "
+            f"Got invalid entries: {invalid_names}"
+        )
+
+    duplicate_names = sorted(
+        name for name, count in Counter(metadata_names).items() if count > 1
+    )
+    if duplicate_names:
+        raise ValueError(
+            f"[{estimator_name}] Entries in `metadata` must be unique. "
+            f"Got duplicates: {duplicate_names}"
+        )
+
+    if "y" in metadata_names:
+        raise ValueError(
+            f"[{estimator_name}] `y` cannot be requested in `metadata` because "
+            "it is reserved by the estimator API."
+        )
+
+    return metadata_names
+
+
 def _check_metadata_signature(
     fn: Callable, metadata: Sequence[str], estimator_name: str = "Estimator"
 ) -> None:
-    """
-    Validates that a function's signature matches the requested routing metadata.
-    """
-    sig = inspect.signature(fn)
+    """Validate compatibility with ``fn(X, **metadata)`` without executing ``fn``."""
+    metadata_names = _validate_metadata_names(metadata, estimator_name)
+
+    try:
+        sig = inspect.signature(fn)
+    except (TypeError, ValueError) as exc:
+        raise TypeError(
+            f"[{estimator_name}] Could not inspect the signature of {fn!r}."
+        ) from exc
+
     params = sig.parameters
 
     has_var_keyword = any(
@@ -114,7 +186,7 @@ def _check_metadata_signature(
     #    parameters can never be reached that way.
     positional_only_keys = [
         key
-        for key in metadata
+        for key in metadata_names
         if key in params and params[key].kind == inspect.Parameter.POSITIONAL_ONLY
     ]
     if positional_only_keys:
@@ -128,7 +200,7 @@ def _check_metadata_signature(
     # 2. Check for orphaned metadata (requested, but function can't accept it).
     #    Skipped when **kwargs is present — the function absorbs any extra key.
     if not has_var_keyword:
-        missing_in_func = [key for key in metadata if key not in params]
+        missing_in_func = [key for key in metadata_names if key not in params]
         if missing_in_func:
             raise ValueError(
                 f"[{estimator_name}] The function "
@@ -154,7 +226,7 @@ def _check_metadata_signature(
                     inspect.Parameter.VAR_KEYWORD,
                     inspect.Parameter.POSITIONAL_ONLY,
                 )
-                and param_name not in metadata
+                and param_name not in metadata_names
             ):
                 missing_in_metadata.append(param_name)
 
@@ -165,3 +237,14 @@ def _check_metadata_signature(
                 f"arguments without defaults, which are missing from "
                 f"`metadata`: {missing_in_metadata}"
             )
+
+    placeholder = object()
+    metadata_placeholders = dict.fromkeys(metadata_names, placeholder)
+    try:
+        sig.bind(placeholder, **metadata_placeholders)
+    except TypeError as exc:
+        raise ValueError(
+            f"[{estimator_name}] The function "
+            f"'{getattr(fn, '__name__', repr(fn))}' cannot be called as "
+            f"`func(X, **metadata)`: {exc}"
+        ) from exc
