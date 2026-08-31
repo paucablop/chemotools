@@ -318,7 +318,7 @@ class TestMetadataFunctionTransformerTransform:
             func=subtract_reference, metadata=("reference",)
         ).fit(X)
 
-        restored = pickle.loads(pickle.dumps(transformer))
+        restored = pickle.loads(pickle.dumps(transformer))  # nosec B301
 
         np.testing.assert_allclose(
             restored.transform(X, reference=reference), X - reference

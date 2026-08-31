@@ -109,13 +109,18 @@ def divide_by_reference(X: np.ndarray, reference: float | np.ndarray) -> np.ndar
         * ``(n_samples, n_features)`` — per-sample full spectrum.
 
         1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared
-        spectrum or ``.reshape(-1, 1)`` for a per-sample scalar.  Zero
-        values will produce ``inf`` or ``nan`` in the output.
+        spectrum or ``.reshape(-1, 1)`` for a per-sample scalar. Zero values
+        are rejected because division by zero produces non-finite output.
 
     Returns
     -------
     X_corrected : np.ndarray of shape (n_samples, n_features)
         ``X / reference``.
+
+    Raises
+    ------
+    ValueError
+        If ``reference`` contains zero values.
 
     Examples
     --------
@@ -127,7 +132,10 @@ def divide_by_reference(X: np.ndarray, reference: float | np.ndarray) -> np.ndar
     array([[1., 2., 3.],
            [4., 5., 6.]])
     """
-    return X / _check_metadata(reference, "reference")
+    reference_checked = _check_metadata(reference, "reference")
+    if np.any(reference_checked == 0):
+        raise ValueError("`reference` must not contain zero values.")
+    return X / reference_checked
 
 
 def scale_by_factor(X: np.ndarray, factor: float | np.ndarray) -> np.ndarray:

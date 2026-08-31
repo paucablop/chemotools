@@ -144,6 +144,17 @@ class TestDivideByReference:
         with pytest.raises(ValueError, match="Invalid metadata argument `reference`"):
             divide_by_reference(X, reference)
 
+    @pytest.mark.parametrize(
+        "reference",
+        [0.0, np.array([[2.0, 0.0, 2.0]])],
+    )
+    def test_divide_by_reference_zero_raises(self, reference):
+        """Zero values in the divisor raise instead of producing non-finite output."""
+        X = np.array([[2.0, 4.0, 6.0], [8.0, 10.0, 12.0]])
+
+        with pytest.raises(ValueError, match="must not contain zero values"):
+            divide_by_reference(X, reference)
+
 
 class TestScaleByFactor:
     def test_scale_by_factor_scalar(self):

@@ -7,52 +7,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"POT-Creation-Date: 2026-09-01 01:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/generated/chemotools.adaptation.functions.divide_by_reference.rst:2
 msgid "chemotools.adaptation.functions.divide\\_by\\_reference"
 msgstr "chemotools.adaptation.functions.divide\\_by\\_reference"
 
-#: chemotools.adaptation.functions.divide_by_reference:1 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:1
 msgid "Divide every row of ``X`` by a reference spectrum."
 msgstr "Divide cada fila de ``X`` por un espectro de referencia."
 
-#: chemotools.adaptation.functions.divide_by_reference:3 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:3
 msgid ""
-"Useful for single-beam transmission corrections or ratiometric "
-"normalisation where each sample is divided by a simultaneously measured "
-"reference channel."
+"Useful for single-beam transmission corrections or ratiometric normalisation "
+"where each sample is divided by a simultaneously measured reference channel."
 msgstr ""
 "Resulta útil para correcciones de transmisión de haz único o normalizaciones "
 "radiométricas en las que cada muestra se divide por un canal de referencia "
 "medido simultáneamente."
 
-#: chemotools.adaptation.functions.divide_by_reference of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
 msgid "Parameters"
 msgstr "Parámetros"
 
-#: chemotools.adaptation.functions.divide_by_reference:7 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:7
 msgid "Input spectra."
 msgstr "Espectros de entrada."
 
-#: chemotools.adaptation.functions.divide_by_reference:9 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
 msgid ""
 "Reference to divide by.  Accepted shapes:  * scalar ``float`` — divides "
-"every element. * ``(1, n_features)`` — shared reference broadcast across "
-"all samples. * ``(n_samples, 1)`` — per-sample scalar divisor. * "
-"``(n_samples, n_features)`` — per-sample full spectrum.  1-D inputs are "
-"rejected; use ``.reshape(1, -1)`` for a shared spectrum or ``.reshape(-1,"
-" 1)`` for a per-sample scalar.  Zero values will produce ``inf`` or "
-"``nan`` in the output."
+"every element. * ``(1, n_features)`` — shared reference broadcast across all "
+"samples. * ``(n_samples, 1)`` — per-sample scalar divisor. * ``(n_samples, "
+"n_features)`` — per-sample full spectrum.  1-D inputs are rejected; use "
+"``.reshape(1, -1)`` for a shared spectrum or ``.reshape(-1, 1)`` for a per-"
+"sample scalar. Zero values are rejected because division by zero produces "
+"non-finite output."
 msgstr ""
 "Referencia por la que se dividirá.  Formas admitidas:  * ``float`` escalar — "
 "divide cada elemento. * ``(1, n_features)`` — referencia compartida que se "
@@ -60,51 +64,74 @@ msgstr ""
 "muestra. * ``(n_samples, n_features)`` — espectro completo por muestra.  Las "
 "entradas unidimensionales no se admiten; utilice ``.reshape(1, -1)`` para un "
 "espectro compartido o ``.reshape(-1, 1)`` para un escalar por muestra.  Los "
-"valores cero producirán ``inf`` o ``nan`` en la salida."
+"valores cero se rechazan porque la división por cero produce una salida no "
+"finita."
 
-#: chemotools.adaptation.functions.divide_by_reference:9 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
 msgid "Reference to divide by.  Accepted shapes:"
 msgstr "Referencia por la que se dividirá.  Formas admitidas:"
 
-#: chemotools.adaptation.functions.divide_by_reference:11 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:11
 msgid "scalar ``float`` — divides every element."
 msgstr "``float`` escalar — divide cada elemento."
 
-#: chemotools.adaptation.functions.divide_by_reference:12 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:12
 msgid "``(1, n_features)`` — shared reference broadcast across all samples."
-msgstr "``(1, n_features)`` — referencia compartida que se difunde a todas las muestras."
+msgstr ""
+"``(1, n_features)`` — referencia compartida que se difunde a todas las "
+"muestras."
 
-#: chemotools.adaptation.functions.divide_by_reference:13 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:13
 msgid "``(n_samples, 1)`` — per-sample scalar divisor."
 msgstr "``(n_samples, 1)`` — divisor escalar por muestra."
 
-#: chemotools.adaptation.functions.divide_by_reference:14 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:14
 msgid "``(n_samples, n_features)`` — per-sample full spectrum."
 msgstr "``(n_samples, n_features)`` — espectro completo por muestra."
 
-#: chemotools.adaptation.functions.divide_by_reference:16 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:16
 msgid ""
-"1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared spectrum or"
-" ``.reshape(-1, 1)`` for a per-sample scalar.  Zero values will produce "
-"``inf`` or ``nan`` in the output."
+"1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared spectrum or "
+"``.reshape(-1, 1)`` for a per-sample scalar. Zero values are rejected "
+"because division by zero produces non-finite output."
 msgstr ""
-"Las entradas unidimensionales no se admiten; utilice ``.reshape(1, -1)`` para "
-"un espectro compartido o ``.reshape(-1, 1)`` para un escalar por muestra.  Los "
-"valores cero producirán ``inf`` o ``nan`` en la salida."
+"Las entradas unidimensionales no se admiten; utilice ``.reshape(1, -1)`` "
+"para un espectro compartido o ``.reshape(-1, 1)`` para un escalar por "
+"muestra. Los valores cero se rechazan porque la división por cero produce "
+"una salida no finita."
 
-#: chemotools.adaptation.functions.divide_by_reference of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
 msgid "Returns"
 msgstr "Devuelve"
 
-#: chemotools.adaptation.functions.divide_by_reference:21 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:21
 msgid "**X_corrected** -- ``X / reference``."
 msgstr "**X_corrected** -- ``X / reference``."
 
-#: chemotools.adaptation.functions.divide_by_reference of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
 msgid "Return type"
 msgstr "Tipo de retorno"
 
-#: chemotools.adaptation.functions.divide_by_reference:25 of
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Raises"
+msgstr "Excepciones"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:24
+msgid "If ``reference`` contains zero values."
+msgstr "Si ``reference`` contiene valores cero."
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:27
 msgid "Examples"
 msgstr "Ejemplos"
-
