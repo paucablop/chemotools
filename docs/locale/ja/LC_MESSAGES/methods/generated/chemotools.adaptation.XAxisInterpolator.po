@@ -7,99 +7,137 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"POT-Creation-Date: 2026-09-01 01:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ja\n"
 "Language-Team: ja <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:2
 msgid "XAxisInterpolator"
 msgstr "XAxisInterpolator"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1 of
-msgid ""
-"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
-":py:class:`~sklearn.base.TransformerMixin`, "
-":py:class:`~sklearn.base.BaseEstimator`"
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
+msgid "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
 msgstr "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
 msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
 msgstr "``X`` の各行を共通の ``common_x_axis`` 上へ補間します。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:3 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:3
 msgid ""
 "The transformer resamples each row of ``X`` from a sample-specific (or "
 "shared) input grid ``x_axis`` onto a fixed ``common_x_axis`` provided at "
 "instantiation time."
-msgstr "この Transformer は、``X`` の各行をサンプル固有（または共通）の入力グリッド ``x_axis`` から、インスタンス化時に指定した固定の ``common_x_axis`` へリサンプリングします。"
+msgstr ""
+"この Transformer は、``X`` の各行をサンプル固有（または共通）の入力グリッド "
+"``x_axis`` から、インスタンス化時に指定した固定の ``common_x_axis`` へリサン"
+"プリングします。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:7 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:7
 msgid ""
-"``x_axis`` is consumed as **metadata** so it flows correctly through "
-"``Pipeline``, ``ColumnTransformer``, ``GridSearchCV``, ``cross_validate``"
-" etc., once metadata routing is enabled via:"
-msgstr "``x_axis`` は **メタデータ** として受け取られるため、次の設定でメタデータルーティングを有効にすると、 ``Pipeline`` 、 ``ColumnTransformer`` 、 ``GridSearchCV`` 、 ``cross_validate`` などを通じて正しく渡されます。"
+"``x_axis`` is consumed as **metadata** so it can flow through ``Pipeline``, "
+"``ColumnTransformer``, ``GridSearchCV``, and ``cross_validate`` once "
+"metadata routing is enabled via:"
+msgstr ""
+"``x_axis`` は **メタデータ** として受け取られるため、次の設定でメタデータルー"
+"ティングを有効にすると、``Pipeline``、``ColumnTransformer``、"
+"``GridSearchCV``、``cross_validate`` を通じて渡されます。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:11 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:11
 msgid "``sklearn.set_config(enable_metadata_routing=True)``."
 msgstr "``sklearn.set_config(enable_metadata_routing=True)``."
 
-#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:13
+msgid ""
+"Before passing ``x_axis`` to a routed ``fit`` or ``fit_transform`` call, "
+"configure both ``set_fit_request(x_axis=True)`` and "
+"``set_transform_request(x_axis=True)``. For a routed ``transform`` call, "
+"only the transform request is needed. Direct method calls do not require "
+"request configuration."
+msgstr ""
+"ルーティングされた ``fit`` または ``fit_transform`` 呼び出しに ``x_axis`` "
+"を渡す前に、``set_fit_request(x_axis=True)`` と "
+"``set_transform_request(x_axis=True)`` の両方を設定してください。ルーティング"
+"された ``transform`` 呼び出しでは、transform のリクエストのみが必要です。メ"
+"ソッドを直接呼び出す場合、リクエストの設定は不要です。"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:13 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:19
 msgid ""
 "Strictly increasing target grid. ``transform`` returns an array with "
 "``n_output_features`` columns."
-msgstr "狭義単調増加するターゲットグリッド。``transform`` は ``n_output_features`` 列の配列を返します。"
+msgstr ""
+"狭義単調増加するターゲットグリッド。``transform`` は ``n_output_features`` 列"
+"の配列を返します。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:16 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:22
 msgid ""
 "The interpolation mode. One of: ``\"linear\"``, ``\"cubic\"`` or "
 "``\"pchip\"``."
 msgstr "補間モード。``\"linear\"``、``\"cubic\"``、``\"pchip\"`` のいずれか。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:19 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:25
 msgid ""
-"Value returned for query points below the input grid (passed to "
-":func:`numpy.interp`)."
-msgstr "入力グリッドより小さいクエリ点に対して返す値（:func:`numpy.interp` に渡されます）。"
+"Value returned for query points below the input grid (passed "
+"to :func:`numpy.interp`)."
+msgstr ""
+"入力グリッドより小さいクエリ点に対して返す値（:func:`numpy.interp` に渡されま"
+"す）。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:22 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:28
 msgid "Value returned for query points above the input grid."
 msgstr "入力グリッドより大きいクエリ点に対して返す値。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:24 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:30
 msgid ""
-"Number of parallel jobs used to process sample rows independently during "
-":meth:`transform`. Use ``1`` for serial execution."
-msgstr ":meth:`transform` 時にサンプル行を個別に処理する並列ジョブ数。逐次実行には ``1`` を使用します。"
+"Number of parallel jobs used to process sample rows independently "
+"during :meth:`transform`. Use ``1`` for serial execution."
+msgstr ""
+":meth:`transform` 時にサンプル行を個別に処理する並列ジョブ数。逐次実行には "
+"``1`` を使用します。"
 
-#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
 msgid "Variables"
 msgstr "変数"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:28 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:34
 msgid "Validated copy of ``common_x_axis``."
 msgstr "検証済みの ``common_x_axis`` のコピー。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:31 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:37
 msgid "Number of input features seen during ``fit``."
 msgstr "``fit`` 時に確認された入力特徴量数。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:34 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:40
 msgid "Names of features seen during ``fit`` (only if ``X`` had names)."
 msgstr "``fit`` 時に確認された特徴量名（``X`` に名前がある場合のみ）。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:39 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:45
 msgid "Examples"
 msgstr "使用例"
 
@@ -107,180 +145,255 @@ msgstr "使用例"
 msgid "Attributes"
 msgstr "属性"
 
-#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
 msgid ""
 ":py:obj:`n_features_in_ "
 "<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
-msgstr ":py:obj:`n_features_in_ <chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
 
-#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
 msgid ""
 ":py:obj:`common_x_axis_ "
 "<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
-msgstr ":py:obj:`common_x_axis_ <chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
+msgstr ""
+":py:obj:`common_x_axis_ "
+"<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:1 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:1
 msgid "Validate input and the configured ``common_x_axis``."
 msgstr "入力と設定された ``common_x_axis`` を検証します。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:3 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:3
 msgid "The input data to fit the transformer to."
 msgstr "Transformer を適合させる入力データ。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:5 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:5
 msgid "Ignored to align with API."
 msgstr "API との整合性を保つため無視されます。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:7 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:7
 msgid ""
-"Accepted only so that metadata routing through ``fit_transform`` (used by"
-" ``Pipeline``) generates a ``set_fit_request`` method. ``fit`` itself "
-"does not use it."
-msgstr "``Pipeline`` が使用する ``fit_transform`` を介したメタデータルーティングで ``set_fit_request`` メソッドを生成するためにのみ受け付けます。``fit`` 自体は使用しません。"
+"Accepted so that ``x_axis`` can be requested consistently for routed ``fit`` "
+"and ``fit_transform`` calls. ``fit`` itself does not use its value."
+msgstr ""
+"ルーティングされた ``fit`` および ``fit_transform`` 呼び出しで ``x_axis`` "
+"を一貫してリクエストできるように受け付けます。``fit`` 自体はその値を使用しま"
+"せん。"
 
-#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
 msgid "Returns"
 msgstr "戻り値"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:12 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:12
 msgid "**self**"
 msgstr "**self**"
 
-#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
 msgid "Return type"
 msgstr "戻り値の型"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:1 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:1
 msgid "Interpolate ``X`` from ``x_axis`` onto ``common_x_axis_``."
 msgstr "``X`` を ``x_axis`` から ``common_x_axis_`` 上へ補間します。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:3 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:3
 msgid ""
-"``x_axis`` is **metadata** and must be requested explicitly via "
-"``set_transform_request(x_axis=True)`` for routing to work in a "
-"``Pipeline`` / ``GridSearchCV``."
-msgstr "``x_axis`` は **メタデータ** です。``Pipeline`` / ``GridSearchCV`` 内でルーティングを機能させるには、``set_transform_request(x_axis=True)`` により明示的に要求する必要があります。"
+"For routed ``Pipeline.transform`` calls, request ``x_axis`` via "
+"``set_transform_request(x_axis=True)``. For routed ``fit`` or "
+"``fit_transform`` calls, also configure ``set_fit_request(x_axis=True)`` so "
+"the two phases have matching requests."
+msgstr ""
+"ルーティングされた ``Pipeline.transform`` 呼び出しでは、"
+"``set_transform_request(x_axis=True)`` を使用して ``x_axis`` をリクエストして"
+"ください。ルーティングされた ``fit`` または ``fit_transform`` 呼び出しで"
+"は、両フェーズのリクエストが一致するように "
+"``set_fit_request(x_axis=True)`` も設定してください。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:7 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:9
 msgid "Signal values sampled on ``x_axis``."
 msgstr "``x_axis`` 上でサンプリングされた信号値。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:9 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:11
 msgid ""
-"Either shape ``(n_features,)`` (shared grid for every row) or "
-"``(n_samples, n_features)`` (per-row grid). Must be strictly increasing "
-"along the feature axis."
-msgstr "形状 ``(n_features,)`` （全行で共有するグリッド）または ``(n_samples, n_features)`` （行別グリッド）。特徴量軸に沿って狭義単調増加する必要があります。"
+"Either shape ``(n_features,)`` (shared grid for every row) or ``(n_samples, "
+"n_features)`` (per-row grid). Must be strictly increasing along the feature "
+"axis."
+msgstr ""
+"形状 ``(n_features,)`` （全行で共有するグリッド）または ``(n_samples, "
+"n_features)`` （行別グリッド）。特徴量軸に沿って狭義単調増加する必要がありま"
+"す。"
 
-#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:14 of
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:16
 msgid "**X_transformed**"
 msgstr "**X_transformed**"
 
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
 #: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:1
-#: of
 msgid "Fit to data, then transform it."
 msgstr "データに適合させてから変換します。"
 
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
 #: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:3
-#: of
 msgid ""
-"``fit`` does not consume ``x_axis``; only ``transform`` does. This custom"
-" implementation ensures ``x_axis`` is forwarded only to ``transform``, "
-"not to ``fit``."
-msgstr "``fit`` は ``x_axis`` を使用せず、``transform`` だけが使用します。このカスタム実装により、``x_axis`` は ``fit`` ではなく ``transform`` だけに転送されます。"
+"``fit`` does not consume ``x_axis``; only ``transform`` does. This custom "
+"implementation ensures ``x_axis`` is forwarded only to ``transform``, not to "
+"``fit``."
+msgstr ""
+"``fit`` は ``x_axis`` を使用せず、``transform`` だけが使用します。このカスタ"
+"ム実装により、``x_axis`` は ``fit`` ではなく ``transform`` だけに転送されま"
+"す。"
 
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
 #: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:11
-#: of
 msgid "Input grid for interpolation, forwarded to ``transform``."
 msgstr "補間用の入力グリッド。``transform`` に転送されます。"
 
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
 #: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:14
-#: of
 msgid "**X_new**"
 msgstr "**X_new**"
 
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
 #: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.get_feature_names_out:1
-#: of
 msgid "Names are the positions of the common grid."
 msgstr "名前には共通グリッドの位置を使用します。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
 msgid ""
-"Configure whether metadata should be requested to be passed to the "
-"``fit`` method."
+"Configure whether metadata should be requested to be passed to the ``fit`` "
+"method."
 msgstr "``fit`` メソッドへ渡すメタデータを要求するかどうかを設定します。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
 msgid ""
-"Note that this method is only relevant when this estimator is used as a "
-"sub-estimator within a :term:`meta-estimator` and metadata routing is "
-"enabled with ``enable_metadata_routing=True`` (see "
-":func:`sklearn.set_config`). Please check the :ref:`User Guide "
-"<metadata_routing>` on how the routing mechanism works."
-msgstr "このメソッドが関係するのは、この推定器を :term:`meta-estimator` 内のサブ推定器として使用し、``enable_metadata_routing=True`` でメタデータルーティングを有効にした場合のみです（:func:`sklearn.set_config` を参照）。ルーティング機構の動作については :ref:`ユーザーガイド <metadata_routing>` を参照してください。"
+"Note that this method is only relevant when this estimator is used as a sub-"
+"estimator within a :term:`meta-estimator` and metadata routing is enabled "
+"with ``enable_metadata_routing=True`` (see :func:`sklearn.set_config`). "
+"Please check the :ref:`User Guide <metadata_routing>` on how the routing "
+"mechanism works."
+msgstr ""
+"このメソッドが関係するのは、この推定器を :term:`meta-estimator` 内のサブ推定"
+"器として使用し、``enable_metadata_routing=True`` でメタデータルーティングを有"
+"効にした場合のみです（:func:`sklearn.set_config` を参照）。ルーティング機構の"
+"動作については :ref:`ユーザーガイド <metadata_routing>` を参照してください。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
 msgid "The options for each parameter are:"
 msgstr "各パラメータには次のオプションがあります。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
 msgid ""
 "``True``: metadata is requested, and passed to ``fit`` if provided. The "
 "request is ignored if metadata is not provided."
-msgstr "``True``: メタデータを要求し、指定された場合は ``fit`` に渡します。メタデータが指定されなければ、この要求は無視されます。"
+msgstr ""
+"``True``: メタデータを要求し、指定された場合は ``fit`` に渡します。メタデータ"
+"が指定されなければ、この要求は無視されます。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
 msgid ""
-"``False``: metadata is not requested and the meta-estimator will not pass"
-" it to ``fit``."
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``fit``."
 msgstr "``False``: メタデータを要求せず、メタ推定器は ``fit`` に渡しません。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
 msgid ""
-"``None``: metadata is not requested, and the meta-estimator will raise an"
-" error if the user provides it."
-msgstr "``None``: メタデータを要求せず、ユーザーが指定した場合はメタ推定器がエラーを送出します。"
+"``None``: metadata is not requested, and the meta-estimator will raise an "
+"error if the user provides it."
+msgstr ""
+"``None``: メタデータを要求せず、ユーザーが指定した場合はメタ推定器がエラーを"
+"送出します。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
 msgid ""
 "``str``: metadata should be passed to the meta-estimator with this given "
 "alias instead of the original name."
-msgstr "``str``: メタデータを元の名前ではなく、指定した別名でメタ推定器に渡します。"
+msgstr ""
+"``str``: メタデータを元の名前ではなく、指定した別名でメタ推定器に渡します。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
 msgid ""
 "The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
-"existing request. This allows you to change the request for some "
-"parameters and not others."
-msgstr "デフォルト（``sklearn.utils.metadata_routing.UNCHANGED``）では既存の要求を維持します。これにより、一部のパラメータの要求だけを変更できます。"
+"existing request. This allows you to change the request for some parameters "
+"and not others."
+msgstr ""
+"デフォルト（``sklearn.utils.metadata_routing.UNCHANGED``）では既存の要求を維"
+"持します。これにより、一部のパラメータの要求だけを変更できます。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
 msgid "Metadata routing for ``x_axis`` parameter in ``fit``."
 msgstr "``fit`` の ``x_axis`` パラメータに対するメタデータルーティング。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
 msgid "**self** -- The updated object."
 msgstr "**self** -- 更新されたオブジェクト。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
 msgid ""
 "Configure whether metadata should be requested to be passed to the "
 "``transform`` method."
 msgstr "``transform`` メソッドへ渡すメタデータを要求するかどうかを設定します。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
 msgid ""
-"``True``: metadata is requested, and passed to ``transform`` if provided."
-" The request is ignored if metadata is not provided."
-msgstr "``True``: メタデータを要求し、指定された場合は ``transform`` に渡します。メタデータが指定されなければ、この要求は無視されます。"
+"``True``: metadata is requested, and passed to ``transform`` if provided. "
+"The request is ignored if metadata is not provided."
+msgstr ""
+"``True``: メタデータを要求し、指定された場合は ``transform`` に渡します。メタ"
+"データが指定されなければ、この要求は無視されます。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
 msgid ""
-"``False``: metadata is not requested and the meta-estimator will not pass"
-" it to ``transform``."
-msgstr "``False``: メタデータを要求せず、メタ推定器は ``transform`` に渡しません。"
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``transform``."
+msgstr ""
+"``False``: メタデータを要求せず、メタ推定器は ``transform`` に渡しません。"
 
-#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
 msgid "Metadata routing for ``x_axis`` parameter in ``transform``."
 msgstr "``transform`` の ``x_axis`` パラメータに対するメタデータルーティング。"
 
+#~ msgid ""
+#~ "Accepted only so that metadata routing through ``fit_transform`` (used by "
+#~ "``Pipeline``) generates a ``set_fit_request`` method. ``fit`` itself does "
+#~ "not use it."
+#~ msgstr ""
+#~ "``Pipeline`` が使用する ``fit_transform`` を介したメタデータルーティング"
+#~ "で ``set_fit_request`` メソッドを生成するためにのみ受け付けます。``fit`` "
+#~ "自体は使用しません。"
+
+#~ msgid ""
+#~ "``x_axis`` is **metadata** and must be requested explicitly via "
+#~ "``set_transform_request(x_axis=True)`` for routing to work in a "
+#~ "``Pipeline`` / ``GridSearchCV``."
+#~ msgstr ""
+#~ "``x_axis`` は **メタデータ** です。``Pipeline`` / ``GridSearchCV`` 内で"
+#~ "ルーティングを機能させるには、``set_transform_request(x_axis=True)`` によ"
+#~ "り明示的に要求する必要があります。"

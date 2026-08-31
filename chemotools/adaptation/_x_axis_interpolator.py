@@ -25,11 +25,17 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
     input grid ``x_axis`` onto a fixed ``common_x_axis`` provided at instantiation
     time.
 
-    ``x_axis`` is consumed as **metadata** so it flows correctly through
-    ``Pipeline``, ``ColumnTransformer``, ``GridSearchCV``, ``cross_validate`` etc.,
-    once metadata routing is enabled via:
+    ``x_axis`` is consumed as **metadata** so it can flow through ``Pipeline``,
+    ``ColumnTransformer``, ``GridSearchCV``, and ``cross_validate`` once metadata
+    routing is enabled via:
 
     ``sklearn.set_config(enable_metadata_routing=True)``.
+
+    Before passing ``x_axis`` to a routed ``fit`` or ``fit_transform`` call,
+    configure both ``set_fit_request(x_axis=True)`` and
+    ``set_transform_request(x_axis=True)``. For a routed ``transform`` call,
+    only the transform request is needed. Direct method calls do not require
+    request configuration.
 
     Parameters
     ----------
@@ -121,9 +127,9 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
             Ignored to align with API.
 
         x_axis : Ignored
-            Accepted only so that metadata routing through ``fit_transform``
-            (used by ``Pipeline``) generates a ``set_fit_request`` method.
-            ``fit`` itself does not use it.
+            Accepted so that ``x_axis`` can be requested consistently for
+            routed ``fit`` and ``fit_transform`` calls. ``fit`` itself does
+            not use its value.
 
         Returns
         -------
@@ -152,9 +158,11 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
     def transform(self, X: np.ndarray, x_axis=None):
         """Interpolate ``X`` from ``x_axis`` onto ``common_x_axis_``.
 
-        ``x_axis`` is **metadata** and must be requested explicitly via
-        ``set_transform_request(x_axis=True)`` for routing to work in a
-        ``Pipeline`` / ``GridSearchCV``.
+        For routed ``Pipeline.transform`` calls, request ``x_axis`` via
+        ``set_transform_request(x_axis=True)``. For routed ``fit`` or
+        ``fit_transform`` calls, also configure
+        ``set_fit_request(x_axis=True)`` so the two phases have matching
+        requests.
 
         Parameters
         ----------
@@ -234,7 +242,7 @@ class XAxisInterpolator(DocLinkMixin, TransformerMixin, BaseEstimator):
         ----------
         X : array-like of shape (n_samples, n_features)
         y : Ignored
-        x_axis : array-like, optional metadata
+        x_axis : array-like, required metadata
             Input grid for interpolation, forwarded to ``transform``.
 
         Returns
