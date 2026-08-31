@@ -351,8 +351,8 @@ The names must agree exactly:
     X_corrected = transformer.fit_transform(X, reference=background)
 
 The trailing comma in ``("reference",)`` matters: it creates a one-item tuple.
-The name ``"y"`` cannot be used because ``y`` is reserved by the scikit-learn
-estimator API.
+The names ``"X"`` and ``"y"`` cannot be used because they are reserved by the
+scikit-learn estimator API.
 
 
 Start with a predefined function
@@ -665,7 +665,7 @@ Common errors and how to fix them
      - The ``metadata`` declaration is malformed
      - Use one unique string for each routed function argument
    * - ``y`` cannot be requested
-     - ``y`` is reserved by the estimator API
+    - ``X`` and ``y`` are reserved by the estimator API
      - Choose a domain-specific name such as ``target_reference``
    * - Expected a 2-D array
      - ``X``, output, or predefined-function metadata is one-dimensional

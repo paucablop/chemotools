@@ -7,137 +7,147 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"POT-Creation-Date: 2026-08-31 16:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:2
 msgid "MetadataFunctionTransformer"
 msgstr "MetadataFunctionTransformer"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
-msgid ""
-"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
-":py:class:`~sklearn.base.TransformerMixin`, "
-":py:class:`~sklearn.base.BaseEstimator`"
-msgstr ""
-"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
-":py:class:`~sklearn.base.TransformerMixin`, "
-":py:class:`~sklearn.base.BaseEstimator`"
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
+msgid "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+msgstr "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
 msgid "Apply a callable that consumes feature data and routed metadata."
-msgstr "Aplica un objeto invocable que consume datos de características y metadatos enrutados."
+msgstr ""
+"Aplica un objeto invocable que consume datos de características y metadatos "
+"enrutados."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:3
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:3
 msgid ""
 "This is useful when a preprocessing function requires per-sample or per-"
-"batch auxiliary information (e.g. reference spectra, wavelength arrays) "
-"that must be threaded through a scikit-learn ``Pipeline`` via the "
-"metadata-routing API."
+"batch auxiliary information (e.g. reference spectra, wavelength arrays) that "
+"must be threaded through a scikit-learn ``Pipeline`` via the metadata-"
+"routing API."
 msgstr ""
 "Resulta útil cuando una función de preprocesamiento requiere información "
-"auxiliar por muestra o por lote (p. ej., espectros de referencia o matrices de "
-"longitudes de onda) que debe transmitirse a través de un ``Pipeline`` de "
+"auxiliar por muestra o por lote (p. ej., espectros de referencia o matrices "
+"de longitudes de onda) que debe transmitirse a través de un ``Pipeline`` de "
 "scikit-learn mediante la API de enrutamiento de metadatos."
 
-#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:0
 msgid "Parameters"
 msgstr "Parámetros"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:8
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:8
 msgid ""
 "Function applied during ``transform``. It must accept ``X`` as its first "
-"positional argument and each requested metadata value as a keyword "
-"argument. The function is responsible for returning a numeric, 2-D "
-"``np.ndarray`` with the same number of samples and features as ``X``. Use"
-" :func:`chemotools.adaptation.validation.check_metadata_function` to "
+"positional argument and each requested metadata value as a keyword argument. "
+"The function is responsible for returning a numeric, 2-D ``np.ndarray`` with "
+"the same number of samples and features as ``X``. "
+"Use :func:`chemotools.adaptation.validation.check_metadata_function` to "
 "verify this contract on representative data."
 msgstr ""
 "Función aplicada durante ``transform``. Debe aceptar ``X`` como primer "
 "argumento posicional y cada valor de metadatos solicitado como argumento de "
 "palabra clave. La función debe devolver un ``np.ndarray`` numérico y "
 "bidimensional con el mismo número de muestras y características que ``X``. "
-"Utilice :func:`chemotools.adaptation.validation.check_metadata_function` para "
-"verificar este contrato con datos representativos."
+"Utilice :func:`chemotools.adaptation.validation.check_metadata_function` "
+"para verificar este contrato con datos representativos."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:15
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:15
 msgid ""
 "Names of the keyword arguments requested through scikit-learn metadata "
 "routing and forwarded to ``func``. Keys passed to ``transform`` but not "
-"listed here are ignored. Every required keyword argument of ``func`` must"
-" be listed, and the corresponding value must be supplied when calling "
-"``transform``. The name ``\"y\"`` is reserved by the estimator API and "
-"cannot be requested as metadata."
+"listed here are ignored. Every required keyword argument of ``func`` must be "
+"listed, and the corresponding value must be supplied when calling "
+"``transform``. The names ``\"X\"`` and ``\"y\"`` are reserved by the "
+"estimator API and cannot be requested as metadata."
 msgstr ""
 "Nombres de los argumentos de palabra clave solicitados mediante el "
-"enrutamiento de metadatos de scikit-learn y reenviados a ``func``. Se ignoran "
-"las claves que se pasen a ``transform`` pero no figuren aquí. Se deben enumerar "
-"todos los argumentos de palabra clave obligatorios de ``func`` y proporcionar "
-"el valor correspondiente al invocar ``transform``. El nombre ``\"y\"`` está "
-"reservado por la API del estimador y no se puede solicitar como metadato."
+"enrutamiento de metadatos de scikit-learn y reenviados a ``func``. Se "
+"ignoran las claves que se pasen a ``transform`` pero no figuren aquí. Se "
+"deben enumerar todos los argumentos de palabra clave obligatorios de "
+"``func`` y proporcionar el valor correspondiente al invocar ``transform``. "
+"Los nombres ``\"X\"`` e ``\"y\"`` están reservados por la API del estimador "
+"y no se pueden solicitar como metadatos."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:22
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:22
 msgid ""
 "If ``True``, validate ``X`` as a numeric, 2-D array during ``fit`` and "
-"``transform``, and require the number of features to remain consistent. "
-"This does not validate the output of ``func``. If ``False``, pass ``X`` "
-"to ``func`` unchanged. In both cases, ``fit`` must be called before "
+"``transform``, and require the number of features to remain consistent. This "
+"does not validate the output of ``func``. If ``False``, pass ``X`` to "
+"``func`` unchanged. In both cases, ``fit`` must be called before "
 "``transform``."
 msgstr ""
 "Si es ``True``, valida ``X`` como una matriz numérica bidimensional durante "
 "``fit`` y ``transform`` y exige que el número de características permanezca "
-"constante. Esto no valida la salida de ``func``. Si es ``False``, pasa ``X`` a "
-"``func`` sin cambios. En ambos casos, se debe invocar ``fit`` antes de "
+"constante. Esto no valida la salida de ``func``. Si es ``False``, pasa ``X`` "
+"a ``func`` sin cambios. En ambos casos, se debe invocar ``fit`` antes de "
 "``transform``."
 
-#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:0
 msgid "Variables"
 msgstr "Variables"
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:29
-#: of
-msgid "Number of features seen during ``fit``.  Only set when ``validate=True``."
-msgstr "Número de características observadas durante ``fit``.  Solo se establece cuando ``validate=True``."
+msgid ""
+"Number of features seen during ``fit``.  Only set when ``validate=True``."
+msgstr ""
+"Número de características observadas durante ``fit``.  Solo se establece "
+"cuando ``validate=True``."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:35
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:35
 msgid "Examples"
 msgstr "Ejemplos"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:52
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:52
 msgid "Notes"
 msgstr "Notas"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:53
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:53
 msgid ""
 "To route metadata through a scikit-learn ``Pipeline``, enable metadata "
-"routing globally with "
-"``sklearn.set_config(enable_metadata_routing=True)``. This is not "
-"required when calling this estimator directly."
+"routing globally with ``sklearn.set_config(enable_metadata_routing=True)``. "
+"This is not required when calling this estimator directly."
 msgstr ""
-"Para enrutar metadatos a través de un ``Pipeline`` de scikit-learn, active el "
-"enrutamiento de metadatos de forma global con "
-"``sklearn.set_config(enable_metadata_routing=True)``. Esto no es necesario al "
-"invocar este estimador directamente."
+"Para enrutar metadatos a través de un ``Pipeline`` de scikit-learn, active "
+"el enrutamiento de metadatos de forma global con "
+"``sklearn.set_config(enable_metadata_routing=True)``. Esto no es necesario "
+"al invocar este estimador directamente."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:57
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:57
 msgid ""
 "The callable signature is validated during ``fit``, but the callable is "
 "executed only during ``transform``. Consequently, errors that depend on "
@@ -148,140 +158,164 @@ msgstr ""
 "La firma del objeto invocable se valida durante ``fit``, pero este solo se "
 "ejecuta durante ``transform``. Por tanto, los errores que dependen de los "
 "valores de metadatos o de la ejecución del objeto se generan durante "
-"``transform``. Utilice "
-":func:`chemotools.adaptation.validation.check_metadata_function` para validar "
-"anticipadamente un objeto invocable con entradas representativas."
+"``transform``. "
+"Utilice :func:`chemotools.adaptation.validation.check_metadata_function` "
+"para validar anticipadamente un objeto invocable con entradas "
+"representativas."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:65
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:65
 msgid ":py:obj:`chemotools.adaptation.validation.check_metadata_function`"
 msgstr ":py:obj:`chemotools.adaptation.validation.check_metadata_function`"
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:66
-#: of
 msgid "Validate a custom metadata function on representative inputs."
-msgstr "Valida una función de metadatos personalizada con entradas representativas."
+msgstr ""
+"Valida una función de metadatos personalizada con entradas representativas."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:68
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:68
 msgid ":py:obj:`chemotools.adaptation.functions`"
 msgstr ":py:obj:`chemotools.adaptation.functions`"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:69
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:69
 msgid "Predefined metadata-aware functions."
 msgstr "Funciones predefinidas compatibles con metadatos."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:1
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:1
 msgid "Fit the transformer by recording the number of input features."
-msgstr "Ajusta el transformador registrando el número de características de entrada."
+msgstr ""
+"Ajusta el transformador registrando el número de características de entrada."
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:3
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:6
-#: of
 msgid "Training data."
 msgstr "Datos de entrenamiento."
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:5
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:8
-#: of
 msgid "Ignored. Present for API compatibility."
 msgstr "Se ignora. Está presente por compatibilidad con la API."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:7
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:7
 msgid ""
-"Metadata accepted for routing compatibility. It is not forwarded to "
-"``func`` during fitting."
+"Metadata accepted for routing compatibility. It is not forwarded to ``func`` "
+"during fitting."
 msgstr ""
 "Metadatos aceptados por compatibilidad con el enrutamiento. No se reenvían a "
 "``func`` durante el ajuste."
 
-#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:0
 msgid "Returns"
 msgstr "Devuelve"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:11
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:11
 msgid "**self**"
 msgstr "**self**"
 
-#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:0
 msgid "Return type"
 msgstr "Tipo de retorno"
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:1
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:1
 msgid "Apply ``func`` to ``X``, forwarding any requested metadata keys."
 msgstr "Aplica ``func`` a ``X`` y reenvía las claves de metadatos solicitadas."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:3
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:3
 msgid "Data to transform."
 msgstr "Datos que se transformarán."
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:5
-#: of
 msgid ""
-"Metadata values passed to ``func`` as keyword arguments. Only keys listed"
-" in ``self.metadata`` are forwarded."
+"Metadata values passed to ``func`` as keyword arguments. Only keys listed in "
+"``self.metadata`` are forwarded."
 msgstr ""
-"Valores de metadatos que se pasan a ``func`` como argumentos de palabra clave. "
-"Solo se reenvían las claves enumeradas en ``self.metadata``."
+"Valores de metadatos que se pasan a ``func`` como argumentos de palabra "
+"clave. Solo se reenvían las claves enumeradas en ``self.metadata``."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:9
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:9
 msgid ""
-"**X_transformed** -- Result returned by ``func(X, **kwargs)``. Output "
-"type and shape are the responsibility of ``func`` and are not validated "
-"here."
+"**X_transformed** -- Result returned by ``func(X, **kwargs)``. Output type "
+"and shape are the responsibility of ``func`` and are not validated here."
 msgstr ""
 "**X_transformed** -- Resultado devuelto por ``func(X, **kwargs)``. El tipo y "
 "la forma de la salida son responsabilidad de ``func`` y no se validan aquí."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:1
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:1
 msgid "Fit and transform in a single step."
 msgstr "Ajusta y transforma en un solo paso."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:3
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:3
 msgid ""
 "Overrides the default ``TransformerMixin.fit_transform`` to ensure that "
 "``**metadata`` is forwarded to both ``fit`` and ``transform``."
 msgstr ""
 "Sobrescribe el método predeterminado ``TransformerMixin.fit_transform`` para "
-"garantizar que ``**metadata`` se reenvíe tanto a ``fit`` como a ``transform``."
+"garantizar que ``**metadata`` se reenvíe tanto a ``fit`` como a "
+"``transform``."
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:10
-#: of
 msgid "Keyword arguments forwarded to both ``fit`` and ``transform``."
-msgstr "Argumentos de palabra clave reenviados tanto a ``fit`` como a ``transform``."
+msgstr ""
+"Argumentos de palabra clave reenviados tanto a ``fit`` como a ``transform``."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:13
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:13
 msgid "**X_transformed** -- Result returned by ``func``."
 msgstr "**X_transformed** -- Resultado devuelto por ``func``."
 
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
 #: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:1
-#: of
 msgid "Return the metadata routing configuration for this transformer."
-msgstr "Devuelve la configuración de enrutamiento de metadatos de este transformador."
-
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:3
-#: of
-msgid ""
-"Registers each name in ``self.metadata`` as a requested parameter for "
-"both ``fit`` and ``transform``, enabling sklearn's metadata routing to "
-"propagate them through a ``Pipeline``."
 msgstr ""
-"Registra cada nombre de ``self.metadata`` como parámetro solicitado tanto para "
-"``fit`` como para ``transform``, lo que permite que el enrutamiento de "
+"Devuelve la configuración de enrutamiento de metadatos de este transformador."
+
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
+#: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:3
+msgid ""
+"Registers each name in ``self.metadata`` as a requested parameter for both "
+"``fit`` and ``transform``, enabling sklearn's metadata routing to propagate "
+"them through a ``Pipeline``."
+msgstr ""
+"Registra cada nombre de ``self.metadata`` como parámetro solicitado tanto "
+"para ``fit`` como para ``transform``, lo que permite que el enrutamiento de "
 "metadatos de sklearn los propague a través de un ``Pipeline``."
 
-#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:7
+#: ../../../chemotools/adaptation/_metadata_function_transformer.py:docstring
 #: of
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:7
 msgid "**request** -- The populated routing object."
 msgstr "**request** -- El objeto de enrutamiento configurado."
-

@@ -239,11 +239,18 @@ class TestMetadataFunctionTransformerFit:
         with pytest.raises(ValueError, match="Entries in `metadata` must be unique"):
             transformer.fit(X=[[1, 2], [3, 4]])
 
-    def test_fit_raises_when_metadata_name_is_y(self):
-        """Verifies that metadata cannot collide with the estimator y argument."""
-        transformer = MetadataFunctionTransformer(func=lambda X, y: X, metadata=("y",))
+    @pytest.mark.parametrize("reserved_name", ["X", "y"])
+    def test_fit_raises_when_metadata_name_is_reserved(self, reserved_name):
+        """Verifies that metadata cannot collide with estimator API arguments."""
+        transformer = MetadataFunctionTransformer(
+            func=lambda data, **metadata: data,
+            metadata=(reserved_name,),
+        )
 
-        with pytest.raises(ValueError, match="`y` cannot be requested in `metadata`"):
+        with pytest.raises(
+            ValueError,
+            match=rf"`{reserved_name}` cannot be requested in `metadata`",
+        ):
             transformer.fit(X=[[1, 2], [3, 4]])
 
 

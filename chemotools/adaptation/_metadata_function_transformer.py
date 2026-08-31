@@ -42,8 +42,8 @@ class MetadataFunctionTransformer(DocLinkMixin, TransformerMixin, BaseEstimator)
         routing and forwarded to ``func``. Keys passed to ``transform`` but not
         listed here are ignored. Every required keyword argument of ``func``
         must be listed, and the corresponding value must be supplied when
-        calling ``transform``. The name ``"y"`` is reserved by the estimator
-        API and cannot be requested as metadata.
+        calling ``transform``. The names ``"X"`` and ``"y"`` are reserved by
+        the estimator API and cannot be requested as metadata.
 
     validate : bool, default=True
         If ``True``, validate ``X`` as a numeric, 2-D array during ``fit`` and

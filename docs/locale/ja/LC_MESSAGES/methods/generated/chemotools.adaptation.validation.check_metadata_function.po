@@ -7,104 +7,134 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"POT-Creation-Date: 2026-08-31 16:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ja\n"
 "Language-Team: ja <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:2
 msgid "chemotools.adaptation.validation.check\\_metadata\\_function"
 msgstr "chemotools.adaptation.validation.check\\_metadata\\_function"
 
-#: chemotools.adaptation.validation.check_metadata_function:1 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:1
 msgid "Validate a metadata function on representative data."
 msgstr "代表データを用いてメタデータ関数を検証します。"
 
-#: chemotools.adaptation.validation.check_metadata_function:3 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:3
 msgid ""
-"The function is called once as ``func(X_checked, **metadata)``. Its "
-"output is validated as a finite, numeric, 2-D array that preserves the "
-"number of input samples and, by default, the number of input features."
-msgstr "関数は ``func(X_checked, **metadata)`` として 1 回呼び出されます。出力が有限な数値の 2 次元配列であり、入力サンプル数、およびデフォルトでは入力特徴量数を維持していることを検証します。"
+"The function is called once as ``func(X_checked, **metadata)``. Its output "
+"is validated as a finite, numeric, 2-D array that preserves the number of "
+"input samples and, by default, the number of input features."
+msgstr ""
+"関数は ``func(X_checked, **metadata)`` として 1 回呼び出されます。出力が有限"
+"な数値の 2 次元配列であり、入力サンプル数、およびデフォルトでは入力特徴量数を"
+"維持していることを検証します。"
 
-#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:0
 msgid "Parameters"
 msgstr "パラメータ"
 
-#: chemotools.adaptation.validation.check_metadata_function:7 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:7
 msgid "Function invoked as ``func(X_checked, **metadata)``."
 msgstr "``func(X_checked, **metadata)`` として呼び出す関数。"
 
-#: chemotools.adaptation.validation.check_metadata_function:9 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:9
 msgid "Representative input data."
 msgstr "代表入力データ。"
 
-#: chemotools.adaptation.validation.check_metadata_function:11 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:11
 msgid ""
-"Representative keyword arguments passed to ``func``. Use ``None`` when "
-"the function requires no metadata."
-msgstr "``func`` に渡す代表的なキーワード引数。関数がメタデータを必要としない場合は ``None`` を使用します。"
+"Representative keyword arguments passed to ``func``. Use ``None`` when the "
+"function requires no metadata. The names ``\"X\"`` and ``\"y\"`` are "
+"reserved by the estimator API and cannot be used as metadata keys."
+msgstr ""
+"``func`` に渡す代表的なキーワード引数。関数がメタデータを必要としない場合は "
+"``None`` を使用します。名前 ``\"X\"`` と ``\"y\"`` は推定器 API によって予約されており、"
+"メタデータのキーとして使用できません。"
 
-#: chemotools.adaptation.validation.check_metadata_function:14 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:15
 msgid ""
 "If ``True``, require the output to have the same number of features as "
 "``X``. The number of samples is always required to match."
-msgstr "``True`` の場合、出力の特徴量数が ``X`` と同じであることを要求します。サンプル数は常に一致する必要があります。"
+msgstr ""
+"``True`` の場合、出力の特徴量数が ``X`` と同じであることを要求します。サンプ"
+"ル数は常に一致する必要があります。"
 
-#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:0
 msgid "Returns"
 msgstr "戻り値"
 
-#: chemotools.adaptation.validation.check_metadata_function:18 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:19
 msgid "**result** -- Validated output produced by ``func``."
 msgstr "**result** -- ``func`` が生成した検証済みの出力。"
 
-#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:0
 msgid "Return type"
 msgstr "戻り値の型"
 
-#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:0
 msgid "Raises"
 msgstr "例外"
 
-#: chemotools.adaptation.validation.check_metadata_function:21 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:22
 msgid "If ``func`` is not callable or its signature cannot be inspected."
-msgstr "``func`` が callable でない場合、またはそのシグネチャを検査できない場合。"
+msgstr ""
+"``func`` が callable でない場合、またはそのシグネチャを検査できない場合。"
 
-#: chemotools.adaptation.validation.check_metadata_function:22 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:23
 msgid ""
 "If ``X`` is invalid, ``func`` cannot be called with the supplied     "
-"arguments, its output is not a finite numeric 2-D array, or its output"
-"     does not preserve the required dimensions."
-msgstr "``X`` が無効な場合、指定された引数で ``func`` を呼び出せない場合、出力が有限な数値の 2 次元配列でない場合、または出力が必要な次元を維持していない場合。"
+"arguments, its output is not a finite numeric 2-D array, or its output     "
+"does not preserve the required dimensions."
+msgstr ""
+"``X`` が無効な場合、指定された引数で ``func`` を呼び出せない場合、出力が有限"
+"な数値の 2 次元配列でない場合、または出力が必要な次元を維持していない場合。"
 
-#: chemotools.adaptation.validation.check_metadata_function:25 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:26
 msgid "Notes"
 msgstr "注記"
 
-#: chemotools.adaptation.validation.check_metadata_function:26 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:27
 msgid ""
-"This check executes user-provided code. Exceptions raised by ``func`` are"
-" propagated unchanged, and functions with side effects will perform those"
-" side effects once. The validated input and output may be converted to "
-"NumPy arrays by :func:`sklearn.utils.validation.check_array`."
-msgstr "この検査ではユーザー提供のコードを実行します。``func`` が送出した例外は変更せずに伝播され、副作用のある関数はその副作用を 1 回実行します。検証対象の入力と出力は :func:`sklearn.utils.validation.check_array` によって NumPy 配列へ変換される場合があります。"
+"This check executes user-provided code. Exceptions raised by ``func`` are "
+"propagated unchanged, and functions with side effects will perform those "
+"side effects once. The validated input and output may be converted to NumPy "
+"arrays by :func:`sklearn.utils.validation.check_array`."
+msgstr ""
+"この検査ではユーザー提供のコードを実行します。``func`` が送出した例外は変更せ"
+"ずに伝播され、副作用のある関数はその副作用を 1 回実行します。検証対象の入力と"
+"出力は :func:`sklearn.utils.validation.check_array` によって NumPy 配列へ変換"
+"される場合があります。"
 
-#: chemotools.adaptation.validation.check_metadata_function:32 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:33
 msgid "Examples"
 msgstr "使用例"
 
-#: chemotools.adaptation.validation.check_metadata_function:46 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:47
 msgid ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
 msgstr ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
 
-#: chemotools.adaptation.validation.check_metadata_function:47 of
+#: ../../../chemotools/adaptation/validation.py:docstring of
+#: chemotools.adaptation.validation.check_metadata_function:48
 msgid "Wrap a function for scikit-learn metadata routing."
-msgstr "scikit-learn のメタデータルーティングで使用できるように関数をラップします。"
-
+msgstr ""
+"scikit-learn のメタデータルーティングで使用できるように関数をラップします。"

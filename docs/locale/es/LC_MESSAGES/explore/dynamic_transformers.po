@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"POT-Creation-Date: 2026-08-31 16:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
 "Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/explore/dynamic_transformers.rst:4
@@ -25,52 +25,50 @@ msgstr "Transformadores dinámicos"
 #: ../../source/explore/dynamic_transformers.rst:6
 msgid ""
 "In conventional chemometrics practice, preprocessing is treated as a "
-"**static** operation: a correction is determined from a calibration set "
-"and then applied uniformly to every new spectrum. The preprocessing step "
-"holds everything it needs — a stored mean spectrum, a fitted baseline, a "
-"set of PLS loadings — and the data alone is sufficient at prediction "
-"time."
+"**static** operation: a correction is determined from a calibration set and "
+"then applied uniformly to every new spectrum. The preprocessing step holds "
+"everything it needs — a stored mean spectrum, a fitted baseline, a set of "
+"PLS loadings — and the data alone is sufficient at prediction time."
 msgstr ""
 "En la práctica quimiométrica convencional, el preprocesamiento se trata como "
-"una operación **estática**: se determina una corrección a partir de un conjunto "
-"de calibración y después se aplica uniformemente a cada nuevo espectro. El paso "
-"de preprocesamiento contiene todo lo que necesita —un espectro medio almacenado, "
-"una línea base ajustada, un conjunto de cargas PLS— y los datos por sí solos "
-"bastan en el momento de la predicción."
+"una operación **estática**: se determina una corrección a partir de un "
+"conjunto de calibración y después se aplica uniformemente a cada nuevo "
+"espectro. El paso de preprocesamiento contiene todo lo que necesita —un "
+"espectro medio almacenado, una línea base ajustada, un conjunto de cargas PLS"
+"— y los datos por sí solos bastan en el momento de la predicción."
 
 #: ../../source/explore/dynamic_transformers.rst:12
 msgid ""
-"This works well for a large class of problems, but it breaks down when "
-"the correction you need to apply depends on **information that is only "
-"available at inference time**. In practice this information falls into "
-"two categories:"
+"This works well for a large class of problems, but it breaks down when the "
+"correction you need to apply depends on **information that is only available "
+"at inference time**. In practice this information falls into two categories:"
 msgstr ""
 "Este enfoque funciona bien para una amplia clase de problemas, pero falla "
-"cuando la corrección que debe aplicarse depende de **información que solo está "
-"disponible durante la inferencia**. En la práctica, esta información pertenece "
-"a dos categorías:"
+"cuando la corrección que debe aplicarse depende de **información que solo "
+"está disponible durante la inferencia**. En la práctica, esta información "
+"pertenece a dos categorías:"
 
 #: ../../source/explore/dynamic_transformers.rst:16
 msgid ""
-"**Measurement metadata** — instrument-level quantities recorded alongside"
-" the spectrum but not part of it: the x-axis calibration, laser power, "
+"**Measurement metadata** — instrument-level quantities recorded alongside "
+"the spectrum but not part of it: the x-axis calibration, laser power, "
 "integration time, detector temperature."
 msgstr ""
-"**Metadatos de medición**: magnitudes del instrumento registradas junto con el "
-"espectro, pero que no forman parte de él: calibración del eje x, potencia del "
-"láser, tiempo de integración y temperatura del detector."
+"**Metadatos de medición**: magnitudes del instrumento registradas junto con "
+"el espectro, pero que no forman parte de él: calibración del eje x, potencia "
+"del láser, tiempo de integración y temperatura del detector."
 
 #: ../../source/explore/dynamic_transformers.rst:19
 msgid ""
-"**Process data** — sample- or batch-level context that changes between "
-"runs or samples: a fresh background measurement, a dilution factor, a "
-"reference standard collected just before the sample or other process "
-"parameters such as temperature or humidity."
+"**Process data** — sample- or batch-level context that changes between runs "
+"or samples: a fresh background measurement, a dilution factor, a reference "
+"standard collected just before the sample or other process parameters such "
+"as temperature or humidity."
 msgstr ""
 "**Datos del proceso**: contexto de la muestra o del lote que cambia entre "
-"ejecuciones o muestras: una nueva medición de fondo, un factor de dilución, un "
-"patrón de referencia medido justo antes de la muestra u otros parámetros del "
-"proceso, como la temperatura o la humedad."
+"ejecuciones o muestras: una nueva medición de fondo, un factor de dilución, "
+"un patrón de referencia medido justo antes de la muestra u otros parámetros "
+"del proceso, como la temperatura o la humedad."
 
 #: ../../source/explore/dynamic_transformers.rst:24
 msgid "Some concrete examples from spectroscopy:"
@@ -88,11 +86,12 @@ msgstr ""
 
 #: ../../source/explore/dynamic_transformers.rst:29
 msgid ""
-"You want to **normalize by laser power** or integration time, values that"
-" are logged per measurement but are not part of the spectrum itself."
+"You want to **normalize by laser power** or integration time, values that "
+"are logged per measurement but are not part of the spectrum itself."
 msgstr ""
-"Se desea **normalizar por la potencia del láser** o el tiempo de integración, "
-"valores registrados para cada medición que no forman parte del propio espectro."
+"Se desea **normalizar por la potencia del láser** o el tiempo de "
+"integración, valores registrados para cada medición que no forman parte del "
+"propio espectro."
 
 #: ../../source/explore/dynamic_transformers.rst:31
 msgid ""
@@ -105,15 +104,15 @@ msgstr ""
 #: ../../source/explore/dynamic_transformers.rst:34
 msgid ""
 "``chemotools`` addresses this with a set of *dynamic transformers*: "
-"estimators that accept additional **per-call parameters** alongside ``X``"
-" at transform time, delivered through `scikit-learn's metadata routing "
-"framework <https://scikit-learn.org/stable/metadata_routing.html>`_."
+"estimators that accept additional **per-call parameters** alongside ``X`` at "
+"transform time, delivered through `scikit-learn's metadata routing framework "
+"<https://scikit-learn.org/stable/metadata_routing.html>`_."
 msgstr ""
-"``chemotools`` aborda esta situación mediante un conjunto de *transformadores "
-"dinámicos*: estimadores que aceptan **parámetros específicos de cada llamada** "
-"junto con ``X`` durante la transformación, suministrados mediante el `sistema "
-"de enrutamiento de metadatos de scikit-learn <https://scikit-"
-"learn.org/stable/metadata_routing.html>`_."
+"``chemotools`` aborda esta situación mediante un conjunto de "
+"*transformadores dinámicos*: estimadores que aceptan **parámetros "
+"específicos de cada llamada** junto con ``X`` durante la transformación, "
+"suministrados mediante el `sistema de enrutamiento de metadatos de scikit-"
+"learn <https://scikit-learn.org/stable/metadata_routing.html>`_."
 
 #: ../../source/explore/dynamic_transformers.rst:39
 msgid "Dynamic transformers in ``chemotools``"
@@ -140,8 +139,11 @@ msgid "``x_axis``"
 msgstr "``x_axis``"
 
 #: ../../source/explore/dynamic_transformers.rst:48
-msgid "Spectra must be resampled from changing input grids onto one fixed grid."
-msgstr "Los espectros deben remuestrearse desde cuadrículas de entrada variables a una cuadrícula fija."
+msgid ""
+"Spectra must be resampled from changing input grids onto one fixed grid."
+msgstr ""
+"Los espectros deben remuestrearse desde cuadrículas de entrada variables a "
+"una cuadrícula fija."
 
 #: ../../source/explore/dynamic_transformers.rst:49
 msgid ":class:`~chemotools.adaptation.MetadataFunctionTransformer`"
@@ -153,28 +155,28 @@ msgstr "Nombres definidos por el usuario"
 
 #: ../../source/explore/dynamic_transformers.rst:51
 msgid "A custom correction needs one or more values that change between calls."
-msgstr "Una corrección personalizada necesita uno o más valores que cambian entre llamadas."
+msgstr ""
+"Una corrección personalizada necesita uno o más valores que cambian entre "
+"llamadas."
 
 #: ../../source/explore/dynamic_transformers.rst:53
 msgid ""
-"The distinction is useful: "
-":class:`~chemotools.adaptation.XAxisInterpolator` is a specialized, fully"
-" validated interpolation estimator, while "
-":class:`~chemotools.adaptation.MetadataFunctionTransformer` adapts a "
+"The distinction is useful: :class:`~chemotools.adaptation.XAxisInterpolator` "
+"is a specialized, fully validated interpolation estimator, "
+"while :class:`~chemotools.adaptation.MetadataFunctionTransformer` adapts a "
 "regular Python function to scikit-learn's estimator and metadata-routing "
-"interfaces. Use the specialized transformer for x-axis alignment. Use the"
-" function wrapper for operations such as reference subtraction, intensity"
-" scaling, offsets, or domain-specific corrections."
+"interfaces. Use the specialized transformer for x-axis alignment. Use the "
+"function wrapper for operations such as reference subtraction, intensity "
+"scaling, offsets, or domain-specific corrections."
 msgstr ""
-"La distinción es útil: "
-":class:`~chemotools.adaptation.XAxisInterpolator` es un estimador de "
-"interpolación especializado y completamente validado, mientras que "
-":class:`~chemotools.adaptation.MetadataFunctionTransformer` adapta una función "
-"normal de Python a las interfaces de estimador y de enrutamiento de metadatos "
-"de scikit-learn. Utilice el transformador especializado para alinear el eje x. "
-"Utilice el envoltorio de funciones para operaciones como la sustracción de una "
-"referencia, el escalado de intensidad, los desplazamientos o las correcciones "
-"específicas del dominio."
+"La distinción es útil: :class:`~chemotools.adaptation.XAxisInterpolator` es "
+"un estimador de interpolación especializado y completamente validado, "
+"mientras que :class:`~chemotools.adaptation.MetadataFunctionTransformer` "
+"adapta una función normal de Python a las interfaces de estimador y de "
+"enrutamiento de metadatos de scikit-learn. Utilice el transformador "
+"especializado para alinear el eje x. Utilice el envoltorio de funciones para "
+"operaciones como la sustracción de una referencia, el escalado de "
+"intensidad, los desplazamientos o las correcciones específicas del dominio."
 
 #: ../../source/explore/dynamic_transformers.rst:62
 msgid "XAxisInterpolator: align spectra to a common grid"
@@ -183,23 +185,23 @@ msgstr "XAxisInterpolator: alineación de espectros en una cuadrícula común"
 #: ../../source/explore/dynamic_transformers.rst:64
 msgid ""
 "In Raman spectroscopy, each instrument has a slightly different pixel-to-"
-"wavenumber calibration. Spectra from different instruments share the same"
-" chemistry but arrive on different x-axis grids — so they cannot be "
-"stacked into a matrix until they are resampled onto a common one."
+"wavenumber calibration. Spectra from different instruments share the same "
+"chemistry but arrive on different x-axis grids — so they cannot be stacked "
+"into a matrix until they are resampled onto a common one."
 msgstr ""
-"En espectroscopia Raman, cada instrumento presenta una calibración de píxeles a "
-"números de onda ligeramente distinta. Los espectros de distintos instrumentos "
-"comparten la misma química, pero llegan con cuadrículas del eje x diferentes, "
-"por lo que no pueden apilarse en una matriz hasta remuestrearlos en una "
-"cuadrícula común."
+"En espectroscopia Raman, cada instrumento presenta una calibración de "
+"píxeles a números de onda ligeramente distinta. Los espectros de distintos "
+"instrumentos comparten la misma química, pero llegan con cuadrículas del eje "
+"x diferentes, por lo que no pueden apilarse en una matriz hasta "
+"remuestrearlos en una cuadrícula común."
 
 #: ../../source/explore/dynamic_transformers.rst:69
 msgid ""
 "Five simulated spectra, each with a Gaussian peak at 1100 cm⁻¹ but on a "
 "slightly different grid, illustrate the problem."
 msgstr ""
-"Cinco espectros simulados, cada uno con un pico gaussiano a 1100 cm⁻¹ pero en "
-"una cuadrícula ligeramente distinta, ilustran el problema."
+"Cinco espectros simulados, cada uno con un pico gaussiano a 1100 cm⁻¹ pero "
+"en una cuadrícula ligeramente distinta, ilustran el problema."
 
 #: ../../source/explore/dynamic_transformers.rst:72
 msgid "**Setting up the data**"
@@ -211,32 +213,33 @@ msgstr "**Paso 1: lo que proporciona el instrumento**"
 
 #: ../../source/explore/dynamic_transformers.rst:101
 msgid ""
-"Each spectrum is delivered as an array of intensity values indexed by "
-"pixel number. When you plot them on a common pixel axis, the peaks appear"
-" at different positions — each instrument's zero point is slightly "
-"different."
+"Each spectrum is delivered as an array of intensity values indexed by pixel "
+"number. When you plot them on a common pixel axis, the peaks appear at "
+"different positions — each instrument's zero point is slightly different."
 msgstr ""
-"Cada espectro se proporciona como un vector de valores de intensidad indexado "
-"por el número de píxel. Al representarlos sobre un eje de píxeles común, los "
-"picos aparecen en posiciones distintas porque el punto cero de cada instrumento "
-"es ligeramente diferente."
+"Cada espectro se proporciona como un vector de valores de intensidad "
+"indexado por el número de píxel. Al representarlos sobre un eje de píxeles "
+"común, los picos aparecen en posiciones distintas porque el punto cero de "
+"cada instrumento es ligeramente diferente."
 
 #: ../../source/explore/dynamic_transformers.rst:117
 msgid "Raw spectra indexed by pixel number — peaks at different positions"
-msgstr "Espectros sin procesar indexados por número de píxel: picos en posiciones distintas"
+msgstr ""
+"Espectros sin procesar indexados por número de píxel: picos en posiciones "
+"distintas"
 
 #: ../../source/explore/dynamic_transformers.rst:124
 msgid ""
-"Peaks land at different pixel positions — the grids are misaligned. If "
-"you stacked these rows into a matrix as-is and fed it to a PLS model, "
-"column *k* would represent a different wavenumber for each instrument, so"
-" every learned regression coefficient would point at the wrong feature."
+"Peaks land at different pixel positions — the grids are misaligned. If you "
+"stacked these rows into a matrix as-is and fed it to a PLS model, column *k* "
+"would represent a different wavenumber for each instrument, so every learned "
+"regression coefficient would point at the wrong feature."
 msgstr ""
 "Los picos aparecen en posiciones de píxel diferentes: las cuadrículas están "
 "desalineadas. Si estas filas se apilaran en una matriz tal cual y se "
-"introdujeran en un modelo PLS, la columna *k* representaría un número de onda "
-"distinto para cada instrumento, por lo que cada coeficiente de regresión "
-"aprendido apuntaría a la característica equivocada."
+"introdujeran en un modelo PLS, la columna *k* representaría un número de "
+"onda distinto para cada instrumento, por lo que cada coeficiente de "
+"regresión aprendido apuntaría a la característica equivocada."
 
 #: ../../source/explore/dynamic_transformers.rst:129
 msgid "**Step 2 — plot against wavenumber**"
@@ -244,17 +247,18 @@ msgstr "**Paso 2: representación frente al número de onda**"
 
 #: ../../source/explore/dynamic_transformers.rst:131
 msgid ""
-"Each spectrum comes with its own wavenumber axis. Plotting against it "
-"shows the peaks coincide at 1100 cm⁻¹, but the arrays are still all "
-"different."
+"Each spectrum comes with its own wavenumber axis. Plotting against it shows "
+"the peaks coincide at 1100 cm⁻¹, but the arrays are still all different."
 msgstr ""
 "Cada espectro incluye su propio eje de números de onda. Al representarlos "
-"respecto a este eje se observa que los picos coinciden a 1100 cm⁻¹, aunque los "
-"vectores siguen siendo todos diferentes."
+"respecto a este eje se observa que los picos coinciden a 1100 cm⁻¹, aunque "
+"los vectores siguen siendo todos diferentes."
 
 #: ../../source/explore/dynamic_transformers.rst:145
 msgid "Raw spectra on their own wavenumber axes — peaks align at 1100 cm⁻¹"
-msgstr "Espectros sin procesar sobre sus propios ejes de números de onda: los picos se alinean a 1100 cm⁻¹"
+msgstr ""
+"Espectros sin procesar sobre sus propios ejes de números de onda: los picos "
+"se alinean a 1100 cm⁻¹"
 
 #: ../../source/explore/dynamic_transformers.rst:152
 msgid "**Step 3 — interpolate onto a common grid**"
@@ -262,31 +266,33 @@ msgstr "**Paso 3: interpolación sobre una cuadrícula común**"
 
 #: ../../source/explore/dynamic_transformers.rst:154
 msgid ""
-":class:`~chemotools.adaptation.XAxisInterpolator` takes a "
-"``common_x_axis`` defined once at construction time and, at every "
-"``transform`` call, resamples each row from its own ``x_axis`` onto that "
-"shared grid. The per-spectrum axis is passed as metadata — not baked into"
-" the transformer — so it can change freely between calls."
+":class:`~chemotools.adaptation.XAxisInterpolator` takes a ``common_x_axis`` "
+"defined once at construction time and, at every ``transform`` call, "
+"resamples each row from its own ``x_axis`` onto that shared grid. The per-"
+"spectrum axis is passed as metadata — not baked into the transformer — so it "
+"can change freely between calls."
 msgstr ""
-":class:`~chemotools.adaptation.XAxisInterpolator` recibe un ``common_x_axis`` "
-"definido una vez durante la construcción y, en cada llamada a ``transform``, "
-"remuestrea cada fila desde su propio ``x_axis`` a esa cuadrícula compartida. El "
-"eje de cada espectro se pasa como metadato, en lugar de quedar incorporado al "
-"transformador, por lo que puede cambiar libremente entre llamadas."
+":class:`~chemotools.adaptation.XAxisInterpolator` recibe un "
+"``common_x_axis`` definido una vez durante la construcción y, en cada "
+"llamada a ``transform``, remuestrea cada fila desde su propio ``x_axis`` a "
+"esa cuadrícula compartida. El eje de cada espectro se pasa como metadato, en "
+"lugar de quedar incorporado al transformador, por lo que puede cambiar "
+"libremente entre llamadas."
 
 #: ../../source/explore/dynamic_transformers.rst:188
 msgid "Aligned spectra on the common grid — peaks overlap perfectly"
-msgstr "Espectros alineados en la cuadrícula común: los picos se superponen perfectamente"
+msgstr ""
+"Espectros alineados en la cuadrícula común: los picos se superponen "
+"perfectamente"
 
 #: ../../source/explore/dynamic_transformers.rst:195
 msgid ""
 "All five peaks now sit at the same column index. The matrix "
-"``aligned_spectra`` can be fed directly into any subsequent step or "
-"model."
+"``aligned_spectra`` can be fed directly into any subsequent step or model."
 msgstr ""
 "Los cinco picos se encuentran ahora en el mismo índice de columna. La matriz "
-"``aligned_spectra`` puede introducirse directamente en cualquier paso o modelo "
-"posterior."
+"``aligned_spectra`` puede introducirse directamente en cualquier paso o "
+"modelo posterior."
 
 #: ../../source/explore/dynamic_transformers.rst:199
 msgid "Route ``x_axis`` through a Pipeline"
@@ -294,19 +300,18 @@ msgstr "Enrutamiento de ``x_axis`` a través de un pipeline"
 
 #: ../../source/explore/dynamic_transformers.rst:201
 msgid ""
-"The two method calls on the interpolator — "
-"``set_fit_request(x_axis=True)`` and "
-"``set_transform_request(x_axis=True)`` — register ``x_axis`` as a "
+"The two method calls on the interpolator — ``set_fit_request(x_axis=True)`` "
+"and ``set_transform_request(x_axis=True)`` — register ``x_axis`` as a "
 "metadata argument for the ``fit`` and ``transform`` phases respectively. "
-"When you pass ``x_axis`` to a pipeline call, scikit-learn delivers it "
-"only to the step that declared it; every other step is unaffected."
+"When you pass ``x_axis`` to a pipeline call, scikit-learn delivers it only "
+"to the step that declared it; every other step is unaffected."
 msgstr ""
 "Las dos llamadas a métodos del interpolador, "
 "``set_fit_request(x_axis=True)`` y ``set_transform_request(x_axis=True)``, "
 "registran ``x_axis`` como argumento de metadatos para las fases ``fit`` y "
 "``transform``, respectivamente. Cuando se pasa ``x_axis`` a una llamada del "
-"pipeline, scikit-learn lo entrega únicamente al paso que lo declaró; los demás "
-"pasos no se ven afectados."
+"pipeline, scikit-learn lo entrega únicamente al paso que lo declaró; los "
+"demás pasos no se ven afectados."
 
 #: ../../source/explore/dynamic_transformers.rst:207
 msgid ""
@@ -316,9 +321,9 @@ msgid ""
 "``fit_transform`` routes metadata through both phases."
 msgstr ""
 "``set_fit_request`` abarca ``fit`` y ``fit_transform``; "
-"``set_transform_request`` abarca ``transform``. Ambos se declaran en el ejemplo "
-"porque una :class:`~sklearn.pipeline.Pipeline` que llama a ``fit_transform`` "
-"enruta los metadatos a través de las dos fases."
+"``set_transform_request`` abarca ``transform``. Ambos se declaran en el "
+"ejemplo porque una :class:`~sklearn.pipeline.Pipeline` que llama a "
+"``fit_transform`` enruta los metadatos a través de las dos fases."
 
 #: ../../source/explore/dynamic_transformers.rst:213
 msgid "Using it inside a Pipeline"
@@ -326,12 +331,14 @@ msgstr "Uso dentro de un pipeline"
 
 #: ../../source/explore/dynamic_transformers.rst:215
 msgid "The pipeline below continues from the same variables defined above:"
-msgstr "El pipeline siguiente continúa a partir de las mismas variables definidas anteriormente:"
+msgstr ""
+"El pipeline siguiente continúa a partir de las mismas variables definidas "
+"anteriormente:"
 
 #: ../../source/explore/dynamic_transformers.rst:243
 msgid ""
-"Only the step that declared ``set_transform_request(x_axis=True)`` "
-"receives ``x_axis``. The other steps in the pipeline are unaffected."
+"Only the step that declared ``set_transform_request(x_axis=True)`` receives "
+"``x_axis``. The other steps in the pipeline are unaffected."
 msgstr ""
 "Solo el paso que declaró ``set_transform_request(x_axis=True)`` recibe "
 "``x_axis``. Los demás pasos del pipeline no se ven afectados."
@@ -342,33 +349,35 @@ msgstr "Cuadrículas compartidas frente a cuadrículas por muestra"
 
 #: ../../source/explore/dynamic_transformers.rst:249
 msgid ""
-"Not every batch comes from multiple instruments. When all spectra in a "
-"call share the same grid, you can pass a single 1-D array instead of a "
-"matrix. ``x_axis`` accepts two shapes:"
+"Not every batch comes from multiple instruments. When all spectra in a call "
+"share the same grid, you can pass a single 1-D array instead of a matrix. "
+"``x_axis`` accepts two shapes:"
 msgstr ""
-"No todos los lotes proceden de varios instrumentos. Cuando todos los espectros "
-"de una llamada comparten la misma cuadrícula, puede pasarse un único vector 1-D "
-"en lugar de una matriz. ``x_axis`` acepta dos formas:"
+"No todos los lotes proceden de varios instrumentos. Cuando todos los "
+"espectros de una llamada comparten la misma cuadrícula, puede pasarse un "
+"único vector 1-D en lugar de una matriz. ``x_axis`` acepta dos formas:"
 
 #: ../../source/explore/dynamic_transformers.rst:253
 msgid ""
-"**Shape** ``(n_features,)`` — the same grid for every spectrum in the "
-"call. Use this when all spectra in a batch come from the same instrument "
-"(e.g., a single measurement session where the grid is fixed)."
+"**Shape** ``(n_features,)`` — the same grid for every spectrum in the call. "
+"Use this when all spectra in a batch come from the same instrument (e.g., a "
+"single measurement session where the grid is fixed)."
 msgstr ""
-"**Forma** ``(n_features,)``: la misma cuadrícula para todos los espectros de la "
-"llamada. Utilícela cuando todos los espectros de un lote procedan del mismo "
-"instrumento (p. ej., una única sesión de medición con una cuadrícula fija)."
+"**Forma** ``(n_features,)``: la misma cuadrícula para todos los espectros de "
+"la llamada. Utilícela cuando todos los espectros de un lote procedan del "
+"mismo instrumento (p. ej., una única sesión de medición con una cuadrícula "
+"fija)."
 
 #: ../../source/explore/dynamic_transformers.rst:257
 msgid ""
 "**Shape** ``(n_samples, n_features)`` — one grid per row. Use this when "
-"combining spectra from multiple instruments in one batch (as in the "
-"example above, where each of the five spectra has its own offset)."
+"combining spectra from multiple instruments in one batch (as in the example "
+"above, where each of the five spectra has its own offset)."
 msgstr ""
 "**Forma** ``(n_samples, n_features)``: una cuadrícula por fila. Utilícela al "
 "combinar en un lote espectros de varios instrumentos (como en el ejemplo "
-"anterior, donde cada uno de los cinco espectros tiene su propio desplazamiento)."
+"anterior, donde cada uno de los cinco espectros tiene su propio "
+"desplazamiento)."
 
 #: ../../source/explore/dynamic_transformers.rst:271
 msgid "Interpolation methods"
@@ -376,8 +385,8 @@ msgstr "Métodos de interpolación"
 
 #: ../../source/explore/dynamic_transformers.rst:273
 msgid ""
-":class:`~chemotools.adaptation.XAxisInterpolator` supports three methods,"
-" selectable via the ``method`` parameter:"
+":class:`~chemotools.adaptation.XAxisInterpolator` supports three methods, "
+"selectable via the ``method`` parameter:"
 msgstr ""
 ":class:`~chemotools.adaptation.XAxisInterpolator` admite tres métodos, que "
 "pueden seleccionarse mediante el parámetro ``method``:"
@@ -404,7 +413,9 @@ msgstr "Interpolación lineal por tramos."
 
 #: ../../source/explore/dynamic_transformers.rst:285
 msgid "Fast; best when spectra are smooth and grids are closely spaced."
-msgstr "Rápido; idóneo cuando los espectros son suaves y las cuadrículas están poco separadas."
+msgstr ""
+"Rápido; idóneo cuando los espectros son suaves y las cuadrículas están poco "
+"separadas."
 
 #: ../../source/explore/dynamic_transformers.rst:286
 msgid "``\"cubic\"``"
@@ -412,7 +423,8 @@ msgstr "``\"cubic\"``"
 
 #: ../../source/explore/dynamic_transformers.rst:287
 msgid "Natural cubic spline (via :func:`scipy.interpolate.CubicSpline`)."
-msgstr "Spline cúbico natural (mediante :func:`scipy.interpolate.CubicSpline`)."
+msgstr ""
+"Spline cúbico natural (mediante :func:`scipy.interpolate.CubicSpline`)."
 
 #: ../../source/explore/dynamic_transformers.rst:288
 msgid "Good all-round choice; smooth and accurate."
@@ -423,8 +435,11 @@ msgid "``\"pchip\"``"
 msgstr "``\"pchip\"``"
 
 #: ../../source/explore/dynamic_transformers.rst:290
-msgid "Piecewise cubic Hermite (via :func:`scipy.interpolate.PchipInterpolator`)."
-msgstr "Hermite cúbico por tramos (mediante :func:`scipy.interpolate.PchipInterpolator`)."
+msgid ""
+"Piecewise cubic Hermite (via :func:`scipy.interpolate.PchipInterpolator`)."
+msgstr ""
+"Hermite cúbico por tramos "
+"(mediante :func:`scipy.interpolate.PchipInterpolator`)."
 
 #: ../../source/explore/dynamic_transformers.rst:291
 msgid "Preserves monotonicity; avoids overshooting near peaks."
@@ -433,13 +448,13 @@ msgstr "Conserva la monotonía y evita sobreoscilaciones cerca de los picos."
 #: ../../source/explore/dynamic_transformers.rst:293
 msgid ""
 "Points outside the input grid are filled with ``left`` / ``right`` (both "
-"default to :data:`numpy.nan`). You can change these to ``0.0`` or any "
-"other sentinel value if your downstream steps cannot handle ``NaN``."
+"default to :data:`numpy.nan`). You can change these to ``0.0`` or any other "
+"sentinel value if your downstream steps cannot handle ``NaN``."
 msgstr ""
-"Los puntos situados fuera de la cuadrícula de entrada se rellenan con ``left`` "
-"/ ``right`` (ambos tienen como valor predeterminado :data:`numpy.nan`). Puede "
-"cambiarlos a ``0.0`` o a cualquier otro valor centinela si los pasos posteriores "
-"no admiten ``NaN``."
+"Los puntos situados fuera de la cuadrícula de entrada se rellenan con "
+"``left`` / ``right`` (ambos tienen como valor "
+"predeterminado :data:`numpy.nan`). Puede cambiarlos a ``0.0`` o a cualquier "
+"otro valor centinela si los pasos posteriores no admiten ``NaN``."
 
 #: ../../source/explore/dynamic_transformers.rst:299
 msgid "MetadataFunctionTransformer: build a dynamic correction"
@@ -447,29 +462,29 @@ msgstr "MetadataFunctionTransformer: creación de una corrección dinámica"
 
 #: ../../source/explore/dynamic_transformers.rst:301
 msgid ""
-":class:`~chemotools.adaptation.MetadataFunctionTransformer` turns a "
-"Python function into a scikit-learn transformer that can receive named "
-"metadata. It is useful when the mathematical operation is simple, but one"
-" or more operands are only known when a batch is transformed."
+":class:`~chemotools.adaptation.MetadataFunctionTransformer` turns a Python "
+"function into a scikit-learn transformer that can receive named metadata. It "
+"is useful when the mathematical operation is simple, but one or more "
+"operands are only known when a batch is transformed."
 msgstr ""
 ":class:`~chemotools.adaptation.MetadataFunctionTransformer` convierte una "
 "función de Python en un transformador de scikit-learn capaz de recibir "
-"metadatos con nombre. Resulta útil cuando la operación matemática es sencilla, "
-"pero uno o varios operandos solo se conocen al transformar un lote."
+"metadatos con nombre. Resulta útil cuando la operación matemática es "
+"sencilla, pero uno o varios operandos solo se conocen al transformar un lote."
 
 #: ../../source/explore/dynamic_transformers.rst:306
 msgid ""
 "Consider background subtraction. A new reference spectrum is collected "
-"before each measurement batch, so it cannot be stored permanently when "
-"the model is trained. The operation itself is only ``X - reference``. The"
-" wrapper supplies the estimator interface and routes ``reference`` to "
-"that operation at the right time."
+"before each measurement batch, so it cannot be stored permanently when the "
+"model is trained. The operation itself is only ``X - reference``. The "
+"wrapper supplies the estimator interface and routes ``reference`` to that "
+"operation at the right time."
 msgstr ""
-"Considere la sustracción del fondo. Antes de cada lote de mediciones se obtiene "
-"un nuevo espectro de referencia, por lo que no puede almacenarse de forma "
-"permanente al entrenar el modelo. La operación en sí es simplemente ``X - "
-"reference``. El envoltorio proporciona la interfaz de estimador y enruta "
-"``reference`` hacia esa operación en el momento adecuado."
+"Considere la sustracción del fondo. Antes de cada lote de mediciones se "
+"obtiene un nuevo espectro de referencia, por lo que no puede almacenarse de "
+"forma permanente al entrenar el modelo. La operación en sí es simplemente "
+"``X - reference``. El envoltorio proporciona la interfaz de estimador y "
+"enruta ``reference`` hacia esa operación en el momento adecuado."
 
 #: ../../source/explore/dynamic_transformers.rst:313
 msgid "The three pieces"
@@ -545,13 +560,13 @@ msgstr ""
 
 #: ../../source/explore/dynamic_transformers.rst:353
 msgid ""
-"The trailing comma in ``(\"reference\",)`` matters: it creates a one-item"
-" tuple. The name ``\"y\"`` cannot be used because ``y`` is reserved by "
-"the scikit-learn estimator API."
+"The trailing comma in ``(\"reference\",)`` matters: it creates a one-item "
+"tuple. The names ``\"X\"`` and ``\"y\"`` cannot be used because they are "
+"reserved by the scikit-learn estimator API."
 msgstr ""
 "La coma final de ``(\"reference\",)`` es importante: crea una tupla de un "
-"elemento. No se puede utilizar el nombre ``\"y\"`` porque ``y`` está reservado "
-"por la API de estimadores de scikit-learn."
+"elemento. Los nombres ``\"X\"`` e ``\"y\"`` no se pueden utilizar porque "
+"están reservados por la API de estimadores de scikit-learn."
 
 #: ../../source/explore/dynamic_transformers.rst:359
 msgid "Start with a predefined function"
@@ -559,17 +574,19 @@ msgstr "Comenzar con una función predefinida"
 
 #: ../../source/explore/dynamic_transformers.rst:361
 msgid ""
-"``chemotools`` includes common, picklable functions in "
-":mod:`chemotools.adaptation.functions`. Using one of these is the "
+"``chemotools`` includes common, picklable functions "
+"in :mod:`chemotools.adaptation.functions`. Using one of these is the "
 "shortest path to a dynamic correction:"
 msgstr ""
-"``chemotools`` incluye funciones comunes y serializables mediante pickle en "
-":mod:`chemotools.adaptation.functions`. Utilizar una de ellas es la vía más "
-"breve para crear una corrección dinámica:"
+"``chemotools`` incluye funciones comunes y serializables mediante pickle "
+"en :mod:`chemotools.adaptation.functions`. Utilizar una de ellas es la vía "
+"más breve para crear una corrección dinámica:"
 
 #: ../../source/explore/dynamic_transformers.rst:392
 msgid "The predefined functions cover four common element-wise corrections:"
-msgstr "Las funciones predefinidas abarcan cuatro correcciones comunes elemento a elemento:"
+msgstr ""
+"Las funciones predefinidas abarcan cuatro correcciones comunes elemento a "
+"elemento:"
 
 #: ../../source/explore/dynamic_transformers.rst:394
 msgid "Predefined metadata functions"
@@ -639,8 +656,8 @@ msgstr "Comprender las formas de los metadatos"
 #: ../../source/explore/dynamic_transformers.rst:418
 msgid ""
 "The predefined functions use NumPy broadcasting. The metadata shape "
-"determines whether a correction is global, shared by a batch, or "
-"different for each sample."
+"determines whether a correction is global, shared by a batch, or different "
+"for each sample."
 msgstr ""
 "Las funciones predefinidas utilizan la difusión de NumPy. La forma de los "
 "metadatos determina si una corrección es global, se comparte en un lote o es "
@@ -648,8 +665,8 @@ msgstr ""
 
 #: ../../source/explore/dynamic_transformers.rst:422
 msgid ""
-"For an input ``X`` with shape ``(n_samples, n_features)``, accepted "
-"metadata shapes are:"
+"For an input ``X`` with shape ``(n_samples, n_features)``, accepted metadata "
+"shapes are:"
 msgstr ""
 "Para una entrada ``X`` con forma ``(n_samples, n_features)``, se aceptan las "
 "siguientes formas de metadatos:"
@@ -721,8 +738,8 @@ msgstr "Un espectro de referencia específico de cada muestra"
 #: ../../source/explore/dynamic_transformers.rst:445
 msgid ""
 "One-dimensional metadata is deliberately rejected by the predefined "
-"functions because its meaning is ambiguous when ``n_samples == "
-"n_features``. Reshape it explicitly:"
+"functions because its meaning is ambiguous when ``n_samples == n_features``. "
+"Reshape it explicitly:"
 msgstr ""
 "Las funciones predefinidas rechazan deliberadamente los metadatos "
 "unidimensionales porque su significado es ambiguo cuando ``n_samples == "
@@ -730,11 +747,12 @@ msgstr ""
 
 #: ../../source/explore/dynamic_transformers.rst:457
 msgid ""
-"Custom functions decide which metadata types and shapes they support. The"
-" wrapper routes values; it does not interpret or reshape them."
+"Custom functions decide which metadata types and shapes they support. The "
+"wrapper routes values; it does not interpret or reshape them."
 msgstr ""
-"Las funciones personalizadas deciden qué tipos y formas de metadatos admiten. "
-"El envoltorio enruta los valores; no los interpreta ni cambia su forma."
+"Las funciones personalizadas deciden qué tipos y formas de metadatos "
+"admiten. El envoltorio enruta los valores; no los interpreta ni cambia su "
+"forma."
 
 #: ../../source/explore/dynamic_transformers.rst:462
 msgid "Write a custom function"
@@ -750,11 +768,15 @@ msgstr "``X`` es su primer argumento posicional."
 
 #: ../../source/explore/dynamic_transformers.rst:467
 msgid "Routed values are named parameters that can be passed by keyword."
-msgstr "Los valores enrutados son parámetros con nombre que pueden pasarse por palabra clave."
+msgstr ""
+"Los valores enrutados son parámetros con nombre que pueden pasarse por "
+"palabra clave."
 
 #: ../../source/explore/dynamic_transformers.rst:468
 msgid "Every required parameter after ``X`` is listed in ``metadata``."
-msgstr "Todos los parámetros obligatorios posteriores a ``X`` figuran en ``metadata``."
+msgstr ""
+"Todos los parámetros obligatorios posteriores a ``X`` figuran en "
+"``metadata``."
 
 #: ../../source/explore/dynamic_transformers.rst:469
 msgid "It returns a finite, numeric, two-dimensional array."
@@ -762,16 +784,16 @@ msgstr "Devuelve una matriz bidimensional, numérica y finita."
 
 #: ../../source/explore/dynamic_transformers.rst:470
 msgid ""
-"It preserves the number of samples and, for this transformer, the number "
-"of features."
+"It preserves the number of samples and, for this transformer, the number of "
+"features."
 msgstr ""
 "Conserva el número de muestras y, para este transformador, el número de "
 "características."
 
 #: ../../source/explore/dynamic_transformers.rst:473
 msgid ""
-"For example, this correction combines a per-sample integration time with "
-"an optional dark-current offset:"
+"For example, this correction combines a per-sample integration time with an "
+"optional dark-current offset:"
 msgstr ""
 "Por ejemplo, esta corrección combina un tiempo de integración específico de "
 "cada muestra con un desplazamiento opcional de corriente oscura:"
@@ -779,9 +801,9 @@ msgstr ""
 #: ../../source/explore/dynamic_transformers.rst:495
 msgid ""
 "Optional function parameters may still be listed in ``metadata``. If no "
-"value is supplied during a direct ``transform`` call, the function's "
-"default is used. Additional values passed to the transformer but not "
-"listed in ``metadata`` are not forwarded."
+"value is supplied during a direct ``transform`` call, the function's default "
+"is used. Additional values passed to the transformer but not listed in "
+"``metadata`` are not forwarded."
 msgstr ""
 "Los parámetros opcionales de la función también pueden incluirse en "
 "``metadata``. Si no se proporciona ningún valor en una llamada directa a "
@@ -792,24 +814,23 @@ msgstr ""
 #: ../../source/explore/dynamic_transformers.rst:500
 msgid ""
 "Avoid positional-only metadata parameters because metadata is always "
-"forwarded by name. In the following function, ``reference`` cannot be "
-"routed:"
+"forwarded by name. In the following function, ``reference`` cannot be routed:"
 msgstr ""
-"Evite parámetros de metadatos exclusivamente posicionales, ya que los metadatos "
-"siempre se reenvían por nombre. En la función siguiente, ``reference`` no puede "
-"enrutarse:"
+"Evite parámetros de metadatos exclusivamente posicionales, ya que los "
+"metadatos siempre se reenvían por nombre. En la función siguiente, "
+"``reference`` no puede enrutarse:"
 
 #: ../../source/explore/dynamic_transformers.rst:508
 msgid ""
 "Functions defined at module level are preferable to lambdas or nested "
-"functions when the fitted pipeline will be serialized. Standard pickle-"
-"based tools need to import the function by its module and name when "
-"loading the pipeline."
+"functions when the fitted pipeline will be serialized. Standard pickle-based "
+"tools need to import the function by its module and name when loading the "
+"pipeline."
 msgstr ""
-"Las funciones definidas en el ámbito del módulo son preferibles a las funciones "
-"lambda o anidadas cuando el pipeline ajustado vaya a serializarse. Al cargar el "
-"pipeline, las herramientas estándar basadas en pickle necesitan importar la "
-"función mediante su módulo y su nombre."
+"Las funciones definidas en el ámbito del módulo son preferibles a las "
+"funciones lambda o anidadas cuando el pipeline ajustado vaya a serializarse. "
+"Al cargar el pipeline, las herramientas estándar basadas en pickle necesitan "
+"importar la función mediante su módulo y su nombre."
 
 #: ../../source/explore/dynamic_transformers.rst:514
 msgid "Validate a custom function before wrapping it"
@@ -819,23 +840,22 @@ msgstr "Validar una función personalizada antes de envolverla"
 msgid ""
 "The transformer checks the function signature during ``fit`` without "
 "executing the function. Value-dependent problems, such as an invalid "
-"metadata shape or a one-dimensional result, cannot be discovered from the"
-" signature alone."
+"metadata shape or a one-dimensional result, cannot be discovered from the "
+"signature alone."
 msgstr ""
-"El transformador comprueba la firma de la función durante ``fit`` sin ejecutarla. "
-"Los problemas que dependen de los valores, como una forma de metadatos no válida "
-"o un resultado unidimensional, no pueden detectarse únicamente a partir de la "
-"firma."
+"El transformador comprueba la firma de la función durante ``fit`` sin "
+"ejecutarla. Los problemas que dependen de los valores, como una forma de "
+"metadatos no válida o un resultado unidimensional, no pueden detectarse "
+"únicamente a partir de la firma."
 
 #: ../../source/explore/dynamic_transformers.rst:520
 msgid ""
-"Use :func:`~chemotools.adaptation.validation.check_metadata_function` "
-"with representative data to exercise the complete function contract "
-"eagerly:"
+"Use :func:`~chemotools.adaptation.validation.check_metadata_function` with "
+"representative data to exercise the complete function contract eagerly:"
 msgstr ""
-"Utilice :func:`~chemotools.adaptation.validation.check_metadata_function` con "
-"datos representativos para comprobar de inmediato el contrato completo de la "
-"función:"
+"Utilice :func:`~chemotools.adaptation.validation.check_metadata_function` "
+"con datos representativos para comprobar de inmediato el contrato completo "
+"de la función:"
 
 #: ../../source/explore/dynamic_transformers.rst:536
 msgid "This call performs the following checks:"
@@ -863,20 +883,19 @@ msgstr "Su salida conserva el número de muestras y características."
 
 #: ../../source/explore/dynamic_transformers.rst:544
 msgid ""
-"The helper returns the validated output so the custom function is "
-"executed only once. It is intended for development, testing, and "
-"validation of a new function. It is not automatically run inside every "
-"``transform`` call."
+"The helper returns the validated output so the custom function is executed "
+"only once. It is intended for development, testing, and validation of a new "
+"function. It is not automatically run inside every ``transform`` call."
 msgstr ""
 "La función auxiliar devuelve la salida validada, de modo que la función "
-"personalizada solo se ejecuta una vez. Está destinada al desarrollo, las pruebas "
-"y la validación de funciones nuevas. No se ejecuta automáticamente dentro de "
-"cada llamada a ``transform``."
+"personalizada solo se ejecuta una vez. Está destinada al desarrollo, las "
+"pruebas y la validación de funciones nuevas. No se ejecuta automáticamente "
+"dentro de cada llamada a ``transform``."
 
 #: ../../source/explore/dynamic_transformers.rst:550
 msgid ""
-"``check_metadata_function`` executes user-provided code. Exceptions and "
-"side effects from the function are not suppressed."
+"``check_metadata_function`` executes user-provided code. Exceptions and side "
+"effects from the function are not suppressed."
 msgstr ""
 "``check_metadata_function`` ejecuta código proporcionado por el usuario. Las "
 "excepciones y los efectos secundarios de la función no se suprimen."
@@ -884,18 +903,18 @@ msgstr ""
 #: ../../source/explore/dynamic_transformers.rst:553
 msgid ""
 "If a custom operation intentionally changes the number of features, pass "
-"``preserve_features=False`` to the checker. Such a function does not "
-"satisfy the same-shape contract documented by "
-":class:`~chemotools.adaptation.MetadataFunctionTransformer`, so use that "
+"``preserve_features=False`` to the checker. Such a function does not satisfy "
+"the same-shape contract documented "
+"by :class:`~chemotools.adaptation.MetadataFunctionTransformer`, so use that "
 "option only when the downstream interface and feature naming are handled "
 "explicitly."
 msgstr ""
 "Si una operación personalizada cambia intencionadamente el número de "
-"características, pase ``preserve_features=False`` al comprobador. Esa función no "
-"satisface el contrato de conservación de forma documentado por "
-":class:`~chemotools.adaptation.MetadataFunctionTransformer`, por lo que esta "
-"opción solo debe utilizarse cuando la interfaz posterior y los nombres de las "
-"características se gestionen explícitamente."
+"características, pase ``preserve_features=False`` al comprobador. Esa "
+"función no satisface el contrato de conservación de forma documentado "
+"por :class:`~chemotools.adaptation.MetadataFunctionTransformer`, por lo que "
+"esta opción solo debe utilizarse cuando la interfaz posterior y los nombres "
+"de las características se gestionen explícitamente."
 
 #: ../../source/explore/dynamic_transformers.rst:561
 msgid "Use MetadataFunctionTransformer in a Pipeline"
@@ -903,11 +922,11 @@ msgstr "Uso de MetadataFunctionTransformer en un pipeline"
 
 #: ../../source/explore/dynamic_transformers.rst:563
 msgid ""
-"Enable metadata routing before passing additional values through a "
-":class:`~sklearn.pipeline.Pipeline`:"
+"Enable metadata routing before passing additional values through "
+"a :class:`~sklearn.pipeline.Pipeline`:"
 msgstr ""
-"Active el enrutamiento de metadatos antes de pasar valores adicionales a través "
-"de una :class:`~sklearn.pipeline.Pipeline`:"
+"Active el enrutamiento de metadatos antes de pasar valores adicionales a "
+"través de una :class:`~sklearn.pipeline.Pipeline`:"
 
 #: ../../source/explore/dynamic_transformers.rst:589
 msgid ""
@@ -917,33 +936,38 @@ msgid ""
 "automatically. In this example, ``reference`` is routed to "
 "``subtract_background`` and is not sent to ``StandardScaler``."
 msgstr ""
-"A diferencia de :class:`~chemotools.adaptation.XAxisInterpolator`, el envoltorio "
-"de funciones no requiere llamadas a ``set_fit_request`` ni a "
-"``set_transform_request``. Registra automáticamente todos los nombres incluidos "
-"en ``metadata``. En este ejemplo, ``reference`` se enruta a "
+"A diferencia de :class:`~chemotools.adaptation.XAxisInterpolator`, el "
+"envoltorio de funciones no requiere llamadas a ``set_fit_request`` ni a "
+"``set_transform_request``. Registra automáticamente todos los nombres "
+"incluidos en ``metadata``. En este ejemplo, ``reference`` se enruta a "
 "``subtract_background`` y no se envía a ``StandardScaler``."
 
 #: ../../source/explore/dynamic_transformers.rst:595
-msgid "After fitting, a new reference can be supplied for each prediction batch:"
-msgstr "Después del ajuste, puede proporcionarse una nueva referencia para cada lote de predicción:"
+msgid ""
+"After fitting, a new reference can be supplied for each prediction batch:"
+msgstr ""
+"Después del ajuste, puede proporcionarse una nueva referencia para cada lote "
+"de predicción:"
 
 #: ../../source/explore/dynamic_transformers.rst:605
 msgid ""
-"Metadata routing must be enabled for Pipeline calls, but it is not needed"
-" when calling ``fit_transform`` or ``transform`` directly on the "
-"transformer."
+"Metadata routing must be enabled for Pipeline calls, but it is not needed "
+"when calling ``fit_transform`` or ``transform`` directly on the transformer."
 msgstr ""
-"El enrutamiento de metadatos debe estar activado para las llamadas de Pipeline, "
-"pero no es necesario al llamar directamente a ``fit_transform`` o ``transform`` "
-"en el transformador."
+"El enrutamiento de metadatos debe estar activado para las llamadas de "
+"Pipeline, pero no es necesario al llamar directamente a ``fit_transform`` o "
+"``transform`` en el transformador."
 
 #: ../../source/explore/dynamic_transformers.rst:610
 msgid "What happens during fit and transform"
 msgstr "Qué ocurre durante el ajuste y la transformación"
 
 #: ../../source/explore/dynamic_transformers.rst:612
-msgid "The transformer deliberately separates structural checks from execution:"
-msgstr "El transformador separa deliberadamente las comprobaciones estructurales de la ejecución:"
+msgid ""
+"The transformer deliberately separates structural checks from execution:"
+msgstr ""
+"El transformador separa deliberadamente las comprobaciones estructurales de "
+"la ejecución:"
 
 #: ../../source/explore/dynamic_transformers.rst:614
 msgid "Transformer lifecycle"
@@ -1005,141 +1029,28 @@ msgid ""
 "pipeline is fitted."
 msgstr ""
 "No ejecutar la función durante ``fit`` evita trabajo duplicado y efectos "
-"secundarios inesperados. También refleja el caso de uso principal: los valores "
-"de metadatos disponibles durante el despliegue pueden diferir de los observados "
-"al ajustar el pipeline."
+"secundarios inesperados. También refleja el caso de uso principal: los "
+"valores de metadatos disponibles durante el despliegue pueden diferir de los "
+"observados al ajustar el pipeline."
 
 #: ../../source/explore/dynamic_transformers.rst:635
 msgid ""
-"With the default ``validate=True``, ``X`` is converted to a finite "
-"numeric two-dimensional array and its feature count is checked against "
-"the fitted input. Set ``validate=False`` only when the function must "
-"receive another data container unchanged and performs its own input "
-"validation. Output validation is always the responsibility of the "
-"function."
+"With the default ``validate=True``, ``X`` is converted to a finite numeric "
+"two-dimensional array and its feature count is checked against the fitted "
+"input. Set ``validate=False`` only when the function must receive another "
+"data container unchanged and performs its own input validation. Output "
+"validation is always the responsibility of the function."
 msgstr ""
-"Con el valor predeterminado ``validate=True``, ``X`` se convierte en una matriz "
-"bidimensional, numérica y finita, y su número de características se compara con "
-"el de la entrada ajustada. Establezca ``validate=False`` solo cuando la función "
-"deba recibir otro contenedor de datos sin cambios y realice su propia validación "
-"de la entrada. La validación de la salida siempre es responsabilidad de la "
-"función."
+"Con el valor predeterminado ``validate=True``, ``X`` se convierte en una "
+"matriz bidimensional, numérica y finita, y su número de características se "
+"compara con el de la entrada ajustada. Establezca ``validate=False`` solo "
+"cuando la función deba recibir otro contenedor de datos sin cambios y "
+"realice su propia validación de la entrada. La validación de la salida "
+"siempre es responsabilidad de la función."
 
 #: ../../source/explore/dynamic_transformers.rst:643
 msgid "Common errors and how to fix them"
 msgstr "Errores frecuentes y cómo corregirlos"
-
-#: ../../source/explore/dynamic_transformers.rst:645
-msgid "Troubleshooting MetadataFunctionTransformer"
-msgstr "Resolución de problemas de MetadataFunctionTransformer"
-
-#: ../../source/explore/dynamic_transformers.rst:649
-msgid "Symptom"
-msgstr "Síntoma"
-
-#: ../../source/explore/dynamic_transformers.rst:650
-msgid "Likely cause"
-msgstr "Causa probable"
-
-#: ../../source/explore/dynamic_transformers.rst:651
-msgid "Fix"
-msgstr "Solución"
-
-#: ../../source/explore/dynamic_transformers.rst:652
-msgid "Required argument is missing from ``metadata``"
-msgstr "Falta un argumento obligatorio en ``metadata``"
-
-#: ../../source/explore/dynamic_transformers.rst:653
-msgid "The function needs a named value that the transformer does not request"
-msgstr "La función necesita un valor con nombre que el transformador no solicita"
-
-#: ../../source/explore/dynamic_transformers.rst:654
-msgid "Add its name to the ``metadata`` tuple"
-msgstr "Añada su nombre a la tupla ``metadata``"
-
-#: ../../source/explore/dynamic_transformers.rst:655
-msgid "Function does not accept a requested argument"
-msgstr "La función no acepta un argumento solicitado"
-
-#: ../../source/explore/dynamic_transformers.rst:656
-msgid "A metadata name does not match the function signature"
-msgstr "Un nombre de metadato no coincide con la firma de la función"
-
-#: ../../source/explore/dynamic_transformers.rst:657
-msgid "Correct the spelling or change the function parameter"
-msgstr "Corrija el nombre o cambie el parámetro de la función"
-
-#: ../../source/explore/dynamic_transformers.rst:658
-msgid "Missing positional argument during ``transform``"
-msgstr "Falta un argumento posicional durante ``transform``"
-
-#: ../../source/explore/dynamic_transformers.rst:659
-msgid "A requested value was not supplied for that call"
-msgstr "No se proporcionó un valor solicitado para esa llamada"
-
-#: ../../source/explore/dynamic_transformers.rst:660
-msgid "Pass ``name=value`` to ``transform`` or the Pipeline method"
-msgstr "Pase ``name=value`` a ``transform`` o al método de Pipeline"
-
-#: ../../source/explore/dynamic_transformers.rst:661
-msgid "Positional-only parameter error"
-msgstr "Error de parámetro exclusivamente posicional"
-
-#: ../../source/explore/dynamic_transformers.rst:662
-msgid "The function uses ``/`` after a metadata parameter"
-msgstr "La función utiliza ``/`` después de un parámetro de metadatos"
-
-#: ../../source/explore/dynamic_transformers.rst:663
-msgid "Make the metadata parameter keyword-compatible"
-msgstr "Permita pasar el parámetro de metadatos por palabra clave"
-
-#: ../../source/explore/dynamic_transformers.rst:664
-msgid "Metadata must contain strings or unique names"
-msgstr "Los metadatos deben contener cadenas o nombres únicos"
-
-#: ../../source/explore/dynamic_transformers.rst:665
-msgid "The ``metadata`` declaration is malformed"
-msgstr "La declaración ``metadata`` está mal formada"
-
-#: ../../source/explore/dynamic_transformers.rst:666
-msgid "Use one unique string for each routed function argument"
-msgstr "Utilice una cadena única para cada argumento de función enrutado"
-
-#: ../../source/explore/dynamic_transformers.rst:667
-msgid "``y`` cannot be requested"
-msgstr "No se puede solicitar ``y``"
-
-#: ../../source/explore/dynamic_transformers.rst:668
-msgid "``y`` is reserved by the estimator API"
-msgstr "``y`` está reservado por la API de estimadores"
-
-#: ../../source/explore/dynamic_transformers.rst:669
-msgid "Choose a domain-specific name such as ``target_reference``"
-msgstr "Elija un nombre específico del dominio, como ``target_reference``"
-
-#: ../../source/explore/dynamic_transformers.rst:670
-msgid "Expected a 2-D array"
-msgstr "Se esperaba una matriz 2-D"
-
-#: ../../source/explore/dynamic_transformers.rst:671
-msgid "``X``, output, or predefined-function metadata is one-dimensional"
-msgstr "``X``, la salida o los metadatos de la función predefinida son unidimensionales"
-
-#: ../../source/explore/dynamic_transformers.rst:672
-msgid "Reshape explicitly according to its sample or feature meaning"
-msgstr "Cambie la forma explícitamente según su significado de muestra o característica"
-
-#: ../../source/explore/dynamic_transformers.rst:673
-msgid "Unexpected keyword in a Pipeline call"
-msgstr "Palabra clave inesperada en una llamada de Pipeline"
-
-#: ../../source/explore/dynamic_transformers.rst:674
-msgid "Metadata routing is disabled"
-msgstr "El enrutamiento de metadatos está desactivado"
-
-#: ../../source/explore/dynamic_transformers.rst:675
-msgid "Call ``set_config(enable_metadata_routing=True)``"
-msgstr "Llame a ``set_config(enable_metadata_routing=True)``"
 
 #: ../../source/explore/dynamic_transformers.rst:679
 msgid "Choose the right dynamic transformer"
@@ -1147,29 +1058,27 @@ msgstr "Elegir el transformador dinámico adecuado"
 
 #: ../../source/explore/dynamic_transformers.rst:681
 msgid ""
-"Use :class:`~chemotools.adaptation.XAxisInterpolator` when the operation "
-"is specifically interpolation from a changing source axis to a fixed "
-"target axis. It validates monotonic grids, supports multiple "
-"interpolation methods, exposes output feature names, and can process rows"
-" in parallel."
+"Use :class:`~chemotools.adaptation.XAxisInterpolator` when the operation is "
+"specifically interpolation from a changing source axis to a fixed target "
+"axis. It validates monotonic grids, supports multiple interpolation methods, "
+"exposes output feature names, and can process rows in parallel."
 msgstr ""
-"Utilice :class:`~chemotools.adaptation.XAxisInterpolator` cuando la operación "
-"sea específicamente una interpolación desde un eje de origen variable a un eje "
-"de destino fijo. Valida cuadrículas monótonas, admite varios métodos de "
-"interpolación, expone los nombres de las características de salida y puede "
-"procesar filas en paralelo."
+"Utilice :class:`~chemotools.adaptation.XAxisInterpolator` cuando la "
+"operación sea específicamente una interpolación desde un eje de origen "
+"variable a un eje de destino fijo. Valida cuadrículas monótonas, admite "
+"varios métodos de interpolación, expone los nombres de las características "
+"de salida y puede procesar filas en paralelo."
 
 #: ../../source/explore/dynamic_transformers.rst:686
 msgid ""
 "Use :class:`~chemotools.adaptation.MetadataFunctionTransformer` when the "
-"operation is naturally expressed as a function of ``X`` and one or more "
-"per-call values. Before placing a custom function in a production "
-"pipeline:"
+"operation is naturally expressed as a function of ``X`` and one or more per-"
+"call values. Before placing a custom function in a production pipeline:"
 msgstr ""
-"Utilice :class:`~chemotools.adaptation.MetadataFunctionTransformer` cuando la "
-"operación pueda expresarse de forma natural como una función de ``X`` y de uno o "
-"varios valores específicos de cada llamada. Antes de incorporar una función "
-"personalizada a un pipeline de producción:"
+"Utilice :class:`~chemotools.adaptation.MetadataFunctionTransformer` cuando "
+"la operación pueda expresarse de forma natural como una función de ``X`` y "
+"de uno o varios valores específicos de cada llamada. Antes de incorporar una "
+"función personalizada a un pipeline de producción:"
 
 #: ../../source/explore/dynamic_transformers.rst:690
 msgid "Give every routed value a clear, unique parameter name."
@@ -1177,15 +1086,17 @@ msgstr "Asigne a cada valor enrutado un nombre de parámetro claro y único."
 
 #: ../../source/explore/dynamic_transformers.rst:691
 msgid "Test shared and per-sample metadata shapes relevant to the application."
-msgstr "Pruebe las formas de metadatos compartidas y por muestra pertinentes para la aplicación."
+msgstr ""
+"Pruebe las formas de metadatos compartidas y por muestra pertinentes para la "
+"aplicación."
 
 #: ../../source/explore/dynamic_transformers.rst:692
 msgid ""
 "Run :func:`~chemotools.adaptation.validation.check_metadata_function` on "
 "representative inputs."
 msgstr ""
-"Ejecute :func:`~chemotools.adaptation.validation.check_metadata_function` con "
-"entradas representativas."
+"Ejecute :func:`~chemotools.adaptation.validation.check_metadata_function` "
+"con entradas representativas."
 
 #: ../../source/explore/dynamic_transformers.rst:694
 msgid "Test the wrapped function through ``fit_transform`` and ``transform``."
@@ -1193,7 +1104,9 @@ msgstr "Pruebe la función envuelta mediante ``fit_transform`` y ``transform``."
 
 #: ../../source/explore/dynamic_transformers.rst:695
 msgid "Use a module-level named function if the pipeline will be serialized."
-msgstr "Utilice una función con nombre en el ámbito del módulo si el pipeline se va a serializar."
+msgstr ""
+"Utilice una función con nombre en el ámbito del módulo si el pipeline se va "
+"a serializar."
 
 #: ../../source/explore/dynamic_transformers.rst:696
 msgid "Exercise the complete Pipeline with metadata routing enabled."
@@ -1201,35 +1114,124 @@ msgstr "Pruebe la Pipeline completa con el enrutamiento de metadatos activado."
 
 #: ../../source/explore/dynamic_transformers.rst:698
 msgid ""
-"Together, these two estimators support pipelines that remain reusable "
-"when important correction inputs are not known until measurement or "
-"prediction time."
+"Together, these two estimators support pipelines that remain reusable when "
+"important correction inputs are not known until measurement or prediction "
+"time."
 msgstr ""
 "En conjunto, estos dos estimadores permiten crear pipelines reutilizables "
-"cuando las entradas de corrección importantes no se conocen hasta el momento de "
-"la medición o la predicción."
+"cuando las entradas de corrección importantes no se conocen hasta el momento "
+"de la medición o la predicción."
 
 #: ../../source/explore/dynamic_transformers.rst:704
 msgid ""
-":doc:`XAxisInterpolator "
-"<../methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+":doc:`XAxisInterpolator <../methods/generated/"
+"chemotools.adaptation.XAxisInterpolator>`"
 msgstr ""
-":doc:`XAxisInterpolator "
-"<../methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+":doc:`XAxisInterpolator <../methods/generated/"
+"chemotools.adaptation.XAxisInterpolator>`"
 
 #: ../../source/explore/dynamic_transformers.rst:705
 msgid ""
-":doc:`MetadataFunctionTransformer "
-"<../methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+":doc:`MetadataFunctionTransformer <../methods/generated/"
+"chemotools.adaptation.MetadataFunctionTransformer>`"
 msgstr ""
-":doc:`MetadataFunctionTransformer "
-"<../methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+":doc:`MetadataFunctionTransformer <../methods/generated/"
+"chemotools.adaptation.MetadataFunctionTransformer>`"
 
 #: ../../source/explore/dynamic_transformers.rst:706
 msgid ""
-":doc:`check_metadata_function "
-"<../methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+":doc:`check_metadata_function <../methods/generated/"
+"chemotools.adaptation.validation.check_metadata_function>`"
 msgstr ""
-":doc:`check_metadata_function "
-"<../methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+":doc:`check_metadata_function <../methods/generated/"
+"chemotools.adaptation.validation.check_metadata_function>`"
 
+#~ msgid "Troubleshooting MetadataFunctionTransformer"
+#~ msgstr "Resolución de problemas de MetadataFunctionTransformer"
+
+#~ msgid "Symptom"
+#~ msgstr "Síntoma"
+
+#~ msgid "Likely cause"
+#~ msgstr "Causa probable"
+
+#~ msgid "Fix"
+#~ msgstr "Solución"
+
+#~ msgid "Required argument is missing from ``metadata``"
+#~ msgstr "Falta un argumento obligatorio en ``metadata``"
+
+#~ msgid ""
+#~ "The function needs a named value that the transformer does not request"
+#~ msgstr ""
+#~ "La función necesita un valor con nombre que el transformador no solicita"
+
+#~ msgid "Add its name to the ``metadata`` tuple"
+#~ msgstr "Añada su nombre a la tupla ``metadata``"
+
+#~ msgid "Function does not accept a requested argument"
+#~ msgstr "La función no acepta un argumento solicitado"
+
+#~ msgid "A metadata name does not match the function signature"
+#~ msgstr "Un nombre de metadato no coincide con la firma de la función"
+
+#~ msgid "Correct the spelling or change the function parameter"
+#~ msgstr "Corrija el nombre o cambie el parámetro de la función"
+
+#~ msgid "Missing positional argument during ``transform``"
+#~ msgstr "Falta un argumento posicional durante ``transform``"
+
+#~ msgid "A requested value was not supplied for that call"
+#~ msgstr "No se proporcionó un valor solicitado para esa llamada"
+
+#~ msgid "Pass ``name=value`` to ``transform`` or the Pipeline method"
+#~ msgstr "Pase ``name=value`` a ``transform`` o al método de Pipeline"
+
+#~ msgid "Positional-only parameter error"
+#~ msgstr "Error de parámetro exclusivamente posicional"
+
+#~ msgid "The function uses ``/`` after a metadata parameter"
+#~ msgstr "La función utiliza ``/`` después de un parámetro de metadatos"
+
+#~ msgid "Make the metadata parameter keyword-compatible"
+#~ msgstr "Permita pasar el parámetro de metadatos por palabra clave"
+
+#~ msgid "Metadata must contain strings or unique names"
+#~ msgstr "Los metadatos deben contener cadenas o nombres únicos"
+
+#~ msgid "The ``metadata`` declaration is malformed"
+#~ msgstr "La declaración ``metadata`` está mal formada"
+
+#~ msgid "Use one unique string for each routed function argument"
+#~ msgstr "Utilice una cadena única para cada argumento de función enrutado"
+
+#~ msgid "``y`` cannot be requested"
+#~ msgstr "No se puede solicitar ``y``"
+
+#~ msgid "``y`` is reserved by the estimator API"
+#~ msgstr "``y`` está reservado por la API de estimadores"
+
+#~ msgid "Choose a domain-specific name such as ``target_reference``"
+#~ msgstr "Elija un nombre específico del dominio, como ``target_reference``"
+
+#~ msgid "Expected a 2-D array"
+#~ msgstr "Se esperaba una matriz 2-D"
+
+#~ msgid "``X``, output, or predefined-function metadata is one-dimensional"
+#~ msgstr ""
+#~ "``X``, la salida o los metadatos de la función predefinida son "
+#~ "unidimensionales"
+
+#~ msgid "Reshape explicitly according to its sample or feature meaning"
+#~ msgstr ""
+#~ "Cambie la forma explícitamente según su significado de muestra o "
+#~ "característica"
+
+#~ msgid "Unexpected keyword in a Pipeline call"
+#~ msgstr "Palabra clave inesperada en una llamada de Pipeline"
+
+#~ msgid "Metadata routing is disabled"
+#~ msgstr "El enrutamiento de metadatos está desactivado"
+
+#~ msgid "Call ``set_config(enable_metadata_routing=True)``"
+#~ msgstr "Llame a ``set_config(enable_metadata_routing=True)``"

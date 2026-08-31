@@ -32,7 +32,8 @@ def check_metadata_function(
 
     metadata : mapping of str to object, default=None
         Representative keyword arguments passed to ``func``. Use ``None`` when
-        the function requires no metadata.
+        the function requires no metadata. The names ``"X"`` and ``"y"`` are
+        reserved by the estimator API and cannot be used as metadata keys.
 
     preserve_features : bool, default=True
         If ``True``, require the output to have the same number of features as
@@ -88,6 +89,7 @@ def check_metadata_function(
     # Pass metadata **kwarg as a dict, or empty dict if None.
     # This is needed for signature checking.
     metadata = {} if metadata is None else dict(metadata)
+    _validate_metadata_names(list(metadata), "check_metadata_function")
 
     # Check the function's signature
     try:
@@ -153,11 +155,12 @@ def _validate_metadata_names(metadata: Sequence[str], estimator_name: str) -> li
             f"Got duplicates: {duplicate_names}"
         )
 
-    if "y" in metadata_names:
-        raise ValueError(
-            f"[{estimator_name}] `y` cannot be requested in `metadata` because "
-            "it is reserved by the estimator API."
-        )
+    for reserved_name in ("X", "y"):
+        if reserved_name in metadata_names:
+            raise ValueError(
+                f"[{estimator_name}] `{reserved_name}` cannot be requested in "
+                "`metadata` because it is reserved by the estimator API."
+            )
 
     return metadata_names
 

@@ -26,6 +26,20 @@ class TestCheckMetadataFunction:
         ):
             check_metadata_function(func=scale_by_factor, X=[[1, 2], [3, 4]])
 
+    @pytest.mark.parametrize("reserved_name", ["X", "y"])
+    def test_raises_value_error_if_metadata_name_is_reserved(self, reserved_name):
+        """Test that estimator API argument names cannot be metadata keys."""
+
+        with pytest.raises(
+            ValueError,
+            match=rf"`{reserved_name}` cannot be requested in `metadata`",
+        ):
+            check_metadata_function(
+                func=lambda data, **metadata: data,
+                X=[[1, 2], [3, 4]],
+                metadata={reserved_name: object()},
+            )
+
     def test_raises_value_error_if_func_output_is_invalid(self):
         """Test that a ValueError is raised if the func output is invalid."""
 
