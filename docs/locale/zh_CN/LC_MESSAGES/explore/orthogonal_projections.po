@@ -1,0 +1,475 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/orthogonal_projections.rst:4
+msgid "Orthogonal projections"
+msgstr "正交投影"
+
+#: ../../source/explore/orthogonal_projections.rst:6
+msgid ""
+"Spectroscopic measurements almost always contain variation that is "
+"irrelevant to the property you want to predict — baseline drift, "
+"temperature effects, scattering differences, instrument noise. "
+"**Orthogonal projection** methods identify this unwanted systematic "
+"variation and remove it before calibration, leaving a simpler, more "
+"interpretable dataset for the downstream model."
+msgstr "光谱测量几乎总会包含与待预测性质无关的变异，例如基线漂移、温度影响、散射差异和仪器噪声。**正交投影**方法可识别这些不需要的系统变异，并在校准前将其去除，从而为下游模型提供更简单、更易解释的数据集。"
+
+#: ../../source/explore/orthogonal_projections.rst:12
+msgid ""
+"``chemotools`` provides three supervised orthogonal filtering methods in "
+":mod:`chemotools.projection`:"
+msgstr "``chemotools`` 在 :mod:`chemotools.projection` 中提供了三种有监督正交滤波方法："
+
+#: ../../source/explore/orthogonal_projections.rst:15
+msgid ":class:`~chemotools.projection.OrthogonalSignalCorrection` (OSC)"
+msgstr ":class:`~chemotools.projection.OrthogonalSignalCorrection`（OSC）"
+
+#: ../../source/explore/orthogonal_projections.rst:16
+msgid ":class:`~chemotools.projection.OrthogonalPLS` (OPLS)"
+msgstr ":class:`~chemotools.projection.OrthogonalPLS`（OPLS）"
+
+#: ../../source/explore/orthogonal_projections.rst:17
+msgid ":class:`~chemotools.projection.DirectOrthogonalization` (DO)"
+msgstr ":class:`~chemotools.projection.DirectOrthogonalization`（DO）"
+
+#: ../../source/explore/orthogonal_projections.rst:19
+msgid ""
+"All three are sklearn-compatible transformers: they accept ``(X, y)`` in "
+"``fit`` and return a corrected ``X`` with the same number of features "
+"from ``transform``. Their behaviour has been systematically compared by "
+"Svensson, Kourti & MacGregor [1]_."
+msgstr "这三种方法都是与 sklearn 兼容的转换器：在 ``fit`` 中接受 ``(X, y)``，并由 ``transform`` 返回特征数相同的校正后 ``X``。Svensson、Kourti 和 MacGregor 对它们的表现进行了系统比较 [1]_。"
+
+#: ../../source/explore/orthogonal_projections.rst:28
+msgid ""
+"A fourth method — "
+":class:`~chemotools.projection.ExternalParameterOrthogonalization` (EPO) "
+"— handles *unsupervised* removal of variation linked to known external "
+"factors (e.g., temperature, humidity). It is covered on its own page."
+msgstr "第四种方法 :class:`~chemotools.projection.ExternalParameterOrthogonalization`（EPO）用于以*无监督*方式去除与已知外部因素（例如温度、湿度）相关的变异。该方法在单独的页面中介绍。"
+
+#: ../../source/explore/orthogonal_projections.rst:34
+msgid ""
+"Svensson et al. [1]_ found that **none of these methods consistently "
+"improve prediction accuracy** over plain PLS on raw data. Their primary "
+"benefit is **model simplicity and interpretability**: the corrected data "
+"requires fewer PLS components, and the removed variation can itself carry"
+" useful diagnostic information about the measurement process."
+msgstr "Svensson 等人 [1]_ 发现，与直接对原始数据使用 PLS 相比，**这些方法均不能持续提高预测精度**。它们的主要优势在于**模型简洁性和可解释性**：校正后的数据需要更少的 PLS 成分，而且被去除的变异本身也可能包含有关测量过程的有用诊断信息。"
+
+#: ../../source/explore/orthogonal_projections.rst:41
+msgid "What does \"orthogonal\" mean here?"
+msgstr "这里的“正交”是什么意思？"
+
+#: ../../source/explore/orthogonal_projections.rst:43
+msgid ""
+"After fitting a model on spectra ``X`` to predict ``y``, the total "
+"variance in ``X`` can be decomposed into:"
+msgstr "在光谱 ``X`` 上拟合用于预测 ``y`` 的模型后，可将 ``X`` 中的总方差分解为："
+
+#: ../../source/explore/orthogonal_projections.rst:46
+msgid ""
+"**Predictive variation** — correlated with ``y``, informative for the "
+"model."
+msgstr "**预测变异**——与 ``y`` 相关，对模型有用。"
+
+#: ../../source/explore/orthogonal_projections.rst:47
+msgid ""
+"**Orthogonal variation** — uncorrelated with ``y``, systematic noise or "
+"interference for the regression task."
+msgstr "**正交变异**——与 ``y`` 不相关，是回归任务中的系统噪声或干扰。"
+
+#: ../../source/explore/orthogonal_projections.rst:50
+msgid ""
+"Removing orthogonal variation before building the model reduces the "
+"number of PLS components needed and often makes the resulting loadings "
+"easier to interpret chemically."
+msgstr "在构建模型前去除正交变异，可减少所需的 PLS 成分数，并且通常使得到的载荷更便于从化学角度解释。"
+
+#: ../../source/explore/orthogonal_projections.rst:54
+msgid "Predictive vs orthogonal variation in a spectrum"
+msgstr "光谱中的预测变异与正交变异"
+
+#: ../../source/explore/orthogonal_projections.rst:59
+msgid ""
+"*Figure adapted from:* Di Carlo, S. & Falasconi, M. \"Drift Correction "
+"Methods for Gas Chemical Sensors in Artificial Olfaction Systems: "
+"Techniques and Challenges.\" Politecnico di Torino, Torino; SENSOR CNR-"
+"IDASC / University of Brescia, Brescia, Italy."
+msgstr "*图片改编自：* Di Carlo, S. & Falasconi, M. \"Drift Correction Methods for Gas Chemical Sensors in Artificial Olfaction Systems: Techniques and Challenges.\" Politecnico di Torino, Torino; SENSOR CNR-IDASC / University of Brescia, Brescia, Italy."
+
+#: ../../source/explore/orthogonal_projections.rst:66
+msgid "Choosing a method"
+msgstr "选择方法"
+
+#: ../../source/explore/orthogonal_projections.rst:68
+msgid ""
+"Svensson et al. [1]_ identified two groups of algorithms based on how "
+"they interact with the downstream PLS model:"
+msgstr "Svensson 等人 [1]_ 根据这些算法与下游 PLS 模型的相互作用方式，将其分为两组："
+
+#: ../../source/explore/orthogonal_projections.rst:71
+msgid ""
+"**Group 1 — efficient reduction (OSC variants)**: removing a single "
+"orthogonal component is often sufficient to substantially reduce the "
+"number of PLS components needed. One component does the work of several."
+msgstr "**第 1 组——高效降维（OSC 变体）**：通常仅去除一个正交成分，就足以大幅减少所需的 PLS 成分数。一个成分可起到多个成分的作用。"
+
+#: ../../source/explore/orthogonal_projections.rst:74
+msgid ""
+"**Group 2 — one-for-one reduction (OPLS, DO)**: each orthogonal component"
+" removed reduces the complexity of the calibration model by exactly one "
+"PLS component."
+msgstr "**第 2 组——一对一降维（OPLS、DO）**：每去除一个正交成分，校准模型的复杂度恰好减少一个 PLS 成分。"
+
+#: ../../source/explore/orthogonal_projections.rst:82
+msgid "Method"
+msgstr "方法"
+
+#: ../../source/explore/orthogonal_projections.rst:83
+msgid "Group [1]_"
+msgstr "分组 [1]_"
+
+#: ../../source/explore/orthogonal_projections.rst:84
+msgid "Iterative"
+msgstr "迭代"
+
+#: ../../source/explore/orthogonal_projections.rst:85
+#: ../../source/explore/orthogonal_projections.rst:181
+msgid "Notes"
+msgstr "说明"
+
+#: ../../source/explore/orthogonal_projections.rst:86
+msgid "OSC (wold)"
+msgstr "OSC（wold）"
+
+#: ../../source/explore/orthogonal_projections.rst:87
+#: ../../source/explore/orthogonal_projections.rst:91
+#: ../../source/explore/orthogonal_projections.rst:95
+msgid "1"
+msgstr "1"
+
+#: ../../source/explore/orthogonal_projections.rst:88
+#: ../../source/explore/orthogonal_projections.rst:92
+msgid "Yes"
+msgstr "是"
+
+#: ../../source/explore/orthogonal_projections.rst:89
+msgid "Original formulation; can behave differently under non-linearities."
+msgstr "原始形式；在存在非线性时可能表现不同。"
+
+#: ../../source/explore/orthogonal_projections.rst:90
+msgid "OSC (sjoblom)"
+msgstr "OSC（sjoblom）"
+
+#: ../../source/explore/orthogonal_projections.rst:93
+msgid "Modified iteration; often converges faster than ``\"wold\"``."
+msgstr "改进的迭代方式；通常比 ``\"wold\"`` 收敛得更快。"
+
+#: ../../source/explore/orthogonal_projections.rst:94
+msgid "OSC (fearn)"
+msgstr "OSC（fearn）"
+
+#: ../../source/explore/orthogonal_projections.rst:96
+#: ../../source/explore/orthogonal_projections.rst:104
+msgid "No"
+msgstr "否"
+
+#: ../../source/explore/orthogonal_projections.rst:97
+msgid "Direct, non-iterative; deterministic and fast."
+msgstr "直接、非迭代；确定性强且速度快。"
+
+#: ../../source/explore/orthogonal_projections.rst:98
+msgid "OPLS"
+msgstr "OPLS"
+
+#: ../../source/explore/orthogonal_projections.rst:99
+#: ../../source/explore/orthogonal_projections.rst:103
+msgid "2"
+msgstr "2"
+
+#: ../../source/explore/orthogonal_projections.rst:100
+msgid "Yes (deflation)"
+msgstr "是（降阶）"
+
+#: ../../source/explore/orthogonal_projections.rst:101
+msgid "Explicitly separates predictive and orthogonal variation."
+msgstr "显式分离预测变异和正交变异。"
+
+#: ../../source/explore/orthogonal_projections.rst:102
+msgid "DO"
+msgstr "DO"
+
+#: ../../source/explore/orthogonal_projections.rst:105
+msgid "Projects X onto the null space of y, then extracts components via PCA."
+msgstr "将 X 投影到 y 的零空间，然后通过 PCA 提取成分。"
+
+#: ../../source/explore/orthogonal_projections.rst:107
+msgid "A practical rule of thumb:"
+msgstr "实用经验法则如下："
+
+#: ../../source/explore/orthogonal_projections.rst:109
+msgid ""
+"Use **OSC (fearn)** as the default — it is non-iterative, deterministic, "
+"and one component is often sufficient."
+msgstr "默认使用 **OSC（fearn）**：它无需迭代、结果确定，而且通常一个成分就已足够。"
+
+#: ../../source/explore/orthogonal_projections.rst:111
+msgid ""
+"Use **OPLS** when you want an explicit separation of predictive and "
+"orthogonal scores for further analysis."
+msgstr "需要显式分离预测得分和正交得分以进行进一步分析时，请使用 **OPLS**。"
+
+#: ../../source/explore/orthogonal_projections.rst:113
+msgid "Use **DO** as a simple, fast baseline to compare against."
+msgstr "使用 **DO** 作为简单、快速的比较基准。"
+
+#: ../../source/explore/orthogonal_projections.rst:117
+msgid ""
+"Extracting too many orthogonal components risks **stripping predictive "
+"variation** alongside the noise. Start with ``n_components=1`` and "
+"increase only if cross-validation confirms improved model simplicity "
+"without loss of prediction accuracy."
+msgstr "提取过多正交成分可能在去除噪声的同时**剥离预测变异**。请从 ``n_components=1`` 开始，只有在交叉验证确认模型更加简洁且预测精度不受损时才增加该值。"
+
+#: ../../source/explore/orthogonal_projections.rst:123
+msgid "Simulated dataset"
+msgstr "模拟数据集"
+
+#: ../../source/explore/orthogonal_projections.rst:125
+msgid ""
+"The examples below use a simple synthetic dataset where the analyte "
+"signal and the interference are known by construction — making it easy to"
+" verify visually that each method removes the right variation."
+msgstr "下面的示例使用一个简单的合成数据集，其中分析物信号和干扰信号在构造时已知，因而可以直观地验证每种方法是否去除了正确的变异。"
+
+#: ../../source/explore/orthogonal_projections.rst:129
+msgid ""
+"The dataset consists of 50 spectra. Each spectrum is a mixture of an "
+"analyte peak at channel 50 and an interference peak at channel 70. The "
+"analyte amplitude scales linearly with the concentration ``y``, while the"
+" interference amplitude is drawn from a uniform distribution that is "
+"uncorrelated with ``y``."
+msgstr "该数据集包含 50 条光谱。每条光谱都由通道 50 处的分析物峰和通道 70 处的干扰峰混合而成。分析物振幅随浓度 ``y`` 线性变化，而干扰振幅取自与 ``y`` 不相关的均匀分布。"
+
+#: ../../source/explore/orthogonal_projections.rst:156
+msgid ""
+"50 synthetic spectra coloured by concentration. The analyte peak (channel"
+" 50) tracks y; the interference peak (channel 70) is uncorrelated with y."
+msgstr "按浓度着色的 50 条合成光谱。分析物峰（通道 50）随 y 变化；干扰峰（通道 70）与 y 不相关。"
+
+#: ../../source/explore/orthogonal_projections.rst:166
+msgid "Orthogonal Signal Correction (OSC)"
+msgstr "正交信号校正（OSC）"
+
+#: ../../source/explore/orthogonal_projections.rst:168
+msgid ""
+"Introduced by Wold et al. (1998) [2]_, OSC iteratively finds components "
+"in ``X`` that have maximum variance *and* are orthogonal to ``y``, then "
+"removes them by deflation. It belongs to **Group 1** of Svensson et al. "
+"[1]_: a single component can substantially reduce the complexity of a "
+"downstream PLS model."
+msgstr "OSC 由 Wold 等人（1998）提出 [2]_，它通过迭代找出 ``X`` 中方差最大且与 ``y`` 正交的成分，然后通过降阶将其去除。它属于 Svensson 等人 [1]_ 所划分的**第 1 组**：一个成分即可显著降低下游 PLS 模型的复杂度。"
+
+#: ../../source/explore/orthogonal_projections.rst:173
+msgid "Three algorithmic variants are available via the ``method`` parameter:"
+msgstr "可通过 ``method`` 参数选择三种算法变体："
+
+#: ../../source/explore/orthogonal_projections.rst:179
+msgid "``method``"
+msgstr "``method``"
+
+#: ../../source/explore/orthogonal_projections.rst:180
+msgid "Algorithm"
+msgstr "算法"
+
+#: ../../source/explore/orthogonal_projections.rst:182
+msgid "``\"wold\"``"
+msgstr "``\"wold\"``"
+
+#: ../../source/explore/orthogonal_projections.rst:183
+msgid ""
+"Iterative NIPALS-style. Alternates between score estimation and "
+"orthogonality constraint until convergence."
+msgstr "NIPALS 风格的迭代算法。在得分估计和正交约束之间交替计算，直至收敛。"
+
+#: ../../source/explore/orthogonal_projections.rst:185
+msgid "Original formulation [2]_. Can be slow for large datasets."
+msgstr "原始形式 [2]_。处理大型数据集时可能较慢。"
+
+#: ../../source/explore/orthogonal_projections.rst:186
+msgid "``\"sjoblom\"``"
+msgstr "``\"sjoblom\"``"
+
+#: ../../source/explore/orthogonal_projections.rst:187
+msgid ""
+"Modified iteration using the pseudo-inverse of ``y`` to enforce "
+"orthogonality directly."
+msgstr "改进的迭代算法，使用 ``y`` 的伪逆直接施加正交约束。"
+
+#: ../../source/explore/orthogonal_projections.rst:189
+msgid "Often converges faster than ``\"wold\"`` [3]_."
+msgstr "通常比 ``\"wold\"`` 收敛得更快 [3]_。"
+
+#: ../../source/explore/orthogonal_projections.rst:190
+msgid "``\"fearn\"``"
+msgstr "``\"fearn\"``"
+
+#: ../../source/explore/orthogonal_projections.rst:191
+msgid ""
+"Direct (non-iterative). Projects ``X`` onto the null space of ``y`` and "
+"extracts dominant components via SVD."
+msgstr "直接方法（非迭代）。将 ``X`` 投影到 ``y`` 的零空间，并通过 SVD 提取主导成分。"
+
+#: ../../source/explore/orthogonal_projections.rst:193
+msgid "No convergence issues; fast and deterministic [4]_."
+msgstr "不存在收敛问题；快速且结果确定 [4]_。"
+
+#: ../../source/explore/orthogonal_projections.rst:209
+msgid ""
+"OSC-corrected spectra. The interference peak at channel 70 is suppressed;"
+" the analyte peak at channel 50 remains scaled by concentration."
+msgstr "经 OSC 校正的光谱。通道 70 处的干扰峰受到抑制；通道 50 处的分析物峰仍随浓度变化。"
+
+#: ../../source/explore/orthogonal_projections.rst:219
+msgid "Orthogonal PLS (OPLS)"
+msgstr "正交 PLS（OPLS）"
+
+#: ../../source/explore/orthogonal_projections.rst:221
+msgid ""
+"Introduced by Trygg & Wold (2002) [5]_, OPLS extends PLS regression by "
+"explicitly separating the predictive and orthogonal components of ``X``. "
+"It belongs to **Group 2** of Svensson et al. [1]_: each component removed"
+" corresponds to exactly one fewer PLS component in the downstream model."
+msgstr "OPLS 由 Trygg 和 Wold（2002）提出 [5]_，它通过显式分离 ``X`` 的预测成分和正交成分来扩展 PLS 回归。它属于 Svensson 等人 [1]_ 所划分的**第 2 组**：每去除一个成分，下游模型所需的 PLS 成分就恰好减少一个。"
+
+#: ../../source/explore/orthogonal_projections.rst:240
+msgid ""
+"OPLS-corrected spectra. The interference peak at channel 70 is "
+"suppressed; the analyte peak at channel 50 remains scaled by "
+"concentration."
+msgstr "经 OPLS 校正的光谱。通道 70 处的干扰峰受到抑制；通道 50 处的分析物峰仍随浓度变化。"
+
+#: ../../source/explore/orthogonal_projections.rst:250
+msgid "Direct Orthogonalization (DO)"
+msgstr "直接正交化（DO）"
+
+#: ../../source/explore/orthogonal_projections.rst:252
+msgid ""
+"Introduced by Andersson (1999) [6]_, DO is a non-iterative method. It "
+"projects ``X`` onto the null space of ``y`` to isolate the variation "
+"orthogonal to ``y``, then extracts the dominant directions of that "
+"residual via PCA and subtracts them from the original ``X``. Like OPLS it"
+" belongs to **Group 2** of Svensson et al. [1]_: one component removed "
+"equals one fewer PLS component downstream. It is computationally the "
+"lightest of the three and is useful as a fast, transparent baseline."
+msgstr "DO 由 Andersson（1999）提出 [6]_，是一种非迭代方法。它将 ``X`` 投影到 ``y`` 的零空间，以分离与 ``y`` 正交的变异；随后通过 PCA 提取该残差的主导方向，并从原始 ``X`` 中减去这些方向。与 OPLS 一样，它属于 Svensson 等人 [1]_ 所划分的**第 2 组**：每去除一个成分，下游所需的 PLS 成分就减少一个。它是三种方法中计算量最小的，适合作为快速、透明的基准。"
+
+#: ../../source/explore/orthogonal_projections.rst:274
+msgid ""
+"DO-corrected spectra. The interference peak at channel 70 is suppressed; "
+"the analyte peak at channel 50 remains scaled by concentration."
+msgstr "经 DO 校正的光谱。通道 70 处的干扰峰受到抑制；通道 50 处的分析物峰仍随浓度变化。"
+
+#: ../../source/explore/orthogonal_projections.rst:282
+msgid "Fitting in a Pipeline"
+msgstr "在管道中拟合"
+
+#: ../../source/explore/orthogonal_projections.rst:284
+msgid ""
+"All three transformers follow the standard sklearn API and compose freely"
+" with other steps:"
+msgstr "这三种转换器都遵循标准 sklearn API，可与其他步骤自由组合："
+
+#: ../../source/explore/orthogonal_projections.rst:309
+msgid "References"
+msgstr "参考文献"
+
+#: ../../source/explore/orthogonal_projections.rst:311
+msgid ""
+"Svensson, O., Kourti, T., & MacGregor, J. F. (2002). An investigation of "
+"orthogonal signal correction algorithms and their characteristics. "
+"*Journal of Chemometrics*, 16(4), 176–188. "
+"https://doi.org/10.1002/cem.700"
+msgstr "Svensson, O., Kourti, T., & MacGregor, J. F. (2002). An investigation of orthogonal signal correction algorithms and their characteristics. *Journal of Chemometrics*, 16(4), 176–188. https://doi.org/10.1002/cem.700"
+
+#: ../../source/explore/orthogonal_projections.rst:316
+msgid ""
+"Wold, S., Antti, H., Lindgren, F., & Öhman, J. (1998). Orthogonal signal "
+"correction of near-infrared spectra. *Chemometrics and Intelligent "
+"Laboratory Systems*, 44(1–2), 175–185. "
+"https://doi.org/10.1016/S0169-7439(98)00109-9"
+msgstr "Wold, S., Antti, H., Lindgren, F., & Öhman, J. (1998). Orthogonal signal correction of near-infrared spectra. *Chemometrics and Intelligent Laboratory Systems*, 44(1–2), 175–185. https://doi.org/10.1016/S0169-7439(98)00109-9"
+
+#: ../../source/explore/orthogonal_projections.rst:321
+msgid ""
+"Sjöblom, J., Svensson, O., Josefson, M., Kullberg, H., & Wold, S. (1998)."
+" An evaluation of orthogonal signal correction applied to calibration "
+"transfer of near infrared spectra. *Chemometrics and Intelligent "
+"Laboratory Systems*, 44(1–2), 229–244. "
+"https://doi.org/10.1016/S0169-7439(98)00112-9"
+msgstr "Sjöblom, J., Svensson, O., Josefson, M., Kullberg, H., & Wold, S. (1998). An evaluation of orthogonal signal correction applied to calibration transfer of near infrared spectra. *Chemometrics and Intelligent Laboratory Systems*, 44(1–2), 229–244. https://doi.org/10.1016/S0169-7439(98)00112-9"
+
+#: ../../source/explore/orthogonal_projections.rst:327
+msgid ""
+"Fearn, T. (2000). On orthogonal signal correction. *Chemometrics and "
+"Intelligent Laboratory Systems*, 50(1), 47–52. "
+"https://doi.org/10.1016/S0169-7439(99)00045-3"
+msgstr "Fearn, T. (2000). On orthogonal signal correction. *Chemometrics and Intelligent Laboratory Systems*, 50(1), 47–52. https://doi.org/10.1016/S0169-7439(99)00045-3"
+
+#: ../../source/explore/orthogonal_projections.rst:332
+msgid ""
+"Trygg, J., & Wold, S. (2002). Orthogonal projections to latent structures"
+" (O-PLS). *Journal of Chemometrics*, 16(3), 119–128. "
+"https://doi.org/10.1002/cem.695"
+msgstr "Trygg, J., & Wold, S. (2002). Orthogonal projections to latent structures (O-PLS). *Journal of Chemometrics*, 16(3), 119–128. https://doi.org/10.1002/cem.695"
+
+#: ../../source/explore/orthogonal_projections.rst:337
+msgid ""
+"Andersson, C. A. (1999). Direct orthogonalization. *Chemometrics and "
+"Intelligent Laboratory Systems*, 47(1), 51–63. "
+"https://doi.org/10.1016/S0169-7439(98)00158-0"
+msgstr "Andersson, C. A. (1999). Direct orthogonalization. *Chemometrics and Intelligent Laboratory Systems*, 47(1), 51–63. https://doi.org/10.1016/S0169-7439(98)00158-0"
+
+#: ../../source/explore/orthogonal_projections.rst:344
+msgid ""
+":doc:`OrthogonalSignalCorrection "
+"<../methods/generated/chemotools.projection.OrthogonalSignalCorrection>`"
+msgstr ":doc:`OrthogonalSignalCorrection <../methods/generated/chemotools.projection.OrthogonalSignalCorrection>`"
+
+#: ../../source/explore/orthogonal_projections.rst:345
+msgid ""
+":doc:`OrthogonalPLS "
+"<../methods/generated/chemotools.projection.OrthogonalPLS>`"
+msgstr ":doc:`OrthogonalPLS <../methods/generated/chemotools.projection.OrthogonalPLS>`"
+
+#: ../../source/explore/orthogonal_projections.rst:346
+msgid ""
+":doc:`DirectOrthogonalization "
+"<../methods/generated/chemotools.projection.DirectOrthogonalization>`"
+msgstr ":doc:`DirectOrthogonalization <../methods/generated/chemotools.projection.DirectOrthogonalization>`"
+
+#: ../../source/explore/orthogonal_projections.rst:347
+msgid ""
+":doc:`ExternalParameterOrthogonalization "
+"<../methods/generated/chemotools.projection.ExternalParameterOrthogonalization>`"
+msgstr ":doc:`ExternalParameterOrthogonalization <../methods/generated/chemotools.projection.ExternalParameterOrthogonalization>`"
+

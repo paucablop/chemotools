@@ -1,0 +1,425 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst:2
+msgid "PiecewiseDirectStandardization"
+msgstr "PiecewiseDirectStandardization"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:1
+#: of
+msgid ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:1
+#: of
+msgid ""
+"Piecewise Direct Standardization (PDS) is a transformer used for domain "
+"adaptation (calibration) applications. The transformer uses least squares"
+" to find a linear map from the target instrument space to the source "
+"instrument space, following the implementation by [1]_ and [2]_."
+msgstr ""
+"分段直接标准化（PDS）是一种用于域适配（校准）应用的转换器。该转换器依照 [1]_ 和 [2]_ 的实现，"
+"使用最小二乘法寻找从目标仪器空间到源仪器空间的线性映射。"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst
+msgid "Parameters"
+msgstr "参数"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:6
+#: of
+msgid "Half-width (w) of the local spectral window used in PDS"
+msgstr "PDS 中所用局部光谱窗口的半宽度 (w)"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:8
+#: of
+msgid "Number of components to keep for PLS model"
+msgstr "PLS 模型保留的成分数"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:10
+#: of
+msgid "Whether to scale X and Y in the PLS model"
+msgstr "是否在 PLS 模型中缩放 X 和 Y"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:12
+#: of
+msgid ""
+"Storage format for the regression coefficients. - ``\"dense\"`` stores "
+"the full ``(n_features, n_features)`` matrix.   Fastest when "
+"``n_features`` is small enough that the matrix fits in CPU   cache "
+"(roughly ``n_features`` ≤ 1 500 at float64). - ``\"band\"`` stores "
+"coefficients in a compact   ``(n_features, 2 * window_length + 1)`` array"
+" and exploits the band   structure in :meth:`transform` via a strided "
+"sliding-window view and   ``einsum``.  Fastest when ``n_features`` is "
+"large (roughly   ``n_features`` > 1 500), and uses ~2–5 % of the memory "
+"of ``\"dense\"``."
+msgstr ""
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:12
+#: of
+msgid "Storage format for the regression coefficients."
+msgstr "回归系数的存储格式。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:12
+#: of
+msgid ""
+"Storage format for the regression coefficients. - ``\"dense\"`` stores "
+"the full ``(n_features, n_features)`` matrix."
+msgstr ""
+"回归系数的存储格式。- ``\"dense\"`` 存储完整的 ``(n_features, n_features)`` 矩阵。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:14
+#: of
+msgid ""
+"``\"dense\"`` stores the full ``(n_features, n_features)`` matrix. "
+"Fastest when ``n_features`` is small enough that the matrix fits in CPU "
+"cache (roughly ``n_features`` ≤ 1 500 at float64)."
+msgstr ""
+"``\"dense\"`` 存储完整的 ``(n_features, n_features)`` 矩阵。"
+"当 ``n_features`` 足够小、矩阵可放入 CPU 缓存时速度最快（对于 float64，"
+"约为 ``n_features`` ≤ 1 500）。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:16
+#: of
+msgid ""
+"``\"band\"`` stores coefficients in a compact ``(n_features, 2 * "
+"window_length + 1)`` array and exploits the band structure in "
+":meth:`transform` via a strided sliding-window view and ``einsum``.  "
+"Fastest when ``n_features`` is large (roughly ``n_features`` > 1 500), "
+"and uses ~2–5 % of the memory of ``\"dense\"``."
+msgstr ""
+"``\"band\"`` 将系数存储在紧凑的 ``(n_features, 2 * window_length + 1)`` 数组中，"
+"并在 :meth:`transform` 中通过步进滑动窗口视图和 ``einsum`` 利用带状结构。"
+"当 ``n_features`` 较大（约 ``n_features`` > 1 500）时速度最快，内存用量约为 ``\"dense\"`` 的 2–5 %。"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst
+msgid "Variables"
+msgstr "变量"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:23
+#: of
+msgid "Number of features seen during fit (set automatically by sklearn)."
+msgstr "拟合期间看到的特征数（由 sklearn 自动设置）。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:26
+#: of
+msgid ""
+"Banded transformation matrix.  Dense ndarray when ``storage=\"dense\"``. "
+"``None`` when ``storage=\"band\"`` or when fitted without ``X_source``."
+msgstr ""
+"带状变换矩阵。当 ``storage=\"dense\"`` 时为稠密 ndarray；当 ``storage=\"band\"`` "
+"或拟合时未提供 ``X_source`` 时为 ``None``。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:30
+#: of
+msgid ""
+"Packed band of per-feature PLS coefficients.  Set only when "
+"``storage=\"band\"``; ``None`` otherwise."
+msgstr ""
+"打包存储的逐特征 PLS 系数带。仅当 ``storage=\"band\"`` 时设置，否则为 ``None``。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:34
+#: of
+msgid ""
+"Index of the first feature whose local window is fully interior "
+"(``window_length``).  Set only when ``storage=\"band\"``."
+msgstr ""
+"局部窗口完全位于内部的第一个特征索引（``window_length``）。仅当 ``storage=\"band\"`` 时设置。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:38
+#: of
+msgid ""
+"One past the last interior feature (``n_features - window_length``). Set "
+"only when ``storage=\"band\"``."
+msgstr ""
+"最后一个内部特征之后的位置（``n_features - window_length``）。仅当 ``storage=\"band\"`` 时设置。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:42
+#: of
+msgid ""
+"Precomputed per-feature bias that absorbs local PLS centering, allowing "
+":meth:`transform` to avoid per-sample intermediate allocations. None if "
+"fitted with X_source=None."
+msgstr ""
+"预先计算的逐特征偏置，用于吸收局部 PLS 中心化，使 :meth:`transform` 避免逐样本分配中间数组。"
+"若使用 X_source=None 进行拟合，则为 None。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:47
+#: of
+msgid "Boolean flag indicating if X_source was provided during fitting."
+msgstr "指示拟合期间是否提供 X_source 的布尔标志。"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst
+msgid "Raises"
+msgstr "引发"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:50
+#: of
+msgid "If X and X_source do not have the same shape."
+msgstr "当 X 与 X_source 的形状不同时。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:51
+#: of
+msgid "If ``n_components`` exceeds ``n_samples``."
+msgstr "当 ``n_components`` 超过 ``n_samples`` 时。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:52
+#: of
+msgid ""
+"If ``n_components`` exceeds the minimum window size at the boundaries"
+"     (``window_length + 1``)."
+msgstr ""
+"当 ``n_components`` 超过边界处的最小窗口大小（``window_length + 1``）时。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:56
+#: of
+msgid ":py:obj:`DirectStandardization`"
+msgstr ":py:obj:`DirectStandardization`"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:57
+#: of
+msgid "Global linear transformation without local windows."
+msgstr "不使用局部窗口的全局线性变换。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:60
+#: of
+msgid "References"
+msgstr "参考文献"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:61
+#: of
+msgid ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Multivariate "
+"instrument standardization, Analytical Chemistry, 63(23), Pages "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+msgstr ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Multivariate "
+"instrument standardization, Analytical Chemistry, 63(23), Pages "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:66
+#: of
+msgid ""
+"Bouveresse, E.; Massart, D. L. (1996), Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration, Chemometrics and Intelligent Laboratory "
+"Systems, 32(2), Pages 201–213, "
+"https://doi.org/10.1016/0169-7439(95)00074-7."
+msgstr ""
+"Bouveresse, E.; Massart, D. L. (1996), Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration, Chemometrics and Intelligent Laboratory "
+"Systems, 32(2), Pages 201–213, "
+"https://doi.org/10.1016/0169-7439(95)00074-7."
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization:73
+#: of
+msgid "Examples"
+msgstr "示例"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst:15
+msgid "Attributes"
+msgstr "属性"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`T_ <chemotools.adaptation.PiecewiseDirectStandardization.T_>`\\"
+msgstr ":py:obj:`T_ <chemotools.adaptation.PiecewiseDirectStandardization.T_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`coef_band_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.coef_band_>`\\"
+msgstr ""
+":py:obj:`coef_band_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.coef_band_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`interior_start_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.interior_start_>`\\"
+msgstr ""
+":py:obj:`interior_start_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.interior_start_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`interior_end_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.interior_end_>`\\"
+msgstr ""
+":py:obj:`interior_end_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.interior_end_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`bias_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.bias_>`\\"
+msgstr ""
+":py:obj:`bias_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.bias_>`\\"
+
+#: chemotools.adaptation.PiecewiseDirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.x_source_provided_>`\\"
+msgstr ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.PiecewiseDirectStandardization.x_source_provided_>`\\"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.fit:1
+#: of
+msgid "Fit the PiecewiseDirectStandardization to the input data."
+msgstr "使用输入数据拟合 PiecewiseDirectStandardization。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.fit:3
+#: of
+msgid "Data from the target instrument."
+msgstr "来自目标仪器的数据。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.fit:5
+#: of
+msgid "Ignored to align with API."
+msgstr "忽略，以与 API 保持一致。"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.fit:7
+#: of
+msgid ""
+"Data from the source instrument. If None, the transformer defaults to an "
+"identity transformation."
+msgstr ""
+"来自源仪器的数据。若为 None，转换器默认使用恒等变换。"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst
+msgid "Returns"
+msgstr "返回值"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.fit:11
+#: of
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.PiecewiseDirectStandardization.rst
+msgid "Return type"
+msgstr "返回类型"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.transform:1
+#: of
+msgid "Use the trained model to transform the target data"
+msgstr "使用训练后的模型转换目标数据"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.transform:3
+#: of
+msgid "Input data to transform"
+msgstr "要转换的输入数据"
+
+#: chemotools.adaptation._piecewise_direct_standardization.PiecewiseDirectStandardization.transform:6
+#: of
+msgid "**X_transformed** -- Data transformed"
+msgstr "**X_transformed** -- 转换后的数据"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``fit`` method."
+msgstr ""
+"配置是否请求将元数据传递给 ``fit`` 方法。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a "
+"sub-estimator within a :term:`meta-estimator` and metadata routing is "
+"enabled with ``enable_metadata_routing=True`` (see "
+":func:`sklearn.set_config`). Please check the :ref:`User Guide "
+"<metadata_routing>` on how the routing mechanism works."
+msgstr ""
+"请注意，仅当此估计器用作 :term:`meta-estimator` 中的子估计器，并通过 "
+"``enable_metadata_routing=True`` 启用元数据路由时，此方法才有意义（参见 "
+":func:`sklearn.set_config`）。有关路由机制的工作方式，请查阅 :ref:`用户指南 <metadata_routing>`。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "每个参数可使用以下选项："
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+"``True``：请求元数据；若已提供，则将其传给 ``fit``。若未提供元数据，则忽略该请求。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass"
+" it to ``fit``."
+msgstr ""
+"``False``：不请求元数据，元估计器不会将其传给 ``fit``。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an"
+" error if the user provides it."
+msgstr ""
+"``None``：不请求元数据；若用户提供元数据，元估计器将引发错误。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr ""
+"``str``：元数据应使用给定别名而非原始名称传给元估计器。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some "
+"parameters and not others."
+msgstr ""
+"默认值（``sklearn.utils.metadata_routing.UNCHANGED``）会保留现有请求。这样可以只更改部分参数的请求，"
+"而不更改其他参数。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``X_source`` parameter in ``fit``."
+msgstr "``fit`` 中 ``X_source`` 参数的元数据路由。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- 更新后的对象。"
+

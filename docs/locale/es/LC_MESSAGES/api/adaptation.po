@@ -1,0 +1,188 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/api/adaptation.rst:2
+msgid "chemotools.adaptation"
+msgstr "chemotools.adaptation"
+
+#: ../../source/api/adaptation.rst:6
+msgid ""
+"Adaptation methods for calibration transfer between instruments, together"
+" with metadata-aware transformation and validation utilities."
+msgstr ""
+"Métodos de adaptación para transferir calibraciones entre instrumentos, junto "
+"con utilidades de transformación y validación compatibles con metadatos."
+
+#: ../../source/api/adaptation.rst:9
+msgid "**Import from this module:**"
+msgstr "**Importar desde este módulo:**"
+
+#: ../../source/api/adaptation.rst:25
+msgid "Available Classes"
+msgstr "Clases disponibles"
+
+#: ../../source/api/adaptation.rst:31
+msgid "Class"
+msgstr "Clase"
+
+#: ../../source/api/adaptation.rst:32 ../../source/api/adaptation.rst:52
+msgid "Description"
+msgstr "Descripción"
+
+#: ../../source/api/adaptation.rst:33
+msgid ""
+":doc:`DirectStandardization "
+"</methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ""
+":doc:`DirectStandardization "
+"</methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:34
+msgid "Linear calibration transfer via least-squares mapping between instruments"
+msgstr "Transferencia lineal de calibración mediante un mapeo por mínimos cuadrados entre instrumentos"
+
+#: ../../source/api/adaptation.rst:35
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"</methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ""
+":doc:`PiecewiseDirectStandardization "
+"</methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:36
+msgid "Piecewise calibration transfer using local least-squares windows"
+msgstr "Transferencia de calibración por tramos mediante ventanas locales de mínimos cuadrados"
+
+#: ../../source/api/adaptation.rst:37
+msgid ""
+":doc:`SpectralSpaceTransform "
+"</methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+msgstr ""
+":doc:`SpectralSpaceTransform "
+"</methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+
+#: ../../source/api/adaptation.rst:38
+msgid "SVD-based shared latent space domain adaptation"
+msgstr "Adaptación de dominio en un espacio latente compartido basado en SVD"
+
+#: ../../source/api/adaptation.rst:39
+msgid ""
+":doc:`XAxisInterpolator "
+"</methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+msgstr ""
+":doc:`XAxisInterpolator "
+"</methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+
+#: ../../source/api/adaptation.rst:40
+msgid "Resample spectra onto a shared x-axis grid via interpolation"
+msgstr "Remuestrea espectros sobre una cuadrícula compartida del eje x mediante interpolación"
+
+#: ../../source/api/adaptation.rst:41
+msgid ""
+":doc:`MetadataFunctionTransformer "
+"</methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ""
+":doc:`MetadataFunctionTransformer "
+"</methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/api/adaptation.rst:42
+msgid "Apply a callable with auxiliary inputs supplied through metadata routing"
+msgstr "Aplica un objeto invocable con entradas auxiliares proporcionadas mediante el enrutamiento de metadatos"
+
+#: ../../source/api/adaptation.rst:45
+msgid "Available Functions"
+msgstr "Funciones disponibles"
+
+#: ../../source/api/adaptation.rst:51
+msgid "Function"
+msgstr "Función"
+
+#: ../../source/api/adaptation.rst:53
+msgid ""
+":doc:`check_metadata_function "
+"</methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ""
+":doc:`check_metadata_function "
+"</methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/api/adaptation.rst:54
+msgid "Validate a metadata-aware callable on representative data"
+msgstr "Valida un objeto invocable compatible con metadatos usando datos representativos"
+
+#: ../../source/api/adaptation.rst:55
+msgid ""
+":doc:`subtract_reference "
+"</methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+msgstr ""
+":doc:`subtract_reference "
+"</methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/api/adaptation.rst:56
+msgid "Subtract a shared or per-sample reference from spectra"
+msgstr "Resta de los espectros una referencia compartida o específica de cada muestra"
+
+#: ../../source/api/adaptation.rst:57
+msgid ""
+":doc:`divide_by_reference "
+"</methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ""
+":doc:`divide_by_reference "
+"</methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/api/adaptation.rst:58
+msgid "Divide spectra by a shared or per-sample reference"
+msgstr "Divide los espectros por una referencia compartida o específica de cada muestra"
+
+#: ../../source/api/adaptation.rst:59
+msgid ""
+":doc:`scale_by_factor "
+"</methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ""
+":doc:`scale_by_factor "
+"</methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/api/adaptation.rst:60
+msgid "Scale spectra by a scalar or array factor"
+msgstr "Escala los espectros mediante un factor escalar o matricial"
+
+#: ../../source/api/adaptation.rst:61
+msgid ""
+":doc:`add_offset "
+"</methods/generated/chemotools.adaptation.functions.add_offset>`"
+msgstr ""
+":doc:`add_offset "
+"</methods/generated/chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/api/adaptation.rst:62
+msgid "Add a shared or per-sample offset to spectra"
+msgstr "Añade a los espectros un desplazamiento compartido o específico de cada muestra"
+
+#: ../../source/api/adaptation.rst:65
+msgid "See Also"
+msgstr "Véase también"
+
+#: ../../source/api/adaptation.rst:67
+msgid ""
+":doc:`Adaptation Methods Overview </methods/adaptation>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`Descripción general de los métodos de adaptación </methods/adaptation>` "
+"- Documentación completa con ejemplos y guías visuales"
+

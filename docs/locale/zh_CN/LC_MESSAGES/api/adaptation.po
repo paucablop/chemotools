@@ -1,0 +1,186 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/api/adaptation.rst:2
+msgid "chemotools.adaptation"
+msgstr "chemotools.adaptation"
+
+#: ../../source/api/adaptation.rst:6
+msgid ""
+"Adaptation methods for calibration transfer between instruments, together"
+" with metadata-aware transformation and validation utilities."
+msgstr ""
+"用于仪器间校准转移的适配方法，以及支持元数据的转换与验证工具。"
+
+#: ../../source/api/adaptation.rst:9
+msgid "**Import from this module:**"
+msgstr "**从此模块导入：**"
+
+#: ../../source/api/adaptation.rst:25
+msgid "Available Classes"
+msgstr "可用类"
+
+#: ../../source/api/adaptation.rst:31
+msgid "Class"
+msgstr "类"
+
+#: ../../source/api/adaptation.rst:32 ../../source/api/adaptation.rst:52
+msgid "Description"
+msgstr "说明"
+
+#: ../../source/api/adaptation.rst:33
+msgid ""
+":doc:`DirectStandardization "
+"</methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ""
+":doc:`DirectStandardization "
+"</methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:34
+msgid "Linear calibration transfer via least-squares mapping between instruments"
+msgstr "通过仪器间的最小二乘映射进行线性校准转移"
+
+#: ../../source/api/adaptation.rst:35
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"</methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ""
+":doc:`PiecewiseDirectStandardization "
+"</methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:36
+msgid "Piecewise calibration transfer using local least-squares windows"
+msgstr "使用局部最小二乘窗口进行分段校准转移"
+
+#: ../../source/api/adaptation.rst:37
+msgid ""
+":doc:`SpectralSpaceTransform "
+"</methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+msgstr ""
+":doc:`SpectralSpaceTransform "
+"</methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+
+#: ../../source/api/adaptation.rst:38
+msgid "SVD-based shared latent space domain adaptation"
+msgstr "基于 SVD 共享潜在空间的域适配"
+
+#: ../../source/api/adaptation.rst:39
+msgid ""
+":doc:`XAxisInterpolator "
+"</methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+msgstr ""
+":doc:`XAxisInterpolator "
+"</methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+
+#: ../../source/api/adaptation.rst:40
+msgid "Resample spectra onto a shared x-axis grid via interpolation"
+msgstr "通过插值将光谱重采样到共享的 x 轴网格"
+
+#: ../../source/api/adaptation.rst:41
+msgid ""
+":doc:`MetadataFunctionTransformer "
+"</methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ""
+":doc:`MetadataFunctionTransformer "
+"</methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/api/adaptation.rst:42
+msgid "Apply a callable with auxiliary inputs supplied through metadata routing"
+msgstr "应用一个通过元数据路由接收辅助输入的可调用对象"
+
+#: ../../source/api/adaptation.rst:45
+msgid "Available Functions"
+msgstr "可用函数"
+
+#: ../../source/api/adaptation.rst:51
+msgid "Function"
+msgstr "函数"
+
+#: ../../source/api/adaptation.rst:53
+msgid ""
+":doc:`check_metadata_function "
+"</methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ""
+":doc:`check_metadata_function "
+"</methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/api/adaptation.rst:54
+msgid "Validate a metadata-aware callable on representative data"
+msgstr "使用代表性数据验证支持元数据的可调用对象"
+
+#: ../../source/api/adaptation.rst:55
+msgid ""
+":doc:`subtract_reference "
+"</methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+msgstr ""
+":doc:`subtract_reference "
+"</methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/api/adaptation.rst:56
+msgid "Subtract a shared or per-sample reference from spectra"
+msgstr "从光谱中减去共享参考或逐样本参考"
+
+#: ../../source/api/adaptation.rst:57
+msgid ""
+":doc:`divide_by_reference "
+"</methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ""
+":doc:`divide_by_reference "
+"</methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/api/adaptation.rst:58
+msgid "Divide spectra by a shared or per-sample reference"
+msgstr "用共享参考或逐样本参考除以光谱"
+
+#: ../../source/api/adaptation.rst:59
+msgid ""
+":doc:`scale_by_factor "
+"</methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ""
+":doc:`scale_by_factor "
+"</methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/api/adaptation.rst:60
+msgid "Scale spectra by a scalar or array factor"
+msgstr "使用标量或数组因子缩放光谱"
+
+#: ../../source/api/adaptation.rst:61
+msgid ""
+":doc:`add_offset "
+"</methods/generated/chemotools.adaptation.functions.add_offset>`"
+msgstr ""
+":doc:`add_offset "
+"</methods/generated/chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/api/adaptation.rst:62
+msgid "Add a shared or per-sample offset to spectra"
+msgstr "向光谱添加共享偏移量或逐样本偏移量"
+
+#: ../../source/api/adaptation.rst:65
+msgid "See Also"
+msgstr "另请参阅"
+
+#: ../../source/api/adaptation.rst:67
+msgid ""
+":doc:`Adaptation Methods Overview </methods/adaptation>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+":doc:`适配方法概述 </methods/adaptation>` - 包含示例和可视化指南的完整文档"
+

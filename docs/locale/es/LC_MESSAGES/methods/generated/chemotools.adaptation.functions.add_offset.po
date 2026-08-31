@@ -1,0 +1,105 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.add_offset.rst:2
+msgid "chemotools.adaptation.functions.add\\_offset"
+msgstr "chemotools.adaptation.functions.add\\_offset"
+
+#: chemotools.adaptation.functions.add_offset:1 of
+msgid "Add a baseline offset to every row of ``X``."
+msgstr "Añade un desplazamiento de línea base a cada fila de ``X``."
+
+#: chemotools.adaptation.functions.add_offset:3 of
+msgid ""
+"Useful for correcting instrument drift, dark-current baselines, or "
+"additive scatter effects that have been measured externally."
+msgstr ""
+"Resulta útil para corregir la deriva instrumental, las líneas base de "
+"corriente oscura o los efectos aditivos de dispersión medidos externamente."
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: chemotools.adaptation.functions.add_offset:6 of
+msgid "Input spectra."
+msgstr "Espectros de entrada."
+
+#: chemotools.adaptation.functions.add_offset:8 of
+msgid ""
+"Offset to add.  Accepted shapes:  * scalar ``float`` — added to every "
+"element. * ``(n_samples, 1)`` — per-sample scalar offset. * ``(1, "
+"n_features)`` — per-feature offset shared across samples. * ``(n_samples,"
+" n_features)`` — per-sample full spectrum.  1-D inputs are rejected; use "
+"``.reshape(-1, 1)`` for per-sample or ``.reshape(1, -1)`` for per-"
+"feature."
+msgstr ""
+"Desplazamiento que se añadirá.  Formas admitidas:  * ``float`` escalar — se "
+"añade a cada elemento. * ``(n_samples, 1)`` — desplazamiento escalar por "
+"muestra. * ``(1, n_features)`` — desplazamiento por característica compartido "
+"entre las muestras. * ``(n_samples, n_features)`` — espectro completo por "
+"muestra.  Las entradas unidimensionales no se admiten; utilice ``.reshape(-1, "
+"1)`` para valores por muestra o ``.reshape(1, -1)`` para valores por "
+"característica."
+
+#: chemotools.adaptation.functions.add_offset:8 of
+msgid "Offset to add.  Accepted shapes:"
+msgstr "Desplazamiento que se añadirá.  Formas admitidas:"
+
+#: chemotools.adaptation.functions.add_offset:10 of
+msgid "scalar ``float`` — added to every element."
+msgstr "``float`` escalar — se añade a cada elemento."
+
+#: chemotools.adaptation.functions.add_offset:11 of
+msgid "``(n_samples, 1)`` — per-sample scalar offset."
+msgstr "``(n_samples, 1)`` — desplazamiento escalar por muestra."
+
+#: chemotools.adaptation.functions.add_offset:12 of
+msgid "``(1, n_features)`` — per-feature offset shared across samples."
+msgstr "``(1, n_features)`` — desplazamiento por característica compartido entre las muestras."
+
+#: chemotools.adaptation.functions.add_offset:13 of
+msgid "``(n_samples, n_features)`` — per-sample full spectrum."
+msgstr "``(n_samples, n_features)`` — espectro completo por muestra."
+
+#: chemotools.adaptation.functions.add_offset:15 of
+msgid ""
+"1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample or "
+"``.reshape(1, -1)`` for per-feature."
+msgstr ""
+"Las entradas unidimensionales no se admiten; utilice ``.reshape(-1, 1)`` para "
+"valores por muestra o ``.reshape(1, -1)`` para valores por característica."
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Returns"
+msgstr "Devuelve"
+
+#: chemotools.adaptation.functions.add_offset:19 of
+msgid "**X_shifted** -- ``X + offset``."
+msgstr "**X_shifted** -- ``X + offset``."
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: chemotools.adaptation.functions.add_offset:23 of
+msgid "Examples"
+msgstr "Ejemplos"
+

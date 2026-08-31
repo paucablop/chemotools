@@ -1,0 +1,126 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:2
+msgid "chemotools.adaptation.validation.check\\_metadata\\_function"
+msgstr "chemotools.adaptation.validation.check\\_metadata\\_function"
+
+#: chemotools.adaptation.validation.check_metadata_function:1 of
+msgid "Validate a metadata function on representative data."
+msgstr "Valida una función de metadatos con datos representativos."
+
+#: chemotools.adaptation.validation.check_metadata_function:3 of
+msgid ""
+"The function is called once as ``func(X_checked, **metadata)``. Its "
+"output is validated as a finite, numeric, 2-D array that preserves the "
+"number of input samples and, by default, the number of input features."
+msgstr ""
+"La función se invoca una vez como ``func(X_checked, **metadata)``. Su salida "
+"se valida como una matriz numérica, finita y bidimensional que conserva el "
+"número de muestras de entrada y, de forma predeterminada, el número de "
+"características de entrada."
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: chemotools.adaptation.validation.check_metadata_function:7 of
+msgid "Function invoked as ``func(X_checked, **metadata)``."
+msgstr "Función invocada como ``func(X_checked, **metadata)``."
+
+#: chemotools.adaptation.validation.check_metadata_function:9 of
+msgid "Representative input data."
+msgstr "Datos de entrada representativos."
+
+#: chemotools.adaptation.validation.check_metadata_function:11 of
+msgid ""
+"Representative keyword arguments passed to ``func``. Use ``None`` when "
+"the function requires no metadata."
+msgstr ""
+"Argumentos de palabra clave representativos que se pasan a ``func``. Utilice "
+"``None`` cuando la función no requiera metadatos."
+
+#: chemotools.adaptation.validation.check_metadata_function:14 of
+msgid ""
+"If ``True``, require the output to have the same number of features as "
+"``X``. The number of samples is always required to match."
+msgstr ""
+"Si es ``True``, exige que la salida tenga el mismo número de características "
+"que ``X``. El número de muestras debe coincidir siempre."
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Returns"
+msgstr "Devuelve"
+
+#: chemotools.adaptation.validation.check_metadata_function:18 of
+msgid "**result** -- Validated output produced by ``func``."
+msgstr "**result** -- Salida validada producida por ``func``."
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Raises"
+msgstr "Excepciones"
+
+#: chemotools.adaptation.validation.check_metadata_function:21 of
+msgid "If ``func`` is not callable or its signature cannot be inspected."
+msgstr "Si ``func`` no es invocable o no se puede inspeccionar su firma."
+
+#: chemotools.adaptation.validation.check_metadata_function:22 of
+msgid ""
+"If ``X`` is invalid, ``func`` cannot be called with the supplied     "
+"arguments, its output is not a finite numeric 2-D array, or its output"
+"     does not preserve the required dimensions."
+msgstr ""
+"Si ``X`` no es válido, ``func`` no se puede invocar con los argumentos     "
+"proporcionados, su salida no es una matriz numérica bidimensional finita o su "
+"salida     no conserva las dimensiones requeridas."
+
+#: chemotools.adaptation.validation.check_metadata_function:25 of
+msgid "Notes"
+msgstr "Notas"
+
+#: chemotools.adaptation.validation.check_metadata_function:26 of
+msgid ""
+"This check executes user-provided code. Exceptions raised by ``func`` are"
+" propagated unchanged, and functions with side effects will perform those"
+" side effects once. The validated input and output may be converted to "
+"NumPy arrays by :func:`sklearn.utils.validation.check_array`."
+msgstr ""
+"Esta comprobación ejecuta código proporcionado por el usuario. Las excepciones "
+"generadas por ``func`` se propagan sin cambios y las funciones con efectos "
+"secundarios los ejecutarán una vez. La entrada y la salida validadas se pueden "
+"convertir en matrices de NumPy mediante "
+":func:`sklearn.utils.validation.check_array`."
+
+#: chemotools.adaptation.validation.check_metadata_function:32 of
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: chemotools.adaptation.validation.check_metadata_function:46 of
+msgid ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
+msgstr ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
+
+#: chemotools.adaptation.validation.check_metadata_function:47 of
+msgid "Wrap a function for scikit-learn metadata routing."
+msgstr "Encapsula una función para el enrutamiento de metadatos de scikit-learn."
+

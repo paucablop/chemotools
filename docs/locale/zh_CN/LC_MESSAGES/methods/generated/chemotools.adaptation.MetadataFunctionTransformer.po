@@ -1,0 +1,267 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst:2
+msgid "MetadataFunctionTransformer"
+msgstr "MetadataFunctionTransformer"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
+#: of
+msgid ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:1
+#: of
+msgid "Apply a callable that consumes feature data and routed metadata."
+msgstr "应用一个接收特征数据和路由元数据的可调用对象。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:3
+#: of
+msgid ""
+"This is useful when a preprocessing function requires per-sample or per-"
+"batch auxiliary information (e.g. reference spectra, wavelength arrays) "
+"that must be threaded through a scikit-learn ``Pipeline`` via the "
+"metadata-routing API."
+msgstr ""
+"当预处理函数需要逐样本或逐批次的辅助信息（例如参考光谱、波长数组），且这些信息必须通过元数据路由 API "
+"在 scikit-learn ``Pipeline`` 中传递时，此转换器非常有用。"
+
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+msgid "Parameters"
+msgstr "参数"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:8
+#: of
+msgid ""
+"Function applied during ``transform``. It must accept ``X`` as its first "
+"positional argument and each requested metadata value as a keyword "
+"argument. The function is responsible for returning a numeric, 2-D "
+"``np.ndarray`` with the same number of samples and features as ``X``. Use"
+" :func:`chemotools.adaptation.validation.check_metadata_function` to "
+"verify this contract on representative data."
+msgstr ""
+"在 ``transform`` 期间应用的函数。它必须将 ``X`` 作为第一个位置参数，并将每个请求的元数据值作为关键字参数。"
+"该函数负责返回数值型二维 ``np.ndarray``，其样本数和特征数须与 ``X`` 相同。可使用 "
+":func:`chemotools.adaptation.validation.check_metadata_function` 在代表性数据上验证此约定。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:15
+#: of
+msgid ""
+"Names of the keyword arguments requested through scikit-learn metadata "
+"routing and forwarded to ``func``. Keys passed to ``transform`` but not "
+"listed here are ignored. Every required keyword argument of ``func`` must"
+" be listed, and the corresponding value must be supplied when calling "
+"``transform``. The name ``\"y\"`` is reserved by the estimator API and "
+"cannot be requested as metadata."
+msgstr ""
+"通过 scikit-learn 元数据路由请求并转发给 ``func`` 的关键字参数名称。传给 ``transform`` "
+"但未在此列出的键将被忽略。``func`` 的每个必需关键字参数都必须列出，并且调用 ``transform`` 时必须提供相应值。"
+"名称 ``\"y\"`` 由估计器 API 保留，不能作为元数据请求。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:22
+#: of
+msgid ""
+"If ``True``, validate ``X`` as a numeric, 2-D array during ``fit`` and "
+"``transform``, and require the number of features to remain consistent. "
+"This does not validate the output of ``func``. If ``False``, pass ``X`` "
+"to ``func`` unchanged. In both cases, ``fit`` must be called before "
+"``transform``."
+msgstr ""
+"若为 ``True``，则在 ``fit`` 和 ``transform`` 期间将 ``X`` 验证为数值型二维数组，并要求特征数保持一致。"
+"这不会验证 ``func`` 的输出。若为 ``False``，则将 ``X`` 原样传给 ``func``。无论哪种情况，"
+"都必须先调用 ``fit``，再调用 ``transform``。"
+
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+msgid "Variables"
+msgstr "变量"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:29
+#: of
+msgid "Number of features seen during ``fit``.  Only set when ``validate=True``."
+msgstr "在 ``fit`` 期间看到的特征数。仅当 ``validate=True`` 时设置。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:35
+#: of
+msgid "Examples"
+msgstr "示例"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:52
+#: of
+msgid "Notes"
+msgstr "说明"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:53
+#: of
+msgid ""
+"To route metadata through a scikit-learn ``Pipeline``, enable metadata "
+"routing globally with "
+"``sklearn.set_config(enable_metadata_routing=True)``. This is not "
+"required when calling this estimator directly."
+msgstr ""
+"要通过 scikit-learn ``Pipeline`` 路由元数据，请使用 "
+"``sklearn.set_config(enable_metadata_routing=True)`` 全局启用元数据路由。直接调用此估计器时无需这样做。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:57
+#: of
+msgid ""
+"The callable signature is validated during ``fit``, but the callable is "
+"executed only during ``transform``. Consequently, errors that depend on "
+"metadata values or callable execution are raised during ``transform``. "
+"Use :func:`chemotools.adaptation.validation.check_metadata_function` to "
+"validate a callable eagerly on representative inputs."
+msgstr ""
+"可调用对象的签名在 ``fit`` 期间验证，但仅在 ``transform`` 期间执行。因此，依赖元数据值或可调用对象执行的错误"
+"会在 ``transform`` 期间引发。使用 :func:`chemotools.adaptation.validation.check_metadata_function` "
+"可在代表性输入上预先验证可调用对象。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:65
+#: of
+msgid ":py:obj:`chemotools.adaptation.validation.check_metadata_function`"
+msgstr ":py:obj:`chemotools.adaptation.validation.check_metadata_function`"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:66
+#: of
+msgid "Validate a custom metadata function on representative inputs."
+msgstr "在代表性输入上验证自定义元数据函数。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:68
+#: of
+msgid ":py:obj:`chemotools.adaptation.functions`"
+msgstr ":py:obj:`chemotools.adaptation.functions`"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer:69
+#: of
+msgid "Predefined metadata-aware functions."
+msgstr "预定义的元数据感知函数。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:1
+#: of
+msgid "Fit the transformer by recording the number of input features."
+msgstr "通过记录输入特征数来拟合转换器。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:3
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:6
+#: of
+msgid "Training data."
+msgstr "训练数据。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:5
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:8
+#: of
+msgid "Ignored. Present for API compatibility."
+msgstr "忽略。为保持 API 兼容性而存在。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:7
+#: of
+msgid ""
+"Metadata accepted for routing compatibility. It is not forwarded to "
+"``func`` during fitting."
+msgstr ""
+"为兼容路由而接受的元数据。拟合期间不会将其转发给 ``func``。"
+
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+msgid "Returns"
+msgstr "返回值"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit:11
+#: of
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.MetadataFunctionTransformer.rst
+msgid "Return type"
+msgstr "返回类型"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:1
+#: of
+msgid "Apply ``func`` to ``X``, forwarding any requested metadata keys."
+msgstr "将 ``func`` 应用于 ``X``，并转发所有请求的元数据键。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:3
+#: of
+msgid "Data to transform."
+msgstr "要转换的数据。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:5
+#: of
+msgid ""
+"Metadata values passed to ``func`` as keyword arguments. Only keys listed"
+" in ``self.metadata`` are forwarded."
+msgstr ""
+"作为关键字参数传给 ``func`` 的元数据值。仅转发 ``self.metadata`` 中列出的键。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.transform:9
+#: of
+msgid ""
+"**X_transformed** -- Result returned by ``func(X, **kwargs)``. Output "
+"type and shape are the responsibility of ``func`` and are not validated "
+"here."
+msgstr ""
+"**X_transformed** -- ``func(X, **kwargs)`` 返回的结果。输出类型和形状由 ``func`` 负责，此处不进行验证。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:1
+#: of
+msgid "Fit and transform in a single step."
+msgstr "在单个步骤中完成拟合和转换。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:3
+#: of
+msgid ""
+"Overrides the default ``TransformerMixin.fit_transform`` to ensure that "
+"``**metadata`` is forwarded to both ``fit`` and ``transform``."
+msgstr ""
+"重写默认的 ``TransformerMixin.fit_transform``，以确保将 ``**metadata`` 同时转发给 ``fit`` 和 ``transform``。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:10
+#: of
+msgid "Keyword arguments forwarded to both ``fit`` and ``transform``."
+msgstr "同时转发给 ``fit`` 和 ``transform`` 的关键字参数。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.fit_transform:13
+#: of
+msgid "**X_transformed** -- Result returned by ``func``."
+msgstr "**X_transformed** -- ``func`` 返回的结果。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:1
+#: of
+msgid "Return the metadata routing configuration for this transformer."
+msgstr "返回此转换器的元数据路由配置。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:3
+#: of
+msgid ""
+"Registers each name in ``self.metadata`` as a requested parameter for "
+"both ``fit`` and ``transform``, enabling sklearn's metadata routing to "
+"propagate them through a ``Pipeline``."
+msgstr ""
+"将 ``self.metadata`` 中的每个名称注册为 ``fit`` 和 ``transform`` 的请求参数，"
+"使 sklearn 的元数据路由能够通过 ``Pipeline`` 传播这些参数。"
+
+#: chemotools.adaptation._metadata_function_transformer.MetadataFunctionTransformer.get_metadata_routing:7
+#: of
+msgid "**request** -- The populated routing object."
+msgstr "**request** -- 已填充的路由对象。"
+

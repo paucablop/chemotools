@@ -40,6 +40,7 @@ class PiecewiseDirectStandardization(
 
     storage : str {"dense", "band"}, default="dense"
         Storage format for the regression coefficients.
+
         - ``"dense"`` stores the full ``(n_features, n_features)`` matrix.
           Fastest when ``n_features`` is small enough that the matrix fits in CPU
           cache (roughly ``n_features`` ≤ 1 500 at float64).

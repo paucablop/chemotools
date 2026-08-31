@@ -1,0 +1,340 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/calibration_transfer.rst:4
+msgid "Calibration transfer"
+msgstr "キャリブレーション転送"
+
+#: ../../source/explore/calibration_transfer.rst:6
+msgid ""
+"A model trained on one instrument does not always predict accurately on a"
+" second instrument — even when measuring the same samples. Differences in"
+" detector response, optical alignment, wavelength accuracy, and "
+"environmental conditions all introduce systematic spectral shifts between"
+" instruments."
+msgstr ""
+"ある機器で学習したモデルは、同じサンプルを測定する場合でも、別の機器では必ずしも"
+"正確に予測できません。検出器の応答、光学系のアライメント、波長精度、環境条件の違いは"
+"すべて、機器間に系統的なスペクトルシフトをもたらします。"
+
+#: ../../source/explore/calibration_transfer.rst:12
+msgid ""
+"**Calibration transfer** (also called *model transder* or *domain "
+"adaptation*) corrects for these differences so that a model built on a "
+"*source* instrument can be applied to spectra measured on a *target* "
+"instrument, without rebuilding the model from scratch."
+msgstr ""
+"**キャリブレーション転送**（*モデル転送* または *ドメイン適応* とも呼ばれます）は、"
+"これらの差異を補正し、モデルを一から再構築することなく、*ソース* 機器で構築したモデルを"
+"*ターゲット* 機器で測定したスペクトルに適用できるようにします。"
+
+#: ../../source/explore/calibration_transfer.rst:17
+msgid ""
+"``chemotools`` implements two classical transfer methods in "
+":mod:`chemotools.adaptation`:"
+msgstr "``chemotools`` は :mod:`chemotools.adaptation` に2つの古典的な転送手法を実装しています。"
+
+#: ../../source/explore/calibration_transfer.rst:20
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` (DS) — a global "
+"linear transformation."
+msgstr ":class:`~chemotools.adaptation.DirectStandardization` (DS) — 大域的な線形変換。"
+
+#: ../../source/explore/calibration_transfer.rst:22
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` (PDS) — a "
+"local, window-based transformation using PLS regression."
+msgstr ":class:`~chemotools.adaptation.PiecewiseDirectStandardization` (PDS) — PLS 回帰を用いた局所的なウィンドウベースの変換。"
+
+#: ../../source/explore/calibration_transfer.rst:25
+msgid ""
+"Both follow the formulation introduced by Wang, Veltkamp & Kowalski "
+"(1991) [1]_."
+msgstr "どちらも Wang、Veltkamp、Kowalski（1991）[1]_ が提案した定式化に従います。"
+
+#: ../../source/explore/calibration_transfer.rst:28
+msgid "The calibration transfer workflow"
+msgstr "キャリブレーション転送のワークフロー"
+
+#: ../../source/explore/calibration_transfer.rst:30
+msgid "The general workflow is:"
+msgstr "一般的なワークフローは次のとおりです。"
+
+#: ../../source/explore/calibration_transfer.rst:32
+msgid ""
+"Measure a small set of **transfer samples** on both the source and target"
+" instruments."
+msgstr "少数の **転送サンプル** をソース機器とターゲット機器の両方で測定します。"
+
+#: ../../source/explore/calibration_transfer.rst:34
+msgid "Fit the standardization transformer using the paired spectra."
+msgstr "対応するスペクトルの組を使用して標準化トランスフォーマーを適合させます。"
+
+#: ../../source/explore/calibration_transfer.rst:35
+msgid "Apply the transformer to new target spectra before prediction."
+msgstr "予測前に、新しいターゲットスペクトルへトランスフォーマーを適用します。"
+
+#: ../../source/explore/calibration_transfer.rst:43
+msgid ""
+"After standardization, the corrected spectra can be fed directly into the"
+" source-instrument model."
+msgstr "標準化後、補正済みスペクトルをソース機器のモデルへ直接入力できます。"
+
+#: ../../source/explore/calibration_transfer.rst:47
+msgid "Direct Standardization (DS)"
+msgstr "直接標準化（DS）"
+
+#: ../../source/explore/calibration_transfer.rst:49
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` finds a global "
+"linear map ``T`` that transforms target-instrument spectra to the source-"
+"instrument space:"
+msgstr ""
+":class:`~chemotools.adaptation.DirectStandardization` は、ターゲット機器のスペクトルを"
+"ソース機器の空間へ変換する大域的な線形写像 ``T`` を求めます。"
+
+#: ../../source/explore/calibration_transfer.rst:53
+msgid "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+msgstr "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+
+#: ../../source/explore/calibration_transfer.rst:57
+msgid ""
+"``T`` is estimated by ordinary least squares on the paired transfer "
+"spectra. DS is simple, fast, and works well when the spectral differences"
+" between instruments are globally smooth."
+msgstr ""
+"``T`` は、対応する転送スペクトルに対する通常最小二乗法で推定されます。DS は単純かつ高速で、"
+"機器間のスペクトル差が全体として滑らかな場合に良好に機能します。"
+
+#: ../../source/explore/calibration_transfer.rst:61
+msgid "**Fitting DS**"
+msgstr "**DS の適合**"
+
+#: ../../source/explore/calibration_transfer.rst:63
+msgid ""
+"Pass the target transfer spectra as ``X`` and the corresponding source "
+"transfer spectra as ``X_source``:"
+msgstr "ターゲットの転送スペクトルを ``X``、対応するソースの転送スペクトルを ``X_source`` として渡します。"
+
+#: ../../source/explore/calibration_transfer.rst:81
+msgid "**Applying DS to new spectra**"
+msgstr "**新しいスペクトルへの DS の適用**"
+
+#: ../../source/explore/calibration_transfer.rst:91
+msgid "**DS in a Pipeline**"
+msgstr "**Pipeline での DS**"
+
+#: ../../source/explore/calibration_transfer.rst:109
+msgid ""
+"When ``X_source`` is not provided, DS fits an identity transformation "
+"(i.e., ``transform`` returns ``X`` unchanged). This is useful as a no-op "
+"placeholder in pipelines during development."
+msgstr ""
+"``X_source`` が指定されていない場合、DS は恒等変換を適合します（つまり、``transform`` は"
+" ``X`` を変更せずに返します）。これは開発中、パイプライン内の何もしないプレースホルダーとして役立ちます。"
+
+#: ../../source/explore/calibration_transfer.rst:114
+msgid "Piecewise Direct Standardization (PDS)"
+msgstr "区分的直接標準化（PDS）"
+
+#: ../../source/explore/calibration_transfer.rst:116
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` extends DS"
+" by building one *local* PLS model per output feature, using a small "
+"window of neighbouring input features. This makes PDS more robust when:"
+msgstr ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` は、隣接する入力特徴量の小さな"
+"ウィンドウを使用して出力特徴量ごとに1つの *局所* PLS モデルを構築することで DS を拡張します。"
+"そのため、PDS は次の場合により堅牢です。"
+
+#: ../../source/explore/calibration_transfer.rst:120
+msgid ""
+"the spectral shift between instruments is non-linear or varies across the"
+" spectral range."
+msgstr "機器間のスペクトルシフトが非線形であるか、スペクトル範囲によって異なる場合。"
+
+#: ../../source/explore/calibration_transfer.rst:122
+msgid ""
+"there are wavelength registration differences (small offsets between the "
+"x-axis grids of the two instruments)."
+msgstr "波長位置合わせに差異（2つの機器の x 軸グリッド間の小さなオフセット）がある場合。"
+
+#: ../../source/explore/calibration_transfer.rst:125
+msgid ""
+"For each output feature :math:`j`, PDS uses the window :math:`[j - w, "
+"\\ldots, j + w]` of the target spectrum (where ``w = window_length``) to "
+"predict the corresponding feature of the source spectrum via PLS "
+"regression."
+msgstr ""
+"PDS は各出力特徴量 :math:`j` について、ターゲットスペクトルのウィンドウ :math:`[j - w, "
+"\\ldots, j + w]`（``w = window_length``）を使用し、PLS 回帰によってソーススペクトルの"
+"対応する特徴量を予測します。"
+
+#: ../../source/explore/calibration_transfer.rst:130
+msgid "**Fitting PDS**"
+msgstr "**PDS の適合**"
+
+#: ../../source/explore/calibration_transfer.rst:142
+msgid "**Applying PDS**"
+msgstr "**PDS の適用**"
+
+#: ../../source/explore/calibration_transfer.rst:149
+msgid "Choosing between DS and PDS"
+msgstr "DS と PDS の選択"
+
+#: ../../source/explore/calibration_transfer.rst:156
+msgid "DS"
+msgstr "DS"
+
+#: ../../source/explore/calibration_transfer.rst:157
+msgid "PDS"
+msgstr "PDS"
+
+#: ../../source/explore/calibration_transfer.rst:158
+msgid "**Transformation**"
+msgstr "**変換**"
+
+#: ../../source/explore/calibration_transfer.rst:159
+msgid "Global linear map"
+msgstr "大域的な線形写像"
+
+#: ../../source/explore/calibration_transfer.rst:160
+msgid "Local PLS per feature"
+msgstr "特徴量ごとの局所 PLS"
+
+#: ../../source/explore/calibration_transfer.rst:161
+msgid "**Number of transfer samples needed**"
+msgstr "**必要な転送サンプル数**"
+
+#: ../../source/explore/calibration_transfer.rst:162
+msgid "As many as features (can use regularization)"
+msgstr "特徴量数と同程度（正則化を使用可能）"
+
+#: ../../source/explore/calibration_transfer.rst:163
+msgid "Few (local models have few variables)"
+msgstr "少数（局所モデルの変数が少ないため）"
+
+#: ../../source/explore/calibration_transfer.rst:164
+msgid "**Handles wavelength shifts**"
+msgstr "**波長シフトへの対応**"
+
+#: ../../source/explore/calibration_transfer.rst:165
+msgid "Poorly"
+msgstr "不得手"
+
+#: ../../source/explore/calibration_transfer.rst:166
+msgid "Well (windowed input)"
+msgstr "良好（ウィンドウ化された入力）"
+
+#: ../../source/explore/calibration_transfer.rst:167
+msgid "**Handles non-linear differences**"
+msgstr "**非線形差への対応**"
+
+#: ../../source/explore/calibration_transfer.rst:168
+msgid "No"
+msgstr "不可"
+
+#: ../../source/explore/calibration_transfer.rst:169
+msgid "Partially"
+msgstr "部分的に可能"
+
+#: ../../source/explore/calibration_transfer.rst:170
+msgid "**Computation time**"
+msgstr "**計算時間**"
+
+#: ../../source/explore/calibration_transfer.rst:171
+msgid "Fast"
+msgstr "高速"
+
+#: ../../source/explore/calibration_transfer.rst:172
+msgid "Moderate (one PLS per feature)"
+msgstr "中程度（特徴量ごとに1つの PLS）"
+
+#: ../../source/explore/calibration_transfer.rst:173
+msgid "**Best for**"
+msgstr "**最適な用途**"
+
+#: ../../source/explore/calibration_transfer.rst:174
+msgid "Globally smooth instrument differences"
+msgstr "全体として滑らかな機器差"
+
+#: ../../source/explore/calibration_transfer.rst:175
+msgid "Wavelength offsets, local non-linearities"
+msgstr "波長オフセット、局所的な非線形性"
+
+#: ../../source/explore/calibration_transfer.rst:177
+msgid ""
+"A common strategy is to start with DS (fast, interpretable) and switch to"
+" PDS if prediction accuracy on the target instrument is insufficient."
+msgstr ""
+"一般的な戦略は、まず DS（高速で解釈しやすい）を使用し、ターゲット機器での予測精度が"
+"不十分な場合に PDS へ切り替えることです。"
+
+#: ../../source/explore/calibration_transfer.rst:181
+msgid "References"
+msgstr "参考文献"
+
+#: ../../source/explore/calibration_transfer.rst:183
+msgid ""
+"Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate "
+"instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. "
+"https://doi.org/10.1021/ac00023a016"
+msgstr ""
+"Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate "
+"instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. "
+"https://doi.org/10.1021/ac00023a016"
+
+#: ../../source/explore/calibration_transfer.rst:188
+msgid ""
+"Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration. *Chemometrics and Intelligent Laboratory "
+"Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+msgstr ""
+"Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration. *Chemometrics and Intelligent Laboratory "
+"Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+
+#: ../../source/explore/calibration_transfer.rst:196
+msgid ""
+":doc:`DirectStandardization "
+"<../methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ""
+":doc:`DirectStandardization "
+"<../methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:197
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"<../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ""
+":doc:`PiecewiseDirectStandardization "
+"<../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:198
+msgid ""
+":doc:`XAxisInterpolator "
+"<../methods/generated/chemotools.adaptation.XAxisInterpolator>` — align "
+"spectra to a common x-axis grid before standardization."
+msgstr ""
+":doc:`XAxisInterpolator "
+"<../methods/generated/chemotools.adaptation.XAxisInterpolator>` — 標準化の前にスペクトルを共通の x 軸グリッドへ位置合わせします。"
+

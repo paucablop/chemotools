@@ -1,0 +1,354 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst:2
+msgid "SpectralSpaceTransform"
+msgstr "SpectralSpaceTransform"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:1 of
+msgid ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.OneToOneFeatureMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:1 of
+msgid ""
+"Spectral Space Transform (SST) is a transformer used for domain "
+"adaptation (calibration) applications."
+msgstr "Spectral Space Transform（SST）は、ドメイン適応（キャリブレーション）用途の Transformer です。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:4 of
+msgid ""
+"SST is a linear transformation method used to transfer spectral data from"
+" a target domain to a source (reference) domain, allowing calibration "
+"models to remain valid across different instruments or acquisition "
+"conditions, following the implementation by [1]_."
+msgstr "SST は、[1]_ の実装に従ってスペクトルデータをターゲットドメインからソース（参照）ドメインへ転送する線形変換手法です。これにより、異なる装置や取得条件でもキャリブレーションモデルの有効性を維持できます。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:9 of
+msgid ""
+"The method constructs a shared latent space using singular value "
+"decomposition (SVD) of concatenated source and target data, and derives "
+"projection matrices to align the target data to the source space."
+msgstr "この手法は、連結したソースデータとターゲットデータを特異値分解（SVD）して共有潜在空間を構築し、ターゲットデータをソース空間に整合させる射影行列を導出します。"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst
+msgid "Parameters"
+msgstr "パラメータ"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:13 of
+msgid ""
+"Number of latent components retained from the singular value "
+"decomposition (SVD). Controls the dimensionality of the shared subspace."
+msgstr "特異値分解（SVD）から保持する潜在成分数。共有部分空間の次元数を制御します。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:16 of
+msgid ""
+"If True, center each domain's data by subtracting its mean before "
+"computing the SVD. The source mean is added back after transforming."
+msgstr "True の場合、SVD の計算前に各ドメインのデータからその平均を減算してセンタリングします。変換後にソース平均を加え戻します。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:19 of
+msgid ""
+"If True, scale each domain's data by its standard deviation after "
+"centering. Features with zero variance are left unchanged (std set to 1)."
+" Following the same convention as ``StandardScaler``."
+msgstr "True の場合、センタリング後に各ドメインのデータをその標準偏差でスケーリングします。分散がゼロの特徴量は変更しません（標準偏差を 1 に設定）。``StandardScaler`` と同じ規則に従います。"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst
+msgid "Variables"
+msgstr "変数"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:24 of
+msgid "Number of features seen during fit."
+msgstr "fit 時に確認された特徴量数。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:27 of
+msgid "Per-feature mean of the target data. Zero vector when ``with_mean=False``."
+msgstr "ターゲットデータの特徴量別平均。``with_mean=False`` の場合はゼロベクトルです。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:30 of
+msgid "Per-feature mean of the source data. Zero vector when ``with_mean=False``."
+msgstr "ソースデータの特徴量別平均。``with_mean=False`` の場合はゼロベクトルです。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:33 of
+msgid ""
+"Per-feature standard deviation of the target data. Ones vector when "
+"``with_std=False``."
+msgstr "ターゲットデータの特徴量別標準偏差。``with_std=False`` の場合は 1 のベクトルです。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:37 of
+msgid ""
+"Per-feature standard deviation of the source data. Ones vector when "
+"``with_std=False``."
+msgstr "ソースデータの特徴量別標準偏差。``with_std=False`` の場合は 1 のベクトルです。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:41 of
+msgid ""
+"Projection matrix associated with the source domain. It maps the shared "
+"latent space back to the source spectral space."
+msgstr "ソースドメインに対応する射影行列。共有潜在空間をソーススペクトル空間へ写像します。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:45 of
+msgid ""
+"Projection matrix associated with the target domain. It maps target data "
+"into the shared latent space."
+msgstr "ターゲットドメインに対応する射影行列。ターゲットデータを共有潜在空間へ写像します。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:49 of
+msgid ""
+"Pseudoinverse of ``P2_``. Left factor of the low-rank correction; stored "
+"to avoid recomputing the pseudoinverse on every transform call."
+msgstr "``P2_`` の擬似逆行列。低ランク補正の左因子です。transform の呼び出しごとに擬似逆行列を再計算しないよう格納されます。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:53 of
+msgid ""
+"Effective left factor ``A_ / X_target_std_[:, None]`` with target scaling"
+" absorbed. Equals ``A_`` when ``with_std=False``."
+msgstr "ターゲットのスケーリングを吸収した実効左因子 ``A_ / X_target_std_[:, None]``。``with_std=False`` の場合は ``A_`` と等しくなります。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:57 of
+msgid ""
+"Effective right factor ``(P1_ - P2_) * X_source_std_[None, :]`` with "
+"source scaling absorbed. Equals ``P1_ - P2_`` when ``with_std=False``."
+msgstr "ソースのスケーリングを吸収した実効右因子 ``(P1_ - P2_) * X_source_std_[None, :]``。``with_std=False`` の場合は ``P1_ - P2_`` と等しくなります。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:61 of
+msgid ""
+"Per-feature combined scale ``X_source_std_ / X_target_std_``. Ones vector"
+" when ``with_std=False``."
+msgstr "特徴量別の合成スケール ``X_source_std_ / X_target_std_``。``with_std=False`` の場合は 1 のベクトルです。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:65 of
+msgid ""
+"Precomputed per-feature bias that absorbs all mean and std shifts, "
+"allowing :meth:`transform` to avoid intermediate array allocations."
+msgstr "平均と標準偏差によるすべてのシフトを吸収する、事前計算済みの特徴量別バイアス。これにより :meth:`transform` は中間配列の確保を回避できます。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:69 of
+msgid ""
+"Full transformation matrix ``I + A_ @ (P1_ - P2_)`` (property, computed "
+"on demand). Equivalent to ``X_scaled @ T_`` in the SST formula but never "
+"materialised during :meth:`transform`."
+msgstr "完全な変換行列 ``I + A_ @ (P1_ - P2_)``（必要時に計算されるプロパティ）。SST の式における ``X_scaled @ T_`` と等価ですが、:meth:`transform` の実行中に実体化されることはありません。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:74 of
+msgid "Boolean flag indicating if X_source was provided during fitting."
+msgstr "fit 時に X_source が指定されたかを示すブールフラグ。"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst
+msgid "Raises"
+msgstr "例外"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:78 of
+msgid "If ``X`` and ``X_source`` do not have the same shape."
+msgstr "``X`` と ``X_source`` の形状が同じでない場合。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:79 of
+msgid ""
+"If ``n_components`` exceeds ``min(n_samples, 2 * n_features)`` of the"
+"     concatenated matrix."
+msgstr "``n_components`` が連結行列の ``min(n_samples, 2 * n_features)`` を超える場合。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:83 of
+msgid ":py:obj:`PiecewiseDirectStandardization`"
+msgstr ":py:obj:`PiecewiseDirectStandardization`"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:84 of
+msgid "Local standardization using moving windows."
+msgstr "移動ウィンドウを使用する局所標準化。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:86 of
+msgid ":py:obj:`DirectStandardization`"
+msgstr ":py:obj:`DirectStandardization`"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:87 of
+msgid "Global linear transformation without local windows."
+msgstr "局所ウィンドウを使用しない大域的線形変換。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:90 of
+msgid "References"
+msgstr "参考文献"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:91 of
+msgid ""
+"Du, W., Chen, Z.-P., Zhong, L.-J.,Wang, S.-X., Yu, R.-Q., Nordon, A., "
+"Littlejohn, D., & Holden, M. (2011). Maintaining the predictive abilities"
+" of multivariate calibration models by spectral space transformation, "
+"Analytica Chimica Acta, 690(1), Pages 64–70, "
+"https://doi.org/10.1016/j.aca.2011.02.014."
+msgstr "Du, W., Chen, Z.-P., Zhong, L.-J.,Wang, S.-X., Yu, R.-Q., Nordon, A., Littlejohn, D., & Holden, M. (2011). スペクトル空間変換による多変量キャリブレーションモデルの予測能力の維持, Analytica Chimica Acta, 690(1), 64–70 ページ, https://doi.org/10.1016/j.aca.2011.02.014."
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:99 of
+msgid "Examples"
+msgstr "使用例"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform:100
+#: of
+msgid ""
+"**Basic usage** >>> import numpy as np >>> from chemotools.adaptation "
+"import SpectralSpaceTransform >>> >>> rng = np.random.default_rng(17) >>>"
+" X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - "
+"rng.normal(size=(100, 20)) * 0.02 >>> >>> sst = "
+"SpectralSpaceTransform(n_components=2).fit(X_target, X_source=X_source) "
+">>> X_transf = sst.transform(X_target)"
+msgstr "**基本的な使用方法** >>> import numpy as np >>> from chemotools.adaptation import SpectralSpaceTransform >>> >>> rng = np.random.default_rng(17) >>> X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - rng.normal(size=(100, 20)) * 0.02 >>> >>> sst = SpectralSpaceTransform(n_components=2).fit(X_target, X_source=X_source) >>> X_transf = sst.transform(X_target)"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst:15
+msgid "Attributes"
+msgstr "属性"
+
+#: chemotools.adaptation.SpectralSpaceTransform.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`T_ <chemotools.adaptation.SpectralSpaceTransform.T_>`\\"
+msgstr ":py:obj:`T_ <chemotools.adaptation.SpectralSpaceTransform.T_>`\\"
+
+#: chemotools.adaptation.SpectralSpaceTransform.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.SpectralSpaceTransform.n_features_in_>`\\"
+msgstr ":py:obj:`n_features_in_ <chemotools.adaptation.SpectralSpaceTransform.n_features_in_>`\\"
+
+#: chemotools.adaptation.SpectralSpaceTransform.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`P1_ <chemotools.adaptation.SpectralSpaceTransform.P1_>`\\"
+msgstr ":py:obj:`P1_ <chemotools.adaptation.SpectralSpaceTransform.P1_>`\\"
+
+#: chemotools.adaptation.SpectralSpaceTransform.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`P2_ <chemotools.adaptation.SpectralSpaceTransform.P2_>`\\"
+msgstr ":py:obj:`P2_ <chemotools.adaptation.SpectralSpaceTransform.P2_>`\\"
+
+#: chemotools.adaptation.SpectralSpaceTransform.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`A_ <chemotools.adaptation.SpectralSpaceTransform.A_>`\\"
+msgstr ":py:obj:`A_ <chemotools.adaptation.SpectralSpaceTransform.A_>`\\"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.fit:1
+#: of
+msgid "Fit the SpectralSpaceTransform model."
+msgstr "SpectralSpaceTransform モデルを適合させます。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.fit:3
+#: of
+msgid "Data from the target instrument."
+msgstr "ターゲット装置のデータ。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.fit:5
+#: of
+msgid "Ignored to align with API."
+msgstr "API との整合性を保つため無視されます。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.fit:7
+#: of
+msgid ""
+"Data from the source instrument. If None, the transformer defaults to an "
+"identity transformation."
+msgstr "ソース装置のデータ。None の場合、Transformer はデフォルトで恒等変換を使用します。"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst
+msgid "Returns"
+msgstr "戻り値"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.fit:11
+#: of
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.SpectralSpaceTransform.rst
+msgid "Return type"
+msgstr "戻り値の型"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.transform:1
+#: of
+msgid "Use the trained model to transform the target data"
+msgstr "学習済みモデルを使用してターゲットデータを変換します。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.transform:3
+#: of
+msgid "Input data to transform"
+msgstr "変換する入力データ。"
+
+#: chemotools.adaptation._spectral_space_transform.SpectralSpaceTransform.transform:6
+#: of
+msgid "**X_transformed** -- Data transformed"
+msgstr "**X_transformed** -- 変換後のデータ。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``fit`` method."
+msgstr "``fit`` メソッドへ渡すメタデータを要求するかどうかを設定します。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a "
+"sub-estimator within a :term:`meta-estimator` and metadata routing is "
+"enabled with ``enable_metadata_routing=True`` (see "
+":func:`sklearn.set_config`). Please check the :ref:`User Guide "
+"<metadata_routing>` on how the routing mechanism works."
+msgstr "このメソッドが関係するのは、この推定器を :term:`meta-estimator` 内のサブ推定器として使用し、``enable_metadata_routing=True`` でメタデータルーティングを有効にした場合のみです（:func:`sklearn.set_config` を参照）。ルーティング機構の動作については :ref:`ユーザーガイド <metadata_routing>` を参照してください。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "各パラメータには次のオプションがあります。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr "``True``: メタデータを要求し、指定された場合は ``fit`` に渡します。メタデータが指定されなければ、この要求は無視されます。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass"
+" it to ``fit``."
+msgstr "``False``: メタデータを要求せず、メタ推定器は ``fit`` に渡しません。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an"
+" error if the user provides it."
+msgstr "``None``: メタデータを要求せず、ユーザーが指定した場合はメタ推定器がエラーを送出します。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr "``str``: メタデータを元の名前ではなく、指定した別名でメタ推定器に渡します。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some "
+"parameters and not others."
+msgstr "デフォルト（``sklearn.utils.metadata_routing.UNCHANGED``）では既存の要求を維持します。これにより、一部のパラメータの要求だけを変更できます。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``X_source`` parameter in ``fit``."
+msgstr "``fit`` の ``X_source`` パラメータに対するメタデータルーティング。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- 更新されたオブジェクト。"
+

@@ -1,0 +1,94 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.add_offset.rst:2
+msgid "chemotools.adaptation.functions.add\\_offset"
+msgstr "chemotools.adaptation.functions.add\\_offset"
+
+#: chemotools.adaptation.functions.add_offset:1 of
+msgid "Add a baseline offset to every row of ``X``."
+msgstr "``X`` の各行にベースラインオフセットを加算します。"
+
+#: chemotools.adaptation.functions.add_offset:3 of
+msgid ""
+"Useful for correcting instrument drift, dark-current baselines, or "
+"additive scatter effects that have been measured externally."
+msgstr "外部で測定した装置ドリフト、暗電流ベースライン、または加法的散乱効果の補正に役立ちます。"
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Parameters"
+msgstr "パラメータ"
+
+#: chemotools.adaptation.functions.add_offset:6 of
+msgid "Input spectra."
+msgstr "入力スペクトル。"
+
+#: chemotools.adaptation.functions.add_offset:8 of
+msgid ""
+"Offset to add.  Accepted shapes:  * scalar ``float`` — added to every "
+"element. * ``(n_samples, 1)`` — per-sample scalar offset. * ``(1, "
+"n_features)`` — per-feature offset shared across samples. * ``(n_samples,"
+" n_features)`` — per-sample full spectrum.  1-D inputs are rejected; use "
+"``.reshape(-1, 1)`` for per-sample or ``.reshape(1, -1)`` for per-"
+"feature."
+msgstr "加算するオフセット。指定可能な形状: * スカラー ``float`` — すべての要素に加算。* ``(n_samples, 1)`` — サンプル別のスカラーオフセット。* ``(1, n_features)`` — 全サンプルで共有する特徴量別オフセット。* ``(n_samples, n_features)`` — サンプル別の完全なスペクトル。1 次元入力は受け付けません。サンプル別の場合は ``.reshape(-1, 1)``、特徴量別の場合は ``.reshape(1, -1)`` を使用してください。"
+
+#: chemotools.adaptation.functions.add_offset:8 of
+msgid "Offset to add.  Accepted shapes:"
+msgstr "加算するオフセット。指定可能な形状:"
+
+#: chemotools.adaptation.functions.add_offset:10 of
+msgid "scalar ``float`` — added to every element."
+msgstr "スカラー ``float`` — すべての要素に加算します。"
+
+#: chemotools.adaptation.functions.add_offset:11 of
+msgid "``(n_samples, 1)`` — per-sample scalar offset."
+msgstr "``(n_samples, 1)`` — サンプル別のスカラーオフセット。"
+
+#: chemotools.adaptation.functions.add_offset:12 of
+msgid "``(1, n_features)`` — per-feature offset shared across samples."
+msgstr "``(1, n_features)`` — 全サンプルで共有する特徴量別オフセット。"
+
+#: chemotools.adaptation.functions.add_offset:13 of
+msgid "``(n_samples, n_features)`` — per-sample full spectrum."
+msgstr "``(n_samples, n_features)`` — サンプル別の完全なスペクトル。"
+
+#: chemotools.adaptation.functions.add_offset:15 of
+msgid ""
+"1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample or "
+"``.reshape(1, -1)`` for per-feature."
+msgstr "1 次元入力は受け付けません。サンプル別の場合は ``.reshape(-1, 1)``、特徴量別の場合は ``.reshape(1, -1)`` を使用してください。"
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Returns"
+msgstr "戻り値"
+
+#: chemotools.adaptation.functions.add_offset:19 of
+msgid "**X_shifted** -- ``X + offset``."
+msgstr "**X_shifted** -- ``X + offset``。"
+
+#: chemotools.adaptation.functions.add_offset of
+msgid "Return type"
+msgstr "戻り値の型"
+
+#: chemotools.adaptation.functions.add_offset:23 of
+msgid "Examples"
+msgstr "使用例"
+

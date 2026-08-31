@@ -1,0 +1,118 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst:2
+msgid "chemotools.adaptation.validation.check\\_metadata\\_function"
+msgstr "chemotools.adaptation.validation.check\\_metadata\\_function"
+
+#: chemotools.adaptation.validation.check_metadata_function:1 of
+msgid "Validate a metadata function on representative data."
+msgstr "使用代表性数据验证元数据函数。"
+
+#: chemotools.adaptation.validation.check_metadata_function:3 of
+msgid ""
+"The function is called once as ``func(X_checked, **metadata)``. Its "
+"output is validated as a finite, numeric, 2-D array that preserves the "
+"number of input samples and, by default, the number of input features."
+msgstr ""
+"该函数以 ``func(X_checked, **metadata)`` 的形式调用一次。其输出将被验证为有限值的数值二维数组，"
+"且必须保持输入样本数，并默认保持输入特征数。"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Parameters"
+msgstr "参数"
+
+#: chemotools.adaptation.validation.check_metadata_function:7 of
+msgid "Function invoked as ``func(X_checked, **metadata)``."
+msgstr "以 ``func(X_checked, **metadata)`` 形式调用的函数。"
+
+#: chemotools.adaptation.validation.check_metadata_function:9 of
+msgid "Representative input data."
+msgstr "代表性输入数据。"
+
+#: chemotools.adaptation.validation.check_metadata_function:11 of
+msgid ""
+"Representative keyword arguments passed to ``func``. Use ``None`` when "
+"the function requires no metadata."
+msgstr ""
+"传递给 ``func`` 的代表性关键字参数。当函数不需要元数据时使用 ``None``。"
+
+#: chemotools.adaptation.validation.check_metadata_function:14 of
+msgid ""
+"If ``True``, require the output to have the same number of features as "
+"``X``. The number of samples is always required to match."
+msgstr ""
+"若为 ``True``，则要求输出与 ``X`` 具有相同的特征数。样本数始终必须一致。"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Returns"
+msgstr "返回值"
+
+#: chemotools.adaptation.validation.check_metadata_function:18 of
+msgid "**result** -- Validated output produced by ``func``."
+msgstr "**result** -- 由 ``func`` 生成并通过验证的输出。"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Return type"
+msgstr "返回类型"
+
+#: ../../source/methods/generated/chemotools.adaptation.validation.check_metadata_function.rst
+msgid "Raises"
+msgstr "引发"
+
+#: chemotools.adaptation.validation.check_metadata_function:21 of
+msgid "If ``func`` is not callable or its signature cannot be inspected."
+msgstr "当 ``func`` 不可调用或无法检查其签名时。"
+
+#: chemotools.adaptation.validation.check_metadata_function:22 of
+msgid ""
+"If ``X`` is invalid, ``func`` cannot be called with the supplied     "
+"arguments, its output is not a finite numeric 2-D array, or its output"
+"     does not preserve the required dimensions."
+msgstr ""
+"当 ``X`` 无效、无法使用所提供的参数调用 ``func``、其输出不是有限值的数值二维数组，"
+"或其输出未保持所需维度时。"
+
+#: chemotools.adaptation.validation.check_metadata_function:25 of
+msgid "Notes"
+msgstr "说明"
+
+#: chemotools.adaptation.validation.check_metadata_function:26 of
+msgid ""
+"This check executes user-provided code. Exceptions raised by ``func`` are"
+" propagated unchanged, and functions with side effects will perform those"
+" side effects once. The validated input and output may be converted to "
+"NumPy arrays by :func:`sklearn.utils.validation.check_array`."
+msgstr ""
+"此检查会执行用户提供的代码。``func`` 引发的异常将原样传播，具有副作用的函数会执行一次这些副作用。"
+"验证后的输入和输出可能由 :func:`sklearn.utils.validation.check_array` 转换为 NumPy 数组。"
+
+#: chemotools.adaptation.validation.check_metadata_function:32 of
+msgid "Examples"
+msgstr "示例"
+
+#: chemotools.adaptation.validation.check_metadata_function:46 of
+msgid ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
+msgstr ":py:obj:`chemotools.adaptation.MetadataFunctionTransformer`"
+
+#: chemotools.adaptation.validation.check_metadata_function:47 of
+msgid "Wrap a function for scikit-learn metadata routing."
+msgstr "封装函数以用于 scikit-learn 元数据路由。"
+

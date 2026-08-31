@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -17,19 +17,22 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/methods.rst:4
 msgid "Methods overview"
 msgstr "メソッド概要"
 
 #: ../../source/methods/methods.rst:6
-msgid ""
-"This page is a placeholder for upcoming method categories such as "
-"Augmentation, Feature Selection, and Outliers."
-msgstr "このページは、拡張、特徴量選択、外れ値などの今後のメソッドカテゴリのプレースホルダです。"
+msgid "Browse the available chemotools methods by category."
+msgstr ""
 
-#: ../../source/methods/methods.rst:9
-msgid "Available pages"
-msgstr "利用可能なページ"
+#~ msgid ""
+#~ "This page is a placeholder for "
+#~ "upcoming method categories such as "
+#~ "Augmentation, Feature Selection, and Outliers."
+#~ msgstr "このページは、拡張、特徴量選択、外れ値などの今後のメソッドカテゴリのプレースホルダです。"
+
+#~ msgid "Available pages"
+#~ msgstr "利用可能なページ"
 

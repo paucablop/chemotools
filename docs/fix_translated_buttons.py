@@ -85,6 +85,18 @@ BUTTON_TRANSLATIONS = {
             "translation": "使用 Astartes 采样",
             "url": "astartes.html",
         },
+        "Dynamic transformers": {
+            "translation": "动态转换器",
+            "url": "dynamic_transformers.html",
+        },
+        "Orthogonal projections": {
+            "translation": "正交投影",
+            "url": "orthogonal_projections.html",
+        },
+        "Calibration transfer": {
+            "translation": "校准迁移",
+            "url": "calibration_transfer.html",
+        },
         # _methods/index page
         "Augmentation": {
             "translation": "数据增强",
@@ -185,6 +197,18 @@ BUTTON_TRANSLATIONS = {
             "translation": "Muestreo con Astartes",
             "url": "astartes.html",
         },
+        "Dynamic transformers": {
+            "translation": "Transformadores dinámicos",
+            "url": "dynamic_transformers.html",
+        },
+        "Orthogonal projections": {
+            "translation": "Proyecciones ortogonales",
+            "url": "orthogonal_projections.html",
+        },
+        "Calibration transfer": {
+            "translation": "Transferencia de calibración",
+            "url": "calibration_transfer.html",
+        },
         # methods/index page
         "Augmentation": {
             "translation": "Aumento de datos",
@@ -284,6 +308,18 @@ BUTTON_TRANSLATIONS = {
         "Sampling with Astartes": {
             "translation": "Astartesによるサンプリング",
             "url": "astartes.html",
+        },
+        "Dynamic transformers": {
+            "translation": "動的トランスフォーマー",
+            "url": "dynamic_transformers.html",
+        },
+        "Orthogonal projections": {
+            "translation": "直交射影",
+            "url": "orthogonal_projections.html",
+        },
+        "Calibration transfer": {
+            "translation": "キャリブレーション転送",
+            "url": "calibration_transfer.html",
         },
         # methods/index page
         "Augmentation": {

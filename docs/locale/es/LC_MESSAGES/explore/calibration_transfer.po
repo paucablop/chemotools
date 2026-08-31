@@ -1,0 +1,368 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/calibration_transfer.rst:4
+msgid "Calibration transfer"
+msgstr "Transferencia de calibración"
+
+#: ../../source/explore/calibration_transfer.rst:6
+msgid ""
+"A model trained on one instrument does not always predict accurately on a"
+" second instrument — even when measuring the same samples. Differences in"
+" detector response, optical alignment, wavelength accuracy, and "
+"environmental conditions all introduce systematic spectral shifts between"
+" instruments."
+msgstr ""
+"Un modelo entrenado con un instrumento no siempre predice con precisión al "
+"aplicarlo a un segundo instrumento, incluso cuando se miden las mismas "
+"muestras. Las diferencias en la respuesta del detector, la alineación óptica, "
+"la precisión de la longitud de onda y las condiciones ambientales introducen "
+"desplazamientos espectrales sistemáticos entre instrumentos."
+
+#: ../../source/explore/calibration_transfer.rst:12
+msgid ""
+"**Calibration transfer** (also called *model transder* or *domain "
+"adaptation*) corrects for these differences so that a model built on a "
+"*source* instrument can be applied to spectra measured on a *target* "
+"instrument, without rebuilding the model from scratch."
+msgstr ""
+"La **transferencia de calibración** (también denominada *transferencia de "
+"modelos* o *adaptación de dominio*) corrige estas diferencias para que un "
+"modelo creado con un instrumento *origen* pueda aplicarse a espectros medidos "
+"con un instrumento *destino*, sin tener que reconstruir el modelo desde cero."
+
+#: ../../source/explore/calibration_transfer.rst:17
+msgid ""
+"``chemotools`` implements two classical transfer methods in "
+":mod:`chemotools.adaptation`:"
+msgstr ""
+"``chemotools`` implementa dos métodos clásicos de transferencia en "
+":mod:`chemotools.adaptation`:"
+
+#: ../../source/explore/calibration_transfer.rst:20
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` (DS) — a global "
+"linear transformation."
+msgstr ""
+":class:`~chemotools.adaptation.DirectStandardization` (DS): una "
+"transformación lineal global."
+
+#: ../../source/explore/calibration_transfer.rst:22
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` (PDS) — a "
+"local, window-based transformation using PLS regression."
+msgstr ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` (PDS): una "
+"transformación local basada en ventanas que utiliza regresión PLS."
+
+#: ../../source/explore/calibration_transfer.rst:25
+msgid ""
+"Both follow the formulation introduced by Wang, Veltkamp & Kowalski "
+"(1991) [1]_."
+msgstr ""
+"Ambos siguen la formulación introducida por Wang, Veltkamp y Kowalski "
+"(1991) [1]_."
+
+#: ../../source/explore/calibration_transfer.rst:28
+msgid "The calibration transfer workflow"
+msgstr "Flujo de trabajo de la transferencia de calibración"
+
+#: ../../source/explore/calibration_transfer.rst:30
+msgid "The general workflow is:"
+msgstr "El flujo de trabajo general es el siguiente:"
+
+#: ../../source/explore/calibration_transfer.rst:32
+msgid ""
+"Measure a small set of **transfer samples** on both the source and target"
+" instruments."
+msgstr ""
+"Medir un pequeño conjunto de **muestras de transferencia** con los "
+"instrumentos origen y destino."
+
+#: ../../source/explore/calibration_transfer.rst:34
+msgid "Fit the standardization transformer using the paired spectra."
+msgstr "Ajustar el transformador de estandarización con los espectros emparejados."
+
+#: ../../source/explore/calibration_transfer.rst:35
+msgid "Apply the transformer to new target spectra before prediction."
+msgstr "Aplicar el transformador a los nuevos espectros de destino antes de predecir."
+
+#: ../../source/explore/calibration_transfer.rst:43
+msgid ""
+"After standardization, the corrected spectra can be fed directly into the"
+" source-instrument model."
+msgstr ""
+"Tras la estandarización, los espectros corregidos pueden introducirse "
+"directamente en el modelo del instrumento origen."
+
+#: ../../source/explore/calibration_transfer.rst:47
+msgid "Direct Standardization (DS)"
+msgstr "Estandarización directa (DS)"
+
+#: ../../source/explore/calibration_transfer.rst:49
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` finds a global "
+"linear map ``T`` that transforms target-instrument spectra to the source-"
+"instrument space:"
+msgstr ""
+":class:`~chemotools.adaptation.DirectStandardization` obtiene una aplicación "
+"lineal global ``T`` que transforma los espectros del instrumento destino al "
+"espacio del instrumento origen:"
+
+#: ../../source/explore/calibration_transfer.rst:53
+msgid "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+msgstr "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+
+#: ../../source/explore/calibration_transfer.rst:57
+msgid ""
+"``T`` is estimated by ordinary least squares on the paired transfer "
+"spectra. DS is simple, fast, and works well when the spectral differences"
+" between instruments are globally smooth."
+msgstr ""
+"``T`` se estima mediante mínimos cuadrados ordinarios a partir de los espectros "
+"de transferencia emparejados. DS es sencillo, rápido y funciona bien cuando "
+"las diferencias espectrales entre instrumentos son suaves a escala global."
+
+#: ../../source/explore/calibration_transfer.rst:61
+msgid "**Fitting DS**"
+msgstr "**Ajuste de DS**"
+
+#: ../../source/explore/calibration_transfer.rst:63
+msgid ""
+"Pass the target transfer spectra as ``X`` and the corresponding source "
+"transfer spectra as ``X_source``:"
+msgstr ""
+"Pase los espectros de transferencia de destino como ``X`` y los espectros de "
+"transferencia de origen correspondientes como ``X_source``:"
+
+#: ../../source/explore/calibration_transfer.rst:81
+msgid "**Applying DS to new spectra**"
+msgstr "**Aplicación de DS a nuevos espectros**"
+
+#: ../../source/explore/calibration_transfer.rst:91
+msgid "**DS in a Pipeline**"
+msgstr "**DS en un pipeline**"
+
+#: ../../source/explore/calibration_transfer.rst:109
+msgid ""
+"When ``X_source`` is not provided, DS fits an identity transformation "
+"(i.e., ``transform`` returns ``X`` unchanged). This is useful as a no-op "
+"placeholder in pipelines during development."
+msgstr ""
+"Cuando no se proporciona ``X_source``, DS ajusta una transformación identidad "
+"(es decir, ``transform`` devuelve ``X`` sin cambios). Esto resulta útil como "
+"marcador de posición sin efecto en pipelines durante el desarrollo."
+
+#: ../../source/explore/calibration_transfer.rst:114
+msgid "Piecewise Direct Standardization (PDS)"
+msgstr "Estandarización directa por tramos (PDS)"
+
+#: ../../source/explore/calibration_transfer.rst:116
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` extends DS"
+" by building one *local* PLS model per output feature, using a small "
+"window of neighbouring input features. This makes PDS more robust when:"
+msgstr ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` amplía DS "
+"construyendo un modelo PLS *local* por cada característica de salida mediante "
+"una pequeña ventana de características de entrada vecinas. Esto hace que PDS "
+"sea más robusto cuando:"
+
+#: ../../source/explore/calibration_transfer.rst:120
+msgid ""
+"the spectral shift between instruments is non-linear or varies across the"
+" spectral range."
+msgstr ""
+"el desplazamiento espectral entre instrumentos es no lineal o varía a lo "
+"largo del intervalo espectral."
+
+#: ../../source/explore/calibration_transfer.rst:122
+msgid ""
+"there are wavelength registration differences (small offsets between the "
+"x-axis grids of the two instruments)."
+msgstr ""
+"existen diferencias en el registro de las longitudes de onda (pequeños "
+"desplazamientos entre las cuadrículas del eje x de ambos instrumentos)."
+
+#: ../../source/explore/calibration_transfer.rst:125
+msgid ""
+"For each output feature :math:`j`, PDS uses the window :math:`[j - w, "
+"\\ldots, j + w]` of the target spectrum (where ``w = window_length``) to "
+"predict the corresponding feature of the source spectrum via PLS "
+"regression."
+msgstr ""
+"Para cada característica de salida :math:`j`, PDS utiliza la ventana "
+":math:`[j - w, \\ldots, j + w]` del espectro de destino (donde ``w = "
+"window_length``) para predecir mediante regresión PLS la característica "
+"correspondiente del espectro de origen."
+
+#: ../../source/explore/calibration_transfer.rst:130
+msgid "**Fitting PDS**"
+msgstr "**Ajuste de PDS**"
+
+#: ../../source/explore/calibration_transfer.rst:142
+msgid "**Applying PDS**"
+msgstr "**Aplicación de PDS**"
+
+#: ../../source/explore/calibration_transfer.rst:149
+msgid "Choosing between DS and PDS"
+msgstr "Elección entre DS y PDS"
+
+#: ../../source/explore/calibration_transfer.rst:156
+msgid "DS"
+msgstr "DS"
+
+#: ../../source/explore/calibration_transfer.rst:157
+msgid "PDS"
+msgstr "PDS"
+
+#: ../../source/explore/calibration_transfer.rst:158
+msgid "**Transformation**"
+msgstr "**Transformación**"
+
+#: ../../source/explore/calibration_transfer.rst:159
+msgid "Global linear map"
+msgstr "Aplicación lineal global"
+
+#: ../../source/explore/calibration_transfer.rst:160
+msgid "Local PLS per feature"
+msgstr "PLS local por característica"
+
+#: ../../source/explore/calibration_transfer.rst:161
+msgid "**Number of transfer samples needed**"
+msgstr "**Número de muestras de transferencia necesarias**"
+
+#: ../../source/explore/calibration_transfer.rst:162
+msgid "As many as features (can use regularization)"
+msgstr "Tantas como características (se puede usar regularización)"
+
+#: ../../source/explore/calibration_transfer.rst:163
+msgid "Few (local models have few variables)"
+msgstr "Pocas (los modelos locales tienen pocas variables)"
+
+#: ../../source/explore/calibration_transfer.rst:164
+msgid "**Handles wavelength shifts**"
+msgstr "**Gestiona desplazamientos de longitud de onda**"
+
+#: ../../source/explore/calibration_transfer.rst:165
+msgid "Poorly"
+msgstr "Con dificultad"
+
+#: ../../source/explore/calibration_transfer.rst:166
+msgid "Well (windowed input)"
+msgstr "Bien (entrada por ventanas)"
+
+#: ../../source/explore/calibration_transfer.rst:167
+msgid "**Handles non-linear differences**"
+msgstr "**Gestiona diferencias no lineales**"
+
+#: ../../source/explore/calibration_transfer.rst:168
+msgid "No"
+msgstr "No"
+
+#: ../../source/explore/calibration_transfer.rst:169
+msgid "Partially"
+msgstr "Parcialmente"
+
+#: ../../source/explore/calibration_transfer.rst:170
+msgid "**Computation time**"
+msgstr "**Tiempo de cálculo**"
+
+#: ../../source/explore/calibration_transfer.rst:171
+msgid "Fast"
+msgstr "Rápido"
+
+#: ../../source/explore/calibration_transfer.rst:172
+msgid "Moderate (one PLS per feature)"
+msgstr "Moderado (un PLS por característica)"
+
+#: ../../source/explore/calibration_transfer.rst:173
+msgid "**Best for**"
+msgstr "**Más adecuado para**"
+
+#: ../../source/explore/calibration_transfer.rst:174
+msgid "Globally smooth instrument differences"
+msgstr "Diferencias entre instrumentos suaves a escala global"
+
+#: ../../source/explore/calibration_transfer.rst:175
+msgid "Wavelength offsets, local non-linearities"
+msgstr "Desplazamientos de longitud de onda y no linealidades locales"
+
+#: ../../source/explore/calibration_transfer.rst:177
+msgid ""
+"A common strategy is to start with DS (fast, interpretable) and switch to"
+" PDS if prediction accuracy on the target instrument is insufficient."
+msgstr ""
+"Una estrategia habitual consiste en comenzar con DS (rápido e interpretable) "
+"y cambiar a PDS si la precisión de predicción con el instrumento destino es "
+"insuficiente."
+
+#: ../../source/explore/calibration_transfer.rst:181
+msgid "References"
+msgstr "Referencias"
+
+#: ../../source/explore/calibration_transfer.rst:183
+msgid ""
+"Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate "
+"instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. "
+"https://doi.org/10.1021/ac00023a016"
+msgstr ""
+"Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate "
+"instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. "
+"https://doi.org/10.1021/ac00023a016"
+
+#: ../../source/explore/calibration_transfer.rst:188
+msgid ""
+"Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration. *Chemometrics and Intelligent Laboratory "
+"Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+msgstr ""
+"Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration. *Chemometrics and Intelligent Laboratory "
+"Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+
+#: ../../source/explore/calibration_transfer.rst:196
+msgid ""
+":doc:`DirectStandardization "
+"<../methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ""
+":doc:`DirectStandardization "
+"<../methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:197
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"<../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ""
+":doc:`PiecewiseDirectStandardization "
+"<../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:198
+msgid ""
+":doc:`XAxisInterpolator "
+"<../methods/generated/chemotools.adaptation.XAxisInterpolator>` — align "
+"spectra to a common x-axis grid before standardization."
+msgstr ""
+":doc:`XAxisInterpolator "
+"<../methods/generated/chemotools.adaptation.XAxisInterpolator>`: alinea los "
+"espectros con una cuadrícula común del eje x antes de la estandarización."
+

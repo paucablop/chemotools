@@ -1,0 +1,70 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/api/physics.rst:2
+msgid "chemotools.physics"
+msgstr ""
+
+#: ../../source/api/physics.rst:6
+msgid ""
+"Physical unit conversion methods for spectral intensity data. These "
+"transformers convert between common measurement representations used in "
+"vibrational and diffuse reflectance spectroscopy."
+msgstr ""
+
+#: ../../source/api/physics.rst:8
+msgid "**Import from this module:**"
+msgstr ""
+
+#: ../../source/api/physics.rst:17
+msgid "Available Classes"
+msgstr ""
+
+#: ../../source/api/physics.rst:23
+msgid "Class"
+msgstr ""
+
+#: ../../source/api/physics.rst:24
+msgid "Description"
+msgstr ""
+
+#: ../../source/api/physics.rst:25
+msgid ""
+":doc:`IntensityConversion "
+"</methods/generated/chemotools.physics.IntensityConversion>`"
+msgstr ""
+
+#: ../../source/api/physics.rst:26
+msgid ""
+"Convert spectral intensity between absorbance, transmittance, "
+"reflectance, Kubelka-Munk, and pseudoabsorbance"
+msgstr ""
+
+#: ../../source/api/physics.rst:29
+msgid "See Also"
+msgstr ""
+
+#: ../../source/api/physics.rst:31
+msgid ""
+":doc:`Physics Methods Overview </methods/physics>` - Complete "
+"documentation with examples and visual guides"
+msgstr ""
+

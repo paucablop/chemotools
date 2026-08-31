@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Adaptation Methods"
 msgstr "Métodos de adaptación"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
@@ -31,15 +31,15 @@ msgstr ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Direct Standardization (DS) is a transformer used for domain adaptation "
-"(calibration) applications."
+"(calibration ) applications."
 msgstr ""
 "La Estandarización Directa (DS) es un transformador utilizado para "
 "aplicaciones de adaptación de dominio (calibración)."
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
@@ -47,7 +47,7 @@ msgstr ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Piecewise Direct Standardization (PDS) is a transformer used for domain "
 "adaptation (calibration) applications."
@@ -55,7 +55,7 @@ msgstr ""
 "La Estandarización Directa por Segmentos (PDS) es un transformador "
 "utilizado para aplicaciones de adaptación de dominio (calibración)."
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
@@ -63,22 +63,95 @@ msgstr ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
-"Spectral Space Transform (SST) is a transformer used for domain adaptation "
-"(calibration) applications."
+"Spectral Space Transform (SST) is a transformer used for domain "
+"adaptation (calibration) applications."
 msgstr ""
-"La Transformada del Espacio Espectral (SST) es un transformador utilizado "
-"para aplicaciones de adaptación de dominio (calibración)."
+"La Transformada del Espacio Espectral (SST) es un transformador utilizado"
+" para aplicaciones de adaptación de dominio (calibración)."
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
-msgid ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
-msgstr ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
+msgstr ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
 msgstr "Interpola cada fila de ``X`` en un ``common_x_axis`` compartido."
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid "Apply a callable that consumes feature data and routed metadata."
+msgstr "Aplica un objeto invocable que consume datos de características y metadatos enrutados."
+
+#: ../../source/methods/adaptation_methods.rst:17
+msgid "Validation"
+msgstr "Validación"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid "Validate a metadata function on representative data."
+msgstr "Valida una función de metadatos con datos representativos."
+
+#: ../../source/methods/adaptation_methods.rst:28
+msgid "Predefined Functions"
+msgstr "Funciones predefinidas"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+msgstr ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Subtract a reference spectrum from every row of ``X``."
+msgstr "Resta un espectro de referencia de cada fila de ``X``."
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Divide every row of ``X`` by a reference spectrum."
+msgstr "Divide cada fila de ``X`` por un espectro de referencia."
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Multiply every row of ``X`` by a scalar or array factor."
+msgstr "Multiplica cada fila de ``X`` por un factor escalar o matricial."
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+msgstr ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Add a baseline offset to every row of ``X``."
+msgstr "Añade un desplazamiento de línea base a cada fila de ``X``."
+
