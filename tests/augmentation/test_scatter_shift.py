@@ -98,4 +98,4 @@ def test_scatter_shift_basis_matches_emsc():
     # And EMSC at the same order builds the same polynomial block, confirming the
     # augmenter is the forward counterpart of the correction
     emsc = ExtendedMultiplicativeScatterCorrection(order=order).fit(spectra)
-    assert emsc.A_[:, : order + 1].shape == transformer.polynomial_basis_.shape
+    assert np.allclose(emsc.A_[:, : order + 1], transformer.polynomial_basis_, atol=1e-12)
