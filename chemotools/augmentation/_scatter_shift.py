@@ -5,8 +5,8 @@ random polynomial baseline, following the forward Extended Multiplicative Scatte
 Correction (EMSC) model.
 """
 
-
-#<CONTRIBUTOR NAME -- Prabesh Joshi>
+# Authors: Prabesh Joshi
+# License: MIT
 
 from numbers import Integral
 from typing import Optional
@@ -151,9 +151,7 @@ class ScatterShift(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
         # This mirrors the EMSC design matrix so the augmentation is the forward
         # counterpart of ExtendedMultiplicativeScatterCorrection.
         x_indices = np.linspace(-1, 1, self.n_features_in_)
-        self.polynomial_basis_ = np.vander(
-            x_indices, N=self.order + 1, increasing=True
-        )
+        self.polynomial_basis_ = np.vander(x_indices, N=self.order + 1, increasing=True)
 
         # Instantiate the random number generator
         self._rng = check_random_state(self.random_state)
