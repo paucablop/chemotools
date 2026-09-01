@@ -1,0 +1,102 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.subtract_reference.rst:2
+msgid "chemotools.adaptation.functions.subtract\\_reference"
+msgstr "chemotools.adaptation.functions.subtract\\_reference"
+
+#: chemotools.adaptation.functions.subtract_reference:1 of
+msgid "Subtract a reference spectrum from every row of ``X``."
+msgstr "从 ``X`` 的每一行中减去参考光谱。"
+
+#: chemotools.adaptation.functions.subtract_reference:3 of
+msgid ""
+"A common operation in spectroscopy for blank or solvent subtraction, "
+"background removal, or single-beam to double-beam correction."
+msgstr ""
+"光谱学中的常见操作，用于扣除空白或溶剂、去除背景，或进行单光束到双光束的校正。"
+
+#: chemotools.adaptation.functions.subtract_reference of
+msgid "Parameters"
+msgstr "参数"
+
+#: chemotools.adaptation.functions.subtract_reference:6 of
+msgid "Input spectra."
+msgstr "输入光谱。"
+
+#: chemotools.adaptation.functions.subtract_reference:8 of
+msgid ""
+"Reference to subtract.  Accepted shapes:  * scalar ``float`` — subtracted"
+" from every element. * ``(1, n_features)`` — shared reference broadcast "
+"across all samples. * ``(n_samples, 1)`` — per-sample scalar subtracted "
+"from every feature. * ``(n_samples, n_features)`` — per-sample full "
+"spectrum.  1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared "
+"spectrum or ``.reshape(-1, 1)`` for a per-sample scalar."
+msgstr ""
+"要减去的参考值。接受以下形状： * 标量 ``float`` — 从每个元素中减去。 * ``(1, "
+"n_features)`` — 广播到所有样本的共享参考。 * ``(n_samples, 1)`` — "
+"从每个特征中减去的逐样本标量。 * ``(n_samples, n_features)`` — "
+"逐样本完整光谱。不接受一维输入；共享光谱请使用 ``.reshape(1, -1)``，逐样本标量请使用 "
+"``.reshape(-1, 1)``。"
+
+#: chemotools.adaptation.functions.subtract_reference:8 of
+msgid "Reference to subtract.  Accepted shapes:"
+msgstr "要减去的参考值。接受以下形状："
+
+#: chemotools.adaptation.functions.subtract_reference:10 of
+msgid "scalar ``float`` — subtracted from every element."
+msgstr "标量 ``float`` — 从每个元素中减去。"
+
+#: chemotools.adaptation.functions.subtract_reference:11 of
+msgid "``(1, n_features)`` — shared reference broadcast across all samples."
+msgstr "``(1, n_features)`` — 广播到所有样本的共享参考。"
+
+#: chemotools.adaptation.functions.subtract_reference:12 of
+msgid "``(n_samples, 1)`` — per-sample scalar subtracted from every feature."
+msgstr "``(n_samples, 1)`` — 从每个特征中减去的逐样本标量。"
+
+#: chemotools.adaptation.functions.subtract_reference:13 of
+msgid "``(n_samples, n_features)`` — per-sample full spectrum."
+msgstr "``(n_samples, n_features)`` — 逐样本完整光谱。"
+
+#: chemotools.adaptation.functions.subtract_reference:15 of
+msgid ""
+"1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared spectrum or"
+" ``.reshape(-1, 1)`` for a per-sample scalar."
+msgstr ""
+"不接受一维输入；共享光谱请使用 ``.reshape(1, -1)``，逐样本标量请使用 "
+"``.reshape(-1, 1)``。"
+
+#: chemotools.adaptation.functions.subtract_reference of
+msgid "Returns"
+msgstr "返回值"
+
+#: chemotools.adaptation.functions.subtract_reference:19 of
+msgid "**X_corrected** -- ``X - reference``."
+msgstr "**X_corrected** -- ``X - reference``。"
+
+#: chemotools.adaptation.functions.subtract_reference of
+msgid "Return type"
+msgstr "返回类型"
+
+#: chemotools.adaptation.functions.subtract_reference:23 of
+msgid "Examples"
+msgstr "示例"
+

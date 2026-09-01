@@ -1,0 +1,384 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-01 01:30+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:2
+msgid "XAxisInterpolator"
+msgstr "XAxisInterpolator"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
+msgid "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+msgstr "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
+msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
+msgstr "将 ``X`` 的每一行插值到共享的 ``common_x_axis`` 上。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:3
+msgid ""
+"The transformer resamples each row of ``X`` from a sample-specific (or "
+"shared) input grid ``x_axis`` onto a fixed ``common_x_axis`` provided at "
+"instantiation time."
+msgstr ""
+"此转换器将 ``X`` 的每一行从样本特有（或共享）的输入网格 ``x_axis`` 重采样到实"
+"例化时提供的固定 ``common_x_axis`` 上。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:7
+msgid ""
+"``x_axis`` is consumed as **metadata** so it can flow through ``Pipeline``, "
+"``ColumnTransformer``, ``GridSearchCV``, and ``cross_validate`` once "
+"metadata routing is enabled via:"
+msgstr ""
+"``x_axis`` 作为**元数据**使用，因此通过以下方式启用元数据路由后，它可以流经 "
+"``Pipeline``、``ColumnTransformer``、``GridSearchCV`` 和 "
+"``cross_validate``："
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:11
+msgid "``sklearn.set_config(enable_metadata_routing=True)``."
+msgstr "``sklearn.set_config(enable_metadata_routing=True)``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:13
+msgid ""
+"Before passing ``x_axis`` to a routed ``fit`` or ``fit_transform`` call, "
+"configure both ``set_fit_request(x_axis=True)`` and "
+"``set_transform_request(x_axis=True)``. For a routed ``transform`` call, "
+"only the transform request is needed. Direct method calls do not require "
+"request configuration."
+msgstr ""
+"将 ``x_axis`` 传递给路由的 ``fit`` 或 ``fit_transform`` 调用之前，请同时配"
+"置 ``set_fit_request(x_axis=True)`` 和 "
+"``set_transform_request(x_axis=True)``。对于路由的 ``transform`` 调用，只"
+"需配置转换请求。直接调用方法不需要配置请求。"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:19
+msgid ""
+"Strictly increasing target grid. ``transform`` returns an array with "
+"``n_output_features`` columns."
+msgstr ""
+"严格递增的目标网格。``transform`` 返回包含 ``n_output_features`` 列的数组。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:22
+msgid ""
+"The interpolation mode. One of: ``\"linear\"``, ``\"cubic\"`` or "
+"``\"pchip\"``."
+msgstr "插值模式。可选值为 ``\"linear\"``、``\"cubic\"`` 或 ``\"pchip\"``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:25
+msgid ""
+"Value returned for query points below the input grid (passed "
+"to :func:`numpy.interp`)."
+msgstr "查询点低于输入网格时返回的值（传给 :func:`numpy.interp`）。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:28
+msgid "Value returned for query points above the input grid."
+msgstr "查询点高于输入网格时返回的值。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:30
+msgid ""
+"Number of parallel jobs used to process sample rows independently "
+"during :meth:`transform`. Use ``1`` for serial execution."
+msgstr ""
+"在 :meth:`transform` 期间用于独立处理样本行的并行作业数。使用 ``1`` 进行串行"
+"执行。"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Variables"
+msgstr "变量"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:34
+msgid "Validated copy of ``common_x_axis``."
+msgstr "``common_x_axis`` 经过验证的副本。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:37
+msgid "Number of input features seen during ``fit``."
+msgstr "在 ``fit`` 期间看到的输入特征数。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:40
+msgid "Names of features seen during ``fit`` (only if ``X`` had names)."
+msgstr "在 ``fit`` 期间看到的特征名称（仅当 ``X`` 具有名称时）。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:45
+msgid "Examples"
+msgstr "示例"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:15
+msgid "Attributes"
+msgstr "属性"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
+msgid ""
+":py:obj:`common_x_axis_ "
+"<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
+msgstr ""
+":py:obj:`common_x_axis_ "
+"<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:1
+msgid "Validate input and the configured ``common_x_axis``."
+msgstr "验证输入和配置的 ``common_x_axis``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:3
+msgid "The input data to fit the transformer to."
+msgstr "用于拟合转换器的输入数据。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:5
+msgid "Ignored to align with API."
+msgstr "忽略，以与 API 保持一致。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:7
+msgid ""
+"Accepted so that ``x_axis`` can be requested consistently for routed ``fit`` "
+"and ``fit_transform`` calls. ``fit`` itself does not use its value."
+msgstr ""
+"接受此参数是为了在路由的 ``fit`` 和 ``fit_transform`` 调用中一致地请求 "
+"``x_axis``。``fit`` 本身不使用其值。"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:12
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Return type"
+msgstr "返回类型"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:1
+msgid "Interpolate ``X`` from ``x_axis`` onto ``common_x_axis_``."
+msgstr "将 ``X`` 从 ``x_axis`` 插值到 ``common_x_axis_`` 上。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:3
+msgid ""
+"For routed ``Pipeline.transform`` calls, request ``x_axis`` via "
+"``set_transform_request(x_axis=True)``. For routed ``fit`` or "
+"``fit_transform`` calls, also configure ``set_fit_request(x_axis=True)`` so "
+"the two phases have matching requests."
+msgstr ""
+"对于路由的 ``Pipeline.transform`` 调用，请通过 "
+"``set_transform_request(x_axis=True)`` 请求 ``x_axis``。对于路由的 ``fit`` "
+"或 ``fit_transform`` 调用，还需配置 ``set_fit_request(x_axis=True)``，以使"
+"两个阶段的请求保持一致。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:9
+msgid "Signal values sampled on ``x_axis``."
+msgstr "在 ``x_axis`` 上采样的信号值。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:11
+msgid ""
+"Either shape ``(n_features,)`` (shared grid for every row) or ``(n_samples, "
+"n_features)`` (per-row grid). Must be strictly increasing along the feature "
+"axis."
+msgstr ""
+"形状为 ``(n_features,)`` （每行共享网格）或 ``(n_samples, n_features)`` （逐"
+"行网格）。沿特征轴必须严格递增。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:16
+msgid "**X_transformed**"
+msgstr "**X_transformed**"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:1
+msgid "Fit to data, then transform it."
+msgstr "拟合数据，然后进行转换。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:3
+msgid ""
+"``fit`` does not consume ``x_axis``; only ``transform`` does. This custom "
+"implementation ensures ``x_axis`` is forwarded only to ``transform``, not to "
+"``fit``."
+msgstr ""
+"``fit`` 不使用 ``x_axis``，仅 ``transform`` 使用。此自定义实现确保 "
+"``x_axis`` 只转发给 ``transform``，而不转发给 ``fit``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:11
+msgid "Input grid for interpolation, forwarded to ``transform``."
+msgstr "用于插值并转发给 ``transform`` 的输入网格。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:14
+msgid "**X_new**"
+msgstr "**X_new**"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.get_feature_names_out:1
+msgid "Names are the positions of the common grid."
+msgstr "名称为公共网格的位置。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the ``fit`` "
+"method."
+msgstr "配置是否请求将元数据传递给 ``fit`` 方法。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a sub-"
+"estimator within a :term:`meta-estimator` and metadata routing is enabled "
+"with ``enable_metadata_routing=True`` (see :func:`sklearn.set_config`). "
+"Please check the :ref:`User Guide <metadata_routing>` on how the routing "
+"mechanism works."
+msgstr ""
+"请注意，仅当此估计器用作 :term:`meta-estimator` 中的子估计器，并通过 "
+"``enable_metadata_routing=True`` 启用元数据路由时，此方法才有意义（参"
+"见 :func:`sklearn.set_config`）。有关路由机制的工作方式，请查阅 :ref:`用户指"
+"南 <metadata_routing>`。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "每个参数可使用以下选项："
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+"``True``：请求元数据；若已提供，则将其传给 ``fit``。若未提供元数据，则忽略该"
+"请求。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``fit``."
+msgstr "``False``：不请求元数据，元估计器不会将其传给 ``fit``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an "
+"error if the user provides it."
+msgstr "``None``：不请求元数据；若用户提供元数据，元估计器将引发错误。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr "``str``：元数据应使用给定别名而非原始名称传给元估计器。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some parameters "
+"and not others."
+msgstr ""
+"默认值（``sklearn.utils.metadata_routing.UNCHANGED``）会保留现有请求。这样可"
+"以只更改部分参数的请求，而不更改其他参数。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``x_axis`` parameter in ``fit``."
+msgstr "``fit`` 中 ``x_axis`` 参数的元数据路由。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- 更新后的对象。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``transform`` method."
+msgstr "配置是否请求将元数据传递给 ``transform`` 方法。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``transform`` if provided. "
+"The request is ignored if metadata is not provided."
+msgstr ""
+"``True``：请求元数据；若已提供，则将其传给 ``transform``。若未提供元数据，则"
+"忽略该请求。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``transform``."
+msgstr "``False``：不请求元数据，元估计器不会将其传给 ``transform``。"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``x_axis`` parameter in ``transform``."
+msgstr "``transform`` 中 ``x_axis`` 参数的元数据路由。"
+
+#~ msgid ""
+#~ "Accepted only so that metadata routing through ``fit_transform`` (used by "
+#~ "``Pipeline``) generates a ``set_fit_request`` method. ``fit`` itself does "
+#~ "not use it."
+#~ msgstr ""
+#~ "仅为使通过 ``fit_transform``（由 ``Pipeline`` 使用）的元数据路由生成 "
+#~ "``set_fit_request`` 方法而接受。``fit`` 本身不使用它。"
+
+#~ msgid ""
+#~ "``x_axis`` is **metadata** and must be requested explicitly via "
+#~ "``set_transform_request(x_axis=True)`` for routing to work in a "
+#~ "``Pipeline`` / ``GridSearchCV``."
+#~ msgstr ""
+#~ "``x_axis`` 是**元数据**，必须通过 ``set_transform_request(x_axis=True)`` "
+#~ "显式请求，路由才能在 ``Pipeline`` / ``GridSearchCV`` 中工作。"

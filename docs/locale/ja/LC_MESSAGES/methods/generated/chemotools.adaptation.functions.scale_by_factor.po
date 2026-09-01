@@ -1,0 +1,89 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.scale_by_factor.rst:2
+msgid "chemotools.adaptation.functions.scale\\_by\\_factor"
+msgstr "chemotools.adaptation.functions.scale\\_by\\_factor"
+
+#: chemotools.adaptation.functions.scale_by_factor:1 of
+msgid "Multiply every row of ``X`` by a scalar or array factor."
+msgstr "``X`` の各行にスカラーまたは配列の係数を乗算します。"
+
+#: chemotools.adaptation.functions.scale_by_factor:3 of
+msgid ""
+"Useful for per-batch or per-sample intensity rescaling, e.g. correcting "
+"for integration time, path-length, or dilution differences."
+msgstr "積分時間、光路長、希釈率の差の補正など、バッチ別またはサンプル別の強度再スケーリングに役立ちます。"
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Parameters"
+msgstr "パラメータ"
+
+#: chemotools.adaptation.functions.scale_by_factor:6 of
+msgid "Input spectra."
+msgstr "入力スペクトル。"
+
+#: chemotools.adaptation.functions.scale_by_factor:8 of
+msgid ""
+"Scaling factor.  Accepted shapes:  * scalar ``float`` — multiplies every "
+"element. * ``(n_samples, 1)`` — per-sample scalar factor. * ``(1, "
+"n_features)`` — per-feature factor shared across samples.  1-D inputs are"
+" rejected; use ``.reshape(-1, 1)`` for per-sample or ``.reshape(1, -1)`` "
+"for per-feature."
+msgstr "スケーリング係数。指定可能な形状: * スカラー ``float`` — すべての要素に乗算。* ``(n_samples, 1)`` — サンプル別のスカラー係数。* ``(1, n_features)`` — 全サンプルで共有する特徴量別係数。1 次元入力は受け付けません。サンプル別の場合は ``.reshape(-1, 1)``、特徴量別の場合は ``.reshape(1, -1)`` を使用してください。"
+
+#: chemotools.adaptation.functions.scale_by_factor:8 of
+msgid "Scaling factor.  Accepted shapes:"
+msgstr "スケーリング係数。指定可能な形状:"
+
+#: chemotools.adaptation.functions.scale_by_factor:10 of
+msgid "scalar ``float`` — multiplies every element."
+msgstr "スカラー ``float`` — すべての要素に乗算します。"
+
+#: chemotools.adaptation.functions.scale_by_factor:11 of
+msgid "``(n_samples, 1)`` — per-sample scalar factor."
+msgstr "``(n_samples, 1)`` — サンプル別のスカラー係数。"
+
+#: chemotools.adaptation.functions.scale_by_factor:12 of
+msgid "``(1, n_features)`` — per-feature factor shared across samples."
+msgstr "``(1, n_features)`` — 全サンプルで共有する特徴量別係数。"
+
+#: chemotools.adaptation.functions.scale_by_factor:14 of
+msgid ""
+"1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample or "
+"``.reshape(1, -1)`` for per-feature."
+msgstr "1 次元入力は受け付けません。サンプル別の場合は ``.reshape(-1, 1)``、特徴量別の場合は ``.reshape(1, -1)`` を使用してください。"
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Returns"
+msgstr "戻り値"
+
+#: chemotools.adaptation.functions.scale_by_factor:18 of
+msgid "**X_scaled** -- ``X * factor``."
+msgstr "**X_scaled** -- ``X * factor``。"
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Return type"
+msgstr "戻り値の型"
+
+#: chemotools.adaptation.functions.scale_by_factor:22 of
+msgid "Examples"
+msgstr "使用例"
+

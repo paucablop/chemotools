@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-13 22:38+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -25,7 +25,8 @@ msgstr ""
 
 #: chemotools.projection._direct_orthogonalization.DirectOrthogonalization:1 of
 msgid ""
-"Bases: :py:class:`~sklearn.base.TransformerMixin`, "
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
 ":py:class:`~sklearn.base.BaseEstimator`"
 msgstr ""
 
@@ -201,4 +202,9 @@ msgstr ""
 #: of
 msgid "**X_transformed** -- The transformed data."
 msgstr ""
+
+#~ msgid ""
+#~ "Bases: :py:class:`~sklearn.base.TransformerMixin`, "
+#~ ":py:class:`~sklearn.base.BaseEstimator`"
+#~ msgstr ""
 

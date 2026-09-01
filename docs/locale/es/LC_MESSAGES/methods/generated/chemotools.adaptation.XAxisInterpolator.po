@@ -1,0 +1,415 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-01 01:30+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: es <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:2
+msgid "XAxisInterpolator"
+msgstr "XAxisInterpolator"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
+msgid "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+msgstr "Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, :py:class:`~sklearn.base.TransformerMixin`, :py:class:`~sklearn.base.BaseEstimator`"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:1
+msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
+msgstr "Interpola cada fila de ``X`` sobre un ``common_x_axis`` compartido."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:3
+msgid ""
+"The transformer resamples each row of ``X`` from a sample-specific (or "
+"shared) input grid ``x_axis`` onto a fixed ``common_x_axis`` provided at "
+"instantiation time."
+msgstr ""
+"El transformador remuestrea cada fila de ``X`` desde una cuadrícula de "
+"entrada ``x_axis`` específica de la muestra (o compartida) sobre un "
+"``common_x_axis`` fijo proporcionado al crear la instancia."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:7
+msgid ""
+"``x_axis`` is consumed as **metadata** so it can flow through ``Pipeline``, "
+"``ColumnTransformer``, ``GridSearchCV``, and ``cross_validate`` once "
+"metadata routing is enabled via:"
+msgstr ""
+"``x_axis`` se consume como **metadatos** para que pueda transmitirse a través "
+"de ``Pipeline``, ``ColumnTransformer``, ``GridSearchCV`` y "
+"``cross_validate`` una vez activado el enrutamiento de metadatos mediante:"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:11
+msgid "``sklearn.set_config(enable_metadata_routing=True)``."
+msgstr "``sklearn.set_config(enable_metadata_routing=True)``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:13
+msgid ""
+"Before passing ``x_axis`` to a routed ``fit`` or ``fit_transform`` call, "
+"configure both ``set_fit_request(x_axis=True)`` and "
+"``set_transform_request(x_axis=True)``. For a routed ``transform`` call, "
+"only the transform request is needed. Direct method calls do not require "
+"request configuration."
+msgstr ""
+"Antes de pasar ``x_axis`` a una llamada enrutada a ``fit`` o "
+"``fit_transform``, configure tanto ``set_fit_request(x_axis=True)`` como "
+"``set_transform_request(x_axis=True)``. Para una llamada enrutada a "
+"``transform``, solo se necesita la solicitud de transformación. Las llamadas "
+"directas a los métodos no requieren configurar solicitudes."
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:19
+msgid ""
+"Strictly increasing target grid. ``transform`` returns an array with "
+"``n_output_features`` columns."
+msgstr ""
+"Cuadrícula de destino estrictamente creciente. ``transform`` devuelve una "
+"matriz con ``n_output_features`` columnas."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:22
+msgid ""
+"The interpolation mode. One of: ``\"linear\"``, ``\"cubic\"`` or "
+"``\"pchip\"``."
+msgstr ""
+"Modo de interpolación. Debe ser uno de los siguientes: ``\"linear\"``, "
+"``\"cubic\"`` o ``\"pchip\"``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:25
+msgid ""
+"Value returned for query points below the input grid (passed "
+"to :func:`numpy.interp`)."
+msgstr ""
+"Valor devuelto para los puntos de consulta situados por debajo de la "
+"cuadrícula de entrada (se pasa a :func:`numpy.interp`)."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:28
+msgid "Value returned for query points above the input grid."
+msgstr ""
+"Valor devuelto para los puntos de consulta situados por encima de la "
+"cuadrícula de entrada."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:30
+msgid ""
+"Number of parallel jobs used to process sample rows independently "
+"during :meth:`transform`. Use ``1`` for serial execution."
+msgstr ""
+"Número de trabajos en paralelo utilizados para procesar de forma "
+"independiente las filas de las muestras durante :meth:`transform`. Utilice "
+"``1`` para la ejecución en serie."
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Variables"
+msgstr "Variables"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:34
+msgid "Validated copy of ``common_x_axis``."
+msgstr "Copia validada de ``common_x_axis``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:37
+msgid "Number of input features seen during ``fit``."
+msgstr "Número de características de entrada observadas durante ``fit``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:40
+msgid "Names of features seen during ``fit`` (only if ``X`` had names)."
+msgstr ""
+"Nombres de las características observadas durante ``fit`` (solo si ``X`` "
+"tenía nombres)."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator:45
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:15
+msgid "Attributes"
+msgstr "Atributos"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.XAxisInterpolator.n_features_in_>`\\"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation.XAxisInterpolator.n_features_in_:1:<autosummary>:1
+msgid ""
+":py:obj:`common_x_axis_ "
+"<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
+msgstr ""
+":py:obj:`common_x_axis_ "
+"<chemotools.adaptation.XAxisInterpolator.common_x_axis_>`\\"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:1
+msgid "Validate input and the configured ``common_x_axis``."
+msgstr "Valida la entrada y el ``common_x_axis`` configurado."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:3
+msgid "The input data to fit the transformer to."
+msgstr "Datos de entrada con los que se ajustará el transformador."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:5
+msgid "Ignored to align with API."
+msgstr "Se ignora para mantener la compatibilidad con la API."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:7
+msgid ""
+"Accepted so that ``x_axis`` can be requested consistently for routed ``fit`` "
+"and ``fit_transform`` calls. ``fit`` itself does not use its value."
+msgstr ""
+"Se acepta para que ``x_axis`` pueda solicitarse de forma coherente en las "
+"llamadas enrutadas a ``fit`` y ``fit_transform``. ``fit`` no utiliza su valor."
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Returns"
+msgstr "Devuelve"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit:12
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.XAxisInterpolator.rst:0
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:1
+msgid "Interpolate ``X`` from ``x_axis`` onto ``common_x_axis_``."
+msgstr "Interpola ``X`` desde ``x_axis`` sobre ``common_x_axis_``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:3
+msgid ""
+"For routed ``Pipeline.transform`` calls, request ``x_axis`` via "
+"``set_transform_request(x_axis=True)``. For routed ``fit`` or "
+"``fit_transform`` calls, also configure ``set_fit_request(x_axis=True)`` so "
+"the two phases have matching requests."
+msgstr ""
+"Para las llamadas enrutadas a ``Pipeline.transform``, solicite ``x_axis`` "
+"mediante ``set_transform_request(x_axis=True)``. Para las llamadas enrutadas "
+"a ``fit`` o ``fit_transform``, configure también "
+"``set_fit_request(x_axis=True)`` para que ambas fases tengan solicitudes "
+"coincidentes."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:9
+msgid "Signal values sampled on ``x_axis``."
+msgstr "Valores de señal muestreados en ``x_axis``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:11
+msgid ""
+"Either shape ``(n_features,)`` (shared grid for every row) or ``(n_samples, "
+"n_features)`` (per-row grid). Must be strictly increasing along the feature "
+"axis."
+msgstr ""
+"Debe tener la forma ``(n_features,)`` (cuadrícula compartida por todas las "
+"filas) o ``(n_samples, n_features)`` (cuadrícula por fila). Debe ser "
+"estrictamente creciente a lo largo del eje de características."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.transform:16
+msgid "**X_transformed**"
+msgstr "**X_transformed**"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:1
+msgid "Fit to data, then transform it."
+msgstr "Ajusta los datos y, a continuación, los transforma."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:3
+msgid ""
+"``fit`` does not consume ``x_axis``; only ``transform`` does. This custom "
+"implementation ensures ``x_axis`` is forwarded only to ``transform``, not to "
+"``fit``."
+msgstr ""
+"``fit`` no consume ``x_axis``; solo lo hace ``transform``. Esta "
+"implementación personalizada garantiza que ``x_axis`` se reenvíe únicamente "
+"a ``transform`` y no a ``fit``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:11
+msgid "Input grid for interpolation, forwarded to ``transform``."
+msgstr ""
+"Cuadrícula de entrada para la interpolación, reenviada a ``transform``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.fit_transform:14
+msgid "**X_new**"
+msgstr "**X_new**"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: chemotools.adaptation._x_axis_interpolator.XAxisInterpolator.get_feature_names_out:1
+msgid "Names are the positions of the common grid."
+msgstr "Los nombres son las posiciones de la cuadrícula común."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the ``fit`` "
+"method."
+msgstr ""
+"Configura si se debe solicitar que se pasen metadatos al método ``fit``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a sub-"
+"estimator within a :term:`meta-estimator` and metadata routing is enabled "
+"with ``enable_metadata_routing=True`` (see :func:`sklearn.set_config`). "
+"Please check the :ref:`User Guide <metadata_routing>` on how the routing "
+"mechanism works."
+msgstr ""
+"Tenga en cuenta que este método solo es pertinente cuando el estimador se "
+"usa como subestimador dentro de un :term:`meta-estimator` y el enrutamiento "
+"de metadatos está activado con ``enable_metadata_routing=True`` "
+"(consulte :func:`sklearn.set_config`). Consulte la :ref:`Guía del usuario "
+"<metadata_routing>` para saber cómo funciona el mecanismo de enrutamiento."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "Las opciones para cada parámetro son:"
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+"``True``: se solicitan metadatos y, si se proporcionan, se pasan a ``fit``. "
+"La solicitud se ignora si no se proporcionan metadatos."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``fit``."
+msgstr ""
+"``False``: no se solicitan metadatos y el metaestimador no los pasa a "
+"``fit``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an "
+"error if the user provides it."
+msgstr ""
+"``None``: no se solicitan metadatos y el metaestimador genera un error si el "
+"usuario los proporciona."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr ""
+"``str``: los metadatos se deben pasar al metaestimador con el alias indicado "
+"en lugar del nombre original."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some parameters "
+"and not others."
+msgstr ""
+"El valor predeterminado (``sklearn.utils.metadata_routing.UNCHANGED``) "
+"conserva la solicitud existente. Esto permite cambiar la solicitud de "
+"algunos parámetros y no la de otros."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``x_axis`` parameter in ``fit``."
+msgstr "Enrutamiento de metadatos del parámetro ``x_axis`` en ``fit``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- El objeto actualizado."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``transform`` method."
+msgstr ""
+"Configura si se debe solicitar que se pasen metadatos al método "
+"``transform``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``transform`` if provided. "
+"The request is ignored if metadata is not provided."
+msgstr ""
+"``True``: se solicitan metadatos y, si se proporcionan, se pasan a "
+"``transform``. La solicitud se ignora si no se proporcionan metadatos."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass it "
+"to ``transform``."
+msgstr ""
+"``False``: no se solicitan metadatos y el metaestimador no los pasa a "
+"``transform``."
+
+#: ../../../chemotools/adaptation/_x_axis_interpolator.py:docstring of
+#: sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``x_axis`` parameter in ``transform``."
+msgstr "Enrutamiento de metadatos del parámetro ``x_axis`` en ``transform``."
+
+#~ msgid ""
+#~ "Accepted only so that metadata routing through ``fit_transform`` (used by "
+#~ "``Pipeline``) generates a ``set_fit_request`` method. ``fit`` itself does "
+#~ "not use it."
+#~ msgstr ""
+#~ "Solo se acepta para que el enrutamiento de metadatos mediante "
+#~ "``fit_transform`` (utilizado por ``Pipeline``) genere un método "
+#~ "``set_fit_request``. El propio ``fit`` no lo utiliza."
+
+#~ msgid ""
+#~ "``x_axis`` is **metadata** and must be requested explicitly via "
+#~ "``set_transform_request(x_axis=True)`` for routing to work in a "
+#~ "``Pipeline`` / ``GridSearchCV``."
+#~ msgstr ""
+#~ "``x_axis`` son **metadatos** y se deben solicitar explícitamente mediante "
+#~ "``set_transform_request(x_axis=True)`` para que el enrutamiento funcione "
+#~ "en un ``Pipeline`` / ``GridSearchCV``."

@@ -1,0 +1,294 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst:2
+msgid "DirectStandardization"
+msgstr "DirectStandardization"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:1 of
+msgid ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:1 of
+msgid ""
+"Direct Standardization (DS) is a transformer used for domain adaptation "
+"(calibration ) applications. The transformer uses least squares to find a"
+" linear map from the target instrument space to the source instrument "
+"space, following the implementation by [1]_."
+msgstr ""
+"La estandarización directa (DS) es un transformador utilizado en aplicaciones "
+"de adaptación de dominio (calibración). El transformador utiliza mínimos "
+"cuadrados para hallar un mapeo lineal del espacio del instrumento de destino al "
+"espacio del instrumento de origen, según la implementación de [1]_."
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:6 of
+msgid "The transformer has no constructor hyperparameters."
+msgstr "El transformador no tiene hiperparámetros de constructor."
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Variables"
+msgstr "Variables"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:8 of
+msgid ""
+"Right singular vectors of the target transfer data X, used as the column "
+"basis of the low-rank transformation. Empty (shape ``(n_features, 0)``) "
+"when no ``X_source`` was provided."
+msgstr ""
+"Vectores singulares derechos de los datos de transferencia de destino X, "
+"utilizados como base de columnas de la transformación de rango bajo. Está "
+"vacío (forma ``(n_features, 0)``) cuando no se proporciona ``X_source``."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:13 of
+msgid ""
+"Projection of the source transfer data onto the singular basis.  The full"
+" transformation is ``X @ V_ds_ @ B_ds_``, which is algebraically "
+"equivalent to ``X @ T_`` but requires only ``O(n_features × "
+"n_transfer_samples)`` storage instead of ``O(n_features²)``."
+msgstr ""
+"Proyección de los datos de transferencia de origen sobre la base singular.  La "
+"transformación completa es ``X @ V_ds_ @ B_ds_``, que es algebraicamente "
+"equivalente a ``X @ T_``, pero solo requiere almacenamiento "
+"``O(n_features × n_transfer_samples)`` en lugar de ``O(n_features²)``."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:20 of
+msgid "Boolean value to flag if X_source was provided during fitting"
+msgstr "Valor booleano que indica si se proporcionó X_source durante el ajuste"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Raises"
+msgstr "Excepciones"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:24 of
+msgid "If X and X_source do not have the same shape."
+msgstr "Si X y X_source no tienen la misma forma."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:28 of
+msgid ":py:obj:`PiecewiseDirectStandardization`"
+msgstr ":py:obj:`PiecewiseDirectStandardization`"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:29 of
+msgid "Localized version using windowed PLS regression."
+msgstr "Versión localizada que utiliza regresión PLS por ventanas."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:32 of
+msgid "References"
+msgstr "Referencias"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:33 of
+msgid ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Multivariate "
+"instrument standardization, Analytical Chemistry, 63(23), Pages "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+msgstr ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Estandarización "
+"instrumental multivariante, Analytical Chemistry, 63(23), páginas "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:39 of
+msgid "Examples"
+msgstr "Ejemplos"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:40 of
+msgid ""
+"**Basic usage** >>> import numpy as np >>> from chemotools.adaptation "
+"import DirectStandardization >>> >>> rng = np.random.default_rng(17) >>> "
+"X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - "
+"rng.normal(size=(100, 20)) * 0.02 >>> >>> ds = "
+"DirectStandardization().fit(X_target, X_source=X_source) >>> X_transf = "
+"ds.transform(X_target)"
+msgstr ""
+"**Uso básico** >>> import numpy as np >>> from chemotools.adaptation "
+"import DirectStandardization >>> >>> rng = np.random.default_rng(17) >>> "
+"X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - "
+"rng.normal(size=(100, 20)) * 0.02 >>> >>> ds = "
+"DirectStandardization().fit(X_target, X_source=X_source) >>> X_transf = "
+"ds.transform(X_target)"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst:15
+msgid "Attributes"
+msgstr "Atributos"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.DirectStandardization.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.DirectStandardization.n_features_in_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`V_ds_ <chemotools.adaptation.DirectStandardization.V_ds_>`\\"
+msgstr ":py:obj:`V_ds_ <chemotools.adaptation.DirectStandardization.V_ds_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`B_ds_ <chemotools.adaptation.DirectStandardization.B_ds_>`\\"
+msgstr ":py:obj:`B_ds_ <chemotools.adaptation.DirectStandardization.B_ds_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.DirectStandardization.x_source_provided_>`\\"
+msgstr ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.DirectStandardization.x_source_provided_>`\\"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:1 of
+msgid "Fit the Direct Standardization model."
+msgstr "Ajusta el modelo de estandarización directa."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:3 of
+msgid "Data from the target instrument."
+msgstr "Datos del instrumento de destino."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:5 of
+msgid "Ignored to align with API."
+msgstr "Se ignora para mantener la compatibilidad con la API."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:7 of
+msgid ""
+"Data from the source instrument. If None, the transformer defaults to an "
+"identity transformation."
+msgstr ""
+"Datos del instrumento de origen. Si es None, el transformador utiliza de forma "
+"predeterminada una transformación identidad."
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Returns"
+msgstr "Devuelve"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:11
+#: of
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:1
+#: of
+msgid ""
+"Transform the data from the target space to the source space using the "
+"map ``self.T_``."
+msgstr ""
+"Transforma los datos del espacio de destino al espacio de origen mediante el "
+"mapeo ``self.T_``."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:4
+#: of
+msgid "The input data to transform"
+msgstr "Datos de entrada que se transformarán"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:7
+#: of
+msgid "**X_transf** -- The data transformed"
+msgstr "**X_transf** -- Datos transformados"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``fit`` method."
+msgstr ""
+"Configura si se debe solicitar que se pasen metadatos al método ``fit``."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a "
+"sub-estimator within a :term:`meta-estimator` and metadata routing is "
+"enabled with ``enable_metadata_routing=True`` (see "
+":func:`sklearn.set_config`). Please check the :ref:`User Guide "
+"<metadata_routing>` on how the routing mechanism works."
+msgstr ""
+"Tenga en cuenta que este método solo es pertinente cuando el estimador se usa "
+"como subestimador dentro de un :term:`meta-estimator` y el enrutamiento de "
+"metadatos está activado con ``enable_metadata_routing=True`` (consulte "
+":func:`sklearn.set_config`). Consulte la :ref:`Guía del usuario "
+"<metadata_routing>` para saber cómo funciona el mecanismo de enrutamiento."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "Las opciones para cada parámetro son:"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+"``True``: se solicitan metadatos y, si se proporcionan, se pasan a ``fit``. La "
+"solicitud se ignora si no se proporcionan metadatos."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass"
+" it to ``fit``."
+msgstr ""
+"``False``: no se solicitan metadatos y el metaestimador no los pasa a ``fit``."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an"
+" error if the user provides it."
+msgstr ""
+"``None``: no se solicitan metadatos y el metaestimador genera un error si el "
+"usuario los proporciona."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr ""
+"``str``: los metadatos se deben pasar al metaestimador con el alias indicado en "
+"lugar del nombre original."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some "
+"parameters and not others."
+msgstr ""
+"El valor predeterminado (``sklearn.utils.metadata_routing.UNCHANGED``) conserva "
+"la solicitud existente. Esto permite cambiar la solicitud de algunos parámetros "
+"y no la de otros."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``X_source`` parameter in ``fit``."
+msgstr "Enrutamiento de metadatos del parámetro ``X_source`` en ``fit``."
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- El objeto actualizado."
+

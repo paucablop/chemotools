@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -60,14 +60,27 @@ msgid "Core Modules"
 msgstr "核心模块"
 
 #: ../../source/api/index.rst:22
+msgid "Physics"
+msgstr ""
+
+#: ../../source/api/index.rst:22
+#, fuzzy
+msgid "Adaptation"
+msgstr "数据增强"
+
+#: ../../source/api/index.rst:22
+msgid "Spectroscopy & Adaptation"
+msgstr ""
+
+#: ../../source/api/index.rst:29
 msgid "Plotting"
 msgstr ""
 
-#: ../../source/api/index.rst:22
+#: ../../source/api/index.rst:29
 msgid "Inspector"
 msgstr ""
 
-#: ../../source/api/index.rst:22
+#: ../../source/api/index.rst:29
 msgid "Visualization & Inspection"
 msgstr ""
 
@@ -87,11 +100,11 @@ msgid ""
 ":doc:`Methods </methods/index>` section."
 msgstr "有关包含示例和可视化指南的详细文档，请参阅 :doc:`方法 </methods/index>` 部分。"
 
-#: ../../source/api/index.rst:30
+#: ../../source/api/index.rst:37
 msgid "Quick Import Reference"
 msgstr "快速导入参考"
 
-#: ../../source/api/index.rst:32
+#: ../../source/api/index.rst:39
 msgid "All classes can be imported directly from their respective modules:"
 msgstr "所有类都可以直接从其相应的模块导入："
 

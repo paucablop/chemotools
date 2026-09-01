@@ -31,30 +31,35 @@ Some concrete examples from spectroscopy:
 * A **background spectrum** is measured fresh before each sample batch and
   must be subtracted at inference, not at fit time.
 
-``chemotools`` addresses this with a set of *dynamic transformers* — estimators
+``chemotools`` addresses this with a set of *dynamic transformers*: estimators
 that accept additional **per-call parameters** alongside ``X`` at transform
 time, delivered through `scikit-learn's metadata routing framework
 <https://scikit-learn.org/stable/metadata_routing.html>`_.
 
 .. list-table:: Dynamic transformers in ``chemotools``
-   :widths: 35 30 35
+   :widths: 30 25 45
    :header-rows: 1
 
    * - Transformer
-     - Metadata argument
-     - Use case
+     - Metadata
+     - Choose it when
    * - :class:`~chemotools.adaptation.XAxisInterpolator`
      - ``x_axis``
-     - Align spectra measured on different wavenumber grids
-   * - ``ScaleBy`` *(coming soon)*
-     - ``scale``
-     - Normalize by laser power, integration time, temperature factor
-   * - ``SubtractBackground`` *(coming soon)*
-     - ``reference``
-     - Subtract a freshly measured background at inference
+     - Spectra must be resampled from changing input grids onto one fixed grid.
+   * - :class:`~chemotools.adaptation.MetadataFunctionTransformer`
+     - User-defined names
+     - A custom correction needs one or more values that change between calls.
 
-Example: aligning spectra to a common grid
--------------------------------------------
+The distinction is useful: :class:`~chemotools.adaptation.XAxisInterpolator`
+is a specialized, fully validated interpolation estimator, while
+:class:`~chemotools.adaptation.MetadataFunctionTransformer` adapts a regular
+Python function to scikit-learn's estimator and metadata-routing interfaces.
+Use the specialized transformer for x-axis alignment. Use the function wrapper
+for operations such as reference subtraction, intensity scaling, offsets, or
+domain-specific corrections.
+
+XAxisInterpolator: align spectra to a common grid
+--------------------------------------------------
 
 In Raman spectroscopy, each instrument has a slightly different
 pixel-to-wavenumber calibration. Spectra from different instruments share the
@@ -190,8 +195,8 @@ change freely between calls.
 All five peaks now sit at the same column index. The matrix ``aligned_spectra``
 can be fed directly into any subsequent step or model.
 
-How metadata routing works
----------------------------
+Route ``x_axis`` through a Pipeline
+-----------------------------------
 
 The two method calls on the interpolator — ``set_fit_request(x_axis=True)``
 and ``set_transform_request(x_axis=True)`` — register ``x_axis`` as a
@@ -289,11 +294,414 @@ Points outside the input grid are filled with ``left`` / ``right`` (both
 default to :data:`numpy.nan`). You can change these to ``0.0`` or any other
 sentinel value if your downstream steps cannot handle ``NaN``.
 
-That is the core idea behind dynamic transformers: pipelines that stay
-self-contained and reusable even when correction parameters are not known
-until prediction time.
+
+MetadataFunctionTransformer: build a dynamic correction
+--------------------------------------------------------
+
+:class:`~chemotools.adaptation.MetadataFunctionTransformer` turns a Python
+function into a scikit-learn transformer that can receive named metadata. It is
+useful when the mathematical operation is simple, but one or more operands are
+only known when a batch is transformed.
+
+Consider background subtraction. A new reference spectrum is collected before
+each measurement batch, so it cannot be stored permanently when the model is
+trained. The operation itself is only ``X - reference``. The wrapper supplies
+the estimator interface and routes ``reference`` to that operation at the right
+time.
+
+The three pieces
+~~~~~~~~~~~~~~~~
+
+Every metadata function transformer has three parts:
+
+.. list-table:: The MetadataFunctionTransformer contract
+   :widths: 25 35 40
+   :header-rows: 1
+
+   * - Part
+     - Example
+     - Meaning
+   * - Feature matrix
+     - ``X``
+     - The first positional argument passed to the function.
+   * - Metadata names
+     - ``("reference",)``
+     - Keyword arguments that the transformer requests and forwards.
+   * - Metadata values
+     - ``reference=background``
+     - Values supplied separately on each transformation call.
+
+The names must agree exactly:
+
+.. code-block:: python
+
+    def subtract_reference(X, reference):
+        return X - reference
+
+    transformer = MetadataFunctionTransformer(
+        func=subtract_reference,
+        metadata=("reference",),
+    )
+
+``reference`` appears once in the function signature and once in the
+``metadata`` tuple. Its value is supplied later:
+
+.. code-block:: python
+
+    X_corrected = transformer.fit_transform(X, reference=background)
+
+The trailing comma in ``("reference",)`` matters: it creates a one-item tuple.
+The names ``"X"`` and ``"y"`` cannot be used because they are reserved by the
+scikit-learn estimator API.
+
+
+Start with a predefined function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``chemotools`` includes common, picklable functions in
+:mod:`chemotools.adaptation.functions`. Using one of these is the shortest path
+to a dynamic correction:
+
+.. code-block:: python
+
+    import numpy as np
+    from chemotools.adaptation import MetadataFunctionTransformer
+    from chemotools.adaptation.functions import subtract_reference
+
+    X = np.array(
+        [
+            [1.0, 2.0, 3.0],
+            [4.0, 5.0, 6.0],
+        ]
+    )
+    background = np.array([[0.2, 0.3, 0.4]])
+
+    subtract_background = MetadataFunctionTransformer(
+        func=subtract_reference,
+        metadata=("reference",),
+    )
+
+    X_corrected = subtract_background.fit_transform(
+        X,
+        reference=background,
+    )
+
+    # array([[0.8, 1.7, 2.6],
+    #        [3.8, 4.7, 5.6]])
+
+The predefined functions cover four common element-wise corrections:
+
+.. list-table:: Predefined metadata functions
+   :widths: 30 25 45
+   :header-rows: 1
+
+   * - Function
+     - Metadata name
+     - Operation
+   * - :func:`~chemotools.adaptation.functions.subtract_reference`
+     - ``reference``
+     - ``X - reference``
+   * - :func:`~chemotools.adaptation.functions.divide_by_reference`
+     - ``reference``
+     - ``X / reference``
+   * - :func:`~chemotools.adaptation.functions.scale_by_factor`
+     - ``factor``
+     - ``X * factor``
+   * - :func:`~chemotools.adaptation.functions.add_offset`
+     - ``offset``
+     - ``X + offset``
+
+
+Understand metadata shapes
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The predefined functions use NumPy broadcasting. The metadata shape determines
+whether a correction is global, shared by a batch, or different for each
+sample.
+
+For an input ``X`` with shape ``(n_samples, n_features)``, accepted metadata
+shapes are:
+
+.. list-table:: Metadata broadcasting patterns
+   :widths: 25 35 40
+   :header-rows: 1
+
+   * - Shape
+     - Interpretation
+     - Typical use
+   * - Scalar
+     - One value for every element
+     - A global calibration factor
+   * - ``(1, n_features)``
+     - One value per feature, shared by all samples
+     - A background spectrum for the batch
+   * - ``(n_samples, 1)``
+     - One value per sample, shared across its features
+     - Integration time or dilution factor
+   * - ``(n_samples, n_features)``
+     - One value per element
+     - A sample-specific reference spectrum
+
+One-dimensional metadata is deliberately rejected by the predefined functions
+because its meaning is ambiguous when ``n_samples == n_features``. Reshape it
+explicitly:
+
+.. code-block:: python
+
+    # One factor for each sample
+    factor_per_sample = factor_1d.reshape(-1, 1)
+
+    # One reference value for each feature
+    reference_per_feature = reference_1d.reshape(1, -1)
+
+Custom functions decide which metadata types and shapes they support. The
+wrapper routes values; it does not interpret or reshape them.
+
+
+Write a custom function
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A compatible function follows a small contract:
+
+* ``X`` is its first positional argument.
+* Routed values are named parameters that can be passed by keyword.
+* Every required parameter after ``X`` is listed in ``metadata``.
+* It returns a finite, numeric, two-dimensional array.
+* It preserves the number of samples and, for this transformer, the number of
+  features.
+
+For example, this correction combines a per-sample integration time with an
+optional dark-current offset:
+
+.. code-block:: python
+
+    def correct_acquisition(X, integration_time, dark_offset=0.0):
+        return (X - dark_offset) / integration_time
+
+    correction = MetadataFunctionTransformer(
+        func=correct_acquisition,
+        metadata=("integration_time", "dark_offset"),
+    )
+
+    integration_time = np.array([[1.0], [2.0]])
+    dark_offset = np.array([[0.05, 0.04, 0.06]])
+
+    X_corrected = correction.fit_transform(
+        X,
+        integration_time=integration_time,
+        dark_offset=dark_offset,
+    )
+
+Optional function parameters may still be listed in ``metadata``. If no value
+is supplied during a direct ``transform`` call, the function's default is used.
+Additional values passed to the transformer but not listed in ``metadata`` are
+not forwarded.
+
+Avoid positional-only metadata parameters because metadata is always forwarded
+by name. In the following function, ``reference`` cannot be routed:
+
+.. code-block:: python
+
+    def incompatible(X, reference, /):
+        return X - reference
+
+Functions defined at module level are preferable to lambdas or nested functions
+when the fitted pipeline will be serialized. Standard pickle-based tools need
+to import the function by its module and name when loading the pipeline.
+
+
+Validate a custom function before wrapping it
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The transformer checks the function signature during ``fit`` without executing
+the function. Value-dependent problems, such as an invalid metadata shape or a
+one-dimensional result, cannot be discovered from the signature alone.
+
+Use :func:`~chemotools.adaptation.validation.check_metadata_function` with
+representative data to exercise the complete function contract eagerly:
+
+.. code-block:: python
+
+    from chemotools.adaptation.validation import check_metadata_function
+
+    checked_output = check_metadata_function(
+        correct_acquisition,
+        X,
+        metadata={
+            "integration_time": integration_time,
+            "dark_offset": dark_offset,
+        },
+    )
+
+This call performs the following checks:
+
+#. ``X`` is finite, numeric, and two-dimensional.
+#. The function can be called as ``func(X, **metadata)``.
+#. The function executes successfully on the representative values.
+#. Its output is finite, numeric, and two-dimensional.
+#. Its output preserves the number of samples and features.
+
+The helper returns the validated output so the custom function is executed only
+once. It is intended for development, testing, and validation of a new
+function. It is not automatically run inside every ``transform`` call.
+
+.. warning::
+
+   ``check_metadata_function`` executes user-provided code. Exceptions and side
+   effects from the function are not suppressed.
+
+If a custom operation intentionally changes the number of features, pass
+``preserve_features=False`` to the checker. Such a function does not satisfy
+the same-shape contract documented by
+:class:`~chemotools.adaptation.MetadataFunctionTransformer`, so use that option
+only when the downstream interface and feature naming are handled explicitly.
+
+
+Use MetadataFunctionTransformer in a Pipeline
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Enable metadata routing before passing additional values through a
+:class:`~sklearn.pipeline.Pipeline`:
+
+.. code-block:: python
+
+    from sklearn import set_config
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    set_config(enable_metadata_routing=True)
+
+    pipeline = Pipeline(
+        [
+            (
+                "subtract_background",
+                MetadataFunctionTransformer(
+                    func=subtract_reference,
+                    metadata=("reference",),
+                ),
+            ),
+            ("scale", StandardScaler()),
+        ]
+    )
+
+    X_ready = pipeline.fit_transform(X, reference=background)
+
+Unlike :class:`~chemotools.adaptation.XAxisInterpolator`, the function wrapper
+does not require calls to ``set_fit_request`` or ``set_transform_request``.
+It registers every name in ``metadata`` automatically. In this example,
+``reference`` is routed to ``subtract_background`` and is not sent to
+``StandardScaler``.
+
+After fitting, a new reference can be supplied for each prediction batch:
+
+.. code-block:: python
+
+    background_next = np.array([[0.3, 0.2, 0.4]])
+    X_next_ready = pipeline.transform(
+        X_next,
+        reference=background_next,
+    )
+
+Metadata routing must be enabled for Pipeline calls, but it is not needed when
+calling ``fit_transform`` or ``transform`` directly on the transformer.
+
+
+What happens during fit and transform
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The transformer deliberately separates structural checks from execution:
+
+.. list-table:: Transformer lifecycle
+   :widths: 20 40 40
+   :header-rows: 1
+
+   * - Method
+     - What it validates
+     - What it does with metadata
+   * - ``fit``
+     - Parameters, ``X``, and the callable signature
+     - Registers names but does not execute ``func``
+   * - ``transform``
+     - ``X`` and fitted state
+     - Forwards listed values and executes ``func`` once
+   * - ``fit_transform``
+     - Performs both phases
+     - Makes metadata available to the transformation phase
+
+Not executing the function during ``fit`` avoids duplicate work and unexpected
+side effects. It also reflects the central use case: metadata values available
+during deployment may differ from those seen while the pipeline is fitted.
+
+With the default ``validate=True``, ``X`` is converted to a finite numeric
+two-dimensional array and its feature count is checked against the fitted
+input. Set ``validate=False`` only when the function must receive another data
+container unchanged and performs its own input validation. Output validation is
+always the responsibility of the function.
+
+
+Common errors and how to fix them
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table:: Troubleshooting MetadataFunctionTransformer
+   :widths: 35 30 35
+   :header-rows: 1
+
+   * - Symptom
+     - Likely cause
+     - Fix
+   * - Required argument is missing from ``metadata``
+     - The function needs a named value that the transformer does not request
+     - Add its name to the ``metadata`` tuple
+   * - Function does not accept a requested argument
+     - A metadata name does not match the function signature
+     - Correct the spelling or change the function parameter
+   * - Missing positional argument during ``transform``
+     - A requested value was not supplied for that call
+     - Pass ``name=value`` to ``transform`` or the Pipeline method
+   * - Positional-only parameter error
+     - The function uses ``/`` after a metadata parameter
+     - Make the metadata parameter keyword-compatible
+   * - Metadata must contain strings or unique names
+     - The ``metadata`` declaration is malformed
+     - Use one unique string for each routed function argument
+   * - ``y`` cannot be requested
+    - ``X`` and ``y`` are reserved by the estimator API
+     - Choose a domain-specific name such as ``target_reference``
+   * - Expected a 2-D array
+     - ``X``, output, or predefined-function metadata is one-dimensional
+     - Reshape explicitly according to its sample or feature meaning
+   * - Unexpected keyword in a Pipeline call
+     - Metadata routing is disabled
+     - Call ``set_config(enable_metadata_routing=True)``
+
+
+Choose the right dynamic transformer
+------------------------------------
+
+Use :class:`~chemotools.adaptation.XAxisInterpolator` when the operation is
+specifically interpolation from a changing source axis to a fixed target axis.
+It validates monotonic grids, supports multiple interpolation methods, exposes
+output feature names, and can process rows in parallel.
+
+Use :class:`~chemotools.adaptation.MetadataFunctionTransformer` when the
+operation is naturally expressed as a function of ``X`` and one or more
+per-call values. Before placing a custom function in a production pipeline:
+
+#. Give every routed value a clear, unique parameter name.
+#. Test shared and per-sample metadata shapes relevant to the application.
+#. Run :func:`~chemotools.adaptation.validation.check_metadata_function` on
+   representative inputs.
+#. Test the wrapped function through ``fit_transform`` and ``transform``.
+#. Use a module-level named function if the pipeline will be serialized.
+#. Exercise the complete Pipeline with metadata routing enabled.
+
+Together, these two estimators support pipelines that remain reusable when
+important correction inputs are not known until measurement or prediction
+time.
 
 .. seealso::
 
-   :doc:`XAxisInterpolator <../methods/generated/chemotools.adaptation.XAxisInterpolator>` — full API reference.
+   * :doc:`XAxisInterpolator <../methods/generated/chemotools.adaptation.XAxisInterpolator>`
+   * :doc:`MetadataFunctionTransformer <../methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`
+   * :doc:`check_metadata_function <../methods/generated/chemotools.adaptation.validation.check_metadata_function>`
 

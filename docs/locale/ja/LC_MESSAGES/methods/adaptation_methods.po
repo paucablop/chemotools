@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Adaptation Methods"
 msgstr "適応メソッド"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
@@ -31,15 +31,13 @@ msgstr ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Direct Standardization (DS) is a transformer used for domain adaptation "
-"(calibration) applications."
-msgstr ""
-"直接標準化（DS）は、ドメイン適応（キャリブレーション）アプリケーションに使用される"
-"トランスフォーマーです。"
+"(calibration ) applications."
+msgstr "直接標準化（DS）は、ドメイン適応（キャリブレーション）アプリケーションに使用されるトランスフォーマーです。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
@@ -47,15 +45,13 @@ msgstr ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Piecewise Direct Standardization (PDS) is a transformer used for domain "
 "adaptation (calibration) applications."
-msgstr ""
-"区分的直接標準化（PDS）は、ドメイン適応（キャリブレーション）アプリケーションに"
-"使用されるトランスフォーマーです。"
+msgstr "区分的直接標準化（PDS）は、ドメイン適応（キャリブレーション）アプリケーションに使用されるトランスフォーマーです。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
@@ -63,22 +59,93 @@ msgstr ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
-"Spectral Space Transform (SST) is a transformer used for domain adaptation "
-"(calibration) applications."
-msgstr ""
-"スペクトル空間変換（SST）は、ドメイン適応（キャリブレーション）アプリケーションに"
-"使用されるトランスフォーマーです。"
+"Spectral Space Transform (SST) is a transformer used for domain "
+"adaptation (calibration) applications."
+msgstr "スペクトル空間変換（SST）は、ドメイン適応（キャリブレーション）アプリケーションに使用されるトランスフォーマーです。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
-msgid ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
-msgstr ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
+msgstr ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
 msgstr "``X`` の各行を共有の ``common_x_axis`` に補間します。"
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid "Apply a callable that consumes feature data and routed metadata."
+msgstr "特徴データとルーティングされたメタデータを受け取る呼び出し可能オブジェクトを適用します。"
+
+#: ../../source/methods/adaptation_methods.rst:17
+msgid "Validation"
+msgstr "検証"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid "Validate a metadata function on representative data."
+msgstr "代表データを使用してメタデータ関数を検証します。"
+
+#: ../../source/methods/adaptation_methods.rst:28
+msgid "Predefined Functions"
+msgstr "定義済み関数"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+msgstr ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Subtract a reference spectrum from every row of ``X``."
+msgstr "``X`` の各行から参照スペクトルを減算します。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Divide every row of ``X`` by a reference spectrum."
+msgstr "``X`` の各行を参照スペクトルで除算します。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Multiply every row of ``X`` by a scalar or array factor."
+msgstr "``X`` の各行にスカラーまたは配列の係数を乗算します。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+msgstr ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Add a baseline offset to every row of ``X``."
+msgstr "``X`` の各行にベースラインオフセットを加算します。"
+

@@ -1,0 +1,280 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst:2
+msgid "DirectStandardization"
+msgstr "DirectStandardization"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:1 of
+msgid ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+msgstr ""
+"Bases: :py:class:`~chemotools._doc_mixin.DocLinkMixin`, "
+":py:class:`~sklearn.base.OneToOneFeatureMixin`, "
+":py:class:`~sklearn.base.TransformerMixin`, "
+":py:class:`~sklearn.base.BaseEstimator`"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:1 of
+msgid ""
+"Direct Standardization (DS) is a transformer used for domain adaptation "
+"(calibration ) applications. The transformer uses least squares to find a"
+" linear map from the target instrument space to the source instrument "
+"space, following the implementation by [1]_."
+msgstr ""
+"直接标准化（DS）是一种用于域适配（校准）应用的转换器。该转换器依照 [1]_ 的实现，使用最小二乘法寻找"
+"从目标仪器空间到源仪器空间的线性映射。"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Parameters"
+msgstr "参数"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:6 of
+msgid "The transformer has no constructor hyperparameters."
+msgstr "此转换器没有构造函数超参数。"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Variables"
+msgstr "变量"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:8 of
+msgid ""
+"Right singular vectors of the target transfer data X, used as the column "
+"basis of the low-rank transformation. Empty (shape ``(n_features, 0)``) "
+"when no ``X_source`` was provided."
+msgstr ""
+"目标转移数据 X 的右奇异向量，用作低秩变换的列基。未提供 ``X_source`` 时为空（形状为 ``(n_features, 0)``）。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:13 of
+msgid ""
+"Projection of the source transfer data onto the singular basis.  The full"
+" transformation is ``X @ V_ds_ @ B_ds_``, which is algebraically "
+"equivalent to ``X @ T_`` but requires only ``O(n_features × "
+"n_transfer_samples)`` storage instead of ``O(n_features²)``."
+msgstr ""
+"源转移数据在奇异向量基上的投影。完整变换为 ``X @ V_ds_ @ B_ds_``，在代数上等价于 ``X @ T_``，"
+"但仅需 ``O(n_features × n_transfer_samples)`` 存储空间，而非 ``O(n_features²)``。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:20 of
+msgid "Boolean value to flag if X_source was provided during fitting"
+msgstr "标记拟合期间是否提供 X_source 的布尔值"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Raises"
+msgstr "引发"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:24 of
+msgid "If X and X_source do not have the same shape."
+msgstr "当 X 与 X_source 的形状不同时。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:28 of
+msgid ":py:obj:`PiecewiseDirectStandardization`"
+msgstr ":py:obj:`PiecewiseDirectStandardization`"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:29 of
+msgid "Localized version using windowed PLS regression."
+msgstr "使用窗口化 PLS 回归的局部版本。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:32 of
+msgid "References"
+msgstr "参考文献"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:33 of
+msgid ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Multivariate "
+"instrument standardization, Analytical Chemistry, 63(23), Pages "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+msgstr ""
+"Wang, Yongdong., Veltkamp, D. J., & Kowalski, B. R. (1991), Multivariate "
+"instrument standardization, Analytical Chemistry, 63(23), Pages "
+"2750–2756, https://doi.org/10.1021/ac00023a016."
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:39 of
+msgid "Examples"
+msgstr "示例"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization:40 of
+msgid ""
+"**Basic usage** >>> import numpy as np >>> from chemotools.adaptation "
+"import DirectStandardization >>> >>> rng = np.random.default_rng(17) >>> "
+"X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - "
+"rng.normal(size=(100, 20)) * 0.02 >>> >>> ds = "
+"DirectStandardization().fit(X_target, X_source=X_source) >>> X_transf = "
+"ds.transform(X_target)"
+msgstr ""
+"**基本用法** >>> import numpy as np >>> from chemotools.adaptation "
+"import DirectStandardization >>> >>> rng = np.random.default_rng(17) >>> "
+"X_source = rng.normal(size=(100, 20)) >>> X_target = X_source * 2 - "
+"rng.normal(size=(100, 20)) * 0.02 >>> >>> ds = "
+"DirectStandardization().fit(X_target, X_source=X_source) >>> X_transf = "
+"ds.transform(X_target)"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst:15
+msgid "Attributes"
+msgstr "属性"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.DirectStandardization.n_features_in_>`\\"
+msgstr ""
+":py:obj:`n_features_in_ "
+"<chemotools.adaptation.DirectStandardization.n_features_in_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`V_ds_ <chemotools.adaptation.DirectStandardization.V_ds_>`\\"
+msgstr ":py:obj:`V_ds_ <chemotools.adaptation.DirectStandardization.V_ds_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ":py:obj:`B_ds_ <chemotools.adaptation.DirectStandardization.B_ds_>`\\"
+msgstr ":py:obj:`B_ds_ <chemotools.adaptation.DirectStandardization.B_ds_>`\\"
+
+#: chemotools.adaptation.DirectStandardization.n_features_in_:1:<autosummary>:1
+#: of
+msgid ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.DirectStandardization.x_source_provided_>`\\"
+msgstr ""
+":py:obj:`x_source_provided_ "
+"<chemotools.adaptation.DirectStandardization.x_source_provided_>`\\"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:1 of
+msgid "Fit the Direct Standardization model."
+msgstr "拟合直接标准化模型。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:3 of
+msgid "Data from the target instrument."
+msgstr "来自目标仪器的数据。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:5 of
+msgid "Ignored to align with API."
+msgstr "忽略，以与 API 保持一致。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:7 of
+msgid ""
+"Data from the source instrument. If None, the transformer defaults to an "
+"identity transformation."
+msgstr ""
+"来自源仪器的数据。若为 None，转换器默认使用恒等变换。"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Returns"
+msgstr "返回值"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.fit:11
+#: of
+msgid "**self**"
+msgstr "**self**"
+
+#: ../../source/methods/generated/chemotools.adaptation.DirectStandardization.rst
+msgid "Return type"
+msgstr "返回类型"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:1
+#: of
+msgid ""
+"Transform the data from the target space to the source space using the "
+"map ``self.T_``."
+msgstr ""
+"使用映射 ``self.T_`` 将数据从目标空间转换到源空间。"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:4
+#: of
+msgid "The input data to transform"
+msgstr "要转换的输入数据"
+
+#: chemotools.adaptation._direct_standardization.DirectStandardization.transform:7
+#: of
+msgid "**X_transf** -- The data transformed"
+msgstr "**X_transf** -- 转换后的数据"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:1
+msgid ""
+"Configure whether metadata should be requested to be passed to the "
+"``fit`` method."
+msgstr ""
+"配置是否请求将元数据传递给 ``fit`` 方法。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:3
+msgid ""
+"Note that this method is only relevant when this estimator is used as a "
+"sub-estimator within a :term:`meta-estimator` and metadata routing is "
+"enabled with ``enable_metadata_routing=True`` (see "
+":func:`sklearn.set_config`). Please check the :ref:`User Guide "
+"<metadata_routing>` on how the routing mechanism works."
+msgstr ""
+"请注意，仅当此估计器用作 :term:`meta-estimator` 中的子估计器，并通过 "
+"``enable_metadata_routing=True`` 启用元数据路由时，此方法才有意义（参见 "
+":func:`sklearn.set_config`）。有关路由机制的工作方式，请查阅 :ref:`用户指南 <metadata_routing>`。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:9
+msgid "The options for each parameter are:"
+msgstr "每个参数可使用以下选项："
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:11
+msgid ""
+"``True``: metadata is requested, and passed to ``fit`` if provided. The "
+"request is ignored if metadata is not provided."
+msgstr ""
+"``True``：请求元数据；若已提供，则将其传给 ``fit``。若未提供元数据，则忽略该请求。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:13
+msgid ""
+"``False``: metadata is not requested and the meta-estimator will not pass"
+" it to ``fit``."
+msgstr ""
+"``False``：不请求元数据，元估计器不会将其传给 ``fit``。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:15
+msgid ""
+"``None``: metadata is not requested, and the meta-estimator will raise an"
+" error if the user provides it."
+msgstr ""
+"``None``：不请求元数据；若用户提供元数据，元估计器将引发错误。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:17
+msgid ""
+"``str``: metadata should be passed to the meta-estimator with this given "
+"alias instead of the original name."
+msgstr ""
+"``str``：元数据应使用给定别名而非原始名称传给元估计器。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:19
+msgid ""
+"The default (``sklearn.utils.metadata_routing.UNCHANGED``) retains the "
+"existing request. This allows you to change the request for some "
+"parameters and not others."
+msgstr ""
+"默认值（``sklearn.utils.metadata_routing.UNCHANGED``）会保留现有请求。这样可以只更改部分参数的请求，"
+"而不更改其他参数。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:25
+msgid "Metadata routing for ``X_source`` parameter in ``fit``."
+msgstr "``fit`` 中 ``X_source`` 参数的元数据路由。"
+
+#: of sklearn.utils._metadata_requests.RequestMethod.__get__.<locals>.func:28
+msgid "**self** -- The updated object."
+msgstr "**self** -- 更新后的对象。"
+

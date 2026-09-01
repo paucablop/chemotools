@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -20,7 +20,8 @@ msgstr ""
 "Generated-By: Babel 2.17.0\n"
 
 #: ../../source/methods/plotting_methods.rst:2
-msgid "Plotting Classes"
+#, fuzzy
+msgid "Plotting Methods"
 msgstr "绘图类"
 
 #: ../../source/methods/plotting_methods.rst:20:<autosummary>:1

@@ -1,0 +1,307 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/explore/calibration_transfer.rst:4
+msgid "Calibration transfer"
+msgstr "校准迁移"
+
+#: ../../source/explore/calibration_transfer.rst:6
+msgid ""
+"A model trained on one instrument does not always predict accurately on a"
+" second instrument — even when measuring the same samples. Differences in"
+" detector response, optical alignment, wavelength accuracy, and "
+"environmental conditions all introduce systematic spectral shifts between"
+" instruments."
+msgstr "在一台仪器上训练的模型应用于另一台仪器时，预测结果并不总是准确，即使测量的是相同样本也是如此。检测器响应、光学对准、波长精度和环境条件的差异，都会在仪器之间引入系统性的光谱偏移。"
+
+#: ../../source/explore/calibration_transfer.rst:12
+msgid ""
+"**Calibration transfer** (also called *model transder* or *domain "
+"adaptation*) corrects for these differences so that a model built on a "
+"*source* instrument can be applied to spectra measured on a *target* "
+"instrument, without rebuilding the model from scratch."
+msgstr "**校准迁移**（也称为*模型迁移*或*领域自适应*）可校正这些差异，使在*源*仪器上构建的模型能够应用于*目标*仪器测得的光谱，而无需从头重建模型。"
+
+#: ../../source/explore/calibration_transfer.rst:17
+msgid ""
+"``chemotools`` implements two classical transfer methods in "
+":mod:`chemotools.adaptation`:"
+msgstr "``chemotools`` 在 :mod:`chemotools.adaptation` 中实现了两种经典的迁移方法："
+
+#: ../../source/explore/calibration_transfer.rst:20
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` (DS) — a global "
+"linear transformation."
+msgstr ":class:`~chemotools.adaptation.DirectStandardization`（DS）——全局线性变换。"
+
+#: ../../source/explore/calibration_transfer.rst:22
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` (PDS) — a "
+"local, window-based transformation using PLS regression."
+msgstr ":class:`~chemotools.adaptation.PiecewiseDirectStandardization`（PDS）——使用 PLS 回归、基于窗口的局部变换。"
+
+#: ../../source/explore/calibration_transfer.rst:25
+msgid ""
+"Both follow the formulation introduced by Wang, Veltkamp & Kowalski "
+"(1991) [1]_."
+msgstr "两者都采用 Wang、Veltkamp 和 Kowalski（1991）提出的方法 [1]_。"
+
+#: ../../source/explore/calibration_transfer.rst:28
+msgid "The calibration transfer workflow"
+msgstr "校准迁移工作流程"
+
+#: ../../source/explore/calibration_transfer.rst:30
+msgid "The general workflow is:"
+msgstr "一般工作流程如下："
+
+#: ../../source/explore/calibration_transfer.rst:32
+msgid ""
+"Measure a small set of **transfer samples** on both the source and target"
+" instruments."
+msgstr "分别在源仪器和目标仪器上测量一小组**迁移样本**。"
+
+#: ../../source/explore/calibration_transfer.rst:34
+msgid "Fit the standardization transformer using the paired spectra."
+msgstr "使用配对光谱拟合标准化转换器。"
+
+#: ../../source/explore/calibration_transfer.rst:35
+msgid "Apply the transformer to new target spectra before prediction."
+msgstr "在预测之前，将转换器应用于新的目标光谱。"
+
+#: ../../source/explore/calibration_transfer.rst:43
+msgid ""
+"After standardization, the corrected spectra can be fed directly into the"
+" source-instrument model."
+msgstr "标准化后，可将校正后的光谱直接输入源仪器模型。"
+
+#: ../../source/explore/calibration_transfer.rst:47
+msgid "Direct Standardization (DS)"
+msgstr "直接标准化（DS）"
+
+#: ../../source/explore/calibration_transfer.rst:49
+msgid ""
+":class:`~chemotools.adaptation.DirectStandardization` finds a global "
+"linear map ``T`` that transforms target-instrument spectra to the source-"
+"instrument space:"
+msgstr ":class:`~chemotools.adaptation.DirectStandardization` 求取一个全局线性映射 ``T``，将目标仪器光谱转换到源仪器空间："
+
+#: ../../source/explore/calibration_transfer.rst:53
+msgid "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+msgstr "\\hat{X}_{\\text{source}} = X_{\\text{target}} \\cdot T"
+
+#: ../../source/explore/calibration_transfer.rst:57
+msgid ""
+"``T`` is estimated by ordinary least squares on the paired transfer "
+"spectra. DS is simple, fast, and works well when the spectral differences"
+" between instruments are globally smooth."
+msgstr "``T`` 通过配对迁移光谱的普通最小二乘法估计。DS 简单、快速，当仪器之间的光谱差异在全局上平滑时效果良好。"
+
+#: ../../source/explore/calibration_transfer.rst:61
+msgid "**Fitting DS**"
+msgstr "**拟合 DS**"
+
+#: ../../source/explore/calibration_transfer.rst:63
+msgid ""
+"Pass the target transfer spectra as ``X`` and the corresponding source "
+"transfer spectra as ``X_source``:"
+msgstr "将目标迁移光谱作为 ``X`` 传入，并将对应的源迁移光谱作为 ``X_source`` 传入："
+
+#: ../../source/explore/calibration_transfer.rst:81
+msgid "**Applying DS to new spectra**"
+msgstr "**将 DS 应用于新光谱**"
+
+#: ../../source/explore/calibration_transfer.rst:91
+msgid "**DS in a Pipeline**"
+msgstr "**管道中的 DS**"
+
+#: ../../source/explore/calibration_transfer.rst:109
+msgid ""
+"When ``X_source`` is not provided, DS fits an identity transformation "
+"(i.e., ``transform`` returns ``X`` unchanged). This is useful as a no-op "
+"placeholder in pipelines during development."
+msgstr "未提供 ``X_source`` 时，DS 会拟合恒等变换（即 ``transform`` 原样返回 ``X``）。在开发期间，这可用作管道中不执行任何操作的占位步骤。"
+
+#: ../../source/explore/calibration_transfer.rst:114
+msgid "Piecewise Direct Standardization (PDS)"
+msgstr "分段直接标准化（PDS）"
+
+#: ../../source/explore/calibration_transfer.rst:116
+msgid ""
+":class:`~chemotools.adaptation.PiecewiseDirectStandardization` extends DS"
+" by building one *local* PLS model per output feature, using a small "
+"window of neighbouring input features. This makes PDS more robust when:"
+msgstr ":class:`~chemotools.adaptation.PiecewiseDirectStandardization` 对 DS 进行了扩展：利用相邻输入特征的小窗口，为每个输出特征构建一个*局部* PLS 模型。因此，PDS 在以下情况下更为稳健："
+
+#: ../../source/explore/calibration_transfer.rst:120
+msgid ""
+"the spectral shift between instruments is non-linear or varies across the"
+" spectral range."
+msgstr "仪器之间的光谱偏移是非线性的，或随光谱范围而变化。"
+
+#: ../../source/explore/calibration_transfer.rst:122
+msgid ""
+"there are wavelength registration differences (small offsets between the "
+"x-axis grids of the two instruments)."
+msgstr "存在波长配准差异（两台仪器的 x 轴网格之间有小幅偏移）。"
+
+#: ../../source/explore/calibration_transfer.rst:125
+msgid ""
+"For each output feature :math:`j`, PDS uses the window :math:`[j - w, "
+"\\ldots, j + w]` of the target spectrum (where ``w = window_length``) to "
+"predict the corresponding feature of the source spectrum via PLS "
+"regression."
+msgstr "对于每个输出特征 :math:`j`，PDS 使用目标光谱的窗口 :math:`[j - w, \\ldots, j + w]`（其中 ``w = window_length``），通过 PLS 回归预测源光谱中的对应特征。"
+
+#: ../../source/explore/calibration_transfer.rst:130
+msgid "**Fitting PDS**"
+msgstr "**拟合 PDS**"
+
+#: ../../source/explore/calibration_transfer.rst:142
+msgid "**Applying PDS**"
+msgstr "**应用 PDS**"
+
+#: ../../source/explore/calibration_transfer.rst:149
+msgid "Choosing between DS and PDS"
+msgstr "在 DS 和 PDS 之间进行选择"
+
+#: ../../source/explore/calibration_transfer.rst:156
+msgid "DS"
+msgstr "DS"
+
+#: ../../source/explore/calibration_transfer.rst:157
+msgid "PDS"
+msgstr "PDS"
+
+#: ../../source/explore/calibration_transfer.rst:158
+msgid "**Transformation**"
+msgstr "**变换方式**"
+
+#: ../../source/explore/calibration_transfer.rst:159
+msgid "Global linear map"
+msgstr "全局线性映射"
+
+#: ../../source/explore/calibration_transfer.rst:160
+msgid "Local PLS per feature"
+msgstr "每个特征使用局部 PLS"
+
+#: ../../source/explore/calibration_transfer.rst:161
+msgid "**Number of transfer samples needed**"
+msgstr "**所需迁移样本数**"
+
+#: ../../source/explore/calibration_transfer.rst:162
+msgid "As many as features (can use regularization)"
+msgstr "与特征数相当（可使用正则化）"
+
+#: ../../source/explore/calibration_transfer.rst:163
+msgid "Few (local models have few variables)"
+msgstr "较少（局部模型的变量较少）"
+
+#: ../../source/explore/calibration_transfer.rst:164
+msgid "**Handles wavelength shifts**"
+msgstr "**处理波长偏移**"
+
+#: ../../source/explore/calibration_transfer.rst:165
+msgid "Poorly"
+msgstr "效果较差"
+
+#: ../../source/explore/calibration_transfer.rst:166
+msgid "Well (windowed input)"
+msgstr "效果良好（窗口化输入）"
+
+#: ../../source/explore/calibration_transfer.rst:167
+msgid "**Handles non-linear differences**"
+msgstr "**处理非线性差异**"
+
+#: ../../source/explore/calibration_transfer.rst:168
+msgid "No"
+msgstr "否"
+
+#: ../../source/explore/calibration_transfer.rst:169
+msgid "Partially"
+msgstr "部分支持"
+
+#: ../../source/explore/calibration_transfer.rst:170
+msgid "**Computation time**"
+msgstr "**计算时间**"
+
+#: ../../source/explore/calibration_transfer.rst:171
+msgid "Fast"
+msgstr "快"
+
+#: ../../source/explore/calibration_transfer.rst:172
+msgid "Moderate (one PLS per feature)"
+msgstr "中等（每个特征使用一个 PLS）"
+
+#: ../../source/explore/calibration_transfer.rst:173
+msgid "**Best for**"
+msgstr "**最适用于**"
+
+#: ../../source/explore/calibration_transfer.rst:174
+msgid "Globally smooth instrument differences"
+msgstr "全局平滑的仪器差异"
+
+#: ../../source/explore/calibration_transfer.rst:175
+msgid "Wavelength offsets, local non-linearities"
+msgstr "波长偏移、局部非线性"
+
+#: ../../source/explore/calibration_transfer.rst:177
+msgid ""
+"A common strategy is to start with DS (fast, interpretable) and switch to"
+" PDS if prediction accuracy on the target instrument is insufficient."
+msgstr "一种常用策略是先采用 DS（快速且易于解释）；如果在目标仪器上的预测精度不足，再改用 PDS。"
+
+#: ../../source/explore/calibration_transfer.rst:181
+msgid "References"
+msgstr "参考文献"
+
+#: ../../source/explore/calibration_transfer.rst:183
+msgid ""
+"Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate "
+"instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. "
+"https://doi.org/10.1021/ac00023a016"
+msgstr "Wang, Y., Veltkamp, D. J., & Kowalski, B. R. (1991). Multivariate instrument standardization. *Analytical Chemistry*, 63(23), 2750–2756. https://doi.org/10.1021/ac00023a016"
+
+#: ../../source/explore/calibration_transfer.rst:188
+msgid ""
+"Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise "
+"direct standardisation procedure for the transfer of NIR spectra for "
+"multivariate calibration. *Chemometrics and Intelligent Laboratory "
+"Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+msgstr "Bouveresse, E., & Massart, D. L. (1996). Improvement of the piecewise direct standardisation procedure for the transfer of NIR spectra for multivariate calibration. *Chemometrics and Intelligent Laboratory Systems*, 32(2), 201–213. https://doi.org/10.1016/0169-7439(95)00074-7"
+
+#: ../../source/explore/calibration_transfer.rst:196
+msgid ""
+":doc:`DirectStandardization "
+"<../methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ":doc:`DirectStandardization <../methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:197
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"<../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ":doc:`PiecewiseDirectStandardization <../methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/explore/calibration_transfer.rst:198
+msgid ""
+":doc:`XAxisInterpolator "
+"<../methods/generated/chemotools.adaptation.XAxisInterpolator>` — align "
+"spectra to a common x-axis grid before standardization."
+msgstr ":doc:`XAxisInterpolator <../methods/generated/chemotools.adaptation.XAxisInterpolator>` ——在标准化之前将光谱对齐到统一的 x 轴网格。"
+

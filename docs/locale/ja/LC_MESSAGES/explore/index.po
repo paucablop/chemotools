@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-12 05:37+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -23,40 +23,52 @@ msgstr ""
 msgid "Discover the environment"
 msgstr "環境を理解する"
 
-#: ../../source/explore/index.rst:29
+#: ../../source/explore/index.rst:32
 msgid "Get started with scikit-learn"
 msgstr "scikit-learnを始める"
 
-#: ../../source/explore/index.rst:40
+#: ../../source/explore/index.rst:43
 msgid "Working with spectra"
 msgstr "スペクトルデータの操作"
 
-#: ../../source/explore/index.rst:51
+#: ../../source/explore/index.rst:54
 msgid "Creating your pipelines"
 msgstr "パイプラインの作成"
 
-#: ../../source/explore/index.rst:62
+#: ../../source/explore/index.rst:65
 msgid "Optimize your processing"
 msgstr "処理の最適化"
 
-#: ../../source/explore/index.rst:73
+#: ../../source/explore/index.rst:76
 msgid "DataFrame lover?"
 msgstr "DataFrameが好き？"
 
-#: ../../source/explore/index.rst:85
+#: ../../source/explore/index.rst:88
 msgid "Persisting your models"
 msgstr "モデルの永続化"
 
-#: ../../source/explore/index.rst:96
+#: ../../source/explore/index.rst:99
 msgid "Plotting fundamentals"
 msgstr ""
 
-#: ../../source/explore/index.rst:107
+#: ../../source/explore/index.rst:110
 #, fuzzy
 msgid "Inspecting your models"
 msgstr "モデルの永続化"
 
-#: ../../source/explore/index.rst:118
+#: ../../source/explore/index.rst:121
 msgid "Sampling with Astartes"
+msgstr ""
+
+#: ../../source/explore/index.rst:132
+msgid "Dynamic transformers"
+msgstr ""
+
+#: ../../source/explore/index.rst:143
+msgid "Orthogonal projections"
+msgstr ""
+
+#: ../../source/explore/index.rst:154
+msgid "Calibration transfer"
 msgstr ""
 

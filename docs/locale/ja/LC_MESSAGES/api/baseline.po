@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-11 23:56+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -17,7 +17,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.16.0\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: ../../source/api/baseline.rst:2
 msgid "chemotools.baseline"
@@ -27,50 +27,49 @@ msgstr "chemotools.baseline"
 msgid ""
 "Baseline correction methods for spectral preprocessing. These methods "
 "remove baseline drift and offset to isolate the chemical signal."
-msgstr ""
-"スペクトル前処理のためのベースライン補正手法。これらの手法は、化学シグナルを分離するためにベースラインドリフトとオフセットを除去します。"
+msgstr "スペクトル前処理のためのベースライン補正手法。これらの手法は、化学シグナルを分離するためにベースラインドリフトとオフセットを除去します。"
 
 #: ../../source/api/baseline.rst:8
 msgid "**Import from this module:**"
 msgstr "このモジュールからのインポート:"
 
-#: ../../source/api/baseline.rst:25
+#: ../../source/api/baseline.rst:26
 msgid "Available Classes"
 msgstr "利用可能なクラス"
 
-#: ../../source/api/baseline.rst:31
+#: ../../source/api/baseline.rst:32
 msgid "Class"
 msgstr "クラス"
 
-#: ../../source/api/baseline.rst:32
+#: ../../source/api/baseline.rst:33
 msgid "Description"
 msgstr "説明"
 
-#: ../../source/api/baseline.rst:33
+#: ../../source/api/baseline.rst:34
 msgid ":doc:`AirPls </methods/generated/chemotools.baseline.AirPls>`"
 msgstr ":doc:`AirPls </methods/generated/chemotools.baseline.AirPls>`"
 
-#: ../../source/api/baseline.rst:34
+#: ../../source/api/baseline.rst:35
 msgid "Adaptive iteratively reweighted penalized least squares"
 msgstr "適応的反復再重み付けペナルティ付き最小二乗法"
 
-#: ../../source/api/baseline.rst:35
+#: ../../source/api/baseline.rst:36
 msgid ":doc:`ArPls </methods/generated/chemotools.baseline.ArPls>`"
 msgstr ":doc:`ArPls </methods/generated/chemotools.baseline.ArPls>`"
 
-#: ../../source/api/baseline.rst:36
+#: ../../source/api/baseline.rst:37
 msgid "Asymmetrically reweighted penalized least squares"
 msgstr "非対称再重み付けペナルティ付き最小二乗法"
 
-#: ../../source/api/baseline.rst:37
+#: ../../source/api/baseline.rst:38
 msgid ":doc:`AsLs </methods/generated/chemotools.baseline.AsLs>`"
 msgstr ":doc:`AsLs </methods/generated/chemotools.baseline.AsLs>`"
 
-#: ../../source/api/baseline.rst:38
+#: ../../source/api/baseline.rst:39
 msgid "Asymmetric least squares smoothing"
 msgstr "非対称最小二乗平滑化"
 
-#: ../../source/api/baseline.rst:39
+#: ../../source/api/baseline.rst:40
 msgid ""
 ":doc:`ConstantBaselineCorrection "
 "</methods/generated/chemotools.baseline.ConstantBaselineCorrection>`"
@@ -78,11 +77,11 @@ msgstr ""
 ":doc:`ConstantBaselineCorrection "
 "</methods/generated/chemotools.baseline.ConstantBaselineCorrection>`"
 
-#: ../../source/api/baseline.rst:40
+#: ../../source/api/baseline.rst:41
 msgid "Subtract a constant baseline value"
 msgstr "定数ベースライン値を減算"
 
-#: ../../source/api/baseline.rst:41
+#: ../../source/api/baseline.rst:42
 msgid ""
 ":doc:`CubicSplineCorrection "
 "</methods/generated/chemotools.baseline.CubicSplineCorrection>`"
@@ -90,11 +89,11 @@ msgstr ""
 ":doc:`CubicSplineCorrection "
 "</methods/generated/chemotools.baseline.CubicSplineCorrection>`"
 
-#: ../../source/api/baseline.rst:42
+#: ../../source/api/baseline.rst:43
 msgid "Fit and subtract cubic spline baseline"
 msgstr "3次スプラインベースラインをフィットして減算"
 
-#: ../../source/api/baseline.rst:43
+#: ../../source/api/baseline.rst:44
 msgid ""
 ":doc:`LinearCorrection "
 "</methods/generated/chemotools.baseline.LinearCorrection>`"
@@ -102,19 +101,19 @@ msgstr ""
 ":doc:`LinearCorrection "
 "</methods/generated/chemotools.baseline.LinearCorrection>`"
 
-#: ../../source/api/baseline.rst:44
+#: ../../source/api/baseline.rst:45
 msgid "Linear baseline correction"
 msgstr "線形ベースライン補正"
 
-#: ../../source/api/baseline.rst:45
+#: ../../source/api/baseline.rst:46
 msgid ":doc:`NonNegative </methods/generated/chemotools.baseline.NonNegative>`"
 msgstr ":doc:`NonNegative </methods/generated/chemotools.baseline.NonNegative>`"
 
-#: ../../source/api/baseline.rst:46
+#: ../../source/api/baseline.rst:47
 msgid "Enforce non-negative values"
 msgstr "非負値を強制"
 
-#: ../../source/api/baseline.rst:47
+#: ../../source/api/baseline.rst:48
 msgid ""
 ":doc:`PolynomialCorrection "
 "</methods/generated/chemotools.baseline.PolynomialCorrection>`"
@@ -122,11 +121,25 @@ msgstr ""
 ":doc:`PolynomialCorrection "
 "</methods/generated/chemotools.baseline.PolynomialCorrection>`"
 
-#: ../../source/api/baseline.rst:48
+#: ../../source/api/baseline.rst:49
 msgid "Polynomial baseline fitting and subtraction"
 msgstr "多項式ベースラインのフィッティングと減算"
 
-#: ../../source/api/baseline.rst:49
+#: ../../source/api/baseline.rst:50
+#, fuzzy
+msgid ""
+":doc:`RubberbandCorrection "
+"</methods/generated/chemotools.baseline.RubberbandCorrection>`"
+msgstr ""
+":doc:`LinearCorrection "
+"</methods/generated/chemotools.baseline.LinearCorrection>`"
+
+#: ../../source/api/baseline.rst:51
+#, fuzzy
+msgid "Rubberband (convex hull) baseline correction"
+msgstr "線形ベースライン補正"
+
+#: ../../source/api/baseline.rst:52
 msgid ""
 ":doc:`SubtractReference "
 "</methods/generated/chemotools.baseline.SubtractReference>`"
@@ -134,18 +147,17 @@ msgstr ""
 ":doc:`SubtractReference "
 "</methods/generated/chemotools.baseline.SubtractReference>`"
 
-#: ../../source/api/baseline.rst:50
+#: ../../source/api/baseline.rst:53
 msgid "Subtract a reference spectrum"
 msgstr "参照スペクトルを減算"
 
-#: ../../source/api/baseline.rst:53
+#: ../../source/api/baseline.rst:56
 msgid "See Also"
 msgstr "関連項目"
 
-#: ../../source/api/baseline.rst:55
+#: ../../source/api/baseline.rst:58
 msgid ""
 ":doc:`Baseline Methods Overview </methods/baseline>` - Complete "
 "documentation with examples and visual guides"
-msgstr ""
-":doc:`ベースライン手法の概要 </methods/baseline>` - 例とビジュアルガイドを含む完全なドキュメント"
+msgstr ":doc:`ベースライン手法の概要 </methods/baseline>` - 例とビジュアルガイドを含む完全なドキュメント"
 

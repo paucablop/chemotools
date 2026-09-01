@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-16 00:00+0000\n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh_CN\n"
@@ -23,7 +23,7 @@ msgstr ""
 msgid "Adaptation Methods"
 msgstr "适应方法"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
@@ -31,14 +31,13 @@ msgstr ""
 ":py:obj:`DirectStandardization "
 "<chemotools.adaptation.DirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Direct Standardization (DS) is a transformer used for domain adaptation "
-"(calibration) applications."
-msgstr ""
-"直接标准化（DS）是一种用于域适应（校准）应用的转换器。"
+"(calibration ) applications."
+msgstr "直接标准化（DS）是一种用于域适应（校准）应用的转换器。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
@@ -46,14 +45,13 @@ msgstr ""
 ":py:obj:`PiecewiseDirectStandardization "
 "<chemotools.adaptation.PiecewiseDirectStandardization>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 "Piecewise Direct Standardization (PDS) is a transformer used for domain "
 "adaptation (calibration) applications."
-msgstr ""
-"分段直接标准化（PDS）是一种用于域适应（校准）应用的转换器。"
+msgstr "分段直接标准化（PDS）是一种用于域适应（校准）应用的转换器。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
@@ -61,21 +59,93 @@ msgstr ""
 ":py:obj:`SpectralSpaceTransform "
 "<chemotools.adaptation.SpectralSpaceTransform>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid ""
-"Spectral Space Transform (SST) is a transformer used for domain adaptation "
-"(calibration) applications."
-msgstr ""
-"光谱空间变换（SST）是一种用于域适应（校准）应用的转换器。"
+"Spectral Space Transform (SST) is a transformer used for domain "
+"adaptation (calibration) applications."
+msgstr "光谱空间变换（SST）是一种用于域适应（校准）应用的转换器。"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
-msgid ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
-msgstr ""
-":py:obj:`XAxisInterpolator "
-"<chemotools.adaptation.XAxisInterpolator>`"
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
+msgstr ":py:obj:`XAxisInterpolator <chemotools.adaptation.XAxisInterpolator>`"
 
-#: ../../source/methods/adaptation_methods.rst:9:<autosummary>:1
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
 msgid "Interpolate every row of ``X`` onto a shared ``common_x_axis``."
 msgstr "将 ``X`` 的每一行插值到共享的 ``common_x_axis`` 上。"
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ""
+":py:obj:`MetadataFunctionTransformer "
+"<chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/methods/adaptation_methods.rst:15:<autosummary>:1
+msgid "Apply a callable that consumes feature data and routed metadata."
+msgstr "应用一个接收特征数据和路由元数据的可调用对象。"
+
+#: ../../source/methods/adaptation_methods.rst:17
+msgid "Validation"
+msgstr "验证"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ""
+":py:obj:`check_metadata_function "
+"<chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/methods/adaptation_methods.rst:26:<autosummary>:1
+msgid "Validate a metadata function on representative data."
+msgstr "使用代表性数据验证元数据函数。"
+
+#: ../../source/methods/adaptation_methods.rst:28
+msgid "Predefined Functions"
+msgstr "预定义函数"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+msgstr ""
+":py:obj:`subtract_reference "
+"<chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Subtract a reference spectrum from every row of ``X``."
+msgstr "从 ``X`` 的每一行中减去参考光谱。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ""
+":py:obj:`divide_by_reference "
+"<chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Divide every row of ``X`` by a reference spectrum."
+msgstr "将 ``X`` 的每一行除以参考光谱。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ""
+":py:obj:`scale_by_factor "
+"<chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Multiply every row of ``X`` by a scalar or array factor."
+msgstr "将 ``X`` 的每一行乘以标量或数组因子。"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+msgstr ":py:obj:`add_offset <chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/methods/adaptation_methods.rst:39:<autosummary>:1
+msgid "Add a baseline offset to every row of ``X``."
+msgstr "为 ``X`` 的每一行添加基线偏移。"
+

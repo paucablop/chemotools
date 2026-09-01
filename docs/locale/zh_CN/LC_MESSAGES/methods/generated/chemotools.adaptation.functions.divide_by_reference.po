@@ -1,0 +1,128 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-01 01:14+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.divide_by_reference.rst:2
+msgid "chemotools.adaptation.functions.divide\\_by\\_reference"
+msgstr "chemotools.adaptation.functions.divide\\_by\\_reference"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:1
+msgid "Divide every row of ``X`` by a reference spectrum."
+msgstr "将 ``X`` 的每一行除以参考光谱。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:3
+msgid ""
+"Useful for single-beam transmission corrections or ratiometric normalisation "
+"where each sample is divided by a simultaneously measured reference channel."
+msgstr ""
+"适用于单光束透射校正或比率归一化，其中每个样本均除以同步测量的参考通道。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Parameters"
+msgstr "参数"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:7
+msgid "Input spectra."
+msgstr "输入光谱。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
+msgid ""
+"Reference to divide by.  Accepted shapes:  * scalar ``float`` — divides "
+"every element. * ``(1, n_features)`` — shared reference broadcast across all "
+"samples. * ``(n_samples, 1)`` — per-sample scalar divisor. * ``(n_samples, "
+"n_features)`` — per-sample full spectrum.  1-D inputs are rejected; use "
+"``.reshape(1, -1)`` for a shared spectrum or ``.reshape(-1, 1)`` for a per-"
+"sample scalar. Zero values are rejected because division by zero produces "
+"non-finite output."
+msgstr ""
+"作为除数的参考值。接受以下形状： * 标量 ``float`` — 除每个元素。 * ``(1, "
+"n_features)`` — 广播到所有样本的共享参考。 * ``(n_samples, 1)`` — 逐样本标量"
+"除数。 * ``(n_samples, n_features)`` — 逐样本完整光谱。 不接受一维输入；共享"
+"光谱请使用 ``.reshape(1, -1)``，逐样本标量请使用 ``.reshape(-1, 1)``。零值将"
+"被拒绝，因为除以零会产生非有限输出。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
+msgid "Reference to divide by.  Accepted shapes:"
+msgstr "作为除数的参考值。接受以下形状："
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:11
+msgid "scalar ``float`` — divides every element."
+msgstr "标量 ``float`` — 除每个元素。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:12
+msgid "``(1, n_features)`` — shared reference broadcast across all samples."
+msgstr "``(1, n_features)`` — 广播到所有样本的共享参考。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:13
+msgid "``(n_samples, 1)`` — per-sample scalar divisor."
+msgstr "``(n_samples, 1)`` — 逐样本标量除数。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:14
+msgid "``(n_samples, n_features)`` — per-sample full spectrum."
+msgstr "``(n_samples, n_features)`` — 逐样本完整光谱。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:16
+msgid ""
+"1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared spectrum or "
+"``.reshape(-1, 1)`` for a per-sample scalar. Zero values are rejected "
+"because division by zero produces non-finite output."
+msgstr ""
+"不接受一维输入；共享光谱请使用 ``.reshape(1, -1)``，逐样本标量请使用 "
+"``.reshape(-1, 1)``。零值将被拒绝，因为除以零会产生非有限输出。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Returns"
+msgstr "返回值"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:21
+msgid "**X_corrected** -- ``X / reference``."
+msgstr "**X_corrected** -- ``X / reference``。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Return type"
+msgstr "返回类型"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Raises"
+msgstr "引发"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:24
+msgid "If ``reference`` contains zero values."
+msgstr "如果 ``reference`` 包含零值。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:27
+msgid "Examples"
+msgstr "示例"

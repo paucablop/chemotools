@@ -1,0 +1,99 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.scale_by_factor.rst:2
+msgid "chemotools.adaptation.functions.scale\\_by\\_factor"
+msgstr "chemotools.adaptation.functions.scale\\_by\\_factor"
+
+#: chemotools.adaptation.functions.scale_by_factor:1 of
+msgid "Multiply every row of ``X`` by a scalar or array factor."
+msgstr "Multiplica cada fila de ``X`` por un factor escalar o matricial."
+
+#: chemotools.adaptation.functions.scale_by_factor:3 of
+msgid ""
+"Useful for per-batch or per-sample intensity rescaling, e.g. correcting "
+"for integration time, path-length, or dilution differences."
+msgstr ""
+"Resulta útil para reescalar la intensidad por lote o por muestra, por ejemplo, "
+"para corregir diferencias en el tiempo de integración, la longitud de paso "
+"óptico o la dilución."
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: chemotools.adaptation.functions.scale_by_factor:6 of
+msgid "Input spectra."
+msgstr "Espectros de entrada."
+
+#: chemotools.adaptation.functions.scale_by_factor:8 of
+msgid ""
+"Scaling factor.  Accepted shapes:  * scalar ``float`` — multiplies every "
+"element. * ``(n_samples, 1)`` — per-sample scalar factor. * ``(1, "
+"n_features)`` — per-feature factor shared across samples.  1-D inputs are"
+" rejected; use ``.reshape(-1, 1)`` for per-sample or ``.reshape(1, -1)`` "
+"for per-feature."
+msgstr ""
+"Factor de escala.  Formas admitidas:  * ``float`` escalar — multiplica cada "
+"elemento. * ``(n_samples, 1)`` — factor escalar por muestra. * ``(1, "
+"n_features)`` — factor por característica compartido entre las muestras.  Las "
+"entradas unidimensionales no se admiten; utilice ``.reshape(-1, 1)`` para "
+"valores por muestra o ``.reshape(1, -1)`` para valores por característica."
+
+#: chemotools.adaptation.functions.scale_by_factor:8 of
+msgid "Scaling factor.  Accepted shapes:"
+msgstr "Factor de escala.  Formas admitidas:"
+
+#: chemotools.adaptation.functions.scale_by_factor:10 of
+msgid "scalar ``float`` — multiplies every element."
+msgstr "``float`` escalar — multiplica cada elemento."
+
+#: chemotools.adaptation.functions.scale_by_factor:11 of
+msgid "``(n_samples, 1)`` — per-sample scalar factor."
+msgstr "``(n_samples, 1)`` — factor escalar por muestra."
+
+#: chemotools.adaptation.functions.scale_by_factor:12 of
+msgid "``(1, n_features)`` — per-feature factor shared across samples."
+msgstr "``(1, n_features)`` — factor por característica compartido entre las muestras."
+
+#: chemotools.adaptation.functions.scale_by_factor:14 of
+msgid ""
+"1-D inputs are rejected; use ``.reshape(-1, 1)`` for per-sample or "
+"``.reshape(1, -1)`` for per-feature."
+msgstr ""
+"Las entradas unidimensionales no se admiten; utilice ``.reshape(-1, 1)`` para "
+"valores por muestra o ``.reshape(1, -1)`` para valores por característica."
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Returns"
+msgstr "Devuelve"
+
+#: chemotools.adaptation.functions.scale_by_factor:18 of
+msgid "**X_scaled** -- ``X * factor``."
+msgstr "**X_scaled** -- ``X * factor``."
+
+#: chemotools.adaptation.functions.scale_by_factor of
+msgid "Return type"
+msgstr "Tipo de retorno"
+
+#: chemotools.adaptation.functions.scale_by_factor:22 of
+msgid "Examples"
+msgstr "Ejemplos"
+

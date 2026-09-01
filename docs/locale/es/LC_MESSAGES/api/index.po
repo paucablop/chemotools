@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: chemotools \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-13 02:37+0800\n"
+"POT-Creation-Date: 2026-08-30 21:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -60,14 +60,27 @@ msgid "Core Modules"
 msgstr "Módulos principales"
 
 #: ../../source/api/index.rst:22
+msgid "Physics"
+msgstr ""
+
+#: ../../source/api/index.rst:22
+#, fuzzy
+msgid "Adaptation"
+msgstr "Aumento de datos"
+
+#: ../../source/api/index.rst:22
+msgid "Spectroscopy & Adaptation"
+msgstr ""
+
+#: ../../source/api/index.rst:29
 msgid "Plotting"
 msgstr ""
 
-#: ../../source/api/index.rst:22
+#: ../../source/api/index.rst:29
 msgid "Inspector"
 msgstr ""
 
-#: ../../source/api/index.rst:22
+#: ../../source/api/index.rst:29
 msgid "Visualization & Inspection"
 msgstr ""
 
@@ -91,11 +104,11 @@ msgstr ""
 "Para documentación detallada con ejemplos y guías visuales, consulte la "
 "sección :doc:`Métodos </methods/index>`."
 
-#: ../../source/api/index.rst:30
+#: ../../source/api/index.rst:37
 msgid "Quick Import Reference"
 msgstr "Referencia rápida de importación"
 
-#: ../../source/api/index.rst:32
+#: ../../source/api/index.rst:39
 msgid "All classes can be imported directly from their respective modules:"
 msgstr ""
 "Todas las clases se pueden importar directamente desde sus respectivos "

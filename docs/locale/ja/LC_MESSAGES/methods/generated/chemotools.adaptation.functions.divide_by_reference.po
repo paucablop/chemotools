@@ -1,0 +1,131 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-01 01:14+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ja <LL@li.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/methods/generated/chemotools.adaptation.functions.divide_by_reference.rst:2
+msgid "chemotools.adaptation.functions.divide\\_by\\_reference"
+msgstr "chemotools.adaptation.functions.divide\\_by\\_reference"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:1
+msgid "Divide every row of ``X`` by a reference spectrum."
+msgstr "``X`` の各行を参照スペクトルで除算します。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:3
+msgid ""
+"Useful for single-beam transmission corrections or ratiometric normalisation "
+"where each sample is divided by a simultaneously measured reference channel."
+msgstr ""
+"各サンプルを同時測定した参照チャンネルで除算する、シングルビーム透過補正や比"
+"率正規化に役立ちます。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Parameters"
+msgstr "パラメータ"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:7
+msgid "Input spectra."
+msgstr "入力スペクトル。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
+msgid ""
+"Reference to divide by.  Accepted shapes:  * scalar ``float`` — divides "
+"every element. * ``(1, n_features)`` — shared reference broadcast across all "
+"samples. * ``(n_samples, 1)`` — per-sample scalar divisor. * ``(n_samples, "
+"n_features)`` — per-sample full spectrum.  1-D inputs are rejected; use "
+"``.reshape(1, -1)`` for a shared spectrum or ``.reshape(-1, 1)`` for a per-"
+"sample scalar. Zero values are rejected because division by zero produces "
+"non-finite output."
+msgstr ""
+"除数となる参照値。指定可能な形状: * スカラー ``float`` — すべての要素を除算。"
+"* ``(1, n_features)`` — 全サンプルにブロードキャストする共通参照値。* "
+"``(n_samples, 1)`` — サンプル別のスカラー除数。* ``(n_samples, n_features)`` "
+"— サンプル別の完全なスペクトル。1 次元入力は受け付けません。共通スペクトルに"
+"は ``.reshape(1, -1)``、サンプル別スカラーには ``.reshape(-1, 1)`` を使用して"
+"ください。ゼロ値は、ゼロ除算によって非有限の出力が生じるため拒否されます。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:9
+msgid "Reference to divide by.  Accepted shapes:"
+msgstr "除数となる参照値。指定可能な形状:"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:11
+msgid "scalar ``float`` — divides every element."
+msgstr "スカラー ``float`` — すべての要素を除算します。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:12
+msgid "``(1, n_features)`` — shared reference broadcast across all samples."
+msgstr "``(1, n_features)`` — 全サンプルにブロードキャストする共通参照値。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:13
+msgid "``(n_samples, 1)`` — per-sample scalar divisor."
+msgstr "``(n_samples, 1)`` — サンプル別のスカラー除数。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:14
+msgid "``(n_samples, n_features)`` — per-sample full spectrum."
+msgstr "``(n_samples, n_features)`` — サンプル別の完全なスペクトル。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:16
+msgid ""
+"1-D inputs are rejected; use ``.reshape(1, -1)`` for a shared spectrum or "
+"``.reshape(-1, 1)`` for a per-sample scalar. Zero values are rejected "
+"because division by zero produces non-finite output."
+msgstr ""
+"1 次元入力は受け付けません。共通スペクトルには ``.reshape(1, -1)``、サンプル"
+"別スカラーには ``.reshape(-1, 1)`` を使用してください。ゼロ値は、ゼロ除算に"
+"よって非有限の出力が生じるため拒否されます。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Returns"
+msgstr "戻り値"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:21
+msgid "**X_corrected** -- ``X / reference``."
+msgstr "**X_corrected** -- ``X / reference``。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Return type"
+msgstr "戻り値の型"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:0
+msgid "Raises"
+msgstr "例外"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:24
+msgid "If ``reference`` contains zero values."
+msgstr "``reference`` にゼロ値が含まれている場合。"
+
+#: ../../../chemotools/adaptation/functions.py:docstring of
+#: chemotools.adaptation.functions.divide_by_reference:27
+msgid "Examples"
+msgstr "使用例"

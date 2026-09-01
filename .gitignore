@@ -150,6 +150,9 @@ docs/build/*
 # Sphinx generated API/autosummary stubs
 _autosummary/
 generated/
+!docs/locale/*/LC_MESSAGES/methods/generated/
+docs/locale/*/LC_MESSAGES/methods/generated/*
+!docs/locale/*/LC_MESSAGES/methods/generated/chemotools.adaptation*.po
 docs/source/api/generated/
 docs/source/generated/
 

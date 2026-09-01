@@ -1,0 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, chemotools
+# This file is distributed under the same license as the chemotools package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: chemotools \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 03:54+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/api/adaptation.rst:2
+msgid "chemotools.adaptation"
+msgstr "chemotools.adaptation"
+
+#: ../../source/api/adaptation.rst:6
+msgid ""
+"Adaptation methods for calibration transfer between instruments, together"
+" with metadata-aware transformation and validation utilities."
+msgstr "装置間のキャリブレーション転送に用いる適応手法と、メタデータ対応の変換および検証ユーティリティです。"
+
+#: ../../source/api/adaptation.rst:9
+msgid "**Import from this module:**"
+msgstr "**このモジュールからインポート:**"
+
+#: ../../source/api/adaptation.rst:25
+msgid "Available Classes"
+msgstr "利用可能なクラス"
+
+#: ../../source/api/adaptation.rst:31
+msgid "Class"
+msgstr "クラス"
+
+#: ../../source/api/adaptation.rst:32 ../../source/api/adaptation.rst:52
+msgid "Description"
+msgstr "説明"
+
+#: ../../source/api/adaptation.rst:33
+msgid ""
+":doc:`DirectStandardization "
+"</methods/generated/chemotools.adaptation.DirectStandardization>`"
+msgstr ":doc:`DirectStandardization </methods/generated/chemotools.adaptation.DirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:34
+msgid "Linear calibration transfer via least-squares mapping between instruments"
+msgstr "装置間の最小二乗マッピングによる線形キャリブレーション転送"
+
+#: ../../source/api/adaptation.rst:35
+msgid ""
+":doc:`PiecewiseDirectStandardization "
+"</methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+msgstr ":doc:`PiecewiseDirectStandardization </methods/generated/chemotools.adaptation.PiecewiseDirectStandardization>`"
+
+#: ../../source/api/adaptation.rst:36
+msgid "Piecewise calibration transfer using local least-squares windows"
+msgstr "局所最小二乗ウィンドウを用いた区分的キャリブレーション転送"
+
+#: ../../source/api/adaptation.rst:37
+msgid ""
+":doc:`SpectralSpaceTransform "
+"</methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+msgstr ":doc:`SpectralSpaceTransform </methods/generated/chemotools.adaptation.SpectralSpaceTransform>`"
+
+#: ../../source/api/adaptation.rst:38
+msgid "SVD-based shared latent space domain adaptation"
+msgstr "SVD に基づく共有潜在空間でのドメイン適応"
+
+#: ../../source/api/adaptation.rst:39
+msgid ""
+":doc:`XAxisInterpolator "
+"</methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+msgstr ":doc:`XAxisInterpolator </methods/generated/chemotools.adaptation.XAxisInterpolator>`"
+
+#: ../../source/api/adaptation.rst:40
+msgid "Resample spectra onto a shared x-axis grid via interpolation"
+msgstr "補間によりスペクトルを共通の x 軸グリッドへリサンプリング"
+
+#: ../../source/api/adaptation.rst:41
+msgid ""
+":doc:`MetadataFunctionTransformer "
+"</methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+msgstr ":doc:`MetadataFunctionTransformer </methods/generated/chemotools.adaptation.MetadataFunctionTransformer>`"
+
+#: ../../source/api/adaptation.rst:42
+msgid "Apply a callable with auxiliary inputs supplied through metadata routing"
+msgstr "メタデータルーティングで渡された補助入力を使用して callable を適用"
+
+#: ../../source/api/adaptation.rst:45
+msgid "Available Functions"
+msgstr "利用可能な関数"
+
+#: ../../source/api/adaptation.rst:51
+msgid "Function"
+msgstr "関数"
+
+#: ../../source/api/adaptation.rst:53
+msgid ""
+":doc:`check_metadata_function "
+"</methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+msgstr ":doc:`check_metadata_function </methods/generated/chemotools.adaptation.validation.check_metadata_function>`"
+
+#: ../../source/api/adaptation.rst:54
+msgid "Validate a metadata-aware callable on representative data"
+msgstr "代表データを用いてメタデータ対応 callable を検証"
+
+#: ../../source/api/adaptation.rst:55
+msgid ""
+":doc:`subtract_reference "
+"</methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+msgstr ":doc:`subtract_reference </methods/generated/chemotools.adaptation.functions.subtract_reference>`"
+
+#: ../../source/api/adaptation.rst:56
+msgid "Subtract a shared or per-sample reference from spectra"
+msgstr "スペクトルから共通またはサンプル別の参照値を減算"
+
+#: ../../source/api/adaptation.rst:57
+msgid ""
+":doc:`divide_by_reference "
+"</methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+msgstr ":doc:`divide_by_reference </methods/generated/chemotools.adaptation.functions.divide_by_reference>`"
+
+#: ../../source/api/adaptation.rst:58
+msgid "Divide spectra by a shared or per-sample reference"
+msgstr "スペクトルを共通またはサンプル別の参照値で除算"
+
+#: ../../source/api/adaptation.rst:59
+msgid ""
+":doc:`scale_by_factor "
+"</methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+msgstr ":doc:`scale_by_factor </methods/generated/chemotools.adaptation.functions.scale_by_factor>`"
+
+#: ../../source/api/adaptation.rst:60
+msgid "Scale spectra by a scalar or array factor"
+msgstr "スカラーまたは配列の係数でスペクトルをスケーリング"
+
+#: ../../source/api/adaptation.rst:61
+msgid ""
+":doc:`add_offset "
+"</methods/generated/chemotools.adaptation.functions.add_offset>`"
+msgstr ":doc:`add_offset </methods/generated/chemotools.adaptation.functions.add_offset>`"
+
+#: ../../source/api/adaptation.rst:62
+msgid "Add a shared or per-sample offset to spectra"
+msgstr "スペクトルに共通またはサンプル別のオフセットを加算"
+
+#: ../../source/api/adaptation.rst:65
+msgid "See Also"
+msgstr "関連項目"
+
+#: ../../source/api/adaptation.rst:67
+msgid ""
+":doc:`Adaptation Methods Overview </methods/adaptation>` - Complete "
+"documentation with examples and visual guides"
+msgstr ":doc:`適応手法の概要 </methods/adaptation>` - 例とビジュアルガイドを含む完全なドキュメント"
+
