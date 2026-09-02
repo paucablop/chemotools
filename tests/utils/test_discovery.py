@@ -1,5 +1,6 @@
 import pytest
 
+from chemotools.utils import discovery as discovery_module
 from chemotools.utils.discovery import all_displays, all_estimators, all_functions
 
 
@@ -62,3 +63,33 @@ def test_all_functions_returns_list_of_tuples():
     # Check no duplicate names
     names = [name for name, _ in result]
     assert len(names) == len(set(names))
+
+
+@pytest.mark.parametrize(
+    "unimportable_module", ["chemotools.plotting", "chemotools.inspector"]
+)
+@pytest.mark.parametrize(
+    "discover", [all_estimators, all_displays, all_functions], ids=lambda f: f.__name__
+)
+def test_discovery_skips_module_with_missing_optional_dependency(
+    monkeypatch, unimportable_module, discover
+):
+    """Reproduces #283: a submodule whose package raises ImportError at
+    import time (e.g. because matplotlib/the `viz` extra isn't installed)
+    must be skipped with a warning instead of crashing discovery."""
+    real_import_module = discovery_module.import_module
+
+    def fake_import_module(name, package=None):
+        if name == unimportable_module:
+            raise ImportError(
+                f"'{name}' requires the optional dependency 'matplotlib'. "
+                "Install it with: pip install chemotools[viz]"
+            )
+        return real_import_module(name, package)
+
+    monkeypatch.setattr(discovery_module, "import_module", fake_import_module)
+
+    with pytest.warns(UserWarning, match=unimportable_module):
+        result = discover()
+
+    assert isinstance(result, list)

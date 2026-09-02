@@ -7,7 +7,7 @@ objects (i.e. estimators, displays, functions) from the `chemotools` package.
 
 import inspect
 import pkgutil
-import sys
+import warnings
 from importlib import import_module
 from operator import itemgetter
 from pathlib import Path
@@ -24,6 +24,30 @@ from sklearn.feature_selection import SelectorMixin
 from sklearn.utils._testing import ignore_warnings
 
 _MODULE_TO_IGNORE = {"tests", "utils", "datasets"}
+
+
+def _iter_chemotools_modules():
+    """Yield importable chemotools submodules.
+
+    Submodules that fail to import (e.g. because an optional dependency such
+    as matplotlib is not installed) are skipped with a warning instead of
+    propagating the error, so discovery keeps working for callers who don't
+    need the affected submodule.
+    """
+    root = str(Path(__file__).parent.parent)  # chemotools package root
+    for _, module_name, _ in pkgutil.walk_packages(path=[root], prefix="chemotools."):
+        module_parts = module_name.split(".")
+        # Skip ignored modules and any submodules of datasets
+        if any(part in _MODULE_TO_IGNORE for part in module_parts):
+            continue
+
+        try:
+            yield import_module(module_name)
+        except ImportError as exc:
+            warnings.warn(
+                f"Skipping '{module_name}' during discovery: {exc}",
+                stacklevel=3,
+            )
 
 
 def all_estimators(type_filter=None):
@@ -62,22 +86,9 @@ def all_estimators(type_filter=None):
         return bool(getattr(c, "__abstractmethods__", False))
 
     all_classes = []
-    root = str(Path(__file__).parent.parent)  # chemotools package root
-    # Ensure chemotools is importable
-    if root not in sys.path:
-        sys.path.insert(0, root)
 
     with ignore_warnings(category=FutureWarning):
-        for _, module_name, _ in pkgutil.walk_packages(
-            path=[root], prefix="chemotools."
-        ):
-            module_parts = module_name.split(".")
-            # Skip ignored modules and any submodules of datasets
-
-            if any(part in _MODULE_TO_IGNORE for part in module_parts):
-                continue
-
-            module = import_module(module_name)
+        for module in _iter_chemotools_modules():
             classes = inspect.getmembers(module, inspect.isclass)
             # Only classes defined in this module
             classes = [
@@ -143,17 +154,10 @@ def all_displays():
     >>> displays = all_displays()
     """
     all_classes = []
-    root = str(Path(__file__).parent.parent)  # chemotools package
     # Ignore deprecation warnings triggered at import time and from walking
     # packages
     with ignore_warnings(category=FutureWarning):
-        for _, module_name, _ in pkgutil.walk_packages(
-            path=[root], prefix="chemotools."
-        ):
-            module_parts = module_name.split(".")
-            if any(part in _MODULE_TO_IGNORE for part in module_parts):
-                continue
-            module = import_module(module_name)
+        for module in _iter_chemotools_modules():
             classes = inspect.getmembers(module, inspect.isclass)
             classes = [
                 (name, display_class)
@@ -194,18 +198,10 @@ def all_functions():
     >>> functions = all_functions()
     """
     all_functions = []
-    root = str(Path(__file__).parent.parent)  # chemotools package
     # Ignore deprecation warnings triggered at import time and from walking
     # packages
     with ignore_warnings(category=FutureWarning):
-        for _, module_name, _ in pkgutil.walk_packages(
-            path=[root], prefix="chemotools."
-        ):
-            module_parts = module_name.split(".")
-            if any(part in _MODULE_TO_IGNORE for part in module_parts):
-                continue
-
-            module = import_module(module_name)
+        for module in _iter_chemotools_modules():
             functions = inspect.getmembers(module, _is_checked_function)
             functions = [(func.__name__, func) for name, func in functions]
             all_functions.extend(functions)
