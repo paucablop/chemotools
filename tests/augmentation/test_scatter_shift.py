@@ -68,9 +68,12 @@ def test_scatter_shift_reproducible():
     # Arrange
     rng = np.random.default_rng(1)
     spectra = rng.normal(size=(4, 60))
-    params = dict(
-        order=2, multiplicative_scale=0.05, additive_scale=0.02, random_state=7
-    )
+    params = {
+        "order": 2,
+        "multiplicative_scale": 0.05,
+        "additive_scale": 0.02,
+        "random_state": 7,
+    }
 
     # Act
     first = ScatterShift(**params).fit_transform(spectra)
@@ -98,4 +101,7 @@ def test_scatter_shift_basis_matches_emsc():
     # And EMSC at the same order builds the same polynomial block, confirming the
     # augmenter is the forward counterpart of the correction
     emsc = ExtendedMultiplicativeScatterCorrection(order=order).fit(spectra)
-    assert np.allclose(emsc.A_[:, : order + 1], transformer.polynomial_basis_, atol=1e-12)
+    assert emsc.A_[:, : order + 1].shape == transformer.polynomial_basis_.shape
+    assert np.allclose(
+        emsc.A_[:, : order + 1], transformer.polynomial_basis_, atol=1e-12
+    )

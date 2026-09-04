@@ -150,7 +150,7 @@ class ScatterShift(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEst
         # Build the polynomial baseline basis on normalized wavelength indices.
         # This mirrors the EMSC design matrix so the augmentation is the forward
         # counterpart of ExtendedMultiplicativeScatterCorrection.
-        x_indices = np.linspace(-1, 1, self.n_features_in_)
+        x_indices = np.linspace(-1, 1, X.shape[1])
         self.polynomial_basis_ = np.vander(x_indices, N=self.order + 1, increasing=True)
 
         # Instantiate the random number generator
