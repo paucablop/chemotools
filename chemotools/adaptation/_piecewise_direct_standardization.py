@@ -11,11 +11,11 @@ from numbers import Integral
 
 import numpy as np
 from sklearn.base import BaseEstimator, OneToOneFeatureMixin, TransformerMixin
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.utils._param_validation import Interval, StrOptions
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
+from chemotools.regression import PLSRegression
 
 
 class PiecewiseDirectStandardization(

@@ -16,12 +16,12 @@ from typing import (
 )
 
 import numpy as np
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
 
 if TYPE_CHECKING:
     import matplotlib.figure
 
+from chemotools._types import PLSEstimatorType
 from chemotools.outliers import HotellingT2, Leverage, QResiduals, StudentizedResiduals
 
 from .core.base import InspectorPlotConfig, _BaseInspector
@@ -71,7 +71,7 @@ class PLSRegressionInspector(
 
     Parameters
     ----------
-    model : _PLS or Pipeline
+    model : PLS model or Pipeline
         Fitted PLS model or pipeline ending with PLS
     X_train : array-like of shape (n_samples, n_features)
         Training data
@@ -94,9 +94,9 @@ class PLSRegressionInspector(
 
     Attributes
     ----------
-    model : _PLS or Pipeline
+    model : PLS model or Pipeline
         The original model passed to the inspector
-    estimator : _PLS
+    estimator : PLS model
         The PLS estimator
     transformer : Pipeline or None
         Preprocessing pipeline before PLS (if model was a Pipeline)
@@ -129,7 +129,7 @@ class PLSRegressionInspector(
 
     Examples
     --------
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> from sklearn.pipeline import make_pipeline
     >>> from sklearn.preprocessing import StandardScaler
     >>> from chemotools.datasets import load_fermentation_train
@@ -172,12 +172,12 @@ class PLSRegressionInspector(
     component_label = "LV"
 
     # Narrow from base-class broad types — this inspector is PLS-only.
-    _model: Union[_PLS, Pipeline]
-    estimator_: _PLS
+    _model: Union[PLSEstimatorType, Pipeline]
+    estimator_: PLSEstimatorType
 
     def __init__(
         self,
-        model: Union[_PLS, Pipeline],
+        model: Union[PLSEstimatorType, Pipeline],
         X_train: np.ndarray,
         y_train: np.ndarray,
         X_test: Optional[np.ndarray] = None,
@@ -210,12 +210,12 @@ class PLSRegressionInspector(
     # ==================================================================================
 
     @property
-    def model(self) -> Union[_PLS, Pipeline]:
+    def model(self) -> Union[PLSEstimatorType, Pipeline]:
         """Return the original PLS model or Pipeline."""
         return self._model
 
     @property
-    def estimator(self) -> _PLS:
+    def estimator(self) -> PLSEstimatorType:
         """Return the underlying PLS estimator."""
         return self.estimator_
 

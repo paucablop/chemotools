@@ -10,9 +10,10 @@ from typing import Optional, Union
 
 import numpy as np
 from scipy.stats import f as f_distribution
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
+
+from chemotools._types import PLS_TYPES
 
 from ._base import ModelTypes, _ModelResidualsBase
 
@@ -97,7 +98,7 @@ class HotellingT2(_ModelResidualsBase):
         if isinstance(self.estimator_, _BasePCA):
             variances = self.estimator_.explained_variance_  # type: ignore[ty:unresolved-attribute]
 
-        if isinstance(self.estimator_, _PLS):
+        if isinstance(self.estimator_, PLS_TYPES):
             variances = np.var(self.estimator_.x_scores_, axis=0)  # type: ignore[ty:unresolved-attribute]
 
         X_transformed = self.estimator_.transform(X)

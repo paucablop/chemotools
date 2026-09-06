@@ -289,7 +289,7 @@ other steps:
     from sklearn.model_selection import train_test_split
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from chemotools.projection import OrthogonalSignalCorrection
 
     X_train, X_test, y_train, y_test = train_test_split(

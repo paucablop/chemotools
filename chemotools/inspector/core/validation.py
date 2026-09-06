@@ -1,28 +1,27 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 import numpy as np
-from sklearn.cross_decomposition._pls import _PLS
-from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
+from chemotools._types import EstimatorType, ModelInput
 from chemotools._validation import validate_and_extract_model as _canonical_validate
 
 
 def _validate_and_extract_model(
-    model: Union[_BasePCA, _PLS, Pipeline],
-) -> Tuple[Union[_BasePCA, _PLS], Optional[Pipeline]]:
+    model: ModelInput,
+) -> Tuple[EstimatorType, Optional[Pipeline]]:
     """Validate and extract model and transformer.
 
     Delegates to :func:`chemotools._validation.validate_and_extract_model`.
 
     Parameters
     ----------
-    model : Union[_BasePCA, _PLS, Pipeline]
+    model : ModelInput
         The model to validate
 
     Returns
     -------
-    estimator : Union[_BasePCA, _PLS]
+    estimator : EstimatorType
         The extracted estimator
 
     transformer : Optional[Pipeline]

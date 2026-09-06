@@ -2,12 +2,12 @@
 
 import numpy as np
 import pytest
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from chemotools.inspector import PCAInspector, PLSRegressionInspector
+from chemotools.regression import PLSRegression
 
 
 @pytest.fixture

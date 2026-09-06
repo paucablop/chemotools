@@ -3,7 +3,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 
 from chemotools.inspector.helpers._latent import (
@@ -14,6 +13,7 @@ from chemotools.inspector.helpers._latent import (
     create_scores_plot_single_dataset,
     create_variance_plot,
 )
+from chemotools.regression import PLSRegression
 
 
 @pytest.fixture
@@ -898,7 +898,7 @@ class TestCreateQVsYResidualsPlot:
     @pytest.fixture
     def pls_regression_model(self):
         """Create a fitted PLS regression model for testing."""
-        from sklearn.cross_decomposition import PLSRegression
+        from chemotools.regression import PLSRegression
 
         np.random.seed(42)
         X = np.random.rand(100, 50)

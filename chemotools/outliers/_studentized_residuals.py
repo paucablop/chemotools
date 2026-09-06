@@ -9,8 +9,9 @@ implements the Studentized Residuals outlier detection algorithm.
 from typing import Optional, Union
 
 import numpy as np
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.pipeline import Pipeline
+
+from chemotools._types import PLSEstimatorType
 
 from ._base import _ModelResidualsBase
 from ._leverage import calculate_leverage
@@ -68,7 +69,7 @@ class StudentizedResiduals(_ModelResidualsBase):
     --------
     >>> from chemotools.datasets import load_fermentation_train
     >>> from chemotools.outliers import StudentizedResiduals
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> # Load sample data
     >>> X, y = load_fermentation_train()
     >>> y = y.values
@@ -89,9 +90,11 @@ class StudentizedResiduals(_ModelResidualsBase):
         "Multivariate Data Analysis - In Practice", 5th Edition, 2002.
     """
 
-    estimator_: _PLS
+    estimator_: PLSEstimatorType
 
-    def __init__(self, model: Union[_PLS, Pipeline], confidence=0.95) -> None:
+    def __init__(
+        self, model: Union[PLSEstimatorType, Pipeline], confidence=0.95
+    ) -> None:
         super().__init__(model, confidence)
 
     def _fit_residuals(self, X: np.ndarray, y: Optional[np.ndarray]) -> None:
@@ -129,13 +132,13 @@ class StudentizedResiduals(_ModelResidualsBase):
 
 
 def calculate_studentized_residuals(
-    model: _PLS, X: np.ndarray, y_residuals: np.ndarray
+    model: PLSEstimatorType, X: np.ndarray, y_residuals: np.ndarray
 ) -> np.ndarray:
     """Calculate the studentized residuals of the model predictions.
 
     Parameters
     ----------
-    model : _PLS
+    model : PLSEstimatorType
         A fitted model
 
     X : array-like of shape (n_samples, n_features)

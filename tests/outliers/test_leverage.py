@@ -1,7 +1,7 @@
 import numpy as np
-from sklearn.cross_decomposition import PLSRegression
 
 from chemotools.outliers import Leverage
+from chemotools.regression import PLSRegression
 
 
 def test_leverage_calculation(dummy_data_loader):

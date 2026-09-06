@@ -49,7 +49,7 @@ class SRSelector(_PLSFeatureSelectorBase):
     --------
     >>> from chemotools.datasets import load_fermentation_train
     >>> from chemotools.feature_selection import SRSelector
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> # Load sample data
     >>> X, y = load_fermentation_train()
     >>> # Instantiate the PLS regression model

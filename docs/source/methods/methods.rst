@@ -11,6 +11,7 @@ Browse the available chemotools methods by category.
     augmentation
     preprocessing
     feature_selection
+    regression
     outliers
     plotting
     inspector
