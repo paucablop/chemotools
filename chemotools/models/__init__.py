@@ -4,7 +4,9 @@ import warnings
 
 from chemotools.regression import PLSRegression
 
-__all__ = ["PLSRegression"]
+__all__ = [
+    "PLSRegression",
+]
 
 # Show compatibility notices on module import
 warnings.warn(
