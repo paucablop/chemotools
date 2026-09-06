@@ -1,8 +1,11 @@
 """Tests for enhanced PLSRegression with automatic variance calculation."""
 
 import numpy as np
+import pandas as pd
 import pytest
+from sklearn.compose import ColumnTransformer
 from sklearn.cross_decomposition import PLSRegression as SklearnPLSRegression
+from sklearn.pipeline import Pipeline
 from sklearn.utils.estimator_checks import check_estimator
 
 from chemotools.regression import PLSRegression
@@ -183,6 +186,45 @@ class TestPLSRegressionCompatibility:
             decimal=10,
             err_msg="Multivariate predictions should match sklearn",
         )
+
+    def test_works_with_column_transformer(self):
+        # Arrange
+        np.random.seed(42)
+        X = np.random.randn(100, 50)
+        y = np.random.randn(100)
+        cols = [f"c{i}" for i in range(X.shape[1])]
+        df_x = pd.DataFrame(X, columns=cols)
+        df_y = pd.DataFrame(y, columns=["y"])
+
+        df_x.insert(0, "sample_id", [f"S{i:04d}" for i in range(len(df_x))])
+        df_x.insert(
+            1,
+            "region",
+            np.random.choice(["North", "South", "East", "West"], size=len(df_x)),
+        )
+
+        METADATA_COLS = df_x.select_dtypes(exclude="number").columns.tolist()
+        FEATURE_COLS = df_x.select_dtypes(include="number").columns.tolist()
+        N_COMPONENTS = 3
+
+        expected_columns = ["sample_id", "region"]
+        expected_columns += [f"LV{i + 1}" for i in range(N_COMPONENTS)]
+
+        # Act
+        pipeline = Pipeline([("pls", PLSRegression(n_components=N_COMPONENTS))])
+
+        transformer = ColumnTransformer(
+            transformers=[
+                ("metadata", "passthrough", METADATA_COLS),
+                ("features", pipeline, FEATURE_COLS),
+            ],
+            verbose_feature_names_out=False,
+        ).set_output(transform="pandas")
+
+        df_out = transformer.fit_transform(df_x, df_y)
+
+        # Assert
+        assert df_out.columns.tolist() == expected_columns
 
 
 class TestPLSRegressionVarianceCalculation:

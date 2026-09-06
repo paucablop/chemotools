@@ -52,7 +52,7 @@ def test_import_optional_dependency_real_optional(monkeypatch):
             raise ImportError("No module named 'pandas'")
         return real_import(name, *args, **kwargs)
 
-    monkeypatch.setattr("builtins.__import__", fake_import)
+    monkeypatch.setattr("importlib.import_module", fake_import)
 
     with pytest.raises(ImportError) as excinfo:
         import_optional_dependency("pandas", caller_name="test_loader")

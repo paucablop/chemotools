@@ -844,6 +844,25 @@ class TestAdditionalCoverage:
         for fig in figures.values():
             plt.close(fig)
 
+    def test_get_y_scores(self, fitted_pls, regression_data):
+        # Arrange
+        X_train, y_train = regression_data["train"]
+        inspector = PLSRegressionInspector(fitted_pls, X_train, y_train)
+
+        # Act
+        y_scores_inspector = inspector.get_y_scores("train")
+        _, y_scores_pls = fitted_pls.transform(X_train, y_train)
+
+        # Assert
+        np.testing.assert_array_almost_equal(
+            y_scores_inspector,
+            y_scores_pls,
+            decimal=10,
+            err_msg="Inpsector y scores should match the fitted_pls y_scores",
+        )
+
+
+
 
 class TestValidationPropagation:
     def test_y_length_mismatch_raises(self, fitted_pls, regression_data):
