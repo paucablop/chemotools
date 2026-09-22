@@ -22,7 +22,7 @@ For this section, we will use the following fit pipeline as an example:
     from chemotools.feature_selection import RangeCut
     from chemotools.baseline import LinearCorrection
     from chemotools.derivative import SavitzkyGolay
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 

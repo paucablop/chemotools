@@ -137,7 +137,7 @@ class OrthogonalSignalCorrection(DocLinkMixin, TransformerMixin, BaseEstimator):
     The transformer can be used inside a scikit-learn pipeline.
 
     >>> from sklearn.pipeline import make_pipeline
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> pipe = make_pipeline(
     ...     OrthogonalSignalCorrection(n_components=1, method="sjoblom"),
     ...     PLSRegression(n_components=2),

@@ -1,7 +1,7 @@
 import numpy as np
-from sklearn.cross_decomposition import PLSRegression
 
 from chemotools.outliers import StudentizedResiduals
+from chemotools.regression import PLSRegression
 
 
 # Test functionality

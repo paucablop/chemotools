@@ -33,7 +33,7 @@ The code to perform this workflow would look like this:
     from chemotools.feature_selection import RangeCut
     from chemotools.baseline import LinearCorrection
     from chemotools.derivative import SavitzkyGolay
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.preprocessing import StandardScaler
 
     # Range Cut
@@ -99,7 +99,7 @@ The code to perform the pipeline is shown below:
     from chemotools.feature_selection import RangeCut
     from chemotools.baseline import LinearCorrection
     from chemotools.derivative import SavitzkyGolay
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 

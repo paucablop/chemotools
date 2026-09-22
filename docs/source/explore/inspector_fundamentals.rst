@@ -40,7 +40,7 @@ For the example, let's load some data and train a PCA and a PLS regression model
 
 .. code-block:: python
 
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.decomposition import PCA
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler

@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.base import is_regressor
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from chemotools.inspector import PLSRegressionInspector
 from chemotools.inspector.core.summaries import InspectorSummary
+from chemotools.regression import PLSRegression
 
 
 @pytest.fixture

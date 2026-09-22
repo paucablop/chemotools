@@ -14,15 +14,13 @@ from typing import (
 )
 
 import numpy as np
-from sklearn.cross_decomposition._pls import _PLS
-from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
 from sklearn.utils import check_array
 
-from chemotools._types import ModelInput
+from chemotools._types import EstimatorType, ModelInput
 
 from .summaries import InspectorSummary
 from .utils import normalize_datasets
@@ -291,7 +289,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
 
         # Store model components
         self._model: ModelInput = model
-        self.estimator_: Union[_BasePCA, _PLS] = estimator
+        self.estimator_: EstimatorType = estimator
         self.transformer_: Optional[Pipeline] = transformer
 
         # Build and validate datasets
@@ -547,7 +545,7 @@ class _BaseInspector(_DataHoldingBase, ABC):
         return self._model
 
     @property
-    def estimator(self) -> Union[_BasePCA, _PLS]:
+    def estimator(self) -> EstimatorType:
         """Return the underlying estimator (PCA or PLS)."""
         return self.estimator_
 

@@ -54,7 +54,7 @@ class Leverage(_ModelResidualsBase):
 
     Examples
     --------
-    >>> from sklearn.cross_decomposition import PLSRegression
+    >>> from chemotools.regression import PLSRegression
     >>> from chemotools.outliers import Leverage
     >>> X = np.random.rand(100, 10)
     >>> y = np.random.rand(100)

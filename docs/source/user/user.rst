@@ -49,7 +49,7 @@ Combine preprocessing and modelling steps in a single pipeline.
 .. code-block:: python
 
     from chemotools.derivative import SavitzkyGolay
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.pipeline import make_pipeline
     
     # Define the pipeline

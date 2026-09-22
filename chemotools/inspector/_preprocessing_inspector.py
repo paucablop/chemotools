@@ -16,11 +16,12 @@ from typing import (
 
 import numpy as np
 from sklearn.base import is_classifier, is_regressor
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
+
+from chemotools._types import PLS_TYPES
 
 from .core.base import InspectorDataset, _DataHoldingBase
 from .core.spectra import SpectraMixin
@@ -52,7 +53,7 @@ def _is_model_step(step: object) -> bool:
         # Handles "passthrough" and any future string sentinels
         return True
 
-    if isinstance(step, (_BasePCA, _PLS)):
+    if isinstance(step, (_BasePCA, *PLS_TYPES)):
         return True
 
     if is_classifier(step) or is_regressor(step):

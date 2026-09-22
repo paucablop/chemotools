@@ -33,7 +33,10 @@ def test_sr_selector_with_fitted_pca(fitted_pca, dummy_data_loader):
     # Arrange, Act & Assert
     with pytest.raises(
         TypeError,
-        match=".*Model must be _PLS, or a Pipeline ending with one of these types.*",
+        match=(
+            ".*Model must be _PLS, PLSRegression, or a Pipeline ending "
+            "with one of these types.*"
+        ),
     ):
         SRSelector(model=fitted_pca, threshold=1)
 

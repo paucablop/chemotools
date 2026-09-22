@@ -51,7 +51,7 @@ The pipeline can be created using the code shown below:
     from chemotools.feature_selection import RangeCut
     from chemotools.baseline import LinearCorrection
     from chemotools.derivative import SavitzkyGolay
-    from sklearn.cross_decomposition import PLSRegression
+    from chemotools.regression import PLSRegression
     from sklearn.pipeline import make_pipeline
     from sklearn.preprocessing import StandardScaler
 

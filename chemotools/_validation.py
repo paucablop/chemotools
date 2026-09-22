@@ -2,19 +2,18 @@
 
 from typing import Optional, Tuple, Type, Union
 
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils.validation import check_is_fitted
 
-from ._types import EstimatorType
+from ._types import PLS_TYPES, EstimatorType
 
 
 def validate_and_extract_model(
     model: Union[EstimatorType, Pipeline],
     *,
     require_fitted: bool = True,
-    allowed_types: Tuple[Type, ...] = (_BasePCA, _PLS),
+    allowed_types: Tuple[Type, ...] = (_BasePCA, *PLS_TYPES),
 ) -> Tuple[EstimatorType, Optional[Pipeline]]:
     """Validate a model and extract the estimator and optional preprocessing pipeline.
 
@@ -26,9 +25,9 @@ def validate_and_extract_model(
     require_fitted : bool, default=True
         If ``True``, raise an error when the model is not fitted.
 
-    allowed_types : tuple of types, default=(_BasePCA, _PLS)
+    allowed_types : tuple of types, default=(_BasePCA, *PLS_TYPES)
         The estimator types that are permitted. Pass a narrower tuple
-        (e.g. ``(_PLS,)``) to enforce stricter constraints.
+        (e.g. ``PLS_TYPES``) to enforce stricter constraints.
 
     Returns
     -------
@@ -72,7 +71,8 @@ def get_model_parameters(estimator: EstimatorType) -> Tuple[int, int, int]:
     Parameters
     ----------
     estimator : EstimatorType
-        A fitted ``_BasePCA`` or ``_PLS`` instance.
+        A fitted ``_BasePCA``, ``_PLS``, or chemotools ``PLSRegression``
+        instance.
 
     Returns
     -------
@@ -88,11 +88,11 @@ def get_model_parameters(estimator: EstimatorType) -> Tuple[int, int, int]:
     Raises
     ------
     TypeError
-        If *estimator* is neither ``_BasePCA`` nor ``_PLS``.
+        If *estimator* is neither ``_BasePCA`` nor a PLS model.
     """
     if isinstance(estimator, _BasePCA):
         return estimator.n_features_in_, estimator.n_components_, estimator.n_samples_  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attributes
-    if isinstance(estimator, _PLS):
+    if isinstance(estimator, PLS_TYPES):
         return (
             estimator.n_features_in_,  # type: ignore[ty:unresolved-attribute]  # sklearn fitted attribute
             estimator.n_components,
@@ -100,5 +100,5 @@ def get_model_parameters(estimator: EstimatorType) -> Tuple[int, int, int]:
         )
     raise TypeError(
         f"Cannot extract parameters from {type(estimator).__name__}. "
-        "Expected _BasePCA or _PLS."
+        "Expected _BasePCA, _PLS, or PLSRegression."
     )

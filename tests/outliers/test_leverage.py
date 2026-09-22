@@ -1,7 +1,7 @@
 import numpy as np
-from sklearn.cross_decomposition import PLSRegression
 
 from chemotools.outliers import Leverage
+from chemotools.regression import PLSRegression
 
 
 def test_leverage_calculation(dummy_data_loader):
@@ -15,9 +15,15 @@ def test_leverage_calculation(dummy_data_loader):
 
     # Assert
     assert np.all(leverages >= 0), "Leverage values should be positive"
-    assert np.sum(leverages) == 1, "Sum of leverage values should be 1"
-    assert np.isclose(np.mean(leverages), 1 / len(X)), (
+    assert np.isclose(np.sum(leverages), 1, rtol=1e-12, atol=1e-12), (
+        "Sum of leverage values should be 1"
+    )
+    assert np.isclose(np.mean(leverages), 1 / len(X), rtol=1e-12, atol=1e-12), (
         "Mean of leverage values should be 1/n_samples"
     )
-    assert np.isclose(leverages[0], 0.02940591986082612), "Leverage value mismatch"
-    assert np.isclose(leverages[-1], 0.02936313351948305), "Leverage value mismatch"
+    assert np.isclose(leverages[0], 0.02940591986082612, rtol=1e-12, atol=1e-12), (
+        "Leverage value mismatch"
+    )
+    assert np.isclose(leverages[-1], 0.02936313351948305, rtol=1e-12, atol=1e-12), (
+        "Leverage value mismatch"
+    )

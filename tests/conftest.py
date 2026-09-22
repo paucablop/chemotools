@@ -3,13 +3,13 @@ from typing import Optional, Tuple
 
 import numpy as np
 import pytest
-from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
 from chemotools.outliers._base import _ModelResidualsBase
+from chemotools.regression import PLSRegression
 
 test_directory = os.path.dirname(os.path.abspath(__file__))
 

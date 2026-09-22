@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from sklearn.base import BaseEstimator, OutlierMixin
-from sklearn.cross_decomposition._pls import _PLS
 from sklearn.decomposition._base import _BasePCA
 from sklearn.pipeline import Pipeline
 from sklearn.utils._param_validation import Interval, Real
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
     from typing_extensions import Self
 
 from chemotools._doc_mixin import DocLinkMixin
-from chemotools._types import EstimatorType, ModelInput
+from chemotools._types import PLS_TYPES, EstimatorType, ModelInput
 from chemotools._validation import get_model_parameters, validate_and_extract_model
 
 # Backward-compatible alias – existing consumers import this name.
@@ -31,14 +30,15 @@ class _ModelResidualsBase(DocLinkMixin, ABC, BaseEstimator, OutlierMixin):
     Parameters
     ----------
     model : Union[ModelTypes, Pipeline]
-        A fitted _BasePCA or _PLS models or Pipeline ending with such a model
+        A fitted PCA/PLS model (``_BasePCA``, ``_PLS``, or chemotools
+        ``PLSRegression``) or Pipeline ending with such a model
     confidence : float
         Confidence level for statistical calculations (between 0 and 1)
 
     Attributes
     ----------
     estimator_ : ModelTypes
-        The fitted model of type _BasePCA or _PLS
+        The fitted PCA/PLS model
 
     transformer_ : Optional[Pipeline]
         Preprocessing steps before the model
@@ -57,7 +57,7 @@ class _ModelResidualsBase(DocLinkMixin, ABC, BaseEstimator, OutlierMixin):
     """
 
     _parameter_constraints: dict = {
-        "model": [Pipeline, _BasePCA, _PLS],
+        "model": [Pipeline, _BasePCA, *PLS_TYPES],
         "confidence": [Interval(Real, 0, 1, closed="neither")],
     }
 
