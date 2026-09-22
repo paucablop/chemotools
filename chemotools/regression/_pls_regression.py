@@ -354,7 +354,7 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
             )
             if self.algorithm == 2
             # inner_.T is the stored X-scores (non-None) in the algorithm-1 branch.
-            else np.copy(self.inner_.T)  # type: ignore[ty:no-matching-overload]
+            else np.copy(self.inner_.T)
         )
 
         # Calculate explained variance ratios automatically (from the raw inputs)
