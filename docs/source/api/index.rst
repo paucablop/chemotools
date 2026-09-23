@@ -33,6 +33,12 @@ For detailed documentation with examples and visual guides, see the :doc:`Method
    Plotting <plotting>
    Inspector <inspector>
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Classification
+
+   Classification <classification>
+
 Quick Import Reference
 ----------------------
 
@@ -48,7 +54,5 @@ All classes can be imported directly from their respective modules:
    from chemotools.adaptation import DirectStandardization, PiecewiseDirectStandardization, XAxisInterpolator
    from chemotools.plotting import SpectraPlot, ScoresPlot
    from chemotools.inspector import PCAInspector, PLSRegressionInspector
+   from chemotools.classification import PLSDA
    # ... and so on
-
-
-
