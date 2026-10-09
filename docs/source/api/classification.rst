@@ -1,5 +1,5 @@
 chemotools.classification
-==========================
+=========================
 
 .. currentmodule:: chemotools.classification
 
@@ -14,7 +14,7 @@ Classification methods for spectral data. These methods assign discrete class la
    )
 
 Available Classes
-------------------
+-----------------
 
 .. list-table::
    :widths: 30 70
@@ -22,10 +22,12 @@ Available Classes
 
    * - Class
      - Description
-   * - ``PLSDA``
+   * - :doc:`PLSDA </methods/generated/chemotools.classification.PLSDA>`
      - Partial Least Squares Discriminant Analysis for classification
 
 See Also
 --------
+
+:doc:`Classification Methods Overview </methods/classification>` - Complete documentation for the classification module
 
 :doc:`Coffee classification </learn/pls_classification>` - Worked example using ATR-MIR spectra

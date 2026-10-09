@@ -23,8 +23,8 @@ class PLSDA(ClassifierMixin, PLSRegression):
     """PLS Discriminant Analysis (PLS-DA) classifier.
 
     PLS-DA turns PLS regression into a classifier by regressing X against a
-    one-hot encoded matrix of class labels, then assigning each sample to the
-    class whose centroid (in the PLS score space) is closest.
+    one-hot encoded matrix of class labels [1]_, then assigning each sample to
+    the class whose centroid (in the PLS score space) is closest [2]_.
 
     This estimator wraps :class:`chemotools.regression.PLSRegression` (itself
     backed by the Improved Kernel PLS algorithms from the ``ikpls`` package),
@@ -35,7 +35,7 @@ class PLSDA(ClassifierMixin, PLSRegression):
     ----------
     n_components : int, default=2
         Number of components to keep. Should be in
-        [1, min(n_samples, n_features, n_classes)].
+        [1, min(n_samples, n_features)].
     scale : bool, default=True
         Whether to scale X and the one-hot encoded Y to unit standard
         deviation before fitting. Both are always mean-centered.
@@ -55,13 +55,6 @@ class PLSDA(ClassifierMixin, PLSRegression):
     centroids_ : ndarray of shape (n_classes, n_components)
         Mean PLS score vector for each class, used for nearest-centroid
         class assignment in ``predict``.
-
-    All other fitted attributes (``x_weights_``, ``y_weights_``,
-    ``x_loadings_``, ``y_loadings_``, ``x_scores_``, ``x_rotations_``,
-    ``y_rotations_``, ``coef_``, ``intercept_``, ``n_features_in_``,
-    ``explained_x_variance_ratio_``, ``explained_y_variance_ratio_``) are
-    inherited from :class:`chemotools.regression.PLSRegression`. There is no
-    ``y_scores_`` attribute (see that class's docstring for why).
 
     References
     ----------
@@ -88,6 +81,16 @@ class PLSDA(ClassifierMixin, PLSRegression):
 
     Notes
     -----
+    **Inherited attributes:**
+
+    All other fitted attributes (``x_weights_``, ``y_weights_``,
+    ``x_loadings_``, ``y_loadings_``, ``x_scores_``, ``x_rotations_``,
+    ``y_rotations_``, ``coef_``, ``intercept_``, ``n_features_in_``,
+    ``feature_names_in_``, ``explained_x_variance_ratio_``,
+    ``explained_y_variance_ratio_``) are inherited from
+    :class:`chemotools.regression.PLSRegression`. There is no ``y_scores_``
+    attribute (see that class's docstring for why).
+
     **Class assignment:**
 
     - Classification uses a nearest-centroid rule in PLS score space rather
@@ -142,7 +145,7 @@ class PLSDA(ClassifierMixin, PLSRegression):
         self : PLSDA
             Fitted estimator with populated ``classes_`` and ``centroids_``.
         """
-        X, y = check_X_y(X, y)
+        _, y = check_X_y(X, y)
         check_classification_targets(y)
 
         self.classes_ = np.unique(y)

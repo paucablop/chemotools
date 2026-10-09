@@ -1,6 +1,7 @@
 """Tests for PLSDA classifier."""
 
 import numpy as np
+import pytest
 from sklearn.datasets import make_classification
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -165,3 +166,21 @@ class TestPLSDAFunctionality:
         np.testing.assert_array_equal(
             clf.classes_, np.array(["brazil", "ethiopia", "vietnam"])
         )
+
+    def test_dataframe_feature_names_preserved(self):
+        # Fitting on a DataFrame with string columns must record
+        # feature_names_in_, so predicting on reordered columns is rejected
+        # instead of silently producing wrong predictions.
+        pd = pytest.importorskip("pandas")
+        X, y = make_classification(
+            n_samples=100, n_features=6, n_classes=2, random_state=42
+        )
+        columns = [f"feature_{i}" for i in range(6)]
+        X_df = pd.DataFrame(X, columns=columns)
+
+        clf = PLSDA(n_components=3).fit(X_df, y)
+        np.testing.assert_array_equal(clf.feature_names_in_, columns)
+        assert clf.predict(X_df).shape == (100,)
+
+        with pytest.raises(ValueError, match="feature names"):
+            clf.predict(X_df[columns[::-1]])
