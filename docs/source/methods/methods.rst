@@ -12,8 +12,10 @@ Browse the available chemotools methods by category.
     preprocessing
     feature_selection
     regression
+    classification
     outliers
     plotting
     inspector
     physics
     adaptation
+
