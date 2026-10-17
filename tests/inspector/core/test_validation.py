@@ -1,11 +1,13 @@
 import numpy as np
 import pytest
 from sklearn.decomposition import PCA
+from sklearn.decomposition._base import _BasePCA
 from sklearn.exceptions import NotFittedError
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
+from chemotools._types import PLS_TYPES
 from chemotools.inspector.core.validation import (
     _validate_and_extract_model,
     _validate_datasets_consistency,
@@ -21,7 +23,9 @@ class TestValidateAndExtractModel:
         # (fitted_pca fixture provides the fitted model)
 
         # Act
-        estimator, transformer = _validate_and_extract_model(fitted_pca)
+        estimator, transformer = _validate_and_extract_model(
+            fitted_pca, allowed_types=(_BasePCA,)
+        )
 
         # Assert
         assert estimator is fitted_pca
@@ -33,7 +37,9 @@ class TestValidateAndExtractModel:
         # (fitted_pls fixture provides the fitted model)
 
         # Act
-        estimator, transformer = _validate_and_extract_model(fitted_pls)
+        estimator, transformer = _validate_and_extract_model(
+            fitted_pls, allowed_types=PLS_TYPES
+        )
 
         # Assert
         assert estimator is fitted_pls
@@ -45,7 +51,9 @@ class TestValidateAndExtractModel:
         # (fitted_pipeline_pca fixture provides the fitted pipeline)
 
         # Act
-        estimator, transformer = _validate_and_extract_model(fitted_pipeline_pca)
+        estimator, transformer = _validate_and_extract_model(
+            fitted_pipeline_pca, allowed_types=(_BasePCA,)
+        )
 
         # Assert
         assert isinstance(estimator, PCA)
@@ -60,7 +68,7 @@ class TestValidateAndExtractModel:
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            _validate_and_extract_model(unfitted_pca)
+            _validate_and_extract_model(unfitted_pca, allowed_types=(_BasePCA,))
 
     def test_unfitted_pls_raises_error(self, unfitted_pls):
         """Test that unfitted PLS raises NotFittedError."""
@@ -69,7 +77,7 @@ class TestValidateAndExtractModel:
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            _validate_and_extract_model(unfitted_pls)
+            _validate_and_extract_model(unfitted_pls, allowed_types=PLS_TYPES)
 
     def test_unfitted_pipeline_raises_error(self, unfitted_pipeline):
         """Test that unfitted pipeline raises NotFittedError."""
@@ -78,7 +86,9 @@ class TestValidateAndExtractModel:
 
         # Act & Assert
         with pytest.raises(NotFittedError):
-            _validate_and_extract_model(unfitted_pipeline)
+            _validate_and_extract_model(
+                unfitted_pipeline, allowed_types=(_BasePCA, *PLS_TYPES)
+            )
 
     def test_invalid_model_type_raises_error(self, fitted_invalid_model):
         """Test that invalid model type raises TypeError."""
@@ -87,7 +97,9 @@ class TestValidateAndExtractModel:
 
         # Act & Assert
         with pytest.raises(TypeError, match="Model must be _BasePCA, _PLS"):
-            _validate_and_extract_model(fitted_invalid_model)
+            _validate_and_extract_model(
+                fitted_invalid_model, allowed_types=(_BasePCA, *PLS_TYPES)
+            )
 
     def test_pipeline_with_invalid_final_step(self, dummy_data_loader):
         """Test that pipeline with invalid final step raises TypeError."""
@@ -97,7 +109,7 @@ class TestValidateAndExtractModel:
 
         # Act & Assert
         with pytest.raises(TypeError, match="Model must be _BasePCA, _PLS"):
-            _validate_and_extract_model(pipeline)
+            _validate_and_extract_model(pipeline, allowed_types=(_BasePCA, *PLS_TYPES))
 
     def test_single_step_pipeline(self, dummy_data_loader):
         """Test pipeline with only one step (no preprocessing)."""
@@ -106,7 +118,9 @@ class TestValidateAndExtractModel:
         pipeline = make_pipeline(PCA(n_components=2)).fit(X)
 
         # Act
-        estimator, transformer = _validate_and_extract_model(pipeline)
+        estimator, transformer = _validate_and_extract_model(
+            pipeline, allowed_types=(_BasePCA,)
+        )
 
         # Assert
         assert isinstance(estimator, PCA)
@@ -121,7 +135,9 @@ class TestValidateAndExtractModel:
         ).fit(X)
 
         # Act
-        estimator, transformer = _validate_and_extract_model(pipeline)
+        estimator, transformer = _validate_and_extract_model(
+            pipeline, allowed_types=(_BasePCA,)
+        )
 
         # Assert
         assert isinstance(estimator, PCA)

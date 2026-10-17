@@ -3,16 +3,30 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from sklearn.cross_decomposition import PLSRegression as SklearnPLSRegression
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from chemotools.inspector import PCAInspector
 from chemotools.inspector.core.summaries import InspectorSummary
+from chemotools.regression import PLSRegression
 
 
 class TestPCAInspectorInitialization:
     """Test PCAInspector initialization."""
+
+    @pytest.mark.parametrize("estimator_type", [PLSRegression, SklearnPLSRegression])
+    @pytest.mark.parametrize("use_pipeline", [False, True])
+    def test_rejects_pls_models(self, estimator_type, use_pipeline, dummy_data_loader):
+        features, targets = dummy_data_loader
+        model = estimator_type(n_components=2)
+        if use_pipeline:
+            model = make_pipeline(StandardScaler(), model)
+        model.fit(features, targets)
+
+        with pytest.raises(TypeError, match="Model must be _BasePCA"):
+            PCAInspector(model, features)
 
     def test_init_with_fitted_pca_only_train(self, fitted_pca, dummy_data_loader):
         """Test initialization with only training data."""

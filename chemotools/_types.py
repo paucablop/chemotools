@@ -19,9 +19,9 @@ surface the rest of the codebase relies on (``x_scores_``, ``x_loadings_``,
 ``coef_``, ``n_components``, ``transform``/``inverse_transform``).
 
 These aliases define the **input vocabulary** — what constructors accept.
-Concrete subclasses that constrain the model further should narrow via
-class-level annotations and property overrides. If sklearn ever restructures
-its bases, the fix is localised to this file.
+Concrete subclasses that constrain the model further should specialize generic
+base classes rather than narrow inherited mutable attributes. If sklearn ever
+restructures its bases, the fix is localised to this file.
 """
 
 from typing import Tuple, Type, Union
@@ -32,9 +32,8 @@ from sklearn.pipeline import Pipeline
 
 from chemotools.regression import PLSRegression
 
-# Runtime tuple for isinstance dispatch on "any PLS model".
-PLS_TYPES: Tuple[Type, ...] = (_PLS, PLSRegression)
-
 PLSEstimatorType = Union[_PLS, PLSRegression]
 EstimatorType = Union[_BasePCA, _PLS, PLSRegression]
 ModelInput = Union[_BasePCA, _PLS, PLSRegression, Pipeline]
+
+PLS_TYPES: Tuple[Type[PLSEstimatorType], ...] = (_PLS, PLSRegression)

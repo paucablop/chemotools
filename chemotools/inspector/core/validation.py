@@ -1,33 +1,40 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type, TypeVar, Union, cast
 
 import numpy as np
 from sklearn.pipeline import Pipeline
 
-from chemotools._types import EstimatorType, ModelInput
+from chemotools._types import EstimatorType
 from chemotools._validation import validate_and_extract_model as _canonical_validate
+
+EstimatorT = TypeVar("EstimatorT", bound=EstimatorType)
 
 
 def _validate_and_extract_model(
-    model: ModelInput,
-) -> Tuple[EstimatorType, Optional[Pipeline]]:
+    model: Union[EstimatorT, Pipeline],
+    *,
+    allowed_types: Tuple[Type[EstimatorT], ...],
+) -> Tuple[EstimatorT, Optional[Pipeline]]:
     """Validate and extract model and transformer.
 
     Delegates to :func:`chemotools._validation.validate_and_extract_model`.
 
     Parameters
     ----------
-    model : ModelInput
+    model : EstimatorT or Pipeline
         The model to validate
+    allowed_types : tuple of types
+        Permitted final estimator types for this inspector.
 
     Returns
     -------
-    estimator : EstimatorType
+    estimator : EstimatorT
         The extracted estimator
 
     transformer : Optional[Pipeline]
         The preprocessing pipeline (if model is a Pipeline)
     """
-    return _canonical_validate(model)
+    estimator, transformer = _canonical_validate(model, allowed_types=allowed_types)
+    return cast(EstimatorT, estimator), transformer
 
 
 def _validate_sample_length(name: str, y: Optional[np.ndarray], expected: int) -> None:

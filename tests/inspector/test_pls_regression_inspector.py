@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 from sklearn.base import is_regressor
+from sklearn.cross_decomposition import PLSRegression as SklearnPLSRegression
+from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -74,6 +76,36 @@ def fitted_pls_multi(multi_target_regression_data):
 
 
 class TestInitialization:
+    @pytest.mark.parametrize("estimator_type", [PLSRegression, SklearnPLSRegression])
+    @pytest.mark.parametrize("use_pipeline", [False, True])
+    def test_accepts_supported_pls_models(
+        self, estimator_type, use_pipeline, regression_data
+    ):
+        features, targets = regression_data["train"]
+        estimator = estimator_type(n_components=2)
+        model = (
+            make_pipeline(StandardScaler(), estimator) if use_pipeline else estimator
+        )
+        model.fit(features, targets)
+
+        inspector = PLSRegressionInspector(model, features, targets)
+
+        assert inspector.model is model
+        assert inspector.estimator is estimator
+        assert inspector.estimator_ is estimator
+        assert inspector.get_x_scores("train").shape == (len(features), 2)
+
+    @pytest.mark.parametrize("use_pipeline", [False, True])
+    def test_rejects_pca_models(self, use_pipeline, regression_data):
+        features, targets = regression_data["train"]
+        model = PCA(n_components=2)
+        if use_pipeline:
+            model = make_pipeline(StandardScaler(), model)
+        model.fit(features)
+
+        with pytest.raises(TypeError, match="Model must be _PLS, PLSRegression"):
+            PLSRegressionInspector(model, features, targets)
+
     def test_init_with_all_datasets(self, fitted_pls, regression_data):
         """Test PLSRegressionInspector initialization with
         train, test, and validation datasets."""

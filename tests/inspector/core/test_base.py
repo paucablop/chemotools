@@ -5,10 +5,12 @@ import numpy as np
 import pytest
 from sklearn.base import BaseEstimator
 from sklearn.decomposition import PCA
+from sklearn.decomposition._base import _BasePCA
 from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from chemotools._types import PLS_TYPES, EstimatorType
 from chemotools.inspector.core.base import (
     InspectorDataset,
     _BaseInspector,
@@ -17,8 +19,11 @@ from chemotools.regression import PLSRegression
 
 
 # Concrete implementation for testing the abstract base class
-class ConcreteInspector(_BaseInspector):
+class ConcreteInspector(_BaseInspector[EstimatorType]):
     """Concrete implementation of _BaseInspector for testing."""
+
+    def __init__(self, **kwargs):
+        super().__init__(allowed_types=(_BasePCA, *PLS_TYPES), **kwargs)
 
     def plot_scores(self, components=(0, 1), datasets=["train"], **kwargs):
         """Simple implementation for testing."""

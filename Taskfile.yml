@@ -99,7 +99,7 @@ tasks:
   type-check:
     desc: Run ty type checks
     cmds:
-      - "{{.UV}} run ty check ./chemotools"
+      - "{{.UV}} run --extra viz ty check ./chemotools"
 
   spelling:
     desc: Run typos for spelling checks

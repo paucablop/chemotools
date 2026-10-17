@@ -27,7 +27,7 @@ from .core.utils import (
 )
 
 
-class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
+class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector[_BasePCA]):
     """Inspector for PCA model diagnostics and visualization.
 
     This class provides a unified interface for inspecting PCA models by creating
@@ -129,10 +129,6 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
 
     component_label = "PC"
 
-    # Narrow from base-class broad types — this inspector is PCA-only.
-    _model: Union[_BasePCA, Pipeline]
-    estimator_: _BasePCA
-
     def __init__(
         self,
         model: Union[_BasePCA, Pipeline],
@@ -147,6 +143,7 @@ class PCAInspector(SpectraMixin, LatentVariableMixin, _BaseInspector):
     ):
         super().__init__(
             model=model,
+            allowed_types=(_BasePCA,),
             X_train=X_train,
             y_train=y_train,
             X_test=X_test,

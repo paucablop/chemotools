@@ -21,7 +21,7 @@ from sklearn.pipeline import Pipeline
 if TYPE_CHECKING:
     import matplotlib.figure
 
-from chemotools._types import PLSEstimatorType
+from chemotools._types import PLS_TYPES, PLSEstimatorType
 from chemotools.outliers import HotellingT2, Leverage, QResiduals, StudentizedResiduals
 
 from .core.base import InspectorPlotConfig, _BaseInspector
@@ -53,7 +53,10 @@ SummaryValue = Union[
 
 
 class PLSRegressionInspector(
-    SpectraMixin, RegressionMixin, LatentVariableMixin, _BaseInspector
+    SpectraMixin,
+    RegressionMixin,
+    LatentVariableMixin,
+    _BaseInspector[PLSEstimatorType],
 ):
     """Inspector for PLS Regression model diagnostics and visualization.
 
@@ -171,10 +174,6 @@ class PLSRegressionInspector(
 
     component_label = "LV"
 
-    # Narrow from base-class broad types — this inspector is PLS-only.
-    _model: Union[PLSEstimatorType, Pipeline]
-    estimator_: PLSEstimatorType
-
     def __init__(
         self,
         model: Union[PLSEstimatorType, Pipeline],
@@ -189,6 +188,7 @@ class PLSRegressionInspector(
     ):
         super().__init__(
             model=model,
+            allowed_types=PLS_TYPES,
             X_train=X_train,
             y_train=y_train,
             X_test=X_test,

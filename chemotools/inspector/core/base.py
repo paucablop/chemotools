@@ -6,10 +6,13 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    Generic,
     List,
     Optional,
     Sequence,
     Tuple,
+    Type,
+    TypeVar,
     Union,
 )
 
@@ -20,11 +23,13 @@ if TYPE_CHECKING:
     from matplotlib.figure import Figure
 from sklearn.utils import check_array
 
-from chemotools._types import EstimatorType, ModelInput
+from chemotools._types import EstimatorType
 
 from .summaries import InspectorSummary
 from .utils import normalize_datasets
 from .validation import _validate_and_extract_model, _validate_datasets_consistency
+
+EstimatorT = TypeVar("EstimatorT", bound=EstimatorType)
 
 
 @dataclass(frozen=True)
@@ -258,7 +263,7 @@ class _DataHoldingBase:
         return figures
 
 
-class _BaseInspector(_DataHoldingBase, ABC):
+class _BaseInspector(_DataHoldingBase, Generic[EstimatorT], ABC):
     """Base class for estimator-backed inspectors (PCA, PLS).
 
     Extends :class:`_DataHoldingBase` with estimator/model extraction,
@@ -268,7 +273,8 @@ class _BaseInspector(_DataHoldingBase, ABC):
     def __init__(
         self,
         *,
-        model: ModelInput,
+        model: Union[EstimatorT, Pipeline],
+        allowed_types: Tuple[Type[EstimatorT], ...],
         X_train: np.ndarray,
         y_train: Optional[np.ndarray] = None,
         X_test: Optional[np.ndarray] = None,
@@ -285,11 +291,13 @@ class _BaseInspector(_DataHoldingBase, ABC):
         self._confidence = confidence
 
         # Validate and extract model components
-        estimator, transformer = _validate_and_extract_model(model)
+        estimator, transformer = _validate_and_extract_model(
+            model, allowed_types=allowed_types
+        )
 
         # Store model components
-        self._model: ModelInput = model
-        self.estimator_: EstimatorType = estimator
+        self._model: Union[EstimatorT, Pipeline] = model
+        self.estimator_: EstimatorT = estimator
         self.transformer_: Optional[Pipeline] = transformer
 
         # Build and validate datasets
@@ -540,12 +548,12 @@ class _BaseInspector(_DataHoldingBase, ABC):
     # Properties
     # -------------------------------------------------------------------------
     @property
-    def model(self) -> ModelInput:
+    def model(self) -> Union[EstimatorT, Pipeline]:
         """Return the original model."""
         return self._model
 
     @property
-    def estimator(self) -> EstimatorType:
+    def estimator(self) -> EstimatorT:
         """Return the underlying estimator (PCA or PLS)."""
         return self.estimator_
 
