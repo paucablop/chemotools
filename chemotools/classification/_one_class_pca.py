@@ -13,6 +13,7 @@ from numbers import Integral, Real
 from typing import Literal
 
 import numpy as np
+from scipy.stats import chi2
 from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.decomposition import PCA
 from sklearn.utils._param_validation import Interval
@@ -102,37 +103,53 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             self, X, y="no_validation", ensure_2d=True, reset=True, dtype=np.float64
         )
 
-        # 3. Fit the PCA model to the training data
+        # 3. Get dimensions
+        n_samples, _ = X.shape
+
+        # 4. Fit the PCA model to the training data
         self.pca_ = PCA(n_components=self.n_components)
         self.scores_ = self.pca_.fit_transform(X)
 
-        # 4. Calculate distances
-        # 4.1. Calculate score distance (SD, h)
+        # 5. Calculate distances
+        # 5.1. Calculate score distance (SD, h)
         T = self.scores_
         eigval = self.pca_.explained_variance_
+
         # The eigenvalues are scaled because scikit-learn calculates XtX it using
         # Bessel correction.
-        h = np.sum(T**2 / (T.shape[0] - 1) * eigval, axis=1)  # Equation 8 in [1]
-        self.h0_ = np.mean(h, axis=0)  # Equation 9 in [1]
+        h = np.sum(T**2 / ((n_samples - 1) * eigval), axis=1)  # Equation 8 in [1]
+        self.h0_ = self.n_components / n_samples  # Equation 9 in [1]
 
-        # 4.2. Calculate orthogonal distance (OD, v)
-        v = np.einsum("ij,ij->i", X, X) - np.einsum(
-            "ij,ij->i", T, T
-        )  # Equation 17 in [1]
-        self.v0_ = np.mean(v, axis=0)  # Equation 18 in [1]
+        # 5.2. Calculate orthogonal distance (OD, v)
+        residuals = X - self.pca_.inverse_transform(T)
+        v = np.sum(residuals**2, axis=1)
+        self.v0 = v.mean()
 
-        # 5. Calculate decision boundaries
-        # 5.1. Calculate DoF for SD distribution
-        iqr_h = np.percentile(h, 75) - np.percentile(h, 25)
-        self.Nh_ = np.exp(4.36 * np.ln(1.24 / iqr_h)) ** 0.72  # Equation 15 in [1]
+        # 6. Calculate decision boundaries
+        # 6.1. Calculate relative IQR for SD and OD
+        relative_iqr_h = (
+            np.percentile(h, 75) - np.percentile(h, 25)
+        ) / self.h0_  # Equation 14 in [1]
+        relative_iqr_v = (
+            np.percentile(v, 75) - np.percentile(v, 25) / self.v0_
+        )  # From Equation 14 in [1]
 
-        # 5.3. Calculate the DoF for OD distribution
-        iqr_v = np.percentile(v, 75) - np.percentile(v, 25)
+        # 6.2. Estimate the DoF for SD and OD
+        self.Nh_ = (
+            np.exp(4.36 * np.ln(1.24 / relative_iqr_h)) ** 0.72
+        )  # Equation 15 in [1]
+
+        # 6.3. Calculate the DoF for OD distribution
         self.Nv_ = (
-            np.exp(4.36 * np.ln(1.24 / iqr_v)) ** 0.72
+            np.exp(4.36 * np.ln(1.24 / relative_iqr_v)) ** 0.72
         )  # As suggested from Equations 14-15 in [1]
 
-        # 5.4 Decision boundary
-        self.threshold_ = self.Nh_ * h / self.h0_ + self.Nv_ * v / self.h0_
+        # 6.4. Combined distance (Boundary II, Figure 2 in [1])
+        self.training_distances_ = (
+            self.Nh_ * h / self.h0_ + self.Nv_ * v / self.v0_
+        )  # Equations 26-27 in [1]
+
+        # 6.5 Decision boundary
+        self.threshold_ = chi2.ppf(self.threshold, self.Nh + self.Nv)
 
         return self
