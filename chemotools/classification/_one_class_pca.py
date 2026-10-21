@@ -133,6 +133,6 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         )  # As suggested from Equations 14-15 in [1]
 
         # 5.4 Decision boundary
-        self.threshold_ = self.Nh_ * h/self.h0_ + self.Nv_ * v/self.h0_
+        self.threshold_ = self.Nh_ * h / self.h0_ + self.Nv_ * v / self.h0_
 
         return self
