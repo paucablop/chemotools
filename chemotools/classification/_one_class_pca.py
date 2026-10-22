@@ -281,16 +281,16 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             self.Nh_ = np.exp(4.36 * np.log(1.24 / relative_iqr_h)) ** 0.72
             self.Nv_ = np.exp(4.36 * np.log(1.24 / relative_iqr_v)) ** 0.72
 
-        # 6. Calculate boundaries
+            # 6. Calculate boundaries
             # 6.1. Triangle boundary (Boundary II, Figure 2 in [1])
             if self.boundary == "triangle":
                 # 6.1.1. Combined distance Equations (26-27) in [1]
                 self.training_distances_ = (
                     self.Nh_ * h / self.h0_ + self.Nv_ * v / self.v0_
-                ) 
+                )
 
                 # 6.1.2. Decision boundary
-                self.thresholds_ = (chi2.ppf(self.threshold, df=self.Nh_ + self.Nv_))
+                self.thresholds_ = chi2.ppf(self.threshold, df=self.Nh_ + self.Nv_)
 
             # 6.2. Rectabgle boundary (Boundary I, Figure 2 in [1])
             if self.boundary == "rectangle":
