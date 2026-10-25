@@ -40,11 +40,15 @@ def _check_positive_finite(values, name):
 class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     """One-class PCA (Principal Component Analysis) classifier.
 
-    Model a target class using PCA and scaled chi-square distributions for
-    score and orthogonal distances [1]_, [2]_. Choose robust or classic
-    estimation and a triangular or rectangular boundary. Acceptance and
-    outlier boundaries separate training samples into regular, extreme,
-    and outlier categories [3]_.
+    Model a target class using PCA. Score distances measure variation within
+    the retained PCA subspace, while orthogonal distances measure deviation
+    from it. Scaled chi-square distributions define limits for these
+    distances [1]_, [2]_.
+
+    Choose ``robust``, ``robust-fast``, or ``classic`` estimation and a
+    triangular or rectangular boundary. The acceptance and outlier boundaries
+    divide training samples into three categories: regular, extreme, and
+    outlier [3]_.
 
     Parameters
     ----------
