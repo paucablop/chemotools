@@ -13,6 +13,7 @@ from numbers import Integral, Real
 from typing import Literal
 
 import numpy as np
+from scipy.optimize import brentq
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator, OutlierMixin
 from sklearn.decomposition import PCA
@@ -21,7 +22,7 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 from chemotools._doc_mixin import DocLinkMixin
 
-# Approximation coefficients for robust estimation DoF
+# Approximation coefficients for fast robust estimation DoF
 # Text preceding Eq. (16) in [3].
 CONSTANT_A = 0.72414
 CONSTANT_B = 2.68631
@@ -53,10 +54,13 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     gamma : float, default=0.01
         Nominal probability of at least one false outlier flag across the training set.
 
-    method : {"robust", "classic"}, default="robust"
+    method : {"robust", "robust-fast", "classic"}, default="robust"
         How the distributional parameters are estimated:
 
-        - "robust": use medians and median-normalized interquartile ranges.
+        - "robust": use medians and median-normalized interquartile ranges using a root
+        solver for the DoF estimation.
+        - "robust-fast": use medians and median-normalized interquartile ranges using
+        the approximation for DoF suggested in [3].
         - "classic": use mean distances and sample standard deviations.
 
     boundary : {"triangle", "rectangle"}, default="triangle"
@@ -69,6 +73,9 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
           and reject a sample if either limit is exceeded (boundary I in
           Figure 2 and Eq. (25) in [1]_).
 
+    upper_bracket : float, default=10_000
+        Upper bracket for Brendel's method.
+
 
     Attributes
     ----------
@@ -79,12 +86,12 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         Principal component scores of the training samples.
 
     h0_ : float
-        Score-distance normalization factor. In the robust branch, this is the
+        Score-distance normalization factor. In the robust branches, this is the
         robust estimate of the mean score distance; in the classic branch, it is
         ``n_components / n_samples``.
 
     v0_ : float
-        Orthogonal-distance normalization factor. In the robust branch, this is
+        Orthogonal-distance normalization factor. In the robust branches, this is
         the robust estimate of the mean orthogonal distance; in the classic
         branch, it is the sample mean.
 
@@ -154,8 +161,9 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         "n_components": [Interval(Integral, 1, None, closed="left")],
         "alpha": [Interval(Real, 0, 1, closed="neither")],
         "gamma": [Interval(Real, 0, 1, closed="neither")],
-        "method": [StrOptions({"robust", "classic"})],
+        "method": [StrOptions({"robust", "robust-fast", "classic"})],
         "boundary": [StrOptions({"triangle", "rectangle"})],
+        "upper_bracket": [Interval(Real, 0, None, closed="neither")],
     }
 
     def __sklearn_tags__(self):
@@ -171,8 +179,9 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         n_components: int = 2,
         alpha: float = 0.05,
         gamma: float = 0.01,
-        method: Literal["robust", "classic"] = "robust",
+        method: Literal["robust", "robust-fast", "classic"] = "robust",
         boundary: Literal["triangle", "rectangle"] = "triangle",
+        upper_bracket: float = 10_000,
     ):
 
         self.n_components = n_components
@@ -180,6 +189,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         self.gamma = gamma
         self.method = method
         self.boundary = boundary
+        self.upper_bracket = upper_bracket
 
     @property
     def components_(self):
@@ -248,12 +258,11 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         Notes
         -----
         The score and orthogonal distances are modeled using scaled chi-square
-        distributions. For ``method="robust"``, the normalization factors are
-        robust estimates of the mean distances, derived from the median
-        distances and interquartile ranges using Equation (17) in [3]_. The
-        effective degrees of freedom are estimated from the same robust
-        summary statistics using the approximation in Equation (15) of
-        Pomerantsev [1]_.
+        distributions. For ``method="robust"`` and ``method="robust-fast"``, the
+        normalization factors are robust estimates of the mean distances, derived
+        from the median distances and interquartile ranges using Equation (17) in [3]_.
+        The effective degrees of freedom are estimated from the same robust summary
+        statistics using the approximation in Equation (15) of Pomerantsev [1]_.
 
         The classic estimation branch uses ``n_components / n_samples``
         for the score distance normalization factor and the sample mean
@@ -328,7 +337,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             self.Nh_ = max(1, int(np.rint(2 * (self.h0_ / h_std_) ** 2)))
             self.Nv_ = max(1, int(np.rint(2 * (self.v0_ / v_std_) ** 2)))
 
-        if self.method == "robust":
+        else:
             # Median calculation (Eq. (14) in [3])
             median_h = np.median(h)
             median_v0 = np.median(v)
@@ -336,11 +345,21 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             # Interquantile range calculation (Eq. (14) in [3])
             iqr_h = np.percentile(h, 75) - np.percentile(h, 25)
             iqr_v = np.percentile(v, 75) - np.percentile(v, 25)
+            if self.method == "robust-fast":
+                # Fast robust estimation of DoF for SD and OD using Eq. (16) in [3] and
+                # rounding to the closest integeer as suggested in [3]
+                self.Nh_ = self._estimate_robust_fast_dof(median_h, iqr_h)
+                self.Nv_ = self._estimate_robust_fast_dof(median_v0, iqr_v)
 
-            # Robust estimation of DoF for SD and OD using Eq. (16) in [3] and
-            # rounding to the closest integeer as suggested in [3]
-            self.Nh_ = self._estimate_robust_dof(median_h, iqr_h)
-            self.Nv_ = self._estimate_robust_dof(median_v0, iqr_v)
+            if self.method == "robust":
+                # Robust estimation of DoF for SD and OD solving Eq. (15) in [3] using
+                # Berntq's method in the interval (1, self.upper_bracket)
+                self.Nh_ = self._estimate_robust_dof(
+                    median_h, iqr_h, bracket=(1, self.upper_bracket)
+                )
+                self.Nv_ = self._estimate_robust_dof(
+                    median_v0, iqr_v, bracket=(1, self.upper_bracket)
+                )
 
             # Estimate the sample means using Eq. (17) in [3]
             self.h0_ = self._estimate_robust_distance_mean(median_h, iqr_h, self.Nh_)
@@ -511,9 +530,38 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
 
         return h, v
 
-    def _estimate_robust_dof(self, median_u: float, iqr_u: float) -> float:
+    def _estimate_robust_dof(
+        sef, median_u: float, iqr_u: float, bracket=(1, 10_000)
+    ) -> float:
         """
-        Robust estimation of the Degrees of Freedom (DoF) using Eq. (16) in [3].
+        Robust estimation of the Degrees of Freedom (DoF) by matching the
+        theoretical and observed chi-square IQR-to-median ratio solving Eq. (15)
+        in [3] using Brent's method.
+
+        Parameters
+        ----------
+        median_u : float
+            Median of the distance.
+        iqr_u : float
+            Interquartile range of the distance.
+
+        Returns
+        -------
+        float
+            Robust estimate of the Degrees of Freedom (DoF).
+        """
+
+        def objective(dof):
+            q25, q50, q75 = chi2.ppf([0.25, 0.5, 0.75], df=dof)
+            return (q75 - q25) / q50 - iqr_u / median_u
+
+        return max(1, np.round(brentq(objective, *bracket)))
+
+    def _estimate_robust_fast_dof(self, median_u: float, iqr_u: float) -> float:
+        """
+        Fast robust estimation of the Degrees of Freedom (DoF) by matching the
+        theoretical and observed chi-square IQR-to-median ratio using the numerical
+        approximation described in Eq. (16) in [3].
 
         Parameters
         ----------
@@ -552,7 +600,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         # Check for valdid degrees of freedom
         if not np.isfinite(dof):
             raise ValueError(
-                f"The robust DoF estimate is not finite, but found dof={dof}"
+                f"The robust-fast DoF estimate is not finite, but found dof={dof}"
             )
 
         # Round DoF to the nearest positive integer as defined in [3]
@@ -561,7 +609,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         # Warn user if estimated DoF is above reported approximation accuracy.
         if rounded_dof >= 50:
             warnings.warn(
-                f"The robust DoF estimate rounds to {rounded_dof:.0f}. "
+                f"The robust-fast DoF estimate rounds to {rounded_dof:.0f}. "
                 "Eq. (16) in [3] is being used outside its reported N < 50 range. "
                 "The estimate is retained, but approximation accuracy "
                 "outside this range is not established.",
