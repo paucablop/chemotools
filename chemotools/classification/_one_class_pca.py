@@ -1,8 +1,8 @@
 """One-class classification based on Principal Component Analysis (PCA).
 
 The module :mod:`chemotools.classification._one_class_pca` implements
-OneClassPCA, which models a target class using PCA and estimates an acceptance
-limit from the training samples' score and orthogonal distances.
+OneClassPCA, which models a target class using PCA and estimates acceptance
+and outlier boundaries from score and orthogonal distances.
 """
 
 # Author: Pau Cabaneros
@@ -31,6 +31,7 @@ CONSTANT_C = 0.84332
 
 # Helper method to ensure positive finite values
 def _check_positive_finite(values, name):
+    """Raise ValueError if any value is nonfinite or not strictly positive."""
     values = np.asarray(values, dtype=float)
     if not np.isfinite(values).all() or np.any(values <= 0):
         raise ValueError(f"{name} must be finite and strictly positive.")
@@ -39,48 +40,73 @@ def _check_positive_finite(values, name):
 class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     """One-class PCA (Principal Component Analysis) classifier.
 
-    Fit a target-class PCA model and estimate a triangular acceptance region
-    from the combined normalized score and orthogonal distances [1]_.
-    Distributional parameters are estimated from the training data [2]_.
+    Model a target class using PCA and scaled chi-square distributions for
+    score and orthogonal distances [1]_, [2]_. Choose robust or classic
+    estimation and a triangular or rectangular boundary. Acceptance and
+    outlier boundaries separate training samples into regular, extreme,
+    and outlier categories [3]_.
 
     Parameters
     ----------
     n_components : int, default=2
         Number of principal components used to model the target class.
+        Retained components must have numerically nonzero singular values.
 
     alpha : float, default=0.05
-        Nominal probability of rejecting an individual genuine class member.
+        Nominal probability of rejecting an individual genuine class member
+        at the acceptance boundary. Must be strictly between 0 and 1.
 
     gamma : float, default=0.01
-        Nominal probability of at least one false outlier flag across the training set.
+        Nominal probability of at least one false outlier flag across the
+        training set. Must be strictly between 0 and 1 and yield
+        ``outlier_alpha_ < alpha``. See Notes for the calibration assumptions.
 
     method : {"robust", "robust-fast", "classic"}, default="robust"
-        How the distributional parameters are estimated:
+        Method for estimating the distance distributions:
 
-        - "robust": use medians and median-normalized interquartile ranges using a root
-        solver for the DoF estimation.
-        - "robust-fast": use medians and median-normalized interquartile ranges using
-        the approximation for DoF suggested in [3].
-        - "classic": use mean distances and sample standard deviations.
+        - "robust": estimate degrees of freedom by matching the observed
+          IQR-to-median ratio to a chi-square distribution using Brent's
+          root solver (Equation (15) in [3]_).
+        - "robust-fast": estimate degrees of freedom using the explicit
+          approximation in Equation (16) in [3]_.
+        - "classic": estimate degrees of freedom from mean distances and
+          sample standard deviations (Equation (12) in [3]_).
+
+        All methods round degrees of freedom to the nearest integer, with
+        a minimum of 1. Both robust methods estimate mean distances from
+        medians, interquartile ranges, and the estimated degrees of freedom.
 
     boundary : {"triangle", "rectangle"}, default="triangle"
-        Acceptance boundary selection:
+        Geometry used for both acceptance and outlier boundaries:
 
         - "triangle": combine score and orthogonal distances into one
           acceptance criterion (boundary II in Figure 2 and Equations
           (26)-(27) in [1]_).
-        - "rectangle": intended to apply separate limits to the two distances
+        - "rectangle": apply separate limits to the two distances
           and reject a sample if either limit is exceeded (boundary I in
           Figure 2 and Eq. (25) in [1]_).
 
     upper_bracket : float, default=10_000
-        Upper bracket for Brendel's method.
-
+        Upper endpoint of the root-search bracket ``(1, upper_bracket)``
+        for Brent's method. Used only when ``method="robust"``. The bracket
+        must contain a root.
 
     Attributes
     ----------
     pca_ : PCA
         Fitted PCA model.
+
+    components_ : ndarray of shape (n_components, n_features)
+        Principal axes of the fitted PCA model, stored row-wise.
+
+    explained_variance_ : ndarray of shape (n_components,)
+        Variance explained by each principal component.
+
+    explained_variance_ratio_ : ndarray of shape (n_components,)
+        Fraction of total variance explained by each principal component.
+
+    mean_ : ndarray of shape (n_features,)
+        Per-feature mean of the training samples, used for PCA centering.
 
     scores_ : ndarray of shape (n_samples, n_components)
         Principal component scores of the training samples.
@@ -95,40 +121,46 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         the robust estimate of the mean orthogonal distance; in the classic
         branch, it is the sample mean.
 
-    Nh_ : float
-        Estimated degrees of freedom for the score distance distribution.
+    Nh_ : int or float
+        Positive, integer-valued degrees of freedom for the score-distance
+        distribution.
 
-    Nv_ : float
-        Estimated degrees of freedom for the orthogonal distance distribution.
+    Nv_ : int or float
+        Positive, integer-valued degrees of freedom for the orthogonal-distance
+        distribution.
 
     training_distances_ : ndarray of shape (n_samples,)
         Combined normalized distances of the training samples, computed as
         ``Nh_ * h / h0_ + Nv_ * v / v0_`` for the triangular boundary. This
         array is populated only when ``boundary="triangle"``.
 
-    thresholds_ : float or tuple of float
-        Acceptance thresholds. For ``boundary="triangle"``, this is a scalar
-        chi-square quantile at ``1 - alpha`` with ``Nh_ + Nv_`` degrees of
-        freedom. For ``boundary="rectangle"``, this is a pair
-        ``(h_threshold, v_threshold)`` with equal marginal tail probabilities.
+    thresholds_ : float or tuple of (float, float)
+        Acceptance limits calibrated using ``alpha``. For "triangle", a
+        scalar limit on the combined normalized distance. For "rectangle",
+        a pair ``(h_threshold, v_threshold)`` on the original score and
+        orthogonal distances, respectively. See Notes for the calibration.
 
     outlier_alpha_ : float
-        Per-sample probability used to define the outlier region.
+        Nominal per-sample outlier probability, calculated as
+        ``1 - (1 - gamma) ** (1 / n_samples)``. Must be smaller than ``alpha``.
 
-    outlier_thresholds_ : float or tuple of float
-        Outlier-region thresholds corresponding to ``outlier_alpha_``. For
-        ``boundary="triangle"``, this is a scalar; for
-        ``boundary="rectangle"``, it is a pair ``(h_threshold, v_threshold)``.
+    outlier_thresholds_ : float or tuple of (float, float)
+        Outlier limits calibrated using ``outlier_alpha_``, with the same
+        structure and distance scales as ``thresholds_``.
 
-    training_regular_ : ndarray of shape (n_samples,)
-        Boolean mask marking training samples inside the acceptance boundary.
+    training_regular_ : ndarray of shape (n_samples,), dtype=bool
+        Mask marking training samples inside or on the acceptance boundary.
 
-    training_extremes_ : ndarray of shape (n_samples,)
-        Boolean mask marking training samples outside the acceptance boundary
-        but not flagged as outliers.
+    training_extremes_ : ndarray of shape (n_samples,), dtype=bool
+        Mask marking training samples outside the acceptance boundary but
+        inside or on the outlier boundary.
 
-    training_outliers_ : ndarray of shape (n_samples,)
-        Boolean mask marking training samples flagged as outliers.
+    training_outliers_ : ndarray of shape (n_samples,), dtype=bool
+        Mask marking training samples strictly outside the outlier boundary.
+
+    offset_ : float
+        Offset relating normality and decision scores:
+        ``decision_function(X) = score_samples(X) - offset_``. Set to -1.
 
     n_features_in_ : int
         Number of features seen during :meth:`fit`.
@@ -141,20 +173,47 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     --------
     sklearn.decomposition.PCA : Principal component analysis.
 
+    Notes
+    -----
+    The score distance ``h`` is the sum of squared PCA scores divided by
+    the corresponding squared training singular values. The orthogonal
+    distance ``v`` is the squared reconstruction error.
+
+    For a per-sample rejection probability ``p``, the triangular boundary
+    compares ``Nh_ * h / h0_ + Nv_ * v / v0_`` with the chi-square quantile
+    at ``1 - p`` and ``Nh_ + Nv_`` degrees of freedom. The rectangular
+    boundary compares ``h`` and ``v`` with separate scaled chi-square
+    limits, each with marginal tail probability ``1 - sqrt(1 - p)``.
+    This rectangular calibration assumes independent score and orthogonal
+    distances.
+
+    Acceptance limits use ``p = alpha``. Outlier limits use
+    ``p = outlier_alpha_``, calibrated from ``gamma`` under an independent
+    sample model. These probabilities are nominal under the fitted
+    distributional assumptions, not guaranteed empirical rejection rates.
+
+    The three training masks form a partition into regular, extreme, and
+    outlier samples. Prediction is binary: regular samples receive +1,
+    while both extreme and outlier samples receive -1. Scores and
+    predictions use the acceptance limits, not the outlier limits.
+
+    The PCA properties ``components_``, ``explained_variance_``,
+    ``explained_variance_ratio_``, and ``mean_`` require a fitted estimator
+    and expose the underlying PCA arrays without copying them.
 
     References
     ----------
     .. [1] Pomerantsev, A. L.
-            "Acceptance areas for multivariate classification derived by
-            projection methods." Journal of Chemometrics, 22(11-12), 601-609.
+           "Acceptance areas for multivariate classification derived by
+           projection methods." Journal of Chemometrics, 22(11-12), 601-609.
 
     .. [2] Pomerantsev, A. L., Rodionova, O., Kucheryavskiy, S.,
-            "A comprehensive tutorial on Data-Driven SIMCA: Theory and
-            implementation in web." Journal of Chemometrics, 38(7), 1-19.
+           "A comprehensive tutorial on Data-Driven SIMCA: Theory and
+           implementation in web." Journal of Chemometrics, 38(7), 1-19.
 
     .. [3] Pomerantsev, A. L., Rodionova, O.,
-            "Concept and role of extreme objects in PCA/SIMCA"
-            Journal of Chemometrics, 28(5), 429-438.
+           "Concept and role of extreme objects in PCA/SIMCA."
+           Journal of Chemometrics, 28(5), 429-438.
     """
 
     _parameter_constraints: dict = {
@@ -193,59 +252,60 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
 
     @property
     def components_(self):
-        """Principal components of the fitted PCA model.
+        """Principal axes of the fitted PCA model.
 
         Returns
         -------
         components_ : ndarray of shape (n_components, n_features)
-            Principal components of the fitted PCA model.
+            Principal axes stored row-wise, as in ``pca_.components_``.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         return self.pca_.components_
 
     @property
     def explained_variance_(self):
-        """Explained variance of each component in the fitted PCA model.
+        """Variance explained by each principal component.
 
         Returns
         -------
-        explained_variance_ : ndarray of shape (n_components)
-            Explained variance of the fitted PCA model.
+        explained_variance_ : ndarray of shape (n_components,)
+            Explained variances, as in ``pca_.explained_variance_``.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         return self.pca_.explained_variance_
 
     @property
     def explained_variance_ratio_(self):
-        """Explained variance ratio of each component in the fitted PCA model.
+        """Fraction of total variance explained by each principal component.
 
         Returns
         -------
-        explained_variance_ratio_ : ndarray of shape (n_components)
-            Explained variance ratio of the fitted PCA model.
+        explained_variance_ratio_ : ndarray of shape (n_components,)
+            Explained variance ratios, as in ``pca_.explained_variance_ratio_``.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         return self.pca_.explained_variance_ratio_
 
     @property
     def mean_(self):
-        """Mean across rows in X.
+        """Per-feature mean of the training samples.
 
         Returns
         -------
-        mean_ : np.ndarray of shape (n_features,)
-            Mean value of X across X.
+        mean_ : ndarray of shape (n_features,)
+            Training mean used for PCA centering, as in ``pca_.mean_``.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         return self.pca_.mean_
 
     def fit(self, X, y=None):
-        """Fit the PCA model and estimate the acceptance boundary.
+        """Fit the PCA model, estimate boundaries, and categorize training samples.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training vectors.
+            Training samples from the target class. At least two samples
+            are required.
 
         y : Ignored, default=None
             Not used, present for API consistency by convention.
@@ -253,30 +313,46 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         Returns
         -------
         self : OneClassPCA
-            Fitted estimator.
+            Fitted estimator with acceptance and outlier limits and training
+            category masks.
+
+        Raises
+        ------
+        ValueError
+            If input or parameters are invalid, retained PCA components are
+            numerically degenerate, or ``outlier_alpha_ >= alpha``. Also
+            raised if the robust root-search bracket does not bracket a root,
+            or robust-fast inputs are invalid, exceed the approximation's
+            supported IQR-to-median ratio, or produce a nonfinite estimate.
+        RuntimeError
+            If the root solver fails to converge when ``method="robust"``.
+
+        Warns
+        -----
+        UserWarning
+            If ``method="robust-fast"`` estimates rounded degrees of freedom
+            of at least 50, outside the approximation's reported accuracy
+            range. The estimate is retained; no method switch is performed.
 
         Notes
         -----
-        The score and orthogonal distances are modeled using scaled chi-square
-        distributions. For ``method="robust"`` and ``method="robust-fast"``, the
-        normalization factors are robust estimates of the mean distances, derived
-        from the median distances and interquartile ranges using Equation (17) in [3]_.
-        The effective degrees of freedom are estimated from the same robust summary
-        statistics using the approximation in Equation (15) of Pomerantsev [1]_.
+        In the classic method, mean distances are ``n_components / n_samples``
+        for score distance and the sample mean for orthogonal distance.
+        Degrees of freedom are twice the squared ratio of each mean to its
+        sample standard deviation, rounded to the nearest integer with a
+        minimum of 1.
 
-        The classic estimation branch uses ``n_components / n_samples``
-        for the score distance normalization factor and the sample mean
-        for the orthogonal distance normalization factor. The effective
-        degrees of freedom are estimated as twice the squared ratio of
-        each normalization factor to its sample standard deviation
-        (Section 3.2 in [2]_).
+        Both robust methods use medians and interquartile ranges. The
+        "robust" method solves the chi-square IQR-to-median matching equation;
+        "robust-fast" uses its explicit approximation. Both round degrees of
+        freedom to the nearest integer with a minimum of 1, then estimate mean
+        distances using Equation (17) in reference [3] of the class docstring.
 
-        For ``boundary="triangle"``, the acceptance region is constructed from
-        the combined normalized distances using a chi-square quantile at the
-        specified confidence level (Equations (26)-(27) in [1]_). For
-        ``boundary="rectangle"``, the score and orthogonal distances are
-        compared against separate thresholds derived from the same marginal tail
-        probability.
+        For either boundary geometry, acceptance limits use ``alpha`` and
+        outlier limits use ``1 - (1 - gamma) ** (1 / n_samples)``. The latter
+        must be smaller than ``alpha`` so the outlier boundary lies outside
+        the acceptance boundary. See the class Notes for threshold scales,
+        probability assumptions, and category definitions.
         """
         # 1. Validate input parameters
         self._validate_params()
@@ -419,11 +495,25 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         X : array-like of shape (n_samples, n_features)
             Samples to classify using the fitted model.
 
+        y : Ignored, default=None
+            Not used, present for API consistency by convention.
+
         Returns
         -------
-        labels : ndarray of shape (n_samples,)
-            Predicted labels: 1 for accepted samples and -1 for rejected
-            samples. Samples on the acceptance boundary are accepted.
+        labels : ndarray of shape (n_samples,), dtype=int
+            +1 for samples inside or on the acceptance boundary and -1 for
+            samples outside it, including both extremes and outliers.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
+
+        Notes
+        -----
+        Labels use the acceptance limits for the selected boundary geometry,
+        not the outlier limits. The three-way categorization is recorded
+        separately for training samples during :meth:`fit`.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         X = validate_data(
@@ -448,7 +538,13 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         Returns
         -------
         scores : ndarray of shape (n_samples,)
-            Normality scores for the input samples.
+            Negative normalized distances. Values greater than or equal to
+            -1 indicate acceptance; values below -1 indicate rejection.
+
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
 
         Notes
         -----
@@ -456,8 +552,9 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         threshold. For the rectangular boundary, the maximum of the two
         distance-to-threshold ratios is used. The resulting measure is negated.
 
-        Scores depend on the fitted acceptance thresholds and are not
-        probabilities of class membership.
+        Scores use ``thresholds_``, not ``outlier_thresholds_``. They are not
+        probabilities of class membership, and their magnitudes need not be
+        comparable across boundary geometries.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
 
@@ -496,27 +593,35 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             acceptance region, zero indicates the boundary, and negative
             values indicate samples outside the acceptance region.
 
+        Raises
+        ------
+        NotFittedError
+            If the estimator has not been fitted.
+
         Notes
         -----
         Calculated as ``score_samples(X) - offset_``, where ``offset_ = -1``
-        for the normalized scores.
+        for either boundary geometry. Both extreme and outlier samples have
+        negative scores; the outlier limits do not affect this calculation.
         """
         check_is_fitted(self, ["pca_", "thresholds_"])
         return self.score_samples(X) - self.offset_
 
     def _compute_distances(self, X) -> tuple:
-        """
-        Calculate the distances SD and OD from the model for the given samples.
+        """Compute score and orthogonal distances from the fitted PCA model.
 
         Parameters
         ----------
-        X : np.ndarray
-            Input samples.
+        X : array-like of shape (n_samples, n_features)
+            Samples to project onto the fitted PCA model.
 
         Returns
         -------
-        np.ndarray[float]
-            Distances SD and OD for each sample.
+        h : ndarray of shape (n_samples,)
+            Score distances: sums of squared component scores divided by
+            the corresponding squared training singular values.
+        v : ndarray of shape (n_samples,)
+            Orthogonal distances: sums of squared reconstruction residuals.
         """
         # Calculate the scores onto the model
         scores = self.pca_.transform(X)
@@ -533,22 +638,33 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     def _estimate_robust_dof(
         sef, median_u: float, iqr_u: float, bracket=(1, 10_000)
     ) -> float:
-        """
-        Robust estimation of the Degrees of Freedom (DoF) by matching the
-        theoretical and observed chi-square IQR-to-median ratio solving Eq. (15)
-        in [3] using Brent's method.
+        """Estimate degrees of freedom by chi-square IQR-to-median matching.
+
+        Solve Equation (15) in reference [3] of the class docstring using
+        Brent's method, then round the root to the nearest integer with a
+        minimum of 1.
 
         Parameters
         ----------
         median_u : float
-            Median of the distance.
+            Median of the observed distances.
         iqr_u : float
-            Interquartile range of the distance.
+            Interquartile range of the observed distances.
+        bracket : tuple of (float, float), default=(1, 10_000)
+            Root-search endpoints. The interval must bracket a root.
 
         Returns
         -------
-        float
-            Robust estimate of the Degrees of Freedom (DoF).
+        dof : int or float
+            Positive, integer-valued estimate of the degrees of freedom.
+
+        Raises
+        ------
+        ValueError
+            If the objective is invalid at the bracket endpoints or the
+            bracket does not bracket a root.
+        RuntimeError
+            If Brent's method fails to converge.
         """
 
         def objective(dof):
@@ -558,22 +674,36 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         return max(1, np.round(brentq(objective, *bracket)))
 
     def _estimate_robust_fast_dof(self, median_u: float, iqr_u: float) -> float:
-        """
-        Fast robust estimation of the Degrees of Freedom (DoF) by matching the
-        theoretical and observed chi-square IQR-to-median ratio using the numerical
-        approximation described in Eq. (16) in [3].
+        """Approximate degrees of freedom from the observed IQR-to-median ratio.
+
+        Use Equation (16) in reference [3] of the class docstring, then round
+        to the nearest integer with a minimum of 1.
 
         Parameters
         ----------
         median_u : float
-            Median of the distance.
+            Finite, strictly positive median of the observed distances.
         iqr_u : float
-            Interquartile range of the distance.
+            Finite, strictly positive interquartile range of the observed
+            distances.
 
         Returns
         -------
-        float
-            Robust estimate of the Degrees of Freedom (DoF).
+        dof : int
+            Positive estimate of the degrees of freedom.
+
+        Raises
+        ------
+        ValueError
+            If inputs are nonfinite or not strictly positive,
+            ``iqr_u / median_u`` exceeds the supported maximum of 2.68631,
+            or the estimated degrees of freedom are nonfinite.
+
+        Warns
+        -----
+        UserWarning
+            If the rounded estimate is at least 50, outside the reported
+            accuracy range. The estimate is retained.
         """
         # Check for valid median_u and iqr_u values
         if not (
@@ -622,21 +752,22 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     def _estimate_robust_distance_mean(
         self, median_u: float, iqr_u: float, N: float
     ) -> float:
-        """
-        Robust estimation of the distance mean using Equation (17) in [3].
+        """Estimate the mean distance from robust summary statistics.
+
+        Use Equation (17) in reference [3] of the class docstring.
 
         Parameters
         ----------
         median_u : float
-            Median of the distance.
+            Median of the observed distances.
         iqr_u : float
-            Interquartile range of the distance.
+            Interquartile range of the observed distances.
         N : float
-            Degrees of Freedom (DoF) for the distance.
+            Estimated degrees of freedom for the distance distribution.
 
         Returns
         -------
-        float
+        mean_u : float
             Robust estimate of the distance mean.
         """
         return (
@@ -649,7 +780,30 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         )
 
     def _calculate_thresholds(self, tail_probability: float):
-        """Calculate thresholds for a per-sample rejection probability."""
+        """Calculate limits for the selected boundary geometry.
+
+        Parameters
+        ----------
+        tail_probability : float
+            Nominal per-sample rejection probability, strictly between 0
+            and 1. Use ``alpha`` for acceptance limits or ``outlier_alpha_``
+            for outlier limits.
+
+        Returns
+        -------
+        thresholds : float or tuple of (float, float)
+            For "triangle", a chi-square quantile with ``Nh_ + Nv_`` degrees
+            of freedom on the combined normalized distance scale. For
+            "rectangle", a pair of scaled chi-square limits on the original
+            score and orthogonal distances, in that order.
+
+        Notes
+        -----
+        Rectangular limits use equal marginal tail probabilities
+        ``1 - sqrt(1 - tail_probability)``. This yields the requested joint
+        rejection probability under independent score and orthogonal
+        distance models.
+        """
         if self.boundary == "triangle":
             # Eq. (4)-(5) in [2]
             return chi2.isf(tail_probability, df=self.Nh_ + self.Nv_)
