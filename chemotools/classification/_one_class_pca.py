@@ -362,7 +362,8 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             self,
             X,
             y="no_validation",
-            ensure_min_samples=2,
+            ensure_min_samples=self.n_components + 2,
+            ensure_min_features=self.n_components + 1,
             ensure_2d=True,
             reset=True,
             dtype=np.float64,
@@ -431,10 +432,10 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
                 # Robust estimation of DoF for SD and OD solving Eq. (15) in [3] using
                 # Berntq's method in the interval (1, self.upper_bracket)
                 self.Nh_ = self._estimate_robust_dof(
-                    median_h, iqr_h, bracket=(1, self.upper_bracket)
+                    median_h, iqr_h, bracket=(1e-3, self.upper_bracket)
                 )
                 self.Nv_ = self._estimate_robust_dof(
-                    median_v0, iqr_v, bracket=(1, self.upper_bracket)
+                    median_v0, iqr_v, bracket=(1e-3, self.upper_bracket)
                 )
 
             # Estimate the sample means using Eq. (17) in [3]
@@ -636,7 +637,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         return h, v
 
     def _estimate_robust_dof(
-        sef, median_u: float, iqr_u: float, bracket=(1, 10_000)
+        sef, median_u: float, iqr_u: float, bracket=(1e-12, 10_000)
     ) -> float:
         """Estimate degrees of freedom by chi-square IQR-to-median matching.
 
@@ -718,11 +719,15 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         log_term = np.log(CONSTANT_B) + np.log(median_u) - np.log(iqr_u)
 
         if log_term < 0:
-            raise ValueError(
+            warnings.warn(
                 "Cannot estimate robust degrees of freedom using Equation (16): "
                 f"IQR / median = {iqr_u / median_u:.6g} exceeds "
                 f"the approximation's supported maximum of {CONSTANT_B}. "
+                "Setting DoF to 1.",
+                UserWarning,
+                stacklevel=2,
             )
+            return 1
 
         # Calculate degrees of freedom
         dof = np.exp((1 / CONSTANT_A * log_term) ** (1 / CONSTANT_C))
