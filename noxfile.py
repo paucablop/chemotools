@@ -17,7 +17,7 @@ TEST_DEPENDENCIES = ("pytest>=8.3.0", "pytest-cov>=6.3.0")
 LINT_DEPENDENCIES = ("ruff>=0.10.0",)
 
 TYPECHECK_DEPENDENCIES = (
-    "ty>=0.0.15",
+    "ty==0.0.91",
     "pandas-stubs>=2.2.3.241126,<3",
     "scipy-stubs>=1.15.1.0,<2",
     "typing-extensions>=4.12.0",
