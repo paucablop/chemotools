@@ -13,6 +13,7 @@ from numbers import Integral, Real
 from typing import Literal
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.optimize import brentq
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator, OutlierMixin
@@ -91,7 +92,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
           Figure 2 and Eq. (25) in [1]_).
 
     upper_bracket : float, default=10_000
-        Upper endpoint of the root-search bracket ``(1, upper_bracket)``
+        Upper endpoint of the root-search bracket ``(0.01, upper_bracket)``
         for Brent's method. Used only when ``method="robust"``. The bracket
         must contain a root.
 
@@ -433,13 +434,15 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
                 self.Nv_ = self._estimate_robust_fast_dof(median_v0, iqr_v)
 
             if self.method == "robust":
-                # Robust estimation of DoF for SD and OD solving Eq. (15) in [3] using
-                # Berntq's method in the interval (1, self.upper_bracket)
+                # Estimate score and orthogonal distance DoF using Eq. (15) in [3].
+                # Use Brent's method with a lower bound of 0.01 to avoid underflow
+                # of the chi-square median and division by zero in the objective.
+                # Round the root to an integer with a minimum of 1.
                 self.Nh_ = self._estimate_robust_dof(
-                    median_h, iqr_h, bracket=(1e-3, self.upper_bracket)
+                    median_h, iqr_h, bracket=(1e-2, self.upper_bracket)
                 )
                 self.Nv_ = self._estimate_robust_dof(
-                    median_v0, iqr_v, bracket=(1e-3, self.upper_bracket)
+                    median_v0, iqr_v, bracket=(1e-2, self.upper_bracket)
                 )
 
             # Estimate the sample means using Eq. (17) in [3]
@@ -492,7 +495,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
 
         return self
 
-    def predict(self, X, y=None) -> np.ndarray[int]:
+    def predict(self, X, y=None) -> NDArray[np.int_]:
         """Classify samples as accepted or rejected by the fitted model.
 
         Parameters
@@ -528,7 +531,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
 
         return np.where(score < 0, -1, 1)
 
-    def score_samples(self, X) -> np.ndarray[float]:
+    def score_samples(self, X) -> NDArray[np.float64]:
         """Compute a normality score for each sample.
 
         Scores are negative normalized distance measures. Higher values
