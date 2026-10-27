@@ -5,7 +5,7 @@ OneClassPCA, which models a target class using PCA and estimates acceptance
 and outlier boundaries from score and orthogonal distances.
 """
 
-# Author: Pau Cabaneros
+# Author: Pau Cabaneros & Ruggero Guerrini
 # License: MIT
 
 import warnings
@@ -46,7 +46,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     from it. Scaled chi-square distributions define limits for these
     distances [1]_, [2]_.
 
-    Choose ``robust``, ``robust-fast``, or ``classic`` estimation and a
+    Choose ``robust``, ``robust-approx``, or ``classic`` estimation and a
     triangular or rectangular boundary. The acceptance and outlier boundaries
     divide training samples into three categories: regular, extreme, and
     outlier [3]_.
@@ -66,13 +66,13 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         training set. Must be strictly between 0 and 1 and yield
         ``outlier_alpha_ < alpha``. See Notes for the calibration assumptions.
 
-    method : {"robust", "robust-fast", "classic"}, default="robust"
+    method : {"robust-numeric", "robust-approx", "classic"}, default="robust-numeric"
         Method for estimating the distance distributions:
 
-        - "robust": estimate degrees of freedom by matching the observed
+        - "robust-numeric": estimate degrees of freedom by matching the observed
           IQR-to-median ratio to a chi-square distribution using Brent's
           root solver (Equation (15) in [3]_).
-        - "robust-fast": estimate degrees of freedom using the explicit
+        - "robust-approx": estimate degrees of freedom using the explicit
           approximation in Equation (16) in [3]_.
         - "classic": estimate degrees of freedom from mean distances and
           sample standard deviations (Equation (12) in [3]_).
@@ -93,7 +93,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
 
     upper_bracket : float, default=10_000
         Upper endpoint of the root-search bracket ``(0.01, upper_bracket)``
-        for Brent's method. Used only when ``method="robust"``. The bracket
+        for Brent's method. Used only when ``method="robust-numeric"``. The bracket
         must contain a root.
 
     Attributes
@@ -225,7 +225,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         "n_components": [Interval(Integral, 1, None, closed="left")],
         "alpha": [Interval(Real, 0, 1, closed="neither")],
         "gamma": [Interval(Real, 0, 1, closed="neither")],
-        "method": [StrOptions({"robust", "robust-fast", "classic"})],
+        "method": [StrOptions({"robust-numeric", "robust-approx", "classic"})],
         "boundary": [StrOptions({"triangle", "rectangle"})],
         "upper_bracket": [Interval(Real, 0, None, closed="neither")],
     }
@@ -243,7 +243,9 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         n_components: int = 2,
         alpha: float = 0.05,
         gamma: float = 0.01,
-        method: Literal["robust", "robust-fast", "classic"] = "robust",
+        method: Literal[
+            "robust-numeric", "robust-approx", "classic"
+        ] = "robust-numeric",
         boundary: Literal["triangle", "rectangle"] = "triangle",
         upper_bracket: float = 10_000,
     ):
@@ -327,17 +329,18 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             If input or parameters are invalid, retained PCA components are
             numerically degenerate, or ``outlier_alpha_ >= alpha``. Also
             raised if the robust root-search bracket does not bracket a root,
-            or robust-fast inputs are invalid, exceed the approximation's
+            or robust-approx inputs are invalid, exceed the approximation's
             supported IQR-to-median ratio, or produce a nonfinite estimate.
         RuntimeError
-            If the root solver fails to converge when ``method="robust"``.
+            If the root solver fails to converge when ``method="robust-numeric"``.
 
         Warns
         -----
         UserWarning
-            If ``method="robust-fast"`` estimates rounded degrees of freedom
+            If ``method="robust-approx"`` estimates rounded degrees of freedom
             of at least 50, outside the approximation's reported accuracy
             range. The estimate is retained; no method switch is performed.
+            If ``method="robust-numeric"`` fails to converge, a RuntimeError is raised.
 
         Notes
         -----
@@ -348,8 +351,8 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         minimum of 1.
 
         Both robust methods use medians and interquartile ranges. The
-        "robust" method solves the chi-square IQR-to-median matching equation;
-        "robust-fast" uses its explicit approximation. Both round degrees of
+        "robust-numeric" method solves the chi-square IQR-to-median matching equation;
+        "robust-approx" uses its explicit approximation. Both round degrees of
         freedom to the nearest integer with a minimum of 1, then estimate mean
         distances using Equation (17) in reference [3] of the class docstring.
 
@@ -427,13 +430,13 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
             # Interquantile range calculation (Eq. (14) in [3])
             iqr_h = np.percentile(h, 75) - np.percentile(h, 25)
             iqr_v = np.percentile(v, 75) - np.percentile(v, 25)
-            if self.method == "robust-fast":
+            if self.method == "robust-approx":
                 # Fast robust estimation of DoF for SD and OD using Eq. (16) in [3] and
                 # rounding to the closest integeer as suggested in [3]
                 self.Nh_ = self._estimate_robust_fast_dof(median_h, iqr_h)
                 self.Nv_ = self._estimate_robust_fast_dof(median_v0, iqr_v)
 
-            if self.method == "robust":
+            if self.method == "robust-numeric":
                 # Estimate score and orthogonal distance DoF using Eq. (15) in [3].
                 # Use Brent's method with a lower bound of 0.01 to avoid underflow
                 # of the chi-square median and division by zero in the objective.
@@ -644,7 +647,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         return h, v
 
     def _estimate_robust_dof(
-        sef, median_u: float, iqr_u: float, bracket=(1e-12, 10_000)
+        self, median_u: float, iqr_u: float, bracket=(1e-12, 10_000)
     ) -> float:
         """Estimate degrees of freedom by chi-square IQR-to-median matching.
 
@@ -742,7 +745,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         # Check for valdid degrees of freedom
         if not np.isfinite(dof):
             raise ValueError(
-                f"The robust-fast DoF estimate is not finite, but found dof={dof}"
+                f"The robust-approx DoF estimate is not finite, but found dof={dof}"
             )
 
         # Round DoF to the nearest positive integer as defined in [3]
@@ -751,7 +754,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
         # Warn user if estimated DoF is above reported approximation accuracy.
         if rounded_dof >= 50:
             warnings.warn(
-                f"The robust-fast DoF estimate rounds to {rounded_dof:.0f}. "
+                f"The robust-approx DoF estimate rounds to {rounded_dof:.0f}. "
                 "Eq. (16) in [3] is being used outside its reported N < 50 range. "
                 "The estimate is retained, but approximation accuracy "
                 "outside this range is not established.",

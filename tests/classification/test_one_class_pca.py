@@ -12,8 +12,8 @@ class TestSklearnCompatibility:
     @pytest.mark.parametrize(
         "estimator",
         [
-            OneClassPCA(n_components=1, method="robust"),
-            OneClassPCA(n_components=1, method="robust-fast"),
+            OneClassPCA(n_components=1, method="robust-numeric"),
+            OneClassPCA(n_components=1, method="robust-approx"),
             OneClassPCA(n_components=1, method="classic"),
         ],
     )
@@ -22,7 +22,7 @@ class TestSklearnCompatibility:
         check_estimator(estimator)
 
 
-@pytest.mark.parametrize("method", ["robust", "robust-fast", "classic"])
+@pytest.mark.parametrize("method", ["robust-numeric", "robust-approx", "classic"])
 @pytest.mark.parametrize("boundary", ["triangle", "rectangle"])
 def test_fit_and_predict(method, boundary):
     """Verify predictions and training categories across methods and boundaries."""
@@ -111,7 +111,7 @@ def test_invalid_fit(case):
 def test_robust_fast_invalid_statistics(median, iqr):
     """Reject nonpositive or nonfinite robust-fast summary statistics."""
     # Arrange
-    clf = OneClassPCA(method="robust-fast")
+    clf = OneClassPCA(method="robust-approx")
 
     # Act / Assert
     with pytest.raises(ValueError, match="finite and strictly positive"):
@@ -121,7 +121,7 @@ def test_robust_fast_invalid_statistics(median, iqr):
 def test_robust_fast_nonfinite_estimate():
     """Reject a robust-fast degrees-of-freedom estimate that overflows."""
     # Arrange
-    clf = OneClassPCA(method="robust-fast")
+    clf = OneClassPCA(method="robust-approx")
 
     # Act / Assert
     with pytest.warns(RuntimeWarning, match="overflow"):
@@ -132,7 +132,7 @@ def test_robust_fast_nonfinite_estimate():
 def test_robust_fast_high_dof_warning():
     """Warn but retain estimates outside the robust-fast accuracy range."""
     # Arrange
-    clf = OneClassPCA(method="robust-fast")
+    clf = OneClassPCA(method="robust-approx")
 
     # Act
     with pytest.warns(UserWarning, match="outside its reported N < 50 range"):
