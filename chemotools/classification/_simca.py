@@ -81,9 +81,9 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
         return np.column_stack(
             [estimator.decision_function(X) for estimator in self.estimators_]
-        ).astype(int)
+        )
 
-    @available_if(lambda self: hasattr(self.estimator, "decision_function"))
+    @available_if(lambda self: hasattr(self.estimator, "score_samples"))
     def score_samples(self, X: NDArray) -> NDArray:
         """Returns per-sample scores, shape (n_samples, n_classes).
 
@@ -97,4 +97,4 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
         return np.column_stack(
             [estimator.score_samples(X) for estimator in self.estimators_]
-        ).astype(int)
+        )
