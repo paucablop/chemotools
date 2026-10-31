@@ -54,7 +54,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         self.estimators_ = []
         for k in self.classes_:
             estimator = clone(self.estimator)
-            estimator.fit(X[y[:, k]==1, :])
+            estimator.fit(X[y[:, k] == 1, :])
             self.estimators_.append(estimator)
         return self
 
