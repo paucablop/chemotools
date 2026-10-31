@@ -1,3 +1,12 @@
+"""Soft Independent Modeling of Class Analogy (SIMCA) classification.
+
+The module :mod:`chemotools.classification._simca` implements a classifier
+that fits an independent one-class model for each target class.
+"""
+
+# Author: Pau Cabaneros & Ruggero Guerrini
+# License: MIT
+
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.base import (
@@ -12,10 +21,117 @@ from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
-    """Soft Independent Modeling of Class Analogy classifier."""
+    """Soft Independent Modeling of Class Analogy (SIMCA) classifier.
+
+    Fit a separate clone of a one-class estimator to the training samples
+    belonging to each class. Class memberships are independent, so a sample
+    can be accepted by multiple classes or rejected by all classes.
+
+    Parameters
+    ----------
+    estimator : estimator object
+        Scikit-learn-compatible outlier detector implementing ``fit(X)`` and
+        ``predict(X)``. Predictions equal to 1 indicate class membership.
+        The estimator must support prediction on new observations. A separate
+        clone is fitted for each class; the supplied estimator is not fitted
+        or modified.
+
+    class_names : list of str or int or None, default=None
+        Names of the classes, with one entry per column of the target matrix
+        in the same order. If None or an empty list, the integer indices in
+        ``classes_`` are used. Names are used by :meth:`predict_labels` and
+        :meth:`get_model`; they do not change the binary membership matrix
+        returned by :meth:`predict`.
+
+    Attributes
+    ----------
+    classes_ : ndarray of shape (n_classes,)
+        Class indices, from 0 to ``n_classes - 1``, corresponding to the
+        columns of the binary target matrix passed to :meth:`fit`.
+
+    estimators_ : list of estimator objects
+        Fitted one-class estimators, ordered as ``classes_``.
+
+    class_names_ : ndarray of shape (n_classes,)
+        Class names in target-column order. Contains the supplied names
+        converted to an array, or ``classes_`` when no names are supplied.
+
+    n_features_in_ : int
+        Number of features seen during :meth:`fit`.
+
+    feature_names_in_ : ndarray of shape (n_features_in_,)
+        Names of features seen during :meth:`fit`. Defined only when the
+        input has feature names that are all strings.
+
+    Methods
+    -------
+    fit(X, y)
+        Fit an independent one-class estimator for each target column.
+
+    predict(X)
+        Return a binary class-membership matrix.
+
+    predict_labels(X)
+        Return a tuple of accepted class names for each sample.
+
+    fit_predict_labels(X, y)
+        Fit the classifier and return class-name tuples for the training data.
+
+    get_model(class_name)
+        Return the fitted estimator associated with a class name.
+
+    decision_function(X)
+        Return per-class decision values when supported by the estimator.
+
+    score_samples(X)
+        Return per-class sample scores when supported by the estimator.
+
+    See Also
+    --------
+    chemotools.classification.OneClassPCA : PCA-based one-class classifier.
+    sklearn.svm.OneClassSVM : SVM-based one-class classifier.
+
+    Notes
+    -----
+    The target must be a dense binary indicator matrix, not a vector of
+    class labels. Each column defines a class and must contain at least one
+    positive training sample. A sample with multiple positive entries is used
+    to fit each corresponding class model; a sample with no positive entries
+    is not used to fit any class model.
+
+    The :meth:`decision_function` and :meth:`score_samples` methods are
+    available only when the supplied estimator exposes the corresponding
+    method. Their outputs retain the scale and meaning of the underlying
+    estimator; they are not converted to class probabilities.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from sklearn.svm import OneClassSVM
+    >>> from chemotools.classification._simca import SIMCA
+    >>> X = np.array([[0.0], [0.1], [0.2], [2.0], [2.1], [2.2]])
+    >>> y = np.array([[1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1]])
+    >>> classifier = SIMCA(estimator=OneClassSVM(), class_names=["A", "B"])
+    >>> labels = classifier.fit_predict_labels(X, y)
+    >>> len(labels)
+    6
+    >>> classifier.predict(X).shape
+    (6, 2)
+    >>> classifier.get_model("A") is classifier.estimators_[0]
+    True
+    """
+
+    # TODO: Add parameter constraints
 
     def __sklearn_tags__(self):
-        """Return the scikit-learn estimator tags for this classifier."""
+        """Return the scikit-learn estimator tags for this classifier.
+
+        Returns
+        -------
+        tags : sklearn.utils.Tags
+            Estimator tags declaring support for two-dimensional multilabel
+            targets rather than single-output multiclass targets.
+        """
         tags = super().__sklearn_tags__()
         tags.classifier_tags.multi_label = True
         tags.classifier_tags.multi_class = False
@@ -24,11 +140,53 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         tags.target_tags.two_d_labels = True
         return tags
 
-    def __init__(self, estimator: BaseEstimator):
+    def __init__(self, estimator: BaseEstimator, class_names: None | list = None):
+        """Initialize the classifier with a one-class estimator.
+
+        Parameters
+        ----------
+        estimator : estimator object
+            Scikit-learn-compatible outlier detector supporting ``fit(X)``
+            and ``predict(X)`` on new observations. Cloned for each class
+            during :meth:`fit`.
+
+        class_names : list of str or int or None, default=None
+            Names of the classes, with one entry per target column in the
+            same order. If None or an empty list, integer class indices are
+            used.
+        """
         self.estimator = estimator
+        self.class_names = class_names
 
     def fit(self, X: NDArray, y: NDArray) -> "SIMCA":
-        """Fit one class model per column of the binary target matrix."""
+        """Fit one class model per column of the binary target matrix.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data. Each class model is fitted only to samples whose
+            corresponding target entry is 1.
+
+        y : array-like of shape (n_samples, n_classes)
+            Dense binary indicator matrix with 1 for class membership and 0
+            otherwise. Each class must have at least one training sample.
+
+        Returns
+        -------
+        self : SIMCA
+            Fitted classifier.
+
+        Raises
+        ------
+        TypeError
+            If ``estimator`` is not an outlier detector with a callable
+            ``predict`` method.
+
+        ValueError
+            If the input data are invalid, the target is not a dense
+            two-dimensional binary indicator matrix, or any class has no
+            training samples.
+        """
         # 1. Validation
         # Require an outlier detector that can predict new observations.
         if not is_outlier_detector(self.estimator) or not callable(
@@ -56,10 +214,30 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             estimator = clone(self.estimator)
             estimator.fit(X[y[:, k] == 1, :])
             self.estimators_.append(estimator)
+
+        # 3. Handle class names
+        self.class_names_ = (
+            np.asarray(self.class_names) if self.class_names else self.classes_
+        )
+
         return self
 
     def predict(self, X: NDArray) -> NDArray:
-        """Return a binary membership matrix."""
+        """Predict class memberships for the input samples.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Samples to classify.
+
+        Returns
+        -------
+        memberships : ndarray of shape (n_samples, n_classes), dtype=int
+            Binary membership matrix with columns ordered as ``classes_``.
+            An entry is 1 when the corresponding class estimator predicts 1,
+            and 0 otherwise. Each sample may belong to zero, one, or multiple
+            classes.
+        """
         check_is_fitted(self, "estimators_")
         X = validate_data(self, X, reset=False)
 
@@ -67,14 +245,115 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             [estimator.predict(X) == 1 for estimator in self.estimators_]
         ).astype(int)
 
+    def predict_labels(self, X: NDArray) -> list:
+        """Predict class names for the input samples.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Samples to classify.
+
+        Returns
+        -------
+        labels : list of tuple
+            List of length ``n_samples``, with one tuple per sample containing
+            the entries of ``class_names_``
+            for all accepted classes, in target-column order. An empty tuple
+            indicates rejection by all class models. A tuple may contain
+            multiple names when several class models accept the sample.
+
+        See Also
+        --------
+        predict : Return class memberships as a binary indicator matrix.
+        """
+        masks = np.asarray(self.predict(X), dtype=bool)
+        return [tuple(self.class_names_[mask].tolist()) for mask in masks]
+
+    def fit_predict_labels(self, X: NDArray, y: NDArray):
+        """Fit the classifier and predict class names for the training data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training samples, also used to predict class memberships after
+            fitting.
+
+        y : array-like of shape (n_samples, n_classes)
+            Dense binary indicator matrix with 1 for class membership and 0
+            otherwise. Each class must have at least one training sample.
+
+        Returns
+        -------
+        labels : list of tuple
+            List of length ``n_samples`` containing the accepted class names
+            for each training sample, in target-column order. Tuples may be
+            empty or contain multiple names. Predicted memberships need not
+            match the training targets.
+
+        See Also
+        --------
+        fit : Fit one class model per target column.
+        predict_labels : Predict class names using the fitted models.
+
+        Notes
+        -----
+        Equivalent to ``self.fit(X, y).predict_labels(X)``. Any previously
+        fitted class models are replaced.
+        """
+        return self.fit(X, y).predict_labels(X)
+
+    def get_class_model(self, class_name: str | int) -> BaseEstimator:
+        """Return the fitted one-class estimator for a class.
+
+        Parameters
+        ----------
+        class_name : str or int
+            Class name present in ``class_names_``. When no custom names were
+            supplied, use the integer class index.
+
+        Returns
+        -------
+        estimator : estimator object
+            Fitted estimator for the first matching entry in ``class_names_``.
+            This is the stored estimator, not a copy; modifying it also
+            modifies the corresponding class model in this classifier.
+
+        Raises
+        ------
+        ValueError
+            If ``class_name`` is not present in ``class_names_``.
+
+        Notes
+        -----
+        The classifier must be fitted before calling this method.
+        """
+        check_is_fitted(self, "estimators_")
+        if class_name not in self.class_names_:
+            raise ValueError(
+                f"Selected class: {class_name} not in model classes. "
+                f"Available options are: {self.class_names_}"
+            )
+
+        return self.estimators_[np.where(self.class_names_ == class_name)[0][0]]
+
     @available_if(lambda self: hasattr(self.estimator, "decision_function"))
     def decision_function(self, X: NDArray) -> NDArray:
-        """Returns per-class decision values.
+        """Compute per-class decision values for the input samples.
+
+        Available only when ``estimator`` exposes ``decision_function``.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Samples to evaluate.
 
         Returns
         -------
         decisions : ndarray of shape (n_samples, n_classes)
-            Decision values, with columns ordered as ``classes_``
+            Decision values returned by each fitted class estimator, with
+            columns ordered as ``classes_``. The sign convention, scale, and
+            acceptance threshold are determined by the underlying estimator.
+            Values are not class probabilities.
         """
         check_is_fitted(self, "estimators_")
         X = validate_data(self, X, reset=False)
@@ -85,12 +364,22 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
     @available_if(lambda self: hasattr(self.estimator, "score_samples"))
     def score_samples(self, X: NDArray) -> NDArray:
-        """Returns per-sample scores, shape (n_samples, n_classes).
+        """Compute per-class sample scores for the input samples.
+
+        Available only when ``estimator`` exposes ``score_samples``.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Samples to score.
 
         Returns
         -------
-        decisions : ndarray of shape (n_samples, n_classes)
-            Decision values, with columns ordered as ``classes_``
+        scores : ndarray of shape (n_samples, n_classes)
+            Sample scores returned by each fitted class estimator, with
+            columns ordered as ``classes_``. Scores retain the meaning and
+            scale of the underlying estimator and are not class probabilities
+            or necessarily comparable across classes.
         """
         check_is_fitted(self, "estimators_")
         X = validate_data(self, X, reset=False)
