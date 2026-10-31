@@ -17,9 +17,11 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
     def __sklearn_tags__(self):
         """Return the scikit-learn estimator tags for this classifier."""
         tags = super().__sklearn_tags__()
-        tags.estimator_type = "classifier"
-        tags.target_tags.required = True
+        tags.classifier_tags.multi_label = True
+        tags.classifier_tags.multi_class = False
         tags.target_tags.multi_output = True
+        tags.target_tags.single_output = False
+        tags.target_tags.two_d_labels = True
         return tags
 
     def __init__(self, estimator: BaseEstimator):
@@ -51,10 +53,8 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         # 2. Clone and estimate
         self.estimators_ = []
         for k in self.classes_:
-            mask = y[:, k] == 1
-            X_class = X[mask, :]
             estimator = clone(self.estimator)
-            estimator.fit(X_class)
+            estimator.fit(X[y[:, k]==1, :])
             self.estimators_.append(estimator)
         return self
 
