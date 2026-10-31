@@ -40,7 +40,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         Names of the classes, with one entry per column of the target matrix
         in the same order. If None or an empty list, the integer indices in
         ``classes_`` are used. Names are used by :meth:`predict_labels` and
-        :meth:`get_model`; they do not change the binary membership matrix
+        :meth:`get_class_model`; they do not change the binary membership matrix
         returned by :meth:`predict`.
 
     Attributes
@@ -77,7 +77,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
     fit_predict_labels(X, y)
         Fit the classifier and return class-name tuples for the training data.
 
-    get_model(class_name)
+    get_class_model(class_name)
         Return the fitted estimator associated with a class name.
 
     decision_function(X)
@@ -117,7 +117,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
     6
     >>> classifier.predict(X).shape
     (6, 2)
-    >>> classifier.get_model("A") is classifier.estimators_[0]
+    >>> classifier.get_class_model("A") is classifier.estimators_[0]
     True
     """
 
@@ -208,17 +208,30 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
         self.classes_ = np.arange(y.shape[1])
 
-        # 2. Clone and estimate
+        # Validate number of classes
+        names = self.class_names
+
+        if names is None or len(names) == 0:
+            self.class_names_ = self.classes_.copy()
+        else:
+            self.class_names_ = np.array(names, dtype=object, copy=True)
+
+        if self.class_names_ != self.classes_.shape:
+            raise ValueError("class_names must contain one name per target column.")
+
+        if len(set(self.class_names_)) != len(self.classes_):
+            raise ValueError("class_names must be unique")
+
+        # 2. Set attributes
+        self.n_samples_per_class_ = np.count_nonzero(y, axis=0)
+        self.class_count_ = len(np.unique(y))
+
+        # 3. Clone and estimate
         self.estimators_ = []
         for k in self.classes_:
             estimator = clone(self.estimator)
             estimator.fit(X[y[:, k] == 1, :])
             self.estimators_.append(estimator)
-
-        # 3. Handle class names
-        self.class_names_ = (
-            np.asarray(self.class_names) if self.class_names else self.classes_
-        )
 
         return self
 
