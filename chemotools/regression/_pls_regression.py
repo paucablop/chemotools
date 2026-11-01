@@ -361,7 +361,7 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
         (
             self.explained_x_variance_ratio_,
             self.explained_y_variance_ratio_,
-        ) = self._calculate_explained_variance_deflation(X_raw, y_raw)
+        ) = self._calculate_explained_variance(X_raw, y_raw)
 
         return self
 
@@ -423,62 +423,48 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
         """
         return super().transform(X, y)
 
-    def _calculate_explained_variance_deflation(
-        self, X, y
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Calculate explained variance ratios using sequential deflation.
+    def _calculate_explained_variance(self, X, y) -> Tuple[np.ndarray, np.ndarray]:
+        """Calculate explained variance ratios from fitted scores and loadings.
 
-        This implements the variance decomposition for PLS regression following
-        the deflation methodology described in Wegelin (2000): each component's
-        explained variance is the drop in residual variance when that component
-        is deflated from ``X`` and ``Y``.
+        For each component, the explained sum of squares is the squared norm
+        of its X-score vector multiplied by the squared norm of the corresponding
+        loading vector. Both X and Y contributions use X-scores, consistent
+        with the regression-mode PLS decomposition described by Abdi [7]_.
 
-        .. warning::
-
-            This calculation assumes the centered preprocessing the public API
-            always uses (``X`` and ``Y`` are mean-centered; ``scale`` only
-            toggles unit-variance scaling). Components beyond the numerical rank
-            of ``X`` (which ikpls may emit when ``n_components`` is large) have a
-            numerically-zero score and are skipped, so the ratios stay valid --
-            non-negative, summing to one at full rank, and identical for
-            ``algorithm=1`` and ``algorithm=2``. (A fully constant ``X`` or ``y``
-            has zero total variance, so its ratios are ``NaN``.)
+        Each contribution is divided by the total sum of squares of its block
+        after applying the fitted centering and optional scaling. This is
+        equivalent to the reduction in residual variance from sequential
+        deflation, up to numerical precision.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training vectors. Accepts numpy arrays, pandas DataFrames.
+            Original training predictors, before centering and scaling.
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors. Accepts 1D (univariate) or 2D (multivariate) targets.
+            Original training responses, before centering and scaling.
 
         Returns
         -------
-        tuple[ndarray, ndarray]
-            - X variance ratios of shape (n_components,)
-            - Y variance ratios of shape (n_components,)
+        x_ratios : ndarray of shape (n_components,)
+            Fraction of total preprocessed X variance explained by each
+            component.
+        y_ratios : ndarray of shape (n_components,)
+            Fraction of total preprocessed Y variance explained by each
+            component. These are training-data contributions, not measures
+            of predictive performance on unseen data.
+
+        Notes
+        -----
+        Requires fitted training scores, loadings, and preprocessing statistics.
+        Ratios are individual component contributions, not cumulative values.
+        If a block has zero total variance, its ratios are NaN.
         """
         # Convert to arrays and ensure y is 2D (handles pandas DataFrame/Series).
         X = np.asarray(X, dtype=self.dtype)
         y_array = np.asarray(y, dtype=self.dtype)
         y = np.atleast_2d(y_array).T if y_array.ndim == 1 else y_array
 
-        # Preprocess into the exact space the model was fitted in -- the public
-        # API always mean-centers and scales both blocks together per the single
-        # ``scale`` flag -- reusing the model's own fitted moments so the
-        # deflation stays consistent with the fitted scores/loadings.
-        #
-        # NB: an earlier version recomputed the std here as
-        # ``np.maximum(std, 1.0)``. That was a bug -- it left every feature with
-        # std < 1 (the common spectral case) unscaled, desyncing from the fit
-        # (which divides by the real std) and yielding negative / non-normalized
-        # ratios. The clamp is also unnecessary: ikpls already guards near-zero
-        # std when fitting (``inner.X_std[inner.X_std <= eps] = 1``, and likewise
-        # for ``Y_std``), so reusing ``inner.X_std`` / ``inner.Y_std`` is both
-        # correct and safe against division by zero.
-        #
-        # ``X - inner.X_mean`` allocates a fresh array, so the in-place scaling
-        # below (and the deflation, which works on the ``X_current`` copy) never
-        # touch the caller's data.
+        # Apply the fitted preprocessing
         inner = self.inner_
         X_centered = X - inner.X_mean
         y_centered = y - inner.Y_mean
@@ -486,51 +472,14 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
             X_centered /= inner.X_std
             y_centered /= inner.Y_std
 
-        # Total variance in centered data
-        X_total_var = np.var(X_centered, axis=0).sum()
-        y_total_var = np.var(y_centered, axis=0).sum()
+        # Explained variances calculated from sum of squared
+        scores_ss = np.sum(self.x_scores_**2, axis=0)
+        explained_x_ss = scores_ss * np.sum(self.x_loadings_**2, axis=0)
+        explained_y_ss = scores_ss * np.sum(self.y_loadings_**2, axis=0)
 
-        # Initialize matrices for deflation
-        X_current = X_centered.copy()
-        y_current = y_centered.copy()
+        # Zero total variance give undefined ratios (NaN)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            x_ratios = explained_x_ss / np.sum(X_centered**2)
+            y_ratios = explained_y_ss / np.sum(y_centered**2)
 
-        # Components past the numerical rank of X need no special handling here.
-        # When ``n_components`` exceeds that rank, the ikpls backend stops its fit
-        # loop at ``max_stable_components_`` and leaves the remaining components'
-        # scores and loadings as exact zeros (see ``max_stable_components_`` and
-        # ``ikpls.numpy.PLS.max_stable_components``). A zero score ``t`` gives a zero
-        # reconstruction ``t @ p.T``, so those components deflate nothing and
-        # contribute exactly zero explained variance -- the ratios stay non-negative,
-        # sum to one, and are algorithm-independent, mirroring scikit-learn's NIPALS
-        # PLSRegression, which likewise stops early on rank-deficient data.
-        X_var_ratios = []
-        y_var_ratios = []
-
-        # For each component, calculate variance explained then deflate
-        for a in range(self.n_components):
-            # Get scores and loadings for component a (using slicing to keep 2D)
-            t_a = self.x_scores_[:, a : a + 1]  # (n_samples, 1)
-            p_a = self.x_loadings_[:, a : a + 1]  # (n_features_X, 1)
-            q_a = self.y_loadings_[:, a : a + 1]  # (n_features_y, 1)
-
-            # Reconstruct X and y using current component
-            X_hat = t_a @ p_a.T
-            y_hat = t_a @ q_a.T
-
-            # Variance of current residual before deflation
-            X_var_before = np.var(X_current, axis=0).sum()
-            y_var_before = np.var(y_current, axis=0).sum()
-
-            # Deflate X and y
-            X_current -= X_hat
-            y_current -= y_hat
-
-            # Variance of residual after deflation
-            X_var_after = np.var(X_current, axis=0).sum()
-            y_var_after = np.var(y_current, axis=0).sum()
-
-            # Store variance explained as ratio of total variance
-            X_var_ratios.append((X_var_before - X_var_after) / X_total_var)
-            y_var_ratios.append((y_var_before - y_var_after) / y_total_var)
-
-        return np.array(X_var_ratios), np.array(y_var_ratios)
+        return x_ratios, y_ratios
