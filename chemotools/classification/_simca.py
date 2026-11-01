@@ -71,7 +71,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         Feature names seen during :meth:`fit`, defined only when all names
         are strings.
 
-        
+
     See Also
     --------
     chemotools.classification.OneClassPCA : PCA-based one-class classifier.
