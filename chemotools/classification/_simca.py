@@ -7,6 +7,8 @@ that fits an independent one-class model for each target class.
 # Author: Pau Cabaneros & Ruggero Guerrini
 # License: MIT
 
+from numbers import Integral
+
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.base import (
@@ -18,6 +20,7 @@ from sklearn.base import (
 )
 from sklearn.utils._param_validation import HasMethods
 from sklearn.utils.metaestimators import available_if
+from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
@@ -45,6 +48,18 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         ``classes_`` are used. Names are used by :meth:`predict_labels` and
         :meth:`get_class_model`; they do not change the binary membership matrix
         returned by :meth:`predict`.
+
+    n_jobs : int or None, default=None
+        Number of parallel jobs used to fit the independent class models
+        during :meth:`fit`, including calls through :meth:`fit_predict_labels`.
+        None means 1 unless a :obj:`joblib.parallel_config` context specifies
+        otherwise. Use 1 for serial execution and -1 to use all available CPUs.
+        Other negative values use fewer CPUs; for example, -2 uses all but one.
+        A value of 0 is invalid.
+
+        This parameter does not parallelize prediction, scoring, or
+        :meth:`add_model`, and does not change parallelism settings of the
+        underlying estimator.
 
     Attributes
     ----------
@@ -155,6 +170,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
     _parameter_constraints = {
         "estimator": [HasMethods(["predict"])],
         "class_names": ["array-like", None],
+        "n_jobs": [Integral, None],
     }
 
     def __sklearn_tags__(self):
@@ -174,7 +190,13 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         tags.target_tags.two_d_labels = True
         return tags
 
-    def __init__(self, estimator: BaseEstimator, class_names: None | list = None):
+    def __init__(
+        self,
+        estimator: BaseEstimator,
+        class_names: None | list = None,
+        *,
+        n_jobs: None | int = None,
+    ):
         """Initialize the classifier with a one-class estimator.
 
         Parameters
@@ -188,9 +210,19 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             Names of the classes, with one entry per target column in the
             same order. If None or an empty list, integer class indices are
             used.
+
+        n_jobs : int or None, default=None
+            Number of parallel jobs used to fit the independent class models.
+            None means 1 unless a :obj:`joblib.parallel_config` context
+            specifies otherwise. Use 1 for serial execution and -1 to use all
+            available CPUs. Other negative values use fewer CPUs; for example,
+            -2 uses all but one. A value of 0 is invalid. Does not parallelize
+            prediction, scoring, or :meth:`add_model`, or change parallelism
+            settings of the underlying estimator.
         """
         self.estimator = estimator
         self.class_names = class_names
+        self.n_jobs = n_jobs
 
     def fit(self, X: NDArray, y: NDArray) -> "SIMCA":
         """Fit one class model per column of the binary target matrix.
@@ -222,6 +254,9 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             training samples.
         """
         # 1. Validation
+        # Validate parameters
+        self._validate_params()
+
         # Require an outlier detector that can predict new observations.
         if not is_outlier_detector(self.estimator) or not callable(
             getattr(self.estimator, "predict", None)
@@ -259,11 +294,14 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         self.n_classes_ = y.shape[1]
 
         # 3. Clone and estimate
-        self.estimators_ = []
-        for k in self.classes_:
-            estimator = clone(self.estimator)
-            estimator.fit(X[y[:, k] == 1, :])
-            self.estimators_.append(estimator)
+        self.estimators_ = Parallel(n_jobs=self.n_jobs)(
+            delayed(self._fit_class_model)(
+                self.estimator,
+                X,
+                y[:, k] == 1,
+            )
+            for k in self.classes_
+        )
 
         return self
 
@@ -517,3 +555,6 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         return np.column_stack(
             [estimator.score_samples(X) for estimator in self.estimators_]
         )
+
+    def _fit_class_model(self, estimator, X, mask):
+        return clone(estimator).fit(X[mask, :])
