@@ -367,8 +367,8 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             :meth:`fit`.
 
         class_name : str or None, default=None
-            New class name. None uses the next zero-based class index.
-            An empty string also stores that index; see Notes.
+            New class name. None or an empty string uses the next zero-based
+            class index. The resolved name must not already exist.
 
         Returns
         -------
@@ -394,9 +394,6 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         Appends to the fitted model, index, name, and sample-count collections
         and increments ``n_classes_``. The new class is the last output column.
 
-        Duplicate checks use the generated index for None, but the literal
-        empty string for ``""``. Thus an empty string can store a duplicate
-        index.
         """
         check_is_fitted(self, "estimators_")
 
@@ -410,7 +407,9 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             dtype=np.float64,
         )
 
-        new_class_name = self.n_classes_ if class_name is None else class_name
+        new_class_name = (
+            self.n_classes_ if class_name is None or class_name == "" else class_name
+        )
 
         if new_class_name in self.class_names_:
             raise ValueError(f"Class name {new_class_name!r} already exists")
@@ -422,9 +421,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         # Update attributes
         self.estimators_.append(estimator)
         self.classes_ = np.append(self.classes_, len(self.classes_))
-        self.class_names_ = np.append(
-            self.class_names_, class_name if class_name else len(self.class_names_)
-        )
+        self.class_names_ = np.append(self.class_names_, new_class_name)
         self.class_count_ = np.append(self.class_count_, X.shape[0])
         self.n_classes_ += 1
 
