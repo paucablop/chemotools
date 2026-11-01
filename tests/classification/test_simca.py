@@ -35,26 +35,15 @@ def expected_failed_checks(estimator):
     }
 
 
-# @parametrize_with_checks(
-#    [
-#        SIMCA(estimator=OneClassPCA(n_components=1)),
-#    ],
-#    expected_failed_checks=expected_failed_checks,
-#    xfail_strict = True,
-# )
-# def test_sklearn_compatibility(estimator, check):
-#    check(estimator)
-
-
 @pytest.mark.parametrize(
     "estimator",
     [
         OneClassPCA(n_components=1),
         OneClassSVM(),
-        SGDOneClassSVM(),
-        IsolationForest(),
+        SGDOneClassSVM(random_state=0),
+        IsolationForest(random_state=0),
         LocalOutlierFactor(novelty=True),
-        EllipticEnvelope(),
+        EllipticEnvelope(random_state=0),
     ],
 )
 def test_sklearn_compatibility(estimator):
