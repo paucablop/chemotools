@@ -16,12 +16,13 @@ from sklearn.base import (
 )
 from sklearn.utils._param_validation import HasMethods
 from sklearn.utils.metaestimators import available_if
+from sklearn.utils.multiclass import check_classification_targets
 from sklearn.utils.parallel import Parallel, delayed
 from sklearn.utils.validation import check_is_fitted, validate_data
 
 
 class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
-    """Soft Independent Modeling of Class Analogy (SIMCA) classifier.
+    """Generalized Soft Independent Modeling of Class Analogy (SIMCA) classifier.
 
     Fit one independent model per class. Samples may belong to multiple
     classes or be rejected by all models.
@@ -210,9 +211,13 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         # Allow y to be multioutput
         X, y = validate_data(self, X, y, multi_output=True)
 
+        check_classification_targets(y)
+
         # Require a dense indicator matrix containing only zeros and ones.
         if not isinstance(y, np.ndarray) or y.ndim != 2 or not np.isin(y, [0, 1]).all():
-            raise ValueError("y must be a dense 2D binary indicator matrix.")
+            raise ValueError(
+                "y must be a dense 2D binary class-membership indicator matrix."
+            )
 
         if y.shape[1] == 0 or not np.any(y == 1, axis=0).all():
             raise ValueError("Every class must have at least one training sample.")
