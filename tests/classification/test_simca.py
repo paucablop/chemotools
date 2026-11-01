@@ -1,15 +1,14 @@
 """Tests for SIMCA classifier."""
 
 import pytest
-
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
-from sklearn.neighbors import LocalOutlierFactor
 from sklearn.linear_model import SGDOneClassSVM
+from sklearn.neighbors import LocalOutlierFactor
 from sklearn.svm import OneClassSVM
-from sklearn.utils.estimator_checks import check_estimator, parametrize_with_checks
+from sklearn.utils.estimator_checks import check_estimator
 
-from chemotools.classification import OneClassPCA, SIMCA
+from chemotools.classification import SIMCA, OneClassPCA
 
 
 def expected_failed_checks(estimator):
@@ -46,15 +45,17 @@ def expected_failed_checks(estimator):
 # def test_sklearn_compatibility(estimator, check):
 #    check(estimator)
 
+
 @pytest.mark.parametrize(
-        "estimator", [
-            OneClassPCA(n_components=1),
-            OneClassSVM(),
-            SGDOneClassSVM(),
-            IsolationForest(),
-            LocalOutlierFactor(novelty=True),
-            EllipticEnvelope(),
-        ]
+    "estimator",
+    [
+        OneClassPCA(n_components=1),
+        OneClassSVM(),
+        SGDOneClassSVM(),
+        IsolationForest(),
+        LocalOutlierFactor(novelty=True),
+        EllipticEnvelope(),
+    ],
 )
 def test_sklearn_compatibility(estimator):
     estimator = SIMCA(estimator=estimator)
