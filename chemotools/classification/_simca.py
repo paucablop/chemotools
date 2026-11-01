@@ -71,32 +71,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         Feature names seen during :meth:`fit`, defined only when all names
         are strings.
 
-    Methods
-    -------
-    fit(X, y)
-        Fit one model per target column.
-
-    predict(X)
-        Return a binary class-membership matrix.
-
-    predict_labels(X)
-        Return accepted class names per sample.
-
-    fit_predict_labels(X, y)
-        Fit and predict class names for the training data.
-
-    get_class_model(class_name)
-        Retrieve a fitted model by class name.
-
-    add_model(X, class_name=None)
-        Append a class model without refitting existing models.
-
-    decision_function(X)
-        Return per-class decision values when supported by the estimator.
-
-    score_samples(X)
-        Return per-class sample scores when supported by the estimator.
-
+        
     See Also
     --------
     chemotools.classification.OneClassPCA : PCA-based one-class classifier.

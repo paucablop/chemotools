@@ -7,4 +7,6 @@ Classification Methods
     :toctree: ./generated
     :nosignatures:
 
+    OneClassPCA
     PLSDA
+    SIMCA
