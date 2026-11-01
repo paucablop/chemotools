@@ -16,6 +16,7 @@ from sklearn.base import (
     clone,
     is_outlier_detector,
 )
+from sklearn.utils._param_validation import HasMethods
 from sklearn.utils.metaestimators import available_if
 from sklearn.utils.validation import check_is_fitted, validate_data
 
@@ -52,7 +53,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         columns of the binary target matrix passed to :meth:`fit`, followed
         by any classes appended with :meth:`add_model`.
 
-    estimators_ : list or ndarray of shape (n_classes,)
+    estimators_ : list of length (n_classes)
         Fitted one-class estimators, ordered as ``classes_``. Stored as a list
         after :meth:`fit` and an array after :meth:`add_model`.
 
@@ -151,6 +152,11 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
     # TODO: Add parameter constraints
 
+    _parameter_constraints = {
+        "estimator": [HasMethods(["predict"])],
+        "class_names": ["array-like", None],
+    }
+
     def __sklearn_tags__(self):
         """Return the scikit-learn estimator tags for this classifier.
 
@@ -237,12 +243,10 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
         self.classes_ = np.arange(y.shape[1])
 
         # Validate number of classes
-        names = self.class_names
-
-        if names is None or len(names) == 0:
-            self.class_names_ = self.classes_.copy()
+        if self.class_names is None or len(self.class_names) == 0:
+            self.class_names_ = np.array(self.classes_, dtype=object)
         else:
-            self.class_names_ = np.array(names, dtype=object, copy=True)
+            self.class_names_ = np.array(self.class_names, dtype=object)
 
         if self.class_names_.shape != self.classes_.shape:
             raise ValueError("class_names must contain one name per target column.")
@@ -377,7 +381,7 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
 
         return self.estimators_[np.where(self.class_names_ == class_name)[0][0]]
 
-    def add_model(self, X: NDArray, class_name: None | str = None):
+    def add_model(self, X: NDArray, class_name: None | str = None) -> "SIMCA":
         """Fit and append a one-class model to the fitted classifier.
 
         All input samples are treated as members of the new class. A clone
@@ -438,29 +442,29 @@ class SIMCA(ClassifierMixin, MetaEstimatorMixin, BaseEstimator):
             X,
             y="no_validation",
             ensure_2d=True,
-            reset=True,
+            reset=False,
             dtype=np.float64,
         )
 
-        # Check the class has not been previously fitted
-        if class_name in self.class_names_:
-            raise ValueError(
-                f"Provided class name: {class_name} already present in the fitted "
-                "SIMCA estimator."
-            )
+        new_class_name = self.n_classes_ if class_name is None else class_name
+
+        if new_class_name in self.class_names_:
+            raise ValueError(f"Class name {new_class_name!r} already exists")
 
         # Clone and fit a new estimator
         estimator = clone(self.estimator)
         estimator.fit(X)
 
         # Update attributes
-        self.estimators_ = np.append(self.estimators_, estimator)
+        self.estimators_.append(estimator)
         self.classes_ = np.append(self.classes_, len(self.classes_))
         self.class_names_ = np.append(
             self.class_names_, class_name if class_name else len(self.class_names_)
         )
         self.class_count_ = np.append(self.class_count_, X.shape[0])
         self.n_classes_ += 1
+
+        return self
 
     @available_if(lambda self: hasattr(self.estimator, "decision_function"))
     def decision_function(self, X: NDArray) -> NDArray:
