@@ -555,8 +555,9 @@ class TestPLSRegressionVarianceCalculation:
     def test_x_variance_sums_to_one(self):
         """X-space variance ratios sum to 1.0 at full rank -- including for
         sub-unit-std features (the common spectral case). This regresses if the
-        deflation rescales by anything other than the model's own fitted std
-        (e.g. a clamp at 1.0 would leave std<1 features unscaled)."""
+        total sum of squares (the ratio denominator) is computed with any
+        preprocessing other than the model's own fitted mean and std (e.g. a
+        clamp at 1.0 would leave std<1 features unscaled)."""
         # Arrange - std < 1 per feature exercises the scaling path
         np.random.seed(42)
         X = np.random.randn(100, 50) * 0.3
@@ -566,7 +567,8 @@ class TestPLSRegressionVarianceCalculation:
         pls = PLSRegression(n_components=50)
         pls.fit(X, y)
 
-        # Assert - exact, since the deflation happens in the model's own
+        # Assert - at full rank the component sums of squares add up to the
+        # total sum of squares, provided both are taken in the model's own
         # (inner_.X_mean / inner_.X_std) preprocessed space
         np.testing.assert_almost_equal(
             pls.explained_x_variance_ratio_.sum(),
@@ -575,13 +577,17 @@ class TestPLSRegressionVarianceCalculation:
             err_msg="X-space variance should sum to 1.0 at full rank",
         )
 
-    def test_y_variance_high_with_strong_correlation(self):
-        """Test Y variance calculation against known literature example.
+    @pytest.mark.parametrize("algorithm", [1, 2])
+    def test_variance_matches_abdi_2003_example(self, algorithm):
+        """Test X and Y variance ratios against a known literature example.
 
         Abdi, H. (2003). Partial Least Squares (PLS) Regression.
         In Lewis-Beck M., Bryman A., Futing T. (Eds.),
         Encyclopedia of Social Sciences Research Methods.
         Thousand Oaks (CA): Sage.
+
+        Table 11 of the paper gives the variance explained per latent vector
+        in whole percent: X 70/28/2 and Y 63/22/10.
         """
         # Arrange - Known example from literature
         X = np.array(
@@ -600,10 +606,18 @@ class TestPLSRegressionVarianceCalculation:
         )
 
         # Act
-        pls = PLSRegression(n_components=3)
+        pls = PLSRegression(n_components=3, algorithm=algorithm)
         pls.fit(X, y)
 
-        # Assert - Expected values from literature
+        # Assert - X: Table 11, rounded to whole percent
+        np.testing.assert_allclose(
+            100 * pls.explained_x_variance_ratio_,
+            [70, 28, 2],
+            atol=0.5,
+            err_msg="X variance should match Abdi (2003), Table 11",
+        )
+
+        # Assert - Y: pinned more tightly than Table 11 (63/22/10)
         expected_y_var = np.array([0.63331666, 0.22064505, 0.10437163])
 
         np.testing.assert_array_almost_equal(
@@ -698,8 +712,9 @@ class TestPLSRegressionVarianceCalculation:
     def test_variance_respects_preprocessing_flags(self):
         """With the default centering, the full-rank X variance sums to 1 whether
         or not scaling is enabled -- including for sub-unit-std, offset features,
-        which regresses if the deflation does not use the model's own fitted std.
-        Disabling centering is a documented limitation and is not asserted here."""
+        which regresses if the total sum of squares is not computed with the
+        model's own fitted mean and std.
+        Centering is always on in this wrapper."""
         # Arrange - std < 1 (and a mean offset) so scale=True is truly exercised
         np.random.seed(42)
         X = np.random.randn(100, 20) * 0.3 + 5
