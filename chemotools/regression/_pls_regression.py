@@ -2,7 +2,7 @@
 The module :mod:`chemotools.regression._pls_regression` implements PLS regression
 backed by the fast and numerically stable Improved Kernel PLS algorithms from the
 `ikpls <https://github.com/sm00thix/ikpls>`_ package, with automatic explained
-variance calculation for both X and Y spaces.
+variance ratios for both X and Y spaces computed from fitted scores and loadings.
 """
 
 # Authors: Pau Cabaneros, Ole-Christian Galbo Engstrøm
@@ -52,27 +52,6 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
       weighted variants). This wrapper does not expose ``sample_weight``;
       whether to enable it is left to the maintainer.
 
-    After fitting, two additional attributes are computed:
-
-    - ``explained_x_variance_ratio_``: Variance explained in X-space (predictors)
-    - ``explained_y_variance_ratio_``: Variance explained in Y-space (response)
-
-    Following the PLSRegression implemented in scikit-learn [3]_, the
-    explained variance calculation uses the x_scores_ (t) to asymmetrically
-    deflate the Y matrix.
-
-    In PLS, the latent score vector t (from X) is used to
-    model Y via its loading vector c:
-        Y_hat = t @ c.T
-
-    Deflation removes the part of Y explained by the current component:
-        Y_new = Y - Y_hat
-
-    This process is repeated for each component, using the
-    corresponding t and c vectors.
-    Note: Unlike PCA, deflation in PLS is asymmetric—Y is
-    deflated using t-scores derived from X.
-
     Parameters
     ----------
     n_components : int, default=2
@@ -102,24 +81,16 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
     Attributes
     ----------
     explained_x_variance_ratio_ : ndarray of shape (n_components,)
-        Explained variance ratio in X-space (predictors) for each component.
-        This measures how much variance in the predictor variables each latent
-        variable captures. Automatically calculated after fitting.
+        Fraction of the total preprocessed training X sum of squares explained
+        by each component (not cumulative). See Notes for the calculation and
+        numerical caveats.
 
     explained_y_variance_ratio_ : ndarray of shape (n_components,)
-        Explained variance ratio in Y-space (response) for each component.
-        This measures the prediction quality - how much variance in the response
-        each latent variable explains. Automatically calculated after fitting.
-
-        Both ratios are computed by sequential deflation in the centered
-        (optionally scaled) space, which the public API always uses. For inputs
-        with nonzero variance they are valid: non-negative, with the X ratios
-        summing to 1 at full rank. Components beyond the numerical rank of ``X``
-        carry no variance and are assigned zero.
-
-        Degenerate inputs: if ``X`` (all features) or ``y`` is fully constant --
-        i.e. has zero total variance -- the corresponding ratios are ``NaN`` (a
-        ``0/0`` result), since there is no variance to apportion.
+        Fraction of the total preprocessed training Y sum of squares explained
+        by each component (not cumulative).
+        For multiple targets, sums of squares are aggregated across all targets.
+        These ratios describe training-data variance, not predictive performance
+        on unseen data. See Notes for the calculation and numerical caveats.
 
     x_scores_ : ndarray of shape (n_samples, n_components)
         The training X-scores ``T`` (the projection of the preprocessed
@@ -209,19 +180,34 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
     -----
     **Variance Calculation:**
 
-    - **X-space variance** is calculated using sequential
-      deflation and sums to 1.0 (100%) when ``n_components`` equals the rank
-      of the (centered) ``X``
-    - **Y-space variance** is calculated using sequential
-      deflation but may not sum to 1.0 due to asymmetric
-      deflation (Y deflated with X-scores). The sum depends
-      on X-Y correlation.
-    - For each component, variance explained = variance reduction after deflation
-    - This follows the standard PLS variance decomposition methodology (Wegelin, 2000)
-    - Components beyond the numerical rank of ``X`` carry no variance and are
-      assigned zero explained variance, so the ratios stay non-negative and the
-      X ratios sum to 1 at full rank even when ``n_components`` exceeds that
-      rank (and are identical for ``algorithm=1`` and ``algorithm=2``).
+    Component sums of squares are computed directly from squared X-score and
+    loading norms [7]_. Both X and Y contributions use X-scores, consistent
+    with regression-mode PLS.
+
+    Let ``t_a``, ``p_a``, and ``q_a`` be column ``a`` of ``x_scores_``,
+    ``x_loadings_``, and ``y_loadings_``, respectively. Let ``X_c`` and ``Y_c``
+    denote the training blocks after applying the fitted means and, when
+    ``scale=True``, the fitted standard deviations (``ddof=1``). Then::
+
+        explained_x_variance_ratio_[a] = sum(t_a**2) * sum(p_a**2) / sum(X_c**2)
+        explained_y_variance_ratio_[a] = sum(t_a**2) * sum(q_a**2) / sum(Y_c**2)
+
+    Each sum is over all elements of its vector or matrix. Thus the denominators
+    are the total sums of squares of the preprocessed blocks, not the residual
+    sums of squares after earlier components.
+
+    - For orthogonal fitted X-scores, these contributions equal the reduction
+      in residual sum of squares from sequential PLS deflation, up to numerical
+      precision [4]_ [7]_. No explicit deflation is performed here.
+    - X ratios sum to approximately 1 when the fitted components reconstruct
+      the preprocessed X block. Y ratios do not need to sum to 1: variation in
+      Y that the X-scores cannot explain remains in the residual.
+    - The same calculation is used for both algorithms. Ratios are non-negative
+      for finite fitted scores and loadings and positive total variance.
+      There is no explicit rank thresholding, clipping, or renormalization;
+      components near or beyond numerical rank depend on the backend's
+      numerical behavior.
+    - A block with zero total variance has undefined ratios (``NaN``).
 
     **Differences from the previous scikit-learn (NIPALS) backend:**
 
@@ -305,8 +291,8 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
         """Fit model to data and compute explained variance ratios.
 
         This method extends ``ikpls.sklearn.PLS.fit`` by storing the training
-        scores and automatically calculating explained variance ratios after
-        fitting.
+        X-scores and calculating explained variance ratios. See the Notes
+        section of :class:`PLSRegression` for calculation details.
 
         Parameters
         ----------
@@ -325,7 +311,7 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
 
         # The inner PLS centers/scales X and y IN PLACE when copy=False, so
         # snapshot the raw inputs first. Both the score computation (algorithm 2
-        # re-projects via transform) and the explained-variance deflation re-apply
+        # re-projects via transform) and the variance normalization re-apply
         # the fitted preprocessing, so they must start from the original data, not
         # data already preprocessed in place. With copy=True the inputs are left
         # untouched, so no snapshot is needed.
@@ -361,7 +347,7 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
         (
             self.explained_x_variance_ratio_,
             self.explained_y_variance_ratio_,
-        ) = self._calculate_explained_variance_deflation(X_raw, y_raw)
+        ) = self._calculate_explained_variance(X_raw, y_raw)
 
         return self
 
@@ -423,62 +409,35 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
         """
         return super().transform(X, y)
 
-    def _calculate_explained_variance_deflation(
-        self, X, y
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Calculate explained variance ratios using sequential deflation.
+    def _calculate_explained_variance(self, X, y) -> Tuple[np.ndarray, np.ndarray]:
+        """Calculate explained variance ratios from fitted scores and loadings.
 
-        This implements the variance decomposition for PLS regression following
-        the deflation methodology described in Wegelin (2000): each component's
-        explained variance is the drop in residual variance when that component
-        is deflated from ``X`` and ``Y``.
-
-        .. warning::
-
-            This calculation assumes the centered preprocessing the public API
-            always uses (``X`` and ``Y`` are mean-centered; ``scale`` only
-            toggles unit-variance scaling). Components beyond the numerical rank
-            of ``X`` (which ikpls may emit when ``n_components`` is large) have a
-            numerically-zero score and are skipped, so the ratios stay valid --
-            non-negative, summing to one at full rank, and identical for
-            ``algorithm=1`` and ``algorithm=2``. (A fully constant ``X`` or ``y``
-            has zero total variance, so its ratios are ``NaN``.)
+        Requires fitted training scores, loadings, and preprocessing statistics.
+        See the Notes section of :class:`PLSRegression` for the formulas and
+        numerical caveats.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Training vectors. Accepts numpy arrays, pandas DataFrames.
+            Original training predictors, before centering and scaling.
         y : array-like of shape (n_samples,) or (n_samples, n_targets)
-            Target vectors. Accepts 1D (univariate) or 2D (multivariate) targets.
+            Original training responses, before centering and scaling.
 
         Returns
         -------
-        tuple[ndarray, ndarray]
-            - X variance ratios of shape (n_components,)
-            - Y variance ratios of shape (n_components,)
+        x_ratios : ndarray of shape (n_components,)
+            Fraction of total preprocessed X variance explained by each
+            component.
+        y_ratios : ndarray of shape (n_components,)
+            Fraction of total preprocessed Y variance explained by each
+            component.
         """
         # Convert to arrays and ensure y is 2D (handles pandas DataFrame/Series).
         X = np.asarray(X, dtype=self.dtype)
         y_array = np.asarray(y, dtype=self.dtype)
         y = np.atleast_2d(y_array).T if y_array.ndim == 1 else y_array
 
-        # Preprocess into the exact space the model was fitted in -- the public
-        # API always mean-centers and scales both blocks together per the single
-        # ``scale`` flag -- reusing the model's own fitted moments so the
-        # deflation stays consistent with the fitted scores/loadings.
-        #
-        # NB: an earlier version recomputed the std here as
-        # ``np.maximum(std, 1.0)``. That was a bug -- it left every feature with
-        # std < 1 (the common spectral case) unscaled, desyncing from the fit
-        # (which divides by the real std) and yielding negative / non-normalized
-        # ratios. The clamp is also unnecessary: ikpls already guards near-zero
-        # std when fitting (``inner.X_std[inner.X_std <= eps] = 1``, and likewise
-        # for ``Y_std``), so reusing ``inner.X_std`` / ``inner.Y_std`` is both
-        # correct and safe against division by zero.
-        #
-        # ``X - inner.X_mean`` allocates a fresh array, so the in-place scaling
-        # below (and the deflation, which works on the ``X_current`` copy) never
-        # touch the caller's data.
+        # Apply the fitted preprocessing
         inner = self.inner_
         X_centered = X - inner.X_mean
         y_centered = y - inner.Y_mean
@@ -486,51 +445,14 @@ class PLSRegression(DocLinkMixin, _IkplsPLS):
             X_centered /= inner.X_std
             y_centered /= inner.Y_std
 
-        # Total variance in centered data
-        X_total_var = np.var(X_centered, axis=0).sum()
-        y_total_var = np.var(y_centered, axis=0).sum()
+        # Component sums of squares from squared score and loading norms.
+        scores_ss = np.sum(self.x_scores_**2, axis=0)
+        explained_x_ss = scores_ss * np.sum(self.x_loadings_**2, axis=0)
+        explained_y_ss = scores_ss * np.sum(self.y_loadings_**2, axis=0)
 
-        # Initialize matrices for deflation
-        X_current = X_centered.copy()
-        y_current = y_centered.copy()
+        # Zero total variance give undefined ratios (NaN)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            x_ratios = explained_x_ss / np.sum(X_centered**2)
+            y_ratios = explained_y_ss / np.sum(y_centered**2)
 
-        # Components past the numerical rank of X need no special handling here.
-        # When ``n_components`` exceeds that rank, the ikpls backend stops its fit
-        # loop at ``max_stable_components_`` and leaves the remaining components'
-        # scores and loadings as exact zeros (see ``max_stable_components_`` and
-        # ``ikpls.numpy.PLS.max_stable_components``). A zero score ``t`` gives a zero
-        # reconstruction ``t @ p.T``, so those components deflate nothing and
-        # contribute exactly zero explained variance -- the ratios stay non-negative,
-        # sum to one, and are algorithm-independent, mirroring scikit-learn's NIPALS
-        # PLSRegression, which likewise stops early on rank-deficient data.
-        X_var_ratios = []
-        y_var_ratios = []
-
-        # For each component, calculate variance explained then deflate
-        for a in range(self.n_components):
-            # Get scores and loadings for component a (using slicing to keep 2D)
-            t_a = self.x_scores_[:, a : a + 1]  # (n_samples, 1)
-            p_a = self.x_loadings_[:, a : a + 1]  # (n_features_X, 1)
-            q_a = self.y_loadings_[:, a : a + 1]  # (n_features_y, 1)
-
-            # Reconstruct X and y using current component
-            X_hat = t_a @ p_a.T
-            y_hat = t_a @ q_a.T
-
-            # Variance of current residual before deflation
-            X_var_before = np.var(X_current, axis=0).sum()
-            y_var_before = np.var(y_current, axis=0).sum()
-
-            # Deflate X and y
-            X_current -= X_hat
-            y_current -= y_hat
-
-            # Variance of residual after deflation
-            X_var_after = np.var(X_current, axis=0).sum()
-            y_var_after = np.var(y_current, axis=0).sum()
-
-            # Store variance explained as ratio of total variance
-            X_var_ratios.append((X_var_before - X_var_after) / X_total_var)
-            y_var_ratios.append((y_var_before - y_var_after) / y_total_var)
-
-        return np.array(X_var_ratios), np.array(y_var_ratios)
+        return x_ratios, y_ratios
