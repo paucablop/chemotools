@@ -21,9 +21,9 @@ from chemotools._doc_mixin import DocLinkMixin
 class DirectOrthogonalization(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation in X that is uncorrelated with the target y using Direct
-    Orthogonalization (DO) [1]_ [2]_.
+    Orthogonalization (DO).
 
-    DO removes from X systematic variation that is independent of y. X is
+    DO [1]_ [2]_ removes from X systematic variation that is independent of y. X is
     orthogonalized with respect to y, PCA is performed on the orthogonalized matrix
     to estimate orthogonal components, and those components are subtracted from X to
     obtain the corrected data.

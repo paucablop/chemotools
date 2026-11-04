@@ -21,9 +21,9 @@ from chemotools._doc_mixin import DocLinkMixin
 class ExternalParameterOrthogonalization(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation linked to known external nuisance parameters using
-    External Parameter Orthogonalization (EPO) [1]_.
+    External Parameter Orthogonalization (EPO).
 
-    EPO is designed for situations where spectral measurements are affected by
+    EPO [1]_ is designed for situations where spectral measurements are affected by
     controlled external factors (e.g., temperature, humidity, instrument
     differences) that are not related to the target property. The method
     estimates a nuisance subspace from an auxiliary dataset or from structured

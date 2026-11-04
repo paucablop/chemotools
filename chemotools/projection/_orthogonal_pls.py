@@ -21,9 +21,9 @@ from chemotools._doc_mixin import DocLinkMixin
 class OrthogonalPLS(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     A transformer that removes variation in X that is orthogonal to the target y using
-    Orthogonal Projection to Latent Structures (OPLS) [1]_.
+    Orthogonal Projection to Latent Structures (OPLS).
 
-    OPLS extends PLS by explicitly separating X into predictive variation,
+    OPLS [1]_ extends PLS by explicitly separating X into predictive variation,
     correlated with y, and orthogonal variation, unrelated to y. At each
     iteration, a predictive weight vector is estimated using the PLS criterion
     (maximizing covariance between X and y). Scores and loadings are then

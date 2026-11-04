@@ -19,8 +19,10 @@ from chemotools._doc_mixin import DocLinkMixin
 
 class ParetoScaler(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstimator):
     """
-    This transformer scales data using a generalized power of the standard deviation,
-    as described by [1]_. It acts as a bridge between Mean Centering (P=0) and
+    This transformer scales data using a generalized power of the standard
+    deviation.
+
+    As described by [1]_, it acts as a bridge between Mean Centering (P=0) and
     Autoscaling (P=1).
 
     Parameters
