@@ -22,7 +22,7 @@ class MultiplicativeScatterCorrection(
 ):
     """Multiplicative Scatter Correction (MSC).
 
-    MSC is a transformation method used to compensate for additive and/or
+    MSC [1]_ is a transformation method used to compensate for additive and/or
     multiplicative scatter effects in spectral data (like NIR). It linearizes
     each spectrum against a reference spectrum (usually the mean or median)
     using Ordinary Least Squares (OLS) or Weighted Least Squares (WLS).

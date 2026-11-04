@@ -23,8 +23,8 @@ class ExtendedMultiplicativeScatterCorrection(
 ):
     """Extended Multiplicative Scatter Correction (EMSC).
 
-    EMSC is a preprocessing technique used to remove non-linear scatter effects
-    and baseline shifts from spectral data. It fits a model consisting of a
+    EMSC [1]_ is a preprocessing technique used to remove non-linear scatter
+    effects and baseline shifts from spectral data. It fits a model consisting of a
     polynomial baseline, a reference spectrum, and optional interference
     spectra to each sample.
 
