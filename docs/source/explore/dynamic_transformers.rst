@@ -665,7 +665,7 @@ Common errors and how to fix them
      - The ``metadata`` declaration is malformed
      - Use one unique string for each routed function argument
    * - ``y`` cannot be requested
-    - ``X`` and ``y`` are reserved by the estimator API
+     - ``X`` and ``y`` are reserved by the estimator API
      - Choose a domain-specific name such as ``target_reference``
    * - Expected a 2-D array
      - ``X``, output, or predefined-function metadata is one-dimensional

@@ -115,7 +115,7 @@ Piecewise Direct Standardization (PDS)
 
 :class:`~chemotools.adaptation.PiecewiseDirectStandardization` extends DS by
 building one *local* PLS model per output feature, using a small window of
-neighbouring input features. This makes PDS more robust when:
+neighbouring input features [2]_. This makes PDS more robust when:
 
 * the spectral shift between instruments is non-linear or varies across the
   spectral range.

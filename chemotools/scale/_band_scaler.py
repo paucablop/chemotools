@@ -85,23 +85,25 @@ class BandScaler(
     integrated signal:
 
     - **Mean Scaling ('mean')**: Normalizes by the average intensity across the
-        band. This is standard for correcting global intensity fluctuations
-        (e.g., source power drift or pathlength changes) while preserving the
-        relative magnitude of the spectral profile.
+      band. This is standard for correcting global intensity fluctuations
+      (e.g., source power drift or pathlength changes) while preserving the
+      relative magnitude of the spectral profile.
 
     - **Area Scaling ('area')**: Normalizes by the numerical integral
-        (Trapezoidal rule) of the band. In many spectroscopic applications,
-        the area under a curve is more representative of the total concentration
-        or molar abundance than a single peak height or average intensity.
+      (Trapezoidal rule) of the band. In many spectroscopic applications,
+      the area under a curve is more representative of the total concentration
+      or molar abundance than a single peak height or average intensity.
 
     **Importance of Coordinate-Aware Scaling**:
     In some spectrometers, the sampling interval (distance between
     points on the x-axis) is not perfectly constant across the entire detector.
+
     - If the sampling is **non-linear**, a simple summation (equivalent to
-        assuming :math:`\Delta x=1`) will mathematically over-weight regions where data
-        points are more densely packed.
+      assuming :math:`\Delta x=1`) will mathematically over-weight regions
+      where data points are more densely packed.
     - By providing an `x_axis`, the 'area' method uses the actual distances
-        between points (:math:`\Delta x`) to calculate a physically accurate integral.
+      between points (:math:`\Delta x`) to calculate a physically accurate
+      integral.
 
     When using ``aggregation='area'``, an ``x_axis`` must be provided. If it is
     omitted, the transformer raises a :class:`ValueError` rather than implicitly

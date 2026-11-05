@@ -33,12 +33,13 @@ class IndexShift(DocLinkMixin, TransformerMixin, OneToOneFeatureMixin, BaseEstim
     padding_mode : {'zeros', 'constant', 'wrap', 'extend',
         'mirror', 'linear'}, default='linear'
         Specifies how to handle padding when shifting the data:
-            - 'zeros': Pads with zeros.
-            - 'constant': Pads with a constant value defined by `pad_value`.
-            - 'wrap': Circular shift (wraps around).
-            - 'extend': Extends using edge values.
-            - 'mirror': Mirrors the signal.
-            - 'linear': Uses linear regression to extrapolate values.
+
+        - 'zeros': Pads with zeros.
+        - 'constant': Pads with a constant value defined by `pad_value`.
+        - 'wrap': Circular shift (wraps around).
+        - 'extend': Extends using edge values.
+        - 'mirror': Mirrors the signal.
+        - 'linear': Uses linear regression to extrapolate values.
 
     pad_value : float, default=0.0
         The value used for padding when `padding_mode='constant'`.

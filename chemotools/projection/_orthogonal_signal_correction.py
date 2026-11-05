@@ -24,7 +24,7 @@ from chemotools._doc_mixin import DocLinkMixin
 class OrthogonalSignalCorrection(DocLinkMixin, TransformerMixin, BaseEstimator):
     """
     Remove variation in X that is orthogonal to the target y using Orthogonal
-    Signal Correction (OSC) [1]_ [2]_ [3]_.
+    Signal Correction (OSC).
 
     OSC identifies and removes spectral components that carry substantial
     variance in X yet have no linear relationship with y. Three algorithmic
