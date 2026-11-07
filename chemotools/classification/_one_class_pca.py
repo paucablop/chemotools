@@ -46,7 +46,7 @@ class OneClassPCA(DocLinkMixin, OutlierMixin, BaseEstimator):
     from it. Scaled chi-square distributions define limits for these
     distances [1]_, [2]_.
 
-    Choose ``robust``, ``robust-approx``, or ``classic`` estimation and a
+    Choose ``robust-numeric``, ``robust-approx``, or ``classic`` estimation and a
     triangular or rectangular boundary. The acceptance and outlier boundaries
     divide training samples into three categories: regular, extreme, and
     outlier [3]_.
